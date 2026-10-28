@@ -3198,6 +3198,38 @@ test_a_from_line_can_read_a_key_named_by_a_param_before_naming_each_subject if {
 	}
 }
 
+test_named_by_each_of_on_an_object_that_cant_be_read_fails_min_subjects_so_a_check_for_a_missing_field_cant_meet_the_requirement if {
+	policy := {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "m named by each of $params.keys"}}, "requirements": {"s": {"subject": "b", "checks": {"c": "x does not exist"}}}}
+	every run in [
+		[{}, "absent"],
+		[{"m": null}, "null"],
+		[{"m": [{"x": 1}]}, "unusable"],
+		[{"m": "k1"}, "unusable"],
+	] {
+		rep := ergo.report(run[0], policy, {"keys": ["k1"]})
+		rep.compliant == false
+		rep.requirements.s.status == "not_met"
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, run[1]]]
+		[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["k1", true]]
+	}
+}
+
+test_named_by_each_of_a_key_that_isnt_a_string_makes_no_subject_and_fails_min_subjects_as_unusable if {
+	policy := {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "m named by each of $params.keys"}}, "requirements": {"s": {"subject": "b", "checks": {"c": "x does not exist"}}}}
+	every keys in [["k1", 1], [null]] {
+		rep := ergo.report({"m": {"k1": {}}}, policy, {"keys": keys})
+		rep.compliant == false
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "unusable"]]
+		rows_for(rep, "s", "c") == []
+	}
+}
+
+test_named_by_each_of_still_makes_a_subject_of_a_key_the_object_lacks if {
+	policy := {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "m named by each of $params.keys"}}, "requirements": {"s": {"subject": "b", "checks": {"c": "x does not exist"}}}}
+	rep := ergo.report({"m": {"k1": {"x": 1}}}, policy, {"keys": ["k1", "k2"]})
+	[[r.subject.id, r.passed] | some r in rows_for(rep, "s", "c")] == [["k1", false], ["k2", true]]
+}
+
 test_the_largest_position_a_float_holds_exactly_is_well_written if {
 	rep := ergo.report(
 		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {

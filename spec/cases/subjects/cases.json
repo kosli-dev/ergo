@@ -4606,6 +4606,1100 @@
     ]
   },
   {
+    "description": "a from line with named by each of, when the object it names keys of can't be read",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "required": [
+        "sast"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as absent when the object is missing, and still makes a subject of each key, so the requirement can't be met",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {},
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as null when the object is null, and still makes a subject of each key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "path.null"
+        ],
+        "input": {
+          "scans": null
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the object is a list, and still makes a subject of each key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {
+          "scans": [
+            {
+              "name": "sast"
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the object is a string, and still makes a subject of each key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {
+          "scans": "sast"
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the object is a number, and still makes a subject of each key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {
+          "scans": 5
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a list that holds a key that isn't a string",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "required": [
+        "sast",
+        1
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable and makes no subject, even when the object has the other keys",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": {
+            "sast": {
+              "name": "sast"
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the object is null too",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": null
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a list that holds null",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "required": [
+        null
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable and makes no subject, because null can't be a key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": {}
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a param that isn't a list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "required": "sast"
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": {
+            "sast": {
+              "name": "sast"
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a param the params don't have",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "fails min_subjects as absent",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": {
+            "sast": {
+              "name": "sast"
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of whose object can't be read",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "f": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "min_subjects": 0,
+          "subject": "finding"
+        }
+      },
+      "subjects": {
+        "finding": {
+          "from": "scan.findings",
+          "identified_by": "id"
+        },
+        "scan": {
+          "from": "scans named by each of $params.required"
+        }
+      }
+    },
+    "params": {
+      "required": [
+        "sast"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects with the object's cause on one row with no in, even with min_subjects 0",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "scans": null
+        },
+        "status": {
+          "f": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "f",
+            "subject": {
+              "id": null,
+              "type": "finding"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope finding count",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "requirement": "f",
+            "subject": {
+              "id": null,
+              "type": "finding"
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated finding ids",
+                "value": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with a ref step that can't be used before named by each of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by $params.env named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "env": 5,
+      "required": [
+        "sast"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable, so a check that passes on a missing field can't meet the requirement",
+        "rules": [
+          "subjects.sentence",
+          "path.ref_step"
+        ],
+        "input": {
+          "scans": {
+            "prod": {
+              "sast": {
+                "name": "sast"
+              }
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated scan ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with a ref step before named by each of, when the object it leads to can't be read",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by $params.env named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "env": "prod",
+      "required": [
+        "sast"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as null when the object is null, and still makes a subject of each key",
+        "rules": [
+          "subjects.sentence",
+          "path.null"
+        ],
+        "input": {
+          "scans": {
+            "prod": null
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans/prod"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated scan ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans/prod"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the object is a list",
+        "rules": [
+          "subjects.sentence"
+        ],
+        "input": {
+          "scans": {
+            "prod": [
+              1
+            ]
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans/prod"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated scan ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans/prod"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as absent when the object is missing",
+        "rules": [
+          "subjects.sentence",
+          "path.absent"
+        ],
+        "input": {
+          "scans": {}
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated scan ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "is met when the object is there",
+        "rules": [
+          "subjects.sentence",
+          "path.ref_step"
+        ],
+        "input": {
+          "scans": {
+            "prod": {
+              "sast": {
+                "name": "sast"
+              }
+            }
+          }
+        },
+        "status": {
+          "s": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans/prod/sast"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$unique_ids",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated scan ids",
+                "value": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans/prod/sast"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a subject's own name in its own from",
     "policy": {
       "ergo_spec": "v0.3-dev",
