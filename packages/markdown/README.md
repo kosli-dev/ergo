@@ -112,7 +112,7 @@ Each `###` under `## Subjects` is a subject, and each `###` under `## Requiremen
 | `Identified by` | `Require`           |
 |                 | `Min subjects`      |
 
-The name can have any capitals and a colon after it, so ``- from: `batches` `` works too. `Min subjects` is a number, still in a code span: ``- Min subjects `1` ``. The [reference](../../REFERENCE.md) says what each field does. A bullet that starts with a field's name but isn't written this way, like `- from batches`, is a problem, so a field can't go missing unnoticed.
+The name can have any capitals and a colon after it, so ``- from: `batches` `` works too. Under a subject or requirement, any bullet of words and one code span is a field, so a misspelt name like ``- Frm `batches` `` is a problem rather than a field that goes missing. Put words with code in them in a paragraph instead. `Min subjects` is a number, still in a code span: ``- Min subjects `1` ``. The [reference](../../REFERENCE.md) says what each field does. A bullet that starts with a field's name but isn't written this way, like `- from batches`, is a problem, so a field can't go missing unnoticed.
 
 ### Names
 

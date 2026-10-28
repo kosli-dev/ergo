@@ -264,7 +264,7 @@ test("a field with no code span or two paragraphs is a problem", () => {
 });
 
 test("a list in an item with no field in it is prose", () => {
-  const {problems, blocks} = compile("## Requirements\n\n### r\n\n- subject: `s`\n\n1. a numbered note\n2. another `one`\n");
+  const {problems, blocks} = compile("## Requirements\n\n### r\n\n- subject: `s`\n\n1. a numbered note\n2. another, with `code` in it\n");
   assert.deepEqual(problems, []);
   assert.deepEqual(blocks.at(-1), {kind: "prose", startLine: 7, endLine: 8});
 });
@@ -279,8 +279,15 @@ test("a field's colon is optional and its key is read whatever its capitals", ()
   assert.deepEqual(blocks.filter((b) => b.kind === "field").map((b) => b.name), ["from", "identified by", "subject", "require", "min subjects"]);
 });
 
-test("a bullet without a colon is a field only when it starts with a field's name", () => {
-  assert.deepEqual(problemsOf(inRequirement("- See `docs`\n- Owner `bakery`")), []);
+test("in a subject or requirement, words and one code span are a field, colon or not", () => {
+  assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- Frm `xs`\n"), [{line: 5, message: 'a subject\'s fields are from and identified by, not "Frm"'}]);
+  assert.deepEqual(problemsOf(inRequirement("- See `docs`")), [
+    {line: 5, message: 'a requirement\'s fields are subject, require and min subjects, not "See"'},
+  ]);
+  assert.deepEqual(problemsOf(inRequirement("- See the docs\n- See `docs` and more")), []);
+});
+
+test("outside a subject or requirement, a bullet without a colon is a field only when it starts with a field's name", () => {
   assert.deepEqual(problemsOf("# T\n\n- See `docs`\n"), []);
   assert.deepEqual(problemsOf("# T\n\n- From `xs`\n"), [{line: 3, message: "a field goes under a ### subject or requirement"}]);
 });
@@ -304,7 +311,7 @@ test("a bullet in an item that only starts like a field's name is prose", () => 
 });
 
 test("a field item that is not a paragraph or has no key is a problem", () => {
-  assert.deepEqual(messages("## Subjects\n\n### a\n\n- from: `x`\n- ```\n  x\n  ```\n- `x`\n- : `x`\n- text `x`\n"), [
+  assert.deepEqual(messages("## Subjects\n\n### a\n\n- from: `x`\n- ```\n  x\n  ```\n- `x`\n- : `x`\n- text `x` more\n"), [
     "a field is written as key: `value`",
     "a field is written as key: `value`",
     "a field is written as key: `value`",
