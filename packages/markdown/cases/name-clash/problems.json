@@ -9,7 +9,7 @@
   },
   {
     "line": 34,
-    "message": "check nut_free has the same name as the check on line 33"
+    "message": "check nut free has the same name as the check on line 33"
   },
   {
     "line": 37,
@@ -17,6 +17,6 @@
   },
   {
     "line": 39,
-    "message": "requirement cake_batch has the same name as the requirement on line 27"
+    "message": "requirement cake batch has the same name as the requirement on line 27"
   }
 ]

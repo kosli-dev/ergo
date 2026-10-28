@@ -65,14 +65,14 @@ the report isn't compliant, and its rows for the two checks are:
 
 | batch                       | check         | passed  | cause       |
 | --------------------------- | ------------- | ------- | ----------- |
-| `cake-batch-2026-03-18-001` | `baked_right` | `true`  | `satisfied` |
-| `cake-batch-2026-03-18-001` | `nut_free`    | `true`  | `satisfied` |
-| `cake-batch-2026-03-18-002` | `baked_right` | `true`  | `satisfied` |
-| `cake-batch-2026-03-18-002` | `nut_free`    | `false` | `value`     |
-| `cake-batch-2026-03-18-003` | `baked_right` | `true`  | `satisfied` |
-| `cake-batch-2026-03-18-003` | `nut_free`    | `false` | `unusable`  |
-| `cake-batch-2026-03-18-004` | `baked_right` | `true`  | `satisfied` |
-| `cake-batch-2026-03-18-004` | `nut_free`    | `false` | `absent`    |
+| `cake-batch-2026-03-18-001` | `baked right` | `true`  | `satisfied` |
+| `cake-batch-2026-03-18-001` | `nut free`    | `true`  | `satisfied` |
+| `cake-batch-2026-03-18-002` | `baked right` | `true`  | `satisfied` |
+| `cake-batch-2026-03-18-002` | `nut free`    | `false` | `value`     |
+| `cake-batch-2026-03-18-003` | `baked right` | `true`  | `satisfied` |
+| `cake-batch-2026-03-18-003` | `nut free`    | `false` | `unusable`  |
+| `cake-batch-2026-03-18-004` | `baked right` | `true`  | `satisfied` |
+| `cake-batch-2026-03-18-004` | `nut free`    | `false` | `absent`    |
 
 Batch 2 contains nuts, batch 3 lists its allergens as a string instead of a list, so Ergo can't read it, and batch 4 has no allergens at all. The [reference](../../REFERENCE.md#causes) explains each cause.
 
@@ -116,17 +116,24 @@ The name can have any capitals and a colon after it, so ``- from: `batches` `` w
 
 ### Names
 
-You don't write names: the tool works them out from the headings and labels.
+You don't write names: a subject, requirement, check or option is named by its heading or bold label, in lowercase, with each run of spaces made one and none at either end. Punctuation stays. So `### Cake batch` is the requirement `cake batch`, and under it
 
-- A subject's name is its heading in lowercase, spaces included, with each run of spaces made one and none at either end: `### Pull Request` is `pull request`, and a requirement says ``- Subject `pull request` ``. So `### Batch` and `### batch` are the same name.
-- A requirement's name is its heading in lowercase, with every run of other characters than letters and digits turned into one `_`, and none at either end: `### Cake batch` is `cake_batch`, and `### Crème brûlée — the "recipe" check!` is `crème_brûlée_the_recipe_check`.
-- A check's name is worked out the same way from its bold label: `**Nut free**` is `nut_free`, and `**Approved by 2+ people**` is `approved_by_2_people`.
+```markdown
+- **Nut free**: Must not contain nut allergens.
+  `allergens does not contain "nuts"`
+```
 
-The report uses these names. Two names that come out the same in one place, like `**Nut free**` and `**Nut-free!**` in one requirement, are a problem.
+is the check `nut free`. The report names them as written, as in this part of batch 2's row:
+
+```json
+{"requirement":"cake batch","check":"nut free","subject":{"id":"cake-batch-2026-03-18-002","type":"batch"},"passed":false,"cause":"value"}
+```
+
+A requirement names its subject the same way: ``- Subject `batch` `` for `### Batch`. Two names that come out the same in one place, like `**Nut free**` and `**nut  FREE**`, are a problem, and so is a name that starts with `$`, because Ergo's own rows, like `$well_formed`, start with it.
 
 ### Checks
 
-After a paragraph that says `Checks:`, each item of the list is a check: a bold label, a colon, what the check means in words, then its [sentences](../../REFERENCE.md#checks), each in its own code span. The check passes when every sentence passes, like `baked_right` above. The words are the check's `description` and can be left out. They can also run over more paragraphs in the bullet, before its first code span, and are joined with a blank line the same way:
+After a paragraph that says `Checks:`, each item of the list is a check: a bold label, a colon, what the check means in words, then its [sentences](../../REFERENCE.md#checks), each in its own code span. The check passes when every sentence passes, like `baked right` above. The words are the check's `description` and can be left out. They can also run over more paragraphs in the bullet, before its first code span, and are joined with a blank line the same way:
 
 ```markdown
 - **Nut free**: Must not contain nut allergens.
@@ -186,14 +193,14 @@ subjects:
     from: batches
     identified_by: id
 requirements:
-  cake_batch:
+  cake batch:
     description: Cakes are safe to eat and baked right.
     subject: batch
     checks:
-      nut_free:
+      nut free:
         description: Must not contain nut allergens.
         assert: allergens does not contain "nuts"
-      baked_right:
+      baked right:
         description: Baked at 175–200°C for 25–40 minutes.
         assert:
           - bake.temp_c is between 175 and 200

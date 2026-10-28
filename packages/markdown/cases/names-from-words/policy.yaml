@@ -4,12 +4,12 @@ subjects:
     from: pull_requests
     identified_by: number
 requirements:
-  crème_brûlée_the_recipe_check:
+  "crème brûlée — the \"recipe\" check!":
     subject: pull request
     checks:
-      approved_by_2_people:
+      "approved by 2+ people":
         assert: count of approvers is at least 2
-      optional_review:
+      "(optional) review":
         assert: reviewed is true
-      ci_green:
+      ci__green:
         assert: ci.status is "green"

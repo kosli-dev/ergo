@@ -8,7 +8,7 @@ subjects:
   test run:
     from: test_runs
 requirements:
-  approved_deployment:
+  approved deployment:
     description: Each production deployment has an approver.
     subject: deployment
     require: every
@@ -17,7 +17,7 @@ requirements:
       approved:
         description: Someone approved the deployment
         assert: approved_by is a non-empty string
-  some_test_passed:
+  some test passed:
     subject: test run
     require: some
     min_subjects: 1

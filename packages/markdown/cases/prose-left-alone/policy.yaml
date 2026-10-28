@@ -6,10 +6,10 @@ subjects:
     from: batches
     identified_by: id
 requirements:
-  cake_batch:
+  cake batch:
     description: Cakes are safe to eat and baked right.
     subject: batch
     checks:
-      nut_free:
+      nut free:
         description: Must not contain nut allergens.
         assert: allergens does not contain "nuts"

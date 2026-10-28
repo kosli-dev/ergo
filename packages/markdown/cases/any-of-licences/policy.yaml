@@ -11,7 +11,7 @@ requirements:
   licences:
     subject: component
     checks:
-      licence_allowed:
+      licence allowed:
         description: The licence is allowed
         any_of:
           declared: some licenses.license.id is in $params.allowed_licenses
