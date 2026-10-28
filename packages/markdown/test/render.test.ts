@@ -166,6 +166,8 @@ test("render refuses what the Markdown can't hold, naming the path", () => {
       "has a paragraph that is just Checks:, which the Markdown reads as the start of the checks",
     ],
     [{subjects: {Batch: {}}}, "subjects.Batch", "has upper case"],
+    [{subjects: {"cafe\u0301": {}}}, "subjects.cafe\u0301", "isn't in Unicode normal form NFC"],
+    [{requirements: {r: {subject: "Batch", checks: {c: "a"}}}}, "requirements.r.subject", "isn't written as a subject's name: lower case, with single spaces"],
     [{subjects: {" b": {}}}, "subjects. b", "starts or ends with a space"],
     [{subjects: {"a\tb": {}}}, "subjects.a\tb", "has a tab, a line break or a space that isn't a plain one"],
     [{subjects: {"a  b": {}}}, "subjects.a  b", "has two spaces in a row"],

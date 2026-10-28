@@ -68,10 +68,18 @@ const endOf = (node: {position?: {end: {line: number}}}): number => node.positio
 
 const collapse = (text: string): string => text.replace(/\s+/g, " ").trim();
 
-export const nameOf = (text: string): string => collapse(text).toLowerCase();
+export const nameOf = (text: string): string => collapse(text.normalize("NFC")).toLowerCase();
 
 export const nameProblem = (name: string): string | null =>
-  name === "" ? NO_LABEL : name.startsWith("$") ? "a name can't start with $" : null;
+  name === ""
+    ? NO_LABEL
+    : name.startsWith("$")
+      ? "a name can't start with $"
+      : /\p{Cf}/u.test(name)
+        ? "a name can't hold a character you can't see"
+        : /[\p{L}\p{N}]/u.test(name)
+          ? null
+          : NO_LABEL;
 
 const plain = (nodes: PhrasingContent[]): string =>
   collapse(toString({type: "paragraph", children: nodes} satisfies Paragraph));
@@ -330,7 +338,9 @@ export function compile(markdown: string): Compiled {
         problem(field.line, `${field.key} is already set on line ${earlier.line}`);
         continue;
       }
-      if (key === "min_subjects") {
+      if (key === "subject") {
+        current.fields.set(key, {value: nameOf(field.value), line: field.line});
+      } else if (key === "min_subjects") {
         if (/^[0-9]+$/.test(field.value)) current.fields.set(key, {value: Number(field.value), line: field.line});
         else problem(field.line, "min subjects must be a whole number");
       } else {

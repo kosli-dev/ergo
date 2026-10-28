@@ -1,5 +1,5 @@
 import {stringify} from "yaml";
-import {compile, nameProblem} from "./compile.ts";
+import {compile, nameOf, nameProblem} from "./compile.ts";
 
 export type PathProblem = {path: string; message: string};
 
@@ -66,6 +66,7 @@ const nameRefusal = (name: string): string | null => {
   if (name !== name.trim()) return "starts or ends with a space";
   if (/[^\S ]/.test(name)) return "has a tab, a line break or a space that isn't a plain one";
   if (name.includes("  ")) return "has two spaces in a row";
+  if (name !== name.normalize("NFC")) return "isn't in Unicode normal form NFC";
   if (name !== name.toLowerCase()) return "has upper case";
   return nameProblem(name);
 };
@@ -144,7 +145,9 @@ export function refusals(policy: unknown): PathProblem[] {
       if (key === "description") refuse(at, descriptionRefusal(value, true));
       else if (kind === "subject" && (key === "from" || key === "identified_by")) refuse(at, codeRefusal(value));
       else if (kind === "subject" && key === "has") refuse(at, NO_PARTS);
-      else if (kind === "requirement" && (key === "subject" || key === "require")) refuse(at, codeRefusal(value));
+      else if (kind === "requirement" && key === "subject") {
+        refuse(at, codeRefusal(value) ?? (value === nameOf(value as string) ? null : "isn't written as a subject's name: lower case, with single spaces"));
+      } else if (kind === "requirement" && key === "require") refuse(at, codeRefusal(value));
       else if (kind === "requirement" && key === "min_subjects") {
         if (!Number.isSafeInteger(value) || (value as number) < 0) refuse(at, "isn't a whole number of 0 or more");
       } else if (kind === "requirement" && key === "checks") {

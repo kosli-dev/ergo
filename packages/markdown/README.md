@@ -116,7 +116,7 @@ The name can have any capitals and a colon after it, so ``- from: `batches` `` w
 
 ### Names
 
-You don't write names: a subject, requirement, check or option is named by its heading or bold label, in lowercase, with each run of spaces made one and none at either end. Punctuation stays. So `### Cake batch` is the requirement `cake batch`, and under it
+You don't write names: a subject, requirement, check or option is named by its heading or bold label, in lowercase, with each run of spaces made one and none at either end, and with a letter and its accent written in the one way Unicode calls NFC. Punctuation stays. So `### Cake batch` is the requirement `cake batch`, and under it
 
 ```markdown
 - **Nut free**: Must not contain nut allergens.
@@ -129,7 +129,7 @@ is the check `nut free`. The report names them as written, as in this part of ba
 {"requirement":"cake batch","check":"nut free","subject":{"id":"cake-batch-2026-03-18-002","type":"batch"},"passed":false,"cause":"value"}
 ```
 
-A requirement names its subject the same way: ``- Subject `batch` `` for `### Batch`. Two names that come out the same in one place, like `**Nut free**` and `**nut  FREE**`, are a problem, and so is a name that starts with `$`, because Ergo's own rows, like `$well_formed`, start with it.
+A requirement names its subject the same way, and its `Subject` field is read that way too: ``- Subject `batch` `` and ``- Subject `Batch` `` both name `### Batch`. Two names that come out the same in one place, like `**Nut free**` and `**nut  FREE**`, are a problem, and so is a name that starts with `$`, because Ergo's own rows, like `$well_formed`, start with it. A name needs a letter or a digit (in any script), so `**!!!**` is a problem, and it can't hold a character you can't see, like a zero-width space, which would make `nut free` and `nutfree` look the same.
 
 ### Checks
 

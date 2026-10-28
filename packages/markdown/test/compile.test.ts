@@ -458,9 +458,21 @@ test("a bold label that is not followed by a colon is a problem", () => {
   assert.deepEqual(messages(inChecks("- **A** : `x`")), ["a bold label is followed by a colon"]);
 });
 
-test("a label of punctuation is a name like any other", () => {
-  assert.deepEqual(Object.keys((compile(inChecks("- **!!**: `x`\n- **A**:\n  - **?**: `y`")).policy as any).requirements.r.checks), ["!!", "a"]);
-  assert.deepEqual((compile(inChecks("- **A**:\n  - **?**: `y`")).policy as any).requirements.r.checks.a, {any_of: {"?": "y"}});
+test("a label with punctuation and a letter or a digit is a name, and one of punctuation alone is a problem", () => {
+  assert.deepEqual(Object.keys((compile(inChecks("- **!!a**: `x`\n- **A**:\n  - **?1**: `y`")).policy as any).requirements.r.checks), ["!!a", "a"]);
+  assert.deepEqual(problemsOf(inChecks("- **A**:\n  - **?**: `y`")), [{line: 8, message: "a label needs a letter or a digit"}]);
+  assert.equal(nameProblem("\u65e5\u672c"), null);
+  assert.equal(nameProblem("\u0661\u0662"), null);
+  assert.equal(nameProblem("\u200b"), "a name can't hold a character you can't see");
+});
+
+test("a name is Unicode-normalised, so a letter with its accent written either way is one name", () => {
+  assert.equal(nameOf("Cafe\u0301"), "caf\u00e9");
+});
+
+test("a Subject field is folded like a subject name", () => {
+  const {policy} = compile("## Subjects\n\n### Batch\n\n- From `b`\n\n## Requirements\n\n### R\n\n- Subject `  BATCH `\n");
+  assert.equal((policy as any).requirements.r.subject, "batch");
 });
 
 test("nameOf and nameProblem give the name a heading or label makes and what is wrong with it", () => {
