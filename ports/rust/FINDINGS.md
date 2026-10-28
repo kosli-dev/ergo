@@ -60,3 +60,8 @@ Here a rule's text says one thing and a case, which `ergo.rego` passes, says ano
 
 - **`from: $input` on an input that is a list.** [subjects.from] says a `from` that ends `found` on a list makes each item a subject, and that with no steps it reads the whole input, so `[1]` would give one subject. The case gives none and fails `$min_subjects` as `unusable`. Case: `requirements / the whole input as the subject / fails min_subjects as unusable on a list`.
 - **The id of a subject that isn't an object, when it has an `identified_by`.** [subjects.id] says the id is `null` when the path doesn't end `found`, and a path into a string ends `not_an_object`. The case gives `"a"` the id `"a"`. Case: `requirements / ... / takes items that aren't objects as subjects, each its own id when it has no id field`.
+
+## Things the spec leaves to the implementation
+
+- **The order of keys in the report.** [report.policy] and [report.requirements] say `meta` is copied into the report, and AGENTS.md says the report stays byte for byte the same whatever order the policy was written in. Nothing in the spec says in which order an object's keys are written. [report.hash] doesn't need one, since RFC 8785 sorts keys, and `ergo.rego` gets sorted keys from OPA. serde_json sorts keys unless its `preserve_order` feature is on, and with it on `meta` kept the order it was written in. So the engine sorts every object in the report and in `violations()` by key, code point by code point, and `tests/key_order.rs` runs with that feature on too.
+

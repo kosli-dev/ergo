@@ -33,7 +33,26 @@ pub fn report_with(
             )
         })
         .collect();
-    report::assemble_with(&read, &reading, extra_problems, &evaluations, input, params)
+    sorted(report::assemble_with(
+        &read,
+        &reading,
+        extra_problems,
+        &evaluations,
+        input,
+        params,
+    ))
+}
+
+fn sorted(value: Value) -> Value {
+    match value {
+        Value::Object(map) => {
+            let mut entries: Vec<(String, Value)> = map.into_iter().collect();
+            entries.sort_by(|a, b| a.0.cmp(&b.0));
+            Value::Object(entries.into_iter().map(|(k, v)| (k, sorted(v))).collect())
+        }
+        Value::Array(items) => Value::Array(items.into_iter().map(sorted).collect()),
+        other => other,
+    }
 }
 
 pub fn report(input: &Value, policy: &Value, params: &Value) -> Value {
@@ -41,7 +60,7 @@ pub fn report(input: &Value, policy: &Value, params: &Value) -> Value {
 }
 
 pub fn violations(report: &Value) -> Value {
-    report::violations(report)
+    sorted(report::violations(report))
 }
 
 #[cfg(test)]
