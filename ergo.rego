@@ -498,6 +498,20 @@ _target_cause(doc, req) := c if {
 	c := _every_cause(doc, req)
 }
 
+_target_cause(doc, req) := c if {
+	_from_well_formed(req)
+	not _from_unreadable(req)
+	_keys_step(req)
+	c := _keyed_state(doc, req)
+}
+
+_keyed_state(doc, req) := c if {
+	c := _target_state(doc, req)
+	c != "value"
+}
+
+_keyed_state(doc, req) := "unusable" if is_array(_target_read(doc, req))
+
 _every_cause(doc, req) := c if {
 	not is_object(doc)
 	c := _target_state(doc, req)
@@ -575,6 +589,11 @@ _from_unreadable(req) if {
 	not _listed_keys(step)
 }
 
+_from_unreadable(req) if {
+	some k in _listed_keys(_each_step(req))
+	not is_string(k)
+}
+
 _from_cause(req) := _worst_of(unread) if {
 	unread := _from_ref_states(req) - {"value"}
 	count(unread) > 0
@@ -624,12 +643,20 @@ _raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k
 	_from_well_formed(req)
 	"keys" in object.keys(_each_step(req))
 	_listed_keys(_each_step(req))
+	not _from_unreadable(req)
 }
 
 _raw_entries(_, req) := [] if {
 	_from_well_formed(req)
 	"keys" in object.keys(_each_step(req))
 	not _listed_keys(_each_step(req))
+}
+
+_raw_entries(_, req) := [] if {
+	_from_well_formed(req)
+	"keys" in object.keys(_each_step(req))
+	_listed_keys(_each_step(req))
+	_from_unreadable(req)
 }
 
 _keyed(doc, req) := coll if {
