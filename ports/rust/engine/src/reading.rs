@@ -1163,7 +1163,7 @@ mod tests {
 
     #[test]
     fn a_condition_no_operator_reads_yet_is_marked_and_not_called_written_wrong() {
-        let (_, r) = reading(json!({"s": {"from": "art whose x is 1"}}));
+        let (_, r) = reading(json!({"s": {"from": "art whose x is empty"}}));
         assert!(r.infos["s"].unsupported);
         assert!(r.infos["s"].problems.is_empty());
         assert!(r.lowered("s").is_none());

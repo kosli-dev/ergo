@@ -1,7 +1,12 @@
-use super::{Input, Verdict, read_path, verdict};
+use super::equals::Equals;
+use super::range::Range;
+use super::time::{CompareTime, Order};
+use super::{Check, Input, Verdict, read_path, verdict};
 use crate::cause::Cause;
+use crate::lower::Scope;
 use crate::path::{Ctx, Outcome, Path};
 use crate::value;
+use ergo_sentences as tree;
 use serde_json::{Number, Value};
 use std::cmp::Ordering;
 
@@ -254,6 +259,113 @@ fn within(a: &Number, b: &Number, distance: &Number) -> bool {
 fn within_as_floats(a: &Number, b: &Number, distance: &Number) -> bool {
     let float = |n: &Number| n.to_string().parse::<f64>().unwrap_or(f64::NAN);
     (float(a) - float(b)).abs() <= float(distance)
+}
+
+fn joined<A, B>(
+    a: Result<A, Vec<String>>,
+    b: Result<B, Vec<String>>,
+) -> Result<(A, B), Vec<String>> {
+    match (a, b) {
+        (Ok(a), Ok(b)) => Ok((a, b)),
+        (a, b) => Err(a.err().into_iter().chain(b.err()).flatten().collect()),
+    }
+}
+
+fn number(text: &str, scope: &Scope) -> Result<Number, Vec<String>> {
+    match scope.value(&tree::Value::Number(text.to_string()))? {
+        Value::Number(n) => Ok(n),
+        _ => Err(vec![format!("{text} isn't a number")]),
+    }
+}
+
+fn operand_side(operand: &tree::Operand, scope: &Scope) -> Option<Result<Side, Vec<String>>> {
+    match operand {
+        tree::Operand::Value(v) => Some(scope.value(v).map(Side::Value)),
+        tree::Operand::Field(terms) => match terms.as_slice() {
+            [tree::Term::Path(p)] => Some(scope.path(p).map(Side::Path)),
+            _ => None,
+        },
+    }
+}
+
+pub fn lower_phrase(
+    path: &tree::Path,
+    phrase: &tree::Phrase,
+    scope: &Scope,
+) -> Option<Result<Check, Vec<String>>> {
+    let compare =
+        |operand: &tree::Operand, cmp: Cmp, within: Option<&String>| {
+            let right = operand_side(operand, scope)?;
+            let within = within.map(|w| number(w, scope)).transpose();
+            Some(joined(joined(scope.left_path(path), right), within).map(
+                |((left, right), within)| match (cmp, right, within) {
+                    (Cmp::Eq, Side::Value(value), None) => {
+                        Check::Equals(Equals { path: left, value })
+                    }
+                    (cmp, right, within) => Check::Compare(Compare {
+                        left: Side::Path(left),
+                        right,
+                        cmp,
+                        within,
+                    }),
+                },
+            ))
+        };
+    match phrase {
+        tree::Phrase::Is {
+            not,
+            operand,
+            within,
+        } => compare(
+            operand,
+            if *not { Cmp::Ne } else { Cmp::Eq },
+            within.as_ref(),
+        ),
+        tree::Phrase::Order { order, operand } => compare(
+            operand,
+            match order {
+                tree::Order::AtLeast => Cmp::Gte,
+                tree::Order::AtMost => Cmp::Lte,
+                tree::Order::MoreThan => Cmp::Gt,
+                tree::Order::LessThan => Cmp::Lt,
+            },
+            None,
+        ),
+        tree::Phrase::StartsWith(operand) => compare(operand, Cmp::StartsWith, None),
+        tree::Phrase::EndsWith(operand) => compare(operand, Cmp::EndsWith, None),
+        tree::Phrase::Alphabetically { after, operand } => compare(
+            operand,
+            if *after {
+                Cmp::AlphabeticallyAfter
+            } else {
+                Cmp::AlphabeticallyBefore
+            },
+            None,
+        ),
+        tree::Phrase::Between { min, max } => Some(
+            joined(
+                scope.left_path(path),
+                joined(number(min, scope), number(max, scope)),
+            )
+            .map(|(path, (min, max))| Check::Range(Range { path, min, max })),
+        ),
+        tree::Phrase::Time { time, operand } => {
+            let right = operand_side(operand, scope)?;
+            Some(joined(scope.left_path(path), right).map(|(left, right)| {
+                Check::CompareTime(CompareTime {
+                    left: Side::Path(left),
+                    right,
+                    order: match time {
+                        tree::TimeOrder::Before => Order::Before,
+                        tree::TimeOrder::After => Order::After,
+                        tree::TimeOrder::OnOrBefore => Order::OnOrBefore,
+                        tree::TimeOrder::OnOrAfter => Order::OnOrAfter,
+                    },
+                })
+            }))
+        }
+        _ => None,
+    }
 }
 
 #[cfg(test)]
@@ -509,5 +621,166 @@ mod tests {
         assert_eq!(cause(json!({"a": "1", "b": 1}), &c), Cause::Unusable);
         assert_eq!(cause(json!({"a": "1", "b": "1"}), &c), Cause::Unusable);
         assert_eq!(cause(json!({"b": 1}), &c), Cause::Absent);
+    }
+
+    fn lowered(sentence: &str) -> Option<Result<Check, Vec<String>>> {
+        let check = tree::parse_check(sentence).unwrap();
+        match &check.assertions[0] {
+            tree::Assertion::Plain { path, phrase } => {
+                lower_phrase(path, phrase, &Scope::new().on_subject())
+            }
+            other => panic!("{sentence} isn't a plain assertion: {other:?}"),
+        }
+    }
+
+    fn lowered_check(sentence: &str) -> Check {
+        lowered(sentence).unwrap().unwrap()
+    }
+
+    #[test]
+    fn is_with_a_written_value_reads_into_equals() {
+        assert!(
+            matches!(lowered_check("x is \"a\""), Check::Equals(Equals { value, .. }) if value == json!("a"))
+        );
+        assert!(matches!(
+            lowered_check("x is null"),
+            Check::Equals(Equals {
+                value: Value::Null,
+                ..
+            })
+        ));
+    }
+
+    #[test]
+    fn is_not_with_a_written_value_reads_into_compare_ne() {
+        assert!(matches!(
+            lowered_check("x is not 1"),
+            Check::Compare(Compare {
+                cmp: Cmp::Ne,
+                right: Side::Value(_),
+                within: None,
+                ..
+            })
+        ));
+    }
+
+    #[test]
+    fn within_reads_into_compare_eq_with_the_distance() {
+        match lowered_check("x is 5 within 0.5") {
+            Check::Compare(c) => {
+                assert_eq!(c.cmp, Cmp::Eq);
+                assert_eq!(c.within.map(|n| n.to_string()), Some("0.5".to_string()));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn a_field_on_the_right_reads_into_compare_with_two_paths() {
+        assert!(matches!(
+            lowered_check("x equals y"),
+            Check::Compare(Compare {
+                cmp: Cmp::Eq,
+                right: Side::Path(_),
+                ..
+            })
+        ));
+        assert!(matches!(
+            lowered_check("x does not equal y"),
+            Check::Compare(Compare {
+                cmp: Cmp::Ne,
+                right: Side::Path(_),
+                ..
+            })
+        ));
+    }
+
+    #[test]
+    fn each_order_phrase_reads_into_its_cmp() {
+        for (sentence, cmp) in [
+            ("x is at least 1", Cmp::Gte),
+            ("x is at most 1", Cmp::Lte),
+            ("x is more than 1", Cmp::Gt),
+            ("x is less than 1", Cmp::Lt),
+            ("x starts with \"a\"", Cmp::StartsWith),
+            ("x ends with \"a\"", Cmp::EndsWith),
+            (
+                "x is alphabetically before \"a\"",
+                Cmp::AlphabeticallyBefore,
+            ),
+            ("x is alphabetically after \"a\"", Cmp::AlphabeticallyAfter),
+        ] {
+            match lowered_check(sentence) {
+                Check::Compare(c) => assert_eq!(c.cmp, cmp, "{sentence}"),
+                other => panic!("{sentence}: {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn between_reads_into_range() {
+        match lowered_check("x is between 1.5 and 20") {
+            Check::Range(r) => {
+                assert_eq!(r.min.to_string(), "1.5");
+                assert_eq!(r.max.to_string(), "20");
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn each_time_phrase_reads_into_compare_time() {
+        for (sentence, order) in [
+            ("x is before y", Order::Before),
+            ("x is after y", Order::After),
+            ("x is on or before \"2024-01-01\"", Order::OnOrBefore),
+            ("x is on or after 3", Order::OnOrAfter),
+        ] {
+            match lowered_check(sentence) {
+                Check::CompareTime(c) => assert_eq!(c.order, order, "{sentence}"),
+                other => panic!("{sentence}: {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn a_phrase_that_is_not_one_of_these_is_left_to_another_operator() {
+        for sentence in [
+            "x exists",
+            "x is empty",
+            "x is a string",
+            "x is one of 1, 2",
+            "x contains 1",
+            "x matches \"a\"",
+        ] {
+            assert!(lowered(sentence).is_none(), "{sentence}");
+        }
+    }
+
+    #[test]
+    fn a_count_sum_plus_or_elapsed_on_the_right_is_left_to_tally() {
+        for sentence in [
+            "x is at least count of ys",
+            "x is at most y plus 1",
+            "x is less than days elapsed from p to q",
+        ] {
+            assert!(lowered(sentence).is_none(), "{sentence}");
+        }
+    }
+
+    #[test]
+    fn a_path_scope_rejects_on_either_side_is_written_wrong() {
+        for sentence in [
+            "x is less than item 9007199254740993 of y",
+            "item 9007199254740993 of x is at least 1",
+        ] {
+            let problems = lowered(sentence).unwrap().unwrap_err();
+            assert_eq!(problems.len(), 1, "{sentence}");
+            assert!(
+                problems[0].ends_with("can't be a list position"),
+                "{sentence}: {problems:?}"
+            );
+        }
+        assert!(lowered("x is at least $params.y").unwrap().is_ok());
     }
 }

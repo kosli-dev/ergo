@@ -456,6 +456,16 @@ fn merged_inputs(mut inputs: Vec<Input>) -> Vec<Value> {
     inputs.iter().map(Input::to_json).collect()
 }
 
+fn inputs_in_order(inputs: Vec<Input>) -> Vec<Value> {
+    let mut kept: Vec<Input> = Vec::new();
+    for input in inputs {
+        if !kept.contains(&input) {
+            kept.push(input);
+        }
+    }
+    kept.iter().map(Input::to_json).collect()
+}
+
 struct Applied {
     matched: bool,
     cause: Cause,
@@ -689,12 +699,15 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
         .map(|item| ops::run(&item.check, ctx))
         .collect();
     let cause = Cause::worst(verdicts.iter().map(|v| v.cause)).unwrap_or(Cause::Satisfied);
-    let inputs = merged_inputs(
-        verdicts
-            .iter()
-            .flat_map(|v| v.inputs.iter().cloned())
-            .collect(),
-    );
+    let read: Vec<Input> = verdicts
+        .iter()
+        .flat_map(|v| v.inputs.iter().cloned())
+        .collect();
+    let inputs = if plan.all_of {
+        merged_inputs(read)
+    } else {
+        inputs_in_order(read)
+    };
     let mut row = row_of(env.requirement_name, env.requirement, name, cause, inputs);
     row.subject_id = judged.id.clone();
     if plan.all_of {
@@ -1537,7 +1550,7 @@ mod tests {
     #[test]
     fn a_condition_no_operator_reads_yet_finds_nothing_and_fails_closed_even_with_min_zero() {
         let r = run(
-            json!({"thing": {"from": "ds whose x is 1"}}),
+            json!({"thing": {"from": "ds whose x is empty"}}),
             json!({"ds": [{"x": 1}]}),
         );
         assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("unusable"));
@@ -1548,7 +1561,7 @@ mod tests {
     #[test]
     fn a_child_of_a_subject_with_such_a_condition_fails_closed_too() {
         let r = run(
-            json!({"art": {"from": "arts whose x is 1"}, "thing": {"from": "art.prs"}}),
+            json!({"art": {"from": "arts whose x is empty"}, "thing": {"from": "art.prs"}}),
             json!({"arts": [{"x": 1, "prs": [{}]}]}),
         );
         assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("unusable"));
@@ -1662,6 +1675,38 @@ mod tests {
         assert_eq!(a[0]["inputs"][0]["name"], json!("x"));
         assert_eq!(a[1]["failed_assertions"], json!([]));
         assert_eq!(a[1]["passed"], json!(true));
+    }
+
+    #[test]
+    fn one_assertion_keeps_its_inputs_in_the_order_it_read_them_left_then_right() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds"}}),
+            json!({"a": "x is less than $input.limit"}),
+            json!({"limit": 5, "ds": [{"x": 1}]}),
+        );
+        let names: Vec<_> = rows(&r, "a")[0]["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|i| i["name"].clone())
+            .collect();
+        assert_eq!(names, [json!("x"), json!("$input.limit")]);
+    }
+
+    #[test]
+    fn several_assertions_sort_their_inputs_by_name() {
+        let r = with_checks(
+            json!({"thing": {"from": "ds"}}),
+            json!({"a": "x is less than $input.limit and x exists"}),
+            json!({"limit": 5, "ds": [{"x": 1}]}),
+        );
+        let names: Vec<_> = rows(&r, "a")[0]["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|i| i["name"].clone())
+            .collect();
+        assert_eq!(names, [json!("$input.limit"), json!("x")]);
     }
 
     #[test]

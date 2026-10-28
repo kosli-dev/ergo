@@ -333,7 +333,7 @@ mod tests {
         let read = one(json!({"c": "every xs.y is 1"}));
         let plan = read.plan.unwrap();
         assert!(matches!(plan.items[0].check, Check::NotYet));
-        let read = one(json!({"c": "x is 1 and y exists"}));
+        let read = one(json!({"c": "x is empty and y exists"}));
         let plan = read.plan.unwrap();
         assert!(matches!(plan.items[0].check, Check::NotYet));
         assert!(matches!(plan.items[1].check, Check::Present(_)));
