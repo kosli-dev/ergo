@@ -11554,5 +11554,97 @@
         }
       }
     ]
+  },
+  {
+    "description": "a for line with a ref step after a field, and the param is missing",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}},
+    "cases": [
+      {
+        "description": "fails with the ref's cause when the parent field is missing",
+        "rules": ["for.flaws", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "rs": [{}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the parent field is null",
+        "rules": ["for.flaws", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "rs": [{"x": null}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the item is a list",
+        "rules": ["for.flaws", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "rs": [[1]]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with a ref step after a field, and the param is null",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}},
+    "params": {"i": null},
+    "cases": [
+      {
+        "description": "fails with the ref's cause when the parent field is missing",
+        "rules": ["for.flaws", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "rs": [{}]}]},
+        "results": [
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the parent field is null",
+        "rules": ["for.flaws", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "rs": [{"x": null}]}]},
+        "results": [
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the item is a list",
+        "rules": ["for.flaws", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "rs": [[1]]}]},
+        "results": [
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with a ref step after a field, and the param is a list",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}},
+    "params": {"i": [1]},
+    "cases": [
+      {
+        "description": "fails with the ref's cause when the parent field is missing",
+        "rules": ["for.flaws", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "rs": [{}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the parent field is null",
+        "rules": ["for.flaws", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "rs": [{"x": null}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the item is a list",
+        "rules": ["for.flaws", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "rs": [[1]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

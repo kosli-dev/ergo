@@ -12162,5 +12162,145 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a whose filter with a ref step after a field, and the param is missing",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things whose x.y named by $params.i does not exist", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "fails with the ref's cause when the parent field is missing",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the parent field is null",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the subject is a list",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [[1]]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the subject is a string",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": ["s"]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the subject is null",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [null]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose filter with a ref step after a field, and the param is null",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things whose x.y named by $params.i does not exist", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "params": {"i": null},
+    "cases": [
+      {
+        "description": "fails with the ref's cause when the parent field is missing",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the parent field is null",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the subject is a list",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [[1]]},
+        "results": [
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the subject is a string",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": ["s"]},
+        "results": [
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the subject is null",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [null]},
+        "results": [
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose filter with a ref step after a field, and the param is a list",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things whose x.y named by $params.i does not exist", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "params": {"i": [1]},
+    "cases": [
+      {
+        "description": "fails with the ref's cause when the parent field is missing",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the parent field is null",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the subject is a list",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [[1]]},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the subject is a string",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": ["s"]},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails with the ref's cause when the subject is null",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [null]},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]
