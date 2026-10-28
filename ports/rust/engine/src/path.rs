@@ -248,6 +248,28 @@ pub fn part_tag(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
 }
 
 pub fn read<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
+    let mut walked = walk(path, ctx);
+    if !walked.step_unreadable
+        && matches!(
+            walked.outcome,
+            Outcome::Absent | Outcome::Unusable | Outcome::NotAnObject
+        )
+    {
+        let failed = leading_steps(&path.start)
+            .iter()
+            .chain(path.steps.iter())
+            .filter(|step| matches!(step, Step::Ref(_)))
+            .find_map(|step| resolve(step, ctx).err());
+        if let Some(outcome) = failed {
+            walked.outcome = outcome;
+            walked.value = None;
+            walked.step_unreadable = true;
+        }
+    }
+    walked
+}
+
+fn walk<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
     let (mut value, mut location, from_subject) = match start_of(&path.start, ctx) {
         Ok(found) => found,
         Err(read) => return read,
@@ -697,6 +719,46 @@ mod tests {
         let reference = at(Start::Params, vec![key("k")]);
         let (o, _, _) = w.run(&subject_path(vec![Step::Ref(Box::new(reference))]));
         assert_eq!(o, Outcome::Absent);
+    }
+
+    #[test]
+    fn a_ref_in_a_later_step_beats_a_field_that_is_missing_or_null() {
+        for (params, want) in [
+            ("{}", Outcome::Absent),
+            (r#"{"k": null}"#, Outcome::Null),
+            (r#"{"k": [1]}"#, Outcome::Unusable),
+            (r#"{"k": true}"#, Outcome::Unusable),
+        ] {
+            for subject in [
+                "{}",
+                r#"{"x": null}"#,
+                r#"{"x": 1}"#,
+                "[1]",
+                r#""s""#,
+                "null",
+            ] {
+                let w = World::new(subject).with_params(params);
+                let reference = at(Start::Params, vec![key("k")]);
+                let (o, value, _) = w.run(&subject_path(vec![
+                    key("x"),
+                    Step::Ref(Box::new(reference)),
+                ]));
+                assert_eq!(o, want, "{params} on {subject}");
+                assert_eq!(value, None);
+            }
+        }
+    }
+
+    #[test]
+    fn a_ref_in_a_later_step_that_can_be_read_leaves_the_earlier_cause() {
+        let w = World::new("{}").with_params(r#"{"k": "y"}"#);
+        let reference = at(Start::Params, vec![key("k")]);
+        let (o, _, l) = w.run(&subject_path(vec![
+            key("x"),
+            Step::Ref(Box::new(reference)),
+        ]));
+        assert_eq!(o, Outcome::Absent);
+        assert_eq!(l, loc("/s"));
     }
 
     #[test]
