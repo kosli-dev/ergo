@@ -1,0 +1,23 @@
+{
+  "batches": [
+    {
+      "id": "cake-batch-2026-03-18-001",
+      "allergens": ["milk", "eggs"],
+      "bake": { "minutes": 32, "temp_c": 180 }
+    },
+    {
+      "id": "cake-batch-2026-03-18-002",
+      "allergens": ["nuts", "milk"],
+      "bake": { "minutes": 32, "temp_c": 180 }
+    },
+    {
+      "id": "cake-batch-2026-03-18-003",
+      "allergens": "nuts",
+      "bake": { "minutes": 32, "temp_c": 180 }
+    },
+    {
+      "id": "cake-batch-2026-03-18-004",
+      "bake": { "minutes": 32, "temp_c": 180 }
+    }
+  ]
+}

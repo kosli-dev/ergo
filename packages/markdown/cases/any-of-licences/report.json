@@ -1,6 +1,6 @@
 {
   "compliant": false,
-  "description": "Every component we ship has a licence we allow.",
+  "description": "Every component we ship has a licence we allow.\n\nIt reads two params: allowed_licenses, the licences we allow, and known_package_licenses, the licence of each package whose SBOM doesn't declare one, by package name.",
   "engine": {
     "name": "ergo.rego",
     "version": "0.3.0-dev"
