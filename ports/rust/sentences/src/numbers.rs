@@ -377,6 +377,16 @@ fn repeats_too_much(ast: &regex_syntax::ast::Ast, left: u32) -> bool {
     }
 }
 
+/// Gives a `matches` pattern as the `regex` crate should read it, or `None` when it is not valid.
+///
+/// Validity follows RE2, which `ergo.rego` uses. The result reads `\d`, `\w`, `\s` and `\b` as ASCII only, as RE2 does.
+///
+/// ```
+/// use ergo_sentences::rust_pattern;
+///
+/// assert!(rust_pattern("^v[0-9]+$").is_some());
+/// assert_eq!(rust_pattern("("), None);
+/// ```
 pub fn rust_pattern(pattern: &str) -> Option<String> {
     let text = prepare(pattern)?;
     let ast = regex_syntax::ast::parse::Parser::new().parse(&text).ok()?;

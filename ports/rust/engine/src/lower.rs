@@ -150,6 +150,7 @@ impl Scope {
         self
     }
 
+    #[cfg(test)]
     pub fn parts(&self) -> &BTreeMap<String, PartDef> {
         &self.parts
     }
@@ -196,10 +197,6 @@ impl Scope {
 
     pub fn path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
         self.read_path(path, true, true)
-    }
-
-    pub fn is_item(&self) -> bool {
-        self.item
     }
 
     pub fn counted_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {

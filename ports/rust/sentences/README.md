@@ -4,7 +4,7 @@ Reads Ergo's check sentences, `for` lines, `from` lines and paths into a tree, a
 
 ## What it gives
 
-```rust
+```rust,ignore
 pub fn parse_check(line: &str) -> Result<Check, Vec<SyntaxError>>;
 pub fn parse_for(line: &str) -> Result<For, Vec<SyntaxError>>;
 pub fn parse_from(line: &str) -> Result<From, Vec<SyntaxError>>;

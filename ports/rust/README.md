@@ -29,6 +29,7 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
   cargo fmt --check &&
   cargo clippy -j 4 --all-targets --all-features -- -D warnings &&
   cargo test -j 4 --all-features -- --show-output &&
+  RUSTDOCFLAGS="-D warnings" cargo doc -j 4 --no-deps --all-features &&
   cargo test -j 4 -p ergo-engine --features serde_json/preserve_order --test key_order &&
   cargo build -j 4 -p ergo-sentences --target wasm32-unknown-unknown'
 ```

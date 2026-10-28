@@ -2,14 +2,32 @@ use crate::numbers::above_list_position;
 use crate::tree::*;
 use crate::words::{is_bare_key, is_word};
 
+/// Prints a path as a canonical sentence.
+///
+/// `side` says whether the path is left of a phrase or right of it. `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
+///
+/// ```
+/// use ergo_sentences::{Side, parse_path, print_path};
+///
+/// let path = parse_path("  x.y[1]  ").unwrap();
+/// assert_eq!(print_path(&path, Side::Left, &[]), "item 2 of x.y");
+/// ```
 pub fn print_path(path: &Path, side: Side, aliases: &[&str]) -> String {
     path_text(path, side, aliases, false)
 }
 
+/// Prints a term as a canonical sentence.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 pub fn print_term(term: &Term, aliases: &[&str]) -> String {
     term_text(term, aliases, false)
 }
 
+/// Prints a term that stands on the left of a phrase.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
+///
+/// `parents` holds the names of a child subject's parents. On the left of a `whose`, a key named like a parent reads the item's own field, so it prints with a dot.
 pub fn print_left_term(term: &Term, aliases: &[&str], parents: &[&str]) -> String {
     match term {
         Term::Derived(derived) => {
@@ -27,10 +45,16 @@ pub fn print_left_term(term: &Term, aliases: &[&str], parents: &[&str]) -> Strin
     }
 }
 
+/// Prints a `whose` condition as a canonical sentence.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String {
     condition_text(condition, aliases)
 }
 
+/// Prints one `whose` condition of a `from` line as a canonical sentence.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> String {
     print_from_condition_with(condition, aliases, &[])
 }
@@ -49,6 +73,11 @@ fn left_of_whose(path: &Path, aliases: &[&str], parents: &[&str], own: bool) -> 
     }
 }
 
+/// Prints one `whose` condition of a `from` line, for a child subject.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
+///
+/// `parents` holds the names of a child subject's parents. On the left of a `whose`, a key named like a parent reads the item's own field, so it prints with a dot.
 pub fn print_from_condition_with(
     condition: &FromCondition,
     aliases: &[&str],
@@ -90,10 +119,25 @@ fn from_condition_text(
     }
 }
 
+/// Prints a `from` line as a canonical sentence.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
+///
+/// ```
+/// use ergo_sentences::{parse_from, print_from};
+///
+/// let line = parse_from("every  items whose x is 1").unwrap();
+/// assert_eq!(print_from(&line, &[]), "every items whose x is 1");
+/// ```
 pub fn print_from(line: &From, aliases: &[&str]) -> String {
     print_from_with(line, aliases, &[])
 }
 
+/// Prints a `from` line for a child subject.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
+///
+/// `parents` holds the names of a child subject's parents. On the left of a `whose`, a key named like a parent reads the item's own field, so it prints with a dot.
 pub fn print_from_with(line: &From, aliases: &[&str], parents: &[&str]) -> String {
     let mut out = String::new();
     if line.every {
@@ -481,6 +525,9 @@ fn phrase_text(phrase: &Phrase, aliases: &[&str]) -> String {
     }
 }
 
+/// Prints one assertion of a check as a canonical sentence.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String {
     match assertion {
         Assertion::Plain { path, phrase } => format!(
@@ -510,6 +557,16 @@ pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String {
     }
 }
 
+/// Prints a check as a canonical sentence: one space between words, `is` before a value and numbers in plain decimal form.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
+///
+/// ```
+/// use ergo_sentences::{parse_check, print_check};
+///
+/// let check = parse_check("approvals   is at least 2").unwrap();
+/// assert_eq!(print_check(&check, &[]), "approvals is at least 2");
+/// ```
 pub fn print_check(check: &Check, aliases: &[&str]) -> String {
     let parts: Vec<String> = check
         .assertions
@@ -570,10 +627,23 @@ fn alias_of(item: &ForItem) -> &str {
     }
 }
 
+/// Prints one item of a `for` line as a canonical sentence.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 pub fn print_for_item(item: &ForItem, aliases: &[&str]) -> String {
     for_item_text(item, aliases, aliases)
 }
 
+/// Prints a `for` line as a canonical sentence.
+///
+/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
+///
+/// ```
+/// use ergo_sentences::{parse_for, print_for};
+///
+/// let line = parse_for("every  xs as x").unwrap();
+/// assert_eq!(print_for(&line, &[]), "every xs as x");
+/// ```
 pub fn print_for(line: &For, aliases: &[&str]) -> String {
     let all: Vec<&str> = aliases
         .iter()

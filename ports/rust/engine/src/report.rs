@@ -367,7 +367,7 @@ pub fn check_defs(
     };
     let from_refs = match policy.subject_of(requirement) {
         Some((name, _)) if from_readable(reading, name, extra) => crate::checks::refs_read(
-            &reading.from_refs(name),
+            &reading.source_refs(name),
             input,
             params.as_object().map(|_| params),
         ),
@@ -547,6 +547,7 @@ fn engine() -> Value {
     json!({"name": "ergo-engine", "version": env!("CARGO_PKG_VERSION")})
 }
 
+#[cfg(test)]
 pub fn assemble(
     policy: &Policy,
     extra: &BTreeMap<String, Problems>,

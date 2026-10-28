@@ -5,6 +5,16 @@ use crate::words::is_word;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 
+/// Lists what is written wrong in a check that was read.
+///
+/// The messages are in `ergo.rego`'s words and sorted. It only reads the tree and the names in `aliases`. Rules that need the policy's names, like an alias named like a subject, are left to the engine. The list is empty when nothing is wrong.
+///
+/// ```
+/// use ergo_sentences::{check_problems, parse_check};
+///
+/// let check = parse_check("x is not null").unwrap();
+/// assert_eq!(check_problems(&check, &[]), [r#""is not null" is written "exists""#]);
+/// ```
 pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
     let mut found = check_base(check, &[]);
     if found.is_empty() {
@@ -13,6 +23,9 @@ pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
     found.into_iter().collect()
 }
 
+/// Lists what is written wrong in a `for` line that was read.
+///
+/// The messages are in `ergo.rego`'s words and sorted. It only reads the tree and the names in `aliases`. Rules that need the policy's names, like an alias named like a subject, are left to the engine. The list is empty when nothing is wrong.
 pub fn for_problems(line: &For, aliases: &[&str]) -> Vec<String> {
     let mut found = for_base(line, &[]);
     if found.is_empty() {
@@ -21,6 +34,9 @@ pub fn for_problems(line: &For, aliases: &[&str]) -> Vec<String> {
     found.into_iter().collect()
 }
 
+/// Lists what is written wrong in a `from` line that was read.
+///
+/// The messages are in `ergo.rego`'s words and sorted. It only reads the tree, so `_aliases` is not used. Rules that need the policy's names are left to the engine. The list is empty when nothing is wrong.
 pub fn from_problems(line: &From, _aliases: &[&str]) -> Vec<String> {
     from_base(line).into_iter().collect()
 }

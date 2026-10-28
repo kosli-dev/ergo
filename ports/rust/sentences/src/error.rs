@@ -1,7 +1,14 @@
+/// Why a line did not read, in the words `ergo.rego` uses.
+///
+/// ```text
+/// unclosed quote at column 14
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SyntaxError {
+    /// The place in the trimmed line, counted in characters from 1. It is only set when the message names a column.
     pub column: Option<usize>,
+    /// What is wrong.
     pub message: String,
 }
 

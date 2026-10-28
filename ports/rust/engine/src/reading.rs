@@ -45,7 +45,6 @@ pub enum Source {
         each_of: Option<path::Path>,
     },
     Child {
-        parent: String,
         path: path::Path,
     },
 }
@@ -56,14 +55,12 @@ pub struct Lowered {
     pub filters: Vec<Filter>,
     pub id: Option<Vec<Step>>,
     pub from_text: String,
-    pub id_text: Option<String>,
 }
 
 #[derive(Debug, Clone)]
 pub struct Info {
     pub relation: Relation,
     pub problems: Problems,
-    pub effective: BTreeMap<String, PartRead>,
     pub lowered: Option<Lowered>,
     pub from_text: Option<String>,
     pub scope: Scope,
@@ -485,10 +482,7 @@ fn source_of(
                 steps: line.path.steps.clone(),
             };
             let path = scope.path(&sentence_path)?;
-            Ok(Source::Child {
-                parent: parent.clone(),
-                path,
-            })
+            Ok(Source::Child { path })
         }
         _ => {
             if let s::Start::Field { key, .. } = &line.path.start {
@@ -808,7 +802,6 @@ impl Reading {
                 Info {
                     relation: found.relation.clone(),
                     problems,
-                    effective: effective.get(name).cloned().unwrap_or_default(),
                     lowered,
                     from_text,
                     scope: scope_of(name, &raw, &effective),
@@ -901,7 +894,7 @@ impl Reading {
         self.infos.get(name).and_then(|info| info.lowered.as_ref())
     }
 
-    pub fn from_refs(&self, name: &str) -> Vec<path::Path> {
+    pub fn source_refs(&self, name: &str) -> Vec<path::Path> {
         match self.lowered(name).map(|lowered| &lowered.source) {
             Some(Source::Root { path, each_of, .. }) => {
                 let mut refs = path::step_refs(path);
@@ -974,7 +967,6 @@ fn flatten(
             filters: own.filters.clone(),
             id: own.id.clone(),
             from_text: own.from_text.clone(),
-            id_text: own.id_text.clone(),
         }),
     }
 }
