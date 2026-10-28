@@ -26,20 +26,29 @@ const dropOthers = (storage, name, keep) => {
     if (key !== keep && (key === PREFIX + name || key.startsWith(`${PREFIX}edit:${name}:`))) stale.push(key);
   }
   for (const key of stale) storage.removeItem(key);
+  return stale.length > 0;
 };
 
 export const savedEdit = (storage, name, shipped) =>
-  attempt(() => {
-    const key = editKey(name, shipped);
-    dropOthers(storage, name, key);
-    return storage.getItem(key) ?? shipped;
-  }, shipped);
+  attempt(
+    () => {
+      const key = editKey(name, shipped);
+      const dropped = dropOthers(storage, name, key);
+      const text = storage.getItem(key);
+      return { text: text ?? shipped, edited: text !== null, dropped };
+    },
+    { text: shipped, edited: false, dropped: false },
+  );
 
-export const saveEdit = (storage, name, shipped, text) =>
-  attempt(() => {
-    const key = editKey(name, shipped);
+export const saveEdit = (storage, name, shipped, text) => {
+  const key = editKey(name, shipped);
+  const saved = attempt(() => {
     if (text === shipped) storage.removeItem(key);
     else storage.setItem(key, text);
-  }, undefined);
+    return true;
+  }, false);
+  if (!saved) attempt(() => storage.removeItem(key), undefined);
+  return saved;
+};
 
 export const forgetEdit = (storage, name, shipped) => attempt(() => storage.removeItem(editKey(name, shipped)), undefined);

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { layoutRows, policySheet, yamlText, markOf, parseJson, reportTables, makeRunner, plural } from "../src/lib.mjs";
+import { layoutRows, policySheet, yamlText, markOf, parseJson, reportTables, makeRunner, plural, reportDocument, unroundable } from "../src/lib.mjs";
 
 const block = (kind, startLine, endLine, name) => ({ kind, startLine, endLine, ...(name ? { name } : {}) });
 
@@ -68,7 +68,7 @@ test("a check shows its sentences as written, whether one or several, and its fo
   assert.deepEqual(nutFree.sentences, ['allergens does not contain "nuts"']);
   assert.equal(nutFree.description, "No nuts.");
   assert.deepEqual(both.sentences, ["a is 1", "b is 2"]);
-  assert.equal(both.for, "every items");
+  assert.equal(both.for, "for every items");
 });
 
 test("a requirement's title is its name with spaces for underscores", () => {
@@ -126,10 +126,29 @@ test("JSON that does not parse is reported with what it was", () => {
   assert.match(out.message, /^The input isn't valid JSON yet\./);
 });
 
-test("JSON that is not an object is refused, and an object is accepted", () => {
-  assert.equal(parseJson("[]", "params").ok, false);
-  assert.equal(parseJson("null", "params").ok, false);
+test("any JSON is accepted, as Ergo takes any input and params", () => {
+  assert.deepEqual(parseJson("[]", "params"), { ok: true, value: [] });
+  assert.deepEqual(parseJson("null", "input"), { ok: true, value: null });
+  assert.deepEqual(parseJson('"x"', "params"), { ok: true, value: "x" });
   assert.deepEqual(parseJson('{"a": 1}', "params"), { ok: true, value: { a: 1 } });
+});
+
+test("the report's document holds the input and params as written, so no number is rounded", () => {
+  const doc = reportDocument('{"n": 9007199254740993, "d": 1.0000000000000001}', { p: 1 }, "[1e400]");
+  assert.ok(doc instanceof ArrayBuffer);
+  assert.equal(
+    new TextDecoder().decode(doc),
+    '{"input":{"n": 9007199254740993, "d": 1.0000000000000001},"policy":{"p":1},"params":[1e400]}',
+  );
+});
+
+test("numbers a JavaScript number can't hold as written are found, and strings are skipped", () => {
+  assert.deepEqual(
+    unroundable('{"a": 9007199254740993, "b": 1.0000000000000001, "c": 1e400, "s": "9007199254740993"}'),
+    ["9007199254740993", "1.0000000000000001", "1e400"],
+  );
+  assert.deepEqual(unroundable('{"a": 9007199254740992, "b": 1.50, "c": 1e2, "d": -0.1, "e": 2.5e-3}'), []);
+  assert.deepEqual(unroundable('{"s": "a\\"b 99999999999999999999", "n": 1}'), []);
 });
 
 test("the runner passes input, policy and params together and returns null when there is no result", () => {
@@ -138,10 +157,11 @@ test("the runner passes input, policy and params together and returns null when 
     seen = doc;
     return [{ result: { compliant: true } }];
   });
-  assert.deepEqual(run({ a: 1 }, { p: 1 }, { q: 1 }), { compliant: true });
-  assert.deepEqual(seen, { input: { a: 1 }, policy: { p: 1 }, params: { q: 1 } });
-  assert.equal(makeRunner(() => [])({}, {}, {}), null);
-  assert.equal(makeRunner(() => [{}])({}, {}, {}), null);
+  const doc = reportDocument('{"a": 1}', { p: 1 }, '{"q": 1}');
+  assert.deepEqual(run(doc), { compliant: true });
+  assert.equal(seen, doc);
+  assert.equal(makeRunner(() => [])(doc), null);
+  assert.equal(makeRunner(() => [{}])(doc), null);
 });
 
 const report = {
@@ -160,7 +180,7 @@ test("the report becomes one table per requirement with subjects as rows and che
   assert.equal(cake.name, "cake");
   assert.equal(cake.status, "not_met");
   assert.deepEqual(cake.checks, ["nut_free", "temp_ok"]);
-  assert.deepEqual(cake.rows.map((r) => r.subject), ["b1", "b2"]);
+  assert.deepEqual(cake.rows.map((r) => r.subject), ['"b1"', '"b2"']);
   assert.deepEqual(cake.rows[0].cells.temp_ok, { passed: false, cause: "value" });
   assert.equal(cake.rows[1].cells.temp_ok, undefined);
 });
@@ -175,7 +195,7 @@ test("a subject inside a parent says which parent", () => {
     requirements: { r: {} },
     results: [{ requirement: "r", check: "c", subject: { type: "pr", id: "7", in: { artifact: "sha-1" } }, passed: true, cause: "satisfied" }],
   });
-  assert.equal(t.rows[0].subject, "7 in artifact sha-1");
+  assert.equal(t.rows[0].subject, '"7" in artifact "sha-1"');
 });
 
 test("no report gives no tables", () => {
@@ -277,3 +297,52 @@ test("the front matter's row shows the spec version the policy reads", () => {
   const rows = layoutRows({ policy: { ergo_spec: "v0.2" }, problems: [], blocks: [block("front matter", 1, 3)] }, "---\nergo_spec: v0.2\n---");
   assert.deepEqual(rows[0].head, [{ kind: "name", text: "ergo_spec" }, { kind: "value", text: "v0.2" }]);
 });
+
+test("a subject's label shows its id as JSON, so 1 and \"1\" are two rows", () => {
+  const [t] = reportTables({
+    requirements: { r: { status: "not_met" } },
+    results: [
+      { requirement: "r", check: "ok", subject: { id: 1 }, passed: false, cause: "value" },
+      { requirement: "r", check: "ok", subject: { id: "1" }, passed: true, cause: "satisfied" },
+    ],
+  });
+  assert.deepEqual(t.rows, [
+    { subject: "1", cells: { ok: { passed: false, cause: "value" } } },
+    { subject: '"1"', cells: { ok: { passed: true, cause: "satisfied" } } },
+  ]);
+});
+
+test("two subjects with the same id stay two rows, so a failure is never overwritten", () => {
+  const [t] = reportTables({
+    requirements: { r: { status: "not_met" } },
+    results: [
+      { requirement: "r", check: "a", subject: { id: "x" }, passed: false, cause: "value" },
+      { requirement: "r", check: "b", subject: { id: "x" }, passed: true, cause: "satisfied" },
+      { requirement: "r", check: "a", subject: { id: "x" }, passed: true, cause: "satisfied" },
+      { requirement: "r", check: "b", subject: { id: "x" }, passed: true, cause: "satisfied" },
+    ],
+  });
+  assert.equal(t.rows.length, 2);
+  assert.deepEqual(t.rows[0].cells.a, { passed: false, cause: "value" });
+  assert.deepEqual(t.rows[1].cells.a, { passed: true, cause: "satisfied" });
+});
+
+test("a subject's $applies row and its check rows share one row, whatever order they come in", () => {
+  const [t] = reportTables({
+    requirements: { r: { status: "not_met" } },
+    results: [
+      { requirement: "r", check: "$applies", subject: { id: 1 }, passed: true, cause: "satisfied" },
+      { requirement: "r", check: "$applies", subject: { id: "1" }, passed: true, cause: "satisfied" },
+      { requirement: "r", check: "ok", subject: { id: 1 }, passed: false, cause: "absent" },
+      { requirement: "r", check: "ok", subject: { id: "1" }, passed: true, cause: "satisfied" },
+    ],
+  });
+  assert.deepEqual(
+    t.rows.map((r) => [r.subject, Object.keys(r.cells), r.cells.ok.passed]),
+    [
+      ["1", ["$applies", "ok"], false],
+      ['"1"', ["$applies", "ok"], true],
+    ],
+  );
+});
+

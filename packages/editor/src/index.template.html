@@ -198,6 +198,9 @@ textarea:focus { outline:none; }
 .run .tw { overflow-x:auto; }
 .run h3 { margin:0 0 .4rem; font-family:var(--serif); font-size:1.05rem; font-weight:500; }
 .run .status { font-family:var(--mono); font-size:.7rem; color:var(--muted); margin-left:.5rem; }
+.edited { font-size:.72rem; color:var(--muted); white-space:nowrap; }
+.edited.unsaved { color:var(--bad); }
+.diags .undo { align-self:flex-start; margin:.35rem .75rem; }
 .run pre { margin:0; font-family:var(--mono); font-size:.72rem; overflow:auto; max-height:24rem; }
 </style>
 </head>
@@ -207,6 +210,7 @@ textarea:focus { outline:none; }
   <div class="samples" role="group" aria-label="Sample policy" id="samples">
     <button id="s-reset" title="Throw away your edits and load the sample again">reset</button>
   </div>
+  <span id="s-edited" class="edited" aria-live="polite"></span>
   <div class="stats">
     <span id="n-req">0 requirements</span>
     <span id="n-chk">0 checks</span>

@@ -25,19 +25,19 @@ test("a saved edit is keyed by the sample's name and its shipped text", () => {
 test("an edit comes back while the sample is the same", () => {
   const storage = memory();
   saveEdit(storage, "bakery", "shipped", "edited");
-  assert.equal(savedEdit(storage, "bakery", "shipped"), "edited");
+  assert.deepEqual(savedEdit(storage, "bakery", "shipped"), { text: "edited", edited: true, dropped: false });
 });
 
 test("an edit saved against an older sample is dropped when the sample changes", () => {
   const storage = memory();
   saveEdit(storage, "bakery", "old sample", "edited");
-  assert.equal(savedEdit(storage, "bakery", "new sample"), "new sample");
+  assert.deepEqual(savedEdit(storage, "bakery", "new sample"), { text: "new sample", edited: false, dropped: true });
   assert.equal(storage.map.size, 0);
 });
 
 test("an edit saved before edits were keyed by the sample is dropped", () => {
   const storage = memory({ "ergo-editor:bakery": "- from: `things`", "ergo-editor:any of": "kept" });
-  assert.equal(savedEdit(storage, "bakery", "shipped"), "shipped");
+  assert.deepEqual(savedEdit(storage, "bakery", "shipped"), { text: "shipped", edited: false, dropped: true });
   assert.deepEqual([...storage.map.keys()], ["ergo-editor:any of"]);
 });
 
@@ -54,7 +54,7 @@ test("forgetting an edit gives the shipped sample back", () => {
   const storage = memory();
   saveEdit(storage, "bakery", "shipped", "edited");
   forgetEdit(storage, "bakery", "shipped");
-  assert.equal(savedEdit(storage, "bakery", "shipped"), "shipped");
+  assert.deepEqual(savedEdit(storage, "bakery", "shipped"), { text: "shipped", edited: false, dropped: false });
 });
 
 test("storage that throws leaves the shipped sample and saves nothing", () => {
@@ -72,7 +72,24 @@ test("storage that throws leaves the shipped sample and saves nothing", () => {
       throw new Error("blocked");
     },
   };
-  assert.equal(savedEdit(broken, "bakery", "shipped"), "shipped");
-  assert.doesNotThrow(() => saveEdit(broken, "bakery", "shipped", "edited"));
+  assert.deepEqual(savedEdit(broken, "bakery", "shipped"), { text: "shipped", edited: false, dropped: false });
+  assert.equal(saveEdit(broken, "bakery", "shipped", "edited"), false);
   assert.doesNotThrow(() => forgetEdit(broken, "bakery", "shipped"));
 });
+
+test("a save reports whether it worked", () => {
+  const storage = memory();
+  assert.equal(saveEdit(storage, "bakery", "shipped", "edited"), true);
+  assert.equal(saveEdit(storage, "bakery", "shipped", "shipped"), true);
+});
+
+test("a save that fails removes the older edit, so a reload never shows it as current", () => {
+  const storage = memory();
+  saveEdit(storage, "bakery", "shipped", "edit A");
+  storage.setItem = () => {
+    throw new Error("QuotaExceededError");
+  };
+  assert.equal(saveEdit(storage, "bakery", "shipped", "edit B"), false);
+  assert.deepEqual(savedEdit(storage, "bakery", "shipped"), { text: "shipped", edited: false, dropped: false });
+});
+

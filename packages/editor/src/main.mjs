@@ -4,7 +4,7 @@ import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
 import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
 import { savedEdit, saveEdit, forgetEdit } from "./saved.mjs";
-import { layoutRows, policySheet, yamlText, markOf, parseJson, makeRunner, parseTime, reportTables, plural } from "./lib.mjs";
+import { layoutRows, policySheet, yamlText, markOf, parseJson, makeRunner, parseTime, reportTables, plural, reportDocument, unroundable } from "./lib.mjs";
 
 const { samples, wasm } = window.EDITOR;
 const LH = 22;
@@ -92,8 +92,10 @@ const yamlPane = (() => {
   return pane;
 })();
 let yamlProblems = [];
-let yamlTimer = 0;
+let yamlPending = false;
 let noteTimer = 0;
+let flashing = false;
+const yamlUndo = [];
 
 const drawYaml = () => {
   paint(yamlHl, highlightYaml(yamlBox.value));
@@ -114,27 +116,51 @@ const showYamlNotes = (problems, changes) => {
       row.append(el("span", "where", "changed"), el("span", null, c));
       return row;
     }),
+    ...(changes.length && yamlUndo.length
+      ? [
+          (() => {
+            const b = el("button", "ghost undo", "Undo the YAML change");
+            b.title = "Put the Markdown back as it was before this change (Ctrl+Z or ⌘Z in the Markdown does the same)";
+            b.addEventListener("click", undoYaml);
+            return b;
+          })(),
+        ]
+      : []),
   );
 };
 
+const undoYaml = () => {
+  const step = yamlUndo[yamlUndo.length - 1];
+  if (!step || src.value !== step.after) return false;
+  yamlUndo.pop();
+  src.value = step.before;
+  clearTimeout(noteTimer);
+  showYamlNotes([], []);
+  recompile();
+  if (last && shows("yaml")) viewYaml(last);
+  return true;
+};
+
 const fromYaml = () => {
-  yamlTimer = 0;
+  yamlPending = false;
   const out = editFromYaml(src.value, yamlBox.value);
   yamlProblems = out.problems;
   clearTimeout(noteTimer);
   if (out.markdown === null) return showYamlNotes(out.problems, []);
   if (out.markdown !== src.value) {
+    yamlUndo.push({ before: src.value, after: out.markdown });
     src.value = out.markdown;
     recompile();
   }
   showYamlNotes([], out.changes);
-  if (out.changes.length) noteTimer = setTimeout(() => showYamlNotes([], []), 4000);
 };
 
 const flash = (text) => {
+  flashing = true;
   $("note").textContent = text;
   setTimeout(() => {
-    $("note").textContent = noteText();
+    flashing = false;
+    if (!flashing) $("note").textContent = noteText();
   }, 4000);
 };
 
@@ -331,7 +357,8 @@ const viewYaml = (result) => {
     drawYaml();
     yamlProblems = [];
     clearTimeout(noteTimer);
-    showYamlNotes(result.policy ? [] : [{ path: "Markdown", message: "The Markdown has problems, so there is no YAML for it yet." }], []);
+    const undoable = yamlUndo.length && yamlUndo[yamlUndo.length - 1].after === src.value;
+    if (!undoable) showYamlNotes(result.policy ? [] : [{ path: "Markdown", message: "The Markdown has problems, so there is no YAML for it yet." }], []);
   }
 };
 
@@ -393,12 +420,22 @@ const showReport = (out, result) => {
   if (!params.ok) return out.append(el("p", "notice", params.message));
   let report;
   try {
-    report = runner(input.value, result.policy, params.value);
+    report = runner(reportDocument(reportInput, result.policy, reportParams));
   } catch (e) {
     return out.append(el("p", "notice", "Ergo couldn't run this: " + e.message));
   }
   if (report === null) return out.append(el("p", "notice", "Ergo gave no report for this policy and input."));
   out.append(el("p", "notice info", report.compliant ? "Every requirement is met." : "At least one requirement is not met."));
+  const rounded = [...new Set([...unroundable(reportInput), ...unroundable(reportParams)])];
+  if (rounded.length) {
+    out.append(
+      el(
+        "p",
+        "notice info",
+        `Ergo checked ${rounded.join(", ")} as written, but this page shows ${rounded.length === 1 ? "it" : "them"} rounded, because a JavaScript number can't hold ${rounded.length === 1 ? "it" : "them"}.`,
+      ),
+    );
+  }
   for (const t of reportTables(report)) out.append(table(t));
   const raw = el("details");
   raw.append(el("summary", null, "The full report as JSON"), el("pre", null, JSON.stringify(report, null, 2)));
@@ -440,7 +477,7 @@ const NOTES = {
   blocks: "Each block sits next to the lines it came from.",
   policy: "The policy as Ergo reads it, in plain words.",
   doc: "A coloured edge marks text that Ergo acts on.",
-  yaml: "Edit the YAML and the Markdown follows. Paste a YAML policy into an empty document to start from it.",
+  yaml: "Edit the YAML, then press Ctrl+Enter (⌘Enter) or leave it, and the Markdown follows. Paste a YAML policy into an empty document to start from it.",
   report: "Runs the policy on the input in your browser.",
 };
 
@@ -548,7 +585,7 @@ const render = (result) => {
     }),
   );
 
-  $("note").textContent = noteText();
+  if (!flashing) $("note").textContent = noteText();
   drawPane("left", result);
   drawPane("right", result);
 };
@@ -574,7 +611,11 @@ const recompile = () => {
     result = { policy: null, blocks: [], problems: [{ line: 1, message: "Ergo couldn't read this document. " + (e?.message ?? e) }] };
   }
   render(result);
-  saveEdit(storage, current, samples[current].source, src.value);
+  const saved = saveEdit(storage, current, samples[current].source, src.value);
+  const edited = src.value !== samples[current].source;
+  $("s-edited").textContent = !edited ? "" : saved ? "your edited version" : "your edited version (not saved)";
+  $("s-edited").title = edited && !saved ? "This browser won't let the page save your edit, so a reload gives the sample back." : "";
+  $("s-edited").classList.toggle("unsaved", edited && !saved);
 };
 
 let timer = 0;
@@ -585,17 +626,22 @@ src.addEventListener("input", () => {
 });
 yamlBox.addEventListener("input", () => {
   drawYaml();
-  clearTimeout(yamlTimer);
-  yamlTimer = setTimeout(fromYaml, 400);
+  yamlPending = true;
+});
+yamlBox.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    fromYaml();
+  }
+});
+src.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "z" && (e.metaKey || e.ctrlKey) && !e.shiftKey && undoYaml()) e.preventDefault();
 });
 yamlBox.addEventListener("scroll", () => {
   yamlHl.style.transform = `translate(${-yamlBox.scrollLeft}px, ${-yamlBox.scrollTop}px)`;
 });
 yamlBox.addEventListener("blur", () => {
-  if (yamlTimer) {
-    clearTimeout(yamlTimer);
-    fromYaml();
-  }
+  if (yamlPending) fromYaml();
   if (!yamlProblems.length && last && shows("yaml")) viewYaml(last);
 });
 src.addEventListener("paste", (e) => {
@@ -625,7 +671,10 @@ const buttons = {};
 const load = (which) => {
   current = which;
   for (const [name, b] of Object.entries(buttons)) b.setAttribute("aria-pressed", String(name === which));
-  src.value = savedEdit(storage, which, samples[which].source);
+  const edit = savedEdit(storage, which, samples[which].source);
+  src.value = edit.text;
+  yamlUndo.length = 0;
+  if (edit.dropped) flash(`Your saved edit of ${which} was dropped, because the sample changed since you made it.`);
   reportInput = JSON.stringify(samples[which].input, null, 2);
   reportParams = JSON.stringify(samples[which].params, null, 2);
   src.scrollTop = 0;

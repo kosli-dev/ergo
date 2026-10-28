@@ -7,7 +7,7 @@ import { dirname, join } from "node:path";
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
 import { parse as parseYaml } from "yaml";
-import { layoutRows, policySheet, makeRunner, parseTime, reportTables, yamlText } from "../src/lib.mjs";
+import { layoutRows, policySheet, makeRunner, parseTime, reportTables, yamlText, reportDocument } from "../src/lib.mjs";
 import { sampleCases, readSample, opaVersionNote } from "../build.mjs";
 import { VIEWS, LABELS } from "../src/layout.mjs";
 
@@ -54,10 +54,30 @@ const expected = (dir, file) => {
   return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : null;
 };
 let ergo;
-const runErgo = async (input, policy, params) => {
+const runErgoText = async (inputText, policy, paramsText) => {
   ergo ??= await opa.loadPolicy(Buffer.from(/wasm: "([^"]+)"/.exec(html)[1], "base64"), undefined, { "time.parse_rfc3339_ns": parseTime });
-  return makeRunner((doc) => ergo.evaluate(doc))(input, policy, params);
+  return makeRunner((doc) => ergo.evaluate(doc))(reportDocument(inputText, policy, paramsText));
 };
+const runErgo = (input, policy, params) => runErgoText(JSON.stringify(input), policy, JSON.stringify(params));
+
+test("the Wasm inside the page reads a number a JavaScript number can't hold as written", async () => {
+  const policy = {
+    ergo_spec: /ergo_spec: (v[0-9.]+(?:-dev)?)/.exec(readFileSync(join(casesDir, "baking", "policy.ergo.md"), "utf8"))[1],
+    subjects: { item: { from: "items", identified_by: "id" } },
+    requirements: { r: { subject: "item", checks: { exact: "n is 9007199254740993", cap: "n is at most $params.max" } } },
+  };
+  const report = await runErgoText('{"items": [{"id": "a", "n": 9007199254740993}]}', policy, '{"max": 9007199254740992}');
+  const cells = Object.fromEntries(report.results.filter((r) => r.subject.id === "a").map((r) => [r.check, r.passed]));
+  assert.deepEqual(cells, { cap: false, exact: true });
+});
+
+test("the Wasm inside the page takes input and params that aren't objects, as Ergo does", async () => {
+  const policy = { ergo_spec: /ergo_spec: (v[0-9.]+(?:-dev)?)/.exec(readFileSync(join(casesDir, "baking", "policy.ergo.md"), "utf8"))[1], subjects: { item: { from: "items" } }, requirements: { r: { subject: "item", checks: { c: "x exists" } } } };
+  for (const input of ["null", "[]", '"x"']) {
+    const report = await runErgoText(input, policy, "{}");
+    assert.equal(report.requirements.r.status, "not_met", input);
+  }
+});
 
 test("the bakery sample is the baking case", () => {
   assert.equal(sampleCases.bakery, "baking");

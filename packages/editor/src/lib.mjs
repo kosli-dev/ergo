@@ -6,9 +6,50 @@ export const parseTime = (v) => {
   return JSON.rawJSON(String(BigInt(Date.parse(time + zone)) / 1000n * 1000000000n + BigInt(fraction.padEnd(9, "0").slice(0, 9))));
 };
 
-export const makeRunner = (evaluate) => (input, policy, params) => {
-  const out = evaluate({ input, policy, params });
+export const makeRunner = (evaluate) => (doc) => {
+  const out = evaluate(doc);
   return out?.length && out[0].result !== undefined ? out[0].result : null;
+};
+
+export const reportDocument = (inputText, policy, paramsText) =>
+  new TextEncoder().encode(`{"input":${inputText.trim()},"policy":${JSON.stringify(policy)},"params":${paramsText.trim()}}`).buffer;
+
+const NUMBER = /-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/y;
+
+const decimal = (text) => {
+  const m = /^(-?)([0-9]+)(?:\.([0-9]+))?(?:[eE]([+-]?[0-9]+))?$/.exec(text);
+  if (!m) return null;
+  const digits = (m[2] + (m[3] ?? "")).replace(/^0+/, "");
+  const exponent = Number(m[4] ?? 0) - (m[3] ?? "").length;
+  const trimmed = digits.replace(/0+$/, "");
+  if (!trimmed) return "0";
+  return `${m[1]}${trimmed}e${exponent + digits.length - trimmed.length}`;
+};
+
+export const unroundable = (text) => {
+  const found = [];
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+    if (ch === '"') {
+      i++;
+      while (i < text.length && text[i] !== '"') i += text[i] === "\\" ? 2 : 1;
+      i++;
+      continue;
+    }
+    if (ch === "-" || (ch >= "0" && ch <= "9")) {
+      NUMBER.lastIndex = i;
+      const m = NUMBER.exec(text);
+      if (m) {
+        const n = Number(m[0]);
+        if (!Number.isFinite(n) || decimal(m[0]) !== decimal(String(n))) found.push(m[0]);
+        i += m[0].length;
+        continue;
+      }
+    }
+    i++;
+  }
+  return found;
 };
 
 export const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
@@ -96,7 +137,7 @@ const checkSheet = (name, check) => ({
   name,
   description: check.description ?? "",
   sentences: sentencesOf(check.assert),
-  for: check.for ?? "",
+  for: check.for ? `for ${check.for}` : "",
   options: Object.entries(check.any_of ?? {}).map(([optionName, option]) => ({
     name: optionName,
     sentences: sentencesOf(option),
@@ -145,15 +186,12 @@ export const parseJson = (text, what) => {
   } catch (e) {
     return { ok: false, message: `The ${what} isn't valid JSON yet. ${e.message}` };
   }
-  if (value === null || typeof value !== "object" || Array.isArray(value)) {
-    return { ok: false, message: `The ${what} needs to be an object, in curly brackets.` };
-  }
   return { ok: true, value };
 };
 
 const subjectLabel = (subject) => {
-  const parents = Object.entries(subject.in ?? {}).map(([k, v]) => `${k} ${v}`);
-  return [String(subject.id), ...(parents.length ? [`in ${parents.join(", ")}`] : [])].join(" ");
+  const parents = Object.entries(subject.in ?? {}).map(([k, v]) => `${k} ${JSON.stringify(v)}`);
+  return [JSON.stringify(subject.id), ...(parents.length ? [`in ${parents.join(", ")}`] : [])].join(" ");
 };
 
 export const reportTables = (report) => {
@@ -161,7 +199,7 @@ export const reportTables = (report) => {
   return Object.entries(report?.requirements ?? {}).map(([name, requirement]) => {
     const mine = rows.filter((r) => r.requirement === name);
     const checks = [];
-    const subjects = new Map();
+    const subjects = [];
     const general = [];
     for (const row of mine) {
       const cell = { passed: row.passed === true, cause: String(row.cause ?? "") };
@@ -171,14 +209,15 @@ export const reportTables = (report) => {
       }
       if (!checks.includes(row.check)) checks.push(row.check);
       const label = subjectLabel(row.subject);
-      if (!subjects.has(label)) subjects.set(label, {});
-      subjects.get(label)[row.check] = cell;
+      const open = subjects.find((s) => s.subject === label && !(row.check in s.cells));
+      if (open) open.cells[row.check] = cell;
+      else subjects.push({ subject: label, cells: { [row.check]: cell } });
     }
     return {
       name,
       status: requirement.status ?? "",
       checks,
-      rows: [...subjects].map(([subject, cells]) => ({ subject, cells })),
+      rows: subjects,
       general,
     };
   });
