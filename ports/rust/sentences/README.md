@@ -12,7 +12,7 @@ pub fn parse_path(line: &str) -> Result<Path, Vec<SyntaxError>>;
 
 pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String>;
 pub fn for_problems(line: &For, aliases: &[&str]) -> Vec<String>;
-pub fn from_problems(line: &From, aliases: &[&str]) -> Vec<String>;
+pub fn from_problems(line: &From) -> Vec<String>;
 
 pub fn print_check(check: &Check, aliases: &[&str]) -> String;
 pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String;
@@ -24,10 +24,10 @@ pub fn print_from_with(line: &From, aliases: &[&str], parents: &[&str]) -> Strin
 pub fn print_from_condition_with(condition: &FromCondition, aliases: &[&str], parents: &[&str]) -> String;
 pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String;
 pub fn print_term(term: &Term, aliases: &[&str]) -> String;
+pub fn print_left_term(term: &Term, aliases: &[&str], parents: &[&str]) -> String;
 pub fn print_path(path: &Path, side: Side, aliases: &[&str]) -> String;
 
 pub fn rust_pattern(pattern: &str) -> Option<String>;
-pub const NAME: &str;
 ```
 
 ## Using it
@@ -57,15 +57,15 @@ An editor reads each line with the `parse_` function for its kind, shows the `Sy
 - `aliases` are the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot when printed.
 - `parents` are the names of a child subject's parents, for `print_from_with` and `print_from_condition_with`. On the left of a `whose`, a key named like a parent reads the item's own field, so it prints with a dot, like `b.kids whose .b.x equals v`. A `for` alias or a part named the same way doesn't get one there.
 
-- A line that the grammar reads can still be written wrong. `check_problems`, `for_problems` and `from_problems` give the rules that need only the tree and the names in `aliases`, in `ergo.rego`'s words and sorted: `min above max`, `invalid pattern`, `<n> can't be a list position`, `number out of range: <n>`, `"is not null" is written "exists"`, the `takes a number`, `takes text` and `takes a time or a number` rules, the `within` rules, a misplaced `it`, `if any can't go with some`, a `for` alias that is a word or is given twice, `"sorted by"` reading an alias, and every `compared with itself`. `check_problems` and `for_problems` add `compared with itself`, for the names in `aliases` too, only when nothing else is wrong, as `ergo.rego` does. Rules that need the policy's names, like an alias named like a subject, stay in the engine.
+- A line that the grammar reads can still be written wrong. `check_problems`, `for_problems` and `from_problems` give the rules that need only the tree and, for the first two, the names in `aliases`, in `ergo.rego`'s words and sorted: `min above max`, `invalid pattern`, `<n> can't be a list position`, `number out of range: <n>`, `"is not null" is written "exists"`, the `takes a number`, `takes text` and `takes a time or a number` rules, the `within` rules, a misplaced `it`, `if any can't go with some`, a `for` alias that is a word or is given twice, `"sorted by"` reading an alias, and every `compared with itself`. `check_problems` and `for_problems` add `compared with itself`, for the names in `aliases` too, only when nothing else is wrong, as `ergo.rego` does. Rules that need the policy's names, like an alias named like a subject, stay in the engine.
 - When a line fails to read, the messages also hold the rules above that the loose reading of the line finds, as `ergo.rego` lists them.
 - When a line is only a path, the message is what's wrong with the path, like `and is a word of the grammar: write .and`, or `nothing after the path at column N` when nothing is. A `from` line that reads as a `for` item says `an item starts with "every", "some" or a position`. Both are what `ergo.rego` says.
 - Reading takes time in proportion to the length of the line, so a long pasted line doesn't stall an editor.
-- `invalid pattern` follows RE2, which `ergo.rego` uses: `regex-syntax` does the parsing, with fixes for the places where RE2 differs (`\Q...\E`, a `{` that is not a repeat, flags other than `i`, `m`, `s` and `U`, a repeat of a repeat, and repeat counts above 1000). `rust_pattern` gives the pattern as the `regex` crate should read it, or `None` when RE2 rejects it, with RE2's ASCII-only `\d`, `\w`, `\s` and `\b`. The engine matches with it. `NAME` is the crate's name.
+- `invalid pattern` follows RE2, which `ergo.rego` uses: `regex-syntax` does the parsing, with fixes for the places where RE2 differs (`\Q...\E`, a `{` that is not a repeat, flags other than `i`, `m`, `s` and `U`, a repeat of a repeat, and repeat counts above 1000). `rust_pattern` gives the pattern as the `regex` crate should read it, or `None` when RE2 rejects it, with RE2's ASCII-only `\d`, `\w`, `\s` and `\b`. The engine matches with it.
 
 ## The tree
 
-Every type derives `Debug`, `Clone`, `PartialEq`, `Eq` and `Hash`. With the `serde` feature, which is off by default, they also derive `Serialize` and `Deserialize`.
+Every type derives `Debug`, `Clone`, `PartialEq`, `Eq` and `Hash`, and `SyntaxError` is also a `std::error::Error` whose `Display` is its message. With the `serde` feature, which is off by default, they also derive `Serialize` and `Deserialize`.
 
 | Type            | ABNF rule                       | Example                                                      |
 | --------------- | ------------------------------- | ------------------------------------------------------------ |

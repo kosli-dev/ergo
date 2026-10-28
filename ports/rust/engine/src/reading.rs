@@ -667,7 +667,7 @@ impl Reading {
                     let alias_refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
                     let parent_names = scope.parent_names();
                     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
-                    let syntax_problems = s::from_problems(line, &alias_refs);
+                    let syntax_problems = s::from_problems(line);
                     let reads = syntax_problems.is_empty();
                     found_problems.extend(syntax_problems);
                     let mut filters = Vec::new();

@@ -36,8 +36,8 @@ pub fn for_problems(line: &For, aliases: &[&str]) -> Vec<String> {
 
 /// Lists what is written wrong in a `from` line that was read.
 ///
-/// The messages are in `ergo.rego`'s words and sorted. It only reads the tree, so `_aliases` is not used. Rules that need the policy's names are left to the engine. The list is empty when nothing is wrong.
-pub fn from_problems(line: &From, _aliases: &[&str]) -> Vec<String> {
+/// The messages are in `ergo.rego`'s words and sorted. Rules that need the policy's names are left to the engine. The list is empty when nothing is wrong.
+pub fn from_problems(line: &From) -> Vec<String> {
     from_base(line).into_iter().collect()
 }
 

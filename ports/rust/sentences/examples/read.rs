@@ -23,7 +23,7 @@ fn read_kind(kind: &str, text: &str) -> Value {
     let (syntax, problems) = match kind {
         "check" => messages(parse_check(text), |c| check_problems(c, &[])),
         "for-line" => messages(parse_for(text), |f| for_problems(f, &[])),
-        "from-line" => messages(parse_from(text), |f| from_problems(f, &[])),
+        "from-line" => messages(parse_from(text), from_problems),
         other => {
             let unknown = vec![format!("unknown kind {other}")];
             (unknown.clone(), unknown)

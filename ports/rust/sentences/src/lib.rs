@@ -23,9 +23,6 @@ pub use tree::*;
 use parse::{FromRead, Parser, trim};
 use problems::{Kind, errors};
 
-/// The name of this crate.
-pub const NAME: &str = "ergo-sentences";
-
 /// Reads a path, like `x.y[1]` or `item 2 of xs`.
 ///
 /// Whitespace at both ends is dropped. It returns the `SyntaxError`s `ergo.rego` gives for the same line when the line is not a path.
@@ -100,14 +97,4 @@ pub fn parse_for(line: &str) -> Result<For, Vec<SyntaxError>> {
         .read_for(2)
         .map(|(line, _)| line)
         .ok_or_else(|| errors(text, Kind::For))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn names_itself() {
-        assert_eq!(NAME, "ergo-sentences");
-    }
 }

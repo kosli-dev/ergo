@@ -108,6 +108,6 @@ fn for_lines_written_wrong_parse_and_give_ergo_rego_problems() {
 #[test]
 fn from_lines_have_the_problems_ergo_rego_gives() {
     for (line, want) in oracle::FROM_WRITTEN_WRONG {
-        assert_eq!(&from_problems(&from(line), &[]), want, "{line:?}");
+        assert_eq!(&from_problems(&from(line)), want, "{line:?}");
     }
 }

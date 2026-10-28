@@ -30,7 +30,7 @@ fn from_lines_ergo_rego_rejects_get_its_messages() {
 fn from_lines_written_wrong_still_parse() {
     for (line, problems) in oracle::FROM_WRITTEN_WRONG {
         let read = parse_from(line).unwrap_or_else(|e| panic!("{line:?}: {e:?}"));
-        assert_eq!(&from_problems(&read, &[]), problems, "{line:?}");
+        assert_eq!(&from_problems(&read), problems, "{line:?}");
     }
 }
 

@@ -372,11 +372,11 @@ fn if_any_cannot_go_with_some() {
         none()
     );
     assert_eq!(
-        from_problems(&from("x whose some y, if any, exists"), &[]),
+        from_problems(&from("x whose some y, if any, exists")),
         one("if any can't go with some")
     );
     assert_eq!(
-        from_problems(&from("x whose every y, if any, exists"), &[]),
+        from_problems(&from("x whose every y, if any, exists")),
         none()
     );
 }
@@ -396,7 +396,7 @@ fn a_list_position_is_at_most_9007199254740991() {
         message
     );
     assert_eq!(
-        from_problems(&from("x whose y[9007199254740993] exists"), &[]),
+        from_problems(&from("x whose y[9007199254740993] exists")),
         one("9007199254740993 can't be a list position")
     );
 }
@@ -531,7 +531,7 @@ fn it_in_a_from_line_is_allowed_in_a_condition_only() {
         "x whose count of it is 1",
         "x whose first of it exists",
     ] {
-        assert_eq!(from_problems(&from(line), &[]), none(), "{line}");
+        assert_eq!(from_problems(&from(line)), none(), "{line}");
     }
     let message = one("it can only start an assertion: write it first, like it is not empty");
     assert_eq!(failure("x whose y equals it"), message);
@@ -873,18 +873,18 @@ fn a_problem_in_a_whose_is_found() {
 #[test]
 fn from_lines_report_the_same_rules() {
     assert_eq!(
-        from_problems(&from("x whose y is between 2 and 1"), &[]),
+        from_problems(&from("x whose y is between 2 and 1")),
         one("min above max")
     );
     assert_eq!(
-        from_problems(&from("x whose y matches \"(\""), &[]),
+        from_problems(&from("x whose y matches \"(\"")),
         one("invalid pattern \"(\"")
     );
     assert_eq!(
-        from_problems(&from("x whose y is not null"), &[]),
+        from_problems(&from("x whose y is not null")),
         one("\"is not null\" is written \"exists\"")
     );
-    assert_eq!(from_problems(&from("x whose y is 1"), &[]), none());
+    assert_eq!(from_problems(&from("x whose y is 1")), none());
 }
 
 #[test]
@@ -915,7 +915,7 @@ fn a_quoted_first_key_is_not_a_bare_word_of_the_grammar() {
         ".every is 1"
     );
     assert_eq!(
-        from_problems(&parse_from("\"every\".y").unwrap(), &[]),
+        from_problems(&parse_from("\"every\".y").unwrap()),
         Vec::<String>::new()
     );
 }

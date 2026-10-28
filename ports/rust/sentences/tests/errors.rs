@@ -67,6 +67,14 @@ fn columns_count_characters_not_bytes() {
 }
 
 #[test]
+fn columns_count_a_four_byte_character_as_one() {
+    assert_eq!(
+        errors_of("x whose \"\u{1F600}\" is \"a"),
+        one("unclosed quote at column 16", Some(16))
+    );
+}
+
+#[test]
 fn columns_count_from_the_trimmed_line() {
     assert_eq!(
         errors_of("   x whose y is \"a"),
@@ -473,4 +481,12 @@ fn a_for_item_given_as_a_from_line_says_an_item_starts_with_every_or_some() {
             "{line}"
         );
     }
+}
+
+#[test]
+fn a_syntax_error_displays_as_its_message_and_is_an_error() {
+    let errors = errors_of("x whose y is \"abc");
+    assert_eq!(errors[0].to_string(), "unclosed quote at column 14");
+    let boxed: Box<dyn std::error::Error> = Box::new(errors[0].clone());
+    assert_eq!(boxed.to_string(), "unclosed quote at column 14");
 }
