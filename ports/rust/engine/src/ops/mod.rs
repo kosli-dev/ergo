@@ -2,6 +2,7 @@ pub mod compare;
 pub mod equals;
 pub mod present;
 pub mod range;
+pub mod tally;
 pub mod time;
 pub mod walk;
 
@@ -96,6 +97,7 @@ pub enum Check {
     CompareTime(time::CompareTime),
     Equals(equals::Equals),
     Range(range::Range),
+    Tally(tally::Tally),
     Walk(Box<walk::Walk>),
     NotYet,
 }
@@ -114,7 +116,7 @@ impl Check {
                 compare::Side::Path(path) => Some(path),
                 compare::Side::Value(_) => None,
             },
-            Check::Walk(_) | Check::NotYet => None,
+            Check::Tally(_) | Check::Walk(_) | Check::NotYet => None,
         }
     }
 
@@ -137,6 +139,7 @@ impl Check {
                 .into_iter()
                 .filter_map(side)
                 .collect(),
+            Check::Tally(check) => check.paths(),
             Check::Walk(_) | Check::NotYet => Vec::new(),
         }
     }
@@ -163,7 +166,7 @@ impl Check {
                 left: compare::Side::Path(left),
                 ..check.clone()
             }),
-            Check::Walk(_) | Check::NotYet => self.clone(),
+            Check::Tally(_) | Check::Walk(_) | Check::NotYet => self.clone(),
         }
     }
 
@@ -174,6 +177,7 @@ impl Check {
             Check::Range(check) => check.refs(),
             Check::Compare(check) => check.refs(),
             Check::CompareTime(check) => check.refs(),
+            Check::Tally(check) => check.refs(),
             Check::Walk(check) => check.refs(),
             Check::NotYet => Vec::new(),
         }
@@ -212,6 +216,7 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::CompareTime(check) => time::run(check, ctx),
         Check::Equals(check) => equals::run(check, ctx),
         Check::Range(check) => range::run(check, ctx),
+        Check::Tally(check) => tally::run(check, ctx),
         Check::Walk(check) => walk::run(check, ctx).verdict,
         Check::NotYet => Verdict {
             cause: Cause::Unusable,

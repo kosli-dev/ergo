@@ -93,16 +93,6 @@ derived / sum within a distance of a field / passes when the sum is close enough
 derived / sum within a distance of a field / fails as value when it is not
 derived / sum within a distance of a field / fails as absent when the field is missing
 derived / sum within a distance of a field / the worse cause wins when both sides fail: absent before null
-derived / a path plus a number on the left / adds a path and a number
-derived / a path plus a number on the left / fails as value when the sum is different
-derived / a path plus a number on the left / fails as unusable when the path holds text
-derived / a path plus a number on the left / fails as absent when the path is missing
-derived / a path plus a number on the left / fails as null when the path is null
-derived / a number plus a path on the left / adds a number and a path
-derived / two paths on the left / adds two fields
-derived / two paths on the left / fails as unusable before absent before null when several operands fail
-derived / two paths on the left / fails as absent before null
-derived / decimals added from paths / adds 0.1 and 0.2 up to 0.3
 derived / a path plus a count on the left / adds a path and a count
 derived / a path plus a count on the left / fails as absent when the list is missing
 derived / a path plus a count on the left / fails as unusable when the path is text and the list is null
@@ -110,9 +100,6 @@ derived / a count plus a path on the left / adds a count and a path
 derived / a count plus a number on the left / adds a count and a number
 derived / a path plus a sum on the left / adds a path and a sum, as decimals
 derived / a number plus a count with whose / adds to a count that has whose when the count is last
-derived / a path on the left and a path plus a number on the right / compares a field with a sum on the right
-derived / a path on the left and a path plus a number on the right / fails as value when they differ
-derived / a path on the left and a path plus a number on the right / fails as absent when an operand on the right is missing
 derived / a path and a count plus a path on the right / compares a field with a count plus a path
 derived / a path on the left and a path plus a count on the right / compares a field with a path plus a count
 derived / a count on the left and a count plus a number on the right / compares a count with a count plus a number
@@ -167,64 +154,13 @@ derived / a sum with is between / passes between the bounds
 derived / a sum with is between / passes at the upper bound
 derived / a sum with is between / fails as value below the lower bound
 derived / a sum with is between / fails as unusable when a value is text
-derived / a plus with is between / passes between the bounds
-derived / a plus with is between / fails as value above the upper bound
-derived / a plus with is between / fails as absent when the path is missing
 derived / count of on subjects and items that aren't objects / a subject that isn't an object fails as not_an_object
 derived / count of on subjects and items that aren't objects / an item that isn't an object fails as not_an_object, and a null value counts
 derived / a count whose whose reads a param that's missing / fails as absent and shows null for the count
 derived / a count of zero whose whose reads a param that's missing / fails as absent even with no items, where a count of zero would pass
-derived / seconds elapsed between two times / passes when the times are exactly that many seconds apart
-derived / seconds elapsed between two times / fails as value when they are further apart
-derived / minutes elapsed between two times / passes when the times are exactly that many minutes apart
-derived / minutes elapsed between two times / fails as value when they are further apart
-derived / hours elapsed between two times / passes when the times are exactly that many hours apart
-derived / hours elapsed between two times / fails as value when they are further apart
-derived / days elapsed between two times / passes when the times are exactly that many days apart
-derived / days elapsed between two times / fails as value when they are further apart
-derived / weeks elapsed between two times / passes when the times are exactly that many weeks apart
-derived / weeks elapsed between two times / fails as value when they are further apart
-derived / days elapsed against a limit by severity / passes when fewer days than the limit for its severity have passed
-derived / days elapsed against a limit by severity / fails as value when as many days as the limit have passed
-derived / days elapsed against a limit by severity / fails as absent when the limit has no entry for its severity
-derived / days elapsed between two numbers / reads two numbers as seconds and does not round
-derived / days elapsed between two numbers / fails as value when the seconds are fewer
-derived / days elapsed between equal times / gives 0 for the same instant written two ways
-derived / days elapsed between equal times / gives 0 for two equal numbers
-derived / days elapsed with the end before the start / fails as value for two times, and shows no number
-derived / days elapsed with the end before the start / fails as value for two numbers
-derived / days elapsed that cannot be read / fails as absent when the start is missing
-derived / days elapsed that cannot be read / fails as absent when the end is missing
-derived / days elapsed that cannot be read / fails as null when the start is null
-derived / days elapsed that cannot be read / fails as null when the end is null
-derived / days elapsed that cannot be read / fails as absent when one side is missing and the other null
-derived / days elapsed that cannot be read / fails as unusable when a side is true
-derived / days elapsed that cannot be read / fails as unusable when a side is a list
-derived / days elapsed that cannot be read / fails as unusable when a side is an object
-derived / days elapsed that cannot be read / fails as unusable when a side is text that is not a time
-derived / days elapsed that cannot be read / fails as unusable when a time has a lowercase t
-derived / days elapsed that cannot be read / fails as unusable when a time has a lowercase z
-derived / days elapsed that cannot be read / fails as unusable when the date does not exist
-derived / days elapsed that cannot be read / fails as unusable when the year is before 1678
-derived / days elapsed that cannot be read / fails as unusable when the year is after 2261
-derived / days elapsed that cannot be read / fails as unusable when one side is a time and the other a number
-derived / days elapsed that cannot be read / fails as unusable when one side is a number and the other a time
 derived / days elapsed under a for line reading the line's name / passes when every pull request was closed within 2 days
 derived / days elapsed under a for line reading the line's name / fails as value when one pull request took longer, and lists it
 derived / days elapsed under a for line reading the line's name / fails as absent when a pull request has no closing time
-derived / days elapsed in a list of assertions / passes when every line passes
-derived / a field called to / reads both fields, because to and days are words of the grammar and need a dot
-derived / days elapsed added to another term / adds a number to the elapsed days
-derived / days elapsed added to another term / fails as value when the sum is different
-derived / days elapsed added to another term / fails as value when the end is before the start, and shows no number
-derived / days elapsed added to another term / fails as absent when the end is missing
-derived / days elapsed added to another term, first / adds the elapsed days to a number
-derived / days elapsed added to another term, first / fails as absent when the start is missing
-derived / days elapsed on the right side of a phrase / compares a field with the elapsed days
-derived / days elapsed on the right side of a phrase / fails as value when they differ
-derived / days elapsed on the right side of a phrase / fails as absent when the end is missing
-derived / days elapsed in a plus on the right side / compares a field with a number plus the elapsed days
-derived / days elapsed in a plus on the right side / fails as value when the field is not more
 derived / days elapsed in the whose of an every / checks the items whose elapsed days pass, and leaves the others out
 derived / days elapsed in the whose of an every / leaves out an item whose end is before its start
 derived / days elapsed in the whose of an every / fails as value when a kept item fails
@@ -236,14 +172,6 @@ derived / days elapsed in the whose of a count / fails as absent when an item ca
 derived / a count in the whose of a count / counts the items whose own count passes, and shows every item
 derived / a count in the whose of a count / fails as absent when an item's list is missing, so the item cannot be decided
 derived / a count in the whose of a sum / adds only the items whose own count passes
-derived / days elapsed with is between / passes at the lower bound
-derived / days elapsed with is between / passes at the upper bound
-derived / days elapsed with is between / fails as value above the upper bound
-derived / days elapsed with is between / fails as value when the end is before the start, and shows no number
-derived / days elapsed with is between / fails as absent when the end is missing
-derived / days elapsed between two dates / counts whole days between two dates
-derived / days elapsed between two dates / counts 29 February in a leap year
-derived / days elapsed between two dates / fails as unusable on a date and a time, even at midnight
 derived / count of a list / gives the count the locations of the items it counted
 derived / count of a list / gives a count of no items no locations
 derived / count of a list with whose / gives the count the locations of every item read, kept or not
@@ -251,8 +179,6 @@ derived / count of lists inside lists / gives the count one location per item of
 derived / sum of a field / gives the sum the locations of the values it added
 derived / a path plus a count / gives the plus the locations of the entries after it, once each, in their order
 derived / a path plus a sum / gives the plus the location of the path and then of every value summed
-derived / days elapsed between two numbers / gives the elapsed time the locations of both ends
-derived / days elapsed between two numbers / points at the subject for an end that isn't there
 derived / a plus that reads the same list twice / shows the number and the list once each
 derived / a count compared with a count of the same list / shows the list once, after the left side's number, and the right side's number
 for / every over one list on a for line / passes when every item passes, and failed_items is empty

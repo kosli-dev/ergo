@@ -1,5 +1,5 @@
 use crate::ops::walk::{Quantifier, Walk};
-use crate::ops::{Check, present::Present};
+use crate::ops::{Check, present::Present, tally};
 use crate::path::{self, OUTER, PartStart, Start, Step};
 use crate::value::Decimal;
 use ergo_sentences as s;
@@ -350,7 +350,9 @@ pub fn lower_assertion(assertion: &s::Assertion, scope: &Scope) -> Result<Check,
                 path: scope.left_path(path)?,
                 missing: *not,
             })),
-            other => match lower_with_operator_modules(path, other, &scope) {
+            other => match tally::lower_assertion(assertion, &scope)
+                .or_else(|| lower_with_operator_modules(path, other, &scope))
+            {
                 Some(lowered) => lowered,
                 None => Ok(Check::NotYet),
             },
@@ -365,7 +367,9 @@ pub fn lower_assertion(assertion: &s::Assertion, scope: &Scope) -> Result<Check,
             lower_quantified(*quantifier, path, whose, *if_any, phrase, &scope)?
                 .unwrap_or(Check::NotYet),
         ),
-        s::Assertion::Derived { .. } => Ok(Check::NotYet),
+        s::Assertion::Derived { .. } => {
+            tally::lower_assertion(assertion, &scope).unwrap_or(Ok(Check::NotYet))
+        }
     }
 }
 

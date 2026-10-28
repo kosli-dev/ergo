@@ -197,11 +197,11 @@ fn scaled(n: &Exact, exponent: i64) -> String {
     )
 }
 
-fn magnitude_order(a: &str, b: &str) -> Ordering {
+pub(super) fn magnitude_order(a: &str, b: &str) -> Ordering {
     a.len().cmp(&b.len()).then_with(|| a.cmp(b))
 }
 
-fn add_magnitudes(a: &str, b: &str) -> String {
+pub(super) fn add_magnitudes(a: &str, b: &str) -> String {
     let (a, b) = (a.as_bytes(), b.as_bytes());
     let mut out = Vec::with_capacity(a.len().max(b.len()) + 1);
     let mut carry = 0;
@@ -226,7 +226,7 @@ fn add_magnitudes(a: &str, b: &str) -> String {
     trimmed(out)
 }
 
-fn subtract_magnitudes(a: &str, b: &str) -> String {
+pub(super) fn subtract_magnitudes(a: &str, b: &str) -> String {
     let (a, b) = (a.as_bytes(), b.as_bytes());
     let mut out = Vec::with_capacity(a.len());
     let mut borrow = 0;
