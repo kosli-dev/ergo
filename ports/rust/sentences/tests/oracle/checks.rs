@@ -1,4 +1,6 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("p.z is 1", "p.z is 1", &[], &[]),
+    ("q.w is 2", "q.w is 2", &[], &[]),
     ("\tx is 1\n", "x is 1", &[], &[]),
     ("x is 1\n", "x is 1", &[], &[]),
     ("\n\tx is 1", "x is 1", &[], &[]),

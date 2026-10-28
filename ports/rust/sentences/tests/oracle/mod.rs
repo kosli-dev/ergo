@@ -3,6 +3,8 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("\u{3000}k\n", "k"),
+    ("\tm\n", "m"),
     (
         "\n\tevery things whose y is 1\t\n",
         "every things whose y is 1",
@@ -2473,6 +2475,10 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("\tid\n", "id"),
+    ("\nmid\t", "mid"),
+    ("\u{3000}k\n", "k"),
+    ("\tm\n", "m"),
     ("  d.b  ", "d.b"),
     ("\"a b\"", "\"a b\""),
     ("\"a b\".c", "\"a b\".c"),
