@@ -1,3 +1,4 @@
+pub mod any_of;
 pub mod compare;
 pub mod equals;
 pub mod present;
@@ -99,6 +100,7 @@ pub enum Check {
     Range(range::Range),
     Tally(tally::Tally),
     Walk(Box<walk::Walk>),
+    AnyOf(any_of::AnyOf),
     NotYet,
 }
 
@@ -116,7 +118,7 @@ impl Check {
                 compare::Side::Path(path) => Some(path),
                 compare::Side::Value(_) => None,
             },
-            Check::Tally(_) | Check::Walk(_) | Check::NotYet => None,
+            Check::Tally(_) | Check::Walk(_) | Check::AnyOf(_) | Check::NotYet => None,
         }
     }
 
@@ -140,6 +142,7 @@ impl Check {
                 .filter_map(side)
                 .collect(),
             Check::Tally(check) => check.paths(),
+            Check::AnyOf(check) => check.paths(),
             Check::Walk(_) | Check::NotYet => Vec::new(),
         }
     }
@@ -166,7 +169,7 @@ impl Check {
                 left: compare::Side::Path(left),
                 ..check.clone()
             }),
-            Check::Tally(_) | Check::Walk(_) | Check::NotYet => self.clone(),
+            Check::Tally(_) | Check::Walk(_) | Check::AnyOf(_) | Check::NotYet => self.clone(),
         }
     }
 
@@ -179,12 +182,16 @@ impl Check {
             Check::CompareTime(check) => check.refs(),
             Check::Tally(check) => check.refs(),
             Check::Walk(check) => check.refs(),
+            Check::AnyOf(check) => check.refs(),
             Check::NotYet => Vec::new(),
         }
     }
 
-    pub fn flawed(&self, _ctx: &Ctx) -> bool {
-        false
+    pub fn flawed(&self, ctx: &Ctx) -> bool {
+        match self {
+            Check::AnyOf(check) => check.flawed(ctx),
+            _ => false,
+        }
     }
 }
 
@@ -218,6 +225,7 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::Range(check) => range::run(check, ctx),
         Check::Tally(check) => tally::run(check, ctx),
         Check::Walk(check) => walk::run(check, ctx).verdict,
+        Check::AnyOf(check) => any_of::run(check, ctx),
         Check::NotYet => Verdict {
             cause: Cause::Unusable,
             inputs: Vec::new(),

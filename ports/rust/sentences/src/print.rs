@@ -14,8 +14,37 @@ pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String {
 }
 
 pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> String {
+    print_from_condition_with(condition, aliases, &[])
+}
+
+fn left_of_whose(path: &Path, aliases: &[&str], parents: &[&str], own: bool) -> String {
+    match &path.start {
+        Start::Field { key, .. } if parents.contains(&key.as_str()) => {
+            let mut dotted = path.clone();
+            dotted.start = Start::Field {
+                key: key.clone(),
+                dot: true,
+            };
+            path_text(&dotted, Side::Left, aliases, false)
+        }
+        _ => path_text(path, Side::Left, aliases, own),
+    }
+}
+
+pub fn print_from_condition_with(
+    condition: &FromCondition,
+    aliases: &[&str],
+    parents: &[&str],
+) -> String {
     match condition {
-        FromCondition::Condition(condition) => condition_text(condition, aliases),
+        FromCondition::Condition(condition) => {
+            let left = match &condition.left {
+                Left::Path(path) => left_of_whose(path, aliases, parents, true),
+                Left::Derived(derived) => derived_text(derived, aliases, true),
+                Left::Elapsed(elapsed) => elapsed_text(elapsed, aliases, true),
+            };
+            format!("{left} {}", phrase_text(&condition.phrase, aliases))
+        }
         FromCondition::Quantified {
             quantifier,
             path,
@@ -24,7 +53,7 @@ pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> Stri
         } => format!(
             "{} {}{} {}",
             quantifier_text(*quantifier),
-            path_text(path, Side::Left, aliases, false),
+            left_of_whose(path, aliases, parents, false),
             if_any_text(*if_any),
             phrase_text(phrase, aliases)
         ),
@@ -32,6 +61,10 @@ pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> Stri
 }
 
 pub fn print_from(line: &From, aliases: &[&str]) -> String {
+    print_from_with(line, aliases, &[])
+}
+
+pub fn print_from_with(line: &From, aliases: &[&str], parents: &[&str]) -> String {
     let mut out = String::new();
     if line.every {
         out.push_str("every ");
@@ -46,7 +79,7 @@ pub fn print_from(line: &From, aliases: &[&str]) -> String {
         let parts: Vec<String> = line
             .whose
             .iter()
-            .map(|c| print_from_condition(c, aliases))
+            .map(|c| print_from_condition_with(c, aliases, parents))
             .collect();
         out.push_str(&parts.join(" and "));
     }

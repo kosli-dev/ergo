@@ -1,6 +1,7 @@
 use crate::lower::{self, Scope};
 use crate::name;
 use crate::ops::Check;
+use crate::ops::any_of::AnyOf;
 use crate::path::{self, Ctx, Located, Location};
 use crate::policy::{Form, OptionLines, Requirement, SubjectName};
 use crate::reading::Reading;
@@ -203,6 +204,7 @@ fn read_one(
         }
         Form::AnyOf(Some(options)) => {
             let mut parts = Vec::new();
+            let mut lowered_options = Vec::new();
             let mut ok = !options.is_empty();
             for (option, read) in options {
                 match read {
@@ -219,6 +221,34 @@ fn read_one(
                             &mut problems,
                         );
                         ok &= found.ok;
+                        if found.ok {
+                            let mut option_problems = BTreeSet::new();
+                            let mut checks = Vec::new();
+                            for (at, tree) in found.trees.iter().enumerate() {
+                                let place = if found.trees.len() >= 2 {
+                                    format!("option {option}: line {}: ", at + 1)
+                                } else {
+                                    format!("option {option}: ")
+                                };
+                                match lowered_plan(
+                                    std::slice::from_ref(tree),
+                                    scope,
+                                    &aliases,
+                                    &mut option_problems,
+                                ) {
+                                    Some(plan) => {
+                                        checks.extend(plan.items.into_iter().map(|i| i.check));
+                                    }
+                                    None => ok = false,
+                                }
+                                problems.extend(
+                                    std::mem::take(&mut option_problems)
+                                        .into_iter()
+                                        .map(|problem| format!("{place}{problem}")),
+                                );
+                            }
+                            lowered_options.push(checks);
+                        }
                         parts.push(format!("{option}({})", printed(&found.trees, &aliases)));
                     }
                     _ => ok = false,
@@ -228,8 +258,21 @@ fn read_one(
                 return wrong(problems);
             }
             let expression = format!("one of: {}", parts.join(" | "));
+            let plan = Plan {
+                items: vec![Item {
+                    text: expression.clone(),
+                    check: Check::AnyOf(AnyOf {
+                        options: lowered_options,
+                    }),
+                }],
+                all_of: false,
+            };
             CheckRead {
-                plan: Some(not_yet(&expression)),
+                plan: if problems.is_empty() {
+                    Some(plan)
+                } else {
+                    None
+                },
                 expression,
                 problems,
             }
@@ -516,6 +559,24 @@ mod tests {
             problems(&wrong),
             ["option known: line 2: unclosed quote at column 6"]
         );
+    }
+
+    #[test]
+    fn an_any_of_lowers_each_option_to_its_checks_and_names_a_problem_by_option_and_line() {
+        let read = one(json!({"c": {"any_of": {"b": "y exists", "a": ["x exists", "z exists"]}}}));
+        let plan = read.plan.unwrap();
+        let Check::AnyOf(found) = &plan.items[0].check else {
+            panic!("not any_of");
+        };
+        assert_eq!(found.options.len(), 2);
+        assert_eq!(found.options[0].len(), 2);
+        assert!(!plan.all_of);
+        let wrong = one(json!({"c": {"any_of": {"o": ["x exists", "x equals x"]}}}));
+        assert_eq!(
+            problems(&wrong),
+            ["option o: line 2: x is compared with itself"]
+        );
+        assert!(wrong.plan.is_none());
     }
 
     #[test]

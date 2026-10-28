@@ -432,3 +432,38 @@ fn params_and_input_print_with_their_dollar() {
     );
     assert_eq!(printed("$input"), "$input");
 }
+
+#[test]
+fn a_parent_name_on_the_left_of_a_whose_is_the_items_field_and_prints_with_a_dot() {
+    let read = from("b.kids whose b.x equals v and some b.ls is empty");
+    assert_eq!(
+        print_from_with(&read, &["b"], &["b"]),
+        "b.kids whose .b.x equals v and some .b.ls is empty"
+    );
+    assert_eq!(
+        print_from_with(&read, &["b"], &[]),
+        "b.kids whose b.x equals v and some b.ls is empty"
+    );
+}
+
+#[test]
+fn a_dot_on_the_path_of_some_in_a_from_line_stays_because_it_reads_the_field_and_not_the_part() {
+    let read = from("ds whose some .cov.x exists");
+    assert_eq!(
+        print_from_with(&read, &["cov"], &[]),
+        "ds whose some .cov.x exists"
+    );
+}
+
+#[test]
+fn a_name_that_is_both_a_parent_and_an_alias_prints_with_a_dot_only_on_the_left_of_a_whose() {
+    let read = from("b.kids whose b.x equals b.y");
+    assert_eq!(
+        print_from_with(&read, &["b"], &["b"]),
+        "b.kids whose .b.x equals b.y"
+    );
+    assert_eq!(
+        print_from_with(&read, &["b"], &[]),
+        "b.kids whose b.x equals b.y"
+    );
+}

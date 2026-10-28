@@ -153,6 +153,10 @@ impl Scope {
         &self.parts
     }
 
+    pub fn parent_names(&self) -> Vec<String> {
+        self.parents.keys().cloned().collect()
+    }
+
     pub fn aliases(&self) -> Vec<String> {
         let mut names: BTreeSet<String> = self.parts.keys().cloned().collect();
         names.extend(self.parents.keys().cloned());
