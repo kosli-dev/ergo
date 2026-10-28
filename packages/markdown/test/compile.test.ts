@@ -667,3 +667,13 @@ test("paragraphs after a title that follows a description at the top are prose",
 test("a paragraph after a table at the top is prose", () => {
   assert.equal(compile("| a |\n| - |\n| b |\n\nText.\n").policy!.description, undefined);
 });
+
+test("a field written in a table cell under a requirement is a problem", () => {
+  assert.deepEqual(problemsOf(inRequirement("| a |\n| - |\n| Min subjects `5` |")), [
+    {line: 7, message: "a field goes in the list of fields, as - key `value`"},
+  ]);
+});
+
+test("a paragraph that starts with a word that isn't a field key and a code span is prose", () => {
+  assert.deepEqual(problemsOf(inRequirement("- Subject `batch`\n\nNote: `x`")), []);
+});

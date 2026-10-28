@@ -42,6 +42,7 @@ type Span = {value: string; line: number};
 
 const NO_LABEL = "a label needs a letter or a digit";
 const NOT_FIELD = "a field is written as key: `value`";
+const FIELD_PLACE = "a field goes in the list of fields, as - key `value`";
 const CHECK_PLACE = "a check goes in the list right after Checks:";
 const COLON = "a bold label is followed by a colon";
 const CHECK_TAIL = "a check's sentences go in code spans, with nothing else after the first one";
@@ -92,6 +93,12 @@ function readField(li: ListItem, anyKey = false): {key: string; value: string; l
   const key = (colon ? head.slice(0, -1) : head).trim();
   if (key === "" || (!colon && !anyKey && !FIELD_WORDS.includes(key.toLowerCase()))) return null;
   return {key, value: code.value, line: startOf(li)};
+}
+
+function fieldIn(children: PhrasingContent[]): boolean {
+  const [label, code] = children;
+  if (label?.type !== "text" || code?.type !== "inlineCode") return false;
+  return FIELD_WORDS.includes(label.value.trim().replace(/:$/, "").trim().toLowerCase());
 }
 
 function looksLikeField(li: ListItem): boolean {
@@ -162,6 +169,13 @@ export function compile(markdown: string): Compiled {
     }
     blocks[blocks.length - 1]!.endLine = endOf(node);
     return `${sofar}\n\n${collapse(toString(node))}`;
+  };
+
+  const strays = (node: Nodes) => {
+    if (node.type === "listItem" && placed.has(node)) return;
+    if (node.type === "paragraph" || node.type === "tableCell") {
+      if (fieldIn(node.children)) problem(startOf(node), FIELD_PLACE);
+    } else if ("children" in node) for (const child of node.children) strays(child);
   };
 
   const claim = (scope: Map<string, number>, kind: string, name: string, line: number): boolean => {
@@ -395,6 +409,7 @@ export function compile(markdown: string): Compiled {
         }
         continue;
       }
+      if (item) strays(node);
       if (item && text !== "Checks:" && item.descriptionOpen) {
         item.description = describe(item.description, node);
         continue;
@@ -416,6 +431,8 @@ export function compile(markdown: string): Compiled {
       readFields(node, item);
       continue;
     }
+
+    if (item) strays(node);
 
     if (node.type === "list" && section !== "other") {
       for (const li of node.children) {
