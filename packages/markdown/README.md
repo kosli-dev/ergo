@@ -143,7 +143,7 @@ When a check can pass in more than one way, write a list of options under it in 
 
 ## Compile and check
 
-<!-- rerun once packages/markdown/src exists: both outputs below are what the cases expect, not a real run yet -->
+The tool isn't published. Run `pnpm install` in `packages/`, then `node packages/markdown/src/cli.ts` in place of `ergo` below.
 
 `ergo compile` prints the policy as YAML:
 
@@ -178,8 +178,12 @@ Save it next to `ergo.rego` and run it as the [getting started](../../README.md#
 
 `ergo check` lists what the tool can't place, with the line, and fails when there's any. A check written without a bold label gives:
 
+```sh
+ergo check cakes.ergo.md
 ```
-line 21: a check needs a bold label
+
+```
+cakes.ergo.md:21: a check needs a bold label
 ```
 
 The tool doesn't read the sentences. Ergo does, and a sentence written wrong shows up in the report's `$well_formed` row.

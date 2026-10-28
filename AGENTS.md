@@ -15,18 +15,20 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.
+- `packages/` holds Node tools that build on Ergo, in one pnpm workspace. Someone who only copies `ergo.rego` never needs them.
+- `packages/markdown/` compiles a policy written in Markdown into a policy object. It's an experiment, not published.
 
 ## Checks
 
 Run these before saying a change is done:
 
 ```sh
-opa check --strict . --ignore .github
+opa check --strict . --ignore .github --ignore packages
 opa check --strict --schema .github/closed-input-schema.json ergo.rego
 opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > /tmp/ergo-deterministic.json && opa check --strict --capabilities /tmp/ergo-deterministic.json ergo.rego
 opa fmt --list .
-opa test . --ignore .github --timeout 120s
-opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
+opa test . --ignore .github --ignore packages --timeout 120s
+opa eval --strict-builtin-errors --ignore .github --ignore packages -d . --format raw 'count(data) > 0'
 regal lint --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
 python3 spec/check_rules.py
 python3 spec/sentences_corpus.py --check
@@ -46,7 +48,19 @@ The `opa eval` command runs every test again with `--strict-builtin-errors`, whi
 
 The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml` because OPA would load that file as data.
 
-OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
+OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, and so do the workspace's files under `packages`, so the checks ignore both folders.
+
+When you change anything under `packages/`, run these too, one at a time:
+
+```sh
+cd packages
+pnpm install --frozen-lockfile
+pnpm check
+pnpm test
+pnpm -r bundle
+```
+
+`pnpm test` fails when a line under `packages/markdown/src` isn't reached by a test. Its tests also run `ergo.report` with opa on every case in `packages/markdown/cases` that has an input.
 
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. That's OPA 1.20.2, the version the Kosli CLI embeds. When you change the OPA version, change it in the README, in `CONTRIBUTING.md`, in every job of the workflow, in the Docker command below and in `opaVersion` in `site/hugo.toml`.
 
@@ -65,7 +79,7 @@ A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case ci
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
 ```sh
-opa test . --ignore .github --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
+opa test . --ignore .github --ignore packages --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
 ```
 
 ## Tests
@@ -128,6 +142,7 @@ The first line names the part of the repo that changed, then says what the chang
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`
 - `spec:` the spec in `spec/`, its cases and `spec_test.rego`
+- `markdown:` the Markdown compiler in `packages/markdown` and the pnpm workspace around it
 
 For example, `core: fail compare when either side is missing`.
 

@@ -72,4 +72,4 @@ Each row has the clause's wording, the check, what it read, the expression and t
 
 ## Tests
 
-`plain-rego/baking_test.rego` and `ergo/baking_test.rego` pin what each version reports for these batches, so `opa test . --ignore .github` from the repo root checks them along with Ergo's own tests.
+`plain-rego/baking_test.rego` and `ergo/baking_test.rego` pin what each version reports for these batches, so `opa test . --ignore .github --ignore packages` from the repo root checks them along with Ergo's own tests.

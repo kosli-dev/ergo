@@ -1,0 +1,4 @@
+packages:
+  - markdown
+onlyBuiltDependencies:
+  - esbuild
