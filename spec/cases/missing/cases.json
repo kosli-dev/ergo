@@ -1,7 +1,7 @@
 [
   {
     "description": "missing on a field of the subject",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not exist"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not exist"}}}},
     "cases": [
       {
         "description": "passes when the field is missing",
@@ -48,7 +48,7 @@
   },
   {
     "description": "missing on a nested field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y does not exist"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y does not exist"}}}},
     "cases": [
       {
         "description": "passes when the parent is missing",
@@ -70,7 +70,7 @@
   },
   {
     "description": "missing on a param the params don't have",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.flag does not exist"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.flag does not exist"}}}},
     "params": {},
     "cases": [
       {
@@ -85,7 +85,7 @@
   },
   {
     "description": "missing with a ref step that reads a number too big to be a list position",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x[$params.i] does not exist"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x[$params.i] does not exist"}}}},
     "params": {"i": 9007199254740992},
     "cases": [
       {
@@ -100,7 +100,7 @@
   },
   {
     "description": "missing as a filter",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things whose x does not exist", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things whose x does not exist", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "rules out a subject whose field is there",

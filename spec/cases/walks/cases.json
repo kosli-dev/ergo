@@ -1,7 +1,7 @@
 [
   {
     "description": "every over one list of objects",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true"}}}},
     "cases": [
       {
         "description": "passes when every item passes, and failed_items is empty",
@@ -104,7 +104,7 @@
   },
   {
     "description": "every over nested lists",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
     "cases": [
       {
         "description": "passes when every commit of every pull request is signed",
@@ -182,7 +182,7 @@
   },
   {
     "description": "every where the last list is the one walked, over strings",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every branches matches \"^release/\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every branches matches \"^release/\""}}}},
     "cases": [
       {
         "description": "passes when every string matches",
@@ -229,7 +229,7 @@
   },
   {
     "description": "every where each label is checked, not each pull request's labels",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.labels is not empty"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.labels is not empty"}}}},
     "cases": [
       {
         "description": "passes when every label is not empty",
@@ -267,7 +267,7 @@
   },
   {
     "description": "every with if any",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed, if any, is true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed, if any, is true"}}}},
     "cases": [
       {
         "description": "passes when the list is empty",
@@ -354,7 +354,7 @@
   },
   {
     "description": "some over one list of objects",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.state is \"APPROVED\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.state is \"APPROVED\""}}}},
     "cases": [
       {
         "description": "passes when one item passes, and failed_items is empty even though another item did not",
@@ -433,7 +433,7 @@
   },
   {
     "description": "some over nested lists",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some pull_requests.approvers.state is \"APPROVED\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some pull_requests.approvers.state is \"APPROVED\""}}}},
     "cases": [
       {
         "description": "passes when an item passes, even if another pull request has no approvers",
@@ -455,7 +455,7 @@
   },
   {
     "description": "whose under some",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -519,7 +519,7 @@
   },
   {
     "description": "whose under every",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -582,7 +582,7 @@
   },
   {
     "description": "whose under every with if any",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\", if any, is in $params.staff"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\", if any, is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -630,7 +630,7 @@
   },
   {
     "description": "whose with exists is the exception to undecided items",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"e": "every approvers.username whose comment exists is in $params.staff", "s2": "some approvers.username whose comment does not exist is in $params.staff"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"e": "every approvers.username whose comment exists is in $params.staff", "s2": "some approvers.username whose comment does not exist is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -655,7 +655,7 @@
   },
   {
     "description": "whose with a condition that cannot compare the item",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every reviews.name whose rank is at least 2 is \"ann\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every reviews.name whose rank is at least 2 is \"ann\""}}}},
     "cases": [
       {
         "description": "fails as unusable under every when the field is the wrong type for the condition",
@@ -669,7 +669,7 @@
   },
   {
     "description": "a field on the right side is read from the item",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.timestamp whose state is \"APPROVED\" is after last_commit_timestamp"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.timestamp whose state is \"APPROVED\" is after last_commit_timestamp"}}}},
     "cases": [
       {
         "description": "passes when the item's timestamp is after the item's own last commit",
@@ -700,7 +700,7 @@
   },
   {
     "description": "params and input on the right side still read the params and the input",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"i": "every approvers.username is in $input.staff", "p": "every approvers.username is in $params.staff"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"i": "every approvers.username is in $input.staff", "p": "every approvers.username is in $params.staff"}}}},
     "params": {"staff": ["ann", "bob"]},
     "cases": [
       {
@@ -716,7 +716,7 @@
   },
   {
     "description": "every and some joined with and to a plain sentence",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true and state is \"MERGED\"", "d": "state is \"MERGED\" and some approvers.state is \"APPROVED\"", "w": "every items.price whose kind is \"a\" is at least 2 and owner is \"x\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true and state is \"MERGED\"", "d": "state is \"MERGED\" and some approvers.state is \"APPROVED\"", "w": "every items.price whose kind is \"a\" is at least 2 and owner is \"x\""}}}},
     "cases": [
       {
         "description": "passes with failed_assertions empty when both parts pass",
@@ -762,7 +762,7 @@
   },
   {
     "description": "a walk that can't be run as written",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs.v whose kind is not one of $params.l, if any, is 1", "n": "every xs named by $params.k is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs.v whose kind is not one of $params.l, if any, is 1", "n": "every xs named by $params.k is 1"}}}},
     "params": {"l": "text"},
     "cases": [
       {
@@ -778,7 +778,7 @@
   },
   {
     "description": "a walk on a subject that isn't an object",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs is 1"}}}},
     "cases": [
       {
         "description": "fails as not_an_object, as any path with steps does",
@@ -792,7 +792,7 @@
   },
   {
     "description": "contains after every",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every pull_requests.labels does not contain \"hotfix\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every pull_requests.labels does not contain \"hotfix\""}}}},
     "cases": [
       {
         "description": "is written wrong, because the last list is walked too and a label never holds a value",
@@ -806,7 +806,7 @@
   },
   {
     "description": "every over nested lists of different lengths",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
     "cases": [
       {
         "description": "has one location per value, in the order of the walk, when the lists differ in length",
@@ -820,7 +820,7 @@
   },
   {
     "description": "some with a whose",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
     "params": {"staff": ["bob"]},
     "cases": [
       {
@@ -835,7 +835,7 @@
   },
   {
     "description": "every that stops before it walks a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
     "cases": [
       {
         "description": "has no values and no locations when the first list is missing",
@@ -857,7 +857,7 @@
   },
   {
     "description": "every on a path that has no list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every x.y is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every x.y is 1"}}}},
     "cases": [
       {
         "description": "has no values and no locations when nothing along the path is a list",
@@ -871,7 +871,7 @@
   },
   {
     "description": "every where a value is missing at the end of its path",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
     "cases": [
       {
         "description": "has the location where each item's read stopped",
@@ -885,7 +885,7 @@
   },
   {
     "description": "every over a field of each item, where it fails",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.title is \"x\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.title is \"x\""}}}},
     "cases": [
       {
         "description": "points a failed item at the field it read, not at the item",
@@ -907,7 +907,7 @@
   },
   {
     "description": "every over the items themselves, where it fails",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every scores is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every scores is 1"}}}},
     "cases": [
       {
         "description": "points a failed item at the item when the item is the value",
@@ -921,7 +921,7 @@
   },
   {
     "description": "every over a list that is missing",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.title is \"x\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.title is \"x\""}}}},
     "cases": [
       {
         "description": "keeps no values and no locations, and its failed item says where the walk stopped",
@@ -935,7 +935,7 @@
   },
   {
     "description": "a one-line some compares with a parent's value",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some files.owner is artifact.owner"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some files.owner is artifact.owner"}}}},
     "cases": [
       {
         "description": "lists the list it walked and the parent's value, sorted by name, and passes when a file has the parent's owner",
@@ -1181,7 +1181,7 @@
   },
   {
     "description": "a one-line every compares with a parent's value",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every files.owner is artifact.owner"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every files.owner is artifact.owner"}}}},
     "cases": [
       {
         "description": "lists the list it walked and the parent's value, sorted by name, and passes when every file has the parent's owner",
@@ -1351,7 +1351,7 @@
   },
   {
     "description": "a count of reads a parent's value in its whose",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of files whose owner is artifact.owner is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of files whose owner is artifact.owner is 1"}}}},
     "cases": [
       {
         "description": "lists the number, the list and then the parent's value",
@@ -1440,7 +1440,7 @@
   },
   {
     "description": "a for line with a walk next to a parent",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every files as f", "assert": "some f.tags is artifact.owner"}}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every files as f", "assert": "some f.tags is artifact.owner"}}}}},
     "cases": [
       {
         "description": "lists the for line's list and the parent's value, and never the alias's value",
@@ -1569,7 +1569,7 @@
   {
     "description": "a one-line some whose parent path is named by the item",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -1689,7 +1689,7 @@
   {
     "description": "a one-line some compares with a value of the input",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -1793,7 +1793,7 @@
   {
     "description": "a one-line some compares with a list of params",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -1912,7 +1912,7 @@
   {
     "description": "a one-line some compares with the subject's own part",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -2027,7 +2027,7 @@
   {
     "description": "a one-line some compares with a parent that sorts after the list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "zart": {
           "from": "trail.artifacts",
@@ -2130,7 +2130,7 @@
   {
     "description": "a count of reads a parent's value in its whose, and the parent sorts after the list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "zart": {
           "from": "trail.artifacts",
@@ -2239,7 +2239,7 @@
   {
     "description": "a walk or a count through a for name, read from a parent",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -2401,7 +2401,7 @@
   {
     "description": "a walk through a for name, read from a parent on its right side",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -2906,7 +2906,7 @@
   {
     "description": "a walk whose parent path is named by a field of each item",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",

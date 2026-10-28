@@ -34,6 +34,9 @@ NON_SYNTAX = [
 ]
 
 LATER = re.compile(r" is compared with itself")
+WHITE_SPACE = "\t\n\x0b\x0c\r \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000"
+NOT_WHITE_SPACE = ["\ufeff", "\u200b", "\x1c"]
+EDGED_EVERY = 5
 
 VOCABULARY = ["x", "y", "items", "status", "a_b", "k-1", "_id", "Count", "env", "sha", "pr", "commits", "owner"]
 GRAMMAR_WORDS = re.findall(
@@ -45,6 +48,14 @@ OTHER_POOL = [0xE9, 0x65E5, 0x1F600, 0xFEFF, 0x2028, 0xA0]
 
 EXTRA = [
     ("check", " x is 1"),
+    ("check", "\tx is 1\n"),
+    ("check", "\n\tx is 1 \r\n"),
+    ("check", "\u3000x is 1\u2028"),
+    ("check", "\ufeffx is 1"),
+    ("check", "x is 1\u200b"),
+    ("for-line", "\tevery xs as x\n"),
+    ("from-line", "\n\tevery xs whose y is 1\t\n"),
+    ("from-line", "\x85xs whose y is 1\xa0"),
     ("check", "x is 1 "),
     ("check", "x  is 1"),
     ("check", "x is  1"),
@@ -231,7 +242,7 @@ def bare_word_keys(node):
 def abnf_accepts(grammar, rules, text):
     for rule in rules:
         try:
-            tree = grammar(rule).parse_all(text.strip(" "))
+            tree = grammar(rule).parse_all(text.strip(WHITE_SPACE))
         except ParseError:
             continue
         if not any(bare_word_keys(tree)):
@@ -349,6 +360,19 @@ def main():
             add("mutated", kind, changed, [kind])
             mutated += 1
 
+    edged = 0
+    for n, (kind, text) in enumerate(generated):
+        if n % EDGED_EVERY:
+            continue
+        pool = list(WHITE_SPACE) + NOT_WHITE_SPACE
+        left = "".join(rng.choice(pool) for _ in range(rng.randint(0, 2)))
+        right = "".join(rng.choice(pool) for _ in range(rng.randint(0, 2)))
+        changed = left + text + right
+        if changed == text or (kind, changed) in seen:
+            continue
+        add("edges", kind, changed, [kind])
+        edged += 1
+
     flat = [(o, t, k) for o, t, k, _ in samples]
     results = ergo_reads(flat)
 
@@ -402,7 +426,7 @@ def main():
         problems.append(f"{kind} {json.dumps(text)} ({origin}): {side}{said}")
 
     rust_summary = f", {len(rust_disagreements)} Rust disagreements" if command else ""
-    origins = {o: sum(1 for s in samples if s[0] == o) for o in ["corpus", "case", "extra", "generated", "mutated"]}
+    origins = {o: sum(1 for s in samples if s[0] == o) for o in ["corpus", "case", "extra", "generated", "mutated", "edges"]}
     print(f"read {len(samples)} sentences ({origins}) in {time.time() - started:.1f}s; {len(disagreements)} disagreements, {len(listed)} listed{rust_summary}; ergo.rego rejected {semantic} for reasons that aren't syntax; {bad_generated} generated sentences the ABNF parser itself refused")
     for line in problems:
         print(line)
