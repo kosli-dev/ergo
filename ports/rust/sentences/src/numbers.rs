@@ -201,6 +201,20 @@ fn repeat_spec(chars: &[char], at: usize) -> Option<usize> {
     }
 }
 
+fn ascii_class(letter: char, in_class: bool) -> Option<&'static str> {
+    match letter {
+        'd' => Some("[0-9]"),
+        'D' => Some("[^0-9]"),
+        'w' => Some("[0-9A-Za-z_]"),
+        'W' => Some("[^0-9A-Za-z_]"),
+        's' => Some("[\\t\\n\\x0C\\r ]"),
+        'S' => Some("[^\\t\\n\\x0C\\r ]"),
+        'b' if !in_class => Some("(?-u:\\b)"),
+        'B' if !in_class => Some("(?-u:\\B)"),
+        _ => None,
+    }
+}
+
 fn prepare(pattern: &str) -> Option<String> {
     let chars: Vec<char> = pattern.chars().collect();
     let mut out = String::new();
@@ -231,8 +245,13 @@ fn prepare(pattern: &str) -> Option<String> {
                 out.push_str(&regex_syntax::escape(&literal));
                 continue;
             }
-            out.push('\\');
-            out.push(next);
+            match ascii_class(next, in_class) {
+                Some(set) => out.push_str(set),
+                None => {
+                    out.push('\\');
+                    out.push(next);
+                }
+            }
             i += 2;
             if "pPx".contains(next) && chars.get(i) == Some(&'{') {
                 while i < chars.len() && chars[i - 1] != '}' {
@@ -358,12 +377,15 @@ fn repeats_too_much(ast: &regex_syntax::ast::Ast, left: u32) -> bool {
     }
 }
 
+pub fn rust_pattern(pattern: &str) -> Option<String> {
+    let text = prepare(pattern)?;
+    let ast = regex_syntax::ast::parse::Parser::new().parse(&text).ok()?;
+    if repeats_too_much(&ast, 1000) || regex_syntax::Parser::new().parse(&text).is_err() {
+        return None;
+    }
+    Some(text)
+}
+
 pub(crate) fn valid_pattern(pattern: &str) -> bool {
-    let Some(text) = prepare(pattern) else {
-        return false;
-    };
-    let Ok(ast) = regex_syntax::ast::parse::Parser::new().parse(&text) else {
-        return false;
-    };
-    !repeats_too_much(&ast, 1000) && regex_syntax::Parser::new().parse(&text).is_ok()
+    rust_pattern(pattern).is_some()
 }

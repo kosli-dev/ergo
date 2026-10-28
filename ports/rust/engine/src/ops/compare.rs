@@ -85,11 +85,6 @@ pub fn side_refs(left: &Side, right: &Side) -> Vec<Path> {
             refs.extend(path::step_refs(path));
         }
     }
-    if let Side::Path(path) = right
-        && path::is_ref(path)
-    {
-        refs.push(path.clone());
-    }
     refs
 }
 
@@ -282,7 +277,7 @@ fn within_as_floats(a: &Number, b: &Number, distance: &Number) -> bool {
     (float(a) - float(b)).abs() <= float(distance)
 }
 
-fn joined<A, B>(
+pub fn joined<A, B>(
     a: Result<A, Vec<String>>,
     b: Result<B, Vec<String>>,
 ) -> Result<(A, B), Vec<String>> {
@@ -803,5 +798,45 @@ mod tests {
             );
         }
         assert!(lowered("x is at least $params.y").unwrap().is_ok());
+    }
+
+    #[test]
+    fn a_compare_or_tally_side_is_never_a_ref_itself_but_its_named_by_refs_are() {
+        use crate::ops::tally::{Derived, Tally, Term, Test};
+        let key = |k: &str| Step::Key(k.to_string());
+        let i = Path {
+            start: Start::Params,
+            steps: vec![key("i")],
+        };
+        let named = Path {
+            start: Start::Subject,
+            steps: vec![key("z"), Step::Ref(Box::new(i.clone()))],
+        };
+        let params_hi = Path {
+            start: Start::Params,
+            steps: vec![key("hi")],
+        };
+        let compare = |right: Path| {
+            Check::Compare(Compare {
+                left: field("n"),
+                right: Side::Path(right),
+                cmp: Cmp::Lte,
+                within: None,
+            })
+        };
+        assert!(compare(params_hi.clone()).refs().is_empty());
+        assert_eq!(compare(named.clone()).refs(), vec![i.clone()]);
+        let tally = Check::Tally(Tally {
+            left: crate::ops::tally::Side::Plain(field("n")),
+            right: Some(crate::ops::tally::Side::Derived(Derived {
+                text: String::new(),
+                terms: vec![Term::Path(params_hi), Term::Path(named)],
+            })),
+            test: Test::Compare {
+                cmp: Cmp::Eq,
+                within: None,
+            },
+        });
+        assert_eq!(tally.refs(), vec![i]);
     }
 }

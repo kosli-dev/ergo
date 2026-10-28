@@ -136,11 +136,6 @@ impl Tally {
                 }
             }
         }
-        if let Some(Side::Plain(compare::Side::Path(path))) = &self.right
-            && path::is_ref(path)
-        {
-            refs.push(path.clone());
-        }
         refs
     }
 }
@@ -897,13 +892,13 @@ mod tests {
     }
 
     #[test]
-    fn a_tally_lists_a_ref_on_its_right_side_and_inside_ref_steps_as_its_refs() {
+    fn a_tally_lists_the_refs_inside_ref_steps_but_not_a_side_that_is_a_ref() {
         let names: Vec<String> = lowered("x plus y named by $params.k is $params.limit")
             .refs()
             .iter()
             .map(crate::name::name)
             .collect();
-        assert_eq!(names, vec!["$params.k", "$params.limit"]);
+        assert_eq!(names, vec!["$params.k"]);
     }
 
     #[test]
@@ -1711,16 +1706,29 @@ mod tests {
 
     #[test]
     fn a_whose_that_reads_a_missing_ref_fails_the_side_even_on_an_empty_list() {
-        let sentence = "count of xs whose k is $params.limit is 0";
+        let sentence = "count of xs whose k is one of $params.limit is 0";
         let run =
             |subject: Value, params: Value| run_on(sentence, subject, json!({}), params).cause;
         assert_eq!(run(json!({"xs": []}), json!({})), Cause::Absent);
         assert_eq!(run(json!({"xs": []}), json!({"limit": null})), Cause::Null);
         assert_eq!(
-            run(json!({"xs": []}), json!({"limit": 1})),
+            run(json!({"xs": []}), json!({"limit": [1]})),
             Cause::Satisfied
         );
         assert_eq!(run(json!({"xs": [{"k": 1}]}), json!({})), Cause::Absent);
+    }
+
+    #[test]
+    fn a_whose_that_compares_with_a_missing_param_is_not_a_ref_so_an_empty_list_still_counts_zero()
+    {
+        let sentence = "count of xs whose k is $params.limit is 0";
+        let run =
+            |subject: Value, params: Value| run_on(sentence, subject, json!({}), params).cause;
+        assert_eq!(run(json!({"xs": []}), json!({})), Cause::Satisfied);
+        assert_eq!(
+            run(json!({"xs": []}), json!({"limit": null})),
+            Cause::Satisfied
+        );
     }
 
     #[test]
@@ -1852,18 +1860,19 @@ mod tests {
     #[test]
     fn a_whose_the_engine_cannot_run_yet_makes_the_side_not_yet_supported() {
         assert_eq!(
-            lowered("count of xs whose k is one of 1, 2 is 1"),
+            lowered("count of xs whose k starts with count of ys is 1"),
             Check::NotYet
         );
     }
 
     #[test]
     fn a_ref_inside_a_count_path_or_whose_is_among_the_refs_of_the_check() {
-        let names: Vec<String> = lowered("count of m named by $params.a whose k is $params.b is 1")
-            .refs()
-            .iter()
-            .map(crate::name::name)
-            .collect();
+        let names: Vec<String> =
+            lowered("count of m named by $params.a whose k is one of $params.b is 1")
+                .refs()
+                .iter()
+                .map(crate::name::name)
+                .collect();
         assert_eq!(names, vec!["$params.a", "$params.b"]);
     }
 

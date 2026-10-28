@@ -368,6 +368,18 @@ mod tests {
         })
     }
 
+    fn in_list_at(path: crate::path::Path) -> Check {
+        use crate::ops::lists::{In, Right};
+        Check::In(In {
+            path: crate::path::Path {
+                start: crate::path::Start::Subject,
+                steps: vec![crate::path::Step::Key("x".into())],
+            },
+            values: Right::Ref(path),
+            not: false,
+        })
+    }
+
     fn reference(start: crate::path::Start, key: &str) -> crate::path::Path {
         crate::path::Path {
             start,
@@ -383,11 +395,11 @@ mod tests {
                 .iter()
                 .map(|k| Item {
                     text: String::new(),
-                    check: compare_to(reference(Start::Params, k)),
+                    check: in_list_at(reference(Start::Params, k)),
                 })
                 .chain(std::iter::once(Item {
                     text: String::new(),
-                    check: compare_to(reference(Start::Input, "i")),
+                    check: in_list_at(reference(Start::Input, "i")),
                 }))
                 .collect(),
             all_of: true,
@@ -410,7 +422,7 @@ mod tests {
         let plan = Plan {
             items: vec![Item {
                 text: String::new(),
-                check: compare_to(reference(Start::Params, "k")),
+                check: in_list_at(reference(Start::Params, "k")),
             }],
             all_of: false,
         };
@@ -502,10 +514,10 @@ mod tests {
 
     #[test]
     fn a_check_the_engine_cannot_run_yet_still_gets_a_plan_that_fails_as_unusable() {
-        let read = one(json!({"c": "every xs.y is empty"}));
+        let read = one(json!({"c": "every xs.y starts with count of zs"}));
         let plan = read.plan.unwrap();
         assert!(matches!(plan.items[0].check, Check::NotYet));
-        let read = one(json!({"c": "x is empty and y exists"}));
+        let read = one(json!({"c": "x starts with count of ys and y exists"}));
         let plan = read.plan.unwrap();
         assert!(matches!(plan.items[0].check, Check::NotYet));
         assert!(matches!(plan.items[1].check, Check::Present(_)));

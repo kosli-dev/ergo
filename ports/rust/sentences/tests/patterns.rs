@@ -138,3 +138,29 @@ fn quoted_text_and_class_ranges_are_read_as_re2_reads_them() {
         );
     }
 }
+
+#[test]
+fn the_rust_text_of_a_pattern_keeps_re2s_ascii_classes() {
+    assert_eq!(rust_pattern(r"^\d+$").as_deref(), Some("^[0-9]+$"));
+    assert_eq!(rust_pattern(r"\D").as_deref(), Some("[^0-9]"));
+    assert_eq!(rust_pattern(r"\w").as_deref(), Some("[0-9A-Za-z_]"));
+    assert_eq!(rust_pattern(r"\W").as_deref(), Some("[^0-9A-Za-z_]"));
+    assert_eq!(rust_pattern(r"\s").as_deref(), Some(r"[\t\n\x0C\r ]"));
+    assert_eq!(rust_pattern(r"\S").as_deref(), Some(r"[^\t\n\x0C\r ]"));
+    assert_eq!(rust_pattern(r"a\b").as_deref(), Some(r"a(?-u:\b)"));
+    assert_eq!(rust_pattern(r"a\B").as_deref(), Some(r"a(?-u:\B)"));
+}
+
+#[test]
+fn an_ascii_class_inside_brackets_is_a_nested_class() {
+    assert_eq!(rust_pattern(r"[\d_]").as_deref(), Some("[[0-9]_]"));
+    assert_eq!(rust_pattern(r"[^\s]").as_deref(), Some(r"[^[\t\n\x0C\r ]]"));
+    assert_eq!(rust_pattern(r"[\d-z]").as_deref(), Some(r"[[0-9]\-z]"));
+}
+
+#[test]
+fn a_pattern_re2_rejects_has_no_rust_text() {
+    for pattern in [r"a\Z", "(", "a**", "(?<=a)b", r"\1"] {
+        assert_eq!(rust_pattern(pattern), None, "{pattern:?}");
+    }
+}
