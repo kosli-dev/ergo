@@ -192,6 +192,12 @@ jobs:
       - run: cargo test --locked -p ergo-engine --features serde_json/preserve_order --test key_order
       - name: Check ergo-sentences builds for Wasm
         run: cargo build --locked -p ergo-sentences --target wasm32-unknown-unknown
+      - name: Install the wasm-bindgen tool, at the version of the crate
+        run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
+      - name: Build ergo-wasm and wrap it for a browser
+        run: |
+          cargo build --locked --release -p ergo-wasm --target wasm32-unknown-unknown
+          wasm-bindgen --target web --out-dir wasm/pkg target/wasm32-unknown-unknown/release/ergo_wasm.wasm
 
   spec:
     runs-on: ubuntu-latest
