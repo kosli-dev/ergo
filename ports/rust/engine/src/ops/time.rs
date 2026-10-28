@@ -50,6 +50,12 @@ pub fn compare_times(a: &Time, b: &Time) -> Option<Ordering> {
     }
 }
 
+impl CompareTime {
+    pub fn refs(&self) -> Vec<crate::path::Path> {
+        super::compare::side_refs(&self.left, &self.right)
+    }
+}
+
 pub fn run(check: &CompareTime, ctx: &Ctx) -> Verdict {
     let (l, r, inputs) = read_sides(&check.left, &check.right, ctx);
     let cause = match unread_cause(&l, &r) {

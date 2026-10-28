@@ -675,9 +675,26 @@ impl Reading {
                                     Err(found) => found_problems.extend(found),
                                 }
                             }
-                            s::FromCondition::Quantified { .. } => {
-                                found_problems.push(format!("{text}{}", lower::UNSUPPORTED_SUFFIX));
-                            }
+                            s::FromCondition::Quantified {
+                                quantifier,
+                                path,
+                                if_any,
+                                phrase,
+                            } => match lower::lower_quantified(
+                                *quantifier,
+                                path,
+                                &[],
+                                *if_any,
+                                phrase,
+                                &scope,
+                            ) {
+                                Ok(Some(check)) => filters.push(Filter { text, check }),
+                                Ok(None) => {
+                                    found_problems
+                                        .push(format!("{text}{}", lower::UNSUPPORTED_SUFFIX));
+                                }
+                                Err(found) => found_problems.extend(found),
+                            },
                         }
                     }
                     if let Relation::Narrows(parent) = &found.relation

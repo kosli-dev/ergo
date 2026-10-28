@@ -130,6 +130,8 @@ pub struct Read<'a> {
     pub step_unreadable: bool,
 }
 
+pub const OUTER: &str = "$outer";
+
 pub enum Resolved {
     Key(String),
     Index(u64),
@@ -142,6 +144,24 @@ fn ended<'a>(outcome: Outcome, location: Location) -> Read<'a> {
         location: Some(location),
         step_unreadable: false,
     }
+}
+
+pub fn is_ref(path: &Path) -> bool {
+    matches!(path.start, Start::Params | Start::Input)
+        && path
+            .steps
+            .iter()
+            .all(|step| matches!(step, Step::Key(_) | Step::Index(_)))
+}
+
+pub fn step_refs(path: &Path) -> Vec<Path> {
+    path.steps
+        .iter()
+        .filter_map(|step| match step {
+            Step::Ref(reference) if is_ref(reference) => Some((**reference).clone()),
+            _ => None,
+        })
+        .collect()
 }
 
 pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
@@ -175,7 +195,7 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
     }
 }
 
-fn start_of<'a>(start: &Start, ctx: &Ctx<'a>) -> Result<(&'a Value, Location, bool), Read<'a>> {
+pub fn start_of<'a>(start: &Start, ctx: &Ctx<'a>) -> Result<(&'a Value, Location, bool), Read<'a>> {
     match start {
         Start::Subject => Ok((ctx.subject.value, ctx.subject.location.clone(), true)),
         Start::Input => Ok((ctx.input, Location::input_root(), false)),
@@ -196,7 +216,7 @@ fn start_of<'a>(start: &Start, ctx: &Ctx<'a>) -> Result<(&'a Value, Location, bo
     }
 }
 
-fn leading_steps(start: &Start) -> &[Step] {
+pub fn leading_steps(start: &Start) -> &[Step] {
     match start {
         Start::Part(part) => &part.steps,
         _ => &[],

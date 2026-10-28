@@ -1,5 +1,6 @@
+use crate::ops::walk::{Quantifier, Walk};
 use crate::ops::{Check, present::Present};
-use crate::path::{self, PartStart, Start, Step};
+use crate::path::{self, OUTER, PartStart, Start, Step};
 use crate::value::Decimal;
 use ergo_sentences as s;
 use serde_json::Value;
@@ -17,6 +18,7 @@ pub struct PartDef {
 #[derive(Debug, Clone, Default)]
 pub struct Scope {
     left_reads_parents: bool,
+    item: bool,
     parts: BTreeMap<String, PartDef>,
     parents: BTreeMap<String, BTreeMap<String, PartDef>>,
     for_aliases: BTreeSet<String>,
@@ -188,11 +190,30 @@ impl Scope {
     }
 
     pub fn path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
-        self.read_path(path, true)
+        self.read_path(path, true, true)
     }
 
     pub fn left_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
-        self.read_path(path, self.left_reads_parents)
+        if self.item {
+            self.read_path(path, false, false)
+        } else {
+            self.read_path(path, self.left_reads_parents, true)
+        }
+    }
+
+    pub fn in_item(&self) -> Scope {
+        Scope {
+            item: true,
+            ..self.clone()
+        }
+    }
+
+    fn base(&self) -> Start {
+        if self.item {
+            Start::Alias(OUTER.to_string())
+        } else {
+            Start::Subject
+        }
     }
 
     pub fn on_subject(&self) -> Scope {
@@ -202,7 +223,12 @@ impl Scope {
         }
     }
 
-    fn read_path(&self, written: &s::Path, parents: bool) -> Result<path::Path, Vec<String>> {
+    fn read_path(
+        &self,
+        written: &s::Path,
+        parents: bool,
+        parts: bool,
+    ) -> Result<path::Path, Vec<String>> {
         let mut problems = Vec::new();
         let mut steps = Vec::new();
         for step in &written.steps {
@@ -223,7 +249,7 @@ impl Scope {
             s::Start::It => (Start::Subject, steps),
             s::Start::Params => (Start::Params, steps),
             s::Start::Input => (Start::Input, steps),
-            s::Start::Field { key, dot } => self.field_start(key, *dot, parents, steps),
+            s::Start::Field { key, dot } => self.field_start(key, *dot, parents, parts, steps),
         };
         Ok(path::Path { start, steps })
     }
@@ -233,11 +259,12 @@ impl Scope {
         key: &str,
         dot: bool,
         parents: bool,
+        parts: bool,
         mut steps: Vec<Step>,
     ) -> (Start, Vec<Step>) {
         if !dot {
-            if let Some(part) = self.parts.get(key) {
-                return (part_start(key, Start::Subject, part), steps);
+            if parts && let Some(part) = self.parts.get(key) {
+                return (part_start(key, self.base(), part), steps);
             }
             if parents {
                 if let Some(found) = self.parents.get(key) {
@@ -328,7 +355,88 @@ pub fn lower_assertion(assertion: &s::Assertion, scope: &Scope) -> Result<Check,
                 None => Ok(Check::NotYet),
             },
         },
-        _ => Ok(Check::NotYet),
+        s::Assertion::Quantified {
+            quantifier,
+            path,
+            whose,
+            if_any,
+            phrase,
+        } => Ok(
+            lower_quantified(*quantifier, path, whose, *if_any, phrase, &scope)?
+                .unwrap_or(Check::NotYet),
+        ),
+        s::Assertion::Derived { .. } => Ok(Check::NotYet),
+    }
+}
+
+pub fn lower_quantified(
+    quantifier: s::Quantifier,
+    path: &s::Path,
+    whose: &[s::Condition],
+    if_any: bool,
+    phrase: &s::Phrase,
+    scope: &Scope,
+) -> Result<Option<Check>, Vec<String>> {
+    let mut problems = Vec::new();
+    let walk_path = match scope.left_path(path) {
+        Ok(found) => Some(found),
+        Err(found) => {
+            problems.extend(found);
+            None
+        }
+    };
+    let item = scope.in_item();
+    let mut conditions = Vec::new();
+    let mut runnable = true;
+    for condition in whose {
+        match lower_condition(condition, &item) {
+            Ok(check) => conditions.push(check),
+            Err(found) if found.iter().all(|p| p.ends_with(UNSUPPORTED_SUFFIX)) => {
+                runnable = false;
+            }
+            Err(found) => problems.extend(found),
+        }
+    }
+    let on_item = s::Path {
+        position: None,
+        start: s::Start::It,
+        steps: Vec::new(),
+    };
+    let check = match phrase {
+        s::Phrase::Exists { not } => match item.left_path(&on_item) {
+            Ok(path) => Some(Check::Present(Present {
+                path,
+                missing: *not,
+            })),
+            Err(found) => {
+                problems.extend(found);
+                None
+            }
+        },
+        other => match lower_with_operator_modules(&on_item, other, &item) {
+            Some(Ok(check)) => Some(check),
+            Some(Err(found)) => {
+                problems.extend(found);
+                None
+            }
+            None => None,
+        },
+    };
+    if !problems.is_empty() {
+        return Err(problems);
+    }
+    match (walk_path, check, runnable) {
+        (Some(path), Some(check), true) => Ok(Some(Check::Walk(Box::new(Walk {
+            quantifier: match quantifier {
+                s::Quantifier::Every => Quantifier::Every,
+                s::Quantifier::Some => Quantifier::Some,
+            },
+            path,
+            whose: conditions,
+            if_any,
+            check: Box::new(check),
+        })))),
+        _ => Ok(None),
     }
 }
 

@@ -4,7 +4,7 @@ use super::time::{CompareTime, Order};
 use super::{Check, Input, Verdict, read_path, verdict};
 use crate::cause::Cause;
 use crate::lower::Scope;
-use crate::path::{Ctx, Outcome, Path};
+use crate::path::{self, Ctx, Outcome, Path};
 use crate::value;
 use ergo_sentences as tree;
 use serde_json::{Number, Value};
@@ -41,7 +41,7 @@ pub struct Compare {
 pub struct SideRead {
     pub outcome: Outcome,
     pub value: Option<Value>,
-    pub input: Option<Input>,
+    pub inputs: Vec<Input>,
 }
 
 pub fn read_side(side: &Side, ctx: &Ctx) -> SideRead {
@@ -51,18 +51,18 @@ pub fn read_side(side: &Side, ctx: &Ctx) -> SideRead {
             SideRead {
                 outcome: read.outcome,
                 value: read.value,
-                input: Some(read.input),
+                inputs: read.inputs,
             }
         }
         Side::Value(Value::Null) => SideRead {
             outcome: Outcome::Null,
             value: None,
-            input: None,
+            inputs: Vec::new(),
         },
         Side::Value(v) => SideRead {
             outcome: Outcome::Found,
             value: Some(v.clone()),
-            input: None,
+            inputs: Vec::new(),
         },
     }
 }
@@ -70,12 +70,33 @@ pub fn read_side(side: &Side, ctx: &Ctx) -> SideRead {
 pub fn read_sides(left: &Side, right: &Side, ctx: &Ctx) -> (SideRead, SideRead, Vec<Input>) {
     let l = read_side(left, ctx);
     let r = read_side(right, ctx);
-    let inputs = l.input.iter().chain(r.input.iter()).cloned().collect();
+    let inputs = l.inputs.iter().chain(r.inputs.iter()).cloned().collect();
     (l, r, inputs)
 }
 
 pub fn unread_cause(l: &SideRead, r: &SideRead) -> Option<Cause> {
     Cause::worst([l.outcome, r.outcome].into_iter().filter_map(|o| o.cause()))
+}
+
+pub fn side_refs(left: &Side, right: &Side) -> Vec<Path> {
+    let mut refs = Vec::new();
+    for side in [left, right] {
+        if let Side::Path(path) = side {
+            refs.extend(path::step_refs(path));
+        }
+    }
+    if let Side::Path(path) = right
+        && path::is_ref(path)
+    {
+        refs.push(path.clone());
+    }
+    refs
+}
+
+impl Compare {
+    pub fn refs(&self) -> Vec<Path> {
+        side_refs(&self.left, &self.right)
+    }
 }
 
 pub fn run(check: &Compare, ctx: &Ctx) -> Verdict {

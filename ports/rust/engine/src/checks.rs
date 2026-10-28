@@ -1,9 +1,12 @@
 use crate::lower::{self, Scope};
+use crate::name;
 use crate::ops::Check;
+use crate::path::{self, Ctx, Located, Location};
 use crate::policy::{Form, OptionLines, Requirement, SubjectName};
 use crate::reading::Reading;
 use crate::report::written_expression;
 use ergo_sentences as s;
+use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone)]
@@ -256,6 +259,33 @@ pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<Str
         .collect()
 }
 
+pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value> {
+    let ctx = Ctx {
+        subject: Located {
+            value: input,
+            location: Location::input_root(),
+        },
+        input,
+        params,
+        aliases: BTreeMap::new(),
+    };
+    let mut entries: Vec<Value> = Vec::new();
+    for item in &plan.items {
+        for reference in item.check.refs() {
+            let read = path::read(&reference, &ctx);
+            let locations: Vec<String> = read.location.iter().map(Location::render).collect();
+            entries.push(serde_json::json!({
+                "name": name::name(&reference),
+                "value": read.value.cloned().unwrap_or(Value::Null),
+                "locations": locations,
+            }));
+        }
+    }
+    entries.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
+    entries.dedup();
+    entries
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -280,6 +310,105 @@ mod tests {
 
     fn problems(read: &CheckRead) -> Vec<&str> {
         read.problems.iter().map(String::as_str).collect()
+    }
+
+    fn compare_to(path: crate::path::Path) -> Check {
+        use crate::ops::compare::{Cmp, Compare, Side};
+        Check::Compare(Compare {
+            left: Side::Path(crate::path::Path {
+                start: crate::path::Start::Subject,
+                steps: vec![crate::path::Step::Key("x".into())],
+            }),
+            right: Side::Path(path),
+            cmp: Cmp::Eq,
+            within: None,
+        })
+    }
+
+    fn reference(start: crate::path::Start, key: &str) -> crate::path::Path {
+        crate::path::Path {
+            start,
+            steps: vec![crate::path::Step::Key(key.into())],
+        }
+    }
+
+    #[test]
+    fn refs_are_read_once_from_the_params_and_the_input_and_sorted_by_name() {
+        use crate::path::Start;
+        let plan = Plan {
+            items: ["b", "a", "a"]
+                .iter()
+                .map(|k| Item {
+                    text: String::new(),
+                    check: compare_to(reference(Start::Params, k)),
+                })
+                .chain(std::iter::once(Item {
+                    text: String::new(),
+                    check: compare_to(reference(Start::Input, "i")),
+                }))
+                .collect(),
+            all_of: true,
+        };
+        let params = json!({"a": 1, "b": [2]});
+        let found = refs_of(&plan, &json!({"i": "z"}), Some(&params));
+        assert_eq!(
+            found,
+            [
+                json!({"name": "$input.i", "value": "z", "locations": ["/i"]}),
+                json!({"name": "$params.a", "value": 1, "locations": ["$params:/a"]}),
+                json!({"name": "$params.b", "value": [2], "locations": ["$params:/b"]}),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_ref_that_cannot_be_read_shows_null_where_the_read_stopped() {
+        use crate::path::Start;
+        let plan = Plan {
+            items: vec![Item {
+                text: String::new(),
+                check: compare_to(reference(Start::Params, "k")),
+            }],
+            all_of: false,
+        };
+        assert_eq!(
+            refs_of(&plan, &json!({}), None),
+            [json!({"name": "$params.k", "value": null, "locations": ["$params:"]})]
+        );
+        let params = json!({});
+        assert_eq!(
+            refs_of(&plan, &json!({}), Some(&params))[0]["locations"],
+            json!(["$params:"])
+        );
+    }
+
+    #[test]
+    fn a_ref_step_is_a_ref_and_a_plain_field_on_the_right_is_not() {
+        use crate::path::{Path, Start, Step};
+        let named = Path {
+            start: Start::Subject,
+            steps: vec![
+                Step::Key("m".into()),
+                Step::Ref(Box::new(reference(Start::Params, "k"))),
+            ],
+        };
+        let plan = Plan {
+            items: vec![
+                Item {
+                    text: String::new(),
+                    check: compare_to(named),
+                },
+                Item {
+                    text: String::new(),
+                    check: compare_to(reference(Start::Subject, "y")),
+                },
+            ],
+            all_of: true,
+        };
+        let params = json!({"k": "a"});
+        let found = refs_of(&plan, &json!({}), Some(&params));
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0]["name"], json!("$params.k"));
     }
 
     #[test]

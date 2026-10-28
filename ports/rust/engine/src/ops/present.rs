@@ -1,11 +1,17 @@
 use super::{Verdict, read_path, verdict};
 use crate::cause::Cause;
-use crate::path::{Ctx, Outcome, Path, Start};
+use crate::path::{self, Ctx, Outcome, Path, Start};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Present {
     pub path: Path,
     pub missing: bool,
+}
+
+impl Present {
+    pub fn refs(&self) -> Vec<Path> {
+        path::step_refs(&self.path)
+    }
 }
 
 pub fn run(check: &Present, ctx: &Ctx) -> Verdict {
@@ -20,7 +26,7 @@ pub fn run(check: &Present, ctx: &Ctx) -> Verdict {
     };
     Verdict {
         cause,
-        inputs: vec![read.input],
+        inputs: read.inputs,
     }
 }
 
