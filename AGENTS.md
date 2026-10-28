@@ -17,6 +17,7 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.
 - `packages/` holds Node tools that build on Ergo, in one pnpm workspace. Someone who only copies `ergo.rego` never needs them.
 - `packages/markdown/` compiles a policy written in Markdown into a policy object. It's an experiment, not published.
+- `packages/editor/` builds a web page for writing those Markdown policies: the source beside what the compiler read, the policy, the document, the YAML and a report from `ergo.rego` run in the page.
 
 ## Checks
 
@@ -60,7 +61,7 @@ pnpm test
 pnpm -r bundle
 ```
 
-`pnpm test` fails when a line under `packages/markdown/src` isn't reached by a test. Its tests also run `ergo.report` with opa on every case in `packages/markdown/cases` that has an input.
+`pnpm test` fails when a line under `packages/markdown/src` isn't reached by a test. Its tests also run `ergo.report` with opa on every case in `packages/markdown/cases` that has an input. The editor's tests build the page, which compiles `ergo.rego` to Wasm with the `opa` on your PATH, and check that each sample gives the report its case expects.
 
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. That's OPA 1.20.2, the version the Kosli CLI embeds. When you change the OPA version, change it in the README, in `CONTRIBUTING.md`, in every job of the workflow, in the Docker command below and in `opaVersion` in `site/hugo.toml`.
 
@@ -142,7 +143,7 @@ The first line names the part of the repo that changed, then says what the chang
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`
 - `spec:` the spec in `spec/`, its cases and `spec_test.rego`
-- `markdown:` the Markdown compiler in `packages/markdown` and the pnpm workspace around it
+- `markdown:` the Markdown compiler in `packages/markdown`, the editor in `packages/editor` and the pnpm workspace around them
 
 For example, `core: fail compare when either side is missing`.
 
