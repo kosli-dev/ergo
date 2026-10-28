@@ -35,10 +35,10 @@ export const sentenceTokens = (text, base = "plain") => {
   return join(out);
 };
 
-const linesIn = (blocks, kinds) => {
+const linesIn = (blocks, kinds, name) => {
   const lines = new Set();
   for (const b of blocks ?? []) {
-    if (!kinds.includes(b.kind)) continue;
+    if (!kinds.includes(b.kind) || (name && b.name !== name)) continue;
     for (let i = b.startLine; i <= b.endLine; i++) lines.add(i);
   }
   return lines;
@@ -117,7 +117,7 @@ const markdownLine = (line, sentence, field) => {
 
 export const highlightMarkdown = (source, blocks) => {
   const lines = source.split("\n");
-  const sentences = linesIn(blocks, ["check", "option"]);
+  const sentences = new Set([...linesIn(blocks, ["check", "option"]), ...linesIn(blocks, ["field"], "from")]);
   const fields = linesIn(blocks, ["field"]);
   const labels = linesIn(blocks, ["checks"]);
   let front = lines[0] === "---";
@@ -145,6 +145,7 @@ export const highlightMarkdown = (source, blocks) => {
 };
 
 const isSentencePath = (keys) =>
+  (keys.at(-1) === "from" && keys.at(-3) === "subjects" && keys.length === 3) ||
   (["assert", "for"].includes(keys.at(-1)) && keys.at(-3) === "checks") || (keys.at(-2) === "any_of" && keys.at(-4) === "checks");
 
 const scalar = (text) => {
@@ -153,6 +154,18 @@ const scalar = (text) => {
   if (/^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(value)) return [space, { kind: "number", text: value }];
   if (/^(?:true|false|null)$/.test(value)) return [space, { kind: "word", text: value }];
   return [space, { kind: "string", text: value }];
+};
+
+const unquote = (key) => {
+  if (key.startsWith("'")) return key.slice(1, -1).replace(/''/g, "'");
+  if (key.startsWith('"')) {
+    try {
+      return JSON.parse(key);
+    } catch {
+      return key.slice(1, -1);
+    }
+  }
+  return key;
 };
 
 export const highlightYaml = (text) => {
@@ -168,14 +181,14 @@ export const highlightYaml = (text) => {
     while (stack.length && stack.at(-1).indent >= indent) stack.pop();
     const keys = stack.map((s) => s.key);
     const head = [{ kind: "plain", text: lead }, { kind: "marker", text: dash }];
-    const kv = /^([^\s"'#][^:]*?|"[^"]*"|'[^']*'):(?=\s|$)(.*)$/.exec(rest);
+    const kv = /^([^\s"'#][^:]*?|"(?:[^"\\]|\\.)*"|'(?:[^']|'')*'):(?=\s|$)(.*)$/.exec(rest);
     if (!kv) {
       if (!rest) return join(head);
       return join([...head, ...(dash && isSentencePath(keys) ? sentenceTokens(rest) : scalar(rest))]);
     }
     const [, key, value] = kv;
     const keyIndent = indent + dash.length;
-    stack.push({ indent: keyIndent, key });
+    stack.push({ indent: keyIndent, key: unquote(key) });
     head.push({ kind: "key", text: key }, { kind: "plain", text: ":" });
     if (/^\s*[|>][-+]?\d*\s*$/.test(value)) {
       scalarBlock = keyIndent;
