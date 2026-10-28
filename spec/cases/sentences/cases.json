@@ -7346,5 +7346,124 @@
         }
       }
     ]
+  },
+  {
+    "description": "whitespace at either end of an identified_by and of a part's path",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "\tid\n",
+          "has": {
+            "p": "\u3000k\n",
+            "q": {
+              "from": "\tm\n",
+              "identified_by": "\nmid\t"
+            }
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "p.z is 1",
+            "d": "q.w is 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is dropped, so the subject and the part are read and named as if it weren't there",
+        "rules": [
+          "sentence.ends",
+          "subjects.id",
+          "parts.path"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "k": {
+                "z": 1
+              },
+              "m": {
+                "mid": "m1",
+                "w": 2
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/k/z"
+                ],
+                "name": "p.z",
+                "part": {
+                  "id": null,
+                  "name": "p"
+                },
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/m/w"
+                ],
+                "name": "q.w",
+                "part": {
+                  "id": "m1",
+                  "name": "q"
+                },
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ],
+        "report": {
+          "subjects": {
+            "thing": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {
+                "p": {
+                  "from": "k",
+                  "identified_by": null
+                },
+                "q": {
+                  "from": "m",
+                  "identified_by": "mid"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
   }
 ]
