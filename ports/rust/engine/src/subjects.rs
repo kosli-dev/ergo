@@ -1632,7 +1632,7 @@ mod tests {
      {
         let r = with_checks(
             json!({"thing": {"from": "ds"}}),
-            json!({"a": "every xs.y is 1"}),
+            json!({"a": "every xs.y is empty"}),
             json!({"ds": [{"xs": [{"y": 1}]}]}),
         );
         let a = rows(&r, "a");

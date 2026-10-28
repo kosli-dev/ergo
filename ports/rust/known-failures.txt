@@ -5,7 +5,6 @@ any_of / any_of with a present check in an option / settles that option as value
 any_of / any_of with a name that starts like another / sorts its options by name, not by the text they print
 any_of / any_of with a ref to a missing param / fails only the option that reads it
 any_of / any_of with a ref to a param of the wrong type / fails the row as unusable even when another option passes
-compare / a key read from a field of the subject / adds the key the field holds, and shows the field too
 contains / includes a value / passes when the list contains it
 contains / includes a value / fails as value when it doesn't
 contains / includes a value / fails as value on an empty list
@@ -30,19 +29,14 @@ contains / excludes a value read through a ref / fails as absent when the param 
 contains / excludes values read through a ref to an empty list / fails as unusable, because an empty list would pass anything
 contains / excludes values read through a ref that isn't a list / fails as unusable
 contains / excludes values read through a ref that holds values of mixed types / fails as unusable, whatever the list holds
-deep_walks / three lists walked in a one-line every / a subject passes when every unit in every team of every group says ok, and fails as value or absent otherwise
-deep_walks / six walks, two in a from line and four in a check / a repo fails when any cell in its groups, teams and units is not ok, as value or as null
 deep_walks / six walks, two in a from line and four in a count of / count of walks every list on its path, so a repo with 15 cells fails and one with 17 passes
-deep_walks / ten steps after every, the most a path can take / reads as written, ten names being ten steps
 deep_walks / eleven steps after every / is written wrong
 deep_walks / ten steps after count of, starting at a for alias / reads as written, the alias being the first of ten steps
 deep_walks / eleven steps after count of, starting at a for alias / is written wrong, because the alias is a step too
-deep_walks / ten steps after every, one of them a position / reads as written, a position being a step like a name, and checks the first value of the last list
 deep_walks / eleven steps after every, one of them a position / is written wrong, because the position is a step too
 deep_walks / ten steps after a count of on the right of a phrase / reads as written, and a subject passes when its n is the count
 deep_walks / eleven steps after a count of on the right of a phrase / is written wrong, as it is on the left
 deep_walks / eleven steps after a sum of on the right of a phrase / is written wrong, as it is on the left
-deep_walks / ten steps after every, starting at a part of nine / reads as written, the part's own path being nine steps and z the tenth, so a subject passes when every z is 1
 deep_walks / eleven steps after every, starting at a part of ten / is written wrong, because a walk that starts at a part counts the part's own path, so x.z is eleven steps
 deep_walks / a parent's part of ten names in the whose of a count of, read on the item / reads the item's own field, so the part is not counted and the policy reads at ten names
 derived / count of a list / passes when the list has that many items, and shows the number and the items
@@ -405,7 +399,6 @@ it / it after a for line / is still the subject, and the alias is the item
 it / it in the whose of a from line / each item is read as the subject, and the $applies row names it it
 it / count of it in the whose of a from line / each list is counted
 it / two equal strings read as subjects / fail $unique_ids, and each is still checked
-it / every on a position of it / names the item and the list it came from
 it / some it in a from line's whose / keeps the tag lists that have latest, and fails the requirement for a value that isn't a list
 it / a check that reads it, on a plain value, a list and a from line that keeps lists / has the location of the subject itself for it, one for each item for every it and count of it, and where each failed item was read
 non_empty_string / non_empty_string / passes on a string
@@ -416,7 +409,6 @@ non_empty_string / non_empty_string / fails as absent when the field is missing
 non_empty_string / non_empty_string / fails as null when the field is null
 parts / where a part's alias is read / reads the alias in the conditions of the from line, in a for line's assertions, and on the right side after a one-line every, but not on the left of a whose
 parts / where a part's alias is read / an alias shadows a field with the same name, and the dot in front reads the field
-parts / a part whose path goes through a list / names a failed item with the full path, so no position is hidden
 parts / a part read in a check with named by on its right side / shows the part's value in its inputs
 parts / a failed sentence on a for line tags the inputs it read through a part / the part's input has the part and the item's has none
 parts / a for alias that isn't named like a subject or a part / reads the item
@@ -528,13 +520,6 @@ sentences / matches patterns from params / fails as value when none does
 sentences / matches a pattern from params that isn't a valid regular expression / fails as unusable
 sentences / does not match patterns from params / passes when none matches
 sentences / does not match patterns from params / fails as value when one matches
-sentences / a key chosen by a param / reads the key the param holds
-sentences / a key chosen by a param / fails as value when the other key holds another value
-sentences / a key chosen by a param / fails as absent when the key isn't there
-sentences / a key chosen by a param, then more keys / reads the keys after it
-sentences / a key chosen by a param that is missing / fails as absent
-sentences / a key chosen by a param that isn't a key / fails as unusable when the param is a list
-sentences / a key chosen by a param in brackets / reads the key the param holds and prints named by
 sentences / is in values prints as is one of / prints as x is one of "a", "b"
 sentences / values with no space after the comma print with one / prints as x is one of "a", "b"
 sentences / is one of a path prints as is in / prints as x is in $params.k
@@ -620,7 +605,6 @@ subjects / a condition with every / fails the requirement for a subject whose li
 subjects / a condition with every and if any / keeps a subject with no items, as every does in a check
 subjects / a condition with every and if any / does not keep a subject whose list is missing, null, not a list or has an item without the field, and points at the last value it reached
 subjects / a condition with some after another condition / joins the conditions with and in the expression, and keeps a subject that passes both
-subjects / a condition with some in the from line of a child subject / reads the parent's field by its name on the right side, and the item's field for a bare name
 subjects / a condition with some in a from line with every / keeps the releases of every artifact that pass the condition
 subjects / a condition with some in the from line of a subject that narrows another / keeps the subjects of the parent that pass the condition
 subjects / a from line whose condition has the parent subject's name on its left / reads the child's own field, as on the left of any whose
@@ -635,27 +619,6 @@ subjects / a child subject whose check reads its parent with named by on its rig
 subjects / a subject that narrows a subject in a loop / leads to a loop, named after its own from
 subjects / a child subject of a subject in a loop / leads to a loop, named after its own from
 subjects / a from line with a some or every condition that fails on some items / gives each failed item of the $applies row the location where its value was read
-walks / every over one list of objects / passes when every item passes, and failed_items is empty
-walks / every over one list of objects / fails as value when one item fails, and lists it with its position
-walks / every over one list of objects / lists every item that fails, in list order
-walks / every over one list of objects / fails as value on an empty list, and lists the list
-walks / every over one list of objects / fails as absent when the list is missing, and lists the list
-walks / every over one list of objects / fails as null when the list is null, and lists the list
-walks / every over one list of objects / fails as unusable when the list is a string, with nothing walked
-walks / every over one list of objects / fails as unusable when the list is an object, with nothing walked
-walks / every over one list of objects / fails as absent when an item has no such field, and shows null for it
-walks / every over one list of objects / fails as null when an item's field is null
-walks / every over one list of objects / fails as unusable when an item's field is the wrong type for is
-walks / every over one list of objects / takes the first cause in order when items fail differently, and lists both
-walks / every over nested lists / passes when every commit of every pull request is signed
-walks / every over nested lists / lists a failed value, a missing inner list and a missing field in path order, and the cause is absent
-walks / every over nested lists / fails as value when one inner list is empty, even though the others pass
-walks / every over nested lists / fails as null when one inner list is null
-walks / every over nested lists / fails as unusable when one inner list is not a list
-walks / every over nested lists / takes unusable over absent and value, and lists every failure in path order
-walks / every over nested lists / fails as value when the outer list is empty
-walks / every over nested lists / fails as absent when the outer list is missing, with nothing walked
-walks / every over nested lists / fails as absent with the item's field as the failed path when the only pull request has no commits, because no list is left to walk
 walks / every where the last list is the one walked, over strings / passes when every string matches
 walks / every where the last list is the one walked, over strings / fails as value for a string that does not match, named by its position
 walks / every where the last list is the one walked, over strings / fails as unusable for an item that is not a string
@@ -665,27 +628,6 @@ walks / every where each label is checked, not each pull request's labels / pass
 walks / every where each label is checked, not each pull request's labels / fails as value for an empty label, named by its position in that pull request's labels
 walks / every where each label is checked, not each pull request's labels / fails as value for a pull request with no labels, because the inner list is empty
 walks / every where each label is checked, not each pull request's labels / fails as unusable for a label that is a number
-walks / every with if any / passes when the list is empty
-walks / every with if any / passes when the outer list is empty
-walks / every with if any / passes when some inner lists are empty and the items of the others pass
-walks / every with if any / still fails when an item fails
-walks / every with if any / fails as absent when an inner list is missing
-walks / every with if any / fails as null when an inner list is null
-walks / every with if any / fails as unusable when an inner list is not a list
-walks / every with if any / fails as unusable with the item's field as the failed path when the only pull request's commits is not a list
-walks / every with if any / fails as absent when the outer list is missing
-walks / every with if any / fails as absent when an item's field is missing, because only empty lists are skipped
-walks / some over one list of objects / passes when one item passes, and failed_items is empty even though another item did not
-walks / some over one list of objects / fails as value when no item passes, and lists every item
-walks / some over one list of objects / fails as value on an empty list
-walks / some over one list of objects / fails as absent when the list is missing, with nothing walked
-walks / some over one list of objects / fails as null when the list is null, and lists the list
-walks / some over one list of objects / fails as unusable when the list is not a list
-walks / some over one list of objects / passes when an item has no such field and another item passes
-walks / some over one list of objects / fails with the first cause in order when an item has no field and none passes
-walks / some over one list of objects / fails as null when an item's field is null and none passes
-walks / some over nested lists / passes when an item passes, even if another pull request has no approvers
-walks / some over nested lists / fails when no item passes, and lists the empty inner list and the failed item in path order
 walks / whose under some / passes when an item that whose keeps passes, and the others are not listed
 walks / whose under some / fails as value when the kept item fails, and leaves out the item whose does not keep
 walks / whose under some / fails as value with no failed items when whose keeps nothing
@@ -707,39 +649,12 @@ walks / whose under every with if any / still fails when an item cannot be decid
 walks / whose under every with if any / still fails as absent when the list is missing
 walks / whose with exists is the exception to undecided items / a missing field leaves the item out under every, and a present one keeps it
 walks / whose with exists is the exception to undecided items / a missing field keeps the item under does not exist, and a present one leaves it out
-walks / whose with a condition that cannot compare the item / fails as unusable under every when the field is the wrong type for the condition
-walks / a field on the right side is read from the item / passes when the item's timestamp is after the item's own last commit
-walks / a field on the right side is read from the item / fails as value when the item's timestamp is before the item's own last commit, even if the subject's is earlier
-walks / a field on the right side is read from the item / fails as absent when the item has no last commit, even if the subject has one
 walks / params and input on the right side still read the params and the input / read the params and the input even when the item has a field of the same name
-walks / every and some joined with and to a plain sentence / passes with failed_assertions empty when both parts pass
-walks / every and some joined with and to a plain sentence / lists only the every part when it fails and the plain part passes
-walks / every and some joined with and to a plain sentence / lists only the plain part when it fails and the walk passes
-walks / every and some joined with and to a plain sentence / lists both in the order written, and the row takes the first cause in order
 walks / a walk that can't be run as written / fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read
-walks / a walk on a subject that isn't an object / fails as not_an_object, as any path with steps does
-walks / every over nested lists of different lengths / has one location per value, in the order of the walk, when the lists differ in length
 walks / some with a whose / has a location for every item the walk read, including the ones whose left out
-walks / every that stops before it walks a list / has no values and no locations when the first list is missing
-walks / every that stops before it walks a list / has no values and no locations when the first list is null
-walks / every on a path that has no list / has no values and no locations when nothing along the path is a list
-walks / every where a value is missing at the end of its path / has the location where each item's read stopped
-walks / every over a field of each item, where it fails / points a failed item at the field it read, not at the item
-walks / every over a field of each item, where it fails / points a failed item at where the read stopped when the field is missing
-walks / every over the items themselves, where it fails / points a failed item at the item when the item is the value
-walks / every over a list that is missing / keeps no values and no locations, and its failed item says where the walk stopped
-walks / a one-line some compares with a parent's value / lists the list it walked and the parent's value, sorted by name, and passes when a file has the parent's owner
-walks / a one-line some compares with a parent's value / fails as value and still lists the parent's value when no file has the parent's owner
-walks / a one-line some compares with a parent's value / fails as absent and lists the parent's value as missing when the parent has no owner
-walks / a one-line every compares with a parent's value / lists the list it walked and the parent's value, sorted by name, and passes when every file has the parent's owner
-walks / a one-line every compares with a parent's value / fails as value and lists the parent's value when one file has another owner
 walks / a count of reads a parent's value in its whose / lists the number, the list and then the parent's value
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
-walks / a one-line some whose parent path is named by the item / lists the part before the name, and leaves out the path named by the item, since it changes with each item
-walks / a one-line some compares with a value of the input / lists the value read from $input once, with where it was read
 walks / a one-line some compares with a list of params / keeps the param out of the row's inputs and lists it in the check's $refs
-walks / a one-line some compares with the subject's own part / lists the part with its tag, as a plain check does
-walks / a one-line some compares with a parent that sorts after the list / lists the entries sorted by name, so the parent comes after the list it walked
 walks / a count of reads a parent's value in its whose, and the parent sorts after the list / lists the number and the list first, then the parent's value
 walks / a walk or a count through a for name, read from a parent / lists the part before the name once, the whole object, and neither the number nor the items read through the name, which change with each item
 walks / a walk through a for name, read from a parent on its right side / reads the parent through the name for each item, and lists the parent once

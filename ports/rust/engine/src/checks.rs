@@ -459,7 +459,7 @@ mod tests {
 
     #[test]
     fn a_check_the_engine_cannot_run_yet_still_gets_a_plan_that_fails_as_unusable() {
-        let read = one(json!({"c": "every xs.y is 1"}));
+        let read = one(json!({"c": "every xs.y is empty"}));
         let plan = read.plan.unwrap();
         assert!(matches!(plan.items[0].check, Check::NotYet));
         let read = one(json!({"c": "x is empty and y exists"}));
