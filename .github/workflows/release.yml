@@ -134,7 +134,7 @@ jobs:
           minor=${minor%%.*}
           next="$major.$((10#$minor + 1)).0-dev"
           branch="core/version-$next"
-          title="core: move main to $next"
+          title="rego: move main to $next"
           if grep -qxF "version := \"$next\"" ergo.rego; then
             echo "main already says $next"
             exit 0
