@@ -1,7 +1,7 @@
 [
   {
     "description": "compare_time with lt",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is before b"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is before b"}}}},
     "cases": [
       {
         "description": "passes on two times in order",

@@ -2,6 +2,12 @@
 
 Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](spec/CHANGELOG.md).
 
+## 0.3.0
+
+### Changed
+
+- Follows spec 0.3: a policy says `ergo_spec: v0.3`, and the report's `ergo` is `"v0.3"`.
+
 ## 0.2.0
 
 ### New

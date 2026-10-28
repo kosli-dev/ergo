@@ -1,7 +1,7 @@
 [
   {
     "description": "compare with eq",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a equals b"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a equals b"}}}},
     "cases": [
       {
         "description": "passes on 1 and 1.0",
@@ -55,7 +55,7 @@
   },
   {
     "description": "compare with ne",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a does not equal b"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a does not equal b"}}}},
     "cases": [
       {
         "description": "passes on two different strings",
@@ -85,7 +85,7 @@
   },
   {
     "description": "compare with lt",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than b"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than b"}}}},
     "cases": [
       {
         "description": "passes on two numbers in order",
@@ -147,7 +147,7 @@
   },
   {
     "description": "compare with gte",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is at least b"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is at least b"}}}},
     "cases": [
       {
         "description": "passes on 2 and 2.0",
@@ -161,7 +161,7 @@
   },
   {
     "description": "compare against the input",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than $input.limit"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a is less than $input.limit"}}}},
     "cases": [
       {
         "description": "names the path into the input",
@@ -183,7 +183,7 @@
   },
   {
     "description": "a path that starts at the params or the input",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "n is at most $params.max_days.high"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "n is at most $params.max_days.high"}}}},
     "params": {"max_days": {"high": 4}},
     "cases": [
       {
@@ -198,7 +198,7 @@
   },
   {
     "description": "a path into params that don't have the key",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "n is at most $params.max_days.high"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "n is at most $params.max_days.high"}}}},
     "params": {},
     "cases": [
       {
@@ -213,7 +213,7 @@
   },
   {
     "description": "a path that starts at the input",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "n is at most $input.limits.high"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "n is at most $input.limits.high"}}}},
     "cases": [
       {
         "description": "starts at the root of the input, not at the subject",
@@ -235,7 +235,7 @@
   },
   {
     "description": "a key read through a ref step",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a named by $params.i is 2"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a named by $params.i is 2"}}}},
     "params": {"i": 1},
     "cases": [
       {
@@ -250,7 +250,7 @@
   },
   {
     "description": "a ref step that reads a position the list doesn't have",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a named by $params.i is 2"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a named by $params.i is 2"}}}},
     "params": {"i": 5},
     "cases": [
       {
@@ -265,7 +265,7 @@
   },
   {
     "description": "a key read from a field of the subject",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "values named by key is 5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "values named by key is 5"}}}},
     "cases": [
       {
         "description": "adds the key the field holds, and shows the field too",
