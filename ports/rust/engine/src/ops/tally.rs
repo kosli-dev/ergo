@@ -683,7 +683,10 @@ fn lower_counted(
 ) -> Result<Option<Term>, Vec<String>> {
     let mut problems = Vec::new();
     let path = match scope.path(&derived.path) {
-        Ok(path) => Some(path),
+        Ok(path) => {
+            problems.extend(crate::lower::walk_too_long(&path));
+            Some(path)
+        }
         Err(found) => {
             problems.extend(found);
             None

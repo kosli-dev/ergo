@@ -184,6 +184,54 @@ fn left_cause(outcome: &Outcome, found: Option<&Value>) -> Result<Value, Cause> 
     }
 }
 
+fn ref_read(right: &Right, ctx: &Ctx) -> Option<Value> {
+    match right {
+        Right::Ref(path) => {
+            let read = read_path(path, ctx);
+            match read.outcome {
+                Outcome::Found => read.value,
+                _ => None,
+            }
+        }
+        Right::Written(_) | Right::Field(_) => None,
+    }
+}
+
+fn usable_values(values: &Value, non_empty: bool) -> bool {
+    match values {
+        Value::Array(items) => (!non_empty || !items.is_empty()) && one_type(items.iter()).is_ok(),
+        _ => false,
+    }
+}
+
+fn usable_patterns(patterns: &Value) -> bool {
+    match patterns {
+        Value::Array(items) => items.iter().all(|p| compiled(p).is_some()),
+        _ => false,
+    }
+}
+
+impl In {
+    pub fn flawed(&self, ctx: &Ctx) -> bool {
+        ref_read(&self.values, ctx).is_some_and(|v| !usable_values(&v, false))
+    }
+}
+
+impl Contains {
+    pub fn flawed(&self, ctx: &Ctx) -> bool {
+        match &self.wanted {
+            Wanted::One(_) => false,
+            Wanted::All(right) => ref_read(right, ctx).is_some_and(|v| !usable_values(&v, true)),
+        }
+    }
+}
+
+impl Matches {
+    pub fn flawed(&self, ctx: &Ctx) -> bool {
+        ref_read(&self.patterns, ctx).is_some_and(|v| !usable_patterns(&v))
+    }
+}
+
 pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
     judged(&check.path, &check.values, ctx, |values, outcome, found| {
         let Value::Array(values) = values else {
@@ -880,5 +928,49 @@ mod tests {
         }
         assert!(lowered("x is one of \"a\", null").unwrap().is_ok());
         assert!(lowered("x contains all of 1, 2").unwrap().is_ok());
+    }
+
+    fn flawed_with(check: &Check, params: Value) -> bool {
+        let input = json!({"things": [{"x": "a"}]});
+        let ctx = Ctx {
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&params),
+            aliases: BTreeMap::new(),
+        };
+        check.flawed(&ctx)
+    }
+
+    #[test]
+    fn a_ref_that_reads_the_wrong_kind_of_value_is_a_flaw_and_a_missing_one_is_not() {
+        let in_list = lowered_check("x is in $params.l");
+        assert!(flawed_with(&in_list, json!({"l": "a"})));
+        assert!(flawed_with(&in_list, json!({"l": ["a", 1]})));
+        assert!(!flawed_with(&in_list, json!({"l": []})));
+        assert!(!flawed_with(&in_list, json!({"l": ["a"]})));
+        assert!(!flawed_with(&in_list, json!({})));
+        assert!(!flawed_with(&in_list, json!({"l": null})));
+        let all = lowered_check("x contains all of $params.l");
+        assert!(flawed_with(&all, json!({"l": []})));
+        assert!(flawed_with(&all, json!({"l": "a"})));
+        assert!(!flawed_with(&all, json!({"l": ["a"]})));
+        let one = lowered_check("x contains $params.v");
+        assert!(!flawed_with(&one, json!({"v": [1, "a"]})));
+        let patterns = lowered_check("x matches $params.p");
+        assert!(flawed_with(&patterns, json!({"p": ["("]})));
+        assert!(flawed_with(&patterns, json!({"p": "a"})));
+        assert!(!flawed_with(&patterns, json!({"p": ["^a"]})));
+    }
+
+    #[test]
+    fn a_written_list_or_a_field_on_the_right_is_never_a_flaw() {
+        assert!(!flawed_with(
+            &lowered_check("x is one of \"a\", \"b\""),
+            json!({})
+        ));
+        assert!(!flawed_with(&lowered_check("x is in ys"), json!({})));
     }
 }
