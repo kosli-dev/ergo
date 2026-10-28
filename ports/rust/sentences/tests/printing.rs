@@ -454,3 +454,16 @@ fn a_dot_on_the_path_of_some_in_a_from_line_stays_because_it_reads_the_field_and
         "ds whose some .cov.x exists"
     );
 }
+
+#[test]
+fn a_name_that_is_both_a_parent_and_an_alias_prints_with_a_dot_only_on_the_left_of_a_whose() {
+    let read = from("b.kids whose b.x equals b.y");
+    assert_eq!(
+        print_from_with(&read, &["b"], &["b"]),
+        "b.kids whose .b.x equals b.y"
+    );
+    assert_eq!(
+        print_from_with(&read, &["b"], &[]),
+        "b.kids whose b.x equals b.y"
+    );
+}

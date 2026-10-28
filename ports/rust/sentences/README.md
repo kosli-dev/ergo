@@ -20,6 +20,8 @@ pub fn print_for(line: &For, aliases: &[&str]) -> String;
 pub fn print_for_item(item: &ForItem, aliases: &[&str]) -> String;
 pub fn print_from(line: &From, aliases: &[&str]) -> String;
 pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> String;
+pub fn print_from_with(line: &From, aliases: &[&str], parents: &[&str]) -> String;
+pub fn print_from_condition_with(condition: &FromCondition, aliases: &[&str], parents: &[&str]) -> String;
 pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String;
 pub fn print_term(term: &Term, aliases: &[&str]) -> String;
 pub fn print_path(path: &Path, side: Side, aliases: &[&str]) -> String;
@@ -31,6 +33,7 @@ pub fn print_path(path: &Path, side: Side, aliases: &[&str]) -> String;
 - Keys and strings are decoded. Numbers, positions and bracket indexes keep their digits as written, so the caller decides what a number that is too big means.
 - The printed sentence is canonical: one space between words, `equals` before a field and `is` before a value, `is in` before a path and `is one of` before values, numbers in plain decimal form, keys bare when they can be, strings in single quotes when they hold a backslash and nothing that needs escaping, and a bracket index that ends a path as `item N of`.
 - `aliases` are the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot when printed.
+- `parents` are the names of a child subject's parents, for `print_from_with` and `print_from_condition_with`. On the left of a `whose`, a key named like a parent reads the item's own field, so it prints with a dot, like `b.kids whose .b.x equals v`. A `for` alias or a part named the same way doesn't get one there.
 
 - A line that the grammar reads can still be written wrong. `check_problems`, `for_problems` and `from_problems` give the rules that need only the tree and the names in `aliases`, in `ergo.rego`'s words and sorted: `min above max`, `invalid pattern`, `<n> can't be a list position`, `number out of range: <n>`, `"is not null" is written "exists"`, the `takes a number`, `takes text` and `takes a time or a number` rules, the `within` rules, a misplaced `it`, `if any can't go with some`, a `for` alias that is a word or is given twice, `"sorted by"` reading an alias, and every `compared with itself`. `check_problems` and `for_problems` add `compared with itself` for the names in `aliases`. Rules that need the policy's names, like an alias named like a subject, stay in the engine.
 - When a line fails to read, the messages also hold the rules above that the loose reading of the line finds, as `ergo.rego` lists them.
