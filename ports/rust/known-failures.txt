@@ -15,7 +15,6 @@ for / a for line on a child subject whose sentence reads the parent and its own 
 for / a second item that starts at a parent and is named by the first / is listed under the parent's whole name
 sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters
 sentences / named by a field / the subject's field picks the key, inside a whose or a one-line every the item's does, and a for name hides a field with the same name
-sentences / a count on the left of a whose / counts the item's own field, even when its first key is the parent subject's name
 walks / a walk that can't be run as written / fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
 walks / a walk or a count through a for name, read from a parent / lists the part before the name once, the whole object, and neither the number nor the items read through the name, which change with each item
