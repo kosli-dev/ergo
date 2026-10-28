@@ -1,0 +1,402 @@
+use crate::tree::*;
+use crate::words::{is_bare_key, is_word};
+
+pub fn print_path(path: &Path, side: Side, aliases: &[&str]) -> String {
+    path_text(path, side, aliases, false)
+}
+
+pub fn print_term(term: &Term, aliases: &[&str]) -> String {
+    term_text(term, aliases, false)
+}
+
+pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String {
+    condition_text(condition, aliases)
+}
+
+pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> String {
+    match condition {
+        FromCondition::Condition(condition) => condition_text(condition, aliases),
+        FromCondition::Quantified {
+            quantifier,
+            path,
+            if_any,
+            phrase,
+        } => format!(
+            "{} {}{} {}",
+            quantifier_text(*quantifier),
+            path_text(path, Side::Left, aliases, false),
+            if_any_text(*if_any),
+            phrase_text(phrase, aliases)
+        ),
+    }
+}
+
+pub fn print_from(line: &From, aliases: &[&str]) -> String {
+    let mut out = String::new();
+    if line.every {
+        out.push_str("every ");
+    }
+    out.push_str(&path_text(&line.path, Side::Left, aliases, false));
+    if let Some(each) = &line.named_by_each_of {
+        out.push_str(" named by each of ");
+        out.push_str(&path_text(each, Side::Right, aliases, false));
+    }
+    if !line.whose.is_empty() {
+        out.push_str(" whose ");
+        let parts: Vec<String> = line
+            .whose
+            .iter()
+            .map(|c| print_from_condition(c, aliases))
+            .collect();
+        out.push_str(&parts.join(" and "));
+    }
+    out
+}
+
+fn quantifier_text(quantifier: Quantifier) -> &'static str {
+    match quantifier {
+        Quantifier::Every => "every",
+        Quantifier::Some => "some",
+    }
+}
+
+fn if_any_text(if_any: bool) -> &'static str {
+    if if_any { ", if any," } else { "" }
+}
+
+pub(crate) fn key_text(key: &str) -> String {
+    if is_bare_key(key) {
+        key.to_string()
+    } else {
+        json_string(key)
+    }
+}
+
+pub(crate) fn json_string(text: &str) -> String {
+    let mut out = String::from("\"");
+    for ch in text.chars() {
+        match ch {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            '\u{8}' => out.push_str("\\b"),
+            '\u{c}' => out.push_str("\\f"),
+            ch if (ch as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", ch as u32)),
+            ch => out.push(ch),
+        }
+    }
+    out.push('"');
+    out
+}
+
+fn string_text(text: &str) -> String {
+    let single = text.contains('\\')
+        && !text.contains('\'')
+        && !text.contains("\\\\")
+        && !text.ends_with('\\')
+        && !text.chars().any(|ch| (ch as u32) < 0x20);
+    if single {
+        format!("'{text}'")
+    } else {
+        json_string(text)
+    }
+}
+
+fn zeros(count: i64) -> String {
+    "0".repeat(usize::try_from(count).unwrap_or(0))
+}
+
+pub(crate) fn number_text(text: &str) -> String {
+    let (negative, rest) = match text.strip_prefix('-') {
+        Some(rest) => (true, rest),
+        None => (false, text),
+    };
+    let (mantissa, exponent) = match rest.find(['e', 'E']) {
+        Some(k) => (&rest[..k], &rest[k + 1..]),
+        None => (rest, ""),
+    };
+    let (whole_digits, fraction_digits) = match mantissa.find('.') {
+        Some(k) => (&mantissa[..k], &mantissa[k + 1..]),
+        None => (mantissa, ""),
+    };
+    let exponent: i64 = if exponent.is_empty() {
+        0
+    } else {
+        match exponent.trim_start_matches('+').parse() {
+            Ok(value) if (-1_000_000..=1_000_000).contains(&value) => value,
+            _ => return text.to_string(),
+        }
+    };
+    let digits = format!("{whole_digits}{fraction_digits}");
+    let point = whole_digits.len() as i64 + exponent;
+    let left = (1 - point).max(0);
+    let padded = format!(
+        "{}{}{}",
+        zeros(left),
+        digits,
+        zeros(point - digits.len() as i64)
+    );
+    let split = (point + left) as usize;
+    let whole = padded[..split].trim_start_matches('0');
+    let fraction = padded[split..].trim_end_matches('0');
+    let body = match (whole.is_empty(), fraction.is_empty()) {
+        (true, true) => "0".to_string(),
+        (false, true) => whole.to_string(),
+        (true, false) => format!("0.{fraction}"),
+        (false, false) => format!("{whole}.{fraction}"),
+    };
+    if negative && body != "0" {
+        format!("-{body}")
+    } else {
+        body
+    }
+}
+
+fn increment(digits: &str) -> String {
+    let mut bytes: Vec<u8> = digits.bytes().collect();
+    let mut k = bytes.len();
+    while k > 0 {
+        k -= 1;
+        if bytes[k] == b'9' {
+            bytes[k] = b'0';
+        } else {
+            bytes[k] += 1;
+            return String::from_utf8(bytes).unwrap_or_default();
+        }
+    }
+    format!("1{}", String::from_utf8(bytes).unwrap_or_default())
+}
+
+fn value_text(value: &Value) -> String {
+    match value {
+        Value::String(text) => string_text(text),
+        Value::Number(number) => number_text(number),
+        Value::True => "true".to_string(),
+        Value::False => "false".to_string(),
+        Value::Null => "null".to_string(),
+    }
+}
+
+fn reference_text(reference: &Reference) -> String {
+    match reference {
+        Reference::Params(key) => format!("$params.{}", key_text(key)),
+        Reference::Input(key) => format!("$input.{}", key_text(key)),
+        Reference::Name(name) => name.clone(),
+    }
+}
+
+fn position_text(position: &Position) -> String {
+    match position {
+        Position::First => "first of ".to_string(),
+        Position::Last => "last of ".to_string(),
+        Position::Item { number, from_last } => {
+            format!(
+                "item {number}{} of ",
+                if *from_last { " from last" } else { "" }
+            )
+        }
+    }
+}
+
+fn step_text(step: &Step) -> String {
+    match step {
+        Step::Key(key) | Step::BracketKey(key) => format!(".{}", key_text(key)),
+        Step::NamedBy(reference) | Step::Brackets(reference) => {
+            format!(" named by {}", reference_text(reference))
+        }
+        Step::Index(number) => format!("[{number}]"),
+    }
+}
+
+fn path_text(path: &Path, side: Side, aliases: &[&str], own: bool) -> String {
+    let lifted = match (&path.position, &path.start, path.steps.last()) {
+        (None, start, Some(Step::Index(number))) if *start != Start::It => Some(Position::Item {
+            number: increment(number),
+            from_last: false,
+        }),
+        _ => None,
+    };
+    let (position, steps) = match &lifted {
+        Some(position) => (Some(position), &path.steps[..path.steps.len() - 1]),
+        None => (path.position.as_ref(), &path.steps[..]),
+    };
+    let mut out = String::new();
+    if let Some(position) = position {
+        out.push_str(&position_text(position));
+    }
+    match &path.start {
+        Start::It => out.push_str("it"),
+        Start::Params => out.push_str("$params"),
+        Start::Input => out.push_str("$input"),
+        Start::Field { key, dot } => {
+            let dotted = is_word(key)
+                || (matches!(side, Side::Right) && !is_bare_key(key))
+                || (*dot && !own && aliases.contains(&key.as_str()));
+            if dotted {
+                out.push('.');
+            }
+            out.push_str(&key_text(key));
+        }
+    }
+    for step in steps {
+        out.push_str(&step_text(step));
+    }
+    out
+}
+
+fn derived_text(derived: &Derived, aliases: &[&str], own: bool) -> String {
+    let word = match derived.kind {
+        DerivedKind::Count => "count of",
+        DerivedKind::Sum => "sum of",
+    };
+    format!(
+        "{word} {}",
+        path_text(&derived.path, Side::Left, aliases, own)
+    )
+}
+
+fn elapsed_text(elapsed: &Elapsed, aliases: &[&str], own: bool) -> String {
+    let unit = match elapsed.unit {
+        Unit::Seconds => "seconds",
+        Unit::Minutes => "minutes",
+        Unit::Hours => "hours",
+        Unit::Days => "days",
+        Unit::Weeks => "weeks",
+    };
+    format!(
+        "{unit} elapsed from {} to {}",
+        path_text(&elapsed.from, Side::Left, aliases, own),
+        path_text(&elapsed.to, Side::Left, aliases, own)
+    )
+}
+
+fn term_text(term: &Term, aliases: &[&str], own: bool) -> String {
+    match term {
+        Term::Path(path) => path_text(path, Side::Right, aliases, false),
+        Term::Number(number) => number_text(number),
+        Term::Derived(derived) => derived_text(derived, aliases, own),
+        Term::Elapsed(elapsed) => elapsed_text(elapsed, aliases, own),
+    }
+}
+
+fn terms_text(terms: &[Term], aliases: &[&str]) -> String {
+    let parts: Vec<String> = terms.iter().map(|t| term_text(t, aliases, false)).collect();
+    parts.join(" plus ")
+}
+
+fn operand_text(operand: &Operand, aliases: &[&str]) -> String {
+    match operand {
+        Operand::Value(value) => value_text(value),
+        Operand::Field(terms) => terms_text(terms, aliases),
+    }
+}
+
+fn list_text(list: &List, aliases: &[&str]) -> String {
+    match list {
+        List::Values(values) => {
+            let parts: Vec<String> = values.iter().map(value_text).collect();
+            parts.join(", ")
+        }
+        List::Path(path) => path_text(path, Side::Right, aliases, true),
+    }
+}
+
+fn condition_text(condition: &Condition, aliases: &[&str]) -> String {
+    let left = match &condition.left {
+        Left::Path(path) => path_text(path, Side::Left, aliases, true),
+        Left::Derived(derived) => derived_text(derived, aliases, true),
+        Left::Elapsed(elapsed) => elapsed_text(elapsed, aliases, true),
+    };
+    format!("{left} {}", phrase_text(&condition.phrase, aliases))
+}
+
+fn phrase_text(phrase: &Phrase, aliases: &[&str]) -> String {
+    let operand =
+        |words: &str, operand: &Operand| format!("{words} {}", operand_text(operand, aliases));
+    let list = |words: &str, list: &List| format!("{words} {}", list_text(list, aliases));
+    match phrase {
+        Phrase::Is {
+            not,
+            operand: o,
+            within,
+        } => {
+            let field = matches!(o, Operand::Field(_));
+            let words = match (*not, field) {
+                (false, false) => "is",
+                (false, true) => "equals",
+                (true, false) => "is not",
+                (true, true) => "does not equal",
+            };
+            match within {
+                Some(within) => format!(
+                    "{words} {} within {}",
+                    operand_text(o, aliases),
+                    number_text(within)
+                ),
+                None => operand(words, o),
+            }
+        }
+        Phrase::Order { order, operand: o } => {
+            let words = match order {
+                Order::AtLeast => "is at least",
+                Order::AtMost => "is at most",
+                Order::MoreThan => "is more than",
+                Order::LessThan => "is less than",
+            };
+            operand(words, o)
+        }
+        Phrase::Between { min, max } => {
+            format!("is between {} and {}", number_text(min), number_text(max))
+        }
+        Phrase::OneOf { not, list: l } => {
+            let path = matches!(l, List::Path(_));
+            let words = match (*not, path) {
+                (false, false) => "is one of",
+                (false, true) => "is in",
+                (true, false) => "is not one of",
+                (true, true) => "is not in",
+            };
+            list(words, l)
+        }
+        Phrase::Exists { not } => if *not { "does not exist" } else { "exists" }.to_string(),
+        Phrase::Empty { not } => if *not { "is not empty" } else { "is empty" }.to_string(),
+        Phrase::NonEmptyString => "is a non-empty string".to_string(),
+        Phrase::Type(kind) => match kind {
+            Type::List => "is a list",
+            Type::String => "is a string",
+            Type::Number => "is a number",
+            Type::Boolean => "is a boolean",
+            Type::Object => "is an object",
+        }
+        .to_string(),
+        Phrase::Contains { not, operand: o } => {
+            operand(if *not { "does not contain" } else { "contains" }, o)
+        }
+        Phrase::ContainsAll(l) => list("contains all of", l),
+        Phrase::ContainsNone(l) => list("contains none of", l),
+        Phrase::Matches { not, list: l } => {
+            list(if *not { "does not match" } else { "matches" }, l)
+        }
+        Phrase::StartsWith(o) => operand("starts with", o),
+        Phrase::EndsWith(o) => operand("ends with", o),
+        Phrase::Alphabetically { after, operand: o } => operand(
+            if *after {
+                "is alphabetically after"
+            } else {
+                "is alphabetically before"
+            },
+            o,
+        ),
+        Phrase::Time { time, operand: o } => {
+            let words = match time {
+                TimeOrder::Before => "is before",
+                TimeOrder::After => "is after",
+                TimeOrder::OnOrAfter => "is on or after",
+                TimeOrder::OnOrBefore => "is on or before",
+            };
+            operand(words, o)
+        }
+    }
+}

@@ -27,8 +27,8 @@ Then run the same checks as CI:
 docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
   find . -name "*.rs" -exec touch {} + &&
   cargo fmt --check &&
-  cargo clippy -j 4 --all-targets -- -D warnings &&
-  cargo test -j 4 -- --show-output &&
+  cargo clippy -j 4 --all-targets --all-features -- -D warnings &&
+  cargo test -j 4 --all-features -- --show-output &&
   cargo build -j 4 -p ergo-sentences --target wasm32-unknown-unknown'
 ```
 
