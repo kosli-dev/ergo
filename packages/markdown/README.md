@@ -269,6 +269,8 @@ requirements.cake batch.checks.Sealed: has upper case
 not written
 ```
 
+When the document itself has problems, `ergo apply` lists them with their lines, as `ergo check` does, and writes nothing.
+
 Before it writes, it compiles the new document and checks it gives back the policy you asked for. When it doesn't, it says `the Markdown wouldn't compile back to this policy` and writes nothing. That happens when removing a requirement's fields and checks would leave a paragraph of prose right under its heading, where it would become the requirement's description.
 
 `ergo render` writes a new document from a policy that has none:
