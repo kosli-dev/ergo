@@ -1,0 +1,3252 @@
+[
+  {
+    "description": "every over one list of objects",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true"}}}},
+    "cases": [
+      {
+        "description": "passes when every item passes, and failed_items is empty",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1", "commits": [{"signed": true}, {"signed": true}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "commits[].signed", "value": [true, true], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1/signed"]}], "failed_items": []}
+        ],
+        "expressions": {"s": {"c": "every commits.signed is true"}}
+      },
+      {
+        "description": "fails as value when one item fails, and lists it with its position",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1", "commits": [{"signed": true}, {"signed": false}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [true, false], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1/signed"]}], "failed_items": [{"path": "commits[1].signed", "item": "item 2 of commits", "cause": "value", "value": false, "locations": ["/releases/0/commits/1/signed"]}]}
+        ]
+      },
+      {
+        "description": "lists every item that fails, in list order",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
+        "input": {"releases": [{"id": "r1", "commits": [{"signed": false}, {"signed": true}, {"signed": false}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [false, true, false], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1/signed", "/releases/0/commits/2/signed"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "value", "value": false, "locations": ["/releases/0/commits/0/signed"]}, {"path": "commits[2].signed", "item": "item 3 of commits", "cause": "value", "value": false, "locations": ["/releases/0/commits/2/signed"]}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty list, and lists the list",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.every.empty"],
+        "input": {"releases": [{"id": "r1", "commits": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [], "locations": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "value", "value": [], "locations": ["/releases/0/commits"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing, and lists the list",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
+        ]
+      },
+      {
+        "description": "fails as null when the list is null, and lists the list",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1", "commits": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "null", "value": null, "locations": ["/releases/0/commits"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the list is a string, with nothing walked",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
+        "input": {"releases": [{"id": "r1", "commits": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "commits", "item": "commits", "cause": "unusable", "value": "abc", "locations": ["/releases/0/commits"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the list is an object, with nothing walked",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
+        "input": {"releases": [{"id": "r1", "commits": {"signed": true}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "commits.signed", "item": "commits.signed", "cause": "unusable", "value": true, "locations": ["/releases/0/commits/signed"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when an item has no such field, and shows null for it",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1", "commits": [{"signed": true}, {}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits[].signed", "value": [true, null], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1"]}], "failed_items": [{"path": "commits[1].signed", "item": "item 2 of commits", "cause": "absent", "value": null, "locations": ["/releases/0/commits/1"]}]}
+        ]
+      },
+      {
+        "description": "fails as null when an item's field is null",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
+        "input": {"releases": [{"id": "r1", "commits": [{"signed": null}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "commits[].signed", "value": [null], "locations": ["/releases/0/commits/0/signed"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "null", "value": null, "locations": ["/releases/0/commits/0/signed"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when an item's field is the wrong type for is",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1", "commits": [{"signed": "yes"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "commits[].signed", "value": ["yes"], "locations": ["/releases/0/commits/0/signed"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "unusable", "value": "yes", "locations": ["/releases/0/commits/0/signed"]}]}
+        ]
+      },
+      {
+        "description": "takes the first cause in order when items fail differently, and lists both",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1", "commits": [{"signed": false}, {}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits[].signed", "value": [false, null], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1"]}], "failed_items": [{"path": "commits[0].signed", "item": "item 1 of commits", "cause": "value", "value": false, "locations": ["/releases/0/commits/0/signed"]}, {"path": "commits[1].signed", "item": "item 2 of commits", "cause": "absent", "value": null, "locations": ["/releases/0/commits/1"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over nested lists",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "cases": [
+      {
+        "description": "passes when every commit of every pull request is signed",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": [{"signed": true}, {"signed": true}]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true, true, true], "locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/1/commits/0/signed", "/releases/0/pull_requests/1/commits/1/signed"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "lists a failed value, a missing inner list and a missing field in path order, and the cause is absent",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}, {"signed": false}]}, {}, {"commits": [{"sha": "c1"}]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true, false, null], "locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/0/commits/1/signed", "/releases/0/pull_requests/2/commits/0"]}], "failed_items": [{"path": "pull_requests[0].commits[1].signed", "item": "item 2 of pull_requests[0].commits", "cause": "value", "value": false, "locations": ["/releases/0/pull_requests/0/commits/1/signed"]}, {"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/1"]}, {"path": "pull_requests[2].commits[0].signed", "item": "item 1 of pull_requests[2].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/2/commits/0"]}]}
+        ]
+      },
+      {
+        "description": "fails as value when one inner list is empty, even though the others pass",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.every.empty"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": []}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests/1/commits"]}]}
+        ]
+      },
+      {
+        "description": "fails as null when one inner list is null",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": null}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null, "locations": ["/releases/0/pull_requests/1/commits"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when one inner list is not a list",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": "x"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "unusable", "value": "x", "locations": ["/releases/0/pull_requests/1/commits"]}]}
+        ]
+      },
+      {
+        "description": "takes unusable over absent and value, and lists every failure in path order",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable", "path.absent"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": false}]}, {"commits": "x"}, {}, {"commits": []}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [false], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[0].commits[0].signed", "item": "item 1 of pull_requests[0].commits", "cause": "value", "value": false, "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}, {"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "unusable", "value": "x", "locations": ["/releases/0/pull_requests/1/commits"]}, {"path": "pull_requests[2].commits", "item": "pull_requests[2].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/2"]}, {"path": "pull_requests[3].commits", "item": "pull_requests[3].commits", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests/3/commits"]}]}
+        ]
+      },
+      {
+        "description": "fails as value when the outer list is empty",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.every.empty"],
+        "input": {"releases": [{"id": "r1", "pull_requests": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "pull_requests", "item": "pull_requests", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the outer list is missing, with nothing walked",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests.commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "pull_requests", "item": "pull_requests", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent with the item's field as the failed path when the only pull request has no commits, because no list is left to walk",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits.signed", "value": [null], "locations": ["/releases/0/pull_requests/0"]}], "failed_items": [{"path": "pull_requests[0].commits.signed", "item": "item 1 of pull_requests", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/0"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every where the last list is the one walked, over strings",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every branches matches \"^release/\""}}}},
+    "cases": [
+      {
+        "description": "passes when every string matches",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.matches"],
+        "input": {"releases": [{"id": "r1", "branches": ["release/1", "release/2"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "branches[]", "value": ["release/1", "release/2"], "locations": ["/releases/0/branches/0", "/releases/0/branches/1"]}], "failed_items": []}
+        ],
+        "expressions": {"s": {"c": "every branches matches \"^release/\""}}
+      },
+      {
+        "description": "fails as value for a string that does not match, named by its position",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.matches"],
+        "input": {"releases": [{"id": "r1", "branches": ["release/1", "main"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "branches[]", "value": ["release/1", "main"], "locations": ["/releases/0/branches/0", "/releases/0/branches/1"]}], "failed_items": [{"path": "item 2 of branches", "item": "item 2 of branches", "cause": "value", "value": "main", "locations": ["/releases/0/branches/1"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable for an item that is not a string",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.matches"],
+        "input": {"releases": [{"id": "r1", "branches": ["release/1", 5]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "branches[]", "value": ["release/1", 5], "locations": ["/releases/0/branches/0", "/releases/0/branches/1"]}], "failed_items": [{"path": "item 2 of branches", "item": "item 2 of branches", "cause": "unusable", "value": 5, "locations": ["/releases/0/branches/1"]}]}
+        ]
+      },
+      {
+        "description": "fails as null for a null item",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.matches", "path.null"],
+        "input": {"releases": [{"id": "r1", "branches": [null]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "branches[]", "value": [null], "locations": ["/releases/0/branches/0"]}], "failed_items": [{"path": "item 1 of branches", "item": "item 1 of branches", "cause": "null", "value": null, "locations": ["/releases/0/branches/0"]}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty list",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.every.empty"],
+        "input": {"releases": [{"id": "r1", "branches": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "branches[]", "value": [], "locations": []}], "failed_items": [{"path": "branches", "item": "branches", "cause": "value", "value": [], "locations": ["/releases/0/branches"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every where each label is checked, not each pull request's labels",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.labels is not empty"}}}},
+    "cases": [
+      {
+        "description": "passes when every label is not empty",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.empty"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"labels": ["bug"]}, {"labels": ["a", "b"]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].labels[]", "value": ["bug", "a", "b"], "locations": ["/releases/0/pull_requests/0/labels/0", "/releases/0/pull_requests/1/labels/0", "/releases/0/pull_requests/1/labels/1"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as value for an empty label, named by its position in that pull request's labels",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.empty"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"labels": ["bug"]}, {"labels": ["a", ""]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].labels[]", "value": ["bug", "a", ""], "locations": ["/releases/0/pull_requests/0/labels/0", "/releases/0/pull_requests/1/labels/0", "/releases/0/pull_requests/1/labels/1"]}], "failed_items": [{"path": "item 2 of pull_requests[1].labels", "item": "item 2 of pull_requests[1].labels", "cause": "value", "value": "", "locations": ["/releases/0/pull_requests/1/labels/1"]}]}
+        ]
+      },
+      {
+        "description": "fails as value for a pull request with no labels, because the inner list is empty",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.empty", "sentence.every.empty"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"labels": ["bug"]}, {"labels": []}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].labels[]", "value": ["bug"], "locations": ["/releases/0/pull_requests/0/labels/0"]}], "failed_items": [{"path": "pull_requests[1].labels", "item": "pull_requests[1].labels", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests/1/labels"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable for a label that is a number",
+        "rules": ["sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.empty"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"labels": [5]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].labels[]", "value": [5], "locations": ["/releases/0/pull_requests/0/labels/0"]}], "failed_items": [{"path": "item 1 of pull_requests[0].labels", "item": "item 1 of pull_requests[0].labels", "cause": "unusable", "value": 5, "locations": ["/releases/0/pull_requests/0/labels/0"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every with if any",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed, if any, is true"}}}},
+    "cases": [
+      {
+        "description": "passes when the list is empty",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": []}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [], "locations": []}], "failed_items": []}
+        ],
+        "expressions": {"s": {"c": "every pull_requests.commits.signed, if any, is true"}}
+      },
+      {
+        "description": "passes when the outer list is empty",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
+        "input": {"releases": [{"id": "r1", "pull_requests": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits.signed", "value": [], "locations": []}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "passes when some inner lists are empty and the items of the others pass",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": []}, {"commits": [{"signed": true}]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/1/commits/0/signed"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "still fails when an item fails",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": []}, {"commits": [{"signed": false}]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [false], "locations": ["/releases/0/pull_requests/1/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits[0].signed", "item": "item 1 of pull_requests[1].commits", "cause": "value", "value": false, "locations": ["/releases/0/pull_requests/1/commits/0/signed"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when an inner list is missing",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/1"]}]}
+        ]
+      },
+      {
+        "description": "fails as null when an inner list is null",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.null"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": null}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "null", "value": null, "locations": ["/releases/0/pull_requests/1/commits"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when an inner list is not a list",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"commits": 3}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [true], "locations": ["/releases/0/pull_requests/0/commits/0/signed"]}], "failed_items": [{"path": "pull_requests[1].commits", "item": "pull_requests[1].commits", "cause": "unusable", "value": 3, "locations": ["/releases/0/pull_requests/1/commits"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable with the item's field as the failed path when the only pull request's commits is not a list",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.unusable"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": 3}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "pull_requests[].commits.signed", "value": [null], "locations": ["/releases/0/pull_requests/0/commits"]}], "failed_items": [{"path": "pull_requests[0].commits.signed", "item": "item 1 of pull_requests", "cause": "unusable", "value": null, "locations": ["/releases/0/pull_requests/0/commits"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the outer list is missing",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests.commits.signed", "value": [], "locations": []}], "failed_items": [{"path": "pull_requests", "item": "pull_requests", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when an item's field is missing, because only empty lists are skipped",
+        "rules": ["sentence.every.if_any", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "path.absent"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{}]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].commits[].signed", "value": [null], "locations": ["/releases/0/pull_requests/0/commits/0"]}], "failed_items": [{"path": "pull_requests[0].commits[0].signed", "item": "item 1 of pull_requests[0].commits", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/0/commits/0"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "some over one list of objects",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.state is \"APPROVED\""}}}},
+    "cases": [
+      {
+        "description": "passes when one item passes, and failed_items is empty even though another item did not",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"state": "CHANGES"}, {"state": "APPROVED"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": ["CHANGES", "APPROVED"], "locations": ["/releases/0/approvers/0/state", "/releases/0/approvers/1/state"]}], "failed_items": []}
+        ],
+        "expressions": {"s": {"c": "some approvers.state is \"APPROVED\""}}
+      },
+      {
+        "description": "fails as value when no item passes, and lists every item",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"state": "CHANGES"}, {"state": "COMMENTED"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": ["CHANGES", "COMMENTED"], "locations": ["/releases/0/approvers/0/state", "/releases/0/approvers/1/state"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "value", "value": "CHANGES", "locations": ["/releases/0/approvers/0/state"]}, {"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "value", "value": "COMMENTED", "locations": ["/releases/0/approvers/1/state"]}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty list",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1", "approvers": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "value", "value": [], "locations": ["/releases/0/approvers"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing, with nothing walked",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers.state", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
+        ]
+      },
+      {
+        "description": "fails as null when the list is null, and lists the list",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"id": "r1", "approvers": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers.state", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "null", "value": null, "locations": ["/releases/0/approvers"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the list is not a list",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.unusable"],
+        "input": {"releases": [{"id": "r1", "approvers": "ann"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "approvers.state", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "unusable", "value": "ann", "locations": ["/releases/0/approvers"]}]}
+        ]
+      },
+      {
+        "description": "passes when an item has no such field and another item passes",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"id": "r1", "approvers": [{}, {"state": "APPROVED"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": [null, "APPROVED"], "locations": ["/releases/0/approvers/0", "/releases/0/approvers/1/state"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails with the first cause in order when an item has no field and none passes",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.absent"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"state": "CHANGES"}, {}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].state", "value": ["CHANGES", null], "locations": ["/releases/0/approvers/0/state", "/releases/0/approvers/1"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "value", "value": "CHANGES", "locations": ["/releases/0/approvers/0/state"]}, {"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "absent", "value": null, "locations": ["/releases/0/approvers/1"]}]}
+        ]
+      },
+      {
+        "description": "fails as null when an item's field is null and none passes",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is", "path.null"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"state": null}, {"state": "CHANGES"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers[].state", "value": [null, "CHANGES"], "locations": ["/releases/0/approvers/0/state", "/releases/0/approvers/1/state"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "null", "value": null, "locations": ["/releases/0/approvers/0/state"]}, {"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "value", "value": "CHANGES", "locations": ["/releases/0/approvers/1/state"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "some over nested lists",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some pull_requests.approvers.state is \"APPROVED\""}}}},
+    "cases": [
+      {
+        "description": "passes when an item passes, even if another pull request has no approvers",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"approvers": []}, {"approvers": [{"state": "APPROVED"}]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "pull_requests[].approvers[].state", "value": ["APPROVED"], "locations": ["/releases/0/pull_requests/1/approvers/0/state"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails when no item passes, and lists the empty inner list and the failed item in path order",
+        "rules": ["sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.is"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"approvers": [{"state": "CHANGES"}]}, {"approvers": []}, {}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].approvers[].state", "value": ["CHANGES"], "locations": ["/releases/0/pull_requests/0/approvers/0/state"]}], "failed_items": [{"path": "pull_requests[0].approvers[0].state", "item": "item 1 of pull_requests[0].approvers", "cause": "value", "value": "CHANGES", "locations": ["/releases/0/pull_requests/0/approvers/0/state"]}, {"path": "pull_requests[1].approvers", "item": "pull_requests[1].approvers", "cause": "value", "value": [], "locations": ["/releases/0/pull_requests/1/approvers"]}, {"path": "pull_requests[2].approvers", "item": "pull_requests[2].approvers", "cause": "absent", "value": null, "locations": ["/releases/0/pull_requests/2"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "whose under some",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
+    "params": {"staff": ["ann", "bob"]},
+    "cases": [
+      {
+        "description": "passes when an item that whose keeps passes, and the others are not listed",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.some.walk", "walk.some"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "zed", "state": "APPROVED"}, {"username": "ann", "state": "CHANGES"}, {"username": "ann", "state": "APPROVED"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["zed", "ann", "ann"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username", "/releases/0/approvers/2/username"]}], "failed_items": []}
+        ],
+        "expressions": {"s": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}
+      },
+      {
+        "description": "fails as value when the kept item fails, and leaves out the item whose does not keep",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.some.walk", "walk.some"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "zed", "state": "APPROVED"}, {"username": "ann", "state": "CHANGES"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["zed", "ann"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/0/username"]}]}
+        ]
+      },
+      {
+        "description": "fails as value with no failed items when whose keeps nothing",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.some.walk", "walk.some"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "CHANGES"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "passes when an item whose condition cannot be decided is beside an item that passes",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.some.walk", "walk.some", "path.absent"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann"}, {"username": "ann", "state": "APPROVED"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann", "ann"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails with the undecided item's cause, listed by the field whose could not read",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.some.walk", "walk.some", "path.absent"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann"}, {"username": "zed", "state": "APPROVED"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "absent", "value": null, "locations": ["/releases/0/approvers/0"]}, {"path": "approvers[1].username", "item": "item 2 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/1/username"]}]}
+        ]
+      },
+      {
+        "description": "treats a null field in whose as undecided with cause null",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.some.walk", "walk.some", "path.null"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": null}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "null", "value": null, "locations": ["/releases/0/approvers/0/state"]}]}
+        ]
+      },
+      {
+        "description": "fails as value when the list is empty",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.some.walk", "walk.some"],
+        "input": {"releases": [{"id": "r1", "approvers": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "value", "value": [], "locations": ["/releases/0/approvers"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "whose under every",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
+    "params": {"staff": ["ann", "bob"]},
+    "cases": [
+      {
+        "description": "passes when the kept items pass, and an item whose leaves out is not checked",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.every", "walk.every"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "zed", "state": "CHANGES"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as value when a kept item fails, and lists only that item",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.every", "walk.every"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "zed", "state": "APPROVED"}, {"username": "bob", "state": "CHANGES"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed", "bob"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username", "/releases/0/approvers/2/username"]}], "failed_items": [{"path": "approvers[1].username", "item": "item 2 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/1/username"]}]}
+        ]
+      },
+      {
+        "description": "fails with the cause of an item that whose cannot decide, listed by the field whose could not read",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.undecided", "walk.every", "path.absent"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "zed"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "absent", "value": null, "locations": ["/releases/0/approvers/1"]}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field whose reads is null",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.undecided", "walk.every", "path.null"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "zed", "state": null}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[1].state", "item": "item 2 of approvers", "cause": "null", "value": null, "locations": ["/releases/0/approvers/1/state"]}]}
+        ]
+      },
+      {
+        "description": "fails as value with no failed items when whose leaves no items",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "sentence.whose.every", "sentence.every.empty", "walk.every"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "CHANGES"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "fails as value when the list is empty, and lists the list",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.empty", "walk.every"],
+        "input": {"releases": [{"id": "r1", "approvers": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "value", "value": [], "locations": ["/releases/0/approvers"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the list is missing, with nothing walked",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.walk", "walk.every", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers.username", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "whose under every with if any",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every approvers.username whose state is \"APPROVED\", if any, is in $params.staff"}}}},
+    "params": {"staff": ["ann", "bob"]},
+    "cases": [
+      {
+        "description": "passes when whose leaves no items",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "sentence.whose.every", "walk.every"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "CHANGES"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": []}
+        ],
+        "expressions": {"s": {"c": "every approvers.username whose state is \"APPROVED\", if any, is in $params.staff"}}
+      },
+      {
+        "description": "passes when the list is empty",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "walk.every"],
+        "input": {"releases": [{"id": "r1", "approvers": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": [], "locations": []}], "failed_items": []}
+        ]
+      },
+      {
+        "description": "still fails when a kept item fails",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "walk.every"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "zed", "state": "APPROVED"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["zed"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/0/username"]}]}
+        ]
+      },
+      {
+        "description": "still fails when an item cannot be decided",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "sentence.whose.undecided", "walk.every", "path.absent"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].state", "item": "item 1 of approvers", "cause": "absent", "value": null, "locations": ["/releases/0/approvers/0"]}]}
+        ]
+      },
+      {
+        "description": "still fails as absent when the list is missing",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.every.if_any", "walk.every", "path.absent"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers.username", "value": [], "locations": []}], "failed_items": [{"path": "approvers", "item": "approvers", "cause": "absent", "value": null, "locations": ["/releases/0"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "whose with exists is the exception to undecided items",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"e": "every approvers.username whose comment exists is in $params.staff", "s2": "some approvers.username whose comment does not exist is in $params.staff"}}}},
+    "params": {"staff": ["ann", "bob"]},
+    "cases": [
+      {
+        "description": "a missing field leaves the item out under every, and a present one keeps it",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.phrase.exists", "sentence.every.walk"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "comment": "ok"}, {"username": "zed"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "e", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": []},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "s2", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann", "zed"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[1].username", "item": "item 2 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/1/username"]}]}
+        ]
+      },
+      {
+        "description": "a missing field keeps the item under does not exist, and a present one leaves it out",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.phrase.exists", "sentence.some.walk"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "zed", "comment": "ok"}, {"username": "bob"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["zed", "bob"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "zed", "locations": ["/releases/0/approvers/0/username"]}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "s2", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["zed", "bob"], "locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"]}], "failed_items": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "whose with a condition that cannot compare the item",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every reviews.name whose rank is at least 2 is \"ann\""}}}},
+    "cases": [
+      {
+        "description": "fails as unusable under every when the field is the wrong type for the condition",
+        "rules": ["sentence.whose.item", "walk.lists", "walk.items", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of", "sentence.whose.undecided", "sentence.every.walk", "walk.every", "sentence.phrase.order"],
+        "input": {"releases": [{"id": "r1", "reviews": [{"name": "ann", "rank": 3}, {"name": "zed", "rank": "high"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "reviews[].name", "value": ["ann", "zed"], "locations": ["/releases/0/reviews/0/name", "/releases/0/reviews/1/name"]}], "failed_items": [{"path": "reviews[1].rank", "item": "item 2 of reviews", "cause": "unusable", "value": "high", "locations": ["/releases/0/reviews/1/rank"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field on the right side is read from the item",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.timestamp whose state is \"APPROVED\" is after last_commit_timestamp"}}}},
+    "cases": [
+      {
+        "description": "passes when the item's timestamp is after the item's own last commit",
+        "rules": ["sentence.argument.item", "sentence.whose.item", "sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.time"],
+        "input": {"releases": [{"id": "r1", "last_commit_timestamp": "2026-12-01T00:00:00Z", "approvers": [{"state": "APPROVED", "timestamp": "2026-10-02T00:00:00Z", "last_commit_timestamp": "2026-10-01T00:00:00Z"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].timestamp", "value": ["2026-10-02T00:00:00Z"], "locations": ["/releases/0/approvers/0/timestamp"]}], "failed_items": []}
+        ],
+        "expressions": {"s": {"c": "some approvers.timestamp whose state is \"APPROVED\" is after last_commit_timestamp"}}
+      },
+      {
+        "description": "fails as value when the item's timestamp is before the item's own last commit, even if the subject's is earlier",
+        "rules": ["sentence.argument.item", "sentence.whose.item", "sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.time"],
+        "input": {"releases": [{"id": "r1", "last_commit_timestamp": "2026-10-01T00:00:00Z", "approvers": [{"state": "APPROVED", "timestamp": "2026-10-02T00:00:00Z", "last_commit_timestamp": "2026-12-01T00:00:00Z"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].timestamp", "value": ["2026-10-02T00:00:00Z"], "locations": ["/releases/0/approvers/0/timestamp"]}], "failed_items": [{"path": "approvers[0].timestamp", "item": "item 1 of approvers", "cause": "value", "value": "2026-10-02T00:00:00Z", "locations": ["/releases/0/approvers/0/timestamp"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the item has no last commit, even if the subject has one",
+        "rules": ["sentence.argument.item", "sentence.whose.item", "sentence.some.walk", "walk.lists", "walk.items", "walk.some", "walk.inputs", "walk.failed_items", "sentence.phrase.time", "path.absent"],
+        "input": {"releases": [{"id": "r1", "last_commit_timestamp": "2026-10-01T00:00:00Z", "approvers": [{"state": "APPROVED", "timestamp": "2026-10-02T00:00:00Z"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "approvers[].timestamp", "value": ["2026-10-02T00:00:00Z"], "locations": ["/releases/0/approvers/0/timestamp"]}], "failed_items": [{"path": "approvers[0].timestamp", "item": "item 1 of approvers", "cause": "absent", "value": "2026-10-02T00:00:00Z", "locations": ["/releases/0/approvers/0/timestamp"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params and input on the right side still read the params and the input",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"i": "every approvers.username is in $input.staff", "p": "every approvers.username is in $params.staff"}}}},
+    "params": {"staff": ["ann", "bob"]},
+    "cases": [
+      {
+        "description": "read the params and the input even when the item has a field of the same name",
+        "rules": ["sentence.argument.item", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.phrase.one_of"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "staff": ["zed"]}]}], "staff": ["zed"]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "i", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": [{"path": "approvers[0].username", "item": "item 1 of approvers", "cause": "value", "value": "ann", "locations": ["/releases/0/approvers/0/username"]}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "p", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].username", "value": ["ann"], "locations": ["/releases/0/approvers/0/username"]}], "failed_items": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every and some joined with and to a plain sentence",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every commits.signed is true and state is \"MERGED\"", "d": "state is \"MERGED\" and some approvers.state is \"APPROVED\"", "w": "every items.price whose kind is \"a\" is at least 2 and owner is \"x\""}}}},
+    "cases": [
+      {
+        "description": "passes with failed_assertions empty when both parts pass",
+        "rules": ["sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
+        "input": {"releases": [{"id": "r1", "state": "MERGED", "commits": [{"signed": true}], "approvers": [{"state": "APPROVED"}], "items": [{"price": 3, "kind": "a"}], "owner": "x"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "commits[].signed", "value": [true], "locations": ["/releases/0/commits/0/signed"]}, {"name": "state", "value": "MERGED", "locations": ["/releases/0/state"]}], "failed_assertions": []},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": ["APPROVED"], "locations": ["/releases/0/approvers/0/state"]}, {"name": "state", "value": "MERGED", "locations": ["/releases/0/state"]}], "failed_assertions": []},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": true, "cause": "satisfied", "inputs": [{"name": "items[].price", "value": [3], "locations": ["/releases/0/items/0/price"]}, {"name": "owner", "value": "x", "locations": ["/releases/0/owner"]}], "failed_assertions": []}
+        ]
+      },
+      {
+        "description": "lists only the every part when it fails and the plain part passes",
+        "rules": ["sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items"],
+        "input": {"releases": [{"id": "r1", "state": "MERGED", "commits": [{"signed": true}, {"signed": false}], "approvers": [{"state": "APPROVED"}], "items": [{"price": 1, "kind": "a"}], "owner": "x"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [true, false], "locations": ["/releases/0/commits/0/signed", "/releases/0/commits/1/signed"]}, {"name": "state", "value": "MERGED", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "every commits.signed is true", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": true, "cause": "satisfied", "inputs": [{"name": "approvers[].state", "value": ["APPROVED"], "locations": ["/releases/0/approvers/0/state"]}, {"name": "state", "value": "MERGED", "locations": ["/releases/0/state"]}], "failed_assertions": []},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": false, "cause": "value", "inputs": [{"name": "items[].price", "value": [1], "locations": ["/releases/0/items/0/price"]}, {"name": "owner", "value": "x", "locations": ["/releases/0/owner"]}], "failed_assertions": [{"assertion": "every items.price whose kind is \"a\" is at least 2", "cause": "value"}]}
+        ]
+      },
+      {
+        "description": "lists only the plain part when it fails and the walk passes",
+        "rules": ["sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.some.walk", "walk.some"],
+        "input": {"releases": [{"id": "r1", "state": "OPEN", "commits": [{"signed": true}], "approvers": [{"state": "APPROVED"}], "items": [{"price": 3, "kind": "a"}], "owner": "y"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "commits[].signed", "value": [true], "locations": ["/releases/0/commits/0/signed"]}, {"name": "state", "value": "OPEN", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "state is \"MERGED\"", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": ["APPROVED"], "locations": ["/releases/0/approvers/0/state"]}, {"name": "state", "value": "OPEN", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "state is \"MERGED\"", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": false, "cause": "value", "inputs": [{"name": "items[].price", "value": [3], "locations": ["/releases/0/items/0/price"]}, {"name": "owner", "value": "y", "locations": ["/releases/0/owner"]}], "failed_assertions": [{"assertion": "owner is \"x\"", "cause": "value"}]}
+        ]
+      },
+      {
+        "description": "lists both in the order written, and the row takes the first cause in order",
+        "rules": ["sentence.assert.and", "all_of.pass", "all_of.cause", "all_of.inputs", "all_of.failed_assertions", "sentence.every.walk", "walk.lists", "walk.items", "walk.every", "walk.inputs", "walk.failed_items", "sentence.some.walk", "walk.some", "path.absent"],
+        "input": {"releases": [{"id": "r1", "state": "OPEN", "approvers": [{"state": "CHANGES"}], "items": [{"price": 1, "kind": "a"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "commits.signed", "value": [], "locations": []}, {"name": "state", "value": "OPEN", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "every commits.signed is true", "cause": "absent"}, {"assertion": "state is \"MERGED\"", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "approvers[].state", "value": ["CHANGES"], "locations": ["/releases/0/approvers/0/state"]}, {"name": "state", "value": "OPEN", "locations": ["/releases/0/state"]}], "failed_assertions": [{"assertion": "state is \"MERGED\"", "cause": "value"}, {"assertion": "some approvers.state is \"APPROVED\"", "cause": "value"}]},
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "w", "passed": false, "cause": "absent", "inputs": [{"name": "items[].price", "value": [1], "locations": ["/releases/0/items/0/price"]}, {"name": "owner", "value": null, "locations": ["/releases/0"]}], "failed_assertions": [{"assertion": "every items.price whose kind is \"a\" is at least 2", "cause": "value"}, {"assertion": "owner is \"x\"", "cause": "absent"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a walk that can't be run as written",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs.v whose kind is not one of $params.l, if any, is 1", "n": "every xs named by $params.k is 1"}}}},
+    "params": {"l": "text"},
+    "cases": [
+      {
+        "description": "fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read",
+        "rules": ["walk.flaws", "sentence.every.if_any"],
+        "input": {"things": [{"id": "t1", "xs": [{"v": 2, "kind": "a"}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "xs[].v", "value": [2], "locations": ["/things/0/xs/0/v"]}], "failed_items": []},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "n", "passed": false, "cause": "absent", "inputs": [{"name": "xs named by $params.k", "value": [], "locations": []}], "failed_items": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a walk on a subject that isn't an object",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs is 1"}}}},
+    "cases": [
+      {
+        "description": "fails as not_an_object, as any path with steps does",
+        "rules": ["walk.flaws", "path.not_an_object"],
+        "input": {"things": ["text"]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "text"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [], "failed_items": []}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains after every",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every pull_requests.labels does not contain \"hotfix\""}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because the last list is walked too and a label never holds a value",
+        "rules": ["sentence.every.walk", "sentence.written_wrong.slot", "written_wrong"],
+        "input": {"things": [{"id": "t1", "pull_requests": [{"labels": ["hotfix"]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["\"does not contain\" after every or some would check each item of the last list, not the list: put the walk on a for line"], "locations": []}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over nested lists of different lengths",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "cases": [
+      {
+        "description": "has one location per value, in the order of the walk, when the lists differ in length",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}, {"signed": true}, {"signed": true}]}, {"commits": [{"signed": true}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/0/commits/1/signed", "/releases/0/pull_requests/0/commits/2/signed", "/releases/0/pull_requests/1/commits/0/signed"], "name": "pull_requests[].commits[].signed", "value": [true, true, true, true]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "some with a whose",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some approvers.username whose state is \"APPROVED\" is in $params.staff"}}}},
+    "params": {"staff": ["bob"]},
+    "cases": [
+      {
+        "description": "has a location for every item the walk read, including the ones whose left out",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1", "approvers": [{"username": "ann", "state": "COMMENTED"}, {"username": "bob", "state": "APPROVED"}, {"username": "cat", "state": "APPROVED"}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username", "/releases/0/approvers/2/username"], "name": "approvers[].username", "value": ["ann", "bob", "cat"]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every that stops before it walks a list",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "cases": [
+      {
+        "description": "has no values and no locations when the first list is missing",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1"}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "item": "pull_requests", "locations": ["/releases/0"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "pull_requests.commits.signed", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      },
+      {
+        "description": "has no values and no locations when the first list is null",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": null}]},
+        "results": [
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "item": "pull_requests", "locations": ["/releases/0/pull_requests"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "pull_requests.commits.signed", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every on a path that has no list",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every x.y is 1"}}}},
+    "cases": [
+      {
+        "description": "has no values and no locations when nothing along the path is a list",
+        "rules": ["location.each"],
+        "input": {"things": [{"id": "t1", "x": {"y": {"z": 1}}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "x.y", "locations": ["/things/0/x/y"], "path": "x.y", "value": {"z": 1}}], "inputs": [{"locations": [], "name": "x.y", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every where a value is missing at the end of its path",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.commits.signed is true"}}}},
+    "cases": [
+      {
+        "description": "has the location where each item's read stopped",
+        "rules": ["location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}, {"sha": "x"}]}, {"commits": "none"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "absent", "item": "item 2 of pull_requests[0].commits", "locations": ["/releases/0/pull_requests/0/commits/1"], "path": "pull_requests[0].commits[1].signed", "value": null}, {"cause": "unusable", "item": "pull_requests[1].commits", "locations": ["/releases/0/pull_requests/1/commits"], "path": "pull_requests[1].commits", "value": "none"}], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/0/commits/1"], "name": "pull_requests[].commits[].signed", "value": [true, null]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over a field of each item, where it fails",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.title is \"x\""}}}},
+    "cases": [
+      {
+        "description": "points a failed item at the field it read, not at the item",
+        "rules": ["location.failed_items", "location.each"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"title": "x"}, {"title": "y"}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1/title"], "path": "pull_requests[1].title", "value": "y"}], "inputs": [{"locations": ["/releases/0/pull_requests/0/title", "/releases/0/pull_requests/1/title"], "name": "pull_requests[].title", "value": ["x", "y"]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      },
+      {
+        "description": "points a failed item at where the read stopped when the field is missing",
+        "rules": ["location.failed_items", "location.read"],
+        "input": {"releases": [{"id": "r1", "pull_requests": [{"title": "x"}, {}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1"], "path": "pull_requests[1].title", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0/title", "/releases/0/pull_requests/1"], "name": "pull_requests[].title", "value": ["x", null]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over the items themselves, where it fails",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every scores is 1"}}}},
+    "cases": [
+      {
+        "description": "points a failed item at the item when the item is the value",
+        "rules": ["location.failed_items"],
+        "input": {"releases": [{"id": "r1", "scores": [1, 2]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 2 of scores", "locations": ["/releases/0/scores/1"], "path": "item 2 of scores", "value": 2}], "inputs": [{"locations": ["/releases/0/scores/0", "/releases/0/scores/1"], "name": "scores[]", "value": [1, 2]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over a list that is missing",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every pull_requests.title is \"x\""}}}},
+    "cases": [
+      {
+        "description": "keeps no values and no locations, and its failed item says where the walk stopped",
+        "rules": ["location.each", "location.failed_items"],
+        "input": {"releases": [{"id": "r1", "other": {}}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "item": "pull_requests", "locations": ["/releases/0"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "pull_requests.title", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a one-line some compares with a parent's value",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "some files.owner is artifact.owner"}}}},
+    "cases": [
+      {
+        "description": "lists the list it walked and the parent's value, sorted by name, and passes when a file has the parent's owner",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "artifact.owner",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals artifact.owner"
+          }
+        }
+      },
+      {
+        "description": "fails as value and still lists the parent's value when no file has the parent's owner",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 1 of files",
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner"
+                ],
+                "path": "files[0].owner",
+                "value": "bob"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "artifact.owner",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals artifact.owner"
+          }
+        }
+      },
+      {
+        "description": "fails as absent and lists the parent's value as missing when the parent has no owner",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of files",
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner"
+                ],
+                "path": "files[0].owner",
+                "value": "bob"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0"
+                ],
+                "name": "artifact.owner",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals artifact.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line every compares with a parent's value",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "every files.owner is artifact.owner"}}}},
+    "cases": [
+      {
+        "description": "lists the list it walked and the parent's value, sorted by name, and passes when every file has the parent's owner",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.every.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.every",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "ann"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "artifact.owner",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "ann",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "every files.owner equals artifact.owner"
+          }
+        }
+      },
+      {
+        "description": "fails as value and lists the parent's value when one file has another owner",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.every.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.every",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "ann"
+                      },
+                      {
+                        "owner": "bob"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "item": "item 2 of files",
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "path": "files[1].owner",
+                "value": "bob"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "artifact.owner",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "ann",
+                  "bob"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "every files.owner equals artifact.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a count of reads a parent's value in its whose",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of files whose owner is artifact.owner is 1"}}}},
+    "cases": [
+      {
+        "description": "lists the number, the list and then the parent's value",
+        "rules": [
+          "tally.whose",
+          "tally.inputs",
+          "walk.inputs"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "ann"
+                      },
+                      {
+                        "owner": "bob"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0",
+                  "/trail/artifacts/0/releases/0/files/1"
+                ],
+                "name": "count of files whose owner equals artifact.owner",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0",
+                  "/trail/artifacts/0/releases/0/files/1"
+                ],
+                "name": "files[]",
+                "value": [
+                  {
+                    "owner": "ann"
+                  },
+                  {
+                    "owner": "bob"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "artifact.owner",
+                "value": "ann"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "count of files whose owner equals artifact.owner is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a for line with a walk next to a parent",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "id"}, "release": {"from": "artifact.releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every files as f", "assert": "some f.tags is artifact.owner"}}}}},
+    "cases": [
+      {
+        "description": "lists the for line's list and the parent's value, and never the alias's value",
+        "rules": [
+          "for.walk",
+          "for.inputs",
+          "walk.inputs"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "tags": [
+                          "ann"
+                        ]
+                      },
+                      {
+                        "tags": [
+                          "bob"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "some f.tags equals artifact.owner",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/releases/0/files/1/tags/0"
+                        ],
+                        "name": "f.tags[]",
+                        "value": [
+                          "bob"
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/owner"
+                        ],
+                        "name": "artifact.owner",
+                        "value": "ann"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of files",
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/1"
+                ],
+                "path": "item 2 of files",
+                "value": {
+                  "tags": [
+                    "bob"
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "artifact.owner",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0",
+                  "/trail/artifacts/0/releases/0/files/1"
+                ],
+                "name": "files[]",
+                "value": [
+                  {
+                    "tags": [
+                      "ann"
+                    ]
+                  },
+                  {
+                    "tags": [
+                      "bob"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every files as f: some f.tags equals artifact.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some whose parent path is named by the item",
+    "policy": {
+      "ergo_spec": "v0.2",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "artifact.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is artifact.atts named by k.owner"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the part before the name, and leaves out the path named by the item, since it changes with each item",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob",
+                        "k": "y"
+                      },
+                      {
+                        "owner": "ann",
+                        "k": "x"
+                      }
+                    ]
+                  }
+                ],
+                "atts": {
+                  "x": {
+                    "owner": "ann"
+                  },
+                  "y": {
+                    "owner": "zed"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/atts"
+                ],
+                "name": "artifact.atts",
+                "value": {
+                  "x": {
+                    "owner": "ann"
+                  },
+                  "y": {
+                    "owner": "zed"
+                  }
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals artifact.atts named by k.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some compares with a value of the input",
+    "policy": {
+      "ergo_spec": "v0.2",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "artifact.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is $input.trail.owner"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the value read from $input once, with where it was read",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "owner": "ann"
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/owner"
+                ],
+                "name": "$input.trail.owner",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals $input.trail.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some compares with a list of params",
+    "policy": {
+      "ergo_spec": "v0.2",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "artifact.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is in $params.owners"
+          }
+        }
+      }
+    },
+    "params": {
+      "owners": [
+        "ann",
+        "cid"
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the param out of the row's inputs and lists it in the check's $refs",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.one_of",
+          "value.refs"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner is in $params.owners"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": [
+              {
+                "locations": [
+                  "$params:/owners"
+                ],
+                "name": "$params.owners",
+                "value": [
+                  "ann",
+                  "cid"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some compares with the subject's own part",
+    "policy": {
+      "ergo_spec": "v0.2",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "artifact.releases",
+          "identified_by": "id",
+          "has": {
+            "w": "info.who"
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is w"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the part with its tag, as a plain check does",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is",
+          "parts.tag",
+          "parts.where"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ],
+                    "info": {
+                      "who": "ann"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/info/who"
+                ],
+                "name": "w",
+                "part": {
+                  "id": null,
+                  "name": "w"
+                },
+                "value": "ann"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals w"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a one-line some compares with a parent that sorts after the list",
+    "policy": {
+      "ergo_spec": "v0.2",
+      "subjects": {
+        "zart": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "zart.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "some files.owner is zart.owner"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the entries sorted by name, so the parent comes after the list it walked",
+        "rules": [
+          "sentence.argument.item",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner",
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "bob",
+                  "ann"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "zart.owner",
+                "value": "ann"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "zart": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "some files.owner equals zart.owner"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a count of reads a parent's value in its whose, and the parent sorts after the list",
+    "policy": {
+      "ergo_spec": "v0.2",
+      "subjects": {
+        "zart": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "release": {
+          "from": "zart.releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "count of files whose owner is zart.owner is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the number and the list first, then the parent's value",
+        "rules": [
+          "tally.whose",
+          "tally.inputs",
+          "walk.inputs"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "owner": "ann",
+                "releases": [
+                  {
+                    "id": "r1",
+                    "files": [
+                      {
+                        "owner": "bob"
+                      },
+                      {
+                        "owner": "ann"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0",
+                  "/trail/artifacts/0/releases/0/files/1"
+                ],
+                "name": "count of files whose owner equals zart.owner",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0",
+                  "/trail/artifacts/0/releases/0/files/1"
+                ],
+                "name": "files[]",
+                "value": [
+                  {
+                    "owner": "bob"
+                  },
+                  {
+                    "owner": "ann"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/owner"
+                ],
+                "name": "zart.owner",
+                "value": "ann"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "zart": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "count of files whose owner equals zart.owner is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a walk or a count through a for name, read from a parent",
+    "policy": {
+      "ergo_spec": "v0.2",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "some": {
+              "for": "every keys as k",
+              "assert": "some artifact.map named by k is at least 1"
+            },
+            "count": {
+              "for": "every keys as k",
+              "assert": "count of artifact.map named by k is at least 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the part before the name once, the whole object, and neither the number nor the items read through the name, which change with each item",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.inputs",
+          "tally.inputs",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "map": {
+                  "a": [
+                    1,
+                    2
+                  ],
+                  "b": [
+                    3
+                  ]
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "a",
+                      "b"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            },
+            "check": "count",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/map"
+                ],
+                "name": "artifact.map",
+                "value": {
+                  "a": [
+                    1,
+                    2
+                  ],
+                  "b": [
+                    3
+                  ]
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "failed_items": []
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            },
+            "check": "some",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/map"
+                ],
+                "name": "artifact.map",
+                "value": {
+                  "a": [
+                    1,
+                    2
+                  ],
+                  "b": [
+                    3
+                  ]
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "a",
+                  "b"
+                ]
+              }
+            ],
+            "failed_items": []
+          }
+        ],
+        "expressions": {
+          "s": {
+            "some": "for every keys as k: some artifact.map named by k is at least 1",
+            "count": "for every keys as k: count of artifact.map named by k is at least 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a walk through a for name, read from a parent on its right side",
+    "policy": {
+      "ergo_spec": "v0.2",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "walk": {
+              "for": "every keys as k",
+              "assert": "some rows.n is at least artifact.nums named by k"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the parent through the name for each item, and lists the parent once",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.inputs",
+          "walk.some",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1",
+                      "k2"
+                    ],
+                    "rows": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
+                "nums": {
+                  "k1": 1,
+                  "k2": 2
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "walk",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "k1": 1,
+                  "k2": 2
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1",
+                  "k2"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "walk": "for every keys as k: some rows.n is at least artifact.nums named by k"
+          }
+        }
+      },
+      {
+        "description": "fails as absent for a name the parent doesn't have",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.some",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1",
+                      "k2"
+                    ],
+                    "rows": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
+                "nums": {
+                  "k1": 1
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "walk",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n is at least artifact.nums named by k",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0/rows/0/n",
+                          "/trail/artifacts/0/prs/0/rows/1/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "path": "item 2 of keys",
+                "value": "k2"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "k1": 1
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1",
+                  "k2"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "walk": "for every keys as k: some rows.n is at least artifact.nums named by k"
+          }
+        }
+      },
+      {
+        "description": "fails as null for a name that is null",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.some",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1",
+                      null
+                    ],
+                    "rows": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
+                "nums": {
+                  "k1": 1
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "walk",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n is at least artifact.nums named by k",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0/rows/0/n",
+                          "/trail/artifacts/0/prs/0/rows/1/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "path": "item 2 of keys",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "k1": 1
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0",
+                  "/trail/artifacts/0/prs/0/keys/1"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1",
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "walk": "for every keys as k: some rows.n is at least artifact.nums named by k"
+          }
+        }
+      },
+      {
+        "description": "fails as unusable for a value that can't be compared",
+        "rules": [
+          "for.inputs",
+          "for.pass",
+          "walk.some",
+          "sentence.some.walk"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1"
+                    ],
+                    "rows": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 2
+                      }
+                    ]
+                  }
+                ],
+                "nums": {
+                  "k1": "a"
+                }
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "walk",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n is at least artifact.nums named by k",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums/k1"
+                        ],
+                        "name": "artifact.nums named by k",
+                        "value": "a"
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0/rows/0/n",
+                          "/trail/artifacts/0/prs/0/rows/1/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "k1": "a"
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "walk": "for every keys as k: some rows.n is at least artifact.nums named by k"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a walk whose parent path is named by a field of each item",
+    "policy": {
+      "ergo_spec": "v0.2",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pr",
+          "checks": {
+            "plain": "some rows.n is at least artifact.nums named by key",
+            "for": {
+              "for": "every keys as k",
+              "assert": "some rows.n is at least artifact.nums named by key"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the part before the name and not the path it names, which changes with each item",
+        "rules": [
+          "walk.inputs",
+          "for.inputs",
+          "sentence.some.walk",
+          "sentence.argument.item"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "nums": {
+                  "a": 1,
+                  "b": 2
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1"
+                    ],
+                    "rows": [
+                      {
+                        "key": "a",
+                        "n": 1
+                      },
+                      {
+                        "key": "b",
+                        "n": 2
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "for",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "a": 1,
+                  "b": 2
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "plain",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "a": 1,
+                  "b": 2
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "plain": "some rows.n is at least artifact.nums named by key",
+            "for": "for every keys as k: some rows.n is at least artifact.nums named by key"
+          }
+        }
+      },
+      {
+        "description": "fails as absent when the parent has none of the names",
+        "rules": [
+          "walk.inputs",
+          "for.inputs",
+          "sentence.some.walk",
+          "sentence.argument.item"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "nums": {
+                  "z": 1
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "keys": [
+                      "k1"
+                    ],
+                    "rows": [
+                      {
+                        "key": "a",
+                        "n": 1
+                      },
+                      {
+                        "key": "b",
+                        "n": 2
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "for",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n is at least artifact.nums named by key",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums",
+                        "value": {
+                          "z": 1
+                        }
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0/rows/0/n",
+                          "/trail/artifacts/0/prs/0/rows/1/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "z": 1
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "plain",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of rows",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n"
+                ],
+                "path": "rows[0].n",
+                "value": 1
+              },
+              {
+                "cause": "absent",
+                "item": "item 2 of rows",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "path": "rows[1].n",
+                "value": 2
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums"
+                ],
+                "name": "artifact.nums",
+                "value": {
+                  "z": 1
+                }
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n",
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "plain": "some rows.n is at least artifact.nums named by key",
+            "for": "for every keys as k: some rows.n is at least artifact.nums named by key"
+          }
+        }
+      }
+    ]
+  }
+]

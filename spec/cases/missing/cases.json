@@ -1,0 +1,128 @@
+[
+  {
+    "description": "missing on a field of the subject",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not exist"}}}},
+    "cases": [
+      {
+        "description": "passes when the field is missing",
+        "rules": ["missing.pass", "sentence.print.canonical", "path.inputs"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+        ],
+        "expressions": {"s": {"c": "x does not exist"}}
+      },
+      {
+        "description": "passes when the field is null",
+        "rules": ["missing.pass"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null, "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as value on false, because the field is there",
+        "rules": ["missing.fail"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": false, "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty string",
+        "rules": ["missing.fail"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "", "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as not_an_object when the subject isn't an object",
+        "rules": ["missing.fail", "path.not_an_object"],
+        "input": {"things": ["t1"]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "missing on a nested field",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y does not exist"}}}},
+    "cases": [
+      {
+        "description": "passes when the parent is missing",
+        "rules": ["missing.pass", "path.absent", "path.inputs"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable when the parent can't hold the field",
+        "rules": ["missing.fail", "path.unusable"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0/x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "missing on a param the params don't have",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.flag does not exist"}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "passes",
+        "rules": ["missing.pass", "path.inputs", "path.steps"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "$params.flag", "value": null, "locations": ["$params:"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "missing with a ref step that reads a number too big to be a list position",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x[$params.i] does not exist"}}}},
+    "params": {"i": 9007199254740992},
+    "cases": [
+      {
+        "description": "fails as unusable, because the item it looks for is unknown, not missing",
+        "rules": ["missing.fail", "path.ref_step"],
+        "input": {"things": [{"id": "t1", "x": [1]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x named by $params.i", "value": null, "locations": ["/things/0/x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "missing as a filter",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things whose x does not exist", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "min_subjects": 0, "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "rules out a subject whose field is there",
+        "rules": ["missing.filter"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "status": {"s": "not_applicable"},
+        "compliant": true,
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "keeps a subject whose field is missing",
+        "rules": ["missing.filter"],
+        "input": {"things": [{"id": "t1"}]},
+        "status": {"s": "met"},
+        "compliant": true,
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": "t1", "locations": ["/things/0/id"]}]}
+        ]
+      }
+    ]
+  }
+]

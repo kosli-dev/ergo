@@ -7,7 +7,7 @@ disableKinds = ["taxonomy", "term", "rss"]
   description = "Ergo is an open source language for writing explainable policies. Instead of a binary result, every decision returns an audit report of what was checked, and why it passed or failed."
   repo = "https://github.com/kosli-dev/ergo"
   fork = "https://github.com/kosli-dev/ergo/fork"
-  opaVersion = "1.19"
+  opaVersion = "1.20"
 
 [markup.goldmark.renderer]
   unsafe = true
@@ -17,12 +17,16 @@ disableKinds = ["taxonomy", "term", "rss"]
   startLevel = 2
   endLevel = 3
 
-# The docs are read straight from the repo's own README.md and REFERENCE.md,
-# so the site can never drift from the library.
 [module]
+  [[module.mounts]]
+    source = "prepared/content"
+    target = "content"
   [[module.mounts]]
     source = "content"
     target = "content"
+  [[module.mounts]]
+    source = "prepared/layouts"
+    target = "layouts"
   [[module.mounts]]
     source = "layouts"
     target = "layouts"
@@ -30,14 +34,20 @@ disableKinds = ["taxonomy", "term", "rss"]
     source = "assets"
     target = "assets"
   [[module.mounts]]
+    source = "prepared/assets"
+    target = "assets"
+  [[module.mounts]]
+    source = "prepared/data"
+    target = "data"
+  [[module.mounts]]
+    source = "data"
+    target = "data"
+  [[module.mounts]]
     source = "static"
     target = "static"
   [[module.mounts]]
-    source = "../README.md"
-    target = "assets/repo/README.md"
+    source = "prepared/repo"
+    target = "assets/repo"
   [[module.mounts]]
-    source = "../REFERENCE.md"
-    target = "assets/repo/REFERENCE.md"
-  [[module.mounts]]
-    source = "../examples"
+    source = "prepared/examples"
     target = "assets/examples"

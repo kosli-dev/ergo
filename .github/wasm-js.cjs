@@ -19,8 +19,8 @@ execFileSync("tar", ["-xzf", bundle, "-C", runtimeDir, "/policy.wasm", "/data.js
 
 const ergoDir = path.join(runtimeDir, "ergo");
 fs.mkdirSync(ergoDir, { recursive: true });
-fs.writeFileSync(path.join(ergoDir, "entrypoint.rego"), "package entrypoint\n\nreport := data.ergo.report(input.document, input.policy, input.params)\n\nviolations := data.ergo.violations(input.report)\n");
-execFileSync("opa", ["build", "-t", "wasm", "-e", "entrypoint/report", "-e", "entrypoint/violations", "-o", path.join(ergoDir, "ergo.tar.gz"), "ergo.rego", path.join(ergoDir, "entrypoint.rego")]);
+fs.writeFileSync(path.join(ergoDir, "entrypoint.rego"), "package entrypoint\n\nreport := data.ergo.report(input.document, input.policy, input.params)\n\nviolations := data.ergo.violations(input.report)\n\nas_sentences := data.ergo.as_sentences(input.policy)\n\ncompile := data.ergo.compile(input.policy)\n");
+execFileSync("opa", ["build", "-t", "wasm", "-e", "entrypoint/report", "-e", "entrypoint/violations", "-e", "entrypoint/as_sentences", "-e", "entrypoint/compile", "-o", path.join(ergoDir, "ergo.tar.gz"), "ergo.rego", path.join(ergoDir, "entrypoint.rego")]);
 execFileSync("tar", ["-xzf", path.join(ergoDir, "ergo.tar.gz"), "-C", ergoDir, "/policy.wasm"]);
 
 const parseTime = (v) => {
@@ -28,7 +28,7 @@ const parseTime = (v) => {
   return JSON.rawJSON(String(BigInt(Date.parse(time + zone)) / 1000n * 1000000000n + BigInt(fraction.padEnd(9, "0").slice(0, 9))));
 };
 
-const load = (dir) => loadPolicy(fs.readFileSync(path.join(dir, "policy.wasm")), undefined, { "time.parse_rfc3339_ns": parseTime });
+const load = (dir, memory) => loadPolicy(fs.readFileSync(path.join(dir, "policy.wasm")), memory, { "time.parse_rfc3339_ns": parseTime });
 
 const builtinsOf = (policy) => {
   const { builtins, opa_json_dump } = policy.wasmInstance.exports;
@@ -37,7 +37,7 @@ const builtinsOf = (policy) => {
   return Object.keys(JSON.parse(Buffer.from(memory.slice(start, memory.indexOf(0, start))).toString()));
 };
 
-Promise.all([load(runtimeDir), load(ergoDir)]).then(([policy, ergo]) => {
+Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([policy, ergo]) => {
   const outside = builtinsOf(ergo).filter((b) => b !== "time.parse_rfc3339_ns");
   if (outside.length > 0) {
     console.error(`ergo uses built-ins that OPA's Wasm build runs outside the module: ${outside.join(", ")}`);
@@ -63,20 +63,49 @@ Promise.all([load(runtimeDir), load(ergoDir)]).then(([policy, ergo]) => {
   failed.forEach((test) => console.error(`FAIL ${test}`));
   console.log(`PASS: ${tests.length - failed.length}/${tests.length} with the Wasm JS runtime`);
 
-  const budgetMB = 20;
   const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
   const budgetPolicy = {
-    subjects: { deployment: { from: ["deployments"], id: ["id"], applies_to: { is_prod: { op: "equals", path: ["environment"], value: "prod" } } } },
+    ergo_spec: "v0.2",
+    subjects: { deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" } },
     requirements: {
-      approved: { subject: "deployment", checks: { approved: { op: "non_empty_string", path: ["approved_by"] } } },
-      tested: { subject: "deployment", require: "some", checks: { tested: { op: "all", path: ["tests"], check: { op: "equals", path: ["ok"], value: true } } } },
+      approved: { subject: "deployment", checks: { approved: "approved_by is a non-empty string" } },
+      tested: { subject: "deployment", require: "some", checks: { tested: "every tests.ok is true" } },
     },
   };
-  const report = ergo.evaluate({ document, policy: budgetPolicy, params: {} }, "entrypoint/report")[0].result;
-  const usedMB = (ergo.wasmInstance.exports.opa_heap_ptr_get() - ergo.baseHeapPtr) / 1e6;
-  const sound = report.results.length === 338 && report.requirements.approved.subjects.matching === 66;
-  console.log(`A report on 100 deployments used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
-  if (!sound) console.error("The memory budget's report didn't come out as expected, so its measurement can't be trusted");
-  if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row.`);
-  process.exit(failed.length > 0 || !sound || usedMB > budgetMB ? 1 : 0);
+  const sentencePolicy = {
+    ergo_spec: "v0.2",
+    subjects: budgetPolicy.subjects,
+    requirements: {
+      approved: {
+        subject: "deployment",
+        checks: {
+          approved: "approved_by is a non-empty string",
+          environment: 'environment is one of "prod", "staging"',
+          tests: "tests is not empty",
+        },
+      },
+    },
+  };
+  const chainPolicy = {
+    ergo_spec: "v0.2",
+    subjects: {
+      deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" },
+      test: { from: "deployment.tests" },
+    },
+    requirements: { approved: { subject: "test", checks: { ok: "ok is true and deployment.approved_by exists" } } },
+  };
+  const measure = async (name, policy, rows, matching, budgetMB) => {
+    const fresh = await load(ergoDir);
+    const report = fresh.evaluate({ document, policy, params: {} }, "entrypoint/report")[0].result;
+    const usedMB = (fresh.wasmInstance.exports.opa_heap_ptr_get() - fresh.baseHeapPtr) / 1e6;
+    const sound = report.results.length === rows && report.requirements.approved.subjects.matching === matching;
+    console.log(`A report on 100 deployments ${name} used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
+    if (!sound) console.error("The memory budget's report didn't come out as expected, so its measurement can't be trusted");
+    if (usedMB > budgetMB) console.error(`That's over the budget. Wasm doesn't cache function calls and frees nothing until the report is done, so look for something worked out again per row, or a large regular expression compiled for every report, or for every parent of a subject read from another subject.`);
+    return sound && usedMB <= budgetMB;
+  };
+  const withEvery = await measure("with a check on every test", budgetPolicy, 338, 66, 24);
+  const withSentences = await measure("with three checks on each deployment", sentencePolicy, 301, 66, 17);
+  const withChain = await measure("with the tests of each prod deployment as subjects", chainPolicy, 265, 132, 40);
+  process.exit(failed.length > 0 || !withEvery || !withSentences || !withChain ? 1 : 0);
 });

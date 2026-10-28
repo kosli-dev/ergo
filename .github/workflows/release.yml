@@ -1,0 +1,272 @@
+name: release
+
+on:
+  push:
+    tags: ['rego-v*', 'spec-v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: An existing rego-vX.Y.Z or spec-vX.Y tag to publish
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+
+jobs:
+  release-rego:
+    if: startsWith(inputs.tag || github.ref_name, 'rego-v')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - name: Read the version from the tag
+        shell: bash
+        run: |
+          echo "VERSION=${TAG#rego-v}" >> "$GITHUB_ENV"
+      - name: Check the version has the right shape
+        shell: bash
+        run: |
+          if ! printf '%s\n' "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "rego-v tags look like rego-v0.1.0, not $TAG"
+            exit 1
+          fi
+      - name: Check the tag points at a commit of main
+        shell: bash
+        run: |
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "The tag must point at a commit of main"
+            exit 1
+          fi
+      - name: Check ergo.rego and CHANGELOG.md are ready for this version
+        shell: bash
+        run: |
+          if ! grep -qxF "version := \"$VERSION-dev\"" ergo.rego; then
+            echo "The tagged ergo.rego must say version := \"$VERSION-dev\""
+            exit 1
+          fi
+          if ! grep -qxF "## $VERSION" CHANGELOG.md; then
+            echo "CHANGELOG.md has no \"## $VERSION\" heading"
+            exit 1
+          fi
+          if grep -q '^_spec := "v.*-dev"$' ergo.rego; then
+            echo "ergo.rego says $(grep -m 1 '^_spec := ' ergo.rego), a spec that isn't released. Release the spec first, or with this tag."
+            exit 1
+          fi
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - run: opa check --strict . --ignore .github
+      - name: Check the test workflow passed on this commit
+        shell: bash
+        run: |
+          passed=$(gh run list --workflow test.yml --commit "$(git rev-parse HEAD)" --status success --json databaseId --jq length)
+          if [ "${passed:-0}" -le 0 ]; then
+            echo "The test workflow hasn't passed on this commit yet. Wait for it, then re-run this job."
+            exit 1
+          fi
+      - name: Write the release copy, which says the version without -dev
+        shell: bash
+        run: |
+          sed "s/^version := \"$VERSION-dev\"$/version := \"$VERSION\"/" ergo.rego > "$RUNNER_TEMP/ergo.rego"
+          grep -qxF "version := \"$VERSION\"" "$RUNNER_TEMP/ergo.rego"
+          opa check --strict "$RUNNER_TEMP/ergo.rego"
+      - name: Create the release, which is the latest only when it's the highest ergo.rego version
+        shell: bash
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "The release $TAG already exists"
+            exit 0
+          fi
+          git show "$GITHUB_SHA:.github/release-notes.sh" > "$RUNNER_TEMP/release-notes.sh"
+          sh "$RUNNER_TEMP/release-notes.sh" CHANGELOG.md "$VERSION" "https://github.com/$GITHUB_REPOSITORY/blob/$TAG/" > "$RUNNER_TEMP/notes.md"
+          highest=$(git tag --list 'rego-v*' | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+          if [ "$TAG" = "$highest" ]; then
+            latest=--latest
+          else
+            latest=--latest=false
+          fi
+          echo "The highest rego-vX.Y.Z tag is $highest, so $TAG is created with $latest"
+          gh release create "$TAG" "$RUNNER_TEMP/ergo.rego" \
+            --title "ergo.rego $VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            "$latest" \
+            --verify-tag
+      - name: Start the site deploy, so the home page names this release
+        run: gh workflow run pages.yml --ref main
+
+  bump-main:
+    needs: release-rego
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Read the version from the tag
+        shell: bash
+        run: |
+          echo "VERSION=${TAG#rego-v}" >> "$GITHUB_ENV"
+      - name: Open the pull request that moves main to the next version
+        shell: bash
+        run: |
+          major=${VERSION%%.*}
+          minor=${VERSION#*.}
+          minor=${minor%%.*}
+          next="$major.$((10#$minor + 1)).0-dev"
+          branch="core/version-$next"
+          title="core: move main to $next"
+          if grep -qxF "version := \"$next\"" ergo.rego; then
+            echo "main already says $next"
+            exit 0
+          fi
+          if ! grep -qxF "version := \"$VERSION-dev\"" ergo.rego; then
+            says=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' ergo.rego)
+            if [ -n "$says" ] && [ "$(printf '%s\n%s\n' "$VERSION" "$says" | sort -V | tail -n 1)" != "$VERSION" ]; then
+              echo "main already says $says-dev, which is above $VERSION"
+              exit 0
+            fi
+            echo "main says $(grep -m 1 '^version := ' ergo.rego || true) and this job expected $VERSION-dev. Move main to the next version by hand."
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          pattern=${VERSION//./\\.}
+          sed -i "s/\b$pattern-dev\b/$next/g" ergo.rego README.md REFERENCE.md
+          grep -qxF "version := \"$next\"" ergo.rego
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "origin/$branch already exists, so there is nothing to commit or push"
+          else
+            git switch --create "$branch"
+            git commit --all --message "$title" --message "Ergo $VERSION was released, so main moves to its next version."
+            git push origin "$branch"
+          fi
+          existing=$(gh pr list --head "$branch" --base main --state open --json url --jq '.[0].url')
+          if [ -n "$existing" ]; then
+            echo "$existing"
+            exit 0
+          fi
+          if ! out=$(gh pr create --base main --head "$branch" --title "$title" \
+            --body "Ergo $VERSION was released, so \`main\` moves to $next.
+
+          GitHub holds the checks of a pull request opened by GitHub Actions until someone approves them, so click \"Approve and run\" on this one, or close and reopen it, then merge it once they pass. Until it's merged, the \`checks\` job shows a warning on every pull request that \`main\` is still at $VERSION-dev." 2>&1); then
+            echo "$out"
+            case $out in
+              *"not permitted"*) echo "Turn on \"Allow GitHub Actions to create and approve pull requests\" in the repository's Actions settings, or open the PR by hand from $branch." ;;
+            esac
+            exit 1
+          fi
+          echo "$out"
+
+  release-spec:
+    if: startsWith(inputs.tag || github.ref_name, 'spec-v')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - name: Read the version from the tag
+        shell: bash
+        run: |
+          echo "VERSION=${TAG#spec-v}" >> "$GITHUB_ENV"
+      - name: Check the version has the right shape
+        shell: bash
+        run: |
+          if ! printf '%s\n' "$VERSION" | grep -qE '^[0-9]+\.[0-9]+$'; then
+            echo "spec-v tags look like spec-v0.1, not $TAG"
+            exit 1
+          fi
+      - name: Check the tag points at a commit of main
+        shell: bash
+        run: |
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "The tag must point at a commit of main"
+            exit 1
+          fi
+      - name: Check the test workflow passed on this commit
+        shell: bash
+        run: |
+          passed=$(gh run list --workflow test.yml --commit "$(git rev-parse HEAD)" --status success --json databaseId --jq length)
+          if [ "${passed:-0}" -le 0 ]; then
+            echo "The test workflow hasn't passed on this commit yet. Wait for it, then re-run this job."
+            exit 1
+          fi
+      - name: Check the schemas, ergo.rego and the changelog name this version
+        shell: bash
+        run: |
+          if grep -q '^_spec := "v.*-dev"$' ergo.rego; then
+            echo "ergo.rego says $(grep -m 1 '^_spec := ' ergo.rego), so this spec isn't ready. Drop -dev from the spec everywhere first."
+            exit 1
+          fi
+          for name in policy report; do
+            if ! grep -q "^ *\"\\\$id\": *\".*/spec/$VERSION/$name.schema.json\"" "spec/$name/schema.json"; then
+              echo "spec/$name/schema.json has a \$id that doesn't end in /spec/$VERSION/$name.schema.json"
+              exit 1
+            fi
+          done
+          if ! grep -qxF "_spec := \"v$VERSION\"" ergo.rego; then
+            echo "ergo.rego must say _spec := \"v$VERSION\""
+            exit 1
+          fi
+          if ! grep -qxF "## $VERSION" spec/CHANGELOG.md; then
+            echo "spec/CHANGELOG.md has no \"## $VERSION\" heading"
+            exit 1
+          fi
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - name: Check every rule a case cites exists, and every rule has a case
+        run: python3 spec/check_rules.py
+      - name: Check the corpus JSON matches the markdown
+        run: python3 spec/sentences_corpus.py --check
+      - name: Install the spec checks' Python packages
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet jsonschema==4.26.0 abnf==2.9.0
+      - name: Check the cases' policies and reports match the schemas
+        run: '"$RUNNER_TEMP/venv/bin/python" .github/spec-schemas.py'
+      - name: Check ergo.rego and the ABNF read the same sentences
+        run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py'
+      - name: Create the release, which is never the latest, so releases/latest stays ergo.rego
+        shell: bash
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "The release $TAG already exists"
+            exit 0
+          fi
+          git show "$GITHUB_SHA:.github/release-notes.sh" > "$RUNNER_TEMP/release-notes.sh"
+          sh "$RUNNER_TEMP/release-notes.sh" spec/CHANGELOG.md "$VERSION" "https://github.com/$GITHUB_REPOSITORY/blob/$TAG/spec/" > "$RUNNER_TEMP/notes.md"
+          cp spec/policy/schema.json "$RUNNER_TEMP/policy.schema.json"
+          cp spec/report/schema.json "$RUNNER_TEMP/report.schema.json"
+          gh release create "$TAG" "$RUNNER_TEMP/policy.schema.json" "$RUNNER_TEMP/report.schema.json" \
+            --title "Ergo spec $VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            --latest=false \
+            --verify-tag
+      - name: Deploy the site, which now serves this version's schemas
+        run: gh workflow run pages.yml --ref main

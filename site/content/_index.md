@@ -14,45 +14,54 @@ hero:
     show_rego: false
     examples:
       - key: deploy
+        holds: [6000, 5800, 6500, 6000, 8500]
         label: Deploy approval
         input_caption: Three deployments. d-2 has no approved_by field at all, and d-3 is in staging.
         rego_caption: Rego says no. Nothing about d-1, or why d-3 was skipped.
         ergo_caption: d-3 is out of scope. d-2 was never approved... and the report says so.
       - key: review
+        holds: [6400, 6200, 6500, 6000, 8500]
         label: Four eyes
         input_caption: Three pull requests. PR 2 was approved only by its author, and PR 3 has no author recorded.
         rego_caption: Two failures, one message. Which is which?
         ergo_caption: PR 2 was only approved by its author. PR 3 has no author recorded. Different problems, different fixes.
+      - key: expenses
+        holds: [6000, 5800, 6500, 6000, 8500]
+        label: Expenses
+        input_caption: Three meal expenses. e-2 is over the €50 limit, and e-3 has no receipt.
+        ergo_caption: e-2 costs too much and e-3 has no receipt, so whoever claimed them knows exactly what to fix.
 
 problem:
   title: A decision nobody can inspect
   muted: isn't evidence.
   lede: With Rego you can block a deployment, but you can't show later why. When you write policies with ==ergo== you have records of why decisions were made.
-  body: In regulated settings, someone else has to be able to check that a policy behaved as it should. A yes or no can't be validated. You don't just tell the auditor the decision. You hand over the workings.
+  body: When a decision matters, someone else has to be able to check that the policy behaved as it should. A yes or no can't be validated. You don't just tell an auditor, a customer or a colleague the decision. You hand over the workings.
   without:
     label: "**Rego** provides decisions"
     note: Useful. But why was it false?
   with:
     label: With **Ergo** you get explanations
     note: Same decision. Now you can see why.
+    out_of_scope: (out of scope, recorded)
 
 declaration:
+  marks: {subjects: 1, from: 1, whose: 2, identified_by: 1, subject: 3, checks: 3}
   title: Write the policy.
   muted: Not the sorcery.
   notes_title: Defined in YAML or Rego
   notes_intro: Write the policy as a YAML file or as a Rego object. ==ergo== reads both the same way and gives the same report.
   notes:
     - title: Define the subjects
-      body: "Each subject gets a name, and `from` and `id` say where to find them."
+      body: "Each subject gets a name. `from` says where the subjects are in the input, and `identified_by` names the field that tells them apart."
     - title: Filter the scope
-      body: "`applies_to` keeps only the subjects the policy is about. The rest are recorded, not dropped."
+      body: "`whose` keeps only the subjects the policy is about, here the production deployments. The rest are recorded, not dropped."
     - title: Test the values
-      body: "A requirement names its subject, and its `checks` are the rules each one must pass. ==ergo== does the looping, the evaluation and the report."
+      body: "A requirement names its subject, and its `checks` are the rules each one must pass, each written as a sentence. ==ergo== does the looping, the evaluation and the report."
 
 shape:
   title: One report format.
   muted: Every policy.
-  lede: "A deployment policy. A code-review policy. A vulnerability policy. Different checks, same evidence: one row per subject and check. Passing and failing rows have the same fields."
+  lede: "A deployment policy. An expense policy. A loan eligibility policy. Different checks, same evidence: one row per subject and check. Passing and failing rows have the same fields."
   fields:
     - name: requirement
       body: Which requirement produced the row.
@@ -100,6 +109,7 @@ start:
       body: Say what you're judging, what's in scope and what must hold.
       code: |-
         report := ergo.report(input, {
+          "ergo_spec": data.ergo_spec,
           "subjects": data.subjects,
           "requirements": data.requirements,
         }, {})

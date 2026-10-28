@@ -126,6 +126,9 @@ p code, li code, dd code, td code {
 .hero__title .ergo-mark { display: inline; color: var(--ink); }
 .hero__lede { font-size: clamp(18px, 1.8vw, 21px); line-height: 1.55; color: var(--muted); max-width: 560px; margin: 0; }
 .hero__lede .hl { color: var(--lime); }
+.hero__release { margin: 20px 0 0; font-size: 14px; color: var(--muted); }
+.hero__release a { color: inherit; text-decoration: none; }
+.hero__release a:hover { color: var(--paper); text-decoration: underline; text-underline-offset: 3px; }
 
 /* Terminal / report */
 .term { margin: 0; background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .6); }
@@ -159,7 +162,7 @@ p code, li code, dd code, td code {
 
 /* Hero from → to: each example steps Rego policy → Rego result → ergo policy → ergo report. */
 .ft__bar { flex-wrap: wrap; row-gap: 10px; }
-.ft__file { flex: 1 1 auto; min-width: 0; }
+.ft__file { flex: 1 1 0; min-width: 0; }
 .ft__tabs { display: flex; gap: 4px; margin-left: auto; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
 .ft__tab { padding: 5px 11px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 12px/1 var(--mono); cursor: pointer; }
 .ft__tab:hover { color: var(--paper); }

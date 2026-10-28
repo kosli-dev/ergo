@@ -9,19 +9,53 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: open-policy-agent/setup-opa@v2
         with:
-          version: 1.19.0
+          version: 1.20.2
       - uses: open-policy-agent/setup-regal@v2.0.0
         with:
           version: 0.43.0
+      - name: Check the version isn't below the latest release
+        shell: bash
+        run: |
+          version=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' ergo.rego)
+          if [ -z "$version" ]; then
+            echo 'ergo.rego must say version := "X.Y.Z-dev" on main'
+            exit 1
+          fi
+          latest=$(git tag --list 'rego-v*' | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^rego-v//' | sort -V | tail -n 1 || true)
+          if [ -n "$latest" ]; then
+            if [ "$latest" = "$version" ]; then
+              echo "::warning::ergo.rego says $version-dev, but rego-v$latest is already released. Merge the pull request that moves main to the next version."
+              exit 0
+            fi
+            highest=$(printf '%s\n%s\n' "$latest" "$version" | sort -V | tail -n 1)
+            if [ "$highest" != "$version" ]; then
+              echo "ergo.rego says $version-dev, but rego-v$latest is already released. Change it to a version above $latest, like the next minor."
+              exit 1
+            fi
+          fi
+      - name: Check the spec version moved when the spec changed
+        run: .github/spec-version.sh
       - run: opa check --strict . --ignore .github
+      - name: Check Ergo compiles where input is checked against a closed schema
+        run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
+      - name: Check Ergo compiles without built-ins whose answer depends on the machine
+        run: |
+          opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > "$RUNNER_TEMP/deterministic.json"
+          opa check --strict --capabilities "$RUNNER_TEMP/deterministic.json" ergo.rego
       - run: opa fmt --list --fail .
-      - run: opa test . --ignore .github --timeout 30s --verbose
+      - name: Check the release workflow's latest flag and release notes
+        run: |
+          python3 .github/release-latest.py
+          .github/release-latest_test.sh
+          .github/release-notes_test.sh
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
       - name: Check there are no comments
@@ -29,7 +63,7 @@ jobs:
         run: |
           comments=$(git ls-files '*.rego' | while read -r f; do
             opa parse "$f" --format json --json-include comments,locations |
-              jq -r --arg f "$f" '.comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r <= 2) | not) | "\($f):\($r)"'
+              jq -r --arg f "$f" '.package.location.row as $p | .comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r < $p) | not) | "\($f):\($r)"'
           done)
           if [ -n "$comments" ]; then
             echo "These lines have comments:"
@@ -38,46 +72,101 @@ jobs:
           fi
       - name: Check the tests give the same results with --strict-builtin-errors
         run: opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
-      - name: Check every line is tested
+
+  tests-rego:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        part: [1, 2, 3, 4]
+    env:
+      PART: ${{ matrix.part }}
+      PARTS: ${{ strategy.job-total }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - name: Run this part of the tests with coverage
         shell: bash
         run: |
-          opa test . --ignore .github --timeout 30s --coverage > "$RUNNER_TEMP/coverage.json"
+          if ! opa test . --ignore .github --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
+            cat "$RUNNER_TEMP/coverage.json"
+            exit 1
+          fi
           jq -e '.files["ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
-          uncovered=$(jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' "$RUNNER_TEMP/coverage.json" | sort -u)
+          jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | range(.start.row; .end.row + 1) | "\($f):\(.)"' "$RUNNER_TEMP/coverage.json" | sort -u > "$RUNNER_TEMP/not-covered-$PART.txt"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: not-covered-${{ matrix.part }}
+          path: ${{ runner.temp }}/not-covered-${{ matrix.part }}.txt
+
+  tests-rego-coverage:
+    needs: tests-rego
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: not-covered-*
+          merge-multiple: true
+          path: not-covered
+      - name: Check every line is reached by some part's tests
+        shell: bash
+        run: |
+          files=(not-covered/*.txt)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No part sent its coverage"
+            exit 1
+          fi
+          uncovered=$(cat "${files[0]}")
+          for f in "${files[@]:1}"; do
+            uncovered=$(comm -12 <(echo "$uncovered") "$f")
+          done
+          uncovered=$(grep -v '^$' <<<"$uncovered" | sort -t: -k1,1 -k2,2n | awk -F: '$1 != f || $2 != r + 1 { print } { f = $1; r = $2 }' || true)
           if [ -n "$uncovered" ]; then
             echo "No test reaches these lines:"
             echo "$uncovered"
             exit 1
           fi
 
-  opa-1-20:
+  tests-wasm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        part: [1, 2, 3, 4]
+    env:
+      PART: ${{ matrix.part }}
+      PARTS: ${{ strategy.job-total }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - name: Run this part of the tests compiled to Wasm
+        run: .github/wasm-tests.sh
+
+  tests-compiled-policy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        part: [1, 2, 3, 4]
+    env:
+      PART: ${{ matrix.part }}
+      PARTS: ${{ strategy.job-total }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - name: Run this part of the tests with every report made from a compiled policy
+        run: .github/compiled-tests.sh
+
+  tests-wasm-js:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
-      - run: opa check --strict . --ignore .github
-      - run: opa fmt --list --fail .
-      - run: opa test . --ignore .github --timeout 30s
-
-  wasm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: open-policy-agent/setup-opa@v2
-        with:
-          version: 1.19.0
-      - name: Run the tests compiled to Wasm
-        run: opa test . --ignore .github --target wasm --timeout 30s
-
-  wasm-js:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: open-policy-agent/setup-opa@v2
-        with:
-          version: 1.19.0
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -85,3 +174,67 @@ jobs:
         run: |
           npm install --silent --no-save --prefix "$RUNNER_TEMP" @open-policy-agent/opa-wasm@1.10.0
           node .github/wasm-js.cjs "$RUNNER_TEMP"
+
+  spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - name: Check every rule a case cites exists, and every rule has a case
+        run: python3 spec/check_rules.py
+      - name: Check the corpus JSON matches the markdown
+        run: python3 spec/sentences_corpus.py --check
+      - name: Install the spec checks' Python packages
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet jsonschema==4.26.0 abnf==2.9.0
+      - name: Check the cases' policies and reports match the schemas
+        run: '"$RUNNER_TEMP/venv/bin/python" .github/spec-schemas.py'
+      - name: Check ergo.rego and the ABNF read the same sentences
+        run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py'
+
+  site:
+    runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: 0.157.0
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install Hugo
+        run: |
+          wget -q -O "$RUNNER_TEMP/hugo.deb" "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
+          sudo dpkg -i "$RUNNER_TEMP/hugo.deb"
+      - name: Test the site's scripts
+        run: |
+          site/latest-release_test.sh
+          site/prepare_test.sh
+          site/check_fit_test.sh
+          site/check_examples_test.sh
+          site/check_build_test.sh
+      - name: Write what the site needs from this commit
+        run: site/prepare.sh --working-tree
+      - name: Test this commit's tutorial and home page examples against its ergo.rego
+        run: site/check.sh
+      - name: Build the site from this commit
+        run: |
+          hugo --source site --gc --minify --destination "$RUNNER_TEMP/public"
+          python3 site/check_build.py "$RUNNER_TEMP/public"
+      - name: Write what the site needs from the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: site/prepare.sh
+      - name: Test the released tutorial, and check it still fits this commit's layouts and CSS
+        run: site/check.sh
+      - name: Build the site from the latest release
+        run: |
+          hugo --source site --gc --minify --destination "$RUNNER_TEMP/public-release"
+          python3 site/check_build.py "$RUNNER_TEMP/public-release"

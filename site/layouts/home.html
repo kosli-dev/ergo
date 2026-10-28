@@ -1,5 +1,6 @@
 {{ define "main" }}
 {{- $c := .Params }}
+{{- if not hugo.Data.release.ergo_spec }}{{ errorf "The home page needs the latest release: run site/prepare.sh" }}{{ end }}
 
 {{/* 00 — Hero */}}
 <section class="hero">
@@ -11,6 +12,10 @@
         <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.hero.primary }} <span aria-hidden="true">→</span></a>
         <a class="btn btn--outline" href="{{ site.Params.repo }}">{{ partial "github-icon.html" . }}{{ $c.hero.secondary }}</a>
       </div>
+      {{- with hugo.Data.release.rego }}
+      <p class="hero__release">Latest release: <a href="{{ site.Params.repo }}/releases/tag/rego-v{{ . }}">ergo.rego {{ . }}</a>
+        {{- with hugo.Data.release.spec }}, <a href="{{ site.Params.repo }}/blob/spec-v{{ . }}/spec/README.md">spec {{ . }}</a>{{ end }}</p>
+      {{- end }}
     </div>
 
     {{ partial "hero-fromto.html" . }}
@@ -36,10 +41,20 @@
         </div>
         <div class="compare__card compare__card--ergo">
           <p class="compare__label mono">{{ partial "copy.html" $c.problem.with.label }}</p>
+{{- $rows := slice }}
+{{- range (index hugo.Data.examples "deploy").report }}{{ if and (isset . "subject") (ne .check "$applies") }}{{ $rows = $rows | append . }}{{ end }}{{ end }}
+{{- range (index hugo.Data.examples "deploy").report }}{{ if and (isset . "subject") (eq .check "$applies") (not .passed) }}{{ $rows = $rows | append . }}{{ end }}{{ end }}
 <pre class="code"><code><span class="n">subject  check      value read               passed  cause</span>
-d-1      approved   approved_by = "alice"    <span class="t">true</span>    <span class="t">satisfied</span>
-d-2      approved   approved_by = <span class="n">null</span>       <span class="f">false</span>   <span class="f">absent</span>
-d-3      <span class="k">$applies</span>   environment = "staging"  <span class="f">false</span>   value <span class="n">(out of scope, recorded)</span></code></pre>
+{{- range $rows }}
+{{- $value := "" }}{{ range .inputs }}{{ $value = printf "%s = %s" .name (jsonify .value) }}{{ end }}
+{{- $value = htmlEscape (printf "%-25s" $value) | replaceRE `= null` `= <span class="n">null</span>` }}
+{{- $check := htmlEscape (printf "%-11s" .check) }}
+{{- if eq .check "$applies" }}{{ $check = replace $check "$applies" `<span class="k">$applies</span>` }}{{ end }}
+{{- $tone := cond .passed "t" "f" }}
+{{- $cause := .cause }}
+{{- if eq .check "$applies" }}{{ $cause = printf `%s <span class="n">%s</span>` .cause (htmlEscape $c.problem.with.out_of_scope) }}{{ else }}{{ $cause = printf `<span class="%s">%s</span>` $tone .cause }}{{ end }}
+{{ printf "%-9s" (string .subject) }}{{ $check | safeHTML }}{{ $value | safeHTML }}<span class="{{ $tone }}">{{ .passed }}</span>{{ cond .passed "    " "   " }}{{ $cause | safeHTML }}
+{{- end }}</code></pre>
           <p class="compare__note">{{ partial "copy.html" $c.problem.with.note }}</p>
         </div>
       </div>
@@ -63,23 +78,7 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
       </div>
       <div class="declare__code">
 <pre class="code code--lg"><code><span class="n"># policy/policy.yaml</span>
-<span class="k" data-note="1">subjects</span>:
-  <span class="k">deployment</span>:
-    <span class="k" data-note="1">from</span>: [<span class="s">deployments</span>]
-    <span class="k" data-note="1">id</span>: [<span class="s">id</span>]
-    <span class="k" data-note="2">applies_to</span>:
-      <span class="k">is_prod</span>:
-        <span class="k">op</span>: <span class="s">equals</span>
-        <span class="k">path</span>: [<span class="s">environment</span>]
-        <span class="k">value</span>: <span class="s">prod</span>
-<span class="k">requirements</span>:
-  <span class="k">prod_deploy</span>:
-    <span class="k" data-note="3">subject</span>: <span class="s">deployment</span>
-    <span class="k" data-note="3">checks</span>:
-      <span class="k">approved</span>:
-        <span class="k">description</span>: <span class="s">Someone approved the deployment</span>
-        <span class="k">op</span>: <span class="s">non_empty_string</span>
-        <span class="k">path</span>: [<span class="s">approved_by</span>]</code></pre>
+{{ partial "code/yaml.html" (dict "text" (printf "ergo_spec: %s\n%s" hugo.Data.release.ergo_spec (index hugo.Data.examples "deploy").policy) "marks" $c.declaration.marks) | safeHTML }}</code></pre>
       </div>
     </div>
   </div>
@@ -181,7 +180,7 @@ d-3      <span class="k">$applies</span>   environment = "staging"  <span class=
   <div class="wrap name__grid">
     <div class="name__glyph"><ergo-mark autoplay>{{ partial "mark.html" . }}</ergo-mark></div>
     <div>
-      <h2 class="display-m"><span class="ergo-mark">ergo</span> <span class="muted">/ˈɜː.ɡəʊ/</span></h2>
+      <h2 class="display-m"><span class="ergo-mark">Ergo</span> <span class="muted">/ˈɜː.ɡəʊ/</span></h2>
       <p class="lede">{{ partial "copy.html" $c.name.lede }}</p>
       <p>{{ partial "copy.html" $c.name.body }}</p>
     </div>

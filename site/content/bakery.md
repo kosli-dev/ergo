@@ -8,7 +8,7 @@ sitemap:
 
 In this introduction to Ergo, we'll show how to define policy decisions with rego and Ergo through the example of a bakery's allergen requirements (hat tip to Toby Weston for [the original inspiration](https://baddotrobot.com/blog/2026-10-02-baking-in-evidence/)). You'll learn how to validate cake batches against three compliance rules and produce explanatory reports of decisions. No deep technical expertise or prior experience with rego is required.
 
-We will look at the same policy written two ways, in plain Rego and with Ergo, and compare the results. You can follow along. The files are in [`examples/baking`](https://github.com/kosli-dev/ergo/tree/main/examples/baking).
+We will look at the same policy written two ways, in plain Rego and with Ergo, and compare the results. You can follow along. The files are in [`examples/baking`]({{< release-url "examples/baking" >}}).
 
 ## The policy
 
@@ -19,7 +19,7 @@ We will look at the same policy written two ways, in plain Rego and with Ergo, a
 
 ## The input file
 
-Our input, [`batches.json`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/batches.json) describes four batches of cake baking:
+Our input, [`batches.json`]({{< release-url "examples/baking/batches.json" >}}) describes four batches of cake baking:
 
 <div class="annotated">
 
@@ -43,22 +43,22 @@ Only batch 001 should pass.
 
 <p class="compare__label mono">In Rego</p>
 
-[`plain-rego/baking.rego`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/plain-rego/baking.rego)
+[`plain-rego/baking.rego`]({{< release-url "examples/baking/plain-rego/baking.rego" >}})
 
 {{< example "baking/plain-rego/baking.rego" "rego" >}}
 
-This is the example's policy with three changes. It reads every batch in the list instead of a single one, so it can say which batch each result is about. The rules need `if`, because OPA 1.19 won't load them without it. And the `contains` helper is renamed `has`, because it clashes with a function OPA now has built in.
+This is the example's policy with three changes. It reads every batch in the list instead of a single one, so it can say which batch each result is about. The rules need `if`, because OPA 1.20 won't load them without it. And the `contains` helper is renamed `has`, because it clashes with a function OPA now has built in.
 
 </div>
 <div class="side--ergo">
 
 <p class="compare__label mono">with <span class="ergo-mark">Ergo</span></p>
 
-[`ergo/baking.yaml`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/ergo/baking.yaml)
+[`ergo/baking.yaml`]({{< release-url "examples/baking/ergo/baking.yaml" >}})
 
 {{< example "baking/ergo/baking.yaml" "yaml" >}}
 
-[`ergo/baking.rego`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/ergo/baking.rego), which runs it:
+[`ergo/baking.rego`]({{< release-url "examples/baking/ergo/baking.rego" >}}), which runs it:
 
 {{< example "baking/ergo/baking.rego" "rego" >}}
 
@@ -141,9 +141,9 @@ The report has a row for every check it ran on every batch, with the value it re
 
 Ergo adds the checks that start with `$` to every report itself. They make sure the requirement is well formed, that there was at least one batch to check, and that no two batches share an id.
 
-In this example, Batch 003 fails because Ergo's `excludes` needs a list, and `"nuts"` isn't one. All three batches fail, but you can see the different reasons. `cause: value` means Ergo read the value and it didn't pass (allergens contain nuts), `cause: unusable` means the value was there but not the kind the check needs, and `cause: absent` means there was no value at all.
+In this example, Batch 003 fails because Ergo's `does not contain` needs a list, and `"nuts"` isn't one. All three batches fail, but you can see the different reasons. `cause: value` means Ergo read the value and it didn't pass (allergens contain nuts), `cause: unusable` means the value was there but not the kind the check needs, and `cause: absent` means there was no value at all.
 
-The report also writes each check as an expression, so the table comes straight out of it. [`ergo/workings.rego`](https://github.com/kosli-dev/ergo/blob/main/examples/baking/ergo/workings.rego) builds it from the report, and the policy exposes it as `workings_table`:
+The report also writes each check as an expression, so the table comes straight out of it. [`ergo/workings.rego`]({{< release-url "examples/baking/ergo/workings.rego" >}}) builds it from the report, and the policy exposes it as `workings_table`:
 
 ```sh
 opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.workings_table'
@@ -151,11 +151,11 @@ opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f
 
 Here are the rows for batch 001:
 
-| Policy clause (`description`)        | Predicate (`check`) | Inputs used (`inputs`)        | Evaluated expression (`expression`)         | Result (`passed`) |
-| ------------------------------------ | ------------------- | ----------------------------- | ------------------------------------------- | ----------------- |
-| Must not contain nut allergens       | `nut_free`          | `allergens = ["milk","eggs"]` | `not contains(allergens, "nuts")`           | `true`            |
-| Bake temperature 175–200°C inclusive | `temp_ok`           | `bake.temp_c = 180`           | `bake.temp_c >= 175 and bake.temp_c <= 200` | `true`            |
-| Bake time 25–40 minutes inclusive    | `time_ok`           | `bake.minutes = 32`           | `bake.minutes >= 25 and bake.minutes <= 40` | `true`            |
+| Policy clause (`description`)        | Predicate (`check`) | Inputs used (`inputs`)        | Evaluated expression (`expression`)  | Result (`passed`) |
+| ------------------------------------ | ------------------- | ----------------------------- | ------------------------------------ | ----------------- |
+| Must not contain nut allergens       | `nut_free`          | `allergens = ["milk","eggs"]` | `allergens does not contain "nuts"`  | `true`            |
+| Bake temperature 175–200°C inclusive | `temp_ok`           | `bake.temp_c = 180`           | `bake.temp_c is between 175 and 200` | `true`            |
+| Bake time 25–40 minutes inclusive    | `time_ok`           | `bake.minutes = 32`           | `bake.minutes is between 25 and 40`  | `true`            |
 
 When you only want to know what to fix, ask for the violations. There's one for each of the three failing batches. Here's the one for batch 004:
 
@@ -168,7 +168,7 @@ opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f
   "cause": "absent",
   "check": "nut_free",
   "description": "Must not contain nut allergens",
-  "expression": "not contains(allergens, \"nuts\")",
+  "expression": "allergens does not contain \"nuts\"",
   "inputs": [
     {
       "name": "allergens",

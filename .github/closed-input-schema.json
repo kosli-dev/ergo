@@ -1,0 +1,7 @@
+{
+  "type": "object",
+  "properties": {
+    "trail": {"type": "object"}
+  },
+  "additionalProperties": false
+}

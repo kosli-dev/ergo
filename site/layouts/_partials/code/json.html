@@ -1,0 +1,14 @@
+{{- $t := .text -}}
+{{- $t = replaceRE `"([^"]*)"(\s*):` "\x01${1}\x02${2}:" $t -}}
+{{- $t = replaceRE `"([^"]*)"` "\x03${1}\x04" $t -}}
+{{- $t = replaceRE `([:\[,]\s*)(-?[0-9]+(\.[0-9]+)?)` "${1}\x05${2}\x06" $t -}}
+{{- $t = replaceRE `\b(true|false|null)\b` "\x07${1}\x06" $t -}}
+{{- $t = htmlEscape $t -}}
+{{- $t = replace $t "\x01" `<span class="k">"` -}}
+{{- $t = replace $t "\x02" `"</span>` -}}
+{{- $t = replace $t "\x03" `<span class="s">"` -}}
+{{- $t = replace $t "\x04" `"</span>` -}}
+{{- $t = replace $t "\x05" `<span class="n">` -}}
+{{- $t = replace $t "\x07" `<span class="f">` -}}
+{{- $t = replace $t "\x06" `</span>` -}}
+{{- return $t -}}

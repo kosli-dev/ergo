@@ -1,0 +1,260 @@
+[
+  {
+    "description": "includes a value",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains \"a\""}}}},
+    "cases": [
+      {
+        "description": "passes when the list contains it",
+        "rules": ["contains.pass", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": ["b", "a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b", "a"], "locations": ["/things/0/x"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains \"a\""}}
+      },
+      {
+        "description": "fails as value when it doesn't",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as value on an empty list",
+        "rules": ["contains.pass", "contains.fail"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": [], "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string that holds it",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": "abc"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on an object that holds it",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": {"a": "a"}}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": {"a": "a"}, "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["contains.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+        ]
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["contains.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": "x", "value": null, "locations": ["/things/0/x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "includes a number",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains 1"}}}},
+    "cases": [
+      {
+        "description": "passes on 1.0, because numbers compare by value",
+        "rules": ["contains.pass", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": [2, 1.0]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [2, 1], "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a list whose items have more than one type, even when it holds the number",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["1", 1]}, {"id": "t2", "x": [1, null]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["1", 1], "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [1, null], "locations": ["/things/1/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on the string \"1\"",
+        "rules": ["contains.fail", "value.equal"],
+        "input": {"things": [{"id": "t1", "x": ["1"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["1"], "locations": ["/things/0/x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "includes values",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of \"b\", \"a\""}}}},
+    "cases": [
+      {
+        "description": "passes when the list contains every one",
+        "rules": ["contains.pass", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": ["a", "c", "b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["a", "c", "b"], "locations": ["/things/0/x"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains all of \"b\", \"a\""}}
+      },
+      {
+        "description": "fails as value when one is missing",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "excludes a value",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain \"a\""}}}},
+    "cases": [
+      {
+        "description": "passes when the list doesn't contain it",
+        "rules": ["contains.pass", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]}
+        ],
+        "expressions": {"s": {"c": "x does not contain \"a\""}}
+      },
+      {
+        "description": "passes on an empty list",
+        "rules": ["contains.pass"],
+        "input": {"things": [{"id": "t1", "x": []}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": [], "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a list of another type, which can't hold it",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": [1, 2]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": [1, 2], "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as value when it does",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as unusable on a string",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": "b"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "b", "locations": ["/things/0/x"]}]}
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing, instead of passing",
+        "rules": ["contains.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "excludes values",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of \"nuts\", \"garlic\""}}}},
+    "cases": [
+      {
+        "description": "passes when the list contains none of them",
+        "rules": ["contains.pass", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": ["salt"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": ["salt"], "locations": ["/things/0/x"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains none of \"nuts\", \"garlic\""}}
+      },
+      {
+        "description": "fails as value when it contains one",
+        "rules": ["contains.fail"],
+        "input": {"things": [{"id": "t1", "x": ["garlic"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": ["garlic"], "locations": ["/things/0/x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "excludes a value read through a ref",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain $params.banned"}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent when the param is missing, instead of passing",
+        "rules": ["value.ref", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+        ],
+        "expressions": {"s": {"c": "x does not contain $params.banned"}}
+      }
+    ]
+  },
+  {
+    "description": "excludes values read through a ref to an empty list",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
+    "params": {"banned": []},
+    "cases": [
+      {
+        "description": "fails as unusable, because an empty list would pass anything",
+        "rules": ["contains.value", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+        ],
+        "expressions": {"s": {"c": "x contains none of $params.banned"}}
+      }
+    ]
+  },
+  {
+    "description": "excludes values read through a ref that isn't a list",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
+    "params": {"banned": "a"},
+    "cases": [
+      {
+        "description": "fails as unusable",
+        "rules": ["contains.value"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "excludes values read through a ref that holds values of mixed types",
+    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
+    "params": {"banned": ["a", 1]},
+    "cases": [
+      {
+        "description": "fails as unusable, whatever the list holds",
+        "rules": ["contains.value"],
+        "input": {"things": [{"id": "t1", "x": ["b"]}, {"id": "t2"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null, "locations": ["/things/1"]}]}
+        ]
+      }
+    ]
+  }
+]

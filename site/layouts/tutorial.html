@@ -1,0 +1,73 @@
+{{ $wasm := resources.Get "tutorial/ergo.wasm" }}
+{{ if not $wasm }}{{ errorf "The tutorial needs Ergo compiled to Wasm: run site/prepare.sh" }}{{ end }}
+<!doctype html>
+<html lang="{{ site.LanguageCode }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .Title }} · Ergo</title>
+  <meta name="description" content="{{ .Params.description }}">
+  <meta name="theme-color" content="#080F1A">
+  <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap">
+  {{ with resources.Get "css/ergo.css" | minify | fingerprint }}<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">{{ end }}
+  {{ with resources.Get "css/tutorial.css" | minify | fingerprint }}<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">{{ end }}
+</head>
+<body class="tut-body">
+  <div class="tut" id="tutorial" data-wasm="{{ ($wasm | fingerprint).RelPermalink }}">
+    <header class="tut__bar">
+      <a class="lockup" href="{{ "/" | relURL }}" aria-label="Ergo home">{{ partial "wordmark.html" . }}</a>
+      <div class="tut__tools">
+        <div class="tut__menu" data-menu-wrap hidden>
+          <button type="button" class="tut__more" data-menu-button aria-haspopup="menu" aria-expanded="false" aria-controls="tut-menu" aria-label="Menu">⋯</button>
+          <div class="tut__menulist" id="tut-menu" role="menu" data-menu hidden>
+            <button type="button" role="menuitem" data-restart-step>restart step</button>
+            <button type="button" role="menuitem" data-start-over>start over</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="tut__body" data-intro>
+      <p class="tut__line" data-intro-line1></p>
+      <pre class="tut__input tut__input--example mono" data-intro-example></pre>
+      <p class="tut__line" data-intro-line2></p>
+      <p class="tut__credit">Based on <a href="{{ "bakery/" | relURL }}">our bakery example</a>.</p>
+    </main>
+
+    <main class="tut__body" data-step hidden>
+      <p class="tut__goal" data-goal></p>
+
+      <pre class="tut__input mono" data-input-fixed></pre>
+      <textarea class="tut__input mono" data-input autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" rows="1" aria-label="Input" hidden></textarea>
+
+      <textarea class="tut__input tut__sentence mono" data-sentence rows="1" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="write a check" aria-label="Check"></textarea>
+
+      <div class="tut__stage" data-stage hidden></div>
+
+      <div class="tut__coachrow" aria-live="polite">
+        <p class="tut__coach" data-coach></p>
+        <button type="button" class="tut__link" data-showme hidden>show me</button>
+      </div>
+
+      <section class="tut__result" aria-live="polite" data-result></section>
+    </main>
+
+    <main class="tut__body tut__end" data-end hidden>
+      <p class="tut__big">That's Ergo.</p>
+      <p class="tut__line">Read <a class="tut__textlink" href="{{ "bakery/" | relURL }}">the bakery example</a> to see a whole policy, or <a class="tut__textlink" href="{{ "docs/reference/" | relURL }}">the reference</a> for every phrase.</p>
+    </main>
+
+    <footer class="tut__foot">
+      <button type="button" class="tut__back" data-back aria-label="back">←</button>
+      <ol class="tut__dots" data-dots aria-label=""></ol>
+      <span class="tut__count mono" data-count aria-hidden="true"></span>
+      <span class="tut__keyhint" data-keyhint aria-hidden="true">press <kbd>↵</kbd></span>
+      <button type="button" class="tut__next" data-next></button>
+    </footer>
+  </div>
+  {{ with resources.Get "js/tutorial/main.mjs" | js.Build (dict "format" "esm" "target" "es2022" "minify" true) | fingerprint }}<script type="module" src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}"></script>{{ end }}
+</body>
+</html>
