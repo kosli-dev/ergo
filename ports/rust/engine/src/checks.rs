@@ -2,7 +2,7 @@ use crate::lower::{self, Scope};
 use crate::name;
 use crate::ops::Check;
 use crate::ops::any_of::AnyOf;
-use crate::path::{self, Ctx, Located, Location};
+use crate::path::{self, Ctx, Located, Location, Path};
 use crate::policy::{Form, OptionLines, Requirement, SubjectName};
 use crate::reading::Reading;
 use crate::report::written_expression;
@@ -317,6 +317,15 @@ pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<Str
 }
 
 pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value> {
+    let paths: Vec<Path> = plan
+        .items
+        .iter()
+        .flat_map(|item| item.check.refs())
+        .collect();
+    refs_read(&paths, input, params)
+}
+
+pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<Value> {
     let ctx = Ctx {
         subject: Located {
             value: input,
@@ -327,16 +336,14 @@ pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value>
         aliases: BTreeMap::new(),
     };
     let mut entries: Vec<Value> = Vec::new();
-    for item in &plan.items {
-        for reference in item.check.refs() {
-            let read = path::read(&reference, &ctx);
-            let locations: Vec<String> = read.location.iter().map(Location::render).collect();
-            entries.push(serde_json::json!({
-                "name": name::name(&reference),
-                "value": read.value.cloned().unwrap_or(Value::Null),
-                "locations": locations,
-            }));
-        }
+    for reference in paths {
+        let read = path::read(reference, &ctx);
+        let locations: Vec<String> = read.location.iter().map(Location::render).collect();
+        entries.push(serde_json::json!({
+            "name": name::name(reference),
+            "value": read.value.cloned().unwrap_or(Value::Null),
+            "locations": locations,
+        }));
     }
     entries.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
     entries.dedup();

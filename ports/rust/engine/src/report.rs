@@ -261,7 +261,14 @@ fn filters_text(
     extra: &Problems,
 ) -> Option<String> {
     let (name, _) = policy.subject_of(requirement)?;
-    if !from_readable(reading, name, extra) {
+    let blocked = extra
+        .get(&field_name(&["subjects", name, "from"]))
+        .is_some_and(|texts| {
+            texts
+                .iter()
+                .any(|text| text != crate::reading::NARROWING_A_CHILD_PROBLEM)
+        });
+    if blocked {
         return None;
     }
     reading.filters_text(name)
@@ -331,7 +338,7 @@ pub fn check_defs(
         .collect();
     let kind = type_text(&subject_type(requirement));
     let from = from_text(reading, policy, requirement, extra);
-    let min = json_text(&requirement.min_subjects);
+    let min = crate::value::literal_text(&requirement.min_subjects);
     let (min_description, min_expression) = if is_zero(&requirement.min_subjects) {
         (
             format!("The {kind} list can be read"),
@@ -343,17 +350,23 @@ pub fn check_defs(
             format!("count(matching({from})) >= {min}"),
         )
     };
-    defs.insert(
-        "$min_subjects".to_string(),
-        CheckDef::added(min_description, min_expression),
-    );
-    defs.insert(
-        "$unique_ids".to_string(),
-        CheckDef::added(
-            format!("Every {kind} id is unique"),
-            format!("count(repeated(ids({from}))) == 0"),
+    let from_refs = match policy.subject_of(requirement) {
+        Some((name, _)) if from_readable(reading, name, extra) => crate::checks::refs_read(
+            &reading.from_refs(name),
+            input,
+            params.as_object().map(|_| params),
         ),
+        _ => Vec::new(),
+    };
+    let mut min_def = CheckDef::added(min_description, min_expression);
+    min_def.refs.clone_from(&from_refs);
+    defs.insert("$min_subjects".to_string(), min_def);
+    let mut unique_def = CheckDef::added(
+        format!("Every {kind} id is unique"),
+        format!("count(repeated(ids({from}))) == 0"),
     );
+    unique_def.refs = from_refs;
+    defs.insert("$unique_ids".to_string(), unique_def);
     defs.insert(
         "$well_formed".to_string(),
         CheckDef::added(
@@ -500,7 +513,16 @@ fn subject_entry(reading: &Reading, name: &str, extra: &Problems) -> Value {
     if extra.contains_key(&field_name(&["subjects", name, "from"])) {
         entry["from"] = json!(INVALID_FROM);
     }
-    if extra.contains_key(&field_name(&["subjects", name, "identified_by"])) {
+    let from_broken = extra
+        .get(&field_name(&["subjects", name, "from"]))
+        .is_some_and(|texts| {
+            texts
+                .iter()
+                .any(|text| text != crate::reading::NARROWING_A_CHILD_PROBLEM)
+        });
+    let follows_parent =
+        matches!(info.relation, crate::reading::Relation::Narrows(_)) && !from_broken;
+    if extra.contains_key(&field_name(&["subjects", name, "identified_by"])) && !follows_parent {
         entry["identified_by"] = json!(crate::reading::INVALID_IDENTIFIED_BY);
     }
     entry

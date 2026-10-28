@@ -51,6 +51,7 @@ fn sorted(value: Value) -> Value {
             Value::Object(entries.into_iter().map(|(k, v)| (k, sorted(v))).collect())
         }
         Value::Array(items) => Value::Array(items.into_iter().map(sorted).collect()),
+        Value::Number(number) => Value::Number(value::plain_number(&number)),
         other => other,
     }
 }
@@ -108,5 +109,47 @@ mod tests {
             report["results"][0]["inputs"][2]["value"],
             json!(["doesn't parse"])
         );
+    }
+    fn plain_everywhere(value: &Value, at: &str) {
+        match value {
+            Value::Number(number) => {
+                let text = number.to_string();
+                assert!(
+                    !text.contains(['e', 'E']) && !(text.contains('.') && text.ends_with('0')),
+                    "{at}: {text}"
+                );
+                assert!(text != "-0", "{at}: {text}");
+            }
+            Value::Array(items) => items
+                .iter()
+                .enumerate()
+                .for_each(|(i, item)| plain_everywhere(item, &format!("{at}/{i}"))),
+            Value::Object(map) => map
+                .iter()
+                .for_each(|(k, item)| plain_everywhere(item, &format!("{at}/{k}"))),
+            _ => {}
+        }
+    }
+
+    #[test]
+    fn no_number_in_the_report_or_the_violations_keeps_a_written_form() {
+        let input: Value = serde_json::from_str(
+            r#"{"items": [{"id": 1.0, "x": 1.50, "y": -0.0, "z": 1e2, "w": 2.5e-3, "l": [1.0, 2.50], "n": -0}, {"id": 1, "x": 100.0}]}"#,
+        )
+        .unwrap();
+        let params: Value = serde_json::from_str(r#"{"k": [1.50, 2.0], "m": 1e1}"#).unwrap();
+        let policy: Value = serde_json::from_str(
+            r#"{"ergo_spec": "v0.2",
+                "subjects": {"d": {"from": "items", "identified_by": "id"}},
+                "requirements": {"r": {"subject": "d", "min_subjects": 2.0,
+                    "checks": {"a": "x is 1.50", "b": "y is 0.0", "c": "z is at least 1e2",
+                               "e": "x is between 1.0 and 2.50", "g": "count of l is 2.0",
+                               "h": "x is in $params.k", "i": "w is $params.m"}}}}"#,
+        )
+        .unwrap();
+        let report = report(&input, &policy, &params);
+        plain_everywhere(&report, "report");
+        plain_everywhere(&violations(&report), "violations");
+        assert!(!report["results"].as_array().unwrap().is_empty());
     }
 }

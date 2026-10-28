@@ -2,7 +2,7 @@ use crate::cause::Cause;
 use crate::checks::{CheckRead, Plan, read_checks};
 use crate::ops::walk;
 use crate::ops::{self, Check, Input, Verdict};
-use crate::path::{self, Ctx, Located, Location, Outcome, Path, Start};
+use crate::path::{self, Ctx, Located, Location, Outcome, Path, Start, Step};
 use crate::policy::{Policy, Requirement, SubjectName};
 use crate::reading::{Filter, Lowered, Reading, Relation, Source};
 use crate::report::{
@@ -21,6 +21,7 @@ struct Env<'a> {
     checks: BTreeMap<String, CheckRead>,
     input: &'a Value,
     params: Option<&'a Value>,
+    unreadable: Vec<Value>,
 }
 
 #[derive(Clone)]
@@ -202,7 +203,10 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
         },
     );
     if let Some(outcome) = walked.unreadable {
-        let cause = outcome.cause().unwrap_or(Cause::Unusable);
+        let cause = match outcome.cause() {
+            Some(Cause::NotAnObject) | None => Cause::Unusable,
+            Some(cause) => cause,
+        };
         return Read::Entries {
             entries: Vec::new(),
             broken: vec![Broken {
@@ -238,8 +242,44 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
             }),
         }
     }
+    for each in &mut broken {
+        if each.cause == Cause::NotAnObject {
+            let null = each
+                .location
+                .as_deref()
+                .and_then(|at| env.input.pointer(at))
+                .is_some_and(Value::is_null);
+            each.cause = if null { Cause::Absent } else { Cause::Unusable };
+        }
+    }
     broken.sort_by(|a, b| a.order.cmp(&b.order));
     Read::Entries { entries, broken }
+}
+
+fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
+    let ctx = context(env, input_root(env), anc);
+    let (path, each_of) = match source {
+        Source::Root { path, each_of, .. } => (path, each_of.as_ref()),
+        Source::Child { path, .. } => (path, None),
+    };
+    let mut causes: Vec<Cause> = path::step_refs(path)
+        .iter()
+        .filter_map(|reference| {
+            let step = Step::Ref(Box::new(reference.clone()));
+            path::resolve(&step, &ctx)
+                .err()
+                .map(|outcome| outcome.cause().unwrap_or(Cause::Unusable))
+        })
+        .collect();
+    if let Some(each_of) = each_of {
+        let read = path::read(each_of, &ctx);
+        match (read.outcome, read.value) {
+            (Outcome::Found, Some(Value::Array(_))) => {}
+            (Outcome::Found, _) => causes.push(Cause::Unusable),
+            (other, _) => causes.push(other.cause().unwrap_or(Cause::Unusable)),
+        }
+    }
+    Cause::worst(causes)
 }
 
 fn read_entries<'a>(
@@ -248,6 +288,9 @@ fn read_entries<'a>(
     lowered: &Lowered,
     anc: &[Anc<'a>],
 ) -> Read<'a> {
+    if let Some(cause) = unread_ref_cause(env, &lowered.source, anc) {
+        return Read::Failed(cause);
+    }
     match &lowered.source {
         Source::Root {
             path,
@@ -371,14 +414,19 @@ fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
         && verdict.cause == Cause::Value
 }
 
-fn apply(filters: &[Filter], ctx: &Ctx) -> Applied {
+fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let mut failed_items = None;
     let verdicts: Vec<(&Filter, Verdict)> = filters
         .iter()
         .map(|filter| {
             let ran = ops::run_full(&filter.check, ctx);
+            let mut verdict = ran.verdict;
             failed_items = ran.failed_items.map(Value::Array);
-            (filter, ran.verdict)
+            if unreadable {
+                verdict.cause = Cause::Unusable;
+                failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
+            }
+            (filter, verdict)
         })
         .collect();
     let failing: Vec<Cause> = verdicts
@@ -474,7 +522,8 @@ fn judge<'a>(
         .map(|entry| {
             let ctx = context(env, entry.at.clone(), anc);
             let (id, id_location) = id_of(lowered, &entry, &ctx);
-            let applied = (!lowered.filters.is_empty()).then(|| apply(&lowered.filters, &ctx));
+            let applied = (!lowered.filters.is_empty())
+                .then(|| apply(&lowered.filters, &ctx, !env.unreadable.is_empty()));
             Judged {
                 entry,
                 id,
@@ -533,6 +582,22 @@ fn applies_row(env: &Env, judged: &Judged, applied: &Applied, anc: &[Anc]) -> Ro
     with_in(row, anc)
 }
 
+fn min_row(env: &Env, count: u64, locations: &[String], read: Option<Cause>) -> Row {
+    let read = if env.unreadable.is_empty() {
+        read
+    } else {
+        Some(Cause::Unusable)
+    };
+    min_subjects_row(
+        env.requirement_name,
+        env.requirement,
+        count,
+        locations,
+        read,
+        env.unreadable.clone(),
+    )
+}
+
 fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> Evaluation {
     let (entries, broken) = match read_entries(env, empty, lowered, anc) {
         Read::Entries { entries, broken } => (entries, broken),
@@ -547,16 +612,14 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
         .collect();
     let every = matches!(&lowered.source, Source::Root { every: true, .. });
     let read = Cause::worst(broken.iter().map(|b| b.cause));
-    let mut min = min_subjects_row(
-        env.requirement_name,
-        env.requirement,
-        in_scope.len() as u64,
-        &locations,
-        read,
-        Vec::new(),
-    );
+    let mut min = min_row(env, in_scope.len() as u64, &locations, read);
     if every {
-        min.failed_items = Some(Value::Array(broken.iter().map(Broken::to_json).collect()));
+        let listed = if env.unreadable.is_empty() {
+            broken.iter().map(Broken::to_json).collect()
+        } else {
+            Vec::new()
+        };
+        min.failed_items = Some(Value::Array(listed));
     }
     let unique = unique_ids_row(
         env.requirement_name,
@@ -604,7 +667,12 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
         .map(|item| {
             let ran = ops::run_full(&item.check, ctx);
             failed_items = ran.failed_items.map(Value::Array);
-            ran.verdict
+            let mut verdict = ran.verdict;
+            if !env.unreadable.is_empty() {
+                verdict.cause = Cause::Unusable;
+                failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
+            }
+            verdict
         })
         .collect();
     let cause = Cause::worst(verdicts.iter().map(|v| v.cause)).unwrap_or(Cause::Satisfied);
@@ -636,14 +704,7 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
 }
 
 fn failed_level(env: &Env, anc: &[Anc], cause: Cause, with_unique: bool) -> Evaluation {
-    let min = min_subjects_row(
-        env.requirement_name,
-        env.requirement,
-        0,
-        &[],
-        Some(cause),
-        Vec::new(),
-    );
+    let min = min_row(env, 0, &[], Some(cause));
     let unique = unique_ids_row(env.requirement_name, env.requirement, Vec::new(), &[]);
     Evaluation {
         total: 0,
@@ -671,6 +732,9 @@ fn descend<'a>(
             None => Vec::new(),
         };
     };
+    if !env.unreadable.is_empty() {
+        return vec![failed_level(env, anc, Cause::Unusable, anc.is_empty())];
+    }
     let Some(lowered) = env.reading.lowered(parent) else {
         return vec![failed_level(env, anc, Cause::Unusable, anc.is_empty())];
     };
@@ -744,9 +808,6 @@ pub fn find_subjects(
     let SubjectName::Named(subject) = &requirement.subject else {
         return no_subjects(requirement_name, requirement, params);
     };
-    if !unreadable_params(params).is_empty() {
-        return no_subjects(requirement_name, requirement, params);
-    }
     if reading.unsupported(subject) {
         return nothing_readable(requirement_name, requirement, params);
     }
@@ -761,6 +822,7 @@ pub fn find_subjects(
         checks: read_checks(reading, requirement),
         input,
         params: params.as_object().map(|_| params),
+        unreadable: unreadable_params(params),
     };
     let empty = Value::Object(Map::new());
     let chain = chain_of(reading, subject);
@@ -781,14 +843,7 @@ fn nothing_readable(name: &str, requirement: &Requirement, params: &Value) -> Ev
 }
 
 fn none_found(env: &Env) -> Evaluation {
-    let min = min_subjects_row(
-        env.requirement_name,
-        env.requirement,
-        0,
-        &[],
-        None,
-        Vec::new(),
-    );
+    let min = min_row(env, 0, &[], None);
     let unique = unique_ids_row(env.requirement_name, env.requirement, Vec::new(), &[]);
     Evaluation {
         total: 0,
@@ -1449,14 +1504,14 @@ mod tests {
     }
 
     #[test]
-    fn params_that_are_not_an_object_leave_no_subjects_and_fail_min_subjects() {
+    fn params_that_are_not_an_object_keep_the_subjects_and_fail_min_subjects() {
         let r = report(
             &json!({"ds": [1]}),
             &policy(json!({"thing": {"from": "ds"}}), json!(0)),
             &json!([1]),
         );
         assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("unusable"));
-        assert_eq!(r["requirements"]["s"]["subjects"]["total"], json!(0));
+        assert_eq!(r["requirements"]["s"]["subjects"]["total"], json!(1));
     }
 
     #[test]

@@ -88,7 +88,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
         Start::Subject => String::new(),
         Start::Input => "$input".to_string(),
         Start::Params => "$params".to_string(),
-        Start::Alias(alias) => alias.clone(),
+        Start::Alias(alias) => key_text(alias),
         Start::Part(part) => part.name.clone(),
     };
     let last = path.steps.len().saturating_sub(1);

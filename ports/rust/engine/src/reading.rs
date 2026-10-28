@@ -11,6 +11,9 @@ use serde_json::{Map, Value, json};
 use std::collections::{BTreeMap, BTreeSet};
 
 pub const INVALID_FROM: &str = "<invalid from>";
+pub const NARROWING_A_CHILD_PROBLEM: &str =
+    "can't build on a subject read from another subject yet";
+
 pub const INVALID_IDENTIFIED_BY: &str = "<invalid identified_by>";
 const MAX_WALK_STEPS: usize = 10;
 
@@ -66,6 +69,9 @@ pub struct Info {
     pub scope: Scope,
     pub declarers: BTreeMap<String, BTreeSet<String>>,
     pub unsupported: bool,
+    pub from_read: bool,
+    pub own_filters: Vec<String>,
+    pub filters_known: bool,
     pub entry: Value,
 }
 
@@ -250,7 +256,7 @@ fn synthesized(name: &str) -> s::From {
             position: None,
             start: s::Start::Field {
                 key: name.to_string(),
-                dot: false,
+                dot: name::is_word(name),
             },
             steps: Vec::new(),
         },
@@ -646,6 +652,7 @@ impl Reading {
         }
         let mut owns: BTreeMap<String, Own> = BTreeMap::new();
         let mut unsupported: BTreeSet<String> = BTreeSet::new();
+        let mut narrowing_a_child: BTreeMap<String, Vec<String>> = BTreeMap::new();
         let mut problems_by_subject: BTreeMap<String, Problems> = BTreeMap::new();
         for (name, found) in &raw {
             let mut problems = found.own_problems.clone();
@@ -706,9 +713,13 @@ impl Reading {
                             Some(Relation::Child(_))
                         )
                     {
-                        found_problems.push(
-                            "can't build on a subject read from another subject yet".to_string(),
-                        );
+                        if found_problems.is_empty() {
+                            narrowing_a_child.insert(
+                                name.clone(),
+                                filters.iter().map(|f| f.text.clone()).collect(),
+                            );
+                        }
+                        found_problems.push(NARROWING_A_CHILD_PROBLEM.to_string());
                     }
                     found_problems.sort();
                     found_problems.dedup();
@@ -802,6 +813,13 @@ impl Reading {
                     scope: scope_of(name, &raw, &effective),
                     declarers: declarers_of(name, &raw),
                     unsupported: unsupported.contains(name),
+                    from_read: ok && !unsupported.contains(name),
+                    own_filters: owns
+                        .get(name)
+                        .map(|own| own.filters.iter().map(|f| f.text.clone()).collect())
+                        .or_else(|| narrowing_a_child.get(name).cloned())
+                        .unwrap_or_default(),
+                    filters_known: owns.contains_key(name) || narrowing_a_child.contains_key(name),
                     entry,
                 },
             );
@@ -826,7 +844,7 @@ impl Reading {
             }
             seen.push(next.clone());
             let info = &self.infos[&next];
-            if only_read && info.lowered.is_none() {
+            if only_read && !info.from_read {
                 continue;
             }
             match &info.relation {
@@ -882,19 +900,49 @@ impl Reading {
         self.infos.get(name).and_then(|info| info.lowered.as_ref())
     }
 
+    pub fn from_refs(&self, name: &str) -> Vec<path::Path> {
+        match self.lowered(name).map(|lowered| &lowered.source) {
+            Some(Source::Root { path, each_of, .. }) => {
+                let mut refs = path::step_refs(path);
+                refs.extend(each_of.iter().filter(|each| path::is_ref(each)).cloned());
+                refs
+            }
+            Some(Source::Child { path, .. }) => path::step_refs(path),
+            None => Vec::new(),
+        }
+    }
+
     pub fn filters_text(&self, name: &str) -> Option<String> {
-        let lowered = self.lowered(name)?;
-        if lowered.filters.is_empty() {
+        let texts = match self.lowered(name) {
+            Some(lowered) => lowered.filters.iter().map(|f| f.text.clone()).collect(),
+            None => self.readable_filters(name),
+        };
+        if texts.is_empty() {
             return None;
         }
-        Some(
-            lowered
-                .filters
-                .iter()
-                .map(|f| f.text.as_str())
-                .collect::<Vec<_>>()
-                .join(" and "),
-        )
+        Some(texts.join(" and "))
+    }
+
+    fn readable_filters(&self, name: &str) -> Vec<String> {
+        let mut layers: Vec<&Info> = Vec::new();
+        let mut seen: Vec<&str> = Vec::new();
+        let mut at = name;
+        while let Some(info) = self.infos.get(at) {
+            if !info.filters_known || seen.contains(&at) {
+                break;
+            }
+            seen.push(at);
+            layers.push(info);
+            match &info.relation {
+                Relation::Narrows(parent) => at = parent,
+                Relation::Child(_) | Relation::Root => break,
+            }
+        }
+        layers
+            .iter()
+            .rev()
+            .flat_map(|info| info.own_filters.iter().cloned())
+            .collect()
     }
 }
 
@@ -943,7 +991,10 @@ fn resolved_id_text(
         }
         let found = raw.get(&at)?;
         let from_at = field_name(&["subjects", &at, "from"]);
-        let read_ok = !problems.get(&at).is_some_and(|p| p.contains_key(&from_at));
+        let read_ok = !problems
+            .get(&at)
+            .and_then(|p| p.get(&from_at))
+            .is_some_and(|texts| texts.iter().any(|text| text != NARROWING_A_CHILD_PROBLEM));
         if let Relation::Narrows(parent) = &found.relation
             && read_ok
         {

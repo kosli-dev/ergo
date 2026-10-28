@@ -81,6 +81,46 @@ impl Decimal {
         (n <= MAX_POSITION).then_some(n)
     }
 
+    pub fn fits_a_float(&self) -> bool {
+        if self.is_zero() {
+            return true;
+        }
+        let (Some(low), Some(high)) = (
+            Decimal::parse("2.2250738585072014e-308"),
+            Decimal::parse("1.7976931348623157e308"),
+        ) else {
+            return false;
+        };
+        let size = Decimal {
+            negative: false,
+            digits: self.digits.clone(),
+            exponent: self.exponent,
+        };
+        compare_decimals(&size, &low) != Ordering::Less
+            && compare_decimals(&size, &high) != Ordering::Greater
+    }
+
+    pub fn plain_text(&self) -> String {
+        if self.is_zero() {
+            return "0".to_string();
+        }
+        let sign = if self.negative { "-" } else { "" };
+        let places = self.digits.len() as i128;
+        let body = if self.exponent >= 0 {
+            format!("{}{}", self.digits, "0".repeat(self.exponent as usize))
+        } else if -self.exponent < places {
+            let at = (places + self.exponent) as usize;
+            format!("{}.{}", &self.digits[..at], &self.digits[at..])
+        } else {
+            format!(
+                "0.{}{}",
+                "0".repeat((-self.exponent - places) as usize),
+                self.digits
+            )
+        };
+        format!("{sign}{body}")
+    }
+
     fn magnitude_order(&self, other: &Decimal) -> Ordering {
         let a = self.digits.len() as i128 + self.exponent;
         let b = other.digits.len() as i128 + other.exponent;
@@ -175,8 +215,50 @@ pub fn type_name(value: &Value) -> &'static str {
     }
 }
 
+pub fn fits_a_float(number: &serde_json::Number) -> bool {
+    Decimal::parse(&number.to_string()).is_some_and(|decimal| decimal.fits_a_float())
+}
+
+pub fn out_of_range(value: &Value) -> bool {
+    match value {
+        Value::Number(number) => !fits_a_float(number),
+        Value::Array(items) => items.iter().any(out_of_range),
+        Value::Object(map) => map.values().any(out_of_range),
+        _ => false,
+    }
+}
+
+pub fn literal_text(value: &Value) -> String {
+    if out_of_range(value) {
+        "<number out of range>".to_string()
+    } else {
+        json_text(value)
+    }
+}
+
+pub fn plain_number(number: &serde_json::Number) -> serde_json::Number {
+    let written = number.to_string();
+    match Decimal::parse(&written) {
+        Some(decimal) if decimal.fits_a_float() => {
+            serde_json::from_str(&decimal.plain_text()).unwrap_or_else(|_| number.clone())
+        }
+        _ => number.clone(),
+    }
+}
+
+pub fn plain(value: &Value) -> Value {
+    match value {
+        Value::Number(number) => Value::Number(plain_number(number)),
+        Value::Array(items) => Value::Array(items.iter().map(plain).collect()),
+        Value::Object(map) => {
+            Value::Object(map.iter().map(|(k, v)| (k.clone(), plain(v))).collect())
+        }
+        other => other.clone(),
+    }
+}
+
 pub fn json_text(value: &Value) -> String {
-    value.to_string()
+    plain(value).to_string()
 }
 
 #[cfg(test)]
@@ -306,10 +388,49 @@ mod tests {
     }
 
     #[test]
-    fn json_text_keeps_numbers_as_serde_json_keeps_them() {
-        assert_eq!(json_text(&v("1.0")), "1.0");
-        assert_eq!(json_text(&v("1e400")), "1e+400");
-        assert_eq!(json_text(&v("[1, \"a\"]")), "[1,\"a\"]");
+    fn json_text_writes_numbers_as_plain_decimals() {
+        for (written, plain) in [
+            ("1.50", "1.5"),
+            ("-0.0", "0"),
+            ("-0", "0"),
+            ("100.0", "100"),
+            ("1e2", "100"),
+            ("2.5e-3", "0.0025"),
+            ("-1.25e1", "-12.5"),
+            ("0.000", "0"),
+            ("12345678901234567890", "12345678901234567890"),
+            (
+                "0.1000000000000000055511151231257827",
+                "0.1000000000000000055511151231257827",
+            ),
+            (
+                "123456789012345678901234567890.5",
+                "123456789012345678901234567890.5",
+            ),
+            ("1e-300", &format!("0.{}1", "0".repeat(299))),
+        ] {
+            assert_eq!(json_text(&v(written)), plain, "{written}");
+        }
+    }
+
+    #[test]
+    fn a_number_past_a_float_keeps_the_text_serde_json_gives_it() {
+        assert_eq!(json_text(&v("1e-400")), "1e-400");
+        assert_eq!(json_text(&v("-1e400")), "-1e+400");
+    }
+
+    #[test]
+    fn a_literal_past_a_float_is_shown_as_out_of_range() {
+        assert_eq!(literal_text(&v("1e400")), "<number out of range>");
+        assert_eq!(literal_text(&v("[1, 1e-400]")), "<number out of range>");
+        assert_eq!(literal_text(&v("1.50")), "1.5");
+        assert_eq!(literal_text(&v("0e400")), "0");
+    }
+
+    #[test]
+    fn json_text_writes_the_numbers_inside_lists_and_objects_plain() {
+        assert_eq!(json_text(&v("[1.0, \"a\"]")), "[1,\"a\"]");
+        assert_eq!(json_text(&v("{\"k\": 2.50}")), "{\"k\":2.5}");
     }
 
     #[test]

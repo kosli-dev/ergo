@@ -1,4 +1,4 @@
-use crate::value::Decimal;
+use crate::value::{Decimal, fits_a_float};
 use serde_json::{Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -522,6 +522,10 @@ fn subject_name(map: &Map<String, Value>) -> SubjectName {
 fn read_min_subjects(map: &Map<String, Value>, problems: &mut Problems) -> (Value, u64) {
     match map.get("min_subjects") {
         None => (Value::from(1), 1),
+        Some(Value::Number(number)) if !fits_a_float(number) => {
+            add_problem(problems, "min_subjects".to_string(), "number out of range");
+            (Value::Number(number.clone()), 1)
+        }
         Some(Value::Number(number)) => {
             match Decimal::parse(&number.to_string()).filter(Decimal::is_non_negative_whole) {
                 Some(decimal) => (
@@ -1178,9 +1182,25 @@ mod tests {
     }
 
     #[test]
-    fn a_huge_min_subjects_is_a_count_nothing_reaches() {
+    fn a_min_subjects_past_a_float_is_written_wrong_as_out_of_range() {
+        for text in ["1e400", "1e-400", "-1e400", "1e0400", "0.00000001e400"] {
+            let mut v = valid();
+            v["min_subjects"] = serde_json::from_str(text).unwrap();
+            let r = read(one(v)).requirements["s"].clone();
+            assert_eq!(
+                r.problems
+                    .get("min_subjects")
+                    .map(|p| p.iter().cloned().collect::<Vec<_>>()),
+                Some(vec!["number out of range".to_string()]),
+                "{text}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_huge_min_subjects_a_float_holds_is_a_count_nothing_reaches() {
         let mut v = valid();
-        v["min_subjects"] = serde_json::from_str("1e400").unwrap();
+        v["min_subjects"] = serde_json::from_str("1e308").unwrap();
         let r = read(one(v)).requirements["s"].clone();
         assert!(r.problems.is_empty());
         assert_eq!(r.min_subjects_count, u64::MAX);

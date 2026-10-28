@@ -38,11 +38,33 @@
           ],
           "checks": {
             "$min_subjects": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/keys"
+                  ],
+                  "name": "$params.keys",
+                  "value": [
+                    "a"
+                  ]
+                }
+              ],
               "description": "The in-scope d count is at least 1",
               "expression": "count(matching(m)) >= 1",
               "meta": {}
             },
             "$unique_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/keys"
+                  ],
+                  "name": "$params.keys",
+                  "value": [
+                    "a"
+                  ]
+                }
+              ],
               "description": "Every d id is unique",
               "expression": "count(repeated(ids(m))) == 0",
               "meta": {}
@@ -180,11 +202,35 @@
           ],
           "checks": {
             "$min_subjects": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/keys"
+                  ],
+                  "name": "$params.keys",
+                  "value": [
+                    "k1",
+                    "k2"
+                  ]
+                }
+              ],
               "description": "The in-scope d count is at least 1",
               "expression": "count(matching(m)) >= 1",
               "meta": {}
             },
             "$unique_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/keys"
+                  ],
+                  "name": "$params.keys",
+                  "value": [
+                    "k1",
+                    "k2"
+                  ]
+                }
+              ],
               "description": "Every d id is unique",
               "expression": "count(repeated(ids(m))) == 0",
               "meta": {}
@@ -325,11 +371,33 @@
           ],
           "checks": {
             "$min_subjects": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/keys"
+                  ],
+                  "name": "$params.keys",
+                  "value": [
+                    null
+                  ]
+                }
+              ],
               "description": "The in-scope d count is at least 1",
               "expression": "count(matching(m)) >= 1",
               "meta": {}
             },
             "$unique_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/keys"
+                  ],
+                  "name": "$params.keys",
+                  "value": [
+                    null
+                  ]
+                }
+              ],
               "description": "Every d id is unique",
               "expression": "count(repeated(ids(m))) == 0",
               "meta": {}
