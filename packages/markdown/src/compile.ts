@@ -81,7 +81,7 @@ export const nameProblem = (name: string): string | null =>
           ? null
           : NO_LABEL;
 
-const plain = (nodes: PhrasingContent[]): string =>
+export const plain = (nodes: PhrasingContent[]): string =>
   collapse(toString({type: "paragraph", children: nodes} satisfies Paragraph));
 
 export function parse(markdown: string): Root {

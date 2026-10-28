@@ -237,14 +237,13 @@ export const FIELD_ORDER = {
   requirement: ["subject", "require", "min_subjects"],
 } as const;
 
-export type Kept = {head?: string[]; sameLine?: boolean; strong?: string; options?: Map<string, string>};
+export type Kept = {head?: string[]; sameLine?: boolean; options?: Map<string, string>};
 
 export function checkLines(name: string, body: unknown, bullet = "- ", kept: Kept = {}): string[] {
   const check = normaliseCheck(body) as Json;
   const pad = " ".repeat(bullet.length);
   const [first, ...rest] = paragraphs(check.description);
-  const strong = kept.strong ?? `**${label(name)}**`;
-  const lines = kept.head ?? [`${bullet}${strong}:${first === undefined ? "" : ` ${first}`}`];
+  const lines = kept.head ?? [`${bullet}**${label(name)}**:${first === undefined ? "" : ` ${first}`}`];
   if (kept.head === undefined) for (const p of rest) lines.push("", `${pad}${p}`);
   const spans = [...(typeof check.for === "string" ? [`for ${check.for}`] : []), ...("assert" in check ? list(check.assert) : [])];
   const sameLine = kept.sameLine ?? first === undefined;

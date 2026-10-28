@@ -259,7 +259,7 @@ and `cakes.ergo.md` now has:
 +  `box.sealed is true`
 ```
 
-A changed field keeps its place, and so does a changed check. When only a sentence changed, only its code span is rewritten, and a label or heading whose name didn't change stays as you wrote it. A new check goes at the end of its list, and a new subject or requirement at the end of its section. A check, subject or requirement that disappears with a new one in its place is renamed there.
+A changed field keeps its place, and so does a changed check. When only a sentence changed, only its code span is rewritten, and a label or heading whose name didn't change stays as you wrote it. A new check goes at the end of its list, and a new subject or requirement at the end of its section. A description paragraph that didn't change stays as written, links and bold included: only the paragraphs that changed are rewritten, and when the number of paragraphs changes, those from the first change on. A check, subject or requirement that disappears with a new one in its place is renamed there, and so is one that disappears while a new one with the same content appears elsewhere in its list.
 
 When the document can't say what the policy says, `ergo apply` writes nothing and says why, with the path in the policy. With a part under `batch` and a check named `Sealed`:
 

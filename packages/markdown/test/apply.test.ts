@@ -325,3 +325,95 @@ test("an option that keeps its name keeps its label as written", () => {
   const {markdown} = edited((p) => (p.requirements.r.checks.c.any_of = {"opt one": ["a is 1", "c is 3"], three: "d is 4"}), source);
   assert.equal(markdown, "## Requirements\n\n### r\n\nChecks:\n\n- **c**:\n  - **OPT one**:\n    `a is 1`\n    `c is 3`\n  - **Three**: `d is 4`\n");
 });
+
+const LINKED = `# P
+
+Read [the rules](https://x.y/r) **first**.
+
+Second paragraph.
+
+## Subjects
+
+### s
+
+- from: \`b\`
+
+## Requirements
+
+### r
+
+See [the list](https://x.y/l) for *why*.
+
+Next \`not code\` words.
+
+- subject: \`s\`
+
+Checks:
+
+- **A**: See [rule 4](https://x.y/4) for *why*.
+
+  More [here](https://x.y/h).
+
+  \`a is 1\`
+- **Old**: \`b is 1\`
+`;
+
+test("changing one description paragraph keeps the others as written", () => {
+  const {markdown} = edited((p) => {
+    p.description = p.description.replace("Second", "2nd");
+    p.requirements.r.description = p.requirements.r.description.replace("See the list", "Look at the list");
+    p.requirements.r.checks.a.description = p.requirements.r.checks.a.description.replace("More here", "Less here");
+  }, LINKED);
+  assert.equal(
+    markdown,
+    LINKED.replace("Second paragraph", "2nd paragraph")
+      .replace("See [the list](https://x.y/l) for *why*.", "Look at the list for why.")
+      .replace("More [here](https://x.y/h).\n\n", "Less here.\n"),
+  );
+});
+
+test("when the paragraphs change in number, the ones before the first change stay as written", () => {
+  const added = edited((p) => {
+    p.description += "\n\nThird.";
+    p.requirements.r.checks.a.description += "\n\nAnd more.";
+  }, LINKED);
+  assert.equal(
+    added.markdown,
+    LINKED.replace("Second paragraph.\n", "Second paragraph.\n\nThird.\n").replace(
+      "More [here](https://x.y/h).\n\n",
+      "More [here](https://x.y/h).\n\n  And more.\n",
+    ),
+  );
+  const cut = edited((p) => {
+    p.description = p.description.split("\n\n")[0];
+    p.requirements.r.description = p.requirements.r.description.split("\n\n")[0];
+    p.requirements.r.checks.a.description = p.requirements.r.checks.a.description.split("\n\n")[0];
+  }, LINKED);
+  assert.equal(
+    cut.markdown,
+    LINKED.replace("Second paragraph.\n\n", "")
+      .replace("Next `not code` words.\n\n", "")
+      .replace("\n\n  More [here](https://x.y/h).\n\n", "\n"),
+  );
+  const first = edited((p) => (p.description = `Zero.\n\n${p.description}`), LINKED);
+  assert.equal(first.markdown, LINKED.replace("Read [the rules](https://x.y/r) **first**.", "Zero.\n\nRead the rules first."));
+});
+
+test("a check renamed to a name with a replacement pattern in it is renamed as written", () => {
+  for (const name of ["cost $& more", "a $' b", "a $` b", "x $$ $1"]) {
+    const {markdown} = edited((p) => (p.requirements.r.checks = {[name]: p.requirements.r.checks.a, old: p.requirements.r.checks.old}), LINKED);
+    assert.deepEqual(Object.keys((compile(markdown!).policy as Policy).requirements.r.checks), [name, "old"]);
+  }
+});
+
+test("a check renamed to a longer name keeps its sentence on its own line and its place", () => {
+  const source = "## Requirements\n\n### r\n\nChecks:\n\n- **a**: *Words* [here](https://x.y).\n  `a is 1`\n- **old**: `b is 1`\n";
+  const {markdown, changes} = edited((p) => {
+    const checks = p.requirements.r.checks;
+    p.requirements.r.checks = {old: checks.old, "a much longer name": checks.a};
+  }, source);
+  assert.deepEqual(changes, ["renamed check r.a to r.a much longer name"]);
+  assert.equal(markdown, source.replace("**a**", "**A much longer name**"));
+  const same = edited((p) => (p.requirements.r.checks = {"a much longer name": p.requirements.r.checks.a, old: p.requirements.r.checks.old}), source);
+  assert.equal(same.markdown, source.replace("**a**", "**A much longer name**"));
+});
