@@ -673,16 +673,21 @@ impl Reading {
                     let alias_refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
                     let parent_names = scope.parent_names();
                     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
-                    found_problems.extend(s::from_problems(line, &alias_refs));
+                    let syntax_problems = s::from_problems(line, &alias_refs);
+                    let reads = syntax_problems.is_empty();
+                    found_problems.extend(syntax_problems);
                     let mut filters = Vec::new();
-                    for condition in &line.whose {
+                    for condition in line.whose.iter().filter(|_| reads) {
                         let text =
                             s::print_from_condition_with(condition, &alias_refs, &parent_refs);
                         match condition {
                             s::FromCondition::Condition(condition) => {
+                                found_problems.extend(lower::condition_elapsed_problems(condition));
                                 match lower::lower_condition(condition, &scope) {
                                     Ok(check) => filters.push(Filter { text, check }),
-                                    Err(found) => found_problems.extend(found),
+                                    Err(found) => {
+                                        found_problems.extend(lower::in_from_line(found));
+                                    }
                                 }
                             }
                             s::FromCondition::Quantified {
@@ -698,12 +703,8 @@ impl Reading {
                                 phrase,
                                 &scope,
                             ) {
-                                Ok(Some(check)) => filters.push(Filter { text, check }),
-                                Ok(None) => {
-                                    found_problems
-                                        .push(format!("{text}{}", lower::UNSUPPORTED_SUFFIX));
-                                }
-                                Err(found) => found_problems.extend(found),
+                                Ok(check) => filters.push(Filter { text, check }),
+                                Err(found) => found_problems.extend(lower::in_from_line(found)),
                             },
                         }
                     }

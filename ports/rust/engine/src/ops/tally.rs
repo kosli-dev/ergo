@@ -92,6 +92,70 @@ struct Worked<T> {
     entries: Vec<Input>,
 }
 
+fn side_paths(side: &Side) -> Vec<&Path> {
+    match side {
+        Side::Plain(compare::Side::Path(path)) => vec![path],
+        Side::Plain(compare::Side::Value(_)) => Vec::new(),
+        Side::Derived(derived) => {
+            let mut paths = Vec::new();
+            for term in &derived.terms {
+                match term {
+                    Term::Path(path) => paths.push(path),
+                    Term::Number(_) => {}
+                    Term::Elapsed(elapsed) => {
+                        paths.push(&elapsed.from);
+                        paths.push(&elapsed.to);
+                    }
+                    Term::Counted(counted) => paths.push(&counted.path),
+                }
+            }
+            paths
+        }
+    }
+}
+
+fn reads_hidden_path(path: &Path, hidden: &[&str]) -> bool {
+    starts_at(path, hidden) || path.steps.iter().any(|step| match step {
+        path::Step::Ref(reference) => {
+            matches!(&reference.start, path::Start::Alias(name) if hidden.contains(&name.as_str()))
+        }
+        _ => false,
+    })
+}
+
+fn check_reads_hidden(check: &Check, hidden: &[&str]) -> bool {
+    check
+        .paths()
+        .into_iter()
+        .any(|path| reads_hidden_path(path, hidden))
+        || match check {
+            Check::Tally(tally) => std::iter::once(&tally.left)
+                .chain(tally.right.as_ref())
+                .any(|side| match side {
+                    Side::Derived(derived) => reads_derived(derived, hidden),
+                    Side::Plain(_) => false,
+                }),
+            _ => false,
+        }
+}
+
+fn reads_derived(derived: &Derived, hidden: &[&str]) -> bool {
+    derived.terms.iter().any(|term| match term {
+        Term::Path(path) => reads_hidden_path(path, hidden),
+        Term::Elapsed(elapsed) => {
+            reads_hidden_path(&elapsed.from, hidden) || reads_hidden_path(&elapsed.to, hidden)
+        }
+        Term::Counted(counted) => {
+            reads_hidden_path(&counted.path, hidden)
+                || counted
+                    .whose
+                    .iter()
+                    .any(|check| check_reads_hidden(check, hidden))
+        }
+        Term::Number(_) => false,
+    })
+}
+
 const MOST_SECONDS: i64 = 9_000_000_000;
 const MICROS: i128 = 1_000_000;
 
@@ -111,20 +175,10 @@ impl Tally {
     }
 
     pub fn unaliased_entries(&self, ctx: &Ctx, hidden: &[&str]) -> Vec<Input> {
-        let reads_hidden = |derived: &Derived| {
-            derived.terms.iter().any(|term| match term {
-                Term::Path(path) => starts_at(path, hidden),
-                Term::Elapsed(elapsed) => {
-                    starts_at(&elapsed.from, hidden) || starts_at(&elapsed.to, hidden)
-                }
-                Term::Counted(counted) => starts_at(&counted.path, hidden),
-                Term::Number(_) => false,
-            })
-        };
+        let reads_hidden = |derived: &Derived| reads_derived(derived, hidden);
         let mut entries = Vec::new();
         for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
             if let Side::Derived(derived) = side
-                && derived.terms.len() > 1
                 && !reads_hidden(derived)
             {
                 entries.extend(work_derived(derived, ctx).entries.into_iter().take(1));
@@ -133,26 +187,27 @@ impl Tally {
         entries
     }
 
-    pub fn paths(&self) -> Vec<&Path> {
+    pub fn paths_outside(&self, hidden: &[&str]) -> Vec<&Path> {
         let mut paths = Vec::new();
         for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
             match side {
-                Side::Plain(compare::Side::Path(path)) => paths.push(path),
-                Side::Plain(compare::Side::Value(_)) => {}
-                Side::Derived(derived) => {
+                Side::Derived(derived) if reads_derived(derived, hidden) => {
                     for term in &derived.terms {
-                        match term {
-                            Term::Path(path) => paths.push(path),
-                            Term::Number(_) => {}
-                            Term::Elapsed(elapsed) => {
-                                paths.push(&elapsed.from);
-                                paths.push(&elapsed.to);
-                            }
-                            Term::Counted(counted) => paths.push(&counted.path),
+                        if let Term::Counted(counted) = term {
+                            paths.push(&counted.path);
                         }
                     }
                 }
+                other => paths.extend(side_paths(other)),
             }
+        }
+        paths
+    }
+
+    pub fn paths(&self) -> Vec<&Path> {
+        let mut paths = Vec::new();
+        for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
+            paths.extend(side_paths(side));
         }
         paths
     }
@@ -623,6 +678,7 @@ impl Parts {
 }
 
 const WIDEST_SPREAD: i64 = 100_000;
+const MOST_EXPONENT: i64 = 10_000;
 
 fn add(numbers: &[Number]) -> Option<Number> {
     let parts: Vec<Parts> = numbers
@@ -637,8 +693,11 @@ fn add(numbers: &[Number]) -> Option<Number> {
         .iter()
         .map(|p| p.exponent.saturating_add(p.digits.len() as i64))
         .max()?;
-    if reach.saturating_sub(low) > WIDEST_SPREAD {
-        return None;
+    if reach.saturating_sub(low) > WIDEST_SPREAD
+        || low.abs() > MOST_EXPONENT
+        || reach.abs() > MOST_EXPONENT
+    {
+        return add_as_floats(numbers);
     }
     let mut positive = "0".to_string();
     let mut negative = "0".to_string();
@@ -661,6 +720,20 @@ fn add(numbers: &[Number]) -> Option<Number> {
     scaled_text(is_negative, &magnitude, low)
         .parse::<Number>()
         .ok()
+}
+
+fn add_as_floats(numbers: &[Number]) -> Option<Number> {
+    let mut total = 0.0_f64;
+    for number in numbers {
+        total += number.to_string().parse::<f64>().ok()?;
+    }
+    if !total.is_finite() {
+        return None;
+    }
+    if total == 0.0 {
+        return "0".parse().ok();
+    }
+    format!("{total}").parse().ok()
 }
 
 fn scaled_text(negative: bool, magnitude: &str, exponent: i64) -> String {
@@ -735,21 +808,17 @@ fn lower_counted(
     };
     let item = scope.in_item();
     let mut whose = Vec::new();
-    let mut runnable = true;
     for condition in &derived.whose {
-        match crate::lower::lower_condition(condition, &item) {
+        match crate::lower::lower_tally_condition(condition, &item) {
             Ok(check) => whose.push(check),
-            Err(found) if found.iter().all(|p| p.ends_with(UNSUPPORTED_SUFFIX)) => {
-                runnable = false;
-            }
             Err(found) => problems.extend(found),
         }
     }
     if !problems.is_empty() {
         return Err(problems);
     }
-    Ok(match (path, runnable) {
-        (Some(path), true) => Some(Term::Counted(Counted {
+    Ok(path.map(|path| {
+        Term::Counted(Counted {
             text: term_text(term, names),
             kind: match derived.kind {
                 s::DerivedKind::Count => Kind::Count,
@@ -757,9 +826,8 @@ fn lower_counted(
             },
             path,
             whose,
-        })),
-        _ => None,
-    })
+        })
+    }))
 }
 
 fn lower_side(
@@ -872,6 +940,8 @@ pub fn lower_assertion(
     assertion: &s::Assertion,
     scope: &Scope,
 ) -> Option<Result<Check, Vec<String>>> {
+    let aliases = scope.aliases();
+    let names: Vec<&str> = aliases.iter().map(String::as_str).collect();
     let (left, phrase): (Vec<s::Term>, &s::Phrase) = match assertion {
         s::Assertion::Derived { terms, phrase } => (terms.clone(), phrase),
         s::Assertion::Plain {
@@ -889,9 +959,12 @@ pub fn lower_assertion(
         _ => return None,
     };
     Some(
-        lower_terms(&left, phrase, scope).map(|lowered| match lowered {
-            Some(tally) => Check::Tally(tally),
-            None => Check::NotYet,
+        lower_terms(&left, phrase, scope).and_then(|lowered| match lowered {
+            Some(tally) => Ok(Check::Tally(tally)),
+            None => Err(vec![format!(
+                "{}{UNSUPPORTED_SUFFIX}",
+                s::print_assertion(assertion, &names)
+            )]),
         }),
     )
 }
@@ -1950,11 +2023,52 @@ mod tests {
         );
     }
 
+    fn subject_with(n: &str) -> Value {
+        serde_json::from_str(&format!(
+            r#"{{"fa": {n}, "fb": {n}, "items": [{{"x": {n}}}]}}"#
+        ))
+        .unwrap()
+    }
+
     #[test]
-    fn a_whose_the_engine_cannot_run_yet_makes_the_side_not_yet_supported() {
+    fn a_number_below_the_range_of_a_float_is_added_as_a_float_does_and_does_not_panic() {
+        for n in ["1e-70000", "1e-1000000000000"] {
+            assert_eq!(
+                cause("sum of items.x is 0", subject_with(n)),
+                Cause::Satisfied,
+                "{n}"
+            );
+            assert_eq!(
+                cause("fa plus fb is 0", subject_with(n)),
+                Cause::Satisfied,
+                "{n}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_number_above_the_range_of_a_float_is_unusable_in_a_sum_and_does_not_allocate_it() {
+        for n in ["1e1000000000000", "-1e1000000000000"] {
+            assert_eq!(
+                cause("sum of items.x is 0", subject_with(n)),
+                Cause::Unusable,
+                "{n}"
+            );
+            assert_eq!(
+                cause("fa plus fb is 1", subject_with(n)),
+                Cause::Unusable,
+                "{n}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_sum_of_a_number_with_a_long_fraction_is_still_added_exactly() {
+        let long = format!("0.{}1", "0".repeat(9000));
+        assert_eq!(cause("fa plus fb is fb", subject_with(&long)), Cause::Value);
         assert_eq!(
-            lowered("count of xs whose k starts with count of ys is 1"),
-            Check::NotYet
+            cause("sum of items.x is fa", subject_with(&long)),
+            Cause::Satisfied
         );
     }
 

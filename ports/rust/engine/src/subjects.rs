@@ -1687,17 +1687,15 @@ mod tests {
     }
 
     #[test]
-    fn a_check_the_engine_cannot_run_yet_fails_every_subject_as_unusable_so_nothing_passes_by_accident()
+    fn a_check_written_with_a_count_after_every_fails_the_requirement_so_nothing_passes_by_accident()
      {
         let r = with_checks(
             json!({"thing": {"from": "ds"}}),
             json!({"a": "every xs.y is at least count of zs"}),
             json!({"ds": [{"xs": [{"y": 1}]}]}),
         );
-        let a = rows(&r, "a");
-        assert_eq!(a.len(), 1);
-        assert_eq!(a[0]["cause"], json!("unusable"));
-        assert_eq!(a[0]["inputs"], json!([]));
+        assert_eq!(rows(&r, "a").len(), 0);
+        assert_eq!(rows(&r, "$well_formed")[0]["passed"], json!(false));
         assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
         assert_eq!(r["compliant"], json!(false));
     }

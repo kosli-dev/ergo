@@ -1,9 +1,9 @@
-use super::tally::{Side, Term};
+use super::tally::{Side, Tally, Term};
 use super::time::{self, Time};
 use super::walk::{self, Failure, Options, Seg, WalkItem};
 use super::{Check, Input, Part, Verdict, run as run_check};
 use crate::cause::Cause;
-use crate::lower::{self, Scope, UNSUPPORTED_SUFFIX};
+use crate::lower::{self, Scope};
 use crate::path::{self, Ctx, Located, Location, OUTER, Path, Start, Step};
 use ergo_sentences as s;
 use serde_json::{Value, json};
@@ -99,6 +99,23 @@ fn all_paths(check: &Check) -> Vec<&Path> {
     paths
 }
 
+fn tally_paths<'a>(tally: &'a Tally, hidden: &[&str]) -> (Vec<&'a Path>, Vec<&'a Path>) {
+    let paths = tally.paths_outside(hidden);
+    let mut whose = Vec::new();
+    for side in std::iter::once(&tally.left).chain(tally.right.as_ref()) {
+        if let Side::Derived(derived) = side {
+            for term in &derived.terms {
+                if let Term::Counted(counted) = term {
+                    for inner in &counted.whose {
+                        whose.extend(item_paths(inner));
+                    }
+                }
+            }
+        }
+    }
+    (paths, whose)
+}
+
 fn walked_paths(check: &Check) -> Vec<(&Path, bool)> {
     match check {
         Check::Walk(walk) => vec![(&walk.path, walk.if_any)],
@@ -145,19 +162,11 @@ fn position_of(number: &str) -> Result<u64, Vec<String>> {
     }
 }
 
-fn lower_whose(
-    whose: &[s::Condition],
-    scope: &Scope,
-    problems: &mut Vec<String>,
-    runnable: &mut bool,
-) -> Vec<Check> {
+fn lower_whose(whose: &[s::Condition], scope: &Scope, problems: &mut Vec<String>) -> Vec<Check> {
     let mut checks = Vec::new();
     for condition in whose {
         match lower::lower_condition(condition, scope) {
             Ok(check) => checks.push(check),
-            Err(found) if found.iter().all(|p| p.ends_with(UNSUPPORTED_SUFFIX)) => {
-                *runnable = false;
-            }
             Err(found) => problems.extend(found),
         }
     }
@@ -167,10 +176,10 @@ fn lower_whose(
 pub fn lower_for(
     line: &s::For,
     assertions: &[s::Assertion],
+    places: &[String],
     scope: &Scope,
 ) -> Result<Check, Vec<String>> {
     let mut problems = Vec::new();
-    let mut runnable = true;
     let mut items = Vec::new();
     let mut bound = scope.clone();
     for item in &line.items {
@@ -240,7 +249,7 @@ pub fn lower_for(
                 None
             }
         };
-        let checks = lower_whose(whose, &item_scope, &mut problems, &mut runnable);
+        let checks = lower_whose(whose, &item_scope, &mut problems);
         if let Some(path) = walk_path {
             items.push(Item {
                 how,
@@ -257,7 +266,7 @@ pub fn lower_for(
         s::ForItem::Walk { alias, .. } | s::ForItem::Pick { alias, .. } => alias.clone(),
     });
     let mut sentences = Vec::new();
-    for assertion in assertions {
+    for (assertion, place) in assertions.iter().zip(places) {
         match lower::lower_assertion(assertion, &bound) {
             Ok(check) => sentences.push(Sentence {
                 text: s::print_assertion(assertion, &names),
@@ -266,14 +275,11 @@ pub fn lower_for(
                     .is_some_and(|alias| reads_alias(&check, alias)),
                 check,
             }),
-            Err(found) => problems.extend(found),
+            Err(found) => problems.extend(found.into_iter().map(|p| format!("{place}{p}"))),
         }
     }
     if !problems.is_empty() {
         return Err(problems);
-    }
-    if !runnable || items.len() != line.items.len() {
-        return Ok(Check::NotYet);
     }
     Ok(Check::For(Box::new(For { items, sentences })))
 }
@@ -520,7 +526,27 @@ impl For {
             picked: false,
         };
         if let How::Pick { spot, sorted } = &item.how {
-            self.pick(&mut cands, *spot, sorted.as_ref(), &outer, &walked);
+            let through_first = depth > 0 && reads_path(&item.path, &self.items[0].alias);
+            let nothing = through_first.then(|| {
+                let shown = crate::name::name(&item.path);
+                Dead {
+                    shared: false,
+                    order: Vec::new(),
+                    name: shown.clone(),
+                    path: shown,
+                    cause: Cause::Absent,
+                    value: Value::Null,
+                    location: None,
+                }
+            });
+            self.pick(
+                &mut cands,
+                *spot,
+                sorted.as_ref(),
+                &outer,
+                &walked,
+                (through_first, nothing),
+            );
             if depth > 0 {
                 let first = &self.items[0].alias;
                 let shared = !reads_path(&item.path, first)
@@ -540,9 +566,17 @@ impl For {
         sorted: Option<&Sorted>,
         outer: &Ctx<'a>,
         walked: &walk::Walked<'a>,
+        (through_first, nothing): (bool, Option<Dead>),
     ) {
         if !cands.dead.is_empty() || cands.walked_none {
+            if through_first && !cands.dead.is_empty() {
+                cands.list.value = Value::Array(Vec::new());
+                cands.list.locations.clear();
+            }
             cands.live.clear();
+            if cands.dead.is_empty() {
+                cands.dead.extend(nothing);
+            }
             return;
         }
         let mut live = std::mem::take(&mut cands.live);
@@ -589,6 +623,10 @@ impl For {
                 keys = rest;
             }
             if !failed.is_empty() {
+                if through_first {
+                    cands.list.value = Value::Array(Vec::new());
+                    cands.list.locations.clear();
+                }
                 cands.dead.extend(failed);
                 return;
             }
@@ -603,6 +641,7 @@ impl For {
                 }
             };
             let Some(index) = at_index else {
+                cands.dead.extend(nothing);
                 return;
             };
             let tied: Vec<usize> = (0..len)
@@ -621,6 +660,10 @@ impl For {
                         location: location.clone(),
                     });
                 }
+                if through_first {
+                    cands.list.value = Value::Array(Vec::new());
+                    cands.list.locations.clear();
+                }
                 cands.dead.sort_by(|a, b| a.order.cmp(&b.order));
                 return;
             }
@@ -637,16 +680,26 @@ impl For {
                 }
             };
             let Some(index) = at_index else {
+                cands.dead.extend(nothing);
                 return;
             };
             live = vec![live.swap_remove(index)];
         }
         let found = &live[0];
-        cands.list = Input {
-            name: found.name.clone(),
-            value: found.shown.clone(),
-            locations: vec![found.location.render()],
-            part: None,
+        cands.list = if through_first {
+            Input {
+                name: walked.name.clone(),
+                value: Value::Array(vec![found.shown.clone()]),
+                locations: vec![found.location.render()],
+                part: cands.list.part.clone(),
+            }
+        } else {
+            Input {
+                name: found.name.clone(),
+                value: found.shown.clone(),
+                locations: vec![found.location.render()],
+                part: None,
+            }
         };
         cands.picked = true;
         cands.live = live;
@@ -981,16 +1034,27 @@ impl For {
         let hides = |path: &Path| matches!(&path.start, Start::Alias(name) if hidden.contains(&name.as_str()));
         let mut inputs = Vec::new();
         let mut paths: Vec<&Path> = Vec::new();
+        let mut in_walk: Vec<*const Path> = Vec::new();
         for sentence in &self.sentences {
-            paths.extend(all_paths(&sentence.check));
+            let (found, whose) = match &sentence.check {
+                Check::Tally(tally) => tally_paths(tally, &hidden),
+                other => (all_paths(other), Vec::new()),
+            };
+            if matches!(sentence.check, Check::Walk(_)) {
+                in_walk.extend(found.iter().map(|path| std::ptr::from_ref(*path)));
+            }
+            in_walk.extend(whose.iter().map(|path| std::ptr::from_ref(*path)));
+            paths.extend(found);
+            paths.extend(whose);
         }
         for item in &self.items {
             for check in &item.whose {
-                paths.extend(
-                    all_paths(check)
-                        .into_iter()
-                        .filter(|path| !matches!(path.start, Start::Subject)),
-                );
+                let found: Vec<&Path> = all_paths(check)
+                    .into_iter()
+                    .filter(|path| !matches!(path.start, Start::Subject))
+                    .collect();
+                in_walk.extend(found.iter().map(|path| std::ptr::from_ref(*path)));
+                paths.extend(found);
             }
         }
         let walked: Vec<(&Path, bool)> = self
@@ -1000,7 +1064,7 @@ impl For {
             .collect();
         for path in paths {
             let own = walked.iter().find(|(p, _)| std::ptr::eq(*p, path));
-            if matches!(path.start, Start::Params) && walk::cut_at(path, &hidden).is_none() {
+            if matches!(path.start, Start::Params) && in_walk.contains(&std::ptr::from_ref(path)) {
                 continue;
             }
             match own {
@@ -1697,17 +1761,6 @@ mod tests {
     }
 
     #[test]
-    fn a_for_line_whose_whose_the_engine_cannot_read_yet_fails_closed() {
-        let found = row(
-            "every xs whose k starts with count of ys as x",
-            json!("x is 1"),
-            json!({"xs": [1]}),
-        );
-        assert_eq!(found["cause"], "unusable");
-        assert_eq!(found["inputs"], json!([]));
-    }
-
-    #[test]
     fn two_sentences_both_failing_are_listed_in_the_order_written() {
         let found = row(
             "every xs as x",
@@ -1838,6 +1891,130 @@ mod tests {
             json!({"ks": ["a"], "m": {"a": [1]}}),
         );
         assert_eq!(names(&through), ["ks[]", "m"]);
+    }
+
+    #[test]
+    fn a_row_lists_the_params_value_a_sentence_compares_with() {
+        let found = row(
+            "every items as x",
+            json!("x.v equals $params.k"),
+            json!({"items": [{"v": 1}]}),
+        );
+        assert_eq!(names(&found), ["$params.k", "items[]"]);
+    }
+
+    #[test]
+    fn a_row_lists_the_params_value_in_a_sentence_that_reads_no_alias() {
+        let found = row(
+            "every items as x",
+            json!(["x.v exists", "n is $params.k"]),
+            json!({"items": [{"v": 1}], "n": 1}),
+        );
+        assert_eq!(names(&found), ["$params.k", "items[]", "n"]);
+    }
+
+    #[test]
+    fn a_row_lists_the_params_value_a_count_is_compared_with_and_the_count() {
+        let found = row(
+            "every items as x",
+            json!("count of items is $params.k"),
+            json!({"items": [{"v": 1}]}),
+        );
+        assert_eq!(names(&found), ["$params.k", "count of items", "items[]"]);
+    }
+
+    #[test]
+    fn a_row_lists_the_count_on_the_right_of_a_sentence_that_reads_an_alias() {
+        let found = row(
+            "every items as x",
+            json!("x.v is at most count of items"),
+            json!({"items": [{"v": 1}]}),
+        );
+        assert_eq!(names(&found), ["count of items", "items[]"]);
+    }
+
+    #[test]
+    fn a_row_lists_the_elapsed_time_of_a_sentence_that_reads_no_alias() {
+        let found = row(
+            "every items as x",
+            json!("fc is days elapsed from fa to fb"),
+            json!({"items": [{"v": 1}], "fa": "2026-10-01T00:00:00Z", "fb": "2026-10-02T00:00:00Z", "fc": 1}),
+        );
+        assert_eq!(
+            names(&found),
+            ["days elapsed from fa to fb", "fa", "fb", "fc", "items[]"]
+        );
+    }
+
+    #[test]
+    fn a_row_leaves_out_the_other_terms_of_a_plus_that_reads_an_alias() {
+        let found = row(
+            "every items as x",
+            json!("x.v plus n is 5"),
+            json!({"items": [{"v": 1}], "n": 4}),
+        );
+        assert_eq!(names(&found), ["items[]"]);
+    }
+
+    #[test]
+    fn a_row_leaves_out_the_params_of_a_walk_and_of_a_whose_on_the_for_line() {
+        let found = row(
+            "every items whose v is $params.k as x",
+            json!("every items.v is at least $params.k"),
+            json!({"items": [{"v": 1}]}),
+        );
+        assert_eq!(names(&found), ["items[]", "items[].v"]);
+    }
+
+    #[test]
+    fn a_pick_that_starts_at_the_first_alias_is_one_entry_holding_every_value_picked() {
+        let found = row(
+            "every items as x, last of x.subs as y",
+            json!("y.w is 1"),
+            json!({"items": [{"subs": [{"w": 1}, {"w": 2}]}, {"subs": [{"w": 3}]}]}),
+        );
+        let inputs = found["inputs"].as_array().unwrap();
+        let picked: Vec<&Value> = inputs.iter().filter(|i| i["name"] == "x.subs[]").collect();
+        assert_eq!(picked.len(), 1);
+        assert_eq!(picked[0]["value"], json!([{"w": 2}, {"w": 3}]));
+        assert_eq!(
+            picked[0]["locations"],
+            json!(["/things/0/items/0/subs/1", "/things/0/items/1/subs/0"])
+        );
+        assert!(!names(&found).iter().any(|n| n.starts_with("item ")));
+    }
+
+    #[test]
+    fn a_pick_that_finds_nothing_lists_the_list_it_looked_in_as_a_failure_of_its_own() {
+        let found = row(
+            "every items as x, last of x.subs as y",
+            json!("y.w is 1"),
+            json!({"items": [{"subs": [{"w": 1}]}, {"subs": []}]}),
+        );
+        assert_eq!(
+            found["failed_items"][0]["failed_items"],
+            json!([{"cause": "absent", "item": "x.subs", "path": "x.subs", "value": null, "locations": []}])
+        );
+        let past_the_end = row(
+            "every items as x, item 2 of x.subs as y",
+            json!("y.w is 1"),
+            json!({"items": [{"subs": [{"w": 1}]}]}),
+        );
+        assert_eq!(
+            past_the_end["failed_items"][0]["failed_items"][0]["item"],
+            "x.subs"
+        );
+        assert_eq!(names(&past_the_end), ["items[]", "x.subs[]"]);
+    }
+
+    #[test]
+    fn a_pick_that_starts_at_another_list_still_names_the_item_where_it_is() {
+        let found = row(
+            "every items as x, last of ps as y",
+            json!("y.w is 1"),
+            json!({"items": [{"v": 1}], "ps": [{"w": 1}, {"w": 2}]}),
+        );
+        assert_eq!(names(&found), ["item 2 of ps", "items[]"]);
     }
 
     #[test]

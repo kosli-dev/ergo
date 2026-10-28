@@ -340,7 +340,189 @@ fn number(text: &str) -> Result<Value, Vec<String>> {
     serde_json::from_str::<Value>(text).map_err(|_| out_of_range())
 }
 
+const AFTER_QUANTIFIER: &str = "count of, sum of and plus after every or some aren't supported yet";
+
+fn phrase_terms(phrase: &s::Phrase) -> &[s::Term] {
+    match phrase {
+        s::Phrase::Is { operand, .. }
+        | s::Phrase::Order { operand, .. }
+        | s::Phrase::Contains { operand, .. }
+        | s::Phrase::StartsWith(operand)
+        | s::Phrase::EndsWith(operand)
+        | s::Phrase::Alphabetically { operand, .. }
+        | s::Phrase::Time { operand, .. } => match operand {
+            s::Operand::Field(terms) => terms,
+            s::Operand::Value(_) => &[],
+        },
+        _ => &[],
+    }
+}
+
+fn one_path(terms: &[s::Term]) -> bool {
+    matches!(terms, [s::Term::Path(_)])
+}
+
+fn phrase_words(phrase: &s::Phrase) -> &'static str {
+    match phrase {
+        s::Phrase::Contains { not: false, .. } => "contains",
+        s::Phrase::Contains { not: true, .. } => "does not contain",
+        s::Phrase::StartsWith(_) => "starts with",
+        s::Phrase::EndsWith(_) => "ends with",
+        s::Phrase::Alphabetically { after: false, .. } => "is alphabetically before",
+        s::Phrase::Alphabetically { after: true, .. } => "is alphabetically after",
+        s::Phrase::Time { time, .. } => match time {
+            s::TimeOrder::Before => "is before",
+            s::TimeOrder::After => "is after",
+            s::TimeOrder::OnOrAfter => "is on or after",
+            s::TimeOrder::OnOrBefore => "is on or before",
+        },
+        s::Phrase::Is { not: false, .. } => "equals",
+        s::Phrase::Is { not: true, .. } => "does not equal",
+        s::Phrase::Order { order, .. } => match order {
+            s::Order::AtLeast => "is at least",
+            s::Order::AtMost => "is at most",
+            s::Order::MoreThan => "is more than",
+            s::Order::LessThan => "is less than",
+        },
+        _ => "",
+    }
+}
+
+fn argument_problems(phrase: &s::Phrase) -> Vec<String> {
+    let terms = phrase_terms(phrase);
+    if terms.is_empty()
+        || one_path(terms)
+        || matches!(phrase, s::Phrase::Is { .. } | s::Phrase::Order { .. })
+    {
+        return Vec::new();
+    }
+    vec![format!(
+        "\"{}\" can't take a count of, a sum of or a plus",
+        phrase_words(phrase)
+    )]
+}
+
+fn after_quantifier_problems(phrase: &s::Phrase) -> Vec<String> {
+    let terms = phrase_terms(phrase);
+    if terms.is_empty() || one_path(terms) {
+        return Vec::new();
+    }
+    vec![AFTER_QUANTIFIER.to_string()]
+}
+
+pub const ELAPSED_AFTER_QUANTIFIER: &str =
+    "an elapsed time isn't supported yet after every or some, or in a from line";
+const IN_COUNT_WHOSE: &str =
+    "a sum of or a plus in the whose of a count of or a sum of isn't supported yet";
+
+fn has_elapsed(terms: &[s::Term]) -> bool {
+    terms.iter().any(|term| match term {
+        s::Term::Elapsed(_) => true,
+        s::Term::Derived(derived) => derived.whose.iter().any(|condition| {
+            matches!(condition.left, s::Left::Elapsed(_))
+                || has_elapsed(phrase_terms(&condition.phrase))
+        }),
+        _ => false,
+    })
+}
+
+pub fn in_from_line(found: Vec<String>) -> Vec<String> {
+    let mut out = Vec::new();
+    for problem in found {
+        let argument = problem.ends_with(" can't take a count of, a sum of or a plus");
+        if problem == ELAPSED_AFTER_QUANTIFIER {
+            out.push(problem.clone());
+        }
+        if argument || problem == AFTER_QUANTIFIER || problem == ELAPSED_AFTER_QUANTIFIER {
+            out.push(format!("whose: {problem}"));
+        } else {
+            out.push(problem);
+        }
+    }
+    out
+}
+
+pub fn condition_elapsed_problems(condition: &s::Condition) -> Vec<String> {
+    if matches!(condition.left, s::Left::Elapsed(_)) {
+        return vec![ELAPSED_AFTER_QUANTIFIER.to_string()];
+    }
+    elapsed_after_quantifier_problems(&condition.phrase)
+}
+
+fn elapsed_after_quantifier_problems(phrase: &s::Phrase) -> Vec<String> {
+    if has_elapsed(phrase_terms(phrase)) {
+        vec![ELAPSED_AFTER_QUANTIFIER.to_string()]
+    } else {
+        Vec::new()
+    }
+}
+
+fn counted_or_elapsed(terms: &[s::Term]) -> bool {
+    matches!(
+        terms,
+        [s::Term::Path(_)
+            | s::Term::Elapsed(_)
+            | s::Term::Derived(s::Derived {
+                kind: s::DerivedKind::Count,
+                ..
+            })]
+    )
+}
+
+pub fn tally_condition_problems(condition: &s::Condition) -> Vec<String> {
+    let left_flawed = matches!(
+        condition.left,
+        s::Left::Derived(s::Derived {
+            kind: s::DerivedKind::Sum,
+            ..
+        })
+    );
+    let terms = phrase_terms(&condition.phrase);
+    let right_flawed = !terms.is_empty() && !counted_or_elapsed(terms);
+    let mut problems = argument_problems(&condition.phrase);
+    if left_flawed || right_flawed {
+        problems.push(IN_COUNT_WHOSE.to_string());
+    }
+    problems
+}
+
+pub fn lower_tally_condition(
+    condition: &s::Condition,
+    scope: &Scope,
+) -> Result<Check, Vec<String>> {
+    with_problems(
+        lower_condition(condition, scope),
+        tally_condition_problems(condition)
+            .into_iter()
+            .filter(|problem| problem == IN_COUNT_WHOSE)
+            .collect(),
+    )
+}
+
+fn with_problems(
+    lowered: Result<Check, Vec<String>>,
+    extra: Vec<String>,
+) -> Result<Check, Vec<String>> {
+    if extra.is_empty() {
+        return lowered;
+    }
+    Err(lowered
+        .err()
+        .into_iter()
+        .flatten()
+        .filter(|problem| !problem.ends_with(UNSUPPORTED_SUFFIX))
+        .chain(extra)
+        .collect())
+}
+
 pub fn lower_condition(condition: &s::Condition, scope: &Scope) -> Result<Check, Vec<String>> {
+    with_problems(
+        lower_condition_phrase(condition, scope),
+        argument_problems(&condition.phrase),
+    )
+}
+
+fn lower_condition_phrase(condition: &s::Condition, scope: &Scope) -> Result<Check, Vec<String>> {
     let aliases = scope.aliases();
     let names: Vec<&str> = aliases.iter().map(String::as_str).collect();
     if let Some(lowered) = tally::lower_condition(&condition.left, &condition.phrase, scope) {
@@ -366,6 +548,16 @@ pub fn lower_condition(condition: &s::Condition, scope: &Scope) -> Result<Check,
 }
 
 pub fn lower_assertion(assertion: &s::Assertion, scope: &Scope) -> Result<Check, Vec<String>> {
+    let extra = match assertion {
+        s::Assertion::Plain { phrase, .. } | s::Assertion::Derived { phrase, .. } => {
+            argument_problems(phrase)
+        }
+        s::Assertion::Quantified { .. } => Vec::new(),
+    };
+    with_problems(lower_assertion_phrase(assertion, scope), extra)
+}
+
+fn lower_assertion_phrase(assertion: &s::Assertion, scope: &Scope) -> Result<Check, Vec<String>> {
     let scope = scope.on_subject();
     match assertion {
         s::Assertion::Plain { path, phrase } => match phrase {
@@ -377,7 +569,7 @@ pub fn lower_assertion(assertion: &s::Assertion, scope: &Scope) -> Result<Check,
                 .or_else(|| lower_with_operator_modules(path, other, &scope))
             {
                 Some(lowered) => lowered,
-                None => Ok(Check::NotYet),
+                None => Err(unsupported_assertion(assertion, &scope)),
             },
         },
         s::Assertion::Quantified {
@@ -386,22 +578,28 @@ pub fn lower_assertion(assertion: &s::Assertion, scope: &Scope) -> Result<Check,
             whose,
             if_any,
             phrase,
-        } => Ok(
-            lower_quantified(*quantifier, path, whose, *if_any, phrase, &scope)?
-                .unwrap_or(Check::NotYet),
-        ),
-        s::Assertion::Derived { .. } => {
-            tally::lower_assertion(assertion, &scope).unwrap_or(Ok(Check::NotYet))
-        }
+        } => lower_quantified(*quantifier, path, whose, *if_any, phrase, &scope),
+        s::Assertion::Derived { .. } => tally::lower_assertion(assertion, &scope)
+            .unwrap_or_else(|| Err(unsupported_assertion(assertion, &scope))),
     }
+}
+
+fn unsupported_assertion(assertion: &s::Assertion, scope: &Scope) -> Vec<String> {
+    let aliases = scope.aliases();
+    let names: Vec<&str> = aliases.iter().map(String::as_str).collect();
+    vec![format!(
+        "{}{UNSUPPORTED_SUFFIX}",
+        s::print_assertion(assertion, &names)
+    )]
 }
 
 pub fn lower_for(
     line: &s::For,
     assertions: &[s::Assertion],
+    places: &[String],
     scope: &Scope,
 ) -> Result<Check, Vec<String>> {
-    crate::ops::for_line::lower_for(line, assertions, scope)
+    crate::ops::for_line::lower_for(line, assertions, places, scope)
 }
 
 pub const MOST_WALK_STEPS: usize = 10;
@@ -427,8 +625,10 @@ pub fn lower_quantified(
     if_any: bool,
     phrase: &s::Phrase,
     scope: &Scope,
-) -> Result<Option<Check>, Vec<String>> {
-    let mut problems = Vec::new();
+) -> Result<Check, Vec<String>> {
+    let mut problems = argument_problems(phrase);
+    problems.extend(after_quantifier_problems(phrase));
+    problems.extend(elapsed_after_quantifier_problems(phrase));
     let walk_path = match scope.left_path(path) {
         Ok(found) => {
             problems.extend(walk_too_long(&found));
@@ -441,13 +641,9 @@ pub fn lower_quantified(
     };
     let item = scope.in_item();
     let mut conditions = Vec::new();
-    let mut runnable = true;
     for condition in whose {
         match lower_condition(condition, &item) {
             Ok(check) => conditions.push(check),
-            Err(found) if found.iter().all(|p| p.ends_with(UNSUPPORTED_SUFFIX)) => {
-                runnable = false;
-            }
             Err(found) => problems.extend(found),
         }
     }
@@ -479,8 +675,8 @@ pub fn lower_quantified(
     if !problems.is_empty() {
         return Err(problems);
     }
-    match (walk_path, check, runnable) {
-        (Some(path), Some(check), true) => Ok(Some(Check::Walk(Box::new(Walk {
+    match (walk_path, check) {
+        (Some(path), Some(check)) => Ok(Check::Walk(Box::new(Walk {
             quantifier: match quantifier {
                 s::Quantifier::Every => Quantifier::Every,
                 s::Quantifier::Some => Quantifier::Some,
@@ -489,8 +685,8 @@ pub fn lower_quantified(
             whose: conditions,
             if_any,
             check: Box::new(check),
-        })))),
-        _ => Ok(None),
+        }))),
+        _ => Err(vec![format!("every or some{UNSUPPORTED_SUFFIX}")]),
     }
 }
 

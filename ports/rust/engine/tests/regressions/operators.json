@@ -1,0 +1,7756 @@
+[
+  {
+    "description": "a check that can't take a count or a plus is written wrong inside an any_of option, so another option can't pass it",
+    "input": {
+      "things": [
+        {
+          "fa": null,
+          "fb": 1,
+          "id": "t0",
+          "items": [
+            {
+              "x": true
+            }
+          ]
+        }
+      ],
+      "top": {}
+    },
+    "params": {
+      "p": "a.b",
+      "q": "ab"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "any_of": {
+                "o1": "$params.q exists",
+                "o2": [
+                  "items does not equal $params.p",
+                  "$input.top ends with fa plus fb"
+                ]
+              }
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "one of: o1($params.q exists) | o2(items does not equal $params.p and $input.top ends with fa plus fb)",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "option o2: line 2: \"ends with\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a count after every in a from line is written wrong with the whose prefix",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "fa exists"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things whose every items.x equals count of items",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(<invalid from>)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa exists",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "subjects.thing.from",
+              "value": [
+                "whose: count of, sum of and plus after every or some aren't supported yet"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "<invalid from>",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a count after some is written wrong inside an any_of option",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "any_of": {
+                "o1": "$params.q exists",
+                "o2": [
+                  "fa exists",
+                  "some items.x equals count of items"
+                ]
+              }
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "one of: o1($params.q exists) | o2(fa exists and some items.x equals count of items)",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "option o2: line 2: count of, sum of and plus after every or some aren't supported yet"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a for check that doesn't parse keeps its for line in the expression",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "zz.k is 1e2"
+              ],
+              "for": "every items as zz,"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as zz,: zz.k is 1e2",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "for: an item ends with \"as\" and a name, like \"every pull_requests as pr\""
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a for row leaves out the other terms of a plus that reads an alias",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "x.v plus fa is $params.q"
+              ],
+              "for": "every items as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x: x.v plus fa equals $params.q",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "unusable",
+              "failed_assertions": [
+                {
+                  "assertion": "x.v plus fa equals $params.q",
+                  "cause": "unusable",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/items/0/v",
+                        "/things/0/fa"
+                      ],
+                      "name": "x.v plus fa",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/items/0/v"
+                      ],
+                      "name": "x.v",
+                      "value": 3
+                    },
+                    {
+                      "locations": [
+                        "/things/0/fa"
+                      ],
+                      "name": "fa",
+                      "value": "2026-10-01T00:00:00Z"
+                    },
+                    {
+                      "locations": [
+                        "$params:/q"
+                      ],
+                      "name": "$params.q",
+                      "value": 3
+                    }
+                  ]
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "k": "a",
+                "subs": [
+                  {
+                    "w": 1
+                  }
+                ],
+                "v": 3,
+                "x": 1
+              }
+            },
+            {
+              "cause": "unusable",
+              "failed_assertions": [
+                {
+                  "assertion": "x.v plus fa equals $params.q",
+                  "cause": "unusable",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/items/1/v",
+                        "/things/0/fa"
+                      ],
+                      "name": "x.v plus fa",
+                      "value": null
+                    },
+                    {
+                      "locations": [
+                        "/things/0/items/1/v"
+                      ],
+                      "name": "x.v",
+                      "value": 4
+                    },
+                    {
+                      "locations": [
+                        "/things/0/fa"
+                      ],
+                      "name": "fa",
+                      "value": "2026-10-01T00:00:00Z"
+                    },
+                    {
+                      "locations": [
+                        "$params:/q"
+                      ],
+                      "name": "$params.q",
+                      "value": 3
+                    }
+                  ]
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "k": "b",
+                "subs": [],
+                "v": 4,
+                "x": 2
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "$params:/q"
+              ],
+              "name": "$params.q",
+              "value": 3
+            },
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "k": "a",
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ],
+                  "v": 3,
+                  "x": 1
+                },
+                {
+                  "k": "b",
+                  "subs": [],
+                  "v": 4,
+                  "x": 2
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a for row leaves out the params of a walk and of a whose on the for line",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "every items.v is at least $params.r named by k"
+              ],
+              "for": "every items whose v is $params.q as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items whose v equals $params.q as x: every items.v is at least $params.r named by k",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "value",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "value",
+              "failed_assertions": [
+                {
+                  "assertion": "every items.v is at least $params.r named by k",
+                  "cause": "value",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/items/0/v",
+                        "/things/0/items/1/v"
+                      ],
+                      "name": "items[].v",
+                      "value": [
+                        3,
+                        4
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "k": "a",
+                "subs": [
+                  {
+                    "w": 1
+                  }
+                ],
+                "v": 3,
+                "x": 1
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "k": "a",
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ],
+                  "v": 3,
+                  "x": 1
+                },
+                {
+                  "k": "b",
+                  "subs": [],
+                  "v": 4,
+                  "x": 2
+                }
+              ]
+            },
+            {
+              "locations": [
+                "/things/0/items/0/v",
+                "/things/0/items/1/v"
+              ],
+              "name": "items[].v",
+              "value": [
+                3,
+                4
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a for row leaves out the params of a whose in a count",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "count of items whose v is $params.q is 1"
+              ],
+              "for": "every items as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": true,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x: count of items whose v equals $params.q is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "c",
+          "failed_items": [],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "count of items whose v equals $params.q",
+              "value": 1
+            },
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "k": "a",
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ],
+                  "v": 3,
+                  "x": 1
+                },
+                {
+                  "k": "b",
+                  "subs": [],
+                  "v": 4,
+                  "x": 2
+                }
+              ]
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a for row lists a count on the right of a sentence that reads an alias",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "x.v is at most count of items"
+              ],
+              "for": "every items as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x: x.v is at most count of items",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "value",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "value",
+              "failed_assertions": [
+                {
+                  "assertion": "x.v is at most count of items",
+                  "cause": "value",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/items/0/v"
+                      ],
+                      "name": "x.v",
+                      "value": 3
+                    },
+                    {
+                      "locations": [
+                        "/things/0/items/0",
+                        "/things/0/items/1"
+                      ],
+                      "name": "count of items",
+                      "value": 2
+                    },
+                    {
+                      "locations": [
+                        "/things/0/items/0",
+                        "/things/0/items/1"
+                      ],
+                      "name": "items[]",
+                      "value": [
+                        {
+                          "k": "a",
+                          "subs": [
+                            {
+                              "w": 1
+                            }
+                          ],
+                          "v": 3,
+                          "x": 1
+                        },
+                        {
+                          "k": "b",
+                          "subs": [],
+                          "v": 4,
+                          "x": 2
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "k": "a",
+                "subs": [
+                  {
+                    "w": 1
+                  }
+                ],
+                "v": 3,
+                "x": 1
+              }
+            },
+            {
+              "cause": "value",
+              "failed_assertions": [
+                {
+                  "assertion": "x.v is at most count of items",
+                  "cause": "value",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/items/1/v"
+                      ],
+                      "name": "x.v",
+                      "value": 4
+                    },
+                    {
+                      "locations": [
+                        "/things/0/items/0",
+                        "/things/0/items/1"
+                      ],
+                      "name": "count of items",
+                      "value": 2
+                    },
+                    {
+                      "locations": [
+                        "/things/0/items/0",
+                        "/things/0/items/1"
+                      ],
+                      "name": "items[]",
+                      "value": [
+                        {
+                          "k": "a",
+                          "subs": [
+                            {
+                              "w": 1
+                            }
+                          ],
+                          "v": 3,
+                          "x": 1
+                        },
+                        {
+                          "k": "b",
+                          "subs": [],
+                          "v": 4,
+                          "x": 2
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "k": "b",
+                "subs": [],
+                "v": 4,
+                "x": 2
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "count of items",
+              "value": 2
+            },
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "k": "a",
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ],
+                  "v": 3,
+                  "x": 1
+                },
+                {
+                  "k": "b",
+                  "subs": [],
+                  "v": 4,
+                  "x": 2
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a for row lists the count and the params value of a count compared with a params value",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "count of items is $params.q"
+              ],
+              "for": "every items as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x: count of items equals $params.q",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "value",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "value",
+              "failed_assertions": [
+                {
+                  "assertion": "count of items equals $params.q",
+                  "cause": "value",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/items/0",
+                        "/things/0/items/1"
+                      ],
+                      "name": "count of items",
+                      "value": 2
+                    },
+                    {
+                      "locations": [
+                        "/things/0/items/0",
+                        "/things/0/items/1"
+                      ],
+                      "name": "items[]",
+                      "value": [
+                        {
+                          "k": "a",
+                          "subs": [
+                            {
+                              "w": 1
+                            }
+                          ],
+                          "v": 3,
+                          "x": 1
+                        },
+                        {
+                          "k": "b",
+                          "subs": [],
+                          "v": 4,
+                          "x": 2
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:/q"
+                      ],
+                      "name": "$params.q",
+                      "value": 3
+                    }
+                  ]
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "k": "a",
+                "subs": [
+                  {
+                    "w": 1
+                  }
+                ],
+                "v": 3,
+                "x": 1
+              }
+            },
+            {
+              "cause": "value",
+              "failed_assertions": [
+                {
+                  "assertion": "count of items equals $params.q",
+                  "cause": "value",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/items/0",
+                        "/things/0/items/1"
+                      ],
+                      "name": "count of items",
+                      "value": 2
+                    },
+                    {
+                      "locations": [
+                        "/things/0/items/0",
+                        "/things/0/items/1"
+                      ],
+                      "name": "items[]",
+                      "value": [
+                        {
+                          "k": "a",
+                          "subs": [
+                            {
+                              "w": 1
+                            }
+                          ],
+                          "v": 3,
+                          "x": 1
+                        },
+                        {
+                          "k": "b",
+                          "subs": [],
+                          "v": 4,
+                          "x": 2
+                        }
+                      ]
+                    },
+                    {
+                      "locations": [
+                        "$params:/q"
+                      ],
+                      "name": "$params.q",
+                      "value": 3
+                    }
+                  ]
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "k": "b",
+                "subs": [],
+                "v": 4,
+                "x": 2
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "$params:/q"
+              ],
+              "name": "$params.q",
+              "value": 3
+            },
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "count of items",
+              "value": 2
+            },
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "k": "a",
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ],
+                  "v": 3,
+                  "x": 1
+                },
+                {
+                  "k": "b",
+                  "subs": [],
+                  "v": 4,
+                  "x": 2
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a for row lists the elapsed time of a sentence that reads no alias",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "fa is days elapsed from fa to fb"
+              ],
+              "for": "every items as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x: fa equals days elapsed from fa to fb",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "unusable",
+              "failed_assertions": [
+                {
+                  "assertion": "fa equals days elapsed from fa to fb",
+                  "cause": "unusable",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/fa"
+                      ],
+                      "name": "fa",
+                      "value": "2026-10-01T00:00:00Z"
+                    },
+                    {
+                      "locations": [
+                        "/things/0/fa",
+                        "/things/0/fb"
+                      ],
+                      "name": "days elapsed from fa to fb",
+                      "value": 1
+                    },
+                    {
+                      "locations": [
+                        "/things/0/fb"
+                      ],
+                      "name": "fb",
+                      "value": "2026-10-02T00:00:00Z"
+                    }
+                  ]
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "k": "a",
+                "subs": [
+                  {
+                    "w": 1
+                  }
+                ],
+                "v": 3,
+                "x": 1
+              }
+            },
+            {
+              "cause": "unusable",
+              "failed_assertions": [
+                {
+                  "assertion": "fa equals days elapsed from fa to fb",
+                  "cause": "unusable",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/fa"
+                      ],
+                      "name": "fa",
+                      "value": "2026-10-01T00:00:00Z"
+                    },
+                    {
+                      "locations": [
+                        "/things/0/fa",
+                        "/things/0/fb"
+                      ],
+                      "name": "days elapsed from fa to fb",
+                      "value": 1
+                    },
+                    {
+                      "locations": [
+                        "/things/0/fb"
+                      ],
+                      "name": "fb",
+                      "value": "2026-10-02T00:00:00Z"
+                    }
+                  ]
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "k": "b",
+                "subs": [],
+                "v": 4,
+                "x": 2
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/fa",
+                "/things/0/fb"
+              ],
+              "name": "days elapsed from fa to fb",
+              "value": 1
+            },
+            {
+              "locations": [
+                "/things/0/fa"
+              ],
+              "name": "fa",
+              "value": "2026-10-01T00:00:00Z"
+            },
+            {
+              "locations": [
+                "/things/0/fb"
+              ],
+              "name": "fb",
+              "value": "2026-10-02T00:00:00Z"
+            },
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "k": "a",
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ],
+                  "v": 3,
+                  "x": 1
+                },
+                {
+                  "k": "b",
+                  "subs": [],
+                  "v": 4,
+                  "x": 2
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a for row lists the params value its sentence compares with",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "x.v equals $params.q"
+              ],
+              "for": "every items as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x: x.v equals $params.q",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "value",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "value",
+              "failed_assertions": [
+                {
+                  "assertion": "x.v equals $params.q",
+                  "cause": "value",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/items/1/v"
+                      ],
+                      "name": "x.v",
+                      "value": 4
+                    },
+                    {
+                      "locations": [
+                        "$params:/q"
+                      ],
+                      "name": "$params.q",
+                      "value": 3
+                    }
+                  ]
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "k": "b",
+                "subs": [],
+                "v": 4,
+                "x": 2
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "$params:/q"
+              ],
+              "name": "$params.q",
+              "value": 3
+            },
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "k": "a",
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ],
+                  "v": 3,
+                  "x": 1
+                },
+                {
+                  "k": "b",
+                  "subs": [],
+                  "v": 4,
+                  "x": 2
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a for row lists the params value of a sentence that reads no alias",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "x.v exists",
+                "fa is $params.q"
+              ],
+              "for": "every items as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x: x.v exists and fa equals $params.q",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "unusable",
+              "failed_assertions": [
+                {
+                  "assertion": "fa equals $params.q",
+                  "cause": "unusable",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/fa"
+                      ],
+                      "name": "fa",
+                      "value": "2026-10-01T00:00:00Z"
+                    },
+                    {
+                      "locations": [
+                        "$params:/q"
+                      ],
+                      "name": "$params.q",
+                      "value": 3
+                    }
+                  ]
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "k": "a",
+                "subs": [
+                  {
+                    "w": 1
+                  }
+                ],
+                "v": 3,
+                "x": 1
+              }
+            },
+            {
+              "cause": "unusable",
+              "failed_assertions": [
+                {
+                  "assertion": "fa equals $params.q",
+                  "cause": "unusable",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/things/0/fa"
+                      ],
+                      "name": "fa",
+                      "value": "2026-10-01T00:00:00Z"
+                    },
+                    {
+                      "locations": [
+                        "$params:/q"
+                      ],
+                      "name": "$params.q",
+                      "value": 3
+                    }
+                  ]
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "k": "b",
+                "subs": [],
+                "v": 4,
+                "x": 2
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "$params:/q"
+              ],
+              "name": "$params.q",
+              "value": 3
+            },
+            {
+              "locations": [
+                "/things/0/fa"
+              ],
+              "name": "fa",
+              "value": "2026-10-01T00:00:00Z"
+            },
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "k": "a",
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ],
+                  "v": 3,
+                  "x": 1
+                },
+                {
+                  "k": "b",
+                  "subs": [],
+                  "v": 4,
+                  "x": 2
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a line that can't be read isn't also checked for what it can't take",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "every items.x contains count of items"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "every items.x contains count of items",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "\"contains\" after every or some would check each item of the last list, not the list: put the walk on a for line"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a phrase in a from line condition that can't take a plus is written wrong with the whose prefix",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "fa exists"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things whose fa starts with fb plus 1",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(<invalid from>)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa exists",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "subjects.thing.from",
+              "value": [
+                "whose: \"starts with\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "<invalid from>",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a phrase in a whose that can't take a count is written wrong",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "every items whose x ends with fa plus 1 exists"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "every items whose x ends with fa plus 1 exists",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "\"ends with\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a phrase on a for line item whose that can't take a plus is written wrong",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "zz.k exists"
+              ],
+              "for": "every items whose x starts with fa plus 1 as zz"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items whose x starts with fa plus 1 as zz: zz.k exists",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "\"starts with\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a pick that ties on the second item lists nothing for the item that tied",
+    "input": {
+      "things": [
+        {
+          "id": "t0",
+          "items": [
+            {
+              "subs": [
+                {
+                  "t": 5,
+                  "w": 1
+                },
+                {
+                  "t": 5,
+                  "w": 2
+                }
+              ]
+            },
+            {
+              "subs": []
+            }
+          ]
+        }
+      ]
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "y.w is 1"
+              ],
+              "for": "every items as x, last of x.subs sorted by t as y"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "ambiguous",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x, last of x.subs sorted by t as y: y.w is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "ambiguous",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "ambiguous",
+              "failed_assertions": [],
+              "failed_items": [
+                {
+                  "cause": "ambiguous",
+                  "item": "item 1 of x.subs",
+                  "locations": [
+                    "/things/0/items/0/subs/0/t"
+                  ],
+                  "path": "item 1 of x.subs",
+                  "value": 5
+                },
+                {
+                  "cause": "ambiguous",
+                  "item": "item 2 of x.subs",
+                  "locations": [
+                    "/things/0/items/0/subs/1/t"
+                  ],
+                  "path": "item 2 of x.subs",
+                  "value": 5
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "subs": [
+                  {
+                    "t": 5,
+                    "w": 1
+                  },
+                  {
+                    "t": 5,
+                    "w": 2
+                  }
+                ]
+              }
+            },
+            {
+              "cause": "absent",
+              "failed_assertions": [],
+              "failed_items": [
+                {
+                  "cause": "absent",
+                  "item": "x.subs",
+                  "locations": [],
+                  "path": "x.subs",
+                  "value": null
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "subs": []
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "subs": [
+                    {
+                      "t": 5,
+                      "w": 1
+                    },
+                    {
+                      "t": 5,
+                      "w": 2
+                    }
+                  ]
+                },
+                {
+                  "subs": []
+                }
+              ]
+            },
+            {
+              "locations": [],
+              "name": "x.subs[]",
+              "value": []
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a pick whose sort fails on the second item lists nothing for the item that failed",
+    "input": {
+      "things": [
+        {
+          "id": "t0",
+          "items": [
+            {
+              "subs": [
+                {
+                  "w": 1
+                }
+              ]
+            },
+            {
+              "subs": [
+                {
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "y.w is 1"
+              ],
+              "for": "every items as x, last of x.subs sorted by w as y"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "absent",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x, last of x.subs sorted by w as y: y.w is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "absent",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "absent",
+              "failed_assertions": [],
+              "failed_items": [
+                {
+                  "cause": "absent",
+                  "item": "item 1 of x.subs",
+                  "locations": [
+                    "/things/0/items/1/subs/0"
+                  ],
+                  "path": "item 1 of x.subs",
+                  "value": null
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "subs": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ]
+                },
+                {
+                  "subs": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "locations": [
+                "/things/0/items/0/subs/0"
+              ],
+              "name": "x.subs[]",
+              "value": [
+                {
+                  "w": 1
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a plus after every is written wrong",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "every items.x is less than k plus 1"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "every items.x is less than k plus 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "count of, sum of and plus after every or some aren't supported yet"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a plus of numbers above the range of a float is unusable and is never written out in full, where OPA panics on that exponent and the spec leaves such numbers to the implementation",
+    "input": {
+      "things": [
+        {
+          "fa": 1e+1000000000000,
+          "fb": 1e+1000000000000,
+          "id": "t0",
+          "items": [
+            {
+              "x": 1e+1000000000000
+            }
+          ]
+        }
+      ]
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "fa plus fb is 1"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa plus fb is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "c",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/fa",
+                "/things/0/fb"
+              ],
+              "name": "fa plus fb",
+              "value": null
+            },
+            {
+              "locations": [
+                "/things/0/fa"
+              ],
+              "name": "fa",
+              "value": 1e+1000000000000
+            },
+            {
+              "locations": [
+                "/things/0/fb"
+              ],
+              "name": "fb",
+              "value": 1e+1000000000000
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a plus of numbers below the range of a float is added as a float is, as 0, where OPA panics on that exponent and the spec leaves such numbers to the implementation",
+    "input": {
+      "things": [
+        {
+          "fa": 1e-70000,
+          "fb": 1e-70000,
+          "id": "t0",
+          "items": [
+            {
+              "x": 1e-70000
+            }
+          ]
+        }
+      ]
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "fa plus fb is 1"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa plus fb is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "value",
+          "check": "c",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/fa",
+                "/things/0/fb"
+              ],
+              "name": "fa plus fb",
+              "value": 0
+            },
+            {
+              "locations": [
+                "/things/0/fa"
+              ],
+              "name": "fa",
+              "value": 1e-70000
+            },
+            {
+              "locations": [
+                "/things/0/fb"
+              ],
+              "name": "fb",
+              "value": 1e-70000
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a problem in a for line assertion names the line and the for line stays in the expression",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "zz.k exists",
+                "zz.x ends with fa plus 1"
+              ],
+              "for": "every items as  zz"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as  zz: zz.k exists and zz.x ends with fa plus 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "line 2: \"ends with\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a problem in the second of two lines names the line",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "fa exists",
+                "fa ends with fb plus 1"
+              ]
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa exists and fa ends with fb plus 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "line 2: \"ends with\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a second item that picks from another list keeps naming the item where it is",
+    "input": {
+      "things": [
+        {
+          "id": "t0",
+          "items": [
+            {
+              "v": 1
+            }
+          ],
+          "ps": [
+            {
+              "w": 1
+            },
+            {
+              "w": 2
+            }
+          ]
+        }
+      ]
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "y.w is 1"
+              ],
+              "for": "every items as x, last of ps as y"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x, last of ps as y: y.w is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "value",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "value",
+              "failed_assertions": [
+                {
+                  "assertion": "y.w is 1",
+                  "cause": "value",
+                  "items": [
+                    {
+                      "cause": "value",
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/ps/1/w"
+                          ],
+                          "name": "y.w",
+                          "value": 2
+                        }
+                      ],
+                      "item": "item 2 of ps"
+                    }
+                  ]
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "v": 1
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/ps/1"
+              ],
+              "name": "item 2 of ps",
+              "value": {
+                "w": 2
+              }
+            },
+            {
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "v": 1
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a second item that picks from the first alias is one entry holding each value picked, and an empty list is a failure of its own",
+    "input": {
+      "things": [
+        {
+          "id": "t0",
+          "items": [
+            {
+              "subs": [
+                {
+                  "w": 1
+                }
+              ]
+            },
+            {
+              "subs": []
+            }
+          ]
+        }
+      ]
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "y.w is 1"
+              ],
+              "for": "every items as x, last of x.subs as y"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "absent",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x, last of x.subs as y: y.w is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "absent",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "absent",
+              "failed_assertions": [],
+              "failed_items": [
+                {
+                  "cause": "absent",
+                  "item": "x.subs",
+                  "locations": [],
+                  "path": "x.subs",
+                  "value": null
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "subs": []
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ]
+                },
+                {
+                  "subs": []
+                }
+              ]
+            },
+            {
+              "locations": [
+                "/things/0/items/0/subs/0"
+              ],
+              "name": "x.subs[]",
+              "value": [
+                {
+                  "w": 1
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a second item that picks from the first alias lists the whole list when it picks past the end",
+    "input": {
+      "things": [
+        {
+          "id": "t0",
+          "items": [
+            {
+              "subs": [
+                {
+                  "w": 1
+                }
+              ]
+            },
+            {
+              "subs": []
+            }
+          ]
+        }
+      ]
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "y.w is 1"
+              ],
+              "for": "every items as x, item 2 of x.subs as y"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "absent",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x, item 2 of x.subs as y: y.w is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "absent",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "absent",
+              "failed_assertions": [],
+              "failed_items": [
+                {
+                  "cause": "absent",
+                  "item": "x.subs",
+                  "locations": [],
+                  "path": "x.subs",
+                  "value": null
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "subs": [
+                  {
+                    "w": 1
+                  }
+                ]
+              }
+            },
+            {
+              "cause": "absent",
+              "failed_assertions": [],
+              "failed_items": [
+                {
+                  "cause": "absent",
+                  "item": "x.subs",
+                  "locations": [],
+                  "path": "x.subs",
+                  "value": null
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "subs": []
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "subs": [
+                    {
+                      "w": 1
+                    }
+                  ]
+                },
+                {
+                  "subs": []
+                }
+              ]
+            },
+            {
+              "locations": [
+                "/things/0/items/0/subs/0"
+              ],
+              "name": "x.subs[]",
+              "value": [
+                {
+                  "w": 1
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a second item that picks past the end of the list names the list as a failure of its own",
+    "input": {
+      "things": [
+        {
+          "id": "t0",
+          "items": [
+            {
+              "subs": [
+                {
+                  "w": 1
+                },
+                {
+                  "w": 2
+                }
+              ]
+            },
+            {
+              "subs": [
+                {
+                  "w": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "assert": [
+                "y.w is 1"
+              ],
+              "for": "every items as x, item 2 of x.subs as y"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "absent",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "for every items as x, item 2 of x.subs as y: y.w is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "absent",
+          "check": "c",
+          "failed_items": [
+            {
+              "cause": "value",
+              "failed_assertions": [
+                {
+                  "assertion": "y.w is 1",
+                  "cause": "value",
+                  "items": [
+                    {
+                      "cause": "value",
+                      "inputs": [
+                        {
+                          "locations": [
+                            "/things/0/items/0/subs/1/w"
+                          ],
+                          "name": "y.w",
+                          "value": 2
+                        }
+                      ],
+                      "item": "item 2 of x.subs"
+                    }
+                  ]
+                }
+              ],
+              "item": "item 1 of items",
+              "locations": [
+                "/things/0/items/0"
+              ],
+              "path": "item 1 of items",
+              "value": {
+                "subs": [
+                  {
+                    "w": 1
+                  },
+                  {
+                    "w": 2
+                  }
+                ]
+              }
+            },
+            {
+              "cause": "absent",
+              "failed_assertions": [],
+              "failed_items": [
+                {
+                  "cause": "absent",
+                  "item": "x.subs",
+                  "locations": [],
+                  "path": "x.subs",
+                  "value": null
+                }
+              ],
+              "item": "item 2 of items",
+              "locations": [
+                "/things/0/items/1"
+              ],
+              "path": "item 2 of items",
+              "value": {
+                "subs": [
+                  {
+                    "w": 2
+                  }
+                ]
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0",
+                "/things/0/items/1"
+              ],
+              "name": "items[]",
+              "value": [
+                {
+                  "subs": [
+                    {
+                      "w": 1
+                    },
+                    {
+                      "w": 2
+                    }
+                  ]
+                },
+                {
+                  "subs": [
+                    {
+                      "w": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "locations": [
+                "/things/0/items/0/subs/1",
+                "/things/0/items/1/subs/0"
+              ],
+              "name": "x.subs[]",
+              "value": [
+                {
+                  "w": 2
+                },
+                {
+                  "w": 2
+                }
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a sum in the whose of a count is written wrong",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "count of items whose x is sum of items.x is 1"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "count of items whose x is sum of items.x is 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "a sum of or a plus in the whose of a count of or a sum of isn't supported yet"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a sum of a number above the range of a float is unusable and is never written out in full, where OPA panics on that exponent and the spec leaves such numbers to the implementation",
+    "input": {
+      "things": [
+        {
+          "fa": 1e+1000000000000,
+          "fb": 1e+1000000000000,
+          "id": "t0",
+          "items": [
+            {
+              "x": 1e+1000000000000
+            }
+          ]
+        }
+      ]
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "sum of items.x is 0"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "sum of items.x is 0",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "c",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0/x"
+              ],
+              "name": "sum of items.x",
+              "value": null
+            },
+            {
+              "locations": [
+                "/things/0/items/0/x"
+              ],
+              "name": "items[].x",
+              "value": [
+                1e+1000000000000
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a sum of a number below the range of a float is added as a float is, as 0, where OPA panics on that exponent and the spec leaves such numbers to the implementation",
+    "input": {
+      "things": [
+        {
+          "fa": 1e-70000,
+          "fb": 1e-70000,
+          "id": "t0",
+          "items": [
+            {
+              "x": 1e-70000
+            }
+          ]
+        }
+      ]
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "sum of items.x is 0"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": true,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "sum of items.x is 0",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 1,
+            "total": 1
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0"
+              ],
+              "name": "in-scope thing count",
+              "value": 1
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated thing ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "c",
+          "inputs": [
+            {
+              "locations": [
+                "/things/0/items/0/x"
+              ],
+              "name": "sum of items.x",
+              "value": 0
+            },
+            {
+              "locations": [
+                "/things/0/items/0/x"
+              ],
+              "name": "items[].x",
+              "value": [
+                1e-70000
+              ]
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": "t0",
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "a written wrong any_of prints each option as written",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "any_of": {
+                "o1": "fa is   1e2",
+                "o2": [
+                  "fa ends with fb plus 1"
+                ]
+              }
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "one of: o1(fa is   1e2) | o2(fa ends with fb plus 1)",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "option o2: \"ends with\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "an any_of option with a syntax problem and a problem in what it can't take lists both",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": {
+              "any_of": {
+                "o1": "$params.q exists",
+                "o2": [
+                  "fa is \"a",
+                  "fa ends with fb plus 1"
+                ]
+              }
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "one of: o1($params.q exists) | o2(fa is \"a and fa ends with fb plus 1)",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "option o2: line 1: unclosed quote at column 7",
+                "option o2: line 2: \"ends with\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "an elapsed time after every is written wrong with both messages",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "every items.x equals days elapsed from fa to fb"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "every items.x equals days elapsed from fa to fb",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "an elapsed time isn't supported yet after every or some, or in a from line",
+                "count of, sum of and plus after every or some aren't supported yet"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "an elapsed time in a from line is written wrong",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "fa exists"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things whose days elapsed from fa to fb is 1",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(<invalid from>)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa exists",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "subjects.thing.from",
+              "value": [
+                "an elapsed time isn't supported yet after every or some, or in a from line"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "<invalid from>",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "does not contain can't take a plus",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "fa does not contain fb plus 1"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa does not contain fb plus 1",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "\"does not contain\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "is alphabetically before can't take a sum of",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "fa is alphabetically before sum of items.x"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa is alphabetically before sum of items.x",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "\"is alphabetically before\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "is before can't take an elapsed time",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "fa is before days elapsed from fa to fb"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa is before days elapsed from fa to fb",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "\"is before\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "starts with can't take a count of",
+    "input": {
+      "things": [
+        {
+          "fa": "2026-10-01T00:00:00Z",
+          "fb": "2026-10-02T00:00:00Z",
+          "id": "t0",
+          "items": [
+            {
+              "k": "a",
+              "subs": [
+                {
+                  "w": 1
+                }
+              ],
+              "v": 3,
+              "x": 1
+            },
+            {
+              "k": "b",
+              "subs": [],
+              "v": 4,
+              "x": 2
+            }
+          ],
+          "k": 1
+        }
+      ],
+      "top": {
+        "a": 1
+      }
+    },
+    "params": {
+      "p": [
+        "a",
+        "b"
+      ],
+      "q": 3,
+      "r": {
+        "a": 5,
+        "b": 6
+      },
+      "s": "a"
+    },
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r1": {
+          "checks": {
+            "c": "fa starts with count of items"
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.3-dev",
+      "meta": {},
+      "requirements": {
+        "r1": {
+          "causes": [
+            {
+              "cause": "value",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "description": "The in-scope thing count is at least 1",
+              "expression": "count(matching(things)) >= 1",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "description": "Every thing id is unique",
+              "expression": "count(repeated(ids(things))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "fa starts with count of items",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "thing",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "value",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            },
+            {
+              "locations": [],
+              "name": "checks.c",
+              "value": [
+                "\"starts with\" can't take a count of, a sum of or a plus"
+              ]
+            }
+          ],
+          "passed": false,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "thing"
+          }
+        }
+      ],
+      "subjects": {
+        "thing": {
+          "description": "",
+          "from": "things",
+          "identified_by": "id",
+          "parts": {}
+        }
+      }
+    }
+  }
+]

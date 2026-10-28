@@ -111,7 +111,6 @@ pub enum Check {
     HasType(kinds::HasType),
     NonEmptyString(kinds::NonEmptyString),
     Empty(kinds::Empty),
-    NotYet,
 }
 
 impl Check {
@@ -135,7 +134,7 @@ impl Check {
             Check::NonEmptyString(check) => Some(&check.path),
             Check::Empty(check) => Some(&check.path),
             Check::Tally(check) => check.paths().into_iter().next(),
-            Check::Walk(_) | Check::For(_) | Check::AnyOf(_) | Check::NotYet => None,
+            Check::Walk(_) | Check::For(_) | Check::AnyOf(_) => None,
         }
     }
 
@@ -166,7 +165,7 @@ impl Check {
             Check::HasType(check) => vec![&check.path],
             Check::NonEmptyString(check) => vec![&check.path],
             Check::Empty(check) => vec![&check.path],
-            Check::Walk(_) | Check::For(_) | Check::NotYet => Vec::new(),
+            Check::Walk(_) | Check::For(_) => Vec::new(),
         }
     }
 
@@ -213,9 +212,7 @@ impl Check {
                 path: left,
                 ..check.clone()
             }),
-            Check::Tally(_) | Check::Walk(_) | Check::For(_) | Check::AnyOf(_) | Check::NotYet => {
-                self.clone()
-            }
+            Check::Tally(_) | Check::Walk(_) | Check::For(_) | Check::AnyOf(_) => self.clone(),
         }
     }
 
@@ -236,7 +233,6 @@ impl Check {
             Check::HasType(check) => check.refs(),
             Check::NonEmptyString(check) => check.refs(),
             Check::Empty(check) => check.refs(),
-            Check::NotYet => Vec::new(),
         }
     }
 
@@ -297,10 +293,6 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::HasType(check) => kinds::run_has_type(check, ctx),
         Check::NonEmptyString(check) => kinds::run_non_empty_string(check, ctx),
         Check::Empty(check) => kinds::run_empty(check, ctx),
-        Check::NotYet => Verdict {
-            cause: Cause::Unusable,
-            inputs: Vec::new(),
-        },
     }
 }
 
@@ -358,15 +350,6 @@ mod tests {
             value: json!(1),
         });
         assert!(run(&equals, &ctx(&subject, &input)).passed());
-    }
-
-    #[test]
-    fn a_check_the_engine_cannot_run_yet_fails_as_unusable_and_reads_nothing() {
-        let subject = json!({"x": 1});
-        let input = json!({});
-        let verdict = run(&Check::NotYet, &ctx(&subject, &input));
-        assert_eq!(verdict.cause, Cause::Unusable);
-        assert!(verdict.inputs.is_empty());
     }
 
     #[test]

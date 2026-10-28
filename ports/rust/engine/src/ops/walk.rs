@@ -1161,14 +1161,6 @@ mod tests {
     }
 
     #[test]
-    fn a_check_the_engine_cannot_run_yet_inside_a_walk_fails_every_item_as_unusable() {
-        let walk = every(&["xs", "ok"], vec![], Check::NotYet, false);
-        let out = row(&walk, json!({"xs": [{"ok": true}]}));
-        assert_eq!(out.verdict.cause, Cause::Unusable);
-        assert_eq!(out.failed_items.len(), 1);
-    }
-
-    #[test]
     fn present_inside_a_walk_reads_the_rest_of_the_path_on_each_item() {
         let walk = every(&["xs", "ok"], vec![], present(false), false);
         let out = row(&walk, json!({"xs": [{"ok": 1}, {}]}));

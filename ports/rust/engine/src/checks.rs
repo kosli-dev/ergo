@@ -35,6 +35,7 @@ fn messages(errors: Vec<s::SyntaxError>) -> Vec<String> {
 
 struct Lines {
     trees: Vec<s::Check>,
+    places: Vec<String>,
     ok: bool,
 }
 
@@ -45,6 +46,7 @@ fn read_lines(
     problems: &mut BTreeSet<String>,
 ) -> Lines {
     let mut trees = Vec::new();
+    let mut places = Vec::new();
     let mut ok = true;
     for (at, line) in lines.iter().enumerate() {
         let place = if lines.len() >= 2 {
@@ -54,11 +56,16 @@ fn read_lines(
         };
         match s::parse_check(line) {
             Ok(tree) => {
-                for problem in s::check_problems(&tree, aliases) {
-                    problems.insert(format!("{place}{problem}"));
-                    ok = false;
+                let found = s::check_problems(&tree, aliases);
+                if found.is_empty() {
+                    trees.push(tree);
+                    places.push(place);
+                    continue;
                 }
-                trees.push(tree);
+                ok = false;
+                for problem in found {
+                    problems.insert(format!("{place}{problem}"));
+                }
             }
             Err(errors) => {
                 ok = false;
@@ -68,7 +75,7 @@ fn read_lines(
             }
         }
     }
-    Lines { trees, ok }
+    Lines { trees, places, ok }
 }
 
 fn printed(trees: &[s::Check], aliases: &[&str]) -> String {
@@ -81,18 +88,21 @@ fn printed(trees: &[s::Check], aliases: &[&str]) -> String {
 
 fn lowered_plan(
     trees: &[s::Check],
+    places: &[String],
     scope: &Scope,
     aliases: &[&str],
     problems: &mut BTreeSet<String>,
 ) -> Option<Plan> {
     let mut items = Vec::new();
-    for assertion in trees.iter().flat_map(|tree| &tree.assertions) {
-        match lower::lower_assertion(assertion, scope) {
-            Ok(check) => items.push(Item {
-                text: s::print_assertion(assertion, aliases),
-                check,
-            }),
-            Err(found) => problems.extend(found),
+    for (tree, place) in trees.iter().zip(places) {
+        for assertion in &tree.assertions {
+            match lower::lower_assertion(assertion, scope) {
+                Ok(check) => items.push(Item {
+                    text: s::print_assertion(assertion, aliases),
+                    check,
+                }),
+                Err(found) => problems.extend(found.into_iter().map(|p| format!("{place}{p}"))),
+            }
         }
     }
     let all_of = items.len() > 1;
@@ -117,11 +127,8 @@ fn read_one(
     match &check.form {
         Form::Line(text) => {
             let lines = read_lines(&[text.as_str()], "", &aliases, &mut problems);
-            if !lines.ok {
-                return wrong(problems);
-            }
-            let plan = lowered_plan(&lines.trees, scope, &aliases, &mut problems);
-            if !problems.is_empty() {
+            let plan = lowered_plan(&lines.trees, &lines.places, scope, &aliases, &mut problems);
+            if !lines.ok || !problems.is_empty() {
                 return wrong(problems);
             }
             CheckRead {
@@ -169,13 +176,16 @@ fn read_one(
             }
             let name_refs: Vec<&str> = names.iter().map(String::as_str).collect();
             let parsed = read_lines(&texts, "", &name_refs, &mut problems);
-            if !parsed.ok || !for_ok {
-                return wrong(problems);
-            }
             match for_tree {
                 None => {
-                    let plan = lowered_plan(&parsed.trees, scope, &aliases, &mut problems);
-                    if !problems.is_empty() {
+                    let plan = lowered_plan(
+                        &parsed.trees,
+                        &parsed.places,
+                        scope,
+                        &aliases,
+                        &mut problems,
+                    );
+                    if !parsed.ok || !for_ok || !problems.is_empty() {
                         return wrong(problems);
                     }
                     CheckRead {
@@ -190,12 +200,15 @@ fn read_one(
                         s::print_for(&tree, &aliases),
                         printed(&parsed.trees, &name_refs)
                     );
-                    let assertions: Vec<s::Assertion> = parsed
-                        .trees
-                        .iter()
-                        .flat_map(|tree| tree.assertions.clone())
-                        .collect();
-                    let plan = match lower::lower_for(&tree, &assertions, scope) {
+                    let mut assertions: Vec<s::Assertion> = Vec::new();
+                    let mut places: Vec<String> = Vec::new();
+                    for (tree, place) in parsed.trees.iter().zip(&parsed.places) {
+                        for assertion in &tree.assertions {
+                            assertions.push(assertion.clone());
+                            places.push(place.clone());
+                        }
+                    }
+                    let plan = match lower::lower_for(&tree, &assertions, &places, scope) {
                         Ok(check) => Some(Plan {
                             items: vec![Item {
                                 text: expression.clone(),
@@ -208,8 +221,11 @@ fn read_one(
                             None
                         }
                     };
+                    if !parsed.ok || !for_ok || !problems.is_empty() {
+                        return wrong(problems);
+                    }
                     CheckRead {
-                        plan: if problems.is_empty() { plan } else { None },
+                        plan,
                         expression,
                         problems,
                     }
@@ -235,40 +251,21 @@ fn read_one(
                             &mut problems,
                         );
                         ok &= found.ok;
-                        if found.ok {
-                            let mut option_problems = BTreeSet::new();
-                            let mut checks = Vec::new();
-                            for (at, tree) in found.trees.iter().enumerate() {
-                                let place = if found.trees.len() >= 2 {
-                                    format!("option {option}: line {}: ", at + 1)
-                                } else {
-                                    format!("option {option}: ")
-                                };
-                                match lowered_plan(
-                                    std::slice::from_ref(tree),
-                                    scope,
-                                    &aliases,
-                                    &mut option_problems,
-                                ) {
-                                    Some(plan) => {
-                                        checks.extend(plan.items.into_iter().map(|i| i.check));
-                                    }
-                                    None => ok = false,
-                                }
-                                problems.extend(
-                                    std::mem::take(&mut option_problems)
-                                        .into_iter()
-                                        .map(|problem| format!("{place}{problem}")),
-                                );
-                            }
-                            lowered_options.push(checks);
+                        if let Some(plan) = lowered_plan(
+                            &found.trees,
+                            &found.places,
+                            scope,
+                            &aliases,
+                            &mut problems,
+                        ) {
+                            lowered_options.push(plan.items.into_iter().map(|i| i.check).collect());
                         }
                         parts.push(format!("{option}({})", printed(&found.trees, &aliases)));
                     }
                     _ => ok = false,
                 }
             }
-            if !ok {
+            if !ok || !problems.is_empty() {
                 return wrong(problems);
             }
             let expression = format!("one of: {}", parts.join(" | "));
@@ -282,11 +279,7 @@ fn read_one(
                 all_of: false,
             };
             CheckRead {
-                plan: if problems.is_empty() {
-                    Some(plan)
-                } else {
-                    None
-                },
+                plan: Some(plan),
                 expression,
                 problems,
             }
@@ -534,14 +527,117 @@ mod tests {
     }
 
     #[test]
-    fn a_check_the_engine_cannot_run_yet_still_gets_a_plan_that_fails_as_unusable() {
+    fn a_phrase_that_cannot_take_a_count_or_a_plus_is_written_wrong() {
+        let read = one(json!({"c": "x ends with y plus z"}));
+        assert_eq!(
+            problems(&read),
+            ["\"ends with\" can't take a count of, a sum of or a plus"]
+        );
+        assert!(read.plan.is_none());
+        let read = one(json!({"c": "x does not contain y plus 1"}));
+        assert_eq!(
+            problems(&read),
+            ["\"does not contain\" can't take a count of, a sum of or a plus"]
+        );
+    }
+
+    #[test]
+    fn a_written_wrong_for_check_keeps_its_for_line_in_the_expression() {
+        let read =
+            one(json!({"c": {"for": "every xs as  zz", "assert": ["zz.a is 1e2", "zz.b is \"a"]}}));
+        assert_eq!(
+            read.expression,
+            "for every xs as  zz: zz.a is 1e2 and zz.b is \"a"
+        );
+        let read = one(
+            json!({"c": {"for": "every xs as zz", "assert": ["zz.a is 1e2", "zz.b ends with y plus 1"]}}),
+        );
+        assert_eq!(
+            read.expression,
+            "for every xs as zz: zz.a is 1e2 and zz.b ends with y plus 1"
+        );
+        assert_eq!(
+            problems(&read),
+            ["line 2: \"ends with\" can't take a count of, a sum of or a plus"]
+        );
+    }
+
+    #[test]
+    fn a_written_wrong_any_of_prints_each_option_as_written() {
+        let read =
+            one(json!({"c": {"any_of": {"a": "x is   1e2", "b": ["y ends with z plus 1"]}}}));
+        assert_eq!(
+            read.expression,
+            "one of: a(x is   1e2) | b(y ends with z plus 1)"
+        );
+        assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn an_option_with_a_syntax_problem_on_one_line_and_a_lowering_problem_on_another_lists_both() {
+        let read = one(json!({"c": {"any_of": {"a": ["x is \"a", "y ends with z plus 1"]}}}));
+        assert_eq!(
+            problems(&read),
+            [
+                "option a: line 1: unclosed quote at column 6",
+                "option a: line 2: \"ends with\" can't take a count of, a sum of or a plus"
+            ]
+        );
+    }
+
+    #[test]
+    fn a_line_with_a_syntax_problem_is_not_lowered() {
+        let read = one(json!({"c": "every xs.y contains count of zs"}));
+        assert_eq!(
+            problems(&read),
+            [
+                "\"contains\" after every or some would check each item of the last list, not the list: put the walk on a for line"
+            ]
+        );
+    }
+
+    #[test]
+    fn a_problem_found_while_lowering_one_of_several_lines_names_the_line() {
+        let read = one(json!({"c": {"assert": ["x exists", "y starts with z plus 1"]}}));
+        assert_eq!(
+            problems(&read),
+            ["line 2: \"starts with\" can't take a count of, a sum of or a plus"]
+        );
+    }
+
+    #[test]
+    fn a_for_line_whose_with_a_phrase_that_cannot_take_a_count_is_written_wrong() {
+        let read = one(json!({"c": {
+            "for": "every xs whose k starts with count of ys as x",
+            "assert": ["x exists"]
+        }}));
+        assert_eq!(
+            problems(&read),
+            ["\"starts with\" can't take a count of, a sum of or a plus"]
+        );
+        assert!(read.plan.is_none());
+        assert_eq!(
+            read.expression,
+            "for every xs whose k starts with count of ys as x: x exists"
+        );
+    }
+
+    #[test]
+    fn a_count_or_a_plus_after_every_or_some_is_written_wrong() {
+        let read = one(json!({"c": "every xs.y is less than k plus 1"}));
+        assert_eq!(
+            problems(&read),
+            ["count of, sum of and plus after every or some aren't supported yet"]
+        );
         let read = one(json!({"c": "every xs.y starts with count of zs"}));
-        let plan = read.plan.unwrap();
-        assert!(matches!(plan.items[0].check, Check::NotYet));
-        let read = one(json!({"c": "x starts with count of ys and y exists"}));
-        let plan = read.plan.unwrap();
-        assert!(matches!(plan.items[0].check, Check::NotYet));
-        assert!(matches!(plan.items[1].check, Check::Present(_)));
+        assert_eq!(
+            problems(&read),
+            [
+                "\"starts with\" can't take a count of, a sum of or a plus",
+                "count of, sum of and plus after every or some aren't supported yet"
+            ]
+        );
+        assert!(read.plan.is_none());
     }
 
     #[test]

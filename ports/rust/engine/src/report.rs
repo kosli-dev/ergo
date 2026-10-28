@@ -191,11 +191,17 @@ fn written_line(line: &Option<String>) -> String {
 pub fn written_expression(check: &Check) -> String {
     match &check.form {
         Form::Line(text) => text.trim().to_string(),
-        Form::Assert { lines, .. } => lines
-            .iter()
-            .map(written_line)
-            .collect::<Vec<_>>()
-            .join(" and "),
+        Form::Assert { lines, for_line } => {
+            let body = lines
+                .iter()
+                .map(written_line)
+                .collect::<Vec<_>>()
+                .join(" and ");
+            match for_line {
+                Some(text) => format!("for {}: {body}", text.trim()),
+                None => body,
+            }
+        }
         Form::MissingAssert => "<missing assert>".to_string(),
         Form::Invalid => "<invalid check>".to_string(),
         Form::AnyOf(None) => "<invalid any_of>".to_string(),
