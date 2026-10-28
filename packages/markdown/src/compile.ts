@@ -1,4 +1,4 @@
-import type {List, ListItem, Paragraph, PhrasingContent, Root, RootContent} from "mdast";
+import type {List, ListItem, Nodes, Paragraph, PhrasingContent, Root, RootContent} from "mdast";
 import {fromMarkdown} from "mdast-util-from-markdown";
 import {frontmatterFromMarkdown} from "mdast-util-frontmatter";
 import {toString} from "mdast-util-to-string";
@@ -48,6 +48,8 @@ const FIELD_KEYS = {
   requirement: ["subject", "require", "min_subjects"],
 } as const;
 
+const FIELD_START = /^(from|identified by|subject|require|min subjects)(?![\p{L}\p{N}_])/u;
+
 const FIELD_MESSAGE = {
   subject: (key: string) => `a subject's fields are from and identified by, not "${key}"`,
   requirement: (key: string) =>
@@ -88,6 +90,23 @@ function readField(li: ListItem): {key: string; value: string; line: number} | n
   return {key, value: code.value, line: startOf(li)};
 }
 
+function looksLikeField(li: ListItem): boolean {
+  const first = li.children[0];
+  return readField(li) !== null || (first?.type === "paragraph" && FIELD_START.test(toString(first).trim()));
+}
+
+function looksLikeCheck(li: ListItem): boolean {
+  const first = li.children[0];
+  if (first?.type !== "paragraph") return false;
+  const [label, colon] = first.children;
+  return (
+    label?.type === "strong" &&
+    colon?.type === "text" &&
+    colon.value.startsWith(":") &&
+    first.children.some((node) => node.type === "inlineCode")
+  );
+}
+
 function scan(nodes: PhrasingContent[]): {before: PhrasingContent[]; spans: Span[]; stray?: PhrasingContent} {
   const first = nodes.findIndex((node) => node.type === "inlineCode");
   const before = first < 0 ? nodes : nodes.slice(0, first);
@@ -104,6 +123,7 @@ export function compile(markdown: string): Compiled {
   const root = parse(markdown);
   const problems: Problem[] = [];
   const blocks: Block[] = [];
+  const placed = new Set<ListItem>();
   const problem = (line: number, message: string) => problems.push({line, message});
   const block = (kind: BlockKind, node: RootContent | ListItem, name?: string, end?: number) =>
     blocks.push({
@@ -204,6 +224,7 @@ export function compile(markdown: string): Compiled {
   };
 
   const readCheck = (li: ListItem, checks: Map<string, Record<string, unknown>>, lines: Map<string, number>) => {
+    placed.add(li);
     const label = readLabel(li, "a check needs a bold label");
     block("check", li, label?.name);
     if (label === null) return;
@@ -247,6 +268,7 @@ export function compile(markdown: string): Compiled {
 
   const readFields = (list: List, current: Item) => {
     for (const li of list.children) {
+      placed.add(li);
       const field = readField(li);
       block("field", li, field?.key);
       if (field === null) {
@@ -364,7 +386,7 @@ export function compile(markdown: string): Compiled {
     titleOpen = false;
     if (item) item.descriptionOpen = false;
 
-    if (node.type === "list" && item && node.children.some((li) => readField(li) !== null)) {
+    if (node.type === "list" && item && node.children.some(looksLikeField)) {
       readFields(node, item);
       continue;
     }
@@ -376,6 +398,13 @@ export function compile(markdown: string): Compiled {
     }
     block("prose", node);
   }
+
+  const unplaced = (node: Nodes) => {
+    if (node.type === "listItem" && placed.has(node)) return;
+    if (node.type === "listItem" && looksLikeCheck(node)) problem(startOf(node), "a check goes in the list right after Checks:");
+    if ("children" in node) for (const child of node.children) unplaced(child);
+  };
+  unplaced(root);
 
   problems.sort((a, b) => a.line - b.line);
 

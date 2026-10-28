@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import {execFileSync, spawnSync} from "node:child_process";
+import {mkdtempSync, rmSync, writeFileSync} from "node:fs";
+import {tmpdir} from "node:os";
+import {join} from "node:path";
 import {test} from "node:test";
 import {parse} from "yaml";
 import {main} from "../src/cli.ts";
@@ -85,11 +88,18 @@ test("a thrown value that is not an error is still reported", () => {
 
 test("the command line entry point runs the real program", () => {
   const file = new URL("../src/cli.ts", import.meta.url).pathname;
-  const bad = spawnSync("node", [file, "check", "/dev/stdin"], {input: "# A\n\n# B\n", encoding: "utf8"});
-  assert.equal(bad.status, 1);
-  assert.equal(bad.stderr, "/dev/stdin:3: a policy has one # title\n");
-  const usage = spawnSync("node", [file], {encoding: "utf8"});
-  assert.equal(usage.status, 2);
-  const out = execFileSync("node", [file, "compile", "/dev/stdin"], {input: CAKE, encoding: "utf8"});
-  assert.deepEqual(parse(out), CAKE_POLICY);
+  const dir = mkdtempSync(join(tmpdir(), "ergo-markdown-"));
+  try {
+    writeFileSync(join(dir, "bad.ergo.md"), "# A\n\n# B\n");
+    writeFileSync(join(dir, "cake.ergo.md"), CAKE);
+    const bad = spawnSync("node", [file, "check", "bad.ergo.md"], {cwd: dir, encoding: "utf8"});
+    assert.equal(bad.status, 1);
+    assert.equal(bad.stderr, "bad.ergo.md:3: a policy has one # title\n");
+    const usage = spawnSync("node", [file], {encoding: "utf8"});
+    assert.equal(usage.status, 2);
+    const out = execFileSync("node", [file, "compile", "cake.ergo.md"], {cwd: dir, encoding: "utf8"});
+    assert.deepEqual(parse(out), CAKE_POLICY);
+  } finally {
+    rmSync(dir, {recursive: true, force: true});
+  }
 });

@@ -248,6 +248,20 @@ test("a list in an item with no field in it is prose", () => {
   assert.deepEqual(blocks.at(-1), {kind: "prose", startLine: 7, endLine: 8});
 });
 
+test("a bullet in an item that starts with a field's name is a field even when written wrong", () => {
+  assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- from batches\n"), [{line: 5, message: "a field is written as key: `value`"}]);
+  assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- identified by `id`\n"), [{line: 5, message: "a field is written as key: `value`"}]);
+  assert.deepEqual(problemsOf(inRequirement("- min subjects 2\n- subject\n- require: every")), [
+    {line: 5, message: "a field is written as key: `value`"},
+    {line: 6, message: "a field is written as key: `value`"},
+    {line: 7, message: "a field is written as key: `value`"},
+  ]);
+});
+
+test("a bullet in an item that only starts like a field's name is prose", () => {
+  assert.deepEqual(problemsOf(inRequirement("- fromage is a cheese\n- subjects of the crown\n- required reading")), []);
+});
+
 test("a field item that is not a paragraph or has no key is a problem", () => {
   assert.deepEqual(messages("## Subjects\n\n### a\n\n- from: `x`\n- ```\n  x\n  ```\n- `x`\n- : `x`\n- text `x`\n"), [
     "a field is written as key: `value`",
@@ -325,12 +339,14 @@ test("a second Checks without a list says it needs a list", () => {
   assert.deepEqual(messages(inChecks("- **A**: `x`\n\nChecks:\n")), ["Checks: must be followed by a list"]);
 });
 
-test("Checks in a subject, under the title or under another section is prose", () => {
+test("Checks in a subject or under the title is prose, and its checks are problems", () => {
   assert.deepEqual(compile("## Subjects\n\n### a\n\nChecks:\n\n- from: `x`\n").policy, {
     subjects: {a: {from: "x"}},
     requirements: {},
   });
-  assert.deepEqual(problemsOf("# T\n\nChecks:\n\n- **A**: `x`\n"), []);
+  assert.deepEqual(problemsOf("# T\n\nChecks:\n\n- **A**: `x`\n"), [
+    {line: 5, message: "a check goes in the list right after Checks:"},
+  ]);
 });
 
 test("Checks in a requirement is a field block named checks, even when it is a problem", () => {
@@ -338,6 +354,31 @@ test("Checks in a requirement is a field block named checks, even when it is a p
   assert.deepEqual(blocks(inChecks("- **A**: `x`")), [5]);
   assert.deepEqual(blocks(inRequirement("Checks:\n\nWords.")), [5]);
   assert.deepEqual(blocks("## Subjects\n\n### a\n\nChecks:\n"), []);
+});
+
+test("a check after a paragraph that ends the Checks list is a problem", () => {
+  assert.deepEqual(problemsOf(inChecks("- **A**: `x`\n\nWhy.\n\n- **B**: `y`\n- **C**: Words `z`")), [
+    {line: 11, message: "a check goes in the list right after Checks:"},
+    {line: 12, message: "a check goes in the list right after Checks:"},
+  ]);
+});
+
+test("a check in a subject, under the title, under another section or in a quote is a problem", () => {
+  const message = "a check goes in the list right after Checks:";
+  assert.deepEqual(problemsOf("## Subjects\n\n### a\n\n- **A**: `x`\n"), [{line: 5, message}]);
+  assert.deepEqual(problemsOf("# T\n\n- **A**: `x`\n"), [{line: 3, message}]);
+  assert.deepEqual(problemsOf("## Notes\n\n> - **A**: `x`\n"), [{line: 3, message}]);
+  assert.deepEqual(problemsOf(inRequirement("Check:\n\n- **A**: `x`")), [{line: 7, message}]);
+});
+
+test("a bullet with a bold label but no code span, or no colon, is prose outside Checks", () => {
+  assert.deepEqual(problemsOf("# T\n\n- **Note**: words only\n- **Note** `x`\n- `x`\n\n1. text\n"), []);
+});
+
+test("an item already reported inside a check is not reported again", () => {
+  assert.deepEqual(messages(inChecks("- **A**: `x`\n\n  > - **O**: `y`")), [
+    "a check's sentences go in code spans, with nothing else after the first one",
+  ]);
 });
 
 test("Checks does not count as the description of a requirement", () => {

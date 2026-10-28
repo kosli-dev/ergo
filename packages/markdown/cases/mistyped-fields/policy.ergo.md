@@ -1,0 +1,29 @@
+---
+ergo_spec: v0.2
+---
+
+# Cake batches
+
+## Subjects
+
+### batch
+
+- from batches
+
+### oven
+
+- from: `ovens`
+
+Each oven has a serial number.
+
+- identified by `serial`
+
+## Requirements
+
+### Cake batch
+
+- subject: `batch`
+
+Checks:
+
+- **Nut free**: `allergens does not contain "nuts"`

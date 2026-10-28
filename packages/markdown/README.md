@@ -100,7 +100,7 @@ Each `###` under `## Subjects` is a subject, and each `###` under `## Requiremen
 | `identified by: ...` | `require: ...`        |
 |                      | `min subjects: ...`   |
 
-`min subjects` is a number, still in a code span: ``min subjects: `1` ``. The [reference](../../REFERENCE.md) says what each field does.
+`min subjects` is a number, still in a code span: ``min subjects: `1` ``. The [reference](../../REFERENCE.md) says what each field does. A bullet that starts with a field's name but isn't written this way, like `- from batches`, is a problem, so a field can't go missing unnoticed.
 
 ### Names
 
@@ -120,6 +120,8 @@ After a paragraph that says `Checks:`, each item of the list is a check: a bold 
 - **Approved**: `approved_by is a non-empty string`
 ```
 
+A check anywhere else, like after a paragraph that ends the list, is a problem, so no check drops out of the policy unnoticed.
+
 A code span that starts with `for ` is the check's `for` line, which names the items of a list so its sentences can read each one ([reference](../../REFERENCE.md#checks)):
 
 ```markdown
@@ -128,6 +130,8 @@ A code span that starts with `for ` is the check's `for` line, which names the i
   `approver.state is "APPROVED"`
   `approver.username does not equal pr.author`
 ```
+
+So a sentence that reads a field named `for` puts a dot in front of it: `.for is 1`.
 
 ### Options
 
