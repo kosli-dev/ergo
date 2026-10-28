@@ -2,7 +2,7 @@
   {
     "description": "a subject whose from is a path in a string",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployment": {
           "from": "data.deployments",
@@ -235,7 +235,7 @@
   {
     "description": "a subject whose id is a dotted string",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployment": {
           "from": "deployments",
@@ -510,7 +510,7 @@
   {
     "description": "a subject whose id is a plain key in a string",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployment": {
           "from": "deployments",
@@ -629,7 +629,7 @@
   {
     "description": "a from line with whose and two conditions",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployment": {
           "from": "deployments whose environment is \"prod\" and change_type is \"emergency\"",
@@ -1232,7 +1232,7 @@
   {
     "description": "a from line with its conditions in the other order",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployment": {
           "from": "deployments whose change_type is \"emergency\" and environment is \"prod\"",
@@ -1385,7 +1385,7 @@
   {
     "description": "a condition with count of",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "pr": {
           "from": "pulls whose count of reviews is at least 1",
@@ -1685,7 +1685,7 @@
   {
     "description": "a condition with some",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases whose some files.path does not match \"^docs/\"",
@@ -2194,7 +2194,7 @@
   {
     "description": "a condition with every",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases whose every files.path matches \"^docs/\"",
@@ -2685,7 +2685,7 @@
   {
     "description": "a condition with every and if any",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases whose every files.path, if any, matches \"^docs/\"",
@@ -3092,7 +3092,7 @@
   {
     "description": "a condition with some after another condition",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases whose ticket is \"ok\" and some files.path does not match \"^docs/\"",
@@ -3341,7 +3341,7 @@
   {
     "description": "a condition with some in the from line of a child subject",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -3574,7 +3574,7 @@
   {
     "description": "a condition with some in a from line with every",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "every artifacts.releases whose some files.path does not match \"^docs/\"",
@@ -3813,7 +3813,7 @@
   {
     "description": "a condition with some in the from line of a subject that narrows another",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "releases": {
           "from": "releases",
@@ -4013,7 +4013,7 @@
   {
     "description": "a condition with some with if any",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases whose some files.path, if any, matches \"x\""
@@ -4091,7 +4091,7 @@
   {
     "description": "a condition with some with a whose of its own",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases whose some files whose kind is \"src\" matches \"x\""
@@ -4169,7 +4169,7 @@
   {
     "description": "a condition with a count of with a whose of its own",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases whose count of files whose path is \"x\" is at least 1"
@@ -4247,7 +4247,7 @@
   {
     "description": "a from line with named by a param",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "artifacts named by $params.name",
@@ -4456,7 +4456,7 @@
   {
     "description": "a from line with named by each of a param list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "scan": {
           "from": "scans named by each of $params.required",
@@ -4606,9 +4606,594 @@
     ]
   },
   {
+    "description": "a from line with named by each of, when the object it names keys of can't be read",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "required": [
+        "sast"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as absent when the object is missing, and still makes a subject of each key, so the requirement can't be met",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {},
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as null when the object is null, and still makes a subject of each key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "path.null"
+        ],
+        "input": {
+          "scans": null
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the object is a list, and still makes a subject of each key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {
+          "scans": [
+            {
+              "name": "sast"
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the object is a string, and still makes a subject of each key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {
+          "scans": "sast"
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the object is a number, and still makes a subject of each key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {
+          "scans": 5
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope scan count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "id": "sast",
+              "type": "scan"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a list that holds a key that isn't a string",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "required": [
+        "sast",
+        1
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable and makes no subject, even when the object has the other keys",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": {
+            "sast": {
+              "name": "sast"
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the object is null too",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": null
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a list that holds null",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "required": [
+        null
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable and makes no subject, because null can't be a key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": {}
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a param that isn't a list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {
+      "required": "sast"
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": {
+            "sast": {
+              "name": "sast"
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a param the params don't have",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by each of $params.required",
+          "identified_by": "name"
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "fails min_subjects as absent",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from",
+          "value.ref"
+        ],
+        "input": {
+          "scans": {
+            "sast": {
+              "name": "sast"
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "scan"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope scan count",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a subject's own name in its own from",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "lockfile": {
           "from": "lockfile whose status is \"COMPLETE\"",
@@ -4777,7 +5362,7 @@
   {
     "description": "a subject with no from",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "identified_by": "id"
@@ -4996,7 +5581,7 @@
   {
     "description": "a subject with nothing under it",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": null
       },
@@ -5229,7 +5814,7 @@
   {
     "description": "a subject with from as an empty list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "$input",
@@ -5358,7 +5943,7 @@
   {
     "description": "a from line that doesn't parse",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployment": {
           "from": "deployments whose environment is \"prod",
@@ -5434,7 +6019,7 @@
   {
     "description": "an id that isn't a path",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployment": {
           "from": "deployments",
@@ -5509,7 +6094,7 @@
   },
   {
     "description": "a subject with applies_to",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"deployment": {"from": "deployments", "identified_by": "id", "applies_to": {"f": {"op": "present", "path": ["x"]}}}}, "requirements": {"s": {"subject": "deployment", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"deployment": {"from": "deployments", "identified_by": "id", "applies_to": {"f": {"op": "present", "path": ["x"]}}}}, "requirements": {"s": {"subject": "deployment", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong:  lists applies_to as an unknown field, and the conditions go after whose",
@@ -5525,7 +6110,7 @@
   {
     "description": "a subject that goes on into another subject",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "artifacts",
@@ -5983,7 +6568,7 @@
   {
     "description": "a subject that goes on into one of several subjects that its own conditions pick",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "artifacts whose environment is \"prod\"",
@@ -6663,7 +7248,7 @@
   {
     "description": "a from line whose condition reads the parent subject by its name",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6999,7 +7584,7 @@
   {
     "description": "a from line whose condition has the parent subject's name on its left",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7216,7 +7801,7 @@
   {
     "description": "a chain of three subjects",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "artifacts whose env is \"prod\"",
@@ -7870,7 +8455,7 @@
   {
     "description": "a chain of four subjects",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "artifacts whose env is \"prod\"",
@@ -7956,7 +8541,7 @@
   {
     "description": "a from line with every",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "pull request": {
           "from": "every artifacts.pull_requests",
@@ -8608,7 +9193,7 @@
   {
     "description": "a from line with every that starts at another subject",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "artifacts",
@@ -8692,7 +9277,7 @@
   {
     "description": "a from line with every and named by each of",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "scan": {
           "from": "every artifacts.attestations named by each of $params.scans"
@@ -8775,7 +9360,7 @@
   {
     "description": "a subject that narrows another",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "defect": {
           "from": "defects whose status exists",
@@ -9031,7 +9616,7 @@
   {
     "description": "a subject that narrows one whose name has a space",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "defect": {
           "from": "defects",
@@ -9275,7 +9860,7 @@
   {
     "description": "subjects that narrow each other",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "x": {
           "from": "y whose id exists"
@@ -9377,7 +9962,7 @@
   {
     "description": "a subject that narrows another and has its own identified_by",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "defect": {
           "from": "defects",
@@ -9467,7 +10052,7 @@
   {
     "description": "a from line whose condition is written wrong",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "b": {
           "from": "things whose x is one of 1, \"a\" and y exists"
@@ -9546,7 +10131,7 @@
   {
     "description": "a from line that reads a key named by a param before naming each subject",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "setting": {
           "from": "settings named by $params.group named by each of $params.names"
@@ -9709,7 +10294,7 @@
   {
     "description": "the report lists the subjects the requirements use",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployment": {
           "from": "  deployments   whose environment is \"prod\" ",
@@ -9773,7 +10358,7 @@
   {
     "description": "a subject that narrows another",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -9824,7 +10409,7 @@
   {
     "description": "a subject read from another subject",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -9872,7 +10457,7 @@
   {
     "description": "a subject with no from and no identified_by",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployments": {}
       },
@@ -9907,7 +10492,7 @@
   {
     "description": "a subject written wrong",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "broken": {
           "from": "deployments whose",
@@ -9945,7 +10530,7 @@
   {
     "description": "a requirement with no subject, or one that isn't there",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "deployment": {
           "from": "deployments"
@@ -9987,7 +10572,7 @@
   },
   {
     "description": "a subject with from and identified_by written as lists",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": ["things"], "identified_by": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, finds no subjects, and $well_formed lists both fields as not a string",
@@ -10003,7 +10588,7 @@
   {
     "description": "a from line that narrows a subject whose name is blank",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         " ": {
           "from": "things",
@@ -10102,7 +10687,7 @@
   {
     "description": "a from line that reads a child subject of a subject whose name is blank",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         " ": {
           "from": "things",
@@ -10206,7 +10791,7 @@
   {
     "description": "child subjects that read each other",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "b": {
           "from": "kid.x"
@@ -10300,7 +10885,7 @@
   {
     "description": "three child subjects that read each other in a ring",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "p": {
           "from": "q.x"
@@ -10403,7 +10988,7 @@
   {
     "description": "a child subject of a subject that narrows it",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "b": {
           "from": "kid"
@@ -10497,7 +11082,7 @@
   {
     "description": "a child subject whose check reads its parent with named by on its right side",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "t": {
           "from": "ts",
@@ -10659,7 +11244,7 @@
   {
     "description": "a subject that narrows a subject in a loop",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "pa": {
           "from": "pb"
@@ -10766,7 +11351,7 @@
   {
     "description": "a child subject of a subject in a loop",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "pa": {
           "from": "pb.x"
@@ -10866,7 +11451,7 @@
   },
   {
     "description": "a subject read from the values of an object",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"scan": {"from": "scans named by each of $params.required", "identified_by": "name"}}, "requirements": {"s": {"subject": "scan", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"scan": {"from": "scans named by each of $params.required", "identified_by": "name"}}, "requirements": {"s": {"subject": "scan", "checks": {"c": "x exists"}}}},
     "params": {"required": ["sast", "sca/x", "secrets"]},
     "cases": [
       {
@@ -10883,7 +11468,7 @@
   },
   {
     "description": "a child subject",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}, "requirements": {"s": {"subject": "pull request", "checks": {"c": "url exists and artifact.fingerprint exists and by exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"artifact": {"from": "trail.artifacts", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}, "requirements": {"s": {"subject": "pull request", "checks": {"c": "url exists and artifact.fingerprint exists and by exists"}}}},
     "cases": [
       {
         "description": "starts a child at its parent's location, and a path through the parent's name at the parent's",
@@ -10899,7 +11484,7 @@
   },
   {
     "description": "a subject read with every",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"item": {"from": "every things.xs", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"item": {"from": "every things.xs", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "starts each subject where the walk found it",
@@ -10914,7 +11499,7 @@
   },
   {
     "description": "a from line with two conditions on one field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things whose state is \"live\" and state is not \"old\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things whose state is \"live\" and state is not \"old\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "lists the field once in the $applies row, with its location",
@@ -10930,7 +11515,7 @@
   },
   {
     "description": "a $min_subjects row counting subjects",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things whose state is \"live\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things whose state is \"live\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "lists the location of each subject it counts, in the order of the rows",
@@ -10958,7 +11543,7 @@
   },
   {
     "description": "a $unique_ids row with repeated ids",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "lists the location of the id of every subject that shares one, ordered by id, then by subject",
@@ -10990,7 +11575,7 @@
   },
   {
     "description": "a $well_formed row",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "has inputs with no locations, because they read the policy",
@@ -11005,7 +11590,7 @@
   },
   {
     "description": "a $well_formed row that lists a problem",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "require": "most", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "require": "most", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "has no locations for the problem either",
@@ -11019,7 +11604,7 @@
   },
   {
     "description": "a from line with every where a list can't be read",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"pull request": {"from": "every artifacts.pull_requests", "identified_by": "url"}}, "requirements": {"r": {"subject": "pull request", "checks": {"c": "approvals is at least 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"pull request": {"from": "every artifacts.pull_requests", "identified_by": "url"}}, "requirements": {"r": {"subject": "pull request", "checks": {"c": "approvals is at least 1"}}}},
     "cases": [
       {
         "description": "gives each failed item of the $min_subjects row the location where its read stopped",
@@ -11034,7 +11619,7 @@
   },
   {
     "description": "a child subject that reads its parent and itself under the same name",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "b.x is 1 and .b.x is 1", "d": "b.x is 1 and b.x is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "b.x is 1 and .b.x is 1", "d": "b.x is 1 and b.x is 1"}}}},
     "cases": [
       {
         "description": "lists each read once when it reads one place, and twice when two places print the same name and value",
@@ -11049,7 +11634,7 @@
   },
   {
     "description": "a from line with a some or every condition that fails on some items",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases whose some files.path does not match \"^docs/\"", "identified_by": "id"}, "module": {"from": "modules whose every files.path matches \"^docs/\"", "identified_by": "id"}}, "requirements": {"r": {"subject": "release", "checks": {"c": "id exists"}}, "m": {"subject": "module", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases whose some files.path does not match \"^docs/\"", "identified_by": "id"}, "module": {"from": "modules whose every files.path matches \"^docs/\"", "identified_by": "id"}}, "requirements": {"r": {"subject": "release", "checks": {"c": "id exists"}}, "m": {"subject": "module", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "gives each failed item of the $applies row the location where its value was read",

@@ -2,6 +2,16 @@
 
 Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](spec/CHANGELOG.md).
 
+## 0.3.0
+
+### Changed
+
+- This version follows spec 0.3, so a policy says `ergo_spec: v0.3`. One that says `v0.2` is written wrong, with `unsupported version v0.2, expected v0.3`, and still works with 0.2.0. The report's `ergo` changes with it, from `"ergo": "v0.2"` to `"ergo": "v0.3"`.
+
+### Fixed
+
+- A `from` line with `named by each of` fails `$min_subjects` when the object it reads the keys from is missing, `null` or not an object, as `absent`, `null` or `unusable`, so the requirement isn't met. Each listed key is still a subject and gets its rows, as before. A key that isn't a string makes no subjects and fails `$min_subjects` as `unusable`. Before, `from: scans named by each of $params.required` on an input without `scans` gave one subject per key, so a check like `x does not exist` passed for each and the policy was compliant.
+
 ## 0.2.0
 
 ### New

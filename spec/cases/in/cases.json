@@ -1,7 +1,7 @@
 [
   {
     "description": "in a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"b\", \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"b\", \"a\""}}}},
     "cases": [
       {
         "description": "passes when the field is one of the values",
@@ -34,7 +34,7 @@
   },
   {
     "description": "in a list of numbers",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1, 2"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1, 2"}}}},
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
@@ -56,7 +56,7 @@
   },
   {
     "description": "in a list holding null",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", null"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", null"}}}},
     "cases": [
       {
         "description": "fails as absent on a missing field",
@@ -86,7 +86,7 @@
   },
   {
     "description": "in values read through a ref",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
     "params": {"allowed": ["a", "b"]},
     "cases": [
       {
@@ -102,7 +102,7 @@
   },
   {
     "description": "in values read through a ref that isn't a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
     "params": {"allowed": "a"},
     "cases": [
       {
@@ -117,7 +117,7 @@
   },
   {
     "description": "in values read through a ref that holds values of mixed types",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
     "params": {"allowed": ["a", 1]},
     "cases": [
       {
@@ -133,7 +133,7 @@
   },
   {
     "description": "is not one of a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not one of \"prod\", \"staging\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not one of \"prod\", \"staging\""}}}},
     "cases": [
       {
         "description": "passes on a string that is none of them, fails as value on one of them, and fails as unusable on another type",
@@ -149,7 +149,7 @@
   },
   {
     "description": "in values read through a ref that holds an object like a ref",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
     "params": {"allowed": [{"ref": ["q"]}]},
     "cases": [
       {
@@ -164,7 +164,7 @@
   },
   {
     "description": "a list read through a ref",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.allowed"}}}},
     "params": {"allowed": ["p", "q"]},
     "cases": [
       {

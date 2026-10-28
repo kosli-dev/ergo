@@ -2,6 +2,16 @@
 
 Each version says whether reports changed, so that anyone who only stores reports knows when to look.
 
+## 0.3
+
+### Changed
+
+- A policy says `ergo_spec: v0.3`, and the report's `ergo` changes from `"ergo": "v0.2"` to `"ergo": "v0.3"`. A policy that says `v0.2` is written wrong, with `unsupported version v0.2, expected v0.3`. The schemas are under `https://ergo.kosli.com/spec/0.3/`.
+
+### Fixed
+
+- A `from` line with `named by each of` fails `$min_subjects` when the path before it doesn't lead to an object, as [subjects.sentence](semantics.md#requirements) now says: as `absent` or `null` when the object is missing or `null`, and as `unusable` when it's a list, a string or a number. Each listed key is still a subject, as before, so its checks still show what's missing, but the requirement is never met. A list of keys that holds anything but strings makes no subjects and fails `$min_subjects` as `unusable`. The spec didn't say, and `ergo.rego` met the requirement whenever every check passed, so with `from: scans named by each of $params.required` and no `scans` in the input, `x does not exist` passed for every key and the policy was compliant. Reports change for such inputs: `$min_subjects` fails and the requirement is `not_met`.
+
 ## 0.2
 
 ### New
