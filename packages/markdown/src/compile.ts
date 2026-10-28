@@ -65,9 +65,9 @@ const endOf = (node: {position?: {end: {line: number}}}): number => node.positio
 
 const collapse = (text: string): string => text.replace(/\s+/g, " ").trim();
 
-const nameOf = (text: string): string => collapse(text).toLowerCase();
+export const nameOf = (text: string): string => collapse(text).toLowerCase();
 
-const nameProblem = (name: string): string | null =>
+export const nameProblem = (name: string): string | null =>
   name === "" ? NO_LABEL : name.startsWith("$") ? "a name can't start with $" : null;
 
 const plain = (nodes: PhrasingContent[]): string =>
