@@ -54,6 +54,10 @@ button { font:inherit; color:inherit; cursor:pointer; }
   border-bottom:1px solid var(--hairline); background:var(--sunk); font-size:.66rem; font-weight:600;
   letter-spacing:.11em; text-transform:uppercase; color:var(--faint); overflow-x:auto; }
 .spacer { margin-left:auto; }
+.tablist { display:flex; gap:.9rem; }
+.tools { display:flex; align-items:center; }
+.cursor { text-transform:none; letter-spacing:0; font-weight:400; font-family:var(--mono); white-space:nowrap; }
+.body { flex:1; display:flex; flex-direction:column; min-height:0; min-width:0; }
 .tab { background:none; border:0; padding:.15rem .1rem; font:inherit; font-size:.66rem; font-weight:600;
   letter-spacing:.11em; text-transform:uppercase; color:var(--faint); border-bottom:2px solid transparent; }
 .tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--check); }
@@ -100,7 +104,7 @@ textarea:focus { outline:none; }
 .diag:first-child { border-top:0; }
 .diag.done { background:var(--good-wash); }
 .diag.done .where { color:var(--good); }
-.yamlpane { height:100%; display:flex; flex-direction:column; }
+.yamlpane { flex:1; min-height:0; display:flex; flex-direction:column; }
 .yamlpane .field { flex:1; min-height:0; }
 .diag .where { font-family:var(--mono); font-size:.7rem; font-weight:600; color:var(--bad); }
 .panel { flex:1; overflow:auto; min-height:0; position:relative; }
@@ -211,31 +215,27 @@ textarea:focus { outline:none; }
 </div>
 
 <div class="work">
-  <div class="side">
-    <header><span>policy.ergo.md</span><span class="spacer"></span>
-      <span id="cursor" style="text-transform:none;letter-spacing:0;font-weight:400;font-family:var(--mono)"></span></header>
-    <div class="editor">
-      <div class="gutter" id="gutter" aria-hidden="true"></div>
-      <div class="field">
-        <div class="bandwrap"><div class="bands" id="bands"></div></div>
-        <div class="hlwrap" aria-hidden="true"><pre class="hl" id="hl"></pre></div>
-        <textarea id="src" spellcheck="false" aria-label="Policy document"></textarea>
-      </div>
+  <div class="side" id="pane-left">
+    <header><span class="tablist"></span><span class="spacer"></span><span class="tools"></span></header>
+    <div class="body"></div>
+  </div>
+  <div class="side" id="pane-right">
+    <header><span class="tablist"></span><span class="spacer"></span><span class="tools"></span></header>
+    <div class="body"></div>
+  </div>
+</div>
+
+<div hidden>
+  <div class="editor" id="mdview">
+    <div class="gutter" id="gutter" aria-hidden="true"></div>
+    <div class="field">
+      <div class="bandwrap"><div class="bands" id="bands"></div></div>
+      <div class="hlwrap" aria-hidden="true"><pre class="hl" id="hl"></pre></div>
+      <textarea id="src" spellcheck="false" aria-label="Policy document"></textarea>
     </div>
   </div>
-
-  <div class="side">
-    <header>
-      <button class="tab" id="t-blocks" aria-selected="true">Blocks</button>
-      <button class="tab" id="t-policy" aria-selected="false">Policy</button>
-      <button class="tab" id="t-doc" aria-selected="false">Document</button>
-      <button class="tab" id="t-yaml" aria-selected="false">YAML</button>
-      <button class="tab" id="t-report" aria-selected="false">Report</button>
-      <span class="spacer"></span>
-      <button class="ghost" id="copy">Copy YAML</button>
-    </header>
-    <div class="panel" id="panel"></div>
-  </div>
+  <span id="cursor" class="cursor"></span>
+  <button class="ghost" id="copy">Copy YAML</button>
 </div>
 
 <div class="foot">

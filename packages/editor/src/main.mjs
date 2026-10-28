@@ -2,6 +2,8 @@ import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
 import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
+import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
+import { savedEdit, saveEdit, forgetEdit } from "./saved.mjs";
 import { layoutRows, policySheet, yamlText, markOf, parseJson, makeRunner, parseTime, reportTables, plural } from "./lib.mjs";
 
 const { samples, wasm } = window.EDITOR;
@@ -10,13 +12,11 @@ const PAD = 12;
 const $ = (id) => document.getElementById(id);
 const src = $("src");
 const gutter = $("gutter");
-const panel = $("panel");
 const diags = $("diags");
 const bands = $("bands");
 const hl = $("hl");
 
 let current = Object.keys(samples)[0];
-let tab = "blocks";
 let last = null;
 let syncing = false;
 let runner = null;
@@ -24,29 +24,29 @@ let runnerError = "";
 let reportInput = "";
 let reportParams = "";
 
-const store = {
-  get(k) {
-    try {
-      return localStorage.getItem("ergo-editor:" + k);
-    } catch {
-      return null;
-    }
-  },
-  set(k, v) {
-    try {
-      localStorage.setItem("ergo-editor:" + k, v);
-    } catch {
-      return;
-    }
-  },
-  del(k) {
-    try {
-      localStorage.removeItem("ergo-editor:" + k);
-    } catch {
-      return;
-    }
-  },
+const storage = (() => {
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+})();
+const remember = (key, value) => {
+  try {
+    storage.setItem("ergo-editor:" + key, value);
+  } catch {
+    return;
+  }
 };
+const recall = (key) => {
+  try {
+    return storage.getItem("ergo-editor:" + key);
+  } catch {
+    return null;
+  }
+};
+let layout = readLayout(recall("layout"));
+const shows = (view) => layout.left === view || layout.right === view;
 
 const el = (tag, cls, text) => {
   const n = document.createElement(tag);
@@ -134,7 +134,7 @@ const fromYaml = () => {
 const flash = (text) => {
   $("note").textContent = text;
   setTimeout(() => {
-    $("note").textContent = NOTES[tab];
+    $("note").textContent = noteText();
   }, 4000);
 };
 
@@ -142,7 +142,7 @@ const kindClass = (kind) => kind.replace(/ /g, "-");
 const GROUP = { check: "check", option: "check", subject: "declare", requirement: "declare", field: "declare", checks: "declare", prose: "prose" };
 const TAGS = { "front matter": "front matter" };
 
-const viewBlocks = (result) => {
+const viewBlocks = (result, into) => {
   const rows = layoutRows(result, src.value, parseTree(src.value));
   const total = src.value.split("\n").length;
   const map = el("div", "map");
@@ -166,18 +166,18 @@ const viewBlocks = (result) => {
     box.addEventListener("click", () => goto(row.top));
     map.append(box);
   }
-  panel.replaceChildren(map);
-  panel.scrollTop = src.scrollTop;
+  into.replaceChildren(map);
+  if (shows("markdown")) into.scrollTop = src.scrollTop;
 };
 
 const sentenceLines = (sentences, into) => {
   for (const s of sentences) into.append(el("div", "expr", s));
 };
 
-const viewPolicy = (result) => {
+const viewPolicy = (result, into) => {
   const sheet = policySheet(result.policy);
   if (!sheet) {
-    panel.replaceChildren(el("p", "empty", "The policy has problems, so there is nothing to show yet. The problems are listed below the editor."));
+    into.replaceChildren(el("p", "empty", "The policy has problems, so there is nothing to show yet. The problems are listed below the editor."));
     return;
   }
   const spec = el("div", "spec");
@@ -236,7 +236,7 @@ const viewPolicy = (result) => {
     }
     spec.append(card);
   }
-  panel.replaceChildren(spec);
+  into.replaceChildren(spec);
 };
 
 const inline = (nodes, into) => {
@@ -313,7 +313,7 @@ const parseTree = (text) => {
   }
 };
 
-const viewDoc = (result) => {
+const viewDoc = (result, into) => {
   const tree = parseTree(src.value);
   const doc = el("div", "doc");
   for (const node of tree.children) {
@@ -322,7 +322,7 @@ const viewDoc = (result) => {
     if (mark) out.classList.add("mark", "mark-" + mark);
     doc.append(out);
   }
-  panel.replaceChildren(doc.children.length ? doc : el("p", "empty", "Nothing to show yet."));
+  into.replaceChildren(doc.children.length ? doc : el("p", "empty", "Nothing to show yet."));
 };
 
 const viewYaml = (result) => {
@@ -333,7 +333,6 @@ const viewYaml = (result) => {
     clearTimeout(noteTimer);
     showYamlNotes(result.policy ? [] : [{ path: "Markdown", message: "The Markdown has problems, so there is no YAML for it yet." }], []);
   }
-  if (panel.firstChild !== yamlPane) panel.replaceChildren(yamlPane);
 };
 
 const table = (t) => {
@@ -406,7 +405,7 @@ const showReport = (out, result) => {
   out.append(raw);
 };
 
-const viewReport = (result) => {
+const viewReport = (result, into) => {
   const run = el("div", "run");
   const inputLabel = el("label", null, "Input");
   const inputBox = el("textarea");
@@ -432,16 +431,83 @@ const viewReport = (result) => {
   inputBox.addEventListener("input", again);
   paramsBox.addEventListener("input", again);
   run.append(inputLabel, paramsLabel, out);
-  panel.replaceChildren(run);
+  into.replaceChildren(run);
   showReport(out, result);
 };
 
 const NOTES = {
+  markdown: "Write the policy as a document.",
   blocks: "Each block sits next to the lines it came from.",
   policy: "The policy as Ergo reads it, in plain words.",
   doc: "A coloured edge marks text that Ergo acts on.",
   yaml: "Edit the YAML and the Markdown follows. Paste a YAML policy into an empty document to start from it.",
   report: "Runs the policy on the input in your browser.",
+};
+
+const noteText = () => NOTES[layout.right === "markdown" ? layout.left : layout.right];
+
+const mdView = $("mdview");
+const cursor = $("cursor");
+const copy = $("copy");
+const panes = Object.fromEntries(
+  ["left", "right"].map((side) => {
+    const root = $("pane-" + side);
+    const tabs = {};
+    const list = root.querySelector(".tablist");
+    for (const view of VIEWS) {
+      const b = el("button", "tab", LABELS[view]);
+      b.addEventListener("click", () => choose(side, view));
+      tabs[view] = b;
+      list.append(b);
+    }
+    const panel = el("div", "panel");
+    panel.addEventListener("scroll", () => {
+      if (syncing || layout[side] !== "blocks" || !shows("markdown")) return;
+      syncing = true;
+      src.scrollTop = panel.scrollTop;
+      gutter.scrollTop = panel.scrollTop;
+      follow();
+      syncing = false;
+    });
+    return [side, { tabs, panel, body: root.querySelector(".body"), tools: root.querySelector(".tools") }];
+  }),
+);
+
+const place = (into, node) => {
+  if (node.parentNode !== into) into.replaceChildren(node);
+};
+
+const drawPane = (side, result) => {
+  const pane = panes[side];
+  const view = layout[side];
+  for (const [name, b] of Object.entries(pane.tabs)) b.setAttribute("aria-selected", String(name === view));
+  if (view === "markdown") {
+    place(pane.body, mdView);
+    place(pane.tools, cursor);
+    gutter.scrollTop = src.scrollTop;
+    follow();
+    return;
+  }
+  if (view === "yaml") {
+    place(pane.body, yamlPane);
+    place(pane.tools, copy);
+    viewYaml(result);
+    return;
+  }
+  pane.tools.replaceChildren();
+  place(pane.body, pane.panel);
+  if (view === "blocks") viewBlocks(result, pane.panel);
+  else if (view === "policy") viewPolicy(result, pane.panel);
+  else if (view === "doc") viewDoc(result, pane.panel);
+  else viewReport(result, pane.panel);
+};
+
+const choose = (side, view) => {
+  const before = layout;
+  layout = pick(layout, side, view);
+  remember("layout", layoutText(layout));
+  for (const s of ["left", "right"]) if (layout[s] !== before[s]) panes[s].panel.scrollTop = 0;
+  if (last) render(last);
 };
 
 const render = (result) => {
@@ -482,15 +548,13 @@ const render = (result) => {
     }),
   );
 
-  $("note").textContent = NOTES[tab];
-  if (tab === "blocks") viewBlocks(result);
-  else if (tab === "policy") viewPolicy(result);
-  else if (tab === "doc") viewDoc(result);
-  else if (tab === "yaml") viewYaml(result);
-  else viewReport(result);
+  $("note").textContent = noteText();
+  drawPane("left", result);
+  drawPane("right", result);
 };
 
 const goto = (line) => {
+  if (!shows("markdown")) choose(layout.left === "blocks" ? "right" : "left", "markdown");
   src.scrollTop = Math.max(0, (line - 1) * LH - 60);
   src.focus();
   const pos = src.value.split("\n").slice(0, line - 1).join("\n").length + (line > 1 ? 1 : 0);
@@ -510,7 +574,7 @@ const recompile = () => {
     result = { policy: null, blocks: [], problems: [{ line: 1, message: "Ergo couldn't read this document. " + (e?.message ?? e) }] };
   }
   render(result);
-  store.set(current, src.value);
+  saveEdit(storage, current, samples[current].source, src.value);
 };
 
 let timer = 0;
@@ -532,7 +596,7 @@ yamlBox.addEventListener("blur", () => {
     clearTimeout(yamlTimer);
     fromYaml();
   }
-  if (!yamlProblems.length && last && tab === "yaml") viewYaml(last);
+  if (!yamlProblems.length && last && shows("yaml")) viewYaml(last);
 });
 src.addEventListener("paste", (e) => {
   if (src.value.trim()) return;
@@ -548,20 +612,12 @@ src.addEventListener("scroll", () => {
   syncing = true;
   gutter.scrollTop = src.scrollTop;
   follow();
-  if (tab === "blocks") panel.scrollTop = src.scrollTop;
-  syncing = false;
-});
-panel.addEventListener("scroll", () => {
-  if (syncing || tab !== "blocks") return;
-  syncing = true;
-  src.scrollTop = panel.scrollTop;
-  gutter.scrollTop = panel.scrollTop;
-  follow();
+  for (const side of ["left", "right"]) if (layout[side] === "blocks") panes[side].panel.scrollTop = src.scrollTop;
   syncing = false;
 });
 for (const ev of ["keyup", "click"]) {
   src.addEventListener(ev, () => {
-    $("cursor").textContent = "line " + (src.value.slice(0, src.selectionStart).split("\n").length);
+    cursor.textContent = "line " + (src.value.slice(0, src.selectionStart).split("\n").length);
   });
 }
 
@@ -569,7 +625,7 @@ const buttons = {};
 const load = (which) => {
   current = which;
   for (const [name, b] of Object.entries(buttons)) b.setAttribute("aria-pressed", String(name === which));
-  src.value = store.get(which) ?? samples[which].source;
+  src.value = savedEdit(storage, which, samples[which].source);
   reportInput = JSON.stringify(samples[which].input, null, 2);
   reportParams = JSON.stringify(samples[which].params, null, 2);
   src.scrollTop = 0;
@@ -583,21 +639,12 @@ for (const name of Object.keys(samples)) {
   $("samples").insertBefore(b, $("s-reset"));
 }
 $("s-reset").addEventListener("click", () => {
-  store.del(current);
+  forgetEdit(storage, current, samples[current].source);
   load(current);
 });
 
-const TABS = [["t-blocks", "blocks"], ["t-policy", "policy"], ["t-doc", "doc"], ["t-yaml", "yaml"], ["t-report", "report"]];
-for (const [id, name] of TABS) {
-  $(id).addEventListener("click", () => {
-    tab = name;
-    for (const [i, n] of TABS) $(i).setAttribute("aria-selected", String(n === name));
-    panel.scrollTop = 0;
-    if (last) render(last);
-  });
-}
-$("copy").addEventListener("click", async () => {
-  const b = $("copy");
+copy.addEventListener("click", async () => {
+  const b = copy;
   try {
     await navigator.clipboard.writeText(yamlText(last?.policy));
     b.textContent = "Copied";
@@ -613,11 +660,11 @@ const bytes = Uint8Array.from(atob(wasm), (c) => c.charCodeAt(0));
 opa.loadPolicy(bytes, undefined, { "time.parse_rfc3339_ns": parseTime }).then(
   (policy) => {
     runner = makeRunner((doc) => policy.evaluate(doc));
-    if (tab === "report" && last) render(last);
+    if (shows("report") && last) render(last);
   },
   (e) => {
     runnerError = "Ergo didn't load: " + e.message;
-    if (tab === "report" && last) render(last);
+    if (shows("report") && last) render(last);
   },
 );
 

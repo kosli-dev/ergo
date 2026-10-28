@@ -9,6 +9,7 @@ import opa from "@open-policy-agent/opa-wasm";
 import { parse as parseYaml } from "yaml";
 import { layoutRows, policySheet, makeRunner, parseTime, reportTables, yamlText } from "../src/lib.mjs";
 import { sampleCases, readSample, opaVersionNote } from "../build.mjs";
+import { VIEWS, LABELS } from "../src/layout.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = join(here, "..", "dist", "editor.html");
@@ -43,9 +44,8 @@ test("the page holds only ASCII in its samples", () => {
   assert.ok(!/[^\x00-\x7f]/.test(html.slice(start, end)));
 });
 
-test("the page has the five tabs and no Reference tab", () => {
-  for (const t of ["Blocks", "Policy", "Document", "YAML", "Report"]) assert.ok(html.includes(`>${t}</button>`), t);
-  assert.ok(!html.includes(">Reference</button>"));
+test("the page has a tab label for every view", () => {
+  for (const view of VIEWS) assert.ok(html.includes(JSON.stringify(LABELS[view])), view);
 });
 
 const casesDir = join(here, "..", "..", "markdown", "cases");
