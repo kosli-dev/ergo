@@ -4,7 +4,8 @@
 ; WS between two words is one space when the report prints a sentence.
 ; Whitespace at either end of a line is dropped before it's read: every
 ; character with Unicode's White_Space property, as syntax.md's
-; [sentence.ends] lists them. Inside a line, WS is spaces only.
+; [sentence.ends] lists them, and so is the whitespace around the path of an
+; identified_by or a part. Inside a line, WS is spaces only.
 
 ; A check is one assertion, or several joined with "and". Under assert:,
 ; a YAML list holds one assertion per item and means the same.
