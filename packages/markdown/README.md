@@ -88,7 +88,7 @@ Params aren't part of a policy: they're the third argument of `ergo.report`. A p
 
 ### The title and descriptions
 
-`# Cake batches` is the document's title. It's for people, and the policy doesn't keep it. The paragraphs after it, up to the first heading, list, table or other block, are the policy's `description`. The same goes for each subject and requirement: the paragraphs under its heading, up to its fields or `Checks:`, are its `description`. The paragraphs are joined with a blank line, so
+`# Cake batches` is the document's title. It's for people, and the policy doesn't keep it. The paragraphs after it, up to the first heading, list, table or other block, are the policy's `description`. A document without a title can start with its description instead: the paragraphs at the top, before the first heading. The same goes for each subject and requirement: the paragraphs under its heading, up to its fields or `Checks:`, are its `description`. The paragraphs are joined with a blank line, so
 
 ```markdown
 ### Cake batch
@@ -220,6 +220,88 @@ cakes.ergo.md:21: a check needs a bold label
 ```
 
 The tool doesn't read the sentences. Ergo does, and a sentence written wrong shows up in the report's `$well_formed` row.
+
+## Editing the policy instead
+
+Someone who'd rather edit YAML can change the policy and write the change back into the document. `ergo apply` rewrites only what changed and leaves the rest of the file as it was, prose included.
+
+Compile `cakes.ergo.md` from above to `policy.yaml`, then change `from: batches` to `from: today.batches` and add a check:
+
+```yaml
+      sealed:
+        description: The box is sealed.
+        assert: box.sealed is true
+```
+
+```sh
+ergo apply cakes.ergo.md policy.yaml
+```
+
+```
+rewrote batch.from
+added check cake batch.sealed
+```
+
+and `cakes.ergo.md` now has:
+
+```diff
+-- From `batches`
++- From `today.batches`
+```
+
+```diff
+ - **Baked right**: Baked at 175–200°C for 25–40 minutes.
+   `bake.temp_c is between 175 and 200`
+   `bake.minutes is between 25 and 40`
++- **Sealed**: The box is sealed.
++  `box.sealed is true`
+```
+
+A changed field keeps its place, and so does a changed check. When only a sentence changed, only its code span is rewritten, and a label or heading whose name didn't change stays as you wrote it. A new check goes at the end of its list, and a new subject or requirement at the end of its section. A check, subject or requirement that disappears with a new one in its place is renamed there.
+
+When the document can't say what the policy says, `ergo apply` writes nothing and says why, with the path in the policy. With a part under `batch` and a check named `Sealed`:
+
+```
+subjects.batch.has: the Markdown can't hold parts yet: write this policy in YAML
+requirements.cake batch.checks.Sealed: has upper case
+not written
+```
+
+Before it writes, it compiles the new document and checks it gives back the policy you asked for. When it doesn't, it says `the Markdown wouldn't compile back to this policy` and writes nothing. That happens when removing a requirement's fields and checks would leave a paragraph of prose right under its heading, where it would become the requirement's description.
+
+`ergo render` writes a new document from a policy that has none:
+
+```sh
+ergo render policy.yaml
+```
+
+```markdown
+---
+ergo_spec: v0.2
+---
+
+## Subjects
+
+### Deployment
+
+- From `deployments whose environment is "prod"`
+- Identified by `id`
+
+## Requirements
+
+### Prod_deploy
+
+Every production deployment is approved
+
+- Subject `deployment`
+
+Checks:
+
+- **Approved**: Someone approved the deployment
+  `approved_by is a non-empty string`
+```
+
+That's README's first policy, where `prod_deploy` is written with `_`, so its heading is too.
 
 ## Cases
 

@@ -646,3 +646,18 @@ test("a name such as __proto__ is kept as a plain key", () => {
   const {policy} = compile("## Subjects\n\n### \\_\\_proto\\_\\_\n\n- from: `x`\n");
   assert.deepEqual(Object.keys((policy as any).subjects), ["__proto__"]);
 });
+
+test("with no title, the paragraphs at the top are the policy's description", () => {
+  assert.equal(compile("Top.\n\nMore.\n\n## Subjects\n").policy!.description, "Top.\n\nMore.");
+  assert.equal(compile("---\nergo_spec: v0.2\n---\n\nTop.\n").policy!.description, "Top.");
+});
+
+test("paragraphs after a title that follows a description at the top are prose", () => {
+  const {policy, blocks} = compile("Top.\n\n# T\n\nUnder the title.\n");
+  assert.equal(policy!.description, "Top.");
+  assert.deepEqual(blocks.map((b) => b.kind), ["description", "title", "prose"]);
+});
+
+test("a paragraph after a table at the top is prose", () => {
+  assert.equal(compile("| a |\n| - |\n| b |\n\nText.\n").policy!.description, undefined);
+});
