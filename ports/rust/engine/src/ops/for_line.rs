@@ -1,7 +1,7 @@
 use super::tally::{Side, Term};
 use super::time::{self, Time};
 use super::walk::{self, Failure, Options, Seg, WalkItem};
-use super::{Check, Input, Part, Verdict, read_path, run as run_check};
+use super::{Check, Input, Part, Verdict, run as run_check};
 use crate::cause::Cause;
 use crate::lower::{self, Scope, UNSUPPORTED_SUFFIX};
 use crate::path::{self, Ctx, Located, Location, OUTER, Path, Start, Step};
@@ -89,6 +89,7 @@ fn all_paths(check: &Check) -> Vec<&Path> {
             }
         }
         Check::Walk(walk) => {
+            paths.push(&walk.path);
             for inner in walk.whose.iter().chain(std::iter::once(&*walk.check)) {
                 paths.extend(item_paths(inner));
             }
@@ -96,6 +97,18 @@ fn all_paths(check: &Check) -> Vec<&Path> {
         _ => {}
     }
     paths
+}
+
+fn walked_paths(check: &Check) -> Vec<(&Path, bool)> {
+    match check {
+        Check::Walk(walk) => vec![(&walk.path, walk.if_any)],
+        Check::Tally(tally) => tally
+            .counted_paths()
+            .into_iter()
+            .map(|p| (p, false))
+            .collect(),
+        _ => Vec::new(),
+    }
 }
 
 fn item_paths(check: &Check) -> Vec<&Path> {
@@ -858,6 +871,10 @@ impl For {
         }
     }
 
+    fn alias_names(&self) -> Vec<&str> {
+        self.items.iter().map(|i| i.alias.as_str()).collect()
+    }
+
     fn try_sentences(&self, ctx: &Ctx) -> (Option<Outcome>, Vec<Sfail>) {
         let mut sfails = Vec::new();
         for (idx, sentence) in self.sentences.iter().enumerate() {
@@ -866,7 +883,7 @@ impl For {
                 sfails.push(Sfail {
                     idx,
                     cause: verdict.cause,
-                    inputs: same_names_by_place(&verdict.inputs)
+                    inputs: reading_order(&sentence.check, &verdict.inputs, &self.alias_names())
                         .iter()
                         .map(Input::to_json)
                         .collect(),
@@ -937,6 +954,28 @@ impl For {
         out
     }
 
+    fn list_entry(&self, path: &Path, if_any: bool, ctx: &Ctx) -> Input {
+        let outer = outer_ctx(ctx);
+        let walked = walk::walk(
+            path,
+            &outer,
+            Options {
+                if_any,
+                empty_adds_nothing: false,
+            },
+        );
+        Input {
+            name: walked.name.clone(),
+            value: Value::Array(walked.items.iter().map(WalkItem::shown).collect()),
+            locations: walked
+                .items
+                .iter()
+                .map(|w| w.end_location.render())
+                .collect(),
+            part: path::part_tag(path, &outer).map(|(name, id)| Part { name, id }),
+        }
+    }
+
     fn subject_inputs(&self, ctx: &Ctx) -> Vec<Input> {
         let hidden: Vec<&str> = self.items.iter().map(|i| i.alias.as_str()).collect();
         let hides = |path: &Path| matches!(&path.start, Start::Alias(name) if hidden.contains(&name.as_str()));
@@ -954,34 +993,22 @@ impl For {
                 );
             }
         }
+        let walked: Vec<(&Path, bool)> = self
+            .sentences
+            .iter()
+            .flat_map(|sentence| walked_paths(&sentence.check))
+            .collect();
         for path in paths {
-            if hides(path) {
-                for step in &path.steps {
-                    if let Step::Field(field) = step {
-                        inputs.extend(read_path(field, ctx).inputs);
-                    }
+            let own = walked.iter().find(|(p, _)| std::ptr::eq(*p, path));
+            if matches!(path.start, Start::Params) && walk::cut_at(path, &hidden).is_none() {
+                continue;
+            }
+            match own {
+                Some((_, if_any)) if !hides(path) && walk::cut_at(path, &hidden).is_none() => {
+                    inputs.push(self.list_entry(path, *if_any, ctx));
                 }
-                continue;
+                _ => inputs.extend(walk::path_inputs(path, ctx, &hidden)),
             }
-            if matches!(path.start, Start::Params) {
-                continue;
-            }
-            let cut = path.steps.iter().position(|step| match step {
-                Step::Field(_) => true,
-                Step::Ref(reference) => hides(reference),
-                _ => false,
-            });
-            let read = match cut {
-                None => path.clone(),
-                Some(at) => Path {
-                    start: path.start.clone(),
-                    steps: path.steps[..at].to_vec(),
-                },
-            };
-            if cut.is_some() && through_a_list(&read, ctx) {
-                continue;
-            }
-            inputs.extend(read_path(&read, ctx).inputs);
         }
         for sentence in &self.sentences {
             if let Check::Tally(tally) = &sentence.check {
@@ -1121,16 +1148,6 @@ fn cause_named(name: &str) -> Option<Cause> {
     .find(|cause| cause.name() == name)
 }
 
-fn through_a_list(path: &Path, ctx: &Ctx) -> bool {
-    (0..path.steps.len()).any(|at| {
-        let before = Path {
-            start: path.start.clone(),
-            steps: path.steps[..at].to_vec(),
-        };
-        path::read(&before, ctx).value.is_some_and(Value::is_array)
-    })
-}
-
 fn same_names_by_place(inputs: &[Input]) -> Vec<Input> {
     let mut out: Vec<Input> = Vec::new();
     let mut done: Vec<&str> = Vec::new();
@@ -1144,6 +1161,22 @@ fn same_names_by_place(inputs: &[Input]) -> Vec<Input> {
         out.extend(group.into_iter().cloned());
     }
     out
+}
+
+fn reading_order(check: &Check, inputs: &[Input], aliases: &[&str]) -> Vec<Input> {
+    let ordered = same_names_by_place(inputs);
+    if !matches!(check, Check::Walk(_)) {
+        return ordered;
+    }
+    let (through, rest): (Vec<Input>, Vec<Input>) = ordered.into_iter().partition(|input| {
+        aliases.iter().any(|alias| {
+            input
+                .name
+                .strip_prefix(alias)
+                .is_some_and(|rest| rest.starts_with(['.', '[']))
+        })
+    });
+    through.into_iter().chain(rest).collect()
 }
 
 #[cfg(test)]
@@ -1162,7 +1195,7 @@ mod tests {
         let report = crate::report(
             &input,
             &policy,
-            &json!({"k": "a", "list": ["x"], "kinds": "code"}),
+            &json!({"k": "a", "list": ["x"], "kinds": "code", "need": {"b": 1}}),
         );
         report["results"]
             .as_array()
@@ -1789,5 +1822,41 @@ mod tests {
             json!({"xs": [{"t": 1, "u": 1}]}),
         );
         assert_eq!(names(&aliased), ["xs[]"]);
+    }
+
+    #[test]
+    fn a_walk_in_a_sentence_lists_its_own_list_unless_it_reads_through_an_alias() {
+        let own = row(
+            "every ks as k",
+            json!("every rs.n is at least 1"),
+            json!({"ks": ["a"], "rs": [{"n": 1}]}),
+        );
+        assert_eq!(names(&own), ["ks[]", "rs[].n"]);
+        let through = row(
+            "every ks as k",
+            json!("some m named by k is at least 1"),
+            json!({"ks": ["a"], "m": {"a": [1]}}),
+        );
+        assert_eq!(names(&through), ["ks[]", "m"]);
+    }
+
+    #[test]
+    fn a_params_path_named_by_an_alias_lists_the_part_before_the_name() {
+        let found = row(
+            "every ks as k",
+            json!("$params.need named by k exists"),
+            json!({"ks": ["b"]}),
+        );
+        assert_eq!(names(&found), ["$params.need", "ks[]"]);
+    }
+
+    #[test]
+    fn a_count_whose_list_does_not_start_at_an_alias_lists_that_list() {
+        let found = row(
+            "every cs as c",
+            json!("count of ps whose n is c.a is at least 1"),
+            json!({"cs": [{"a": 1}], "ps": [{"n": 1}]}),
+        );
+        assert_eq!(names(&found), ["cs[]", "ps[]"]);
     }
 }

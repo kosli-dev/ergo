@@ -96,6 +96,20 @@ const MOST_SECONDS: i64 = 9_000_000_000;
 const MICROS: i128 = 1_000_000;
 
 impl Tally {
+    pub fn counted_paths(&self) -> Vec<&Path> {
+        let mut paths = Vec::new();
+        for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
+            if let Side::Derived(derived) = side {
+                for term in &derived.terms {
+                    if let Term::Counted(counted) = term {
+                        paths.push(&counted.path);
+                    }
+                }
+            }
+        }
+        paths
+    }
+
     pub fn unaliased_entries(&self, ctx: &Ctx, hidden: &[&str]) -> Vec<Input> {
         let reads_hidden = |derived: &Derived| {
             derived.terms.iter().any(|term| match term {
