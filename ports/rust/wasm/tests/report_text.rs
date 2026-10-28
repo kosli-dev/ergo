@@ -50,7 +50,7 @@ fn a_policy_that_is_not_json_is_named_in_the_message() {
 fn params_that_are_not_json_are_named_in_the_message() {
     let message = report_text("{}", POLICY, "").unwrap_err();
     assert!(
-        message.starts_with("the params isn't valid JSON: "),
+        message.starts_with("the params aren't valid JSON: "),
         "{message}"
     );
 }

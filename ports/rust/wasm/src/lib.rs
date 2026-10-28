@@ -6,12 +6,12 @@ use wasm_bindgen::prelude::*;
 /// Builds the report for `input`, `policy` and `params`, each given as JSON text, and returns it as JSON text. When one of them isn't valid JSON, the message says which.
 pub fn report_text(input: &str, policy: &str, params: &str) -> Result<String, String> {
     let read = |what: &str, text: &str| {
-        serde_json::from_str::<Value>(text).map_err(|e| format!("the {what} isn't valid JSON: {e}"))
+        serde_json::from_str::<Value>(text).map_err(|e| format!("{what} valid JSON: {e}"))
     };
     let report = ergo_engine::report(
-        &read("input", input)?,
-        &read("policy", policy)?,
-        &read("params", params)?,
+        &read("the input isn't", input)?,
+        &read("the policy isn't", policy)?,
+        &read("the params aren't", params)?,
     );
     Ok(report.to_string())
 }
