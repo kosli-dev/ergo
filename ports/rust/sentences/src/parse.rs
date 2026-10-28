@@ -247,22 +247,22 @@ impl Parser {
     }
 
     fn values(&self, i: usize) -> Reads<Vec<Value>> {
-        let mut out = Vec::new();
-        for (value, j) in self.value(i) {
-            if self.at(j) == Some(',') {
-                let mut k = j + 1;
-                if let Some(after) = self.ws(k) {
-                    k = after;
-                }
-                for (rest, end) in self.values(k) {
-                    let mut all = vec![value.clone()];
-                    all.extend(rest);
-                    out.push((all, end));
-                }
+        let mut all = Vec::new();
+        let mut at = i;
+        let mut end = i;
+        while let Some((value, j)) = self.value(at).into_iter().next() {
+            all.push(value);
+            end = j;
+            if self.at(j) != Some(',') {
+                break;
             }
-            out.push((vec![value], j));
+            at = self.ws(j + 1).unwrap_or(j + 1);
         }
-        out
+        if all.is_empty() {
+            Vec::new()
+        } else {
+            vec![(all, end)]
+        }
     }
 
     pub(crate) fn list(&self, i: usize) -> Reads<List> {
@@ -325,16 +325,19 @@ impl Parser {
     }
 
     fn steps(&self, i: usize) -> Reads<Vec<Step>> {
-        let mut out = Vec::new();
-        if let Some((step, j)) = self.step(i) {
-            for (rest, end) in self.steps(j) {
-                let mut all = vec![step.clone()];
-                all.extend(rest);
-                out.push((all, end));
-            }
+        let mut all = Vec::new();
+        let mut ends = vec![i];
+        let mut at = i;
+        while let Some((step, j)) = self.step(at) {
+            all.push(step);
+            ends.push(j);
+            at = j;
         }
-        out.push((Vec::new(), i));
-        out
+        (0..=all.len())
+            .rev()
+            .filter(|&n| n == all.len() || self.at(ends[n]) == Some(' '))
+            .map(|n| (all[..n].to_vec(), ends[n]))
+            .collect()
     }
 
     fn start(&self, i: usize, side: Side) -> Option<(Start, usize)> {
@@ -352,7 +355,8 @@ impl Parser {
             }
             '"' if matches!(side, Side::Left) => {
                 let (key, end) = self.dq(i)?;
-                Some((Start::Field { key, dot: false }, end))
+                let dot = is_word(&key);
+                Some((Start::Field { key, dot }, end))
             }
             _ => {
                 let (key, end) = self.bare_key(i)?;
@@ -562,18 +566,33 @@ impl Parser {
     }
 
     fn plus_tail(&self, i: usize) -> Reads<Vec<Term>> {
-        let mut out = Vec::new();
-        if let Some(j) = self.ws(i).and_then(|m| self.lead(m, "plus")) {
-            for (term, k) in self.term(j) {
-                for (rest, end) in self.plus_tail(k) {
-                    let mut all = vec![term.clone()];
-                    all.extend(rest);
-                    out.push((all, end));
-                }
+        let mut done = Vec::new();
+        let mut pending: Vec<(Vec<Term>, usize)> = vec![(Vec::new(), i)];
+        while let Some((terms, at)) = pending.pop() {
+            let next = self
+                .ws(at)
+                .and_then(|m| self.lead(m, "plus"))
+                .map(|j| self.term(j))
+                .unwrap_or_default();
+            if next.is_empty() {
+                done.push((terms, at));
+                continue;
             }
+            let mut terms = Some(terms);
+            let last = next.len() - 1;
+            let mut children = Vec::with_capacity(next.len());
+            for (n, (term, k)) in next.into_iter().enumerate() {
+                let mut grown = if n == last {
+                    terms.take().unwrap_or_default()
+                } else {
+                    terms.clone().unwrap_or_default()
+                };
+                grown.push(term);
+                children.push((grown, k));
+            }
+            pending.extend(children.into_iter().rev());
         }
-        out.push((Vec::new(), i));
-        out
+        done
     }
 
     pub(crate) fn operand(&self, i: usize) -> Reads<Operand> {

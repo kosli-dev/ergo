@@ -1,24 +1,35 @@
 #![allow(dead_code)]
 
-use ergo_sentences::{SyntaxError, parse_check, parse_for, parse_from};
+use ergo_sentences::{
+    SyntaxError, check_problems, for_problems, from_problems, parse_check, parse_for, parse_from,
+};
 use serde_json::{Value, json};
 use std::io::Read;
 
-fn messages<T>(read: Result<T, Vec<SyntaxError>>) -> Vec<String> {
+fn messages<T>(
+    read: Result<T, Vec<SyntaxError>>,
+    found: impl Fn(&T) -> Vec<String>,
+) -> (Vec<String>, Vec<String>) {
     match read {
-        Ok(_) => Vec::new(),
-        Err(errors) => errors.into_iter().map(|e| e.message).collect(),
+        Ok(tree) => (Vec::new(), found(&tree)),
+        Err(errors) => {
+            let syntax: Vec<String> = errors.into_iter().map(|e| e.message).collect();
+            (syntax.clone(), syntax)
+        }
     }
 }
 
 fn read_kind(kind: &str, text: &str) -> Value {
-    let problems = match kind {
-        "check" => messages(parse_check(text)),
-        "for-line" => messages(parse_for(text)),
-        "from-line" => messages(parse_from(text)),
-        other => vec![format!("unknown kind {other}")],
+    let (syntax, problems) = match kind {
+        "check" => messages(parse_check(text), |c| check_problems(c, &[])),
+        "for-line" => messages(parse_for(text), |f| for_problems(f, &[])),
+        "from-line" => messages(parse_from(text), |f| from_problems(f, &[])),
+        other => {
+            let unknown = vec![format!("unknown kind {other}")];
+            (unknown.clone(), unknown)
+        }
     };
-    json!({"kind": kind, "problems": problems})
+    json!({"kind": kind, "syntax": syntax, "problems": problems})
 }
 
 pub fn read_rows(input: &Value) -> Value {

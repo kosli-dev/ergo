@@ -1,3 +1,4 @@
+use crate::numbers::above_list_position;
 use crate::tree::*;
 use crate::words::{is_bare_key, is_word};
 
@@ -249,7 +250,9 @@ fn path_text(path: &Path, side: Side, aliases: &[&str], own: bool) -> String {
 
 fn path_text_with(path: &Path, side: Side, aliases: &[&str], own: bool, lift: bool) -> String {
     let lifted = match (&path.position, &path.start, path.steps.last()) {
-        (None, start, Some(Step::Index(number))) if lift && *start != Start::It => {
+        (None, start, Some(Step::Index(number)))
+            if lift && *start != Start::It && !above_list_position(number) =>
+        {
             Some(Position::Item {
                 number: increment(number),
                 from_last: false,

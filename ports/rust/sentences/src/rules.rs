@@ -7,13 +7,17 @@ use std::collections::BTreeSet;
 
 pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
     let mut found = check_base(check, &[]);
-    found.extend(check_self(check, aliases));
+    if found.is_empty() {
+        found.extend(check_self(check, aliases));
+    }
     found.into_iter().collect()
 }
 
 pub fn for_problems(line: &For, aliases: &[&str]) -> Vec<String> {
     let mut found = for_base(line, &[]);
-    found.extend(for_self(line, aliases));
+    if found.is_empty() {
+        found.extend(for_self(line, aliases));
+    }
     found.into_iter().collect()
 }
 

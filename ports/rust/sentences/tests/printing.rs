@@ -467,3 +467,11 @@ fn a_name_that_is_both_a_parent_and_an_alias_prints_with_a_dot_only_on_the_left_
         "b.kids whose b.x equals b.y"
     );
 }
+
+#[test]
+fn a_bracket_index_too_big_to_be_a_position_prints_as_written() {
+    let check = parse_check("xs[9007199254740992] is 1").unwrap();
+    assert_eq!(print_check(&check, &[]), "xs[9007199254740992] is 1");
+    let check = parse_check("xs[2] is 1").unwrap();
+    assert_eq!(print_check(&check, &[]), "item 3 of xs is 1");
+}

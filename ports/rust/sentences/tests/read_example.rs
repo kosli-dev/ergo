@@ -14,10 +14,19 @@ fn a_row_gets_one_answer_per_kind_in_order() {
     assert_eq!(
         read,
         json!([[
-            {"kind": "check", "problems": []},
-            {"kind": "for-line", "problems": [r#"an item starts with "every", "some" or a position, like "last of""#]},
-            {"kind": "from-line", "problems": ["doesn't parse"]}
+            {"kind": "check", "syntax": [], "problems": []},
+            {"kind": "for-line", "syntax": [r#"an item starts with "every", "some" or a position, like "last of""#], "problems": [r#"an item starts with "every", "some" or a position, like "last of""#]},
+            {"kind": "from-line", "syntax": ["doesn't parse"], "problems": ["doesn't parse"]}
         ]])
+    );
+}
+
+#[test]
+fn a_sentence_that_reads_but_is_written_wrong_has_no_syntax_errors_and_lists_its_problems() {
+    let rows = json!({"rows": [{"kinds": ["check"], "text": "x is not null"}]});
+    assert_eq!(
+        read::read_rows(&rows),
+        json!([[{"kind": "check", "syntax": [], "problems": [r#""is not null" is written "exists""#]}]])
     );
 }
 
