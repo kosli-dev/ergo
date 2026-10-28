@@ -340,11 +340,11 @@ fn unsupported(condition: &s::Condition, names: &[&str]) -> Vec<String> {
 }
 
 pub fn lower_with_operator_modules(
-    _path: &s::Path,
-    _phrase: &s::Phrase,
-    _scope: &Scope,
+    path: &s::Path,
+    phrase: &s::Phrase,
+    scope: &Scope,
 ) -> Option<Result<Check, Vec<String>>> {
-    None
+    crate::ops::compare::lower_phrase(path, phrase, scope)
 }
 
 #[cfg(test)]
@@ -680,10 +680,10 @@ mod tests {
 
     #[test]
     fn a_phrase_no_operator_reads_yet_comes_back_with_the_unsupported_ending() {
-        let problems = lower_condition(&condition("x is 1"), &Scope::new()).unwrap_err();
+        let problems = lower_condition(&condition("x is empty"), &Scope::new()).unwrap_err();
         assert_eq!(problems.len(), 1);
         assert!(problems[0].ends_with(UNSUPPORTED_SUFFIX));
-        assert!(problems[0].starts_with("x is 1"));
+        assert!(problems[0].starts_with("x is empty"));
     }
 
     #[test]

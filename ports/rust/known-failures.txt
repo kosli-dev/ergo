@@ -5,53 +5,7 @@ any_of / any_of with a present check in an option / settles that option as value
 any_of / any_of with a name that starts like another / sorts its options by name, not by the text they print
 any_of / any_of with a ref to a missing param / fails only the option that reads it
 any_of / any_of with a ref to a param of the wrong type / fails the row as unusable even when another option passes
-any_of / a check with several assertions that read the same field / lists the field once, with its location
-compare / compare with eq / passes on 1 and 1.0
-compare / compare with eq / passes on equal objects
-compare / compare with eq / fails as unusable when the types differ
-compare / compare with eq / fails as null when both are null
-compare / compare with eq / fails as absent when one is missing and the other null
-compare / compare with ne / passes on two different strings
-compare / compare with ne / fails as unusable when the types differ, though they aren't equal
-compare / compare with ne / fails as absent when both are missing
-compare / compare with lt / passes on two numbers in order
-compare / compare with lt / fails as value on two numbers out of order
-compare / compare with lt / fails as unusable on two strings, so numbers held as strings aren't ordered as text
-compare / compare with lt / fails as unusable on booleans
-compare / compare with lt / fails as unusable on objects
-compare / compare with lt / fails as absent when one is missing
-compare / compare with gte / passes on 2 and 2.0
-compare / compare against the input / names the path into the input
-compare / a path that starts at the params or the input / gives the params' location after $params:
-compare / a path into params that don't have the key / points at the params when they hold no max_days
-compare / a path that starts at the input / starts at the root of the input, not at the subject
-compare / a path that starts at the input / stops at the object that doesn't have the key
-compare / a key read through a ref step / adds the key the ref read
-compare / a ref step that reads a position the list doesn't have / stops at the list
 compare / a key read from a field of the subject / adds the key the field holds, and shows the field too
-compare_time / compare_time with lt / passes on two times in order
-compare_time / compare_time with lt / compares fractions of a second
-compare_time / compare_time with lt / passes on two numbers in order, decimals included
-compare_time / compare_time with lt / passes on 29 February in a leap year
-compare_time / compare_time with lt / passes on the last year allowed
-compare_time / compare_time with lt / passes on the first year allowed
-compare_time / compare_time with lt / fails as unusable on a number and a string
-compare_time / compare_time with lt / fails as unusable on a lowercase t and z
-compare_time / compare_time with lt / fails as unusable on a date that doesn't exist
-compare_time / compare_time with lt / fails as unusable on 29 February in a century that isn't a leap year
-compare_time / compare_time with lt / fails as unusable on a year before 1678
-compare_time / compare_time with lt / fails as unusable on a year after 2261
-compare_time / compare_time with lt / passes on two dates with no time, in order
-compare_time / compare_time with lt / fails as value on two dates out of order
-compare_time / compare_time with lt / fails as unusable on a date and a time, even at midnight
-compare_time / compare_time with lt / fails as unusable on a date with no time that doesn't exist
-compare_time / compare_time with lt / fails as unusable on a time with no zone
-compare_time / compare_time with lt / fails as unusable on a leap second
-compare_time / compare_time with lt / fails as unusable on hour 24
-compare_time / compare_time with lt / fails as unusable on a space instead of T
-compare_time / compare_time with lt / fails as unusable on an offset with no colon
-compare_time / compare_time with lt / fails as unusable on a dot with no digits after it
-compare_time / compare_time with lt / fails as absent when one is missing
 contains / includes a value / passes when the list contains it
 contains / includes a value / fails as value when it doesn't
 contains / includes a value / fails as value on an empty list
@@ -85,7 +39,6 @@ deep_walks / ten steps after count of, starting at a for alias / reads as writte
 deep_walks / eleven steps after count of, starting at a for alias / is written wrong, because the alias is a step too
 deep_walks / ten steps after every, one of them a position / reads as written, a position being a step like a name, and checks the first value of the last list
 deep_walks / eleven steps after every, one of them a position / is written wrong, because the position is a step too
-deep_walks / ten steps after every in a from line that starts at $input / reads as written, $input not being a step, and each value the last list holds is a subject
 deep_walks / ten steps after a count of on the right of a phrase / reads as written, and a subject passes when its n is the count
 deep_walks / eleven steps after a count of on the right of a phrase / is written wrong, as it is on the left
 deep_walks / eleven steps after a sum of on the right of a phrase / is written wrong, as it is on the left
@@ -266,7 +219,6 @@ derived / days elapsed under a for line reading the line's name / passes when ev
 derived / days elapsed under a for line reading the line's name / fails as value when one pull request took longer, and lists it
 derived / days elapsed under a for line reading the line's name / fails as absent when a pull request has no closing time
 derived / days elapsed in a list of assertions / passes when every line passes
-derived / a field called days with a dot / reads the field
 derived / a field called to / reads both fields, because to and days are words of the grammar and need a dot
 derived / days elapsed added to another term / adds a number to the elapsed days
 derived / days elapsed added to another term / fails as value when the sum is different
@@ -309,19 +261,6 @@ derived / days elapsed between two numbers / gives the elapsed time the location
 derived / days elapsed between two numbers / points at the subject for an end that isn't there
 derived / a plus that reads the same list twice / shows the number and the list once each
 derived / a count compared with a count of the same list / shows the list once, after the left side's number, and the right side's number
-equals / equals a string / passes on the same string
-equals / equals a string / fails as value on another string
-equals / equals a string / fails as absent when the field is missing
-equals / equals a string / fails as null when the field is null
-equals / equals a number / passes on 1.0, because numbers compare by value
-equals / equals a number / fails as unusable on the string "1", because the type must match
-equals / equals a number written with an exponent / shows the number in plain decimal
-equals / equals null / passes on a field that is there and null
-equals / equals null / fails as absent on a missing field
-equals / a position in a list / points at the item it read
-equals / a position in a list / points at the list when it's too short
-equals / a position in a list / points at the object holding a key that looks like the position, not at the value under it
-equals / keys that need escaping / writes a slash as ~1 and a tilde as ~0
 for / every over one list on a for line / passes when every item passes, and failed_items is empty
 for / every over one list on a for line / fails as value when an item fails, and lists the item with the sentence that failed
 for / every over one list on a for line / lists every item that fails, in list order
@@ -454,15 +393,11 @@ it / a list of strings read as subjects, checked against the params / each strin
 it / it is checked like a field that holds the same value / a string passes, null fails as null and a number as value
 it / it is a non-empty string / an empty string and null fail
 it / it is not empty / a string and a non-empty list pass, an empty string, an empty list and null fail
-it / it compared with a number / a string is unusable and null fails as null
-it / it matched against a pattern / a number is unusable
 it / it is an object / it works for an object subject, and a string, a number, a list and null fail
 it / it is a list / a subject that is a list passes
 it / every and some on a subject that is a list / each item of the list is read, and the rows name it with [] and its items by position
 it / count of and sum of on a subject that is a list / the list is counted and summed
-it / a field called it / is written with a dot and reads the field, and the row names it .it
 it / a field called it and the subject itself in one check / the dot picks the field and the bare word picks the subject
-it / a field called it, written in quotes / is read as the field and printed with a dot
 it / a bare it where a field called it used to be read / reads the subject, not its field it
 it / it in a check with and / each assertion reads the subject, and failed_assertions name them with it
 it / it in the options of an any_of / an option passes when its sentences pass
@@ -470,8 +405,6 @@ it / it after a for line / is still the subject, and the alias is the item
 it / it in the whose of a from line / each item is read as the subject, and the $applies row names it it
 it / count of it in the whose of a from line / each list is counted
 it / two equal strings read as subjects / fail $unique_ids, and each is still checked
-it / a position of it written in words / reads one item of a subject that is a list, as it reads one of a field's list, and names it item 1 of it
-it / item 2 of it / reads the second item
 it / every on a position of it / names the item and the list it came from
 it / some it in a from line's whose / keeps the tag lists that have latest, and fails the requirement for a value that isn't a list
 it / a check that reads it, on a plain value, a list and a from line that keeps lists / has the location of the subject itself for it, one for each item for every it and count of it, and where each failed item was read
@@ -481,25 +414,10 @@ non_empty_string / non_empty_string / fails as value on an empty string
 non_empty_string / non_empty_string / fails as value on a number, because checking the type is its job
 non_empty_string / non_empty_string / fails as absent when the field is missing
 non_empty_string / non_empty_string / fails as null when the field is null
-parts / a subject with two parts, one written as a line and one with an id / reads each alias as the path inside the subject, and the names in the rows and expressions keep the alias
-parts / a subject with two parts, one written as a line and one with an id / tags an input with a null id when the part has no id inside it
-parts / a subject with two parts, one written as a line and one with an id / fails as value when a field of a part holds the wrong value
-parts / a subject with two parts, one written as a line and one with an id / fails as absent when the part is missing, as the full path would
-parts / a subject with two parts, one written as a line and one with an id / fails as absent when the part is null, because a step follows it
-parts / a subject with two parts, one written as a line and one with an id / fails as unusable when the part is a string, as the full path would
-parts / a subject with two parts, one written as a line and one with an id / fails as unusable when something on the way to the part can't hold a key
-parts / the same check written with an alias and with the path it stands for / gives the same row apart from the names of the inputs
-parts / the same check written with an alias and with the path it stands for / gives the same rows when the part is missing, null or a string
-parts / the same check written with an alias and with the path it stands for / gives the same rows when the subject is not an object
 parts / where a part's alias is read / reads the alias in the conditions of the from line, in a for line's assertions, and on the right side after a one-line every, but not on the left of a whose
 parts / where a part's alias is read / an alias shadows a field with the same name, and the dot in front reads the field
-parts / named by an alias that is a part / is written wrong, because it would otherwise read the field
-parts / a subject that narrows another keeps its parts and adds its own / reads the kept part in its conditions and in its checks, and its own part in its checks
-parts / a chained subject reads its parent's parts / starts from a part of the parent, reads a part of the parent by the parent's name, and reads a bare alias of the parent as a field
 parts / a part whose path goes through a list / names a failed item with the full path, so no position is hidden
-parts / a part written with a dot on the left of a whose in the subject's own from line / reads the field, not the part
 parts / a part read in a check with named by on its right side / shows the part's value in its inputs
-parts / a part read through its alias / starts at the part's path inside the subject
 parts / a failed sentence on a for line tags the inputs it read through a part / the part's input has the part and the item's has none
 parts / a for alias that isn't named like a subject or a part / reads the item
 parts / a for alias named like a part of a subject that isn't a parent / reads the item
@@ -517,79 +435,7 @@ patterns / a case-insensitive pattern / matches the other case
 patterns / a pattern with a Unicode class / matches letters outside ASCII
 patterns / patterns read through a ref to a list / passes when one matches
 patterns / patterns read through a ref that isn't a list / fails as unusable
-present / present as a filter / rules a subject out when the field is missing, even though the other filter can't read it
-present / present as a filter / rules a subject out when the field is null
-present / present as a filter / keeps a subject in scope when the field is there
-range / range between two numbers / passes inside the range
-range / range between two numbers / passes on min
-range / range between two numbers / passes on max written as 3.0
-range / range between two numbers / fails as value below min
-range / range between two numbers / fails as value above max
-range / range between two numbers / fails as unusable on a string that holds a number
-range / range between two numbers / fails as absent when the field is missing
-range / range with bounds written in other forms / shows them in plain decimal
-requirements / ids of subjects out of scope / still count
-requirements / a filter / leaves out a subject that fails it on value, and fails one it can't read
-requirements / a filter / fails min_subjects when every subject is out of scope
-requirements / a filter with min_subjects 0 / is not applicable when every subject is out of scope
-requirements / a filter with min_subjects 0 / isn't met when a filter can't be read
-requirements / two filters / fail the requirement when one rules the subject out and the other can't be read
 requirements / violations with refs and failed items / add the check's description, expression and refs, and keep failed_items
-requirements / causes of a requirement / counts the rows of each cause that would be a violation, worst cause first
-sentences / a plain sentence and an object with assert / both forms run the same sentence and the report shows only description, meta and expression
-sentences / a plain sentence and an object with assert / both fail the same way
-sentences / is with a string / passes on the same string
-sentences / is with a string / fails as value on another string
-sentences / is with a string / fails as unusable on a number, which has another type than the text
-sentences / is with a string / fails as absent when the field is missing
-sentences / is with a string / fails as null when the field is null
-sentences / is with a number / passes on 1.0, because numbers compare by value
-sentences / is with a number / fails as unusable on the string "1"
-sentences / is with a number / fails as value on another number
-sentences / is with true / passes on true
-sentences / is with true / fails as value on false
-sentences / is with true / fails as unusable on the string "true"
-sentences / is with false / passes on false, which is a value and not a missing field
-sentences / is with false / fails as value on true
-sentences / is with null / passes when the field is there and null
-sentences / is with null / fails as absent when the field is missing
-sentences / is with null / fails as value on any other value
-sentences / is not with a string / passes on another string
-sentences / is not with a string / fails as value on the same string
-sentences / is not with a string / fails as unusable on a number, because two types differ
-sentences / is not with a string / fails as absent when the field is missing
-sentences / is not with a string / fails as null when the field is null
-sentences / is not with a number / passes on 2
-sentences / is not with a number / fails as value on 1.0
-sentences / is not with a number / fails as unusable on the string "2"
-sentences / is not with true / passes on false
-sentences / is not with true / fails as value on true
-sentences / equals a field / passes on 1 and 1.0
-sentences / equals a field / fails as value on two different strings
-sentences / equals a field / fails as unusable when the types differ
-sentences / equals a field / fails as absent when the left is missing
-sentences / equals a field / fails as absent when the right is missing
-sentences / equals a field / fails as null when the left is null
-sentences / equals a field / fails as null when both are null
-sentences / equals a field / fails as absent when one is missing and the other null
-sentences / does not equal a field / passes on two different strings
-sentences / does not equal a field / fails as value on 1 and 1.0
-sentences / does not equal a field / fails as unusable when the types differ
-sentences / does not equal a field / fails as absent when the right is missing
-sentences / does not equal a field / fails as null when the left is null
-sentences / is with a value within a number / passes on the same number
-sentences / is with a value within a number / passes when exactly that far apart
-sentences / is with a value within a number / fails as value when further apart
-sentences / is with a value within a number / fails as unusable on a string
-sentences / is with a value within a number / fails as absent when the field is missing
-sentences / is with a value within a number / fails as null when the field is null
-sentences / equals a field within a number / passes when the numbers are close
-sentences / equals a field within a number / fails as value when they are far apart
-sentences / equals a field within a number / fails as unusable when the right is a string
-sentences / equals a field within a number / fails as absent when the right is missing
-sentences / equals a field within a number / fails as null when the left is null
-sentences / is within 0 / passes on the same number
-sentences / is within 0 / fails as value on another number
 sentences / is one of values / passes on the first value
 sentences / is one of values / passes on the second value
 sentences / is one of values / fails as value on another string
@@ -682,109 +528,6 @@ sentences / matches patterns from params / fails as value when none does
 sentences / matches a pattern from params that isn't a valid regular expression / fails as unusable
 sentences / does not match patterns from params / passes when none matches
 sentences / does not match patterns from params / fails as value when one matches
-sentences / is at least a number / passes on 6
-sentences / is at least a number / fails as value on 4
-sentences / is at least a number / fails as unusable on the string "5"
-sentences / is at least a number / fails as absent when the field is missing
-sentences / is at least a number / fails as null when the field is null
-sentences / is at least a number / passes on 5
-sentences / is at most a number / passes on 4
-sentences / is at most a number / fails as value on 6
-sentences / is at most a number / fails as unusable on the string "5"
-sentences / is at most a number / fails as absent when the field is missing
-sentences / is at most a number / fails as null when the field is null
-sentences / is at most a number / passes on 5
-sentences / is more than a number / passes on 6
-sentences / is more than a number / fails as value on 5
-sentences / is more than a number / fails as unusable on the string "5"
-sentences / is more than a number / fails as absent when the field is missing
-sentences / is more than a number / fails as null when the field is null
-sentences / is less than a number / passes on 4
-sentences / is less than a number / fails as value on 5
-sentences / is less than a number / fails as unusable on the string "5"
-sentences / is less than a number / fails as absent when the field is missing
-sentences / is less than a number / fails as null when the field is null
-sentences / is alphabetically after a string compares by code point / passes on "b"
-sentences / is alphabetically after a string compares by code point / fails as value on "Z", which comes before "a"
-sentences / is alphabetically after a string compares by code point / fails as value on "a" itself
-sentences / is alphabetically after a string compares by code point / fails as unusable on a number
-sentences / is alphabetically after a string compares by code point / fails as absent when missing
-sentences / is alphabetically after a string compares by code point / fails as null on null
-sentences / is alphabetically before a field / passes on "Z" before "a", since uppercase comes first
-sentences / is alphabetically before a field / orders a character above U+FFFF after one below it
-sentences / is alphabetically before a field / fails as unusable when the field is a number
-sentences / is at least a field / passes when the order holds
-sentences / is at least a field / fails as value when it doesn't
-sentences / is at least a field / fails as unusable when the types differ
-sentences / is at least a field / fails as absent when the right is missing
-sentences / is at least a field / fails as null when the left is null
-sentences / is at most a field / passes when the order holds
-sentences / is at most a field / fails as value when it doesn't
-sentences / is at most a field / fails as unusable when the types differ
-sentences / is at most a field / fails as absent when the right is missing
-sentences / is at most a field / fails as null when the left is null
-sentences / is more than a field / passes when the order holds
-sentences / is more than a field / fails as value when it doesn't
-sentences / is more than a field / fails as unusable when the types differ
-sentences / is more than a field / fails as absent when the right is missing
-sentences / is more than a field / fails as null when the left is null
-sentences / is less than a field / passes when the order holds
-sentences / is less than a field / fails as value when it doesn't
-sentences / is less than a field / fails as unusable when the types differ
-sentences / is less than a field / fails as absent when the right is missing
-sentences / is less than a field / fails as null when the left is null
-sentences / is at least a field holding strings / fails as unusable on two strings, so numbers held as strings aren't ordered as text
-sentences / is at least a field holding strings / fails as unusable when both are lists
-sentences / is between two numbers / passes inside the range
-sentences / is between two numbers / passes on the lower bound
-sentences / is between two numbers / passes on the upper bound
-sentences / is between two numbers / fails as value below the range
-sentences / is between two numbers / fails as value above the range
-sentences / is between two numbers / fails as unusable on a string
-sentences / is between two numbers / fails as absent when the field is missing
-sentences / is between two numbers / fails as null when the field is null
-sentences / is between two decimals / passes on 1
-sentences / is between two decimals / fails as value on 1.6
-sentences / is between the same number twice / passes on that number
-sentences / is between the same number twice / fails as value on another
-sentences / a time is before another / passes when the order holds
-sentences / a time is before another / fails as value on the same instant written in another offset
-sentences / a time is before another / fails as value when it doesn't
-sentences / a time is before another / fails as unusable on a string that isn't a time
-sentences / a time is before another / fails as unusable when one is a number and the other a string
-sentences / a time is before another / fails as absent when the right is missing
-sentences / a time is before another / fails as null when the left is null
-sentences / a time is after another / passes when the order holds
-sentences / a time is after another / fails as value on the same instant written in another offset
-sentences / a time is after another / fails as value when it doesn't
-sentences / a time is after another / fails as unusable on a string that isn't a time
-sentences / a time is after another / fails as unusable when one is a number and the other a string
-sentences / a time is after another / fails as absent when the right is missing
-sentences / a time is after another / fails as null when the left is null
-sentences / a time is on or after another / passes when the order holds
-sentences / a time is on or after another / passes on the same instant written in another offset
-sentences / a time is on or after another / fails as value when it doesn't
-sentences / a time is on or after another / fails as unusable on a string that isn't a time
-sentences / a time is on or after another / fails as unusable when one is a number and the other a string
-sentences / a time is on or after another / fails as absent when the right is missing
-sentences / a time is on or after another / fails as null when the left is null
-sentences / a time is on or before another / passes when the order holds
-sentences / a time is on or before another / passes on the same instant written in another offset
-sentences / a time is on or before another / fails as value when it doesn't
-sentences / a time is on or before another / fails as unusable on a string that isn't a time
-sentences / a time is on or before another / fails as unusable when one is a number and the other a string
-sentences / a time is on or before another / fails as absent when the right is missing
-sentences / a time is on or before another / fails as null when the left is null
-sentences / two numbers are compared as times / passes when both are numbers in order
-sentences / two numbers are compared as times / fails as value when both are numbers out of order
-sentences / a quoted key with a dot in it / reads the key as one key
-sentences / a quoted key with a dot in it / fails as absent when the key is missing
-sentences / a bare key with a dash / reads the key with the dash
-sentences / a quoted first key / reads the key $schema, named as syntax.md names it
-sentences / a quoted first key / fails as absent when it's missing
-sentences / a path that starts at the input / reads the input
-sentences / a path that starts at the input and is missing / fails as absent when the input has no such key
-sentences / a path that starts at the params / reads the params
 sentences / a key chosen by a param / reads the key the param holds
 sentences / a key chosen by a param / fails as value when the other key holds another value
 sentences / a key chosen by a param / fails as absent when the key isn't there
@@ -792,48 +535,13 @@ sentences / a key chosen by a param, then more keys / reads the keys after it
 sentences / a key chosen by a param that is missing / fails as absent
 sentences / a key chosen by a param that isn't a key / fails as unusable when the param is a list
 sentences / a key chosen by a param in brackets / reads the key the param holds and prints named by
-sentences / the second item of a list / counts from 1
-sentences / the second item of a list / fails as value on another item
-sentences / the second item of a list / fails as absent when the list is too short
-sentences / the second item of a list / fails as unusable when xs is a string
-sentences / the first item of a list / reads the item at position 0
-sentences / the first item of a list / fails as absent on an empty list
-sentences / an item of a list in brackets / counts from 0 and prints the word form
-sentences / an item of a list in brackets / fails as absent when the list is too short
-sentences / a field of an item in brackets / keeps the brackets when a key follows
-sentences / a field on the right with a dot in front / compares with the field called empty and prints equals
-sentences / a field on the right with a dot in front / fails as value when the field holds another value
-sentences / a field on the right with a dot in front / fails as absent when there is no field called empty
-sentences / a field called true on the right / compares with the field, not with the value true
-sentences / a field called true on the right / fails as value when it holds another value
-sentences / a quoted string on the right is text / compares with the text, not with a field called y
-sentences / a quoted key on the right with a dot in front / compares with the field $schema
-sentences / a field on the right without a dot / compares with the field
-sentences / a field with a dot in front that doesn't need it / prints without the dot
-sentences / a field called empty on the left with a dot in front / reads the field called empty
-sentences / a grammar word after the first key / needs no dot
-sentences / is equal to prints as is / prints as x is "a"
-sentences / is equal to a field prints as equals / prints as x equals y
-sentences / equals with a value prints as is / prints as x is "a"
-sentences / two spaces between words print as one / prints as x is "a"
-sentences / single quotes without a backslash print as double quotes / prints as x is "prod"
-sentences / a quote inside single quotes prints with a JSON escape / prints as x is "a\"b"
 sentences / is in values prints as is one of / prints as x is one of "a", "b"
 sentences / values with no space after the comma print with one / prints as x is one of "a", "b"
 sentences / is one of a path prints as is in / prints as x is in $params.k
-sentences / is before a field prints as equals / prints as x equals y
-sentences / does not equal a value prints as is not / prints as x is not "a"
-sentences / is not a field prints as does not equal / prints as x does not equal y
 sentences / a pattern with a backslash prints in single quotes / prints as x matches '^\d+$'
 sentences / a pattern with a backslash written in double quotes prints in single quotes / prints as x matches '^\d+$'
 sentences / a pattern with two backslashes in a row prints in double quotes / prints as x matches "a\\\\b"
 sentences / a pattern with a single quote prints in double quotes / prints as x matches "it's"
-sentences / a number with a trailing zero prints in its plain form / prints as x is 1.5
-sentences / a number with an exponent prints in its plain form / prints as x is 100
-sentences / a field on the right with a dot in front prints without it when it isn't needed / prints as x is at least y
-sentences / a time sentence prints as written / prints as opened is on or after closed
-sentences / equals with within prints as written / prints as x equals y within 0.5
-sentences / is within a value prints as written / prints as x is 5 within 1
 sentences / an item compared with the subject under assert / reads type from the subject, so no condition matches and the check fails with value
 sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters
 sentences / is empty / passes on an empty list
@@ -875,18 +583,6 @@ sentences / is a <type> / fails every type as null when the field is null
 sentences / is a <type> / fails every type as absent when the field is missing
 sentences / is a <type> on empty values, an article written wrong, and a parent that can't hold the field / an empty object is an object, and is a object prints as is an object
 sentences / is a <type> on empty values, an article written wrong, and a parent that can't hold the field / an empty list is a list, and a parent that's a string fails as unusable
-sentences / starts with and ends with / passes when the field starts or ends with the value or the field
-sentences / starts with and ends with / fails as value when it doesn't
-sentences / starts with and ends with / fails as unusable on numbers, even two of them
-sentences / starts with and ends with / fails as null when the field is null
-sentences / starts with and ends with / fails as absent when the field is missing
-sentences / starts with a field on the right / fails as null when the field on the right is null
-sentences / starts with a field on the right / fails as absent when the field on the right is missing
-sentences / starts with a field on the right / passes on an empty string on the right
-sentences / starts with a field on the right / fails as value when the right side is longer
-sentences / assertions joined with and, and listed under assert / passes when every assertion passes, with no failed assertions, and prints both forms the same way
-sentences / assertions joined with and, and listed under assert / fails as value and names the one assertion that failed
-sentences / assertions joined with and, and listed under assert / takes the first cause among the assertions that failed, and lists each with its own
 sentences / a field after a phrase that takes a list / passes or fails as the same phrase with the list written, and lists both fields in inputs
 sentences / a field after a phrase that takes a list / fails as value when the field holds no match
 sentences / a field after a phrase that takes a list / fails as absent on the right when the field is missing, whatever the left side is
@@ -903,16 +599,6 @@ sentences / is one of a field holding values of mixed types / fails as unusable,
 sentences / an any_of whose options hold sentences written wrong / lists each problem under the check, named by its option and, when the option has more than one, its line
 sentences / contains all of values of mixed types / is written wrong, and says why
 sentences / contains a field of another type than the list / fails as unusable, and so does a list on the right whose values have more than one type
-sentences / a time is before a written time / passes when the order holds
-sentences / a time is before a written time / fails as value on the same instant written in another offset
-sentences / a time is before a written time / fails as unusable when the field is text that is not a time
-sentences / a time is before a written time / fails as unusable when the field is a number, because the written time is a string
-sentences / a time is before a written time / fails as absent when the field is missing
-sentences / a time is after a written number / passes when the number is higher
-sentences / a time is after a written number / fails as value on the same number
-sentences / a time is after a written number / fails as unusable when the field is a string, because the written time is a number
-sentences / a time is on or before a written time / passes on the same instant written in another offset
-sentences / a time is on or before a written time / fails as value when it is later
 sentences / is in a list read with named by / passes when the list under the key has the value
 sentences / is in a list read with named by / fails as value when it does not
 sentences / is in a list read with named by a key that has no list / fails as absent whatever the field holds
@@ -925,11 +611,6 @@ sentences / an any_of of sentences with a name that starts like another / sorts 
 sentences / an any_of of sentences that read a part / reads the part by its alias in each option
 sentences / an any_of of sentences that read a parent subject / reads the parent by its name in each option
 sentences / a count on the left of a whose / counts the item's own field, even when its first key is the parent subject's name
-subjects / a from line with whose and two conditions / joins the conditions as written in the $applies row, and keeps only the subjects that pass both
-subjects / a from line with whose and two conditions / fails the requirement as absent for a subject a condition can't decide, even with min_subjects 0
-subjects / a from line with whose and two conditions / fails the requirement as unusable for a subject whose field has another type than the value, even with min_subjects 0
-subjects / a from line with whose and two conditions / fails as absent when the first condition can't be decided, even though the second rules the subject out
-subjects / a from line with its conditions in the other order / keeps the written order in the expression, and lists the inputs sorted by name
 subjects / a condition with count of / counts the items of the list and keeps subjects with enough
 subjects / a condition with count of / fails the requirement as absent for a subject whose list is missing
 subjects / a condition with some / keeps a subject when some item of the list passes, and rules out one where none does or that has no items
@@ -942,25 +623,9 @@ subjects / a condition with some after another condition / joins the conditions 
 subjects / a condition with some in the from line of a child subject / reads the parent's field by its name on the right side, and the item's field for a bare name
 subjects / a condition with some in a from line with every / keeps the releases of every artifact that pass the condition
 subjects / a condition with some in the from line of a subject that narrows another / keeps the subjects of the parent that pass the condition
-subjects / a subject's own name in its own from / is the input field, never the subject
-subjects / a subject that goes on into one of several subjects that its own conditions pick / checks ids are unique within each parent, so the same id under two parents is fine
-subjects / a subject that goes on into one of several subjects that its own conditions pick / gives no rows for a parent its conditions leave out, even when its subjects repeat an id or fail
-subjects / a subject that goes on into one of several subjects that its own conditions pick / fails min_subjects as absent on the row of a parent whose conditions can't be decided, and doesn't check its subjects
-subjects / a from line whose condition reads the parent subject by its name / reads the parent's field for each of its subjects, like a check does
-subjects / a from line whose condition reads the parent subject by its name / a parent with no such field fails $applies as absent
 subjects / a from line whose condition has the parent subject's name on its left / reads the child's own field, as on the left of any whose
-subjects / a chain of three subjects / checks each grandchild, counts per direct parent, and every row but $well_formed carries every ancestor's id under in
-subjects / a chain of three subjects / leaves out everything below a subject that's out of scope at any level
-subjects / a chain of three subjects / fails min_subjects as absent on the row of an ancestor whose conditions can't be decided, with in up to that ancestor
-subjects / a from line with every / reads one flat list from every list along the path, with no in, and counts it once
-subjects / a from line with every / checks ids are unique across every list
-subjects / a from line with every / fails min_subjects with the worst cause of a broken branch, lists each one, and still checks the subjects it read
-subjects / a subject that narrows another / keeps the subjects that pass the parent's conditions and its own, parent's first in the expression
-subjects / a subject that narrows one whose name has a space / names the parent in quotes and keeps what passes every condition along the chain
 subjects / subjects that narrow each other / lead to a loop, named after from, and the requirement finds no subjects
 subjects / a from line whose condition is written wrong / is written wrong, and $well_formed names the from line and is the requirement's only row
-subjects / a from line that reads a key named by a param before naming each subject / is written correctly and gives one subject per listed key under the key the param names
-subjects / a subject that narrows another / lists both subjects, and the narrowing one has the id of the one it narrows
 subjects / a from line that narrows a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
 subjects / a from line that reads a child subject of a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
 subjects / child subjects that read each other / lead to a loop, named after from
@@ -969,11 +634,6 @@ subjects / a child subject of a subject that narrows it / leads to a loop, named
 subjects / a child subject whose check reads its parent with named by on its right side / shows the parent's value in its inputs
 subjects / a subject that narrows a subject in a loop / leads to a loop, named after its own from
 subjects / a child subject of a subject in a loop / leads to a loop, named after its own from
-subjects / a from line with two conditions on one field / lists the field once in the $applies row, with its location
-subjects / a $min_subjects row counting subjects / lists the location of each subject it counts, in the order of the rows
-subjects / a $min_subjects row counting subjects / lists no location when it counts no subject
-subjects / a from line with every where a list can't be read / gives each failed item of the $min_subjects row the location where its read stopped
-subjects / a child subject that reads its parent and itself under the same name / lists each read once when it reads one place, and twice when two places print the same name and value
 subjects / a from line with a some or every condition that fails on some items / gives each failed item of the $applies row the location where its value was read
 walks / every over one list of objects / passes when every item passes, and failed_items is empty
 walks / every over one list of objects / fails as value when one item fails, and lists it with its position
@@ -1088,5 +748,3 @@ walks / a walk through a for name, read from a parent on its right side / fails 
 walks / a walk through a for name, read from a parent on its right side / fails as unusable for a value that can't be compared
 walks / a walk whose parent path is named by a field of each item / lists the part before the name and not the path it names, which changes with each item
 walks / a walk whose parent path is named by a field of each item / fails as absent when the parent has none of the names
-subjects / a chain of three subjects / with no direct parent at all, fails min_subjects as value on one row without in
-subjects / a subject that goes on into one of several subjects that its own conditions pick / with every parent left out, fails min_subjects as value on one row without in
