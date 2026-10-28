@@ -664,10 +664,13 @@ impl Reading {
                     let scope = scope_of(name, &raw, &effective);
                     let aliases = scope.aliases();
                     let alias_refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
+                    let parent_names = scope.parent_names();
+                    let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
                     found_problems.extend(s::from_problems(line, &alias_refs));
                     let mut filters = Vec::new();
                     for condition in &line.whose {
-                        let text = s::print_from_condition(condition, &alias_refs);
+                        let text =
+                            s::print_from_condition_with(condition, &alias_refs, &parent_refs);
                         match condition {
                             s::FromCondition::Condition(condition) => {
                                 match lower::lower_condition(condition, &scope) {
@@ -807,6 +810,14 @@ impl Reading {
     }
 
     pub fn used(&self, name: &str) -> Vec<String> {
+        self.walk_back(name, true)
+    }
+
+    pub fn listed(&self, name: &str) -> Vec<String> {
+        self.walk_back(name, false)
+    }
+
+    fn walk_back(&self, name: &str, only_read: bool) -> Vec<String> {
         let mut seen: Vec<String> = Vec::new();
         let mut todo = vec![name.to_string()];
         while let Some(next) = todo.pop() {
@@ -815,7 +826,7 @@ impl Reading {
             }
             seen.push(next.clone());
             let info = &self.infos[&next];
-            if info.lowered.is_none() {
+            if only_read && info.lowered.is_none() {
                 continue;
             }
             match &info.relation {
@@ -931,7 +942,11 @@ fn resolved_id_text(
             return None;
         }
         let found = raw.get(&at)?;
-        if let Relation::Narrows(parent) = &found.relation {
+        let from_at = field_name(&["subjects", &at, "from"]);
+        let read_ok = !problems.get(&at).is_some_and(|p| p.contains_key(&from_at));
+        if let Relation::Narrows(parent) = &found.relation
+            && read_ok
+        {
             at = parent.clone();
             continue;
         }
@@ -967,7 +982,9 @@ fn entry_of(
                 let scope = scope_of(name, raw, effective);
                 let aliases = scope.aliases();
                 let refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
-                s::print_from(line, &refs)
+                let parents = scope.parent_names();
+                let parent_refs: Vec<&str> = parents.iter().map(String::as_str).collect();
+                s::print_from_with(line, &refs, &parent_refs)
             }
             _ => name::name(&path::Path {
                 start: Start::Subject,
@@ -1089,6 +1106,28 @@ mod tests {
     fn a_dot_reads_the_field_and_not_the_subject() {
         let (_, r) = reading(json!({"art": {"from": "arts"}, "b": {"from": ".a.x"}}));
         assert_eq!(r.infos["b"].relation, Relation::Root);
+    }
+
+    #[test]
+    fn a_subject_that_narrows_a_blank_name_reports_no_id_of_its_own_nor_its_parents() {
+        let (_, r) = reading(json!({
+            " ": {"from": "things", "identified_by": "id"},
+            "b": {"from": "\" \" whose id is \"a\""}
+        }));
+        assert_eq!(r.infos["b"].entry["identified_by"], Value::Null);
+        assert_eq!(r.infos[" "].entry["identified_by"], json!("id"));
+    }
+
+    #[test]
+    fn a_subject_in_a_loop_lists_the_whole_loop_but_only_reads_itself() {
+        let policy = Policy::read(&json!({
+            "ergo_spec": "v0.2",
+            "subjects": {"x": {"from": "y whose id exists"}, "y": {"from": "x whose id exists"}},
+            "requirements": {}
+        }));
+        let r = Reading::of(&policy);
+        assert_eq!(r.listed("x"), ["x", "y"]);
+        assert_eq!(r.used("x"), ["x"]);
     }
 
     #[test]
@@ -1313,6 +1352,7 @@ mod tests {
         assert_eq!(r.used("n"), ["c", "n"]);
         assert_eq!(r.used("c"), ["c"]);
         assert!(r.used("nope").is_empty());
+        assert!(r.listed("nope").is_empty());
     }
 
     #[test]

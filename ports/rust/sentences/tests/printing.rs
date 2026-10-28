@@ -432,3 +432,16 @@ fn params_and_input_print_with_their_dollar() {
     );
     assert_eq!(printed("$input"), "$input");
 }
+
+#[test]
+fn a_parent_name_on_the_left_of_a_whose_is_the_items_field_and_prints_with_a_dot() {
+    let read = from("b.kids whose b.x equals v and some b.ls is empty");
+    assert_eq!(
+        print_from_with(&read, &["b"], &["b"]),
+        "b.kids whose .b.x equals v and some .b.ls is empty"
+    );
+    assert_eq!(
+        print_from_with(&read, &["b"], &[]),
+        "b.kids whose b.x equals v and some b.ls is empty"
+    );
+}

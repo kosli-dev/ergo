@@ -582,7 +582,7 @@ pub fn assemble_with(
         if let SubjectName::Named(subject_name) = &requirement.subject
             && policy.subject_of(requirement).is_some()
         {
-            for used in reading.used(subject_name) {
+            for used in reading.listed(subject_name) {
                 subjects.insert(used.clone(), subject_entry(reading, &used, extra_problems));
             }
             subjects

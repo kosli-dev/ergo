@@ -525,17 +525,8 @@ subjects / a condition with every and if any / does not keep a subject whose lis
 subjects / a condition with some after another condition / joins the conditions with and in the expression, and keeps a subject that passes both
 subjects / a condition with some in a from line with every / keeps the releases of every artifact that pass the condition
 subjects / a condition with some in the from line of a subject that narrows another / keeps the subjects of the parent that pass the condition
-subjects / a from line whose condition has the parent subject's name on its left / reads the child's own field, as on the left of any whose
-subjects / subjects that narrow each other / lead to a loop, named after from, and the requirement finds no subjects
 subjects / a from line whose condition is written wrong / is written wrong, and $well_formed names the from line and is the requirement's only row
-subjects / a from line that narrows a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
-subjects / a from line that reads a child subject of a subject whose name is blank / is written wrong under from, saying the name isn't a subject name
-subjects / child subjects that read each other / lead to a loop, named after from
-subjects / three child subjects that read each other in a ring / lead to a loop, named after from
-subjects / a child subject of a subject that narrows it / leads to a loop, named after from
 subjects / a child subject whose check reads its parent with named by on its right side / shows the parent's value in its inputs
-subjects / a subject that narrows a subject in a loop / leads to a loop, named after its own from
-subjects / a child subject of a subject in a loop / leads to a loop, named after its own from
 subjects / a from line with a some or every condition that fails on some items / gives each failed item of the $applies row the location where its value was read
 walks / every where the last list is the one walked, over strings / passes when every string matches
 walks / every where the last list is the one walked, over strings / fails as value for a string that does not match, named by its position
