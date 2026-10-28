@@ -285,7 +285,7 @@ fn lenient_problems(text: &str, kind: Kind) -> Vec<String> {
     let found = match kind {
         Kind::From => parser
             .whole(parser.read_from_core(0, false))
-            .map(|line| rules::from_base(&line)),
+            .map(|line| rules::from_base(&line.build())),
         Kind::Path => parser
             .whole(parser.path(0, Side::Left))
             .map(|path| rules::path_base(&path)),
@@ -311,7 +311,7 @@ fn split_notes(notes: parse::Notes) -> (Vec<String>, Vec<Condition>) {
     for note in notes {
         match note {
             parse::Note::Text(text) => texts.push(text.to_string()),
-            parse::Note::Hidden(conditions) => hidden.extend(conditions),
+            parse::Note::Hidden(conditions) => hidden.extend(parse::chain_items(&conditions)),
         }
     }
     (texts, hidden)

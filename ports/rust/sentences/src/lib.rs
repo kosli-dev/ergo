@@ -20,7 +20,7 @@ pub use print::{
 pub use rules::{check_problems, for_problems, from_problems};
 pub use tree::*;
 
-use parse::{Parser, trim};
+use parse::{FromRead, Parser, trim};
 use problems::{Kind, errors};
 
 /// The name of this crate.
@@ -59,6 +59,7 @@ pub fn parse_from(line: &str) -> Result<From, Vec<SyntaxError>> {
     let parser = Parser::new(text, false);
     parser
         .whole(parser.read_from_line(0))
+        .map(FromRead::build)
         .ok_or_else(|| errors(text, Kind::From))
 }
 

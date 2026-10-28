@@ -2,6 +2,7 @@ use crate::tree::*;
 use crate::words::is_word;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 mod checks;
 
@@ -9,13 +10,122 @@ pub(crate) use checks::{ITEM_START, Note, Notes};
 
 pub(crate) type Reads<T> = Vec<(T, usize)>;
 pub(crate) type Noted<T> = (T, Notes);
+pub(crate) type Chain<T> = Option<Rc<Link<T>>>;
+type Heads<T> = RefCell<HashMap<usize, Rc<Reads<T>>>>;
+
+pub(crate) struct Link<T> {
+    item: T,
+    before: Chain<T>,
+}
+
+impl<T> Drop for Link<T> {
+    fn drop(&mut self) {
+        let mut next = self.before.take();
+        while let Some(link) = next {
+            match Rc::try_unwrap(link) {
+                Ok(mut link) => next = link.before.take(),
+                Err(_) => break,
+            }
+        }
+    }
+}
+
+pub(crate) fn chain_items<T: Clone>(chain: &Chain<T>) -> Vec<T> {
+    let mut items = Vec::new();
+    let mut at = chain.as_deref();
+    while let Some(link) = at {
+        items.push(link.item.clone());
+        at = link.before.as_deref();
+    }
+    items.reverse();
+    items
+}
+
+fn heads_at<T>(memo: &Heads<T>, i: usize, make: impl FnOnce() -> Reads<T>) -> Rc<Reads<T>> {
+    if let Some(done) = memo.borrow().get(&i) {
+        return Rc::clone(done);
+    }
+    let made = Rc::new(make());
+    memo.borrow_mut().insert(i, Rc::clone(&made));
+    made
+}
+
+pub(crate) fn chain_reads<T: Clone>(
+    start: usize,
+    most: usize,
+    heads: impl Fn(usize) -> Rc<Reads<T>>,
+    after: impl Fn(usize) -> Option<usize>,
+) -> Reads<Chain<T>> {
+    struct Frame<T> {
+        heads: Rc<Reads<T>>,
+        next: usize,
+        before: Chain<T>,
+        length: usize,
+        pending: Option<(Chain<T>, usize)>,
+    }
+    let mut out = Vec::new();
+    let mut stack = vec![Frame {
+        heads: heads(start),
+        next: 0,
+        before: None,
+        length: 0,
+        pending: None,
+    }];
+    while let Some(frame) = stack.last_mut() {
+        if let Some(done) = frame.pending.take() {
+            out.push(done);
+        }
+        let Some((item, end)) = frame.heads.get(frame.next).cloned() else {
+            stack.pop();
+            continue;
+        };
+        frame.next += 1;
+        let link = Some(Rc::new(Link {
+            item,
+            before: frame.before.clone(),
+        }));
+        let length = frame.length + 1;
+        frame.pending = Some((link.clone(), end));
+        if length < most
+            && let Some(k) = after(end)
+        {
+            stack.push(Frame {
+                heads: heads(k),
+                next: 0,
+                before: link,
+                length,
+                pending: None,
+            });
+        }
+    }
+    out
+}
+
+pub(crate) struct FromRead {
+    every: bool,
+    path: Path,
+    named_by_each_of: Option<Path>,
+    whose: Chain<FromCondition>,
+}
+
+impl FromRead {
+    pub(crate) fn build(self) -> From {
+        From {
+            every: self.every,
+            path: self.path,
+            named_by_each_of: self.named_by_each_of,
+            whose: chain_items(&self.whose),
+        }
+    }
+}
 
 pub(crate) struct Parser {
     c: Vec<char>,
     lenient: bool,
-    memo: RefCell<HashMap<usize, Reads<Vec<FromCondition>>>>,
-    condition_memo: RefCell<HashMap<usize, Reads<Vec<Condition>>>>,
-    assertion_memo: RefCell<HashMap<usize, Reads<Noted<Vec<Assertion>>>>>,
+    memo: Heads<FromCondition>,
+    condition_memo: Heads<Condition>,
+    assertion_memo: Heads<Noted<Assertion>>,
+    item_memo: Heads<Noted<ForItem>>,
 }
 
 fn is_key_start(ch: char) -> bool {
@@ -34,6 +144,7 @@ impl Parser {
             memo: RefCell::new(HashMap::new()),
             condition_memo: RefCell::new(HashMap::new()),
             assertion_memo: RefCell::new(HashMap::new()),
+            item_memo: RefCell::new(HashMap::new()),
         }
     }
 
@@ -333,11 +444,19 @@ impl Parser {
             ends.push(j);
             at = j;
         }
-        (0..=all.len())
-            .rev()
-            .filter(|&n| n == all.len() || self.at(ends[n]) == Some(' '))
-            .map(|n| (all[..n].to_vec(), ends[n]))
-            .collect()
+        let whole = all.len();
+        let mut out: Reads<Vec<Step>> = Vec::new();
+        for n in (0..whole).rev() {
+            if self
+                .ws(ends[n])
+                .and_then(|m| self.lead(m, "named by each of"))
+                .is_some()
+            {
+                out.push((all[..n].to_vec(), ends[n]));
+            }
+        }
+        out.insert(0, (all, ends[whole]));
+        out
     }
 
     fn start(&self, i: usize, side: Side) -> Option<(Start, usize)> {
@@ -921,26 +1040,16 @@ impl Parser {
         out
     }
 
-    fn read_from_conditions(&self, i: usize) -> Reads<Vec<FromCondition>> {
-        if let Some(done) = self.memo.borrow().get(&i) {
-            return done.clone();
-        }
-        let mut out = Vec::new();
-        for (condition, j) in self.read_from_condition(i) {
-            if let Some(k) = self.ws(j).and_then(|m| self.lead(m, "and")) {
-                for (rest, end) in self.read_from_conditions(k) {
-                    let mut all = vec![condition.clone()];
-                    all.extend(rest);
-                    out.push((all, end));
-                }
-            }
-            out.push((vec![condition], j));
-        }
-        self.memo.borrow_mut().insert(i, out.clone());
-        out
+    fn read_from_conditions(&self, i: usize) -> Reads<Chain<FromCondition>> {
+        chain_reads(
+            i,
+            usize::MAX,
+            |at| heads_at(&self.memo, at, || self.read_from_condition(at)),
+            |end| self.ws(end).and_then(|m| self.lead(m, "and")),
+        )
     }
 
-    pub(crate) fn read_from_core(&self, i: usize, every: bool) -> Reads<From> {
+    pub(crate) fn read_from_core(&self, i: usize, every: bool) -> Reads<FromRead> {
         let mut out = Vec::new();
         for (path, j) in self.path(i, Side::Left) {
             let mut eaches: Reads<Option<Path>> = Vec::new();
@@ -954,7 +1063,7 @@ impl Parser {
                 if let Some(k) = self.ws(j2).and_then(|m| self.lead(m, "whose")) {
                     for (whose, end) in self.read_from_conditions(k) {
                         out.push((
-                            From {
+                            FromRead {
                                 every,
                                 path: path.clone(),
                                 named_by_each_of: each.clone(),
@@ -965,11 +1074,11 @@ impl Parser {
                     }
                 }
                 out.push((
-                    From {
+                    FromRead {
                         every,
                         path: path.clone(),
                         named_by_each_of: each,
-                        whose: Vec::new(),
+                        whose: None,
                     },
                     j2,
                 ));
@@ -978,7 +1087,7 @@ impl Parser {
         out
     }
 
-    pub(crate) fn read_from_line(&self, i: usize) -> Reads<From> {
+    pub(crate) fn read_from_line(&self, i: usize) -> Reads<FromRead> {
         let mut out = Vec::new();
         if let Some(j) = self.lead(i, "every") {
             out.extend(self.read_from_core(j, true));

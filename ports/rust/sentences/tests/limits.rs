@@ -20,14 +20,14 @@ fn a_line_of_three_hundred_characters_with_ten_ands_parses() {
 }
 
 #[test]
-fn the_same_line_ending_in_an_error_is_rejected_quickly() {
+fn the_same_line_ending_in_an_error_is_rejected_within_five_seconds() {
     let mut line = long_line(11);
     line.push_str(" and last is");
-    assert_eq!(failure(&line), vec!["doesn't parse"]);
+    assert_eq!(within_seconds(5, || failure(&line)), vec!["doesn't parse"]);
     let mut line = long_line(11);
     line.push_str(" and empty is 1");
     assert_eq!(
-        failure(&line),
+        within_seconds(5, || failure(&line)),
         vec!["empty is a word of the grammar: write .empty"]
     );
 }
@@ -38,12 +38,12 @@ fn a_hundred_conditions_parse() {
 }
 
 #[test]
-fn a_hundred_conditions_ending_in_an_error_are_rejected_quickly() {
+fn a_hundred_conditions_ending_in_an_error_are_rejected_within_five_seconds() {
     let mut line = long_line(100);
     let column = line.chars().count() + " and x is ".len() + 1;
     line.push_str(" and x is \"a");
     assert_eq!(
-        failure(&line),
+        within_seconds(5, || failure(&line)),
         vec![format!("unclosed quote at column {column}")]
     );
 }
@@ -73,14 +73,14 @@ fn a_long_path_parses() {
 }
 
 #[test]
-fn many_and_words_that_could_be_values_do_not_make_it_slow() {
+fn many_and_words_that_could_be_values_parse_within_five_seconds() {
     let mut line = String::from("x whose y equals z");
     for _ in 0..40 {
         line.push_str(" and y equals z plus 1 plus 2 plus 3");
     }
-    assert_eq!(from(&line).whose.len(), 41);
+    assert_eq!(within_seconds(5, || from(&line)).whose.len(), 41);
     line.push_str(" and");
-    assert_eq!(failure(&line), vec!["doesn't parse"]);
+    assert_eq!(within_seconds(5, || failure(&line)), vec!["doesn't parse"]);
 }
 
 #[test]
@@ -138,9 +138,9 @@ fn parenthesis_and_other_symbols_do_not_parse() {
 }
 
 #[test]
-fn a_very_long_exponent_does_not_stop_the_reader() {
+fn a_very_long_exponent_is_read_within_five_seconds() {
     let line = format!("x whose y is 1e{}", "9".repeat(60));
-    assert!(parse_from(&line).is_ok());
+    assert!(within_seconds(5, || parse_from(&line)).is_ok());
 }
 
 fn within_seconds<T>(seconds: u64, read: impl FnOnce() -> T) -> T {
@@ -198,4 +198,81 @@ fn a_chain_of_a_hundred_kilobytes_of_plus_terms_parses_in_time_that_grows_with_i
         } => assert_eq!(terms.len(), 14_001),
         other => panic!("{other:?}"),
     }
+}
+
+fn fastest_of_three(read: &dyn Fn()) -> std::time::Duration {
+    (0..3)
+        .map(|_| {
+            let started = std::time::Instant::now();
+            read();
+            started.elapsed()
+        })
+        .min()
+        .unwrap()
+}
+
+fn assert_grows_in_proportion(small: usize, read: impl Fn(usize)) {
+    let before = fastest_of_three(&|| read(small));
+    let after = fastest_of_three(&|| read(small * 4));
+    let floor = std::time::Duration::from_millis(3);
+    assert!(
+        after < before.max(floor) * 10,
+        "{small} took {before:?} and {} took {after:?}",
+        small * 4
+    );
+}
+
+#[test]
+fn a_check_with_many_ands_is_read_in_time_that_grows_in_proportion() {
+    assert_grows_in_proportion(300, |n| {
+        let line = format!("x is 1{}", " and x is 1".repeat(n));
+        assert_eq!(parse_check(&line).unwrap().assertions.len(), n + 1);
+    });
+}
+
+#[test]
+fn a_whose_of_a_check_with_many_ands_is_read_in_time_that_grows_in_proportion() {
+    assert_grows_in_proportion(300, |n| {
+        let line = format!(
+            "every items whose size is 1{} is empty",
+            " and size is 1".repeat(n)
+        );
+        match &parse_check(&line).unwrap().assertions[0] {
+            Assertion::Quantified { whose, .. } => assert_eq!(whose.len(), n + 1),
+            other => panic!("{other:?}"),
+        }
+    });
+}
+
+#[test]
+fn a_whose_of_a_from_line_with_many_ands_is_read_in_time_that_grows_in_proportion() {
+    assert_grows_in_proportion(300, |n| {
+        let line = format!("items whose size is 1{}", " and size is 1".repeat(n));
+        assert_eq!(from(&line).whose.len(), n + 1);
+    });
+}
+
+#[test]
+fn a_from_line_that_does_not_read_is_rejected_in_time_that_grows_in_proportion() {
+    assert_grows_in_proportion(300, |n| {
+        let line = format!("items whose size is 1{} and", " and size is 1".repeat(n));
+        assert_eq!(failure(&line), vec!["doesn't parse"]);
+    });
+}
+
+#[test]
+fn a_for_line_with_many_items_that_does_not_read_is_rejected_in_time_that_grows_in_proportion() {
+    assert_grows_in_proportion(300, |n| {
+        let line = format!("every x as x{}", ", every x as x".repeat(n));
+        let errors = parse_for(&line).unwrap_err();
+        assert_eq!(errors[0].message, "a for line holds two items at most");
+    });
+}
+
+#[test]
+fn a_chain_of_named_by_is_read_in_time_that_grows_in_proportion() {
+    assert_grows_in_proportion(300, |n| {
+        let line = format!("x{}", " named by a".repeat(n));
+        assert_eq!(from(&line).path.steps.len(), n);
+    });
 }

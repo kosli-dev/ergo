@@ -3,7 +3,7 @@ use super::*;
 #[derive(Clone)]
 pub(crate) enum Note {
     Text(&'static str),
-    Hidden(Vec<Condition>),
+    Hidden(Chain<Condition>),
 }
 
 pub(crate) type Notes = Vec<Note>;
@@ -15,36 +15,32 @@ pub(crate) const SORTED_AFTER: &str =
     r#""sorted by" goes after a position, like "last of", not after every or some"#;
 pub(crate) const IF_ANY_POSITION: &str = "if any can't go with a position";
 
-fn joined(first: &Notes, second: &Notes) -> Notes {
-    first.iter().chain(second.iter()).cloned().collect()
+fn flatten<T: Clone>(chain: &Chain<Noted<T>>) -> (Vec<T>, Notes) {
+    let mut items = Vec::new();
+    let mut notes = Vec::new();
+    for (item, more) in chain_items(chain) {
+        items.push(item);
+        notes.extend(more);
+    }
+    (items, notes)
 }
 
 impl Parser {
-    fn conditions(&self, i: usize) -> Reads<Vec<Condition>> {
-        if let Some(done) = self.condition_memo.borrow().get(&i) {
-            return done.clone();
-        }
-        let mut out = Vec::new();
-        for (condition, j) in self.condition(i) {
-            if let Some(k) = self.ws(j).and_then(|m| self.lead(m, "and")) {
-                for (rest, end) in self.conditions(k) {
-                    let mut all = vec![condition.clone()];
-                    all.extend(rest);
-                    out.push((all, end));
-                }
-            }
-            out.push((vec![condition], j));
-        }
-        self.condition_memo.borrow_mut().insert(i, out.clone());
-        out
+    fn conditions(&self, i: usize) -> Reads<Chain<Condition>> {
+        chain_reads(
+            i,
+            usize::MAX,
+            |at| heads_at(&self.condition_memo, at, || self.condition(at)),
+            |end| self.ws(end).and_then(|m| self.lead(m, "and")),
+        )
     }
 
-    fn whose_opt(&self, i: usize) -> Reads<Vec<Condition>> {
+    fn whose_opt(&self, i: usize) -> Reads<Chain<Condition>> {
         let mut out = Vec::new();
         if let Some(k) = self.ws(i).and_then(|m| self.lead(m, "whose")) {
             out.extend(self.conditions(k));
         }
-        out.push((Vec::new(), i));
+        out.push((None, i));
         out
     }
 
@@ -75,13 +71,13 @@ impl Parser {
                 let last_derived = matches!(chain.last(), Some(Term::Derived(_)));
                 if last_derived || self.lenient {
                     for (whose, w) in self.whose_opt(e) {
-                        if whose.is_empty() {
+                        if whose.is_none() {
                             continue;
                         }
                         let mut with = chain.clone();
                         let mut notes = Vec::new();
                         match with.last_mut() {
-                            Some(Term::Derived(derived)) => derived.whose = whose,
+                            Some(Term::Derived(derived)) => derived.whose = chain_items(&whose),
                             _ => {
                                 notes.push(Note::Text(WHOSE_PLACE));
                                 notes.push(Note::Hidden(whose));
@@ -109,7 +105,7 @@ impl Parser {
                             let assertion = Assertion::Quantified {
                                 quantifier,
                                 path: path.clone(),
-                                whose: whose.clone(),
+                                whose: chain_items(&whose),
                                 if_any,
                                 phrase,
                             };
@@ -123,7 +119,7 @@ impl Parser {
             let mut starts = vec![(j, Vec::new())];
             if self.lenient {
                 for (whose, w) in self.whose_opt(j) {
-                    if !whose.is_empty() {
+                    if whose.is_some() {
                         starts.push((
                             w,
                             vec![Note::Text(WHOSE_PLACE), Note::Hidden(whose.clone())],
@@ -155,28 +151,20 @@ impl Parser {
         out
     }
 
-    fn assertions(&self, i: usize) -> Reads<(Vec<Assertion>, Notes)> {
-        if let Some(done) = self.assertion_memo.borrow().get(&i) {
-            return done.clone();
-        }
-        let mut out = Vec::new();
-        for ((assertion, notes), j) in self.assertion(i) {
-            if let Some(k) = self.ws(j).and_then(|m| self.lead(m, "and")) {
-                for ((rest, more), end) in self.assertions(k) {
-                    let mut all = vec![assertion.clone()];
-                    all.extend(rest);
-                    out.push(((all, joined(&notes, &more)), end));
-                }
-            }
-            out.push(((vec![assertion], notes), j));
-        }
-        self.assertion_memo.borrow_mut().insert(i, out.clone());
-        out
+    fn assertions(&self, i: usize) -> Reads<Chain<Noted<Assertion>>> {
+        chain_reads(
+            i,
+            usize::MAX,
+            |at| heads_at(&self.assertion_memo, at, || self.assertion(at)),
+            |end| self.ws(end).and_then(|m| self.lead(m, "and")),
+        )
     }
 
     pub(crate) fn read_check(&self) -> Option<(Check, Notes)> {
-        self.whole(self.assertions(0))
-            .map(|(assertions, notes)| (Check { assertions }, notes))
+        self.whole(self.assertions(0)).map(|chain| {
+            let (assertions, notes) = flatten(&chain);
+            (Check { assertions }, notes)
+        })
     }
 
     fn sorted_opt(&self, i: usize) -> Reads<Option<SortedBy>> {
@@ -230,7 +218,7 @@ impl Parser {
                             let item = ForItem::Walk {
                                 quantifier,
                                 path: path.clone(),
-                                whose: whose.clone(),
+                                whose: chain_items(&whose),
                                 if_any,
                                 alias,
                             };
@@ -248,7 +236,7 @@ impl Parser {
                             let item = ForItem::Pick {
                                 position: position.clone(),
                                 path: path.clone(),
-                                whose: whose.clone(),
+                                whose: chain_items(&whose),
                                 sorted_by,
                                 alias,
                             };
@@ -283,7 +271,7 @@ impl Parser {
                                 (Some(quantifier), None) => ForItem::Walk {
                                     quantifier,
                                     path: path.clone(),
-                                    whose: whose.clone(),
+                                    whose: chain_items(&whose),
                                     if_any,
                                     alias,
                                 },
@@ -301,7 +289,7 @@ impl Parser {
                                     ForItem::Pick {
                                         position,
                                         path: bare,
-                                        whose: whose.clone(),
+                                        whose: chain_items(&whose),
                                         sorted_by,
                                         alias,
                                     }
@@ -316,30 +304,27 @@ impl Parser {
         out
     }
 
-    fn for_items(&self, i: usize, most: usize) -> Reads<(Vec<ForItem>, Notes)> {
-        let items = if self.lenient {
-            self.lenient_item(i)
-        } else {
-            self.strict_item(i)
-        };
-        let mut out = Vec::new();
-        for ((item, notes), j) in items {
-            if most > 1
-                && let Some(k) = self.lit(j, ",").and_then(|m| self.ws(m))
-            {
-                for ((rest, more), end) in self.for_items(k, most - 1) {
-                    let mut all = vec![item.clone()];
-                    all.extend(rest);
-                    out.push(((all, joined(&notes, &more)), end));
-                }
-            }
-            out.push(((vec![item], notes), j));
-        }
-        out
+    fn for_items(&self, most: usize) -> Reads<Chain<Noted<ForItem>>> {
+        chain_reads(
+            0,
+            most,
+            |at| {
+                heads_at(&self.item_memo, at, || {
+                    if self.lenient {
+                        self.lenient_item(at)
+                    } else {
+                        self.strict_item(at)
+                    }
+                })
+            },
+            |end| self.lit(end, ",").and_then(|m| self.ws(m)),
+        )
     }
 
     pub(crate) fn read_for(&self, most: usize) -> Option<(For, Notes)> {
-        self.whole(self.for_items(0, most))
-            .map(|(items, notes)| (For { items }, notes))
+        self.whole(self.for_items(most)).map(|chain| {
+            let (items, notes) = flatten(&chain);
+            (For { items }, notes)
+        })
     }
 }
