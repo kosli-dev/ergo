@@ -1,5 +1,6 @@
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
+import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { layoutRows, policySheet, yamlText, markOf, parseJson, makeRunner, parseTime, reportTables, plural } from "./lib.mjs";
 
 const { samples, wasm } = window.EDITOR;
@@ -11,6 +12,7 @@ const gutter = $("gutter");
 const panel = $("panel");
 const diags = $("diags");
 const bands = $("bands");
+const hl = $("hl");
 
 let current = Object.keys(samples)[0];
 let tab = "blocks";
@@ -50,6 +52,26 @@ const el = (tag, cls, text) => {
   if (cls) n.className = cls;
   if (text !== undefined) n.textContent = text;
   return n;
+};
+
+const paint = (into, lines) => {
+  const frag = document.createDocumentFragment();
+  lines.forEach((tokens, i) => {
+    if (i) frag.append("\n");
+    for (const t of tokens) frag.append(t.kind === "plain" ? document.createTextNode(t.text) : el("span", "h-" + t.kind, t.text));
+  });
+  into.replaceChildren(frag);
+};
+
+const follow = () => {
+  bands.style.transform = `translateY(${-src.scrollTop}px)`;
+  hl.style.transform = `translate(${-src.scrollLeft}px, ${-src.scrollTop}px)`;
+};
+
+const drawSource = () => {
+  paint(hl, highlightMarkdown(src.value, last?.blocks ?? []));
+  hl.append("\n");
+  follow();
 };
 
 const kindClass = (kind) => kind.replace(/ /g, "-");
@@ -240,9 +262,10 @@ const viewDoc = (result) => {
 
 const viewYaml = (result) => {
   const text = yamlText(result.policy);
-  panel.replaceChildren(
-    text ? el("pre", "yaml", text) : el("p", "empty", "The policy has problems, so there is no YAML yet."),
-  );
+  if (!text) return panel.replaceChildren(el("p", "empty", "The policy has problems, so there is no YAML yet."));
+  const pre = el("pre", "yaml");
+  paint(pre, highlightYaml(text.replace(/\n$/, "")));
+  panel.replaceChildren(pre);
 };
 
 const table = (t) => {
@@ -374,7 +397,7 @@ const render = (result) => {
         return band;
       }),
   );
-  bands.style.transform = `translateY(${-src.scrollTop}px)`;
+  drawSource();
 
   $("n-req").textContent = plural(result.blocks.filter((b) => b.kind === "requirement").length, "requirement");
   $("n-chk").textContent = plural(result.blocks.filter((b) => b.kind === "check").length, "check");
@@ -424,6 +447,7 @@ const recompile = () => {
 
 let timer = 0;
 src.addEventListener("input", () => {
+  drawSource();
   clearTimeout(timer);
   timer = setTimeout(recompile, 150);
 });
@@ -431,7 +455,7 @@ src.addEventListener("scroll", () => {
   if (syncing) return;
   syncing = true;
   gutter.scrollTop = src.scrollTop;
-  bands.style.transform = `translateY(${-src.scrollTop}px)`;
+  follow();
   if (tab === "blocks") panel.scrollTop = src.scrollTop;
   syncing = false;
 });
@@ -440,7 +464,7 @@ panel.addEventListener("scroll", () => {
   syncing = true;
   src.scrollTop = panel.scrollTop;
   gutter.scrollTop = panel.scrollTop;
-  bands.style.transform = `translateY(${-panel.scrollTop}px)`;
+  follow();
   syncing = false;
 });
 for (const ev of ["keyup", "click"]) {
