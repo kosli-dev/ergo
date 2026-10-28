@@ -194,6 +194,27 @@ export const markOf = (node, blocks) => {
   return PRIORITY.find((g) => groups.includes(g)) ?? null;
 };
 
+/** Says which list or paragraph kind a Markdown node starts: `"option"`, `"check"`, `"field"` or `"checks"`, or `null` for anything else. */
+export const kindAt = (node, blocks) => {
+  const start = node.position?.start?.line;
+  const kinds = blocks.filter((b) => b.startLine === start).map((b) => b.kind);
+  return ["option", "check", "field", "checks"].find((k) => kinds.includes(k)) ?? null;
+};
+
+/** Groups a document's top-level nodes for the Document view: each `###` heading and everything up to the next heading of level 3 or above becomes `{heading, nodes}`; every other node stays as it is. */
+export const docGroups = (nodes) => {
+  const out = [];
+  let group = null;
+  for (const node of nodes) {
+    if (node.type === "heading" && node.depth <= 3) {
+      group = node.depth === 3 ? { heading: node, nodes: [node] } : null;
+      out.push(group ?? node);
+    } else if (group) group.nodes.push(node);
+    else out.push(node);
+  }
+  return out;
+};
+
 /** Reads JSON text. Returns `{ok: true, value}`, or `{ok: false, message}` with a message that names what was being read (`what`). Never throws. */
 export const parseJson = (text, what) => {
   let value;

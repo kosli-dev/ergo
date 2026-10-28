@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { layoutRows, policySheet, yamlText, markOf, parseJson, reportTables, makeRunner, plural, reportDocument, unroundable } from "../src/lib.mjs";
+import { layoutRows, policySheet, yamlText, markOf, kindAt, docGroups, parseJson, reportTables, makeRunner, plural, reportDocument, unroundable } from "../src/lib.mjs";
 
 const block = (kind, startLine, endLine, name) => ({ kind, startLine, endLine, ...(name ? { name } : {}) });
 
@@ -346,3 +346,38 @@ test("a subject's $applies row and its check rows share one row, whatever order 
   );
 });
 
+
+test("a list that starts with a check is a check list, even inside a requirement that starts on the same line", () => {
+  assert.equal(kindAt(tree(6, 9), [block("requirement", 6, 12), block("check", 6, 7)]), "check");
+});
+
+test("a list of options is an option list, not a check list", () => {
+  assert.equal(kindAt(tree(7, 8), [block("check", 6, 8), block("option", 7, 7)]), "option");
+});
+
+test("the Checks paragraph and a field list are told apart from prose", () => {
+  assert.equal(kindAt(tree(5, 5), [block("checks", 5, 5)]), "checks");
+  assert.equal(kindAt(tree(3, 4), [block("field", 3, 3), block("field", 4, 4)]), "field");
+  assert.equal(kindAt(tree(3, 4), [block("prose", 3, 4)]), null);
+  assert.equal(kindAt({}, [block("check", 1, 2)]), null);
+});
+
+test("each ### heading groups what follows it up to the next heading of level 3 or above", () => {
+  const h = (depth) => ({ type: "heading", depth });
+  const p = () => ({ type: "paragraph" });
+  const [title, intro, section, a, a1, h4, a2, b, b1] = [h(1), p(), h(2), h(3), p(), h(4), p(), h(3), p()];
+  assert.deepEqual(docGroups([title, intro, section, a, a1, h4, a2, b, b1]), [
+    title,
+    intro,
+    section,
+    { heading: a, nodes: [a, a1, h4, a2] },
+    { heading: b, nodes: [b, b1] },
+  ]);
+});
+
+test("a level 2 heading ends the group before it", () => {
+  const a = { type: "heading", depth: 3 };
+  const two = { type: "heading", depth: 2 };
+  const after = { type: "paragraph" };
+  assert.deepEqual(docGroups([a, two, after]), [{ heading: a, nodes: [a] }, two, after]);
+});

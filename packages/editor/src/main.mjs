@@ -4,7 +4,7 @@ import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
 import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
 import { savedEdit, saveEdit, forgetEdit } from "./saved.mjs";
-import { layoutRows, policySheet, yamlText, markOf, parseJson, makeRunner, parseTime, reportTables, plural, reportDocument, unroundable } from "./lib.mjs";
+import { layoutRows, policySheet, yamlText, markOf, kindAt, docGroups, parseJson, makeRunner, parseTime, reportTables, plural, reportDocument, unroundable } from "./lib.mjs";
 
 const { samples, wasm } = window.EDITOR;
 const LH = 22;
@@ -303,11 +303,11 @@ const block = (node, blocks) => {
   }
   if (node.type === "list") {
     const list = el(node.ordered ? "ol" : "ul");
+    const kind = kindAt(node, blocks);
+    if (kind) list.classList.add("k-" + kind);
     for (const item of node.children ?? []) {
       const li = el("li");
       for (const c of item.children ?? []) li.append(block(c, blocks));
-      const mark = markOf(item, blocks);
-      if (mark) li.classList.add("mark", "mark-" + mark);
       list.append(li);
     }
     return list;
@@ -327,6 +327,7 @@ const block = (node, blocks) => {
     wrap.append(t);
     return wrap;
   }
+  if (node.type === "paragraph" && kindAt(node, blocks) === "checks") return el("p", "label", "Checks");
   const p = el("p");
   inline(node.children, p);
   return p;
@@ -343,8 +344,13 @@ const parseTree = (text) => {
 const viewDoc = (result, into) => {
   const tree = parseTree(src.value);
   const doc = el("div", "doc");
-  for (const node of tree.children) {
-    const out = block(node, result.blocks);
+  for (const item of docGroups(tree.children)) {
+    const node = item.heading ?? item;
+    let out;
+    if (item.heading) {
+      out = el("section", "sec");
+      for (const n of item.nodes) out.append(block(n, result.blocks));
+    } else out = block(item, result.blocks);
     const mark = node.type === "list" ? null : markOf(node, result.blocks);
     if (mark) out.classList.add("mark", "mark-" + mark);
     doc.append(out);
