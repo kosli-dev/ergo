@@ -1,7 +1,3 @@
-deep_walks / a parent's part of ten names in the whose of a count of, read on the item / reads the item's own field, so the part is not counted and the policy reads at ten names
-derived / a count in the whose of an every / fails as absent when an item's list is missing, so the item cannot be decided
-derived / a count in the whose of an every / fails as null when an item's list is null
-derived / a count in the whose of an every / fails as unusable when an item's list is text
 for / a whose that reads a $params list that isn't a list / fails as unusable, whatever the items hold, with no failed items
 for / a second item whose path is named by a param / fails the first list's item with the ref's cause
 for / a second item that reads into a first item that isn't an object / a pull request that is a number or null fails as not_an_object
@@ -12,7 +8,6 @@ for / a for line on a child subject whose sentence reads the parent and its own 
 for / a second item that starts at a parent and is named by the first / is listed under the parent's whole name
 sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters
 sentences / named by a field / the subject's field picks the key, inside a whose or a one-line every the item's does, and a for name hides a field with the same name
-sentences / a count on the left of a whose / counts the item's own field, even when its first key is the parent subject's name
 walks / a for line with a walk next to a parent / lists the for line's list and the parent's value, and never the alias's value
 walks / a walk or a count through a for name, read from a parent / lists the part before the name once, the whole object, and neither the number nor the items read through the name, which change with each item
 walks / a walk through a for name, read from a parent on its right side / reads the parent through the name for each item, and lists the parent once

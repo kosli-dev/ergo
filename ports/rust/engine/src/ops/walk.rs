@@ -21,6 +21,14 @@ pub struct Walk {
 }
 
 impl Walk {
+    pub fn flawed(&self, ctx: &Ctx) -> bool {
+        let outer = outer(ctx);
+        self.whose
+            .iter()
+            .chain(std::iter::once(&*self.check))
+            .any(|check| check.flawed(&outer))
+    }
+
     pub fn refs(&self) -> Vec<Path> {
         let mut refs = path::step_refs(&self.path);
         for check in self.whose.iter().chain(std::iter::once(&*self.check)) {
@@ -650,12 +658,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
 }
 
 pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
-    let outer = outer(ctx);
-    let flawed = walk
-        .whose
-        .iter()
-        .chain(std::iter::once(&*walk.check))
-        .any(|check| check.flawed(&outer));
+    let flawed = walk.flawed(ctx);
     if !flawed && subject_is_not_an_object(walk, ctx) {
         return Run {
             verdict: Verdict {
@@ -745,6 +748,23 @@ mod tests {
         let input = json!({});
         let params = json!({});
         run(walk, &ctx(&subject, &input, Some(&params)))
+    }
+
+    #[test]
+    fn a_walk_without_a_flawed_check_is_not_flawed_and_one_inside_an_any_of_is_asked_too() {
+        let inner = every(&["ys"], vec![], equals(json!(1)), false);
+        let wrapped = every(
+            &["xs"],
+            vec![Check::AnyOf(crate::ops::any_of::AnyOf {
+                options: vec![vec![Check::Walk(Box::new(inner))]],
+            })],
+            equals(json!(1)),
+            false,
+        );
+        let subject = json!({"xs": [{"ys": [1]}]});
+        let input = json!({});
+        assert!(!wrapped.flawed(&ctx(&subject, &input, None)));
+        assert!(!Check::Walk(Box::new(wrapped)).flawed(&ctx(&subject, &input, None)));
     }
 
     #[test]

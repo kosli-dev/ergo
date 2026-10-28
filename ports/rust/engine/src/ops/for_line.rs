@@ -1594,7 +1594,7 @@ mod tests {
     #[test]
     fn a_for_line_whose_whose_the_engine_cannot_read_yet_fails_closed() {
         let found = row(
-            "every xs whose k is at least count of ys as x",
+            "every xs whose k starts with count of ys as x",
             json!("x is 1"),
             json!({"xs": [1]}),
         );

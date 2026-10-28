@@ -682,7 +682,7 @@ fn lower_counted(
     names: &[&str],
 ) -> Result<Option<Term>, Vec<String>> {
     let mut problems = Vec::new();
-    let path = match scope.path(&derived.path) {
+    let path = match scope.counted_path(&derived.path) {
         Ok(path) => {
             problems.extend(crate::lower::walk_too_long(&path));
             Some(path)
@@ -877,7 +877,17 @@ pub fn lower_condition(
     let term = match left {
         s::Left::Derived(derived) => s::Term::Derived(derived.clone()),
         s::Left::Elapsed(elapsed) => s::Term::Elapsed(elapsed.clone()),
-        s::Left::Path(_) => return None,
+        s::Left::Path(path) => match phrase {
+            s::Phrase::Is {
+                operand: s::Operand::Field(terms),
+                ..
+            }
+            | s::Phrase::Order {
+                operand: s::Operand::Field(terms),
+                ..
+            } if scope.is_item() && mine(terms) => s::Term::Path(path.clone()),
+            _ => return None,
+        },
     };
     Some(lower_terms(&[term], phrase, scope).map(|lowered| lowered.map(Check::Tally)))
 }
@@ -885,7 +895,7 @@ pub fn lower_condition(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::path::{Located, Location};
+    use crate::path::{Located, Location, Start, Step};
     use serde_json::json;
     use std::collections::BTreeMap;
 
@@ -1858,6 +1868,45 @@ mod tests {
             Cause::Null
         );
         assert_eq!(cause(sentence, json!({"xs": [{"t": "x"}]})), Cause::Absent);
+    }
+
+    #[test]
+    fn an_item_a_counted_whose_cannot_decide_is_listed_at_the_counted_list() {
+        let check = lowered("every xs.t whose count of ys is at least 1 is \"x\"");
+        let Check::Walk(walk) = check else {
+            panic!("not a walk");
+        };
+        let path = walk.whose[0].left_path().unwrap();
+        assert_eq!(path.steps, [Step::Key("ys".to_string())]);
+    }
+
+    #[test]
+    fn a_count_on_the_item_reads_its_own_field_even_when_it_is_named_like_a_parent() {
+        let scope = Scope::new().with_parent("b", BTreeMap::new()).in_item();
+        let tree = s::parse_check("count of b.kids is at least 1").unwrap();
+        let Check::Tally(check) = lower_assertion(&tree.assertions[0], &scope)
+            .unwrap()
+            .unwrap()
+        else {
+            panic!("not a tally");
+        };
+        let path = check.paths()[0];
+        assert_eq!(path.start, Start::Subject);
+        assert_eq!(
+            path.steps,
+            [Step::Key("b".into()), Step::Key("kids".into())]
+        );
+    }
+
+    #[test]
+    fn a_whose_can_compare_an_items_field_with_a_count_of_its_own_list() {
+        let sentence = "every xs.n whose n is count of ys is at least 1";
+        let subject = json!({"xs": [{"n": 2, "ys": [1, 1]}, {"n": 1, "ys": [1, 1]}]});
+        assert_eq!(cause(sentence, subject), Cause::Satisfied);
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"n": 1, "ys": [1, 1]}]})),
+            Cause::Value
+        );
     }
 
     #[test]
