@@ -42,6 +42,10 @@ const pairRenames = (was: Json, now: Json): Map<string, string> => {
 };
 
 export function apply(markdown: string, policy: object): Applied {
+  if (markdown.includes("\r\n") && !/(^|[^\r])\n/.test(markdown)) {
+    const applied = apply(markdown.replaceAll("\r\n", "\n"), policy);
+    return applied.markdown === null ? applied : {...applied, markdown: applied.markdown.replaceAll("\n", "\r\n")};
+  }
   const compiled = compile(markdown);
   if (compiled.problems.length > 0) {
     return {markdown: null, changes: [], problems: [{path: "", message: "fix the Markdown first"}]};

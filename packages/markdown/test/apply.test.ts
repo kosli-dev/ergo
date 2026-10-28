@@ -417,3 +417,15 @@ test("a check renamed to a longer name keeps its sentence on its own line and it
   const same = edited((p) => (p.requirements.r.checks = {"a much longer name": p.requirements.r.checks.a, old: p.requirements.r.checks.old}), source);
   assert.equal(same.markdown, source.replace("**a**", "**A much longer name**"));
 });
+
+test("a document written with CRLF line endings is written back with CRLF only", () => {
+  const source = DOC.replace(/\n/g, "\r\n");
+  const unchanged = apply(source, policyOf(source));
+  assert.deepEqual(unchanged, {markdown: source, changes: [], problems: []});
+  const {markdown} = edited((p) => {
+    p.requirements["cake batch"].checks.sealed = {description: "Sealed.", assert: "box.sealed is true"};
+    p.description = "Every batch is safe.\n\nAnd tasty.";
+  }, source);
+  assert.ok(!/(^|[^\r])\n/.test(markdown!));
+  assert.ok(markdown!.includes("* **Sealed**: Sealed.\r\n  `box.sealed is true`\r\n"));
+});
