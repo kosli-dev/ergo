@@ -115,6 +115,7 @@ export const policySheet = (policy) => {
     })),
     requirements: Object.entries(policy.requirements ?? {}).map(([name, r]) => ({
       name,
+      title: name.replace(/_/g, " "),
       description: r.description ?? "",
       subject: r.subject ?? "",
       require: r.require ?? "every",

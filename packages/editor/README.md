@@ -16,7 +16,7 @@ The page is one file with nothing to fetch. On the left is the Markdown, coloure
 - **Blocks**: what the compiler read from each part of the source, next to the lines it came from.
 - **Policy**: each requirement and its checks, with each check's description and its sentences as written.
 - **Document**: the Markdown as a reader sees it, with a coloured edge on the parts Ergo acts on.
-- **YAML**: the compiled policy, with its sentences picked out the same way and a button to copy it.
+- **YAML**: the compiled policy, with its sentences picked out the same way and a button to copy it. You can edit it: when the YAML reads as a policy, the Markdown is rewritten where that policy changed and nowhere else. When the Markdown can't say it, or the YAML doesn't parse, the problems show under the YAML and the Markdown stays as it was. Pasting a YAML policy into an empty document writes a new one.
 - **Report**: `ergo.report` run in the page on the input and params you paste in.
 
 The samples are cases from `packages/markdown/cases`, with their input and params.
