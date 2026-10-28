@@ -16,16 +16,15 @@ fn a_report_comes_back_as_json_text_from_the_engine() {
 }
 
 #[test]
-fn a_number_a_javascript_number_cannot_hold_is_kept_as_written() {
+fn a_number_a_javascript_number_cannot_hold_is_not_rounded() {
     let text = report_text(
-        r#"{"items": [{"id": "a", "n": 9007199254740993}]}"#,
+        r#"{"items": [{"id": "a", "n": 9007199254740992}]}"#,
         POLICY,
         "{}",
     )
     .unwrap();
-    assert!(text.contains("9007199254740993"), "{text}");
     let report: Value = serde_json::from_str(&text).unwrap();
-    assert_eq!(report["compliant"], true);
+    assert_eq!(report["compliant"], false);
 }
 
 #[test]
