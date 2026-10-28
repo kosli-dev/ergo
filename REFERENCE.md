@@ -1220,6 +1220,29 @@ Each entry also has `locations`. A number Ergo worked out lists where what it ca
 - An item that `whose` can't decide about fails the check, as with `every`.
 - `whose` goes after the last `count of` or `sum of`, and only on the left: `claude_found plus count of findings whose source is "gpt" is at least 3`.
 - A row shows each input once, so `count of approvals plus count of approvals is 4` lists `count of approvals` and `approvals[]` one time each.
+- Numbers are added as decimals, so `0.1` plus `0.2` is `0.3`. Take every number added, a count or a sum included, and the result, and let p be the most decimal places any of them has, counted on the value: `1.50` has 1, `1e2` has 0 and `1e-7` has 7. p has to be at most 15, and each of them times 10^p has to be a whole number below 10^15, or the check fails as `unusable` and the number is `null`. So the sum has to fit in 15 digits at one scale. That's stricter than 15 significant digits for big round numbers, because `1e20` plus `1e20` fails too. Every runtime can decide it exactly, so every runtime gives the same answer.
+
+With `x plus y is at most 1` on `{"x": 0.1, "y": 0.2}`, the row is satisfied:
+
+```json
+{"check": "sum", "passed": true, "cause": "satisfied", "inputs": [
+  {"name": "x plus y", "value": 0.3, "locations": ["/things/0/x", "/things/0/y"]},
+  {"name": "x", "value": 0.1, "locations": ["/things/0/x"]},
+  {"name": "y", "value": 0.2, "locations": ["/things/0/y"]}
+]}
+```
+
+With `{"x": 0.123456789012345, "y": 100}`, the sum needs 18 digits at one scale, so the row fails as `unusable` and `x plus y` is `null`:
+
+```json
+{"check": "sum", "passed": false, "cause": "unusable", "inputs": [
+  {"name": "x plus y", "value": null, "locations": ["/things/0/x", "/things/0/y"]},
+  {"name": "x", "value": 0.123456789012345, "locations": ["/things/0/x"]},
+  {"name": "y", "value": 100, "locations": ["/things/0/y"]}
+]}
+```
+
+`sum of xs is at most 1` on `{"xs": [1e20]}` fails as `unusable` too, with `sum of xs` as `null` and `xs[]` as `[100000000000000000000]`. A sum of `[0.1, 0.2, 100]` is `100.3`, and `1.50` plus `1` is `2.5`, trailing zeros or not.
 - A count goes with `is`, `equals`, `is not`, `does not equal`, `is at least`, `is at most`, `is more than`, `is less than` and `within`.
 
 `seconds`, `minutes`, `hours`, `days` and `weeks` followed by `elapsed from` and two paths, like `days elapsed from first_seen_ts to now_ts`, work out the time between two fields. Take a requirement on `vulnerabilities`, with the policy's params `{"max_days": {"high": 7, "low": 30}}` and this input:

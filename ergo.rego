@@ -978,7 +978,7 @@ _basic_eval(subj, side) := {"v": v, "found": v, "states": _elapsed_states(subj, 
 
 _side_eval(subj, side) := _basic_eval(subj, side) if _basic_form(side)
 
-_side_eval(subj, side) := {"v": v, "found": v, "states": union({o.states | some o in ops}), "inputs": array.concat([_number_input(_side_text(side), _first_or_null(v), operands)], operands)} if {
+_side_eval(subj, side) := {"v": v, "found": v, "states": (union({o.states | some o in ops}) | _add_states(ops)), "inputs": array.concat([_number_input(_side_text(side), _first_or_null(v), operands)], operands)} if {
 	_side_form(side) == "add"
 	ops := [_operand_eval(subj, operand) | some operand in side.add]
 	operands := [i | some o in ops; some i in o.inputs]
@@ -988,6 +988,12 @@ _side_eval(subj, side) := {"v": v, "found": v, "states": union({o.states | some 
 _operand_eval(subj, operand) := object.union(_basic_eval(subj, operand), {"states": _number_states(subj, operand)}) if _basic_form(operand) == "path"
 
 _operand_eval(subj, operand) := _basic_eval(subj, operand) if _basic_form(operand) != "path"
+
+_add_states(ops) := {"unusable" |
+	nums := [n | some o in ops; [n] := o.v]
+	count(nums) == count(ops)
+	_unaddable(nums)
+}
 
 _added(side, ops) := [_add_numbers(side, nums)] if {
 	nums := [n | some o in ops; [n] := o.v]
@@ -4700,30 +4706,35 @@ _tally_value("sum_of", kept, set()) := {"value": _decimal_sum(kept)}
 
 _tally_number_states("count_of", _) := set()
 
-_tally_number_states("sum_of", kept) := {_sum_state(n) | some n in kept; not _walk_marked(n); not is_number(n)}
+_tally_number_states("sum_of", kept) := {_sum_state(n) | some n in kept; not _walk_marked(n); not is_number(n)} | {"unusable" | _unaddable(kept)}
 
 _sum_state(null) := "null"
 
 _sum_state(n) := "unusable" if n != null
 
-_decimal_sum(nums) := sum([round(n * scale) | some n in nums]) / scale if {
-	places := max(array.concat([0], [_decimal_places(n) | some n in nums]))
+_decimal_sum(nums) := total / scale if {
+	places := max(array.concat([0], [_value_places(n) | some n in nums]))
 	places <= 15
 	scale := product([10 | some i in numbers.range(1, 15); i <= places])
 	every n in nums {
-		abs(n) * scale < 1e15
+		round(abs(n) * scale) < 1e15
 	}
-} else := sum(nums)
+	total := sum([round(n * scale) | some n in nums])
+	abs(total) < 1e15
+}
 
-_decimal_places(n) := max([0, count(_fraction_digits(parts[0])) - _written_exponent(parts)]) if parts := split(lower(json.marshal(n)), "e")
+_value_places(n) := max([0, count(trim_right(digits, "0")) - point]) if {
+	m := regex.find_all_string_submatch_n(`^-?([0-9]+)(?:\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?$`, json.marshal(n), 1)[0]
+	digits := concat("", [m[1], m[2]])
+	point := count(m[1]) + _exponent(m[3])
+}
 
-_fraction_digits(mantissa) := split(mantissa, ".")[1] if contains(mantissa, ".")
-
-_fraction_digits(mantissa) := "" if not contains(mantissa, ".")
-
-_written_exponent([_]) := 0
-
-_written_exponent([_, e]) := to_number(e)
+_unaddable(nums) if {
+	every n in nums {
+		is_number(n)
+	}
+	not _decimal_sum(nums)
+}
 
 _derived_input(subj, side, name, operands) := _number_input(name, v, operands) if {
 	v := _side_value(subj, side)
