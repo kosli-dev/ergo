@@ -82,6 +82,8 @@ There are no comments in the code or the tests, and it should stay that way.
 
 There are two exceptions, both above `package ergo` in `ergo.rego`. The first is the license header. Users copy that file on its own, so the header keeps the license with it. The second is the `METADATA` annotation that declares `input["ergo/names"]` as an object. While Ergo checks, `input` holds Ergo's names, and a host that type-checks `input` against a closed JSON Schema, like Kosli does when a policy is published, would otherwise refuse every read of them. OPA only reads a schema from an annotation, and annotations are comments.
 
+There's one more exception, for code meant for others to call: API doc comments on public items, `///` (and `//!` for a crate) in the Rust crates under `ports/rust`, and JSDoc `/** */` on exported functions and types in `packages/`. They say what the item is, what it takes and what it returns, with an example where it helps, and never why the code is written the way it is. Every other comment stays out, and the Rego files get none.
+
 CI fails on any other comment in a `.rego` file. It asks `opa parse` for each file's comments, so a `#` inside a string doesn't count. To list them yourself:
 
 ```sh
