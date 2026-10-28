@@ -443,8 +443,17 @@ fn through_a_list(path: &Path, ctx: &Ctx) -> bool {
 }
 
 fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
+    let checks: Vec<&Check> = walk
+        .whose
+        .iter()
+        .chain(std::iter::once(&*walk.check))
+        .collect();
+    outside_inputs_of(&checks, ctx)
+}
+
+pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     let mut inputs = Vec::new();
-    for check in walk.whose.iter().chain(std::iter::once(&*walk.check)) {
+    for check in checks {
         for path in check.paths().into_iter().filter(|p| reads_outside(p)) {
             match path
                 .steps
@@ -468,11 +477,15 @@ fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
 }
 
 fn subject_is_not_an_object(walk: &Walk, ctx: &Ctx) -> bool {
+    path_needs_an_object_subject(&walk.path, ctx)
+}
+
+pub(super) fn path_needs_an_object_subject(path: &Path, ctx: &Ctx) -> bool {
     if ctx.subject.value.is_object() {
         return false;
     }
-    match &walk.path.start {
-        Start::Subject => !matches!(walk.path.steps.first(), None | Some(Step::Index(_))),
+    match &path.start {
+        Start::Subject => !matches!(path.steps.first(), None | Some(Step::Index(_))),
         Start::Part(part) => part.base == Start::Subject,
         _ => false,
     }
