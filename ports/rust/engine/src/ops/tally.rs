@@ -404,12 +404,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         }
         match item.end {
             Some(end) => numbers.push(end.clone()),
-            None => causes.push(
-                path::read(&item.rest_path(), &at)
-                    .outcome
-                    .cause()
-                    .unwrap_or(item.miss),
-            ),
+            None => causes.push(item.miss),
         }
     }
     let total = match counted.kind {
