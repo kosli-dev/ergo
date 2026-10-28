@@ -5,7 +5,7 @@
     "name": "ergo.rego",
     "version": "0.3.0-dev"
   },
-  "ergo": "v0.2",
+  "ergo": "v0.3-dev",
   "meta": {},
   "requirements": {
     "prod_deploy": {

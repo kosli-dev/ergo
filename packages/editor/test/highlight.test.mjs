@@ -59,7 +59,7 @@ test("the Markdown pane marks front matter, headings, field labels, check labels
   const source = readSample("baking").source;
   assert.deepEqual(markdown(source).slice(0, 12), [
     "[marker:---]",
-    "[key:ergo_spec]:[string: v0.2]",
+    "[key:ergo_spec]:[string: v0.3-dev]",
     "[marker:---]",
     "",
     "[marker:#] [heading:Cake batches]",
@@ -145,7 +145,7 @@ test("lines inside a fenced code block are code", () => {
 
 test("the YAML view marks keys, plain values and the sentences of a check", () => {
   const lines = yaml(yamlText(compile(readSample("any-of-licences").source).policy));
-  assert.ok(lines.includes("[key:ergo_spec]: [string:v0.2]"));
+  assert.ok(lines.includes("[key:ergo_spec]: [string:v0.3-dev]"));
   assert.ok(lines.includes("      [key:licence allowed]:"));
   assert.ok(lines.includes("        [key:description]: [string:The licence is allowed]"));
   assert.ok(lines.includes("          [key:declared]: [word:some] licenses.license.id [word:is] [word:in] [ref:$params.allowed_licenses]"));
