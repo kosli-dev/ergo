@@ -34,7 +34,7 @@ test("the cake example reports its blocks with kinds, names and line ranges", ()
     {kind: "requirement", name: "cake_batch", startLine: 20, endLine: 36},
     {kind: "description", startLine: 22, endLine: 22},
     {kind: "field", name: "subject", startLine: 24, endLine: 24},
-    {kind: "prose", startLine: 26, endLine: 26},
+    {kind: "field", name: "checks", startLine: 26, endLine: 26},
     {kind: "check", name: "nut_free", startLine: 28, endLine: 29},
     {kind: "check", name: "temp_ok", startLine: 30, endLine: 30},
     {kind: "check", name: "licence_allowed", startLine: 31, endLine: 35},
@@ -331,6 +331,13 @@ test("Checks in a subject, under the title or under another section is prose", (
     requirements: {},
   });
   assert.deepEqual(problemsOf("# T\n\nChecks:\n\n- **A**: `x`\n"), []);
+});
+
+test("Checks in a requirement is a field block named checks, even when it is a problem", () => {
+  const blocks = (markdown: string) => compile(markdown).blocks.filter((b) => b.kind === "field" && b.name === "checks").map((b) => b.startLine);
+  assert.deepEqual(blocks(inChecks("- **A**: `x`")), [5]);
+  assert.deepEqual(blocks(inRequirement("Checks:\n\nWords.")), [5]);
+  assert.deepEqual(blocks("## Subjects\n\n### a\n\nChecks:\n"), []);
 });
 
 test("Checks does not count as the description of a requirement", () => {

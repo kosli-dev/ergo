@@ -330,7 +330,7 @@ export function compile(markdown: string): Compiled {
       const text = toString(node);
       if (item && text === "Checks:" && item.kind === "requirement") {
         item.descriptionOpen = false;
-        block("prose", node);
+        block("field", node, "checks");
         const next = nodes[i + 1];
         if (next?.type !== "list") {
           problem(startOf(node), "Checks: must be followed by a list");
