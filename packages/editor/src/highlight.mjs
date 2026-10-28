@@ -1,3 +1,4 @@
+/** The words a check sentence is built from, like `every`, `is` and `more`. They are shown as keywords. */
 export const GRAMMAR_WORDS = new Set([
   "a", "after", "all", "alphabetically", "an", "and", "as", "at", "before", "between", "boolean", "by",
   "contain", "contains", "count", "days", "does", "each", "elapsed", "empty", "ends", "equal", "equals",
@@ -20,6 +21,7 @@ const join = (tokens) => {
   return out;
 };
 
+/** Splits a sentence into pieces to colour. Each piece is `{kind, text}`, where `kind` is `string`, `ref` (like `$input.items`), `number` or `word` (a grammar word). Everything else, like other words and spaces, gets the kind `base`, which is `"plain"` unless you pass another. Joining the pieces gives back the sentence. */
 export const sentenceTokens = (text, base = "plain") => {
   const out = [];
   SENTENCE.lastIndex = 0;
@@ -115,6 +117,7 @@ const markdownLine = (line, sentence, field) => {
   return [...head, ...inline(rest, sentence)];
 };
 
+/** Splits each line of a policy's Markdown into pieces to colour. Returns one list of `{kind, text}` pieces per line. `blocks` comes from `compile`, and tells which lines are sentences, fields and labels. */
 export const highlightMarkdown = (source, blocks) => {
   const lines = source.split("\n");
   const sentences = new Set([...linesIn(blocks, ["check", "option"]), ...linesIn(blocks, ["field"], "from")]);
@@ -168,6 +171,7 @@ const unquote = (key) => {
   return key;
 };
 
+/** Splits each line of YAML into pieces to colour. Returns one list of `{kind, text}` pieces per line. */
 export const highlightYaml = (text) => {
   const stack = [];
   let scalarBlock = -1;

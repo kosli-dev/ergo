@@ -5,6 +5,7 @@ import {apply} from "./apply.ts";
 import {compile} from "./compile.ts";
 import {type PathProblem, render} from "./render.ts";
 
+/** What the command line needs from outside: where to print, and how to read and write files. Tests pass fakes. */
 export type Io = {
   stdout: (text: string) => void;
   stderr: (text: string) => void;
@@ -24,6 +25,11 @@ const ARGUMENTS: Record<string, number> = {compile: 1, check: 1, render: 1, appl
 const told = (problems: PathProblem[]): string =>
   problems.map((p) => `${p.path === "" ? "" : `${p.path}: `}${p.message}\n`).join("");
 
+/**
+ * Runs one command and returns its exit code.
+ *
+ * The commands are `compile <file>`, `check <file>`, `render <policy>` and `apply <file> <policy>`. It returns 0 on success, 1 when the Markdown or policy has problems (they go to `stderr`, and nothing is written), and 2 for a wrong command or a file it can't read.
+ */
 export function main(argv: string[], io: Io): number {
   const [command, ...files] = argv;
   if (command === undefined || !Object.hasOwn(ARGUMENTS, command) || files.length !== ARGUMENTS[command]) {

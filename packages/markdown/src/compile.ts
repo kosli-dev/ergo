@@ -7,8 +7,10 @@ import {frontmatter} from "micromark-extension-frontmatter";
 import {gfmTable} from "micromark-extension-gfm-table";
 import {isMap, isScalar, parseDocument} from "yaml";
 
+/** Something wrong in the Markdown: the line it is on and what is wrong. */
 export type Problem = {line: number; message: string};
 
+/** What a part of the Markdown is, for example a subject, a requirement, a field or a check. */
 export type BlockKind =
   | "title"
   | "description"
@@ -21,8 +23,10 @@ export type BlockKind =
   | "checks"
   | "prose";
 
+/** A part of the Markdown that means something, with the lines it covers. `name` is set for subjects, requirements, fields, checks and options. */
 export type Block = {kind: BlockKind; name?: string; startLine: number; endLine: number};
 
+/** The result of `compile`: the policy (or `null` when there are problems), the problems, and the blocks found. */
 export type Compiled = {
   policy: Record<string, unknown> | null;
   problems: Problem[];
@@ -68,8 +72,10 @@ const endOf = (node: {position?: {end: {line: number}}}): number => node.positio
 
 const collapse = (text: string): string => text.replace(/\s+/g, " ").trim();
 
+/** Turns a heading or label into the name used in the policy: normalised, with spaces collapsed, in lowercase. `nameOf("  Pull   Request ")` is `pull request`. */
 export const nameOf = (text: string): string => collapse(text.normalize("NFC")).toLowerCase();
 
+/** Says why a name can't be used, or `null` when it can. A name needs a letter or a digit, can't start with `$` and can't hold a character you can't see. */
 export const nameProblem = (name: string): string | null =>
   name === ""
     ? NO_LABEL
@@ -81,9 +87,11 @@ export const nameProblem = (name: string): string | null =>
           ? null
           : NO_LABEL;
 
+/** The text of some inline Markdown, without the formatting, with spaces collapsed. */
 export const plain = (nodes: PhrasingContent[]): string =>
   collapse(toString({type: "paragraph", children: nodes} satisfies Paragraph));
 
+/** Reads Markdown into a syntax tree, with front matter and tables understood. */
 export function parse(markdown: string): Root {
   return fromMarkdown(markdown, {
     extensions: [frontmatter(["yaml"]), gfmTable()],
@@ -143,6 +151,13 @@ function scan(
   return {before, spans, stray, wrapped};
 }
 
+/**
+ * Reads Markdown into a policy. Never throws: a document with mistakes comes back with `policy` set to `null` and one problem per mistake, each with its line.
+ *
+ * @example
+ * compile("### x\n").problems
+ * // [{line: 1, message: "### x is under no ## section"}]
+ */
 export function compile(markdown: string): Compiled {
   const root = parse(markdown);
   const problems: Problem[] = [];

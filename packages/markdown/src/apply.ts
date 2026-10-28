@@ -19,6 +19,7 @@ import {
   same,
 } from "./render.ts";
 
+/** The result of `apply`: the new Markdown (or `null` when it can't be written), what changed, and the problems. */
 export type Applied = {markdown: string | null; changes: string[]; problems: PathProblem[]};
 
 type Json = Record<string, unknown>;
@@ -41,6 +42,7 @@ const pairRenames = (was: Json, now: Json): Map<string, string> => {
   return renames;
 };
 
+/** Changes existing Markdown so that it compiles to `policy`, and leaves the rest of the text as it was. Returns the new Markdown and a list of changes, like `removed requirement reviewed`. When the Markdown has problems or the policy can't be written as Markdown, `markdown` is `null` and `problems` say why. Line endings (`\n` or `\r\n`) are kept. */
 export function apply(markdown: string, policy: object): Applied {
   if (markdown.includes("\r\n") && !/(^|[^\r])\n/.test(markdown)) {
     const applied = apply(markdown.replaceAll("\r\n", "\n"), policy);

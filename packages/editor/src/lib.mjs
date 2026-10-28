@@ -1,16 +1,19 @@
 import { stringify } from "yaml";
 
+/** Turns an RFC 3339 time into its exact number of nanoseconds, as a raw JSON number. Throws when the browser can't hold such a number exactly. */
 export const parseTime = (v) => {
   if (!JSON.rawJSON) throw new Error("this browser can't hold a time in nanoseconds exactly, so compare_time can't run here");
   const [, time, fraction = "", zone] = /^(.{19})(?:\.(\d+))?(.*)$/.exec(v);
   return JSON.rawJSON(String(BigInt(Date.parse(time + zone)) / 1000n * 1000000000n + BigInt(fraction.padEnd(9, "0").slice(0, 9))));
 };
 
+/** Wraps an evaluate function so it returns the first result, or `null` when there is none. */
 export const makeRunner = (evaluate) => (doc) => {
   const out = evaluate(doc);
   return out?.length && out[0].result !== undefined ? out[0].result : null;
 };
 
+/** Builds the bytes of the document the report is made from: `{"input": ..., "policy": ..., "params": ...}`. The input and the params stay as typed, so big numbers aren't rounded. */
 export const reportDocument = (inputText, policy, paramsText) =>
   new TextEncoder().encode(`{"input":${inputText.trim()},"policy":${JSON.stringify(policy)},"params":${paramsText.trim()}}`).buffer;
 
@@ -26,6 +29,12 @@ const decimal = (text) => {
   return `${m[1]}${trimmed}e${exponent + digits.length - trimmed.length}`;
 };
 
+/**
+ * Lists the numbers in a JSON text that a JavaScript number can't hold exactly. Numbers inside strings are ignored.
+ *
+ * @example
+ * unroundable('{"a":0.1,"b":12345678901234567890}') // ["12345678901234567890"]
+ */
 export const unroundable = (text) => {
   const found = [];
   let i = 0;
@@ -52,12 +61,15 @@ export const unroundable = (text) => {
   return found;
 };
 
+/** Writes a count with its word, in the plural unless the count is 1. `plural(2, "check")` is `2 checks`. */
 export const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
+/** Writes a policy as YAML. Returns an empty string when there is no policy. */
 export const yamlText = (policy) => (policy ? stringify(policy, { lineWidth: 0 }) : "");
 
 const textOf = (node) => (typeof node?.value === "string" ? node.value : (node?.children ?? []).map(textOf).join(""));
 
+/** The text of the heading that starts on `line` in a Markdown tree, or an empty string when none does. */
 export const headingText = (tree, line) => {
   const node = (tree?.children ?? []).find((n) => n.type === "heading" && n.position?.start?.line === line);
   return node ? textOf(node) : "";
@@ -106,6 +118,7 @@ const checksAfter = (sorted, i) => {
   return count;
 };
 
+/** Turns the result of `compile` into one row per block, for the Blocks view. Each row has the line it starts on, its height in lines, its kind, what to show on its first line (`head`) and below it, and the problems on its lines. Problems that fall outside every block get a row of their own. `source` is the Markdown and `tree` its syntax tree. */
 export const layoutRows = (result, source = "", tree = null) => {
   const lines = source.split("\n");
   const sorted = [...result.blocks].sort((a, b) => a.startLine - b.startLine || b.endLine - a.endLine);
@@ -144,6 +157,7 @@ const checkSheet = (name, check) => ({
   })),
 });
 
+/** Turns a policy into the plain lists the Document view shows: subjects, requirements and their checks, with the defaults filled in. Returns `null` when there is no policy. */
 export const policySheet = (policy) => {
   if (!policy) return null;
   return {
@@ -169,6 +183,7 @@ export const policySheet = (policy) => {
 const GROUPS = { check: "check", option: "check", subject: "declare", requirement: "declare", field: "declare", checks: "declare" };
 const PRIORITY = ["check", "declare", "other"];
 
+/** Says what a Markdown node is for, so it can be marked: `"check"`, `"declare"` or `"other"`, or `null` when it is no part of a block. A check wins over a declaration when both cover the node. */
 export const markOf = (node, blocks) => {
   const start = node.position?.start?.line;
   const end = node.position?.end?.line;
@@ -179,6 +194,7 @@ export const markOf = (node, blocks) => {
   return PRIORITY.find((g) => groups.includes(g)) ?? null;
 };
 
+/** Reads JSON text. Returns `{ok: true, value}`, or `{ok: false, message}` with a message that names what was being read (`what`). Never throws. */
 export const parseJson = (text, what) => {
   let value;
   try {
@@ -194,6 +210,7 @@ const subjectLabel = (subject) => {
   return [JSON.stringify(subject.id), ...(parents.length ? [`in ${parents.join(", ")}`] : [])].join(" ");
 };
 
+/** Turns a report into one table per requirement: its status, the checks, a row for each subject with a cell for each check (`passed` and `cause`), and the results that belong to no subject under `general`. */
 export const reportTables = (report) => {
   const rows = report?.results ?? [];
   return Object.entries(report?.requirements ?? {}).map(([name, requirement]) => {

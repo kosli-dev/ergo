@@ -1,17 +1,22 @@
 import {stringify} from "yaml";
 import {compile, nameOf, nameProblem} from "./compile.ts";
 
+/** A problem with a policy, and where it is. `path` is the place in the policy, like `requirements.r.checks.c`, or `""` for the whole policy. */
 export type PathProblem = {path: string; message: string};
 
+/** The result of `render`: the Markdown, or `null` and the problems that stopped it. */
 export type Rendered = {markdown: string | null; problems: PathProblem[]};
 
 type Json = Record<string, unknown>;
 
+/** The message for a policy whose Markdown would not compile back to the same policy. */
 export const NOT_BACK = "the Markdown wouldn't compile back to this policy";
 
+/** True for a plain object. Arrays and `null` are not. */
 export const isObject = (value: unknown): value is Json =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+/** True when two JSON values are equal. Compares objects by their keys and values, whatever the order of the keys, and arrays item by item. */
 export const same = (a: unknown, b: unknown): boolean => {
   if (a === b) return true;
   if (Array.isArray(a) || Array.isArray(b)) {
@@ -38,6 +43,7 @@ const normaliseCheck = (check: unknown): unknown => {
   return out;
 };
 
+/** Writes a policy in its one full shape, so two policies that mean the same compare as equal. A missing `subjects` or `requirements` becomes `{}`, a check written as a string becomes `{assert: ...}`, and a list of one sentence becomes that sentence. Anything that isn't a policy comes back unchanged. */
 export function normalise(policy: unknown): unknown {
   if (!isObject(policy)) return policy;
   const requirements = policy.requirements ?? {};
@@ -95,6 +101,7 @@ const descriptionRefusal = (value: unknown, inItem: boolean): string | null => {
 const NO_PARTS = "the Markdown can't hold parts yet: write this policy in YAML";
 const NO_META = "the Markdown can't hold meta yet: write this policy in YAML";
 
+/** Lists what the Markdown can't hold in this policy, for example meta, parts, a name that isn't in its normal form, or a sentence with a backtick in it. Returns an empty list when the policy fits. */
 export function refusals(policy: unknown): PathProblem[] {
   const out: PathProblem[] = [];
   const refuse = (path: string, message: string | null) => {
@@ -194,12 +201,19 @@ const firstDifference = (got: unknown, want: unknown, path: string): string | nu
   return path;
 };
 
+/** Checks that `markdown` compiles back to `policy`. Returns an empty list when it does, or one problem at the first place they differ. */
 export function notBack(markdown: string, policy: unknown): PathProblem[] {
   const compiled = compile(markdown);
   const path = compiled.problems.length > 0 ? "" : firstDifference(compiled.policy, normalise(policy), "");
   return path === null ? [] : [{path, message: NOT_BACK}];
 }
 
+/**
+ * Escapes text so Markdown shows it as written. `where` says if it sits in a line (`"inline"`, the default), at the start of a line, or in a heading.
+ *
+ * @example
+ * escapeText("a*b") // "a\\*b"
+ */
 export const escapeText = (text: string, where: "inline" | "line start" | "heading" = "inline"): string => {
   let out = text
     .replace(/[\\`*[\]<>]/g, "\\$&")
@@ -210,6 +224,7 @@ export const escapeText = (text: string, where: "inline" | "line start" | "headi
   return out;
 };
 
+/** Turns a name into the label shown in the Markdown: the first letter in capitals and the rest escaped. `label("pull request")` is `Pull request`. */
 export const label = (name: string): string => {
   const first = name[0]!;
   const upper = first.toUpperCase();
@@ -229,16 +244,20 @@ const FIELD_WORDS: Record<string, string> = {
   min_subjects: "Min subjects",
 };
 
+/** Writes one field as a list item, like ``- From `input.pulls` ``. `key` is the policy's key, like `identified_by`, and `bullet` starts the line. */
 export const fieldLine = (key: string, value: unknown, bullet = "- "): string =>
   `${bullet}${FIELD_WORDS[key]} \`${String(value)}\``;
 
+/** The order in which the fields of a subject and of a requirement are written. */
 export const FIELD_ORDER = {
   subject: ["from", "identified_by"],
   requirement: ["subject", "require", "min_subjects"],
 } as const;
 
+/** What `checkLines` keeps from the Markdown already written, so editing it changes as little as possible: the first lines, whether the sentence stays on the same line, and the labels of the options. */
 export type Kept = {head?: string[]; sameLine?: boolean; options?: Map<string, string>};
 
+/** Writes a check as Markdown lines: its bold label, its description, its sentences in code spans, and its options when it has any. `bullet` starts the first line and `kept` holds what to reuse from existing Markdown. */
 export function checkLines(name: string, body: unknown, bullet = "- ", kept: Kept = {}): string[] {
   const check = normaliseCheck(body) as Json;
   const pad = " ".repeat(bullet.length);
@@ -260,6 +279,7 @@ export function checkLines(name: string, body: unknown, bullet = "- ", kept: Kep
   return lines;
 }
 
+/** Writes a subject or a requirement as Markdown lines: a `###` heading, its description, its fields and its checks. */
 export function itemLines(kind: "subject" | "requirement", name: string, body: Json): string[] {
   const lines = [`### ${label(name).replace(/#/g, "\\#")}`];
   for (const p of paragraphs(body.description)) lines.push("", p);
@@ -272,15 +292,24 @@ export function itemLines(kind: "subject" | "requirement", name: string, body: J
   return lines;
 }
 
+/** Writes the `---` block that holds `ergo_spec`. */
 export const frontMatterLines = (ergoSpec: unknown): string[] => [
   "---",
   ...stringify({ergo_spec: ergoSpec}, {lineWidth: 0}).trimEnd().split("\n"),
   "---",
 ];
 
+/** Writes a policy's description as Markdown lines, with a blank line between paragraphs. Returns an empty list when there is no description. */
 export const descriptionLines = (description: unknown): string[] =>
   paragraphs(description).flatMap((p, i) => (i === 0 ? [p] : ["", p]));
 
+/**
+ * Writes a policy as Markdown. Returns `{markdown, problems}`: when the Markdown can't hold the policy, or wouldn't compile back to it, `markdown` is `null` and `problems` say where.
+ *
+ * @example
+ * render({subjects: {"pull request": {from: "input.pulls"}}, requirements: {}}).markdown
+ * // "## Subjects\n\n### Pull request\n\n- From `input.pulls`\n\n## Requirements\n"
+ */
 export function render(policy: object): Rendered {
   const problems = refusals(policy);
   if (problems.length > 0) return {markdown: null, problems};
