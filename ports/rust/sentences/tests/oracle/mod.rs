@@ -1,3 +1,7 @@
+#![allow(dead_code)]
+
+pub mod checks;
+
 pub const FROM_OK: &[(&str, &str)] = &[
     ("  d.b  ", "d.b"),
     (

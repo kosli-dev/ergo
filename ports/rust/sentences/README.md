@@ -1,15 +1,23 @@
 # ergo-sentences
 
-Reads Ergo's check sentences, `for` lines, `from` lines and paths into a tree, and prints a tree back as a canonical sentence. It doesn't build reports and has no dependencies, so an editor or a linter can use it without the engine. It builds for `wasm32-unknown-unknown`.
-
-This part reads `from` lines and paths and prints them. Checks and `for` lines come next, and their types are already in the tree.
+Reads Ergo's check sentences, `for` lines, `from` lines and paths into a tree, and prints a tree back as a canonical sentence. It doesn't build reports, and its only dependency is `regex-syntax`, which it uses to check the patterns of `matches`, so an editor or a linter can use it without the engine. It builds for `wasm32-unknown-unknown`.
 
 ## What it gives
 
 ```rust
+pub fn parse_check(line: &str) -> Result<Check, Vec<SyntaxError>>;
+pub fn parse_for(line: &str) -> Result<For, Vec<SyntaxError>>;
 pub fn parse_from(line: &str) -> Result<From, Vec<SyntaxError>>;
 pub fn parse_path(line: &str) -> Result<Path, Vec<SyntaxError>>;
 
+pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String>;
+pub fn for_problems(line: &For, aliases: &[&str]) -> Vec<String>;
+pub fn from_problems(line: &From, aliases: &[&str]) -> Vec<String>;
+
+pub fn print_check(check: &Check, aliases: &[&str]) -> String;
+pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String;
+pub fn print_for(line: &For, aliases: &[&str]) -> String;
+pub fn print_for_item(item: &ForItem, aliases: &[&str]) -> String;
 pub fn print_from(line: &From, aliases: &[&str]) -> String;
 pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> String;
 pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String;
@@ -17,14 +25,16 @@ pub fn print_term(term: &Term, aliases: &[&str]) -> String;
 pub fn print_path(path: &Path, side: Side, aliases: &[&str]) -> String;
 ```
 
-- `parse_from` and `parse_path` read what [`spec/sentences.abnf`](../../../spec/sentences.abnf) allows and nothing else. Spaces at both ends are dropped, and a tab isn't a space. A bare first key is never a word of the grammar: write `.empty` for a field called `empty`.
+- `parse_check`, `parse_for`, `parse_from` and `parse_path` read what [`spec/sentences.abnf`](../../../spec/sentences.abnf) allows and nothing else. Spaces at both ends are dropped, and a tab isn't a space. A bare first key is never a word of the grammar: write `.empty` for a field called `empty`.
 - When the grammar allows two readings, the tree is the one `ergo.rego` picks, and a line that the first choice can't finish is read the other way.
 - A failed read gives the messages `ergo.rego` gives for the same line, in its order, as `SyntaxError { column, message }`. `column` counts characters of the trimmed line from 1, and is only set when the message names a column. For a `from` line the columns count from the text after a leading `every`, as `ergo.rego` does.
 - Keys and strings are decoded. Numbers, positions and bracket indexes keep their digits as written, so the caller decides what a number that is too big means.
 - The printed sentence is canonical: one space between words, `equals` before a field and `is` before a value, `is in` before a path and `is one of` before values, numbers in plain decimal form, keys bare when they can be, strings in single quotes when they hold a backslash and nothing that needs escaping, and a bracket index that ends a path as `item N of`.
 - `aliases` are the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot when printed.
 
-Rules that only need the tree, like `min above max` or `invalid pattern`, come with the checks. Until then a line that is written wrong in that way still parses.
+- A line that the grammar reads can still be written wrong. `check_problems`, `for_problems` and `from_problems` give the rules that need only the tree and the names in `aliases`, in `ergo.rego`'s words and sorted: `min above max`, `invalid pattern`, `<n> can't be a list position`, `number out of range: <n>`, `"is not null" is written "exists"`, the `takes a number`, `takes text` and `takes a time or a number` rules, the `within` rules, a misplaced `it`, `if any can't go with some`, a `for` alias that is a word or is given twice, `"sorted by"` reading an alias, and every `compared with itself`. `check_problems` and `for_problems` add `compared with itself` for the names in `aliases`. Rules that need the policy's names, like an alias named like a subject, stay in the engine.
+- When a line fails to read, the messages also hold the rules above that the loose reading of the line finds, as `ergo.rego` lists them.
+- `invalid pattern` follows RE2, which `ergo.rego` uses: `regex-syntax` does the parsing, with fixes for the places where RE2 differs (`\Q...\E`, a `{` that is not a repeat, flags other than `i`, `m`, `s` and `U`, a repeat of a repeat, and repeat counts above 1000).
 
 ## The tree
 
