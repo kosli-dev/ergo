@@ -1,8 +1,8 @@
 use crate::cause::Cause;
 use crate::checks::{CheckRead, Plan, read_checks};
-use crate::name;
+use crate::ops::walk;
 use crate::ops::{self, Check, Input, Verdict};
-use crate::path::{self, Ctx, Located, Location, Outcome, Path, Resolved, Start, Step};
+use crate::path::{self, Ctx, Located, Location, Outcome, Path, Start};
 use crate::policy::{Policy, Requirement, SubjectName};
 use crate::reading::{Filter, Lowered, Reading, Relation, Source};
 use crate::report::{
@@ -36,6 +36,7 @@ struct Entry<'a> {
 }
 
 struct Broken {
+    order: Vec<walk::Seg>,
     path: String,
     cause: Cause,
     value: Value,
@@ -176,181 +177,68 @@ fn each_of_entries<'a>(
     }
 }
 
-struct Cur<'a> {
-    value: &'a Value,
-    location: Location,
-    name: String,
-}
-
-fn joined(name: &str, key: &str) -> String {
-    if name.is_empty() {
-        name::name(&Path {
-            start: Start::Subject,
-            steps: vec![Step::Key(key.to_string())],
-        })
-    } else {
-        format!("{name}.{}", name::key_text(key))
-    }
-}
-
-fn broken_at(cur: &Cur, name: String, cause: Cause) -> Broken {
+fn broken_from(failure: &walk::Failure) -> Broken {
     Broken {
-        path: name,
-        cause,
-        value: match cause {
-            Cause::Unusable => cur.value.clone(),
-            _ => Value::Null,
-        },
-        location: Some(cur.location.render()),
+        order: failure.order.clone(),
+        path: failure.path.clone(),
+        cause: failure.cause,
+        value: failure.value.clone(),
+        location: failure.location.as_ref().map(Location::render),
     }
-}
-
-fn walk_lists<'a>(
-    current: Vec<Cur<'a>>,
-    broken: &mut Vec<Broken>,
-    walked: &mut bool,
-) -> Vec<Cur<'a>> {
-    let mut out = Vec::new();
-    for cur in current {
-        match cur.value {
-            Value::Array(items) => {
-                *walked = true;
-                for (at, item) in items.iter().enumerate() {
-                    out.push(Cur {
-                        value: item,
-                        location: cur.location.index(at as u64),
-                        name: format!("{}[{at}]", cur.name),
-                    });
-                }
-            }
-            Value::Null => {
-                let name = cur.name.clone();
-                broken.push(broken_at(&cur, name, Cause::Null));
-            }
-            _ => {
-                let name = cur.name.clone();
-                broken.push(broken_at(&cur, name, Cause::Unusable));
-            }
-        }
-    }
-    out
 }
 
 fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
     let ctx = context(env, input_root(env), anc);
-    let mut broken = Vec::new();
-    let mut walked = false;
-    let mut current = vec![Cur {
-        value: env.input,
-        location: Location::input_root(),
-        name: String::new(),
-    }];
-    for step in &path.steps {
-        if !matches!(step, Step::Index(_)) && current.iter().any(|c| c.value.is_array()) {
-            current = walk_lists(current, &mut broken, &mut walked);
-        }
-        let resolved = match path::resolve(step, &ctx) {
-            Ok(resolved) => resolved,
-            Err(outcome) => {
-                if let Some(first) = current.first() {
-                    broken.push(broken_at(
-                        first,
-                        first.name.clone(),
-                        outcome.cause().unwrap_or(Cause::Unusable),
-                    ));
-                }
-                return finish(Vec::new(), broken);
-            }
-        };
-        let mut next = Vec::new();
-        for cur in current {
-            match (&resolved, cur.value) {
-                (_, Value::Null) => {
-                    let name = cur.name.clone();
-                    broken.push(broken_at(&cur, name, Cause::Absent));
-                }
-                (Resolved::Key(key), Value::Object(map)) => match map.get(key) {
-                    Some(value) => next.push(Cur {
-                        value,
-                        location: cur.location.key(key),
-                        name: joined(&cur.name, key),
-                    }),
-                    None => {
-                        let name = joined(&cur.name, key);
-                        broken.push(broken_at(&cur, name, Cause::Absent));
-                    }
-                },
-                (Resolved::Index(at), Value::Array(items)) => {
-                    match usize::try_from(*at).ok().and_then(|i| items.get(i)) {
-                        Some(value) => next.push(Cur {
-                            value,
-                            location: cur.location.index(*at),
-                            name: format!("{}[{at}]", cur.name),
-                        }),
-                        None => {
-                            let name = format!("{}[{at}]", cur.name);
-                            broken.push(broken_at(&cur, name, Cause::Absent));
-                        }
-                    }
-                }
-                _ => {
-                    let name = cur.name.clone();
-                    broken.push(broken_at(&cur, name, Cause::Unusable));
-                }
-            }
-        }
-        current = next;
-    }
-    let ends = if current.iter().any(|c| c.value.is_array()) {
-        let mut kept = Vec::new();
-        let mut rest = Vec::new();
-        for cur in current {
-            if cur.value.is_array() {
-                kept.push(cur);
-            } else {
-                rest.push(cur);
-            }
-        }
-        let mut items = walk_lists(kept, &mut broken, &mut walked);
-        items.extend(rest);
-        items
-    } else {
-        current
+    let from = Path {
+        start: Start::Subject,
+        steps: path.steps.clone(),
     };
+    let walked = walk::walk(
+        &from,
+        &ctx,
+        walk::Options {
+            if_any: true,
+            empty_adds_nothing: false,
+        },
+    );
+    if let Some(outcome) = walked.unreadable {
+        let cause = outcome.cause().unwrap_or(Cause::Unusable);
+        return Read::Entries {
+            entries: Vec::new(),
+            broken: vec![Broken {
+                order: Vec::new(),
+                path: String::new(),
+                cause,
+                value: match cause {
+                    Cause::Unusable => env.input.clone(),
+                    _ => Value::Null,
+                },
+                location: Some(Location::input_root().render()),
+            }],
+        };
+    }
+    let last = walked.walked_last();
+    let mut broken: Vec<Broken> = walked.failures.iter().map(broken_from).collect();
     let mut entries = Vec::new();
-    for cur in ends {
-        match cur.value {
-            _ if walked && is_list_item(&cur.name) => entries.push(entry_of(cur)),
-            Value::Object(_) if walked => entries.push(entry_of(cur)),
-            Value::Null => {
-                let name = cur.name.clone();
-                broken.push(broken_at(&cur, name, Cause::Null));
-            }
-            _ => {
-                let name = cur.name.clone();
-                broken.push(broken_at(&cur, name, Cause::Unusable));
-            }
+    for item in &walked.items {
+        match item.end {
+            Some(value) if last || value.is_object() => entries.push(Entry {
+                at: Located {
+                    value,
+                    location: item.end_location.clone(),
+                },
+                key: None,
+            }),
+            _ => broken.push(Broken {
+                order: item.end_segs.clone(),
+                path: walked.name_of(&item.end_segs, false),
+                cause: item.miss,
+                value: item.shown(),
+                location: Some(item.end_location.render()),
+            }),
         }
     }
-    finish(entries, broken)
-}
-
-fn is_list_item(name: &str) -> bool {
-    name.ends_with(']')
-}
-
-fn entry_of(cur: Cur) -> Entry {
-    Entry {
-        at: Located {
-            value: cur.value,
-            location: cur.location,
-        },
-        key: None,
-    }
-}
-
-fn finish<'a>(entries: Vec<Entry<'a>>, mut broken: Vec<Broken>) -> Read<'a> {
-    broken.sort_by(|a, b| a.path.cmp(&b.path));
+    broken.sort_by(|a, b| a.order.cmp(&b.order));
     Read::Entries { entries, broken }
 }
 
@@ -471,6 +359,7 @@ struct Applied {
     cause: Cause,
     inputs: Vec<Value>,
     failed_assertions: Option<Value>,
+    failed_items: Option<Value>,
 }
 
 fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
@@ -479,9 +368,14 @@ fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
 }
 
 fn apply(filters: &[Filter], ctx: &Ctx) -> Applied {
+    let mut failed_items = None;
     let verdicts: Vec<(&Filter, Verdict)> = filters
         .iter()
-        .map(|filter| (filter, ops::run(&filter.check, ctx)))
+        .map(|filter| {
+            let ran = ops::run_full(&filter.check, ctx);
+            failed_items = ran.failed_items.map(Value::Array);
+            (filter, ran.verdict)
+        })
         .collect();
     let failing: Vec<Cause> = verdicts
         .iter()
@@ -518,6 +412,11 @@ fn apply(filters: &[Filter], ctx: &Ctx) -> Applied {
         cause,
         inputs,
         failed_assertions,
+        failed_items: if filters.len() == 1 {
+            failed_items
+        } else {
+            None
+        },
     }
 }
 
@@ -626,6 +525,7 @@ fn applies_row(env: &Env, judged: &Judged, applied: &Applied, anc: &[Anc]) -> Ro
     );
     row.subject_id = judged.id.clone();
     row.failed_assertions = applied.failed_assertions.clone();
+    row.failed_items = applied.failed_items.clone();
     with_in(row, anc)
 }
 
@@ -693,10 +593,15 @@ fn check_rows(env: &Env, judged: &Judged, anc: &[Anc]) -> Vec<Row> {
 }
 
 fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
+    let mut failed_items = None;
     let verdicts: Vec<Verdict> = plan
         .items
         .iter()
-        .map(|item| ops::run(&item.check, ctx))
+        .map(|item| {
+            let ran = ops::run_full(&item.check, ctx);
+            failed_items = ran.failed_items.map(Value::Array);
+            ran.verdict
+        })
         .collect();
     let cause = Cause::worst(verdicts.iter().map(|v| v.cause)).unwrap_or(Cause::Satisfied);
     let read: Vec<Input> = verdicts
@@ -710,6 +615,9 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
     };
     let mut row = row_of(env.requirement_name, env.requirement, name, cause, inputs);
     row.subject_id = judged.id.clone();
+    if plan.items.len() == 1 {
+        row.failed_items = failed_items;
+    }
     if plan.all_of {
         row.failed_assertions = Some(Value::Array(
             plan.items
@@ -1724,7 +1632,7 @@ mod tests {
      {
         let r = with_checks(
             json!({"thing": {"from": "ds"}}),
-            json!({"a": "every xs.y is 1"}),
+            json!({"a": "every xs.y is empty"}),
             json!({"ds": [{"xs": [{"y": 1}]}]}),
         );
         let a = rows(&r, "a");

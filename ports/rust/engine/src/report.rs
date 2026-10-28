@@ -302,6 +302,8 @@ pub fn check_defs(
     policy: &Policy,
     requirement: &Requirement,
     extra: &Problems,
+    input: &Value,
+    params: &Value,
 ) -> BTreeMap<String, CheckDef> {
     let expressions = crate::checks::read_checks(reading, requirement);
     let mut defs: BTreeMap<String, CheckDef> = requirement
@@ -316,7 +318,13 @@ pub fn check_defs(
                     expression: expressions
                         .get(name)
                         .map_or_else(|| written_expression(check), |read| read.expression.clone()),
-                    refs: Vec::new(),
+                    refs: expressions
+                        .get(name)
+                        .and_then(|read| read.plan.as_ref())
+                        .map(|plan| {
+                            crate::checks::refs_of(plan, input, params.as_object().map(|_| params))
+                        })
+                        .unwrap_or_default(),
                 },
             )
         })
@@ -508,7 +516,14 @@ pub fn assemble(
     evaluations: &BTreeMap<String, Evaluation>,
     params: &Value,
 ) -> Value {
-    assemble_with(policy, &Reading::of(policy), extra, evaluations, params)
+    assemble_with(
+        policy,
+        &Reading::of(policy),
+        extra,
+        evaluations,
+        &Value::Null,
+        params,
+    )
 }
 
 pub fn assemble_with(
@@ -516,6 +531,7 @@ pub fn assemble_with(
     reading: &Reading,
     extra: &BTreeMap<String, Problems>,
     evaluations: &BTreeMap<String, Evaluation>,
+    input: &Value,
     params: &Value,
 ) -> Value {
     let mut requirements = Map::new();
@@ -545,7 +561,7 @@ pub fn assemble_with(
         if status == "not_met" {
             compliant = false;
         }
-        let defs = check_defs(reading, policy, requirement, extra_problems);
+        let defs = check_defs(reading, policy, requirement, extra_problems, input, params);
         let reported_subject = policy.subject_of(requirement).map(|(n, _)| n);
         requirements.insert(
             name.clone(),
@@ -1421,7 +1437,14 @@ mod tests {
             "checks": {"c": "every cs.v is in $params.ok", "d": "x exists"}
         }));
         let mut defs = json!({});
-        let report_defs = check_defs(&Reading::of(&read), &read, &requirement, &Problems::new());
+        let report_defs = check_defs(
+            &Reading::of(&read),
+            &read,
+            &requirement,
+            &Problems::new(),
+            &Value::Null,
+            &Value::Null,
+        );
         for (name, def) in report_defs {
             defs[name] = def.to_json();
         }

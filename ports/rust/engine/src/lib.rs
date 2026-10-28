@@ -33,7 +33,7 @@ pub fn report_with(
             )
         })
         .collect();
-    report::assemble_with(&read, &reading, extra_problems, &evaluations, params)
+    report::assemble_with(&read, &reading, extra_problems, &evaluations, input, params)
 }
 
 pub fn report(input: &Value, policy: &Value, params: &Value) -> Value {

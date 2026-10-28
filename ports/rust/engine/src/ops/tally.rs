@@ -3,7 +3,7 @@ use super::time::{self, NANOS_PER_SECOND, SECONDS_PER_DAY, Time};
 use super::{Check, Input, Verdict, read_path, verdict};
 use crate::cause::Cause;
 use crate::lower::Scope;
-use crate::path::{Ctx, Path};
+use crate::path::{self, Ctx, Path};
 use crate::value;
 use ergo_sentences as s;
 use serde_json::{Number, Value};
@@ -78,6 +78,44 @@ struct Worked<T> {
 const MOST_SECONDS: i64 = 9_000_000_000;
 const MICROS: i128 = 1_000_000;
 
+impl Tally {
+    pub fn paths(&self) -> Vec<&Path> {
+        let mut paths = Vec::new();
+        for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
+            match side {
+                Side::Plain(compare::Side::Path(path)) => paths.push(path),
+                Side::Plain(compare::Side::Value(_)) => {}
+                Side::Derived(derived) => {
+                    for term in &derived.terms {
+                        match term {
+                            Term::Path(path) => paths.push(path),
+                            Term::Number(_) => {}
+                            Term::Elapsed(elapsed) => {
+                                paths.push(&elapsed.from);
+                                paths.push(&elapsed.to);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        paths
+    }
+
+    pub fn refs(&self) -> Vec<Path> {
+        let mut refs = Vec::new();
+        for path in self.paths() {
+            refs.extend(path::step_refs(path));
+        }
+        if let Some(Side::Plain(compare::Side::Path(path))) = &self.right
+            && path::is_ref(path)
+        {
+            refs.push(path.clone());
+        }
+        refs
+    }
+}
+
 pub fn run(check: &Tally, ctx: &Ctx) -> Verdict {
     let left = work_side(&check.left, ctx);
     let right = check.right.as_ref().map(|side| work_side(side, ctx));
@@ -148,7 +186,7 @@ fn work_side(side: &Side, ctx: &Ctx) -> Worked<Value> {
             };
             Worked {
                 result,
-                entries: read.input.into_iter().collect(),
+                entries: read.inputs,
             }
         }
         Side::Derived(derived) => {
@@ -224,7 +262,7 @@ fn work_term(term: &Term, ctx: &Ctx) -> Worked<Number> {
             };
             Worked {
                 result,
-                entries: vec![read.input],
+                entries: read.inputs,
             }
         }
         Term::Elapsed(elapsed) => work_elapsed(elapsed, ctx),
@@ -246,7 +284,7 @@ fn work_elapsed(elapsed: &Elapsed, ctx: &Ctx) -> Worked<Number> {
             _ => Err(Cause::Unusable),
         },
     };
-    let below = vec![from.input, to.input];
+    let below: Vec<Input> = from.inputs.into_iter().chain(to.inputs).collect();
     let mut entries = vec![number_entry(&elapsed.text, &result, &below)];
     entries.extend(below);
     Worked { result, entries }
@@ -614,6 +652,22 @@ mod tests {
     fn lowered(sentence: &str) -> Check {
         let tree = s::parse_check(sentence).unwrap();
         crate::lower::lower_assertion(&tree.assertions[0], &Scope::new()).unwrap()
+    }
+
+    #[test]
+    fn a_tally_lists_a_ref_on_its_right_side_and_inside_ref_steps_as_its_refs() {
+        let names: Vec<String> = lowered("x plus y named by $params.k is $params.limit")
+            .refs()
+            .iter()
+            .map(crate::name::name)
+            .collect();
+        assert_eq!(names, vec!["$params.k", "$params.limit"]);
+    }
+
+    #[test]
+    fn a_tally_reads_every_path_of_its_terms() {
+        let check = lowered("days elapsed from x to y plus w is 1");
+        assert_eq!(check.paths().len(), 3);
     }
 
     fn verdict_of(sentence: &str, subject: Value) -> Verdict {

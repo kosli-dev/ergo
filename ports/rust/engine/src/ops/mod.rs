@@ -4,10 +4,11 @@ pub mod present;
 pub mod range;
 pub mod tally;
 pub mod time;
+pub mod walk;
 
 use crate::cause::Cause;
 use crate::name;
-use crate::path::{self, Ctx, Outcome, Path};
+use crate::path::{self, Ctx, Outcome, Path, Step};
 use serde_json::{Map, Value, json};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -56,23 +57,36 @@ pub struct ReadPath {
     pub outcome: Outcome,
     pub step_unreadable: bool,
     pub value: Option<Value>,
-    pub input: Input,
+    pub inputs: Vec<Input>,
 }
 
 pub fn read_path(path: &Path, ctx: &Ctx) -> ReadPath {
     let read = path::read(path, ctx);
     let value = read.value.cloned();
-    let input = Input {
+    let mut inputs = vec![Input {
         name: name::name(path),
         value: value.clone().unwrap_or(Value::Null),
         locations: read.location.iter().map(|l| l.render()).collect(),
         part: path::part_tag(path, ctx).map(|(name, id)| Part { name, id }),
-    };
+    }];
+    if !ctx.aliases.contains_key(path::OUTER) {
+        for step in &path.steps {
+            if let Step::Field(field) = step {
+                let found = path::read(field, ctx);
+                inputs.push(Input {
+                    name: name::name(field),
+                    value: found.value.cloned().unwrap_or(Value::Null),
+                    locations: found.location.iter().map(|l| l.render()).collect(),
+                    part: None,
+                });
+            }
+        }
+    }
     ReadPath {
         outcome: read.outcome,
         step_unreadable: read.step_unreadable,
         value,
-        input,
+        inputs,
     }
 }
 
@@ -84,7 +98,115 @@ pub enum Check {
     Equals(equals::Equals),
     Range(range::Range),
     Tally(tally::Tally),
+    Walk(Box<walk::Walk>),
     NotYet,
+}
+
+impl Check {
+    pub fn left_path(&self) -> Option<&Path> {
+        match self {
+            Check::Present(check) => Some(&check.path),
+            Check::Equals(check) => Some(&check.path),
+            Check::Range(check) => Some(&check.path),
+            Check::Compare(check) => match &check.left {
+                compare::Side::Path(path) => Some(path),
+                compare::Side::Value(_) => None,
+            },
+            Check::CompareTime(check) => match &check.left {
+                compare::Side::Path(path) => Some(path),
+                compare::Side::Value(_) => None,
+            },
+            Check::Tally(_) | Check::Walk(_) | Check::NotYet => None,
+        }
+    }
+
+    pub fn paths(&self) -> Vec<&Path> {
+        fn side(side: &compare::Side) -> Option<&Path> {
+            match side {
+                compare::Side::Path(path) => Some(path),
+                compare::Side::Value(_) => None,
+            }
+        }
+        match self {
+            Check::Present(check) => vec![&check.path],
+            Check::Equals(check) => vec![&check.path],
+            Check::Range(check) => vec![&check.path],
+            Check::Compare(check) => [&check.left, &check.right]
+                .into_iter()
+                .filter_map(side)
+                .collect(),
+            Check::CompareTime(check) => [&check.left, &check.right]
+                .into_iter()
+                .filter_map(side)
+                .collect(),
+            Check::Tally(check) => check.paths(),
+            Check::Walk(_) | Check::NotYet => Vec::new(),
+        }
+    }
+
+    pub fn with_left(&self, left: Path) -> Check {
+        match self {
+            Check::Present(check) => Check::Present(present::Present {
+                path: left,
+                ..check.clone()
+            }),
+            Check::Equals(check) => Check::Equals(equals::Equals {
+                path: left,
+                ..check.clone()
+            }),
+            Check::Range(check) => Check::Range(range::Range {
+                path: left,
+                ..check.clone()
+            }),
+            Check::Compare(check) => Check::Compare(compare::Compare {
+                left: compare::Side::Path(left),
+                ..check.clone()
+            }),
+            Check::CompareTime(check) => Check::CompareTime(time::CompareTime {
+                left: compare::Side::Path(left),
+                ..check.clone()
+            }),
+            Check::Tally(_) | Check::Walk(_) | Check::NotYet => self.clone(),
+        }
+    }
+
+    pub fn refs(&self) -> Vec<Path> {
+        match self {
+            Check::Present(check) => check.refs(),
+            Check::Equals(check) => check.refs(),
+            Check::Range(check) => check.refs(),
+            Check::Compare(check) => check.refs(),
+            Check::CompareTime(check) => check.refs(),
+            Check::Tally(check) => check.refs(),
+            Check::Walk(check) => check.refs(),
+            Check::NotYet => Vec::new(),
+        }
+    }
+
+    pub fn flawed(&self, _ctx: &Ctx) -> bool {
+        false
+    }
+}
+
+pub struct Ran {
+    pub verdict: Verdict,
+    pub failed_items: Option<Vec<Value>>,
+}
+
+pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
+    match check {
+        Check::Walk(check) => {
+            let run = walk::run(check, ctx);
+            Ran {
+                verdict: run.verdict,
+                failed_items: Some(run.failed_items),
+            }
+        }
+        other => Ran {
+            verdict: run(other, ctx),
+            failed_items: None,
+        },
+    }
 }
 
 pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
@@ -95,6 +217,7 @@ pub fn run(check: &Check, ctx: &Ctx) -> Verdict {
         Check::Equals(check) => equals::run(check, ctx),
         Check::Range(check) => range::run(check, ctx),
         Check::Tally(check) => tally::run(check, ctx),
+        Check::Walk(check) => walk::run(check, ctx).verdict,
         Check::NotYet => Verdict {
             cause: Cause::Unusable,
             inputs: Vec::new(),
@@ -190,6 +313,37 @@ mod tests {
         assert_eq!(
             verdict.inputs[0].to_json(),
             json!({"name": "cov.x", "value": 1, "locations": ["/s/d/x"], "part": {"name": "cov", "id": "c1"}})
+        );
+    }
+
+    #[test]
+    fn a_field_step_gives_the_field_as_an_entry_after_the_path_and_null_where_it_is_missing() {
+        let input = json!({});
+        let path = |subject: &Value| {
+            let path = Path {
+                start: path::Start::Subject,
+                steps: vec![
+                    key("values"),
+                    Step::Field(Box::new(Path {
+                        start: path::Start::Subject,
+                        steps: vec![key("key")],
+                    })),
+                ],
+            };
+            read_path(&path, &ctx(subject, &input)).inputs
+        };
+        let found = path(&json!({"key": "k1", "values": {"k1": 5}}));
+        assert_eq!(
+            found.iter().map(Input::to_json).collect::<Vec<_>>(),
+            [
+                json!({"name": "values named by key", "value": 5, "locations": ["/s/values/k1"]}),
+                json!({"name": "key", "value": "k1", "locations": ["/s/key"]}),
+            ]
+        );
+        let missing = path(&json!({"values": {"k1": 5}}));
+        assert_eq!(
+            missing[1].to_json(),
+            json!({"name": "key", "value": null, "locations": ["/s"]})
         );
     }
 

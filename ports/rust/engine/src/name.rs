@@ -1,4 +1,5 @@
 use crate::path::{Path, Start, Step};
+use std::collections::BTreeSet;
 
 const WORDS: &[&str] = &[
     "a",
@@ -67,6 +68,22 @@ pub fn key_text(key: &str) -> String {
 }
 
 pub fn name(path: &Path) -> String {
+    render(path, None)
+}
+
+pub fn marked_name(path: &Path, marks: &BTreeSet<usize>) -> String {
+    render(path, Some(marks))
+}
+
+fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
+    let mark = |out: &mut String, at: usize| {
+        if marks.is_some_and(|marks| marks.contains(&at)) {
+            if out.is_empty() {
+                out.push_str("it");
+            }
+            out.push_str("[]");
+        }
+    };
     let mut out = match &path.start {
         Start::Subject => String::new(),
         Start::Input => "$input".to_string(),
@@ -76,6 +93,7 @@ pub fn name(path: &Path) -> String {
     };
     let last = path.steps.len().saturating_sub(1);
     for (at, step) in path.steps.iter().enumerate() {
+        mark(&mut out, at);
         match step {
             Step::Key(key) => {
                 if out.is_empty() {
@@ -88,10 +106,13 @@ pub fn name(path: &Path) -> String {
                 out.push_str(&key_text(key));
             }
             Step::Index(index) => {
-                if at == last {
+                if at == last && marks.is_none() {
                     let rest = if out.is_empty() { "it" } else { &out };
                     out = format!("item {} of {}", index.saturating_add(1), rest);
                 } else {
+                    if out.is_empty() && marks.is_some() {
+                        out.push_str("it");
+                    }
                     out.push_str(&format!("[{index}]"));
                 }
             }
@@ -109,6 +130,7 @@ pub fn name(path: &Path) -> String {
             }
         }
     }
+    mark(&mut out, path.steps.len());
     if out.is_empty() {
         "it".to_string()
     } else {

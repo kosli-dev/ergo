@@ -1,6 +1,6 @@
 use super::{Verdict, read_path, verdict};
 use crate::cause::Cause;
-use crate::path::{Ctx, Outcome, Path};
+use crate::path::{self, Ctx, Outcome, Path};
 use crate::value;
 use serde_json::Value;
 
@@ -8,6 +8,12 @@ use serde_json::Value;
 pub struct Equals {
     pub path: Path,
     pub value: Value,
+}
+
+impl Equals {
+    pub fn refs(&self) -> Vec<Path> {
+        path::step_refs(&self.path)
+    }
 }
 
 pub fn run(check: &Equals, ctx: &Ctx) -> Verdict {
@@ -31,7 +37,7 @@ pub fn run(check: &Equals, ctx: &Ctx) -> Verdict {
     };
     Verdict {
         cause,
-        inputs: vec![read.input],
+        inputs: read.inputs,
     }
 }
 
