@@ -22,12 +22,12 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 Run these before saying a change is done:
 
 ```sh
-opa check --strict . --ignore .github
+opa check --strict . --ignore .github --ignore ports
 opa check --strict --schema .github/closed-input-schema.json ergo.rego
 opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > /tmp/ergo-deterministic.json && opa check --strict --capabilities /tmp/ergo-deterministic.json ergo.rego
 opa fmt --list .
-opa test . --ignore .github --timeout 120s
-opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
+opa test . --ignore .github --ignore ports --timeout 120s
+opa eval --strict-builtin-errors --ignore .github --ignore ports -d . --format raw 'count(data) > 0'
 regal lint --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
 python3 spec/check_rules.py
 python3 spec/sentences_corpus.py --check
@@ -48,7 +48,7 @@ The `opa eval` command runs every test again with `--strict-builtin-errors`, whi
 
 The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml` because OPA would load that file as data.
 
-OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, so the checks ignore that folder.
+OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, and the Rust port's test data under `ports` isn't Rego's, so the checks ignore both folders.
 
 When you change `ports/rust/`, run its checks too. There's no need for Rust on your machine: `ports/rust/README.md` has the Docker command, which runs `cargo fmt --check`, Clippy with warnings as errors, the tests, and a Wasm build of `ergo-sentences`. Use `-j 4` and run one at a time, because a full build takes every core otherwise. The Rust version is pinned in `ports/rust/rust-toolchain.toml` and the `Dockerfile` next to it; change both together. CI runs the same checks in the `tests-rust` job.
 
@@ -69,7 +69,7 @@ A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case ci
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
 ```sh
-opa test . --ignore .github --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
+opa test . --ignore .github --ignore ports --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
 ```
 
 ## Tests

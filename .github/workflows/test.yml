@@ -43,7 +43,7 @@ jobs:
           fi
       - name: Check the spec version moved when the spec changed
         run: .github/spec-version.sh
-      - run: opa check --strict . --ignore .github
+      - run: opa check --strict . --ignore .github --ignore ports
       - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
       - name: Check Ergo compiles without built-ins whose answer depends on the machine
@@ -71,7 +71,7 @@ jobs:
             exit 1
           fi
       - name: Check the tests give the same results with --strict-builtin-errors
-        run: opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
+        run: opa eval --strict-builtin-errors --ignore .github --ignore ports -d . --format raw 'count(data) > 0'
 
   tests-rego:
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
       - name: Run this part of the tests with coverage
         shell: bash
         run: |
-          if ! opa test . --ignore .github --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
+          if ! opa test . --ignore .github --ignore ports --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
             cat "$RUNNER_TEMP/coverage.json"
             exit 1
           fi

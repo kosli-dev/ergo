@@ -2,7 +2,7 @@ import json, subprocess, sys
 import jsonschema
 
 query = '[{"where": concat(" / ", [t, g.description, c.description]), "policy": g.policy, "report": data.ergo.report(c.input, g.policy, object.get(g, "params", {}))} | some t, gs in data.spec.cases; some g in gs; some c in g.cases]'
-opa = subprocess.run(["opa", "eval", "-d", ".", "--ignore", ".github", "--format", "json", query], stdout=subprocess.PIPE, text=True)
+opa = subprocess.run(["opa", "eval", "-d", ".", "--ignore", ".github", "--ignore", "ports", "--format", "json", query], stdout=subprocess.PIPE, text=True)
 if opa.returncode != 0:
     sys.exit(f"opa eval failed:\n{opa.stdout}")
 cases = json.loads(opa.stdout)["result"][0]["expressions"][0]["value"]
