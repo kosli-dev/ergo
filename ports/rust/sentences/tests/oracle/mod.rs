@@ -725,6 +725,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("rounds", "rounds"),
     ("rounds whose cov.x is 1", "rounds whose cov.x is 1"),
+    ("scan.findings", "scan.findings"),
+    (
+        "scans named by $params.env named by each of $params.required",
+        "scans named by $params.env named by each of $params.required",
+    ),
     (
         "scans named by each of $params.required",
         "scans named by each of $params.required",

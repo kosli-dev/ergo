@@ -3,7 +3,7 @@ use crate::policy::{
     Check, Form, OptionLines, Policy, Problems, Requirement, SPEC, SubjectName, field_name,
     merge_problems,
 };
-use crate::reading::{INVALID_FROM, Reading};
+use crate::reading::{INVALID_FROM, Reading, Source};
 use crate::value::{Decimal, json_text};
 use serde_json::{Map, Value, json};
 use std::collections::BTreeMap;
@@ -345,7 +345,16 @@ pub fn check_defs(
     let kind = type_text(&subject_type(requirement));
     let from = from_text(reading, policy, requirement, extra);
     let min = crate::value::literal_text(&requirement.min_subjects);
-    let (min_description, min_expression) = if is_zero(&requirement.min_subjects) {
+    let keyed = policy.subject_of(requirement).is_some_and(|(name, _)| {
+        matches!(
+            reading.lowered(name).map(|lowered| &lowered.source),
+            Some(Source::Root {
+                each_of: Some(_),
+                ..
+            })
+        )
+    });
+    let (min_description, min_expression) = if is_zero(&requirement.min_subjects) && !keyed {
         (
             format!("The {kind} list can be read"),
             format!("{from} can be read"),

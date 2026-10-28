@@ -127,9 +127,6 @@ fn each_of_entries<'a>(
 ) -> Read<'a> {
     let ctx = context(env, input_root(env), anc);
     let object = path::read(path, &ctx);
-    if object.outcome != Outcome::Found {
-        return Read::Failed(object.outcome.cause().unwrap_or(Cause::Unusable));
-    }
     let keys = path::read(each_of, &ctx);
     if keys.outcome != Outcome::Found {
         return Read::Failed(keys.outcome.cause().unwrap_or(Cause::Unusable));
@@ -146,14 +143,20 @@ fn each_of_entries<'a>(
     }
     names.sort();
     names.dedup();
-    let (Some(target), Some(location)) = (object.value, object.location) else {
-        return Read::Failed(Cause::Unusable);
+    let unread = match (object.outcome, object.value) {
+        (Outcome::Found, Some(Value::Object(_))) => None,
+        (Outcome::Found, _) => Some(Cause::Unusable),
+        (other, _) => Some(other.cause().unwrap_or(Cause::Unusable)),
+    };
+    let target = object.value;
+    let Some(location) = object.location else {
+        return Read::Failed(unread.unwrap_or(Cause::Unusable));
     };
     let entries = names
         .into_iter()
         .map(|key| {
             let found = match target {
-                Value::Object(map) => map.get(key),
+                Some(Value::Object(map)) => map.get(key),
                 _ => None,
             };
             let at = match found {
@@ -172,10 +175,17 @@ fn each_of_entries<'a>(
             }
         })
         .collect();
-    Read::Entries {
-        entries,
-        broken: Vec::new(),
-    }
+    let broken = unread
+        .map(|cause| Broken {
+            order: Vec::new(),
+            path: String::new(),
+            cause,
+            value: Value::Null,
+            location: Some(location.render()),
+        })
+        .into_iter()
+        .collect();
+    Read::Entries { entries, broken }
 }
 
 fn broken_from(failure: &walk::Failure) -> Broken {
@@ -274,8 +284,7 @@ fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
     if let Some(each_of) = each_of {
         let read = path::read(each_of, &ctx);
         match (read.outcome, read.value) {
-            (Outcome::Found, Some(Value::Array(_))) => {}
-            (Outcome::Found, _) => causes.push(Cause::Unusable),
+            (Outcome::Found, _) => {}
             (other, _) => causes.push(other.cause().unwrap_or(Cause::Unusable)),
         }
     }
