@@ -421,8 +421,14 @@ test("a check in a subject, under the title, under another section or in a quote
   assert.deepEqual(problemsOf(inRequirement("Check:\n\n- **A**: `x`")), [{line: 7, message}]);
 });
 
-test("a bullet with a bold label but no code span, or no colon, is prose outside Checks", () => {
-  assert.deepEqual(problemsOf("# T\n\n- **Note**: words only\n- **Note** `x`\n- `x`\n\n1. text\n"), []);
+test("a bullet with a bold label but no code span is prose outside Checks", () => {
+  assert.deepEqual(problemsOf("# T\n\n- **Note**: words only\n- `x`\n\n1. text\n"), []);
+});
+
+test("a bullet with a bold label and a code span is a misplaced check whatever follows the label", () => {
+  assert.deepEqual(problemsOf("# T\n\n- **Note** `x`\n"), [
+    {line: 3, message: "a check goes in the list right after Checks:"},
+  ]);
 });
 
 test("an item already reported inside a check is not reported again", () => {

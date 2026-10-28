@@ -149,7 +149,7 @@ Without words:
 - **Approved**: `approved_by is a non-empty string`
 ```
 
-A check anywhere else, like after a paragraph that ends the list, is a problem, so no check drops out of the policy unnoticed.
+A check anywhere else is a problem, so no check drops out of the policy unnoticed. That means any bullet that starts with a bold label and holds a code span, however the label is followed (a colon inside the bold, a dash, nothing), and a second list straight after the checks.
 
 A code span that starts with `for ` is the check's `for` line, which names the items of a list so its sentences can read each one ([reference](../../REFERENCE.md#checks)):
 

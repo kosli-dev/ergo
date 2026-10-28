@@ -42,6 +42,7 @@ type Span = {value: string; line: number};
 
 const NO_LABEL = "a label needs a letter or a digit";
 const NOT_FIELD = "a field is written as key: `value`";
+const CHECK_PLACE = "a check goes in the list right after Checks:";
 const COLON = "a bold label is followed by a colon";
 const CHECK_TAIL = "a check's sentences go in code spans, with nothing else after the first one";
 const OPTION_TAIL = "an option's sentences go in code spans, with nothing else after the first one";
@@ -100,13 +101,9 @@ function looksLikeField(li: ListItem): boolean {
 
 function looksLikeCheck(li: ListItem): boolean {
   const first = li.children[0];
-  if (first?.type !== "paragraph") return false;
-  const [label, colon] = first.children;
-  return (
-    label?.type === "strong" &&
-    colon?.type === "text" &&
-    colon.value.startsWith(":") &&
-    first.children.some((node) => node.type === "inlineCode")
+  if (first?.type !== "paragraph" || first.children[0]?.type !== "strong") return false;
+  return li.children.some(
+    (child) => child.type === "paragraph" && child.children.some((node) => node.type === "inlineCode"),
   );
 }
 
@@ -389,6 +386,13 @@ export function compile(markdown: string): Compiled {
         item.checksSeen = true;
         readChecks(next, item, first);
         i++;
+        const after = nodes[i + 1];
+        if (after?.type === "list") {
+          problem(startOf(after), CHECK_PLACE);
+          for (const li of after.children) placed.add(li);
+          block("prose", after);
+          i++;
+        }
         continue;
       }
       if (item && text !== "Checks:" && item.descriptionOpen) {
@@ -423,7 +427,7 @@ export function compile(markdown: string): Compiled {
 
   const unplaced = (node: Nodes) => {
     if (node.type === "listItem" && placed.has(node)) return;
-    if (node.type === "listItem" && looksLikeCheck(node)) problem(startOf(node), "a check goes in the list right after Checks:");
+    if (node.type === "listItem" && looksLikeCheck(node)) problem(startOf(node), CHECK_PLACE);
     if ("children" in node) for (const child of node.children) unplaced(child);
   };
   unplaced(root);
