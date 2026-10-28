@@ -1,0 +1,127 @@
+import test, { before } from "node:test";
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { compile, parse } from "@kosli/ergo-markdown";
+import opa from "@open-policy-agent/opa-wasm";
+import { layoutRows, policySheet, makeRunner, parseTime, reportTables } from "../src/lib.mjs";
+import { sampleCases, readSample, opaVersionNote } from "../build.mjs";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const dist = join(here, "..", "dist", "editor.html");
+let html = "";
+
+before(() => {
+  execFileSync("node", ["build.mjs"], { cwd: join(here, ".."), stdio: "inherit" });
+  html = readFileSync(dist, "utf8");
+});
+
+test("the build writes dist/editor.html", () => {
+  assert.ok(existsSync(dist));
+  assert.ok(html.length > 100000);
+});
+
+test("the page has no script tag that ends early", () => {
+  const opens = html.match(/<script>/g).length;
+  const closes = html.match(/<\/script>/g).length;
+  assert.equal(opens, closes);
+  assert.equal(html.match(/<\/script/gi).length, closes);
+});
+
+test("every placeholder was filled and the page asks nothing from the network", () => {
+  for (const p of ["__BUNDLE__", "__SAMPLES__", "__WASM__"]) assert.ok(!html.includes(p), p);
+  assert.ok(!/<link /.test(html));
+  assert.ok(!/<script[^>]* src=/.test(html));
+});
+
+test("the page holds only ASCII in its samples", () => {
+  const start = html.indexOf("window.EDITOR");
+  const end = html.indexOf("</script>", start);
+  assert.ok(!/[^\x00-\x7f]/.test(html.slice(start, end)));
+});
+
+test("the page has the five tabs and no Reference tab", () => {
+  for (const t of ["Blocks", "Policy", "Document", "YAML", "Report"]) assert.ok(html.includes(`>${t}</button>`), t);
+  assert.ok(!html.includes(">Reference</button>"));
+});
+
+const casesDir = join(here, "..", "..", "markdown", "cases");
+const expected = (dir, file) => {
+  const path = join(casesDir, dir, file);
+  return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : null;
+};
+let ergo;
+const runErgo = async (input, policy, params) => {
+  ergo ??= await opa.loadPolicy(Buffer.from(/wasm: "([^"]+)"/.exec(html)[1], "base64"), undefined, { "time.parse_rfc3339_ns": parseTime });
+  return makeRunner((doc) => ergo.evaluate(doc))(input, policy, params);
+};
+
+test("the bakery sample is the baking case", () => {
+  assert.equal(sampleCases.bakery, "baking");
+});
+
+for (const [name, dir] of Object.entries(sampleCases)) {
+  const sample = readSample(dir);
+  const result = compile(sample.source);
+  const problems = expected(dir, "problems.json");
+
+  test(`the ${name} sample has the problems its case expects`, () => {
+    assert.deepEqual(result.problems, problems ?? []);
+  });
+
+  test(`every block and problem of the ${name} sample has a layout row`, () => {
+    const rows = layoutRows(result, sample.source);
+    for (const b of result.blocks.filter((x) => x.kind !== "prose")) {
+      assert.ok(rows.some((r) => r.top === b.startLine && r.kind === b.kind), `${b.kind} at line ${b.startLine}`);
+    }
+    for (const p of result.problems) {
+      assert.ok(rows.some((r) => r.problems.includes(p.message) && p.line >= r.top && p.line < r.top + r.height), `line ${p.line}`);
+    }
+  });
+
+  test(`every check and option row of the ${name} sample shows every sentence the compiler read`, () => {
+    const rows = layoutRows(result, sample.source, parse(sample.source));
+    const shown = rows.flatMap((r) => [...r.head, ...r.below]).filter((l) => l.kind === "sentence").map((l) => l.text);
+    const read = Object.values(result.policy?.requirements ?? {}).flatMap((r) =>
+      Object.values(r.checks ?? {}).flatMap((c) => [
+        ...(c.for ? [c.for] : []),
+        ...[c.assert ?? []].flat(),
+        ...Object.values(c.any_of ?? {}).flatMap((o) => [o].flat()),
+      ]),
+    );
+    assert.deepEqual(shown.toSorted(), read.toSorted());
+  });
+
+  test(`the title row of the ${name} sample shows text, not Markdown`, () => {
+    const title = layoutRows(result, sample.source, parse(sample.source)).find((r) => r.kind === "title");
+    if (title) assert.ok(!title.head[0].text.startsWith("#"), title.head[0].text);
+  });
+
+  if (problems) continue;
+
+  test(`the ${name} sample shows every requirement and check in the policy sheet`, () => {
+    const sheet = policySheet(result.policy);
+    for (const [reqName, req] of Object.entries(result.policy.requirements)) {
+      const shown = sheet.requirements.find((r) => r.name === reqName);
+      assert.ok(shown, reqName);
+      assert.deepEqual(shown.checks.map((c) => c.name), Object.keys(req.checks));
+    }
+  });
+
+  test(`the Wasm inside the page gives the ${name} sample the report its case expects`, async () => {
+    const report = await runErgo(sample.input, result.policy, sample.params);
+    assert.deepEqual(report, expected(dir, "report.json"));
+    assert.ok(reportTables(report).length > 0);
+  });
+}
+
+test("the build says which OPA it used and warns when the README tests another one", () => {
+  const readme = "and we test Ergo with OPA 1.20.2. Older";
+  assert.equal(opaVersionNote("Version: 1.20.2\nBuild Commit: x", readme), "Built Ergo to Wasm with OPA 1.20.2.");
+  assert.equal(
+    opaVersionNote("Version: 1.21.2\n", readme),
+    "Built Ergo to Wasm with OPA 1.21.2. Warning: the README says we test Ergo with OPA 1.20.2.",
+  );
+});

@@ -1,4 +1,5 @@
 packages:
+  - editor
   - markdown
 onlyBuiltDependencies:
   - esbuild
