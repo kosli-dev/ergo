@@ -1,0 +1,32 @@
+{
+  "name": "@kosli/ergo-markdown",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Write Ergo policies in Markdown",
+  "exports": {
+    ".": "./src/compile.ts"
+  },
+  "bin": {
+    "ergo": "./src/cli.ts"
+  },
+  "scripts": {
+    "ergo": "node src/cli.ts",
+    "check": "tsc --noEmit",
+    "bundle": "esbuild src/web.ts --bundle --format=iife --global-name=ErgoMarkdown --minify --target=es2022 --outfile=dist/web.js",
+    "test": "node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=100 'test/**/*.test.ts'"
+  },
+  "dependencies": {
+    "mdast-util-from-markdown": "^2.0.3",
+    "mdast-util-frontmatter": "^2.0.1",
+    "mdast-util-to-string": "^4.0.0",
+    "micromark-extension-frontmatter": "^2.0.0",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^24.19.2",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}
