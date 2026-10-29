@@ -2,7 +2,7 @@
 
 A second engine for Ergo, in Rust, that should give the same report as `ergo.rego` for every case in [`spec/cases`](../../spec/cases). It's in progress: see [#319](https://github.com/kosli-dev/ergo/issues/319).
 
-It has three crates:
+It has four crates:
 
 - `ergo-sentences` (`sentences/`) reads check sentences, `for` lines, `from` lines and paths, and nothing else, so an editor or a linter can use it without the engine.
 - `ergo-engine` (`engine/`) builds the report, and reads sentences with `ergo-sentences`.
@@ -46,7 +46,7 @@ The build goes to the `ergo-rust-target` volume and not to `ports/rust/target`, 
 
 ## Building for a browser
 
-The Markdown editor can run this engine in the page, so it needs `ergo-wasm` built to Wasm and wrapped in JavaScript. This builds it into `ports/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. Run it with the image from above, from the root of the repo:
+The Markdown editor can run this engine in the page, so it needs `ergo-wasm` built to Wasm and wrapped in JavaScript. This builds it into `ports/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. That editor is on the `markdown/sentences` branch for now. Run it with the image from above, from the root of the repo:
 
 ```sh
 docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
