@@ -1,5 +1,5 @@
 [workspace]
-members = ["sentences", "engine", "wasm", "sentences-wasm"]
+members = ["sentences", "engine", "wasm", "sentences-wasm", "cli"]
 resolver = "3"
 
 [workspace.package]
