@@ -43,7 +43,7 @@ jobs:
           fi
       - name: Check the spec version moved when the spec changed
         run: .github/spec-version.sh
-      - run: opa check --strict . --ignore .github
+      - run: opa check --strict . --ignore .github --ignore ports
       - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
       - name: Check Ergo compiles without built-ins whose answer depends on the machine
@@ -71,7 +71,7 @@ jobs:
             exit 1
           fi
       - name: Check the tests give the same results with --strict-builtin-errors
-        run: opa eval --strict-builtin-errors --ignore .github -d . --format raw 'count(data) > 0'
+        run: opa eval --strict-builtin-errors --ignore .github --ignore ports -d . --format raw 'count(data) > 0'
 
   tests-rego:
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
       - name: Run this part of the tests with coverage
         shell: bash
         run: |
-          if ! opa test . --ignore .github --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
+          if ! opa test . --ignore .github --ignore ports --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
             cat "$RUNNER_TEMP/coverage.json"
             exit 1
           fi
@@ -175,6 +175,46 @@ jobs:
           npm install --silent --no-save --prefix "$RUNNER_TEMP" @open-policy-agent/opa-wasm@1.10.0
           node .github/wasm-js.cjs "$RUNNER_TEMP"
 
+  tests-rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ports/rust
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install the Rust version in rust-toolchain.toml
+        run: rustup toolchain install
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets --all-features -- -D warnings
+      - run: cargo test --locked --all-features -- --show-output
+      - name: Check the API docs
+        run: RUSTDOCFLAGS="-D warnings" cargo doc --locked --no-deps --all-features
+      - run: cargo test --locked -p ergo-engine --features serde_json/preserve_order --test key_order
+      - name: Check ergo-sentences builds for Wasm
+        run: cargo build --locked -p ergo-sentences --target wasm32-unknown-unknown
+      - name: Install the wasm-bindgen tool, at the version of the crate
+        run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
+      - name: Install Binaryen
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/binaryen.tar.gz" https://github.com/WebAssembly/binaryen/releases/download/version_133/binaryen-version_133-x86_64-linux.tar.gz
+          echo "2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489  $RUNNER_TEMP/binaryen.tar.gz" | sha256sum -c -
+          tar -xz -C "$RUNNER_TEMP" -f "$RUNNER_TEMP/binaryen.tar.gz"
+          echo "$RUNNER_TEMP/binaryen-version_133/bin" >> "$GITHUB_PATH"
+      - name: Build ergo-wasm, wrap it for a browser and shrink it
+        run: |
+          cargo build --locked --profile wasm -p ergo-wasm --target wasm32-unknown-unknown
+          wasm-bindgen --target web --out-dir wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_wasm.wasm
+          wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_wasm_bg.wasm -o wasm/pkg/ergo_wasm_bg.wasm
+      - name: Load ergo-wasm in Node and build a report
+        run: node wasm/check-node.mjs
+      - name: Build ergo-sentences-wasm, wrap it for a browser and shrink it
+        run: |
+          cargo build --locked --profile wasm -p ergo-sentences-wasm --target wasm32-unknown-unknown
+          wasm-bindgen --target web --out-dir sentences-wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_sentences_wasm.wasm
+          wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm -o sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm
+      - name: Load ergo-sentences-wasm in Node and read a sentence
+        run: node sentences-wasm/check-node.mjs
+
   spec:
     runs-on: ubuntu-latest
     steps:
@@ -192,8 +232,14 @@ jobs:
           "$RUNNER_TEMP/venv/bin/pip" install --quiet jsonschema==4.26.0 abnf==2.9.0
       - name: Check the cases' policies and reports match the schemas
         run: '"$RUNNER_TEMP/venv/bin/python" .github/spec-schemas.py'
-      - name: Check ergo.rego and the ABNF read the same sentences
-        run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py'
+      - name: Install the Rust version in rust-toolchain.toml
+        working-directory: ports/rust
+        run: rustup toolchain install
+      - name: Build the Rust sentence reader
+        working-directory: ports/rust
+        run: cargo build --locked --release -p ergo-sentences --example read
+      - name: Check ergo.rego, Rust and the ABNF read the same sentences
+        run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py --rust ports/rust/target/release/examples/read'
 
   site:
     runs-on: ubuntu-latest

@@ -1,0 +1,19 @@
+[package]
+name = "ergo-sentences"
+description = "Experimental: reads Ergo's check sentences, without the engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[features]
+serde = ["dep:serde"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"], optional = true }
+
+regex-syntax = { version = "0.8", default-features = false, features = ["unicode"] }
+
+[dev-dependencies]
+serde_json = "1"

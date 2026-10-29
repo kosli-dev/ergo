@@ -20,4 +20,4 @@ open(path, "w").write(text.replace(plain + "\n", compiled))
 PY
 
 cd "$dir"
-opa test . --timeout 120s -r "$pattern"
+opa test . --ignore ports --timeout 120s -r "$pattern"
