@@ -4,11 +4,12 @@
 
 A second engine for Ergo, in Rust, that should give the same report as `ergo.rego` for every case in [`spec/cases`](../../spec/cases). It's in progress: see [#319](https://github.com/kosli-dev/ergo/issues/319).
 
-It has four crates:
+It has five crates:
 
 - `ergo-sentences` (`sentences/`) reads check sentences, `for` lines, `from` lines and paths, and nothing else, so an editor or a linter can use it without the engine.
 - `ergo-engine` (`engine/`) builds the report, and reads sentences with `ergo-sentences`.
 - `ergo-wasm` (`wasm/`) wraps the engine for a browser: one function, `report`, that takes the input, the policy and the params as JSON text and gives the report back as JSON text.
+- `ergo-cli` (`cli/`) is the `ergo` command: it reads a policy, an input and params from JSON or YAML files and prints the report or the violations.
 - `ergo-sentences-wasm` (`sentences-wasm/`) wraps `ergo-sentences` for a browser: `parse_check`, `parse_for`, `parse_from` and `parse_path` give a tree or the syntax errors as JSON text, and there are functions for the problems and for printing a tree back.
 
 ## The cases
@@ -45,6 +46,55 @@ The second `cargo test` runs `tests/key_order.rs` again with serde_json's `prese
 The image is `rust:1.99.0`, the version in `rust-toolchain.toml`, with rustfmt, Clippy and the Wasm target added. `touch` is there because Cargo in Docker can miss an edit made outside the container, and then tests the old code.
 
 The build goes to the `ergo-rust-target` volume and not to `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data. When several sessions or people run the checks at the same time, each should give the target volume their own name, like `ergo-rust-target-<name>`, because two builds sharing one volume can fail with "Permission denied". Change the `-v ergo-rust-target:/target` part of the command and keep the rest.
+
+## Running from the command line
+
+`ergo` reads the policy, the input and the params from files, each one `.json`, `.yaml` or `.yml`, and prints the report or the violations as JSON:
+
+```sh
+ergo report --policy policy.yaml --input deployments.json
+ergo violations --policy policy.yaml --input deployments.json
+```
+
+To build it and run it with Docker, put the policy and the input from the [README](../../README.md#2-write-a-policy) in a folder, with `ergo_spec: v0.3-dev` in the policy because that's the version this engine reads, and run this from that folder, with `$REPO` set to the root of the repo:
+
+```sh
+docker run --rm -v "$REPO":/src -v "$PWD":/work -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
+  find . -name "*.rs" -exec touch {} + &&
+  cargo build -j 4 --locked --release -p ergo-cli &&
+  cd /work &&
+  /target/release/ergo violations --policy policy.yaml --input deployments.json'
+
+`violations` prints:
+
+```json
+[
+  {
+    "cause": "absent",
+    "check": "approved",
+    "description": "Someone approved the deployment",
+    "expression": "approved_by is a non-empty string",
+    "inputs": [
+      {
+        "locations": [
+          "/deployments/1"
+        ],
+        "name": "approved_by",
+        "value": null
+      }
+    ],
+    "requirement": "prod_deploy",
+    "subject": {
+      "id": "d-2",
+      "type": "deployment"
+    }
+  }
+]
+```
+
+`--params <file>` gives the policy its params, and without it they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. The command exits 0 whenever it printed a report, even when `compliant` is `false`. It exits 1 when a file can't be read or parsed and 2 when the command line is wrong, and says why on one line of stderr.
+
+YAML is read the way OPA reads it: `yes`, `no`, `on` and `off` are booleans, `010` is 8, `0x10` is 16, dates stay strings, `<<` merges, and only the first document counts. Numbers keep the digits they were written with, so `1.10` stays `1.10` and a number too big for a float stays a number. Where the rule lives: `number` in `cli/src/number.rs`.
 
 ## Building for a browser
 
