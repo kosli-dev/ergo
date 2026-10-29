@@ -344,10 +344,12 @@ fn order_rank(value: &Value) -> u8 {
     }
 }
 
-fn order(a: &Value, b: &Value) -> Ordering {
+pub(crate) fn order(a: &Value, b: &Value) -> Ordering {
     match (a, b) {
         (Value::Bool(x), Value::Bool(y)) => x.cmp(y),
-        (Value::Number(x), Value::Number(y)) => value::compare_numbers(x, y),
+        (Value::Number(x), Value::Number(y)) => {
+            value::compare_numbers(x, y).unwrap_or_else(|| x.to_string().cmp(&y.to_string()))
+        }
         (Value::String(x), Value::String(y)) => x.cmp(y),
         (Value::Array(x), Value::Array(y)) => {
             for (p, q) in x.iter().zip(y) {
@@ -544,33 +546,28 @@ fn judge<'a>(
 }
 
 fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
-    let mut sorted: Vec<&Judged> = judged.iter().collect();
-    sorted.sort_by(|a, b| order(&a.id, &b.id));
-    let mut groups: Vec<Vec<&Judged>> = Vec::new();
+    let mut sorted: Vec<(usize, &Judged)> = judged.iter().enumerate().collect();
+    sorted.sort_by(|a, b| order(&a.1.id, &b.1.id));
+    let mut groups: Vec<Vec<(usize, &Judged)>> = Vec::new();
     for item in sorted {
         match groups.last_mut() {
-            Some(group) if value::equal(&group[0].id, &item.id) => group.push(item),
+            Some(group) if value::equal(&group[0].1.id, &item.1.id) => group.push(item),
             _ => groups.push(vec![item]),
         }
     }
-    let mut repeated: Vec<Vec<&Judged>> = groups.into_iter().filter(|g| g.len() > 1).collect();
+    let mut repeated: Vec<Vec<(usize, &Judged)>> =
+        groups.into_iter().filter(|g| g.len() > 1).collect();
     repeated.sort_by(|a, b| {
-        json_text(&a[0].id)
-            .cmp(&json_text(&b[0].id))
-            .then_with(|| order(&a[0].id, &b[0].id))
+        json_text(&a[0].1.id)
+            .cmp(&json_text(&b[0].1.id))
+            .then_with(|| order(&a[0].1.id, &b[0].1.id))
     });
     let mut ids = Vec::new();
     let mut locations = Vec::new();
     for group in &mut repeated {
-        ids.push(group[0].id.clone());
-        let mut in_order: Vec<&&Judged> = group.iter().collect();
-        in_order.sort_by_key(|item| {
-            judged
-                .iter()
-                .position(|j| std::ptr::eq(j, **item))
-                .unwrap_or(usize::MAX)
-        });
-        for item in in_order {
+        ids.push(group[0].1.id.clone());
+        group.sort_by_key(|(index, _)| *index);
+        for (_, item) in group.iter() {
             locations.extend(item.id_location.iter().cloned());
         }
     }
@@ -1008,6 +1005,20 @@ mod tests {
     }
 
     #[test]
+    fn the_places_of_repeated_ids_follow_the_order_of_the_list_within_each_id() {
+        let r = run(
+            json!({"thing": {"from": "ds", "identified_by": "id"}}),
+            json!({"ds": [{"id": "b"}, {"id": "a"}, {"id": "b"}, {"id": "a"}, {"id": "c"}, {"id": "b"}]}),
+        );
+        let row = &rows(&r, "$unique_ids")[0];
+        assert_eq!(input_of(row, 0)["value"], json!(["a", "b"]));
+        assert_eq!(
+            input_of(row, 0)["locations"],
+            json!(["/ds/1/id", "/ds/3/id", "/ds/0/id", "/ds/2/id", "/ds/5/id"])
+        );
+    }
+
+    #[test]
     fn two_ids_that_are_the_same_number_written_differently_are_repeated() {
         let r = run(
             json!({"thing": {"from": "ds", "identified_by": "id"}}),
@@ -1429,6 +1440,57 @@ mod tests {
         assert_eq!(
             input_of(&applies[1], 0)["locations"],
             json!(["/bs/0/kids/1"])
+        );
+    }
+
+    fn kid_report(subjects: Value, input: Value) -> Value {
+        report(
+            &input,
+            &json!({
+                "ergo_spec": "v0.3-dev",
+                "subjects": subjects,
+                "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}
+            }),
+            &json!({}),
+        )
+    }
+
+    #[test]
+    fn a_from_line_prints_a_key_named_like_a_parent_without_a_dot_and_its_filter_with_one() {
+        let r = kid_report(
+            json!({
+                "b": {"from": "bs", "identified_by": "id"},
+                "kid": {"from": "b.kids whose b.x equals v", "identified_by": "id"}
+            }),
+            json!({"bs": [{"id": "b1", "kids": [{"id": "k1", "v": 1}]}]}),
+        );
+        assert_eq!(
+            r["subjects"]["kid"]["from"],
+            json!("b.kids whose b.x equals v")
+        );
+        assert_eq!(
+            r["requirements"]["s"]["checks"]["$applies"]["expression"],
+            json!(".b.x equals v")
+        );
+    }
+
+    #[test]
+    fn a_filter_keeps_the_dot_of_a_field_named_like_a_part() {
+        let r = kid_report(
+            json!({"kid": {
+                "from": "kids whose .att.id is 1",
+                "identified_by": "id",
+                "has": {"att": {"from": "atts.pr", "identified_by": "id"}}
+            }}),
+            json!({"kids": [{"id": "k1", "att": {"id": 1}, "atts": {"pr": [{"id": 1}]}}]}),
+        );
+        assert_eq!(
+            r["requirements"]["s"]["checks"]["$applies"]["expression"],
+            json!(".att.id is 1")
+        );
+        assert_eq!(
+            r["subjects"]["kid"]["from"],
+            json!("kids whose att.id is 1")
         );
     }
 

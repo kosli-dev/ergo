@@ -118,9 +118,8 @@ fn compared(check: &Compare, l: &Value, r: &Value) -> Cause {
         Cmp::Eq => verdict(value::equal(l, r)),
         Cmp::Ne => verdict(!value::equal(l, r)),
         Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => match (l, r) {
-            (Value::Number(a), Value::Number(b)) => {
-                verdict(ordered(check.cmp, value::compare_numbers(a, b)))
-            }
+            (Value::Number(a), Value::Number(b)) => value::compare_numbers(a, b)
+                .map_or(Cause::Unusable, |order| verdict(ordered(check.cmp, order))),
             _ => Cause::Unusable,
         },
         Cmp::StartsWith | Cmp::EndsWith | Cmp::AlphabeticallyBefore | Cmp::AlphabeticallyAfter => {

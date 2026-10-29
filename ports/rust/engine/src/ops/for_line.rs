@@ -400,7 +400,9 @@ fn compare_keys(a: &Key, b: &Key) -> Ordering {
     match (a, b) {
         (Key::Text(x), Key::Text(y)) => x.cmp(y),
         (Key::Time(x), Key::Time(y)) => time::compare_times(x, y).unwrap_or(Ordering::Equal),
-        (Key::Number(x), Key::Number(y)) => crate::value::compare_numbers(x, y),
+        (Key::Number(x), Key::Number(y)) => {
+            crate::value::compare_numbers(x, y).unwrap_or(Ordering::Equal)
+        }
         _ => Ordering::Equal,
     }
 }
@@ -413,6 +415,7 @@ fn sort_key(value: &Value, alphabetically: bool) -> Option<Key> {
         };
     }
     match time::read_time(value)? {
+        Time::Number(n) if !crate::value::is_readable(&n) => None,
         Time::Number(n) => Some(Key::Number(n)),
         other => Some(Key::Time(other)),
     }
@@ -1271,7 +1274,9 @@ fn same_names_by_place(inputs: &[Input]) -> Vec<Input> {
         }
         done.push(&input.name);
         let mut group: Vec<&Input> = inputs.iter().filter(|i| i.name == input.name).collect();
-        group.sort_by(|a, b| a.locations.cmp(&b.locations));
+        group.sort_by(|a, b| {
+            crate::subjects::order(&a.value, &b.value).then_with(|| a.locations.cmp(&b.locations))
+        });
         out.extend(group.into_iter().cloned());
     }
     out
@@ -1808,6 +1813,23 @@ mod tests {
             .unwrap();
         let names: Vec<&str> = inputs.iter().map(|i| i["name"].as_str().unwrap()).collect();
         assert_eq!(names, ["x.a", "y"]);
+    }
+
+    #[test]
+    fn inputs_with_the_same_name_are_ordered_by_value_before_their_locations() {
+        let found = row(
+            "some approvals.approver as approver",
+            json!(".approver equals approver"),
+            json!({"approver": "", "approvals": [{"approver": "grace"}]}),
+        );
+        let inputs = found["failed_items"][0]["failed_assertions"][0]["inputs"]
+            .as_array()
+            .unwrap();
+        let values: Vec<&str> = inputs
+            .iter()
+            .map(|i| i["value"].as_str().unwrap())
+            .collect();
+        assert_eq!(values, ["", "grace"]);
     }
 
     #[test]

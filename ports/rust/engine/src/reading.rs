@@ -1026,9 +1026,7 @@ fn entry_of(
                 let scope = scope_of(name, raw, effective);
                 let aliases = scope.aliases();
                 let refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
-                let parents = scope.parent_names();
-                let parent_refs: Vec<&str> = parents.iter().map(String::as_str).collect();
-                s::print_from_with(line, &refs, &parent_refs)
+                s::print_from_with(line, &refs, &[])
             }
             _ => name::name(&path::Path {
                 start: Start::Subject,

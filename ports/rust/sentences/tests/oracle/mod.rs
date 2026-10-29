@@ -3,6 +3,10 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    (
+        "things whose x.y named by $params.i does not exist",
+        "things whose x.y named by $params.i does not exist",
+    ),
     ("\u{3000}k\n", "k"),
     ("\tm\n", "m"),
     (

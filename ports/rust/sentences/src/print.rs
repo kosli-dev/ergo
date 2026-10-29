@@ -83,7 +83,7 @@ pub fn print_from_condition_with(
     aliases: &[&str],
     parents: &[&str],
 ) -> String {
-    from_condition_text(condition, aliases, parents, true)
+    from_condition_text(condition, aliases, parents, true, false)
 }
 
 fn from_condition_text(
@@ -91,11 +91,12 @@ fn from_condition_text(
     aliases: &[&str],
     parents: &[&str],
     dot_derived: bool,
+    own: bool,
 ) -> String {
     match condition {
         FromCondition::Condition(condition) => {
             let left = match &condition.left {
-                Left::Path(path) => left_of_whose(path, aliases, parents, true),
+                Left::Path(path) => left_of_whose(path, aliases, parents, own),
                 Left::Derived(derived) if dot_derived => {
                     print_left_term(&Term::Derived(derived.clone()), aliases, parents)
                 }
@@ -153,7 +154,7 @@ pub fn print_from_with(line: &From, aliases: &[&str], parents: &[&str]) -> Strin
         let parts: Vec<String> = line
             .whose
             .iter()
-            .map(|c| from_condition_text(c, aliases, parents, false))
+            .map(|c| from_condition_text(c, aliases, parents, false, true))
             .collect();
         out.push_str(&parts.join(" and "));
     }

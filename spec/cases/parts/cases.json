@@ -5902,5 +5902,21 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line with a field named like a part",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"kid": {"from": "kids whose .att.id is 1", "identified_by": "id", "has": {"att": {"from": "atts.pr", "identified_by": "id"}}}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "prints the filter with the dot it was written with, so it doesn't read as the part",
+        "rules": ["sentence.subject.applies", "sentence.print.canonical", "sentence.path.part"],
+        "input": {"kids": [{"id": "k1", "att": {"id": 1}, "atts": {"pr": [{"id": 1}]}}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/kids/0/att/id"], "name": "att.id", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "k1", "type": "kid"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/kids/0/id"], "name": "id", "value": "k1"}], "passed": true, "requirement": "s", "subject": {"id": "k1", "type": "kid"}}
+        ],
+        "expressions": {"s": {"$applies": ".att.id is 1"}}
+      }
+    ]
   }
 ]
