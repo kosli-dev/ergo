@@ -75,7 +75,7 @@ OPA crashes when it compares two numbers whose exponents are beyond about ±1e6,
 {"items": [{"size": 1e1000000, "limit": 1e1000001}]}
 ```
 
-The same happens with `1e-1000001` and `1e-1000000`. Smaller exponents, like `1e400` against `1e401`, are compared correctly. A number like this in the policy isn't a problem, because a literal too big for a 64-bit float already fails `$well_formed` with `number out of range`. A fix would make a number whose exponent is past a limit `unusable`. It waits for a real need, or for OPA to fix the crash.
+The same happens with `1e-1000001` and `1e-1000000`. Smaller exponents, like `1e400` against `1e401`, are compared correctly. A number like this in the policy isn't a problem, because a literal too big for a 64-bit float already fails `$well_formed` with `number out of range`. [Values](semantics.md#values) allows a fix that fails such a check as `unusable`. It waits for a real need, or for OPA to fix the crash.
 
 ## Rules without cases
 

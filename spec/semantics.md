@@ -72,7 +72,7 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[value.refs]** A check that has refs gets `$refs` in its definition in the report: one entry for each ref, named as in [syntax.md](syntax.md#naming-a-path), with the value it read, or `null`. They're sorted by name.
 
-The spec only covers numbers in the input and the params that a 64-bit float keeps: `0`, or a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, with at most 15 significant digits. Ergo doesn't control the input or the params, so it doesn't fail a check that reads any other number. An implementation compares such a number and writes it in the report as its runtime does, so reports may differ between implementations. `ergo.rego` compares it exactly and copies it as written, while one in JavaScript reads `1e400` as `Infinity` and `1e-400` as `0`.
+The spec only covers numbers in the input and the params that a 64-bit float keeps: `0`, or a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, with at most 15 significant digits. Ergo doesn't control the input or the params, so it doesn't reject any other number. An implementation compares such a number and writes it in the report as its runtime does, or fails the check as `unusable` when it can't read the number, like one whose exponent is too long to hold. So reports may differ between implementations. `ergo.rego` compares it exactly and copies it as written, while one in JavaScript reads `1e400` as `Infinity` and `1e-400` as `0`.
 
 ## What a row shows
 
