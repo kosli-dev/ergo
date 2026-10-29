@@ -3,6 +3,9 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("open.pulls", "open.pulls"),
+    ("artifact", "artifact"),
+    ("artifact[0].pulls", "artifact[0].pulls"),
     (
         "things whose x.y named by $params.i does not exist",
         "things whose x.y named by $params.i does not exist",
