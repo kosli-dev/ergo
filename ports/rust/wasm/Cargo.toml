@@ -1,6 +1,6 @@
 [package]
 name = "ergo-wasm"
-description = "Builds Ergo reports in a browser, from JSON text"
+description = "Experimental: builds Ergo reports in a browser, from JSON text"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

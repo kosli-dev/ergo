@@ -1,6 +1,6 @@
 [package]
 name = "ergo-engine"
-description = "Builds Ergo reports"
+description = "Experimental: builds Ergo reports"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

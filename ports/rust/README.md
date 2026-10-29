@@ -1,5 +1,7 @@
 # Ergo in Rust
 
+**Experimental.** Nothing here is released, and every crate, function and output may change without notice. Use `ergo.rego` for real policies.
+
 A second engine for Ergo, in Rust, that should give the same report as `ergo.rego` for every case in [`spec/cases`](../../spec/cases). It's in progress: see [#319](https://github.com/kosli-dev/ergo/issues/319).
 
 It has four crates:

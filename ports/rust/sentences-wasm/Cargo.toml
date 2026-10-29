@@ -1,6 +1,6 @@
 [package]
 name = "ergo-sentences-wasm"
-description = "Reads Ergo's check sentences in a browser, from and to JSON text"
+description = "Experimental: reads Ergo's check sentences in a browser, from and to JSON text"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
