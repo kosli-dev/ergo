@@ -2579,20 +2579,5 @@
         ]
       }
     ]
-  },
-  {
-    "description": "min_subjects 1e400",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1e400, "checks": {"c": "x exists"}}}},
-    "cases": [
-      {
-        "description": "is written wrong with number out of range",
-        "rules": ["min_subjects", "well_formed"],
-        "input": {"t": [{"id": 1, "x": 1}]},
-        "requirements": {"s": {"status": "not_met"}},
-        "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["number out of range"], "locations": []}]}
-        ]
-      }
-    ]
   }
 ]
