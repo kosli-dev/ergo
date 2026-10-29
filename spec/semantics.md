@@ -33,7 +33,7 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 | `found`         | Every step was read, and the value at the end isn't `null`.                                                              |
 | `null`          | Every step was read, and the value at the end is `null`.                                                                 |
 | `absent`        | A key isn't in its object, an index is past the end of its list, or a step comes after a value that's missing or `null`. |
-| `unusable`      | A step comes after a value that can't hold it.                                                                           |
+| `unusable`      | A step comes after a value that can't hold it, or a number can't be read or compared exactly, see [Values](#values).     |
 | `not_an_object` | The path reads a field of a subject that isn't an object.                                                                |
 
 **[path.start]** A path starts at the subject, the input, the params or an alias. With no params, a path into the params ends `absent`. Params that are there but aren't an object fail the whole report, as [REFERENCE.md](../REFERENCE.md#params) says.
@@ -72,7 +72,7 @@ Every row has a cause. When a check reads several values, the row takes the firs
 
 **[value.refs]** A check that has refs gets `$refs` in its definition in the report: one entry for each ref, named as in [syntax.md](syntax.md#naming-a-path), with the value it read, or `null`. They're sorted by name.
 
-The spec only covers numbers in the input and the params that a 64-bit float keeps: `0`, or a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, with at most 15 significant digits. Ergo doesn't control the input or the params, so it doesn't reject any other number. An implementation compares such a number and writes it in the report as its runtime does, or fails the check as `unusable` when it can't read the number, like one whose exponent is too long to hold. So reports may differ between implementations. `ergo.rego` compares it exactly and copies it as written, while one in JavaScript reads `1e400` as `Infinity` and `1e-400` as `0`.
+The spec only covers numbers in the input and the params that a 64-bit float keeps: `0`, or a magnitude between `2.2250738585072014e-308` and `1.7976931348623157e308`, with at most 15 significant digits. Ergo doesn't control the input or the params, so the spec doesn't say what happens to any other number. An implementation compares such a number and writes it in the report as its runtime does, or fails the check as `unusable` when it can't read or compare the number exactly, like one whose exponent is too long to hold. So reports may differ between implementations. `ergo.rego` compares it exactly up to an exponent of ±1e6, see [OPEN.md](OPEN.md#numbers-with-huge-exponents), and copies it as written, while one in JavaScript reads `1e400` as `Infinity` and `1e-400` as `0`.
 
 ## What a row shows
 

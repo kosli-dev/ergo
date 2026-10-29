@@ -69,17 +69,19 @@ Three ways to settle it:
 
 ## Numbers with huge exponents
 
-OPA crashes when it compares two numbers whose exponents are beyond about ±1e6, so `ergo.rego` gives no report at all. `size is at least limit` on this input stops OPA 1.20.2 with `panic: illegal value` in `ast.NumberCompare`:
+OPA crashes when it compares a number whose exponent is beyond ±1e6 with any other number, from the input, the params or the policy, so `ergo.rego` gives no report at all. `size is at least 5` on this input stops OPA 1.20.2 with `panic: illegal value` in `ast.NumberCompare`:
 
 ```json
-{"items": [{"size": 1e1000000, "limit": 1e1000001}]}
+{"items": [{"size": 1e1000001}]}
 ```
 
-The same happens with `1e-1000001` and `1e-1000000`. Smaller exponents, like `1e400` against `1e401`, are compared correctly. A number like this in the policy isn't a problem, because a literal too big for a 64-bit float already fails `$well_formed` with `number out of range`. [Values](semantics.md#values) allows a fix that fails such a check as `unusable`. It waits for a real need, or for OPA to fix the crash.
+`1e-1000001` does the same, and so does `size is at least limit` on `{"items": [{"size": 1e1000000, "limit": 1e1000001}]}`. `1e1000000` against `5` is compared correctly, and so is `1e400` against `1e401`. The crash doesn't need a check that compares anything: OPA sorts subject ids, so `identified_by: id` on two subjects with ids `1e1000000` and `1e1000001` crashes too, whatever the check says.
+
+[Values](semantics.md#values) allows a fix that fails such a check as `unusable`. That can't cover the sort of subject ids, because no check row reads them. Both wait for a real need, or for OPA to fix the crash.
 
 ## Rules without cases
 
-Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about numbers above. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
+Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about hashing numbers above. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
 
 - `sentence.forms`
 - `sentence.subject.depth`
