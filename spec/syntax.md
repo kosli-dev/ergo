@@ -512,9 +512,9 @@ Most often the writer meant the subject's field. In a `whose` and after `every` 
 - an object with neither `assert` nor `any_of`: `<missing assert>`, without its `for` line
 - a line of `assert` that isn't a string: `<invalid assert>`, in the line's place
 - an `any_of` that isn't an object: `<invalid any_of>`, and an empty one: `one of: <empty options>`
-- an empty option: `<name>(<empty option>)`, and an option that isn't a string or a list of strings: `<name>(<invalid option>)`
+- an option that's an empty list: `<name>(<empty option>)`, and an option that isn't a string or a list of strings: `<name>(<invalid option>)`
 
-A `for` that isn't a string is left out, and an empty `assert` list prints as `""`. So `{"for": " every  xs ", "assert": [" x  is ", 3]}` prints `for every  xs: x  is and <invalid assert>`. How sentences that read print next to a `for` that isn't a string, or next to a field the check doesn't take, is [still open](OPEN.md#the-expression-of-a-check-with-an-unknown-field).
+A `for` that isn't a string, or that sits next to `any_of`, is left out, and an empty `assert` list prints as `""`. So `{"for": " every  xs ", "assert": [" x  is ", 3]}` prints `for every  xs: x  is and <invalid assert>`. Two cases are [still open](OPEN.md#where-ergorego-and-the-rust-port-differ): sentences that read next to a field the check doesn't take or a `for` that isn't a string, and a sentence written wrong only with `values of mixed types`.
 
 ## Naming a path
 

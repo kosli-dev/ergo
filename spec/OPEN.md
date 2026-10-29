@@ -67,9 +67,13 @@ Three ways to settle it:
 
 [report.hash](semantics.md#statuses) writes the report as RFC 8785 says, and RFC 8785 writes every number as a 64-bit float. Ergo copies numbers from the input into the report with every digit, so a report holding `1.00000000000000000001` hashes as if it held `1`. Two reports that differ only there get the same hash. A number too big or too small for a 64-bit float, like `1e400`, can't be written that way at all, and implementations already write it differently in the report (see [Values](semantics.md#values)). The open question is whether that's fine, or whether the hash should write numbers as the report does.
 
-## The expression of a check with an unknown field
+## Where ergo.rego and the Rust port differ
 
-[sentence.print.written_wrong](syntax.md#printing-the-sentence) doesn't say how a check prints when its sentences read but it has a field it doesn't take, or a `for` that isn't a string. `ergo.rego` prints it as written and the Rust port prints it from its parse, so `{"assert": " x  is  1", "zzz": 1}` gives `x  is  1` with one and `x is 1` with the other. Both fail `$well_formed` the same way.
+The spec doesn't settle these yet, because the two engines give different reports. Both still fail and pass the same checks.
+
+- **A check with a field it doesn't take.** [sentence.print.written_wrong](syntax.md#printing-the-sentence) doesn't say how a check prints when its sentences read but it has an unknown field, a `for` that isn't a string, or `for` or `assert` next to `any_of`. `ergo.rego` prints it as written and Rust prints it from its parse, so `{"assert": " x  is  1", "zzz": 1}` gives `x  is  1` with one and `x is 1` with the other.
+- **A sentence written wrong only with `values of mixed types`.** `ergo.rego` prints it from its parse and Rust as written, so `x is one of 1.0, 'a'` gives `x is one of 1, "a"` with one and `x is one of 1.0, 'a'` with the other.
+- **A walk on a `for` line whose `whose` reads outside the item.** With `for: every xs as x`, `every rows.n whose z is at least $input.q is at least x.v` fails with `inputs` named `$input.q`, `x.v`, `rows[].n` in `ergo.rego`, and `x.v`, `$input.q`, `rows[].n` in Rust, which is what [for.failure_inputs](semantics.md#for) says for a walk without such a `whose`.
 
 ## Rules without cases
 
