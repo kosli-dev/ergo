@@ -410,3 +410,53 @@ fn a_scalar_starting_with_a_dot_takes_underscores_only_between_digits() {
     same(".5_0", json!(0.5));
     same(".1_2e1_0", json!(1.2e9));
 }
+
+#[test]
+fn control_characters_are_refused_as_opa_refuses_them() {
+    for text in [
+        "a: x\u{1}y\n",
+        "a: x\u{7f}y\n",
+        "a: \"x\u{9f}y\"\n",
+        "a: \u{fffe}\n",
+        "a: 1 # x\u{1}\n",
+        "a: 1\n---\nb: \u{1}\n",
+    ] {
+        match parse(text) {
+            Err(Error::Invalid(message)) => {
+                assert!(message.contains("control character"), "{message}")
+            }
+            other => panic!("{text:?}: {other:?}"),
+        }
+    }
+}
+
+#[test]
+fn characters_yaml_allows_are_read() {
+    assert_eq!(
+        parse("a: \"x\ty\u{a0}\u{1f600}\"\n").unwrap(),
+        json!({"a": "x\ty\u{a0}\u{1f600}"})
+    );
+    assert_eq!(parse("\u{feff}a: 1\r\n").unwrap(), json!({"a": 1}));
+}
+
+#[test]
+fn a_yaml_version_other_than_1_1_is_refused_as_opa_refuses_it() {
+    for version in ["1.2", "1.0", "2.0"] {
+        refused(&format!("%YAML {version}\n---\na: 1\n"), "%YAML");
+    }
+    refused("# c\n\n%YAML 1.2\n---\na: 1\n", "%YAML");
+}
+
+#[test]
+fn yaml_1_1_is_read() {
+    assert_eq!(parse("%YAML 1.1\n---\na: 1\n").unwrap(), json!({"a": 1}));
+    assert_eq!(
+        parse("a: '%YAML 1.2'\n").unwrap(),
+        json!({"a": "%YAML 1.2"})
+    );
+}
+
+#[test]
+fn a_merge_of_an_alias_to_a_list_is_refused_as_opa_refuses_it() {
+    refused("l: &l [{a: 1}]\nm:\n  <<: *l\n", "merge");
+}

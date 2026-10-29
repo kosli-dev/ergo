@@ -24,8 +24,10 @@ fn invalid(message: impl Into<String>) -> Error {
 
 const MAX_DEPTH: usize = 10_000;
 
-/// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error, on `.inf` and `.nan`, on a tag it doesn't know, on a key that isn't a scalar or is `null`, on an alias with no anchor, on more than 10,000 levels of nesting, and on more aliases than OPA reads.
+/// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error, on `.inf` and `.nan`, on a tag it doesn't know, on a key that isn't a scalar or is `null`, on an alias with no anchor, on more than 10,000 levels of nesting, on more aliases than OPA reads, on control characters, and on a `%YAML` version other than 1.1.
 pub fn parse(text: &str) -> Result<Value, Error> {
+    characters(text)?;
+    version(text)?;
     let mut events = Parser::new_from_str(text).keep_tags(true);
     loop {
         match next(&mut events)? {
@@ -35,6 +37,40 @@ pub fn parse(text: &str) -> Result<Value, Error> {
             _ => return Err(invalid("unexpected content")),
         }
     }
+}
+
+fn characters(text: &str) -> Result<(), Error> {
+    let allowed = |c: char| matches!(c, '\t' | '\n' | '\r' | ' '..='~' | '\u{85}' | '\u{a0}'..='\u{d7ff}' | '\u{e000}'..='\u{fffd}' | '\u{10000}'..);
+    match text.char_indices().find(|(_, c)| !allowed(*c)) {
+        None => Ok(()),
+        Some((at, c)) => Err(invalid(format!(
+            "line {} holds the control character U+{:04X}, which YAML doesn't allow",
+            text[..at].matches('\n').count() + 1,
+            c as u32
+        ))),
+    }
+}
+
+fn version(text: &str) -> Result<(), Error> {
+    for line in text.trim_start_matches('\u{feff}').lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            continue;
+        }
+        let Some(directive) = line.strip_prefix('%') else {
+            return Ok(());
+        };
+        let mut words = directive.split_whitespace();
+        if words.next() == Some("YAML") {
+            let version = words.next().unwrap_or("");
+            if version != "1.1" {
+                return Err(Error::Refused(format!(
+                    "it says %YAML {version}, and only YAML 1.1 is read"
+                )));
+            }
+        }
+    }
+    Ok(())
 }
 
 fn next<'a>(events: &mut Events<'a>) -> Result<Event<'a>, Error> {
@@ -79,7 +115,7 @@ impl Reader {
     fn document<'a>(mut self, events: &mut Events<'a>) -> Result<Value, Error> {
         self.decoded = 1;
         loop {
-            let (value, size) = match next(events)? {
+            let (value, size, alias) = match next(events)? {
                 Event::Scalar(text, style, anchor, tag) => {
                     if self.expects_key()
                         && style == ScalarStyle::Plain
@@ -92,7 +128,7 @@ impl Reader {
                     self.decoded += 1;
                     let value = scalar(&text, style, tag.as_deref())?.value(&text)?;
                     self.remember(anchor, &value, 1);
-                    (value, 1)
+                    (value, 1, false)
                 }
                 Event::Alias(id) => {
                     let anchor = self
@@ -104,7 +140,7 @@ impl Reader {
                     if excessive(self.decoded, self.aliased) {
                         return Err(Error::Refused("it uses too many aliases".to_string()));
                     }
-                    (anchor.value.clone(), 1 + anchor.size)
+                    (anchor.value.clone(), 1 + anchor.size, true)
                 }
                 Event::SequenceStart(anchor, _) => {
                     self.open(Collection::List(Vec::new()), anchor)?;
@@ -124,7 +160,7 @@ impl Reader {
                         Collection::Map(map, _) => Value::Object(map),
                     };
                     self.remember(frame.anchor, &value, frame.size);
-                    (value, frame.size)
+                    (value, frame.size, false)
                 }
                 _ => return Err(invalid("unexpected content")),
             };
@@ -132,7 +168,7 @@ impl Reader {
                 None => return Ok(value),
                 Some(frame) => {
                     frame.size += size;
-                    place(&mut frame.collection, value)?;
+                    place(&mut frame.collection, value, alias)?;
                 }
             }
         }
@@ -190,7 +226,7 @@ fn excessive(decoded: u64, aliased: u64) -> bool {
     aliased > 100 && decoded > 1000 && aliased as f64 / decoded as f64 > allowed
 }
 
-fn place(collection: &mut Collection, value: Value) -> Result<(), Error> {
+fn place(collection: &mut Collection, value: Value, alias: bool) -> Result<(), Error> {
     match collection {
         Collection::List(items) => items.push(value),
         Collection::Map(map, slot) => match std::mem::replace(slot, Slot::Key) {
@@ -198,13 +234,13 @@ fn place(collection: &mut Collection, value: Value) -> Result<(), Error> {
             Slot::Value(name) => {
                 map.insert(name, value);
             }
-            Slot::Merge => merge(map, value)?,
+            Slot::Merge => merge(map, value, alias)?,
         },
     }
     Ok(())
 }
 
-fn merge(into: &mut Map<String, Value>, source: Value) -> Result<(), Error> {
+fn merge(into: &mut Map<String, Value>, source: Value, alias: bool) -> Result<(), Error> {
     match source {
         Value::Object(map) => {
             for (k, v) in map {
@@ -212,9 +248,13 @@ fn merge(into: &mut Map<String, Value>, source: Value) -> Result<(), Error> {
             }
             Ok(())
         }
+        Value::Array(_) if alias => Err(Error::Refused(
+            "a merge key takes an alias to a list, and only an alias to a mapping is merged"
+                .to_string(),
+        )),
         Value::Array(items) if items.iter().all(Value::is_object) => {
             for item in items.into_iter().rev() {
-                merge(into, item)?;
+                merge(into, item, false)?;
             }
             Ok(())
         }
