@@ -326,3 +326,87 @@ fn too_many_aliases_are_refused_as_opa_refuses_them() {
         refused(&aliases(levels), "aliases");
     }
 }
+
+#[test]
+fn a_core_tag_that_does_not_fit_the_value_is_refused_as_opa_refuses_it() {
+    for text in [
+        "!!int abc",
+        "!!int 1.5",
+        "!!int",
+        "!!int ''",
+        "!!int 08",
+        "!!int 1e3",
+        "!!int 123456789012345678901",
+        "!!float abc",
+        "!!float yes",
+        "!!float 12345678901234567890",
+        "!!bool 1",
+        "!!bool ''",
+        "!!null foo",
+        "!!null alice",
+        "!!timestamp alice",
+        "!!timestamp 123",
+        "!!timestamp 2001-2-30",
+        "!!timestamp 2001-13-01",
+        "!!timestamp 2001-12-14T25:00:00Z",
+        "!!timestamp 2001-12-14T21:60:00Z",
+        "!!timestamp 2001-12-14 21:59:43.10 -5",
+        "!!timestamp 02001-12-14",
+        "!!timestamp 2001-12-14T21:59:43+0500",
+        "!!timestamp 2001-12-14T21:59:43",
+        "!!timestamp 2001-12-14T21:59:43.Z",
+    ] {
+        match parse(&format!("v: {text}\n")) {
+            Err(Error::Invalid(message)) => assert!(message.contains("!!"), "{text}: {message}"),
+            other => panic!("{text}: {other:?}"),
+        }
+    }
+}
+
+#[test]
+fn a_core_tag_that_fits_the_value_reads_as_opa_reads_it() {
+    for (text, expected) in [
+        ("!!float 1", json!(1)),
+        ("!!float 0x10", json!(16)),
+        ("!!float '1.5'", json!(1.5)),
+        ("!!int 0x1F", json!(31)),
+        ("!!int 1_000", json!(1000)),
+        ("!!int '12'", json!(12)),
+        ("!!int 12345678901234567890", json!(12345678901234567890u64)),
+        ("!!bool yes", json!(true)),
+        ("!!bool 'yes'", json!(true)),
+        ("!!null", Value::Null),
+        ("!!null ''", Value::Null),
+        ("!!null ~", Value::Null),
+        ("!!str 123", json!("123")),
+        ("!!str yes", json!("yes")),
+        ("!!timestamp 2001-12-14", json!("2001-12-14")),
+        ("!!timestamp '2001-12-14'", json!("2001-12-14")),
+        ("!!timestamp 2000-02-29", json!("2000-02-29")),
+        (
+            "!!timestamp 2001-12-14t21:59:43.10-05:00",
+            json!("2001-12-14t21:59:43.10-05:00"),
+        ),
+        (
+            "!!timestamp 2001-12-14 21:59:43.10",
+            json!("2001-12-14 21:59:43.10"),
+        ),
+        ("!!timestamp 2001-12-14T1:2:3Z", json!("2001-12-14T1:2:3Z")),
+        (
+            "!!timestamp 2001-12-14T1:2:3,5+01:00",
+            json!("2001-12-14T1:2:3,5+01:00"),
+        ),
+    ] {
+        same(text, expected);
+    }
+}
+
+#[test]
+fn a_scalar_starting_with_a_dot_takes_underscores_only_between_digits() {
+    same("._5", json!("._5"));
+    same(".5_", json!(".5_"));
+    same(".5__0", json!(".5__0"));
+    same(".5e_3", json!(".5e_3"));
+    same(".5_0", json!(0.5));
+    same(".1_2e1_0", json!(1.2e9));
+}

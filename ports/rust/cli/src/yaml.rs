@@ -90,7 +90,7 @@ impl Reader {
                         continue;
                     }
                     self.decoded += 1;
-                    let value = scalar(&text, style, tag.as_deref())?;
+                    let value = scalar(&text, style, tag.as_deref())?.value(&text)?;
                     self.remember(anchor, &value, 1);
                     (value, 1)
                 }
@@ -232,44 +232,92 @@ fn key(value: Value) -> Result<String, Error> {
     }
 }
 
-fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Value, Error> {
-    if let Some(tag) = tag {
-        let core = tag.handle == "!!" || tag.handle == "tag:yaml.org,2002:";
-        return match (core, tag.suffix.as_str()) {
-            (true, "str") => Ok(Value::String(text.to_string())),
-            (true, "int" | "float" | "bool" | "null") => resolve(text),
-            (true, "timestamp") => Ok(Value::String(text.to_string())),
-            (true, "binary") => base64(text).map(Value::String),
-            _ => Err(invalid(format!(
+enum Scalar {
+    Null,
+    Bool(bool),
+    Int(String),
+    Uint(String),
+    Float(String),
+    Special,
+    Str(String),
+}
+
+impl Scalar {
+    fn value(self, text: &str) -> Result<Value, Error> {
+        match self {
+            Scalar::Null => Ok(Value::Null),
+            Scalar::Bool(b) => Ok(Value::Bool(b)),
+            Scalar::Int(digits) | Scalar::Uint(digits) | Scalar::Float(digits) => {
+                Ok(number(&digits))
+            }
+            Scalar::Special => Err(Error::NotJson(format!("{text} isn't a JSON number"))),
+            Scalar::Str(s) => Ok(Value::String(s)),
+        }
+    }
+}
+
+fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Scalar, Error> {
+    let Some(tag) = tag else {
+        return Ok(if style == ScalarStyle::Plain {
+            resolve(text)
+        } else {
+            Scalar::Str(text.to_string())
+        });
+    };
+    let core = tag.handle == "!!" || tag.handle == "tag:yaml.org,2002:";
+    let resolved = resolve(text);
+    let (fits, kind) = match (core, tag.suffix.as_str()) {
+        (true, "str") => return Ok(Scalar::Str(text.to_string())),
+        (true, "binary") => return base64(text).map(Scalar::Str),
+        (true, "timestamp") if timestamp(text) => return Ok(Scalar::Str(text.to_string())),
+        (true, "timestamp") => (None, "a date or a time"),
+        (true, "int") => (
+            matches!(resolved, Scalar::Int(_) | Scalar::Uint(_)).then_some(resolved),
+            "an integer",
+        ),
+        (true, "float") => (
+            match resolved {
+                Scalar::Int(digits) => Some(Scalar::Float(digits)),
+                Scalar::Float(_) | Scalar::Special => Some(resolved),
+                _ => None,
+            },
+            "a number",
+        ),
+        (true, "bool") => (
+            matches!(resolved, Scalar::Bool(_)).then_some(resolved),
+            "true or false",
+        ),
+        (true, "null") => (matches!(resolved, Scalar::Null).then_some(resolved), "null"),
+        _ => {
+            return Err(invalid(format!(
                 "the tag {}{} isn't supported",
                 tag.handle, tag.suffix
-            ))),
-        };
-    }
-    if style == ScalarStyle::Plain {
-        resolve(text)
-    } else {
-        Ok(Value::String(text.to_string()))
-    }
+            )));
+        }
+    };
+    fits.ok_or_else(|| invalid(format!("!!{} `{text}` isn't {kind}", tag.suffix)))
 }
 
-fn resolve(text: &str) -> Result<Value, Error> {
+fn resolve(text: &str) -> Scalar {
     match text {
-        "" | "~" | "null" | "Null" | "NULL" => Ok(Value::Null),
+        "" | "~" | "null" | "Null" | "NULL" => Scalar::Null,
         "y" | "Y" | "yes" | "Yes" | "YES" | "on" | "On" | "ON" | "true" | "True" | "TRUE" => {
-            Ok(Value::Bool(true))
+            Scalar::Bool(true)
         }
         "n" | "N" | "no" | "No" | "NO" | "off" | "Off" | "OFF" | "false" | "False" | "FALSE" => {
-            Ok(Value::Bool(false))
+            Scalar::Bool(false)
         }
         ".nan" | ".NaN" | ".NAN" | ".inf" | ".Inf" | ".INF" | "+.inf" | "+.Inf" | "+.INF"
-        | "-.inf" | "-.Inf" | "-.INF" => Err(Error::NotJson(format!("{text} isn't a JSON number"))),
-        _ => Ok(numeric(text).unwrap_or_else(|| Value::String(text.to_string()))),
+        | "-.inf" | "-.Inf" | "-.INF" => Scalar::Special,
+        _ => numeric(text).unwrap_or_else(|| Scalar::Str(text.to_string())),
     }
 }
 
-fn numeric(text: &str) -> Option<Value> {
+fn numeric(text: &str) -> Option<Scalar> {
     if !text.starts_with(|c: char| matches!(c, '+' | '-' | '.' | '0'..='9')) {
+        return None;
+    }
+    if text.starts_with('.') && !underscores_between_digits(text) {
         return None;
     }
     let plain: String = text.chars().filter(|c| *c != '_').collect();
@@ -278,13 +326,23 @@ fn numeric(text: &str) -> Option<Value> {
         Some(b'+') => (false, &plain[1..]),
         _ => (false, plain.as_str()),
     };
-    if let Some(value) = integer(negative, body) {
-        return value;
+    if let Some(scalar) = integer(negative, body) {
+        return scalar;
     }
-    float(negative, body).map(|t| number(&t))
+    float(negative, body).map(Scalar::Float)
 }
 
-fn integer(negative: bool, body: &str) -> Option<Option<Value>> {
+fn underscores_between_digits(text: &str) -> bool {
+    let bytes = text.as_bytes();
+    bytes.iter().enumerate().all(|(i, b)| {
+        *b != b'_'
+            || (i > 0
+                && bytes[i - 1].is_ascii_digit()
+                && bytes.get(i + 1).is_some_and(u8::is_ascii_digit))
+    })
+}
+
+fn integer(negative: bool, body: &str) -> Option<Option<Scalar>> {
     let (radix, digits, prefixed) = match body.get(..2) {
         Some("0x" | "0X") => (16, &body[2..], true),
         Some("0b" | "0B") => (2, &body[2..], true),
@@ -295,6 +353,12 @@ fn integer(negative: bool, body: &str) -> Option<Option<Value>> {
         {
             (8, &body[1..], false)
         }
+        _ if !body.is_empty()
+            && body.bytes().all(|b| b.is_ascii_digit())
+            && (body == "0" || !body.starts_with('0')) =>
+        {
+            (10, body, false)
+        }
         _ => return None,
     };
     let magnitude = if digits.is_empty() || !digits.chars().all(|c| c.is_digit(radix)) {
@@ -302,20 +366,107 @@ fn integer(negative: bool, body: &str) -> Option<Option<Value>> {
     } else {
         u128::from_str_radix(digits, radix).ok()
     };
+    let largest = if negative {
+        1 << 63
+    } else {
+        u128::from(u64::MAX)
+    };
     match magnitude {
-        Some(m)
-            if m <= if negative {
-                1 << 63
-            } else {
-                u128::from(u64::MAX)
-            } =>
-        {
+        Some(m) if m <= largest => {
             let sign = if negative && m != 0 { "-" } else { "" };
-            Some(Some(number(&format!("{sign}{m}"))))
+            let digits = format!("{sign}{m}");
+            Some(Some(if m > i64::MAX as u128 && !negative {
+                Scalar::Uint(digits)
+            } else {
+                Scalar::Int(digits)
+            }))
         }
         _ if prefixed => Some(None),
         _ => None,
     }
+}
+
+fn timestamp(text: &str) -> bool {
+    let b = text.as_bytes();
+    let mut i = 0;
+    let Some(year) = number_at(b, &mut i, 4, 4) else {
+        return false;
+    };
+    let Some(month) = after(b, &mut i, b'-', 2) else {
+        return false;
+    };
+    let Some(day) = after(b, &mut i, b'-', 2) else {
+        return false;
+    };
+    let leap = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+    let days = match month {
+        2 if leap => 29,
+        2 => 28,
+        4 | 6 | 9 | 11 => 30,
+        1..=12 => 31,
+        _ => return false,
+    };
+    if day < 1 || day > days {
+        return false;
+    }
+    if i == b.len() {
+        return true;
+    }
+    let zoned = match b[i] {
+        b'T' | b't' => true,
+        b' ' => false,
+        _ => return false,
+    };
+    i += 1;
+    let Some(hour) = number_at(b, &mut i, 1, 2) else {
+        return false;
+    };
+    let (Some(minute), Some(second)) = (after(b, &mut i, b':', 2), after(b, &mut i, b':', 2))
+    else {
+        return false;
+    };
+    if hour > 23 || minute > 59 || second > 59 {
+        return false;
+    }
+    if matches!(b.get(i), Some(b'.' | b',')) && b.get(i + 1).is_some_and(u8::is_ascii_digit) {
+        i += 1;
+        while b.get(i).is_some_and(u8::is_ascii_digit) {
+            i += 1;
+        }
+    }
+    if !zoned {
+        return i == b.len();
+    }
+    match &b[i..] {
+        [b'Z'] => true,
+        [b'+' | b'-', h1, h2, b':', m1, m2] => {
+            let two = |a: u8, b: u8| {
+                (a.is_ascii_digit() && b.is_ascii_digit())
+                    .then(|| u32::from(a - b'0') * 10 + u32::from(b - b'0'))
+            };
+            matches!((two(*h1, *h2), two(*m1, *m2)), (Some(h), Some(m)) if h <= 24 && m <= 60)
+        }
+        _ => false,
+    }
+}
+
+fn after(b: &[u8], i: &mut usize, separator: u8, most: usize) -> Option<u32> {
+    if b.get(*i) != Some(&separator) {
+        return None;
+    }
+    *i += 1;
+    number_at(b, i, 1, most)
+}
+
+fn number_at(b: &[u8], i: &mut usize, least: usize, most: usize) -> Option<u32> {
+    let start = *i;
+    while *i - start < most && b.get(*i).is_some_and(u8::is_ascii_digit) {
+        *i += 1;
+    }
+    if *i - start < least {
+        return None;
+    }
+    std::str::from_utf8(&b[start..*i]).ok()?.parse().ok()
 }
 
 fn float(negative: bool, body: &str) -> Option<String> {
