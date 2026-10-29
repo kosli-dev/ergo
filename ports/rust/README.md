@@ -8,8 +8,8 @@ It has five crates:
 
 - `ergo-sentences` (`sentences/`) reads check sentences, `for` lines, `from` lines and paths, and nothing else, so an editor or a linter can use it without the engine.
 - `ergo-engine` (`engine/`) builds the report, and reads sentences with `ergo-sentences`.
-- `ergo-wasm` (`wasm/`) wraps the engine for a browser: one function, `report`, that takes the input, the policy and the params as JSON text and gives the report back as JSON text.
 - `ergo-cli` (`cli/`) is the `ergo` command: it reads a policy, an input and params from JSON or YAML files and prints the report or the violations.
+- `ergo-wasm` (`wasm/`) wraps the engine for a browser: one function, `report`, that takes the input, the policy and the params as JSON text and gives the report back as JSON text.
 - `ergo-sentences-wasm` (`sentences-wasm/`) wraps `ergo-sentences` for a browser: `parse_check`, `parse_for`, `parse_from` and `parse_path` give a tree or the syntax errors as JSON text, and there are functions for the problems and for printing a tree back.
 
 ## The cases
@@ -64,6 +64,7 @@ docker run --rm -v "$REPO":/src -v "$PWD":/work -v ergo-rust-target:/target -v e
   cargo build -j 4 --locked --release -p ergo-cli &&
   cd /work &&
   /target/release/ergo violations --policy policy.yaml --input deployments.json'
+```
 
 `violations` prints:
 
@@ -94,7 +95,7 @@ docker run --rm -v "$REPO":/src -v "$PWD":/work -v ergo-rust-target:/target -v e
 
 `--params <file>` gives the policy its params, and without it they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. The command exits 0 whenever it printed a report, even when `compliant` is `false`. It exits 1 when a file can't be read or parsed and 2 when the command line is wrong, and says why on one line of stderr.
 
-YAML is read the way OPA reads it: `yes`, `no`, `on` and `off` are booleans, `010` is 8, `0x10` is 16, dates stay strings, `<<` merges, and only the first document counts. Numbers keep the digits they were written with, so `1.10` stays `1.10` and a number too big for a float stays a number. Where the rule lives: `number` in `cli/src/number.rs`.
+YAML is read the way OPA reads it: `yes`, `no`, `on` and `off` are booleans, `010` is 8, `0x10` is 16, dates stay strings, `<<` merges, and only the first document counts. Numbers keep the digits they were written with, so `1.10` stays `1.10` and a number too big for a float stays a number.
 
 ## Building for a browser
 
