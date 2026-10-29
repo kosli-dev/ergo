@@ -342,3 +342,14 @@ fn a_number_that_cannot_be_read_keeps_its_digits_in_the_report_text() {
         "{text}"
     );
 }
+
+#[test]
+fn a_zero_whose_exponent_has_more_than_36_digits_is_zero() {
+    let big = format!("1{}", "0".repeat(36));
+    for zero in [format!("0e{big}"), format!("-0.0e-{big}"), format!("0E+{big}")] {
+        let things = format!(r#"{{"id": "t", "fa": {zero}, "fb": 0}}"#);
+        assert_eq!(cause_of("fa is 0", &things), "satisfied", "{zero}");
+        assert_eq!(cause_of("fa is at least fb", &things), "satisfied", "{zero}");
+        assert_eq!(cause_of("fa is less than 1", &things), "satisfied", "{zero}");
+    }
+}

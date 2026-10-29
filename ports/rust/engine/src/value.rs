@@ -34,22 +34,25 @@ impl Decimal {
         {
             return None;
         }
-        let written_exponent = match exp_text {
-            None => 0,
-            Some(t) => parse_exponent(t)?,
-        };
-        let mut exponent = written_exponent - frac_part.len() as i128;
         let all = format!("{int_part}{frac_part}");
         let trimmed = all.trim_start_matches('0');
         let stripped = trimmed.trim_end_matches('0');
-        exponent += (trimmed.len() - stripped.len()) as i128;
         if stripped.is_empty() {
+            if let Some(t) = exp_text {
+                exponent_digits(t)?;
+            }
             return Some(Decimal {
                 negative: false,
                 digits: String::new(),
                 exponent: 0,
             });
         }
+        let written_exponent = match exp_text {
+            None => 0,
+            Some(t) => parse_exponent(t)?,
+        };
+        let exponent =
+            written_exponent - frac_part.len() as i128 + (trimmed.len() - stripped.len()) as i128;
         Some(Decimal {
             negative,
             digits: stripped.to_string(),
@@ -128,7 +131,7 @@ impl Decimal {
     }
 }
 
-fn parse_exponent(text: &str) -> Option<i128> {
+fn exponent_digits(text: &str) -> Option<(bool, &str)> {
     let (negative, digits) = match text.strip_prefix('-') {
         Some(rest) => (true, rest),
         None => (false, text.strip_prefix('+').unwrap_or(text)),
@@ -136,6 +139,11 @@ fn parse_exponent(text: &str) -> Option<i128> {
     if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
         return None;
     }
+    Some((negative, digits))
+}
+
+fn parse_exponent(text: &str) -> Option<i128> {
+    let (negative, digits) = exponent_digits(text)?;
     let trimmed = digits.trim_start_matches('0');
     let magnitude: i128 = if trimmed.len() > 36 {
         return None;
