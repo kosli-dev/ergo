@@ -1432,6 +1432,57 @@ mod tests {
         );
     }
 
+    fn kid_report(subjects: Value, input: Value) -> Value {
+        report(
+            &input,
+            &json!({
+                "ergo_spec": "v0.3-dev",
+                "subjects": subjects,
+                "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}
+            }),
+            &json!({}),
+        )
+    }
+
+    #[test]
+    fn a_from_line_prints_a_key_named_like_a_parent_without_a_dot_and_its_filter_with_one() {
+        let r = kid_report(
+            json!({
+                "b": {"from": "bs", "identified_by": "id"},
+                "kid": {"from": "b.kids whose b.x equals v", "identified_by": "id"}
+            }),
+            json!({"bs": [{"id": "b1", "kids": [{"id": "k1", "v": 1}]}]}),
+        );
+        assert_eq!(
+            r["subjects"]["kid"]["from"],
+            json!("b.kids whose b.x equals v")
+        );
+        assert_eq!(
+            r["requirements"]["s"]["checks"]["$applies"]["expression"],
+            json!(".b.x equals v")
+        );
+    }
+
+    #[test]
+    fn a_filter_keeps_the_dot_of_a_field_named_like_a_part() {
+        let r = kid_report(
+            json!({"kid": {
+                "from": "kids whose .att.id is 1",
+                "identified_by": "id",
+                "has": {"att": {"from": "atts.pr", "identified_by": "id"}}
+            }}),
+            json!({"kids": [{"id": "k1", "att": {"id": 1}, "atts": {"pr": [{"id": 1}]}}]}),
+        );
+        assert_eq!(
+            r["requirements"]["s"]["checks"]["$applies"]["expression"],
+            json!(".att.id is 1")
+        );
+        assert_eq!(
+            r["subjects"]["kid"]["from"],
+            json!("kids whose att.id is 1")
+        );
+    }
+
     #[test]
     fn a_subject_that_narrows_another_has_its_id_and_every_condition_outermost_first() {
         let r = run(

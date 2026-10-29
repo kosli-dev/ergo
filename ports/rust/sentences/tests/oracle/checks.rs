@@ -3176,6 +3176,30 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "x.y named by $params.i exists",
+        "x.y named by $params.i exists",
+        &[],
+        &[],
+    ),
+    (
+        "x.y named by $params.i does not exist",
+        "x.y named by $params.i does not exist",
+        &[],
+        &[],
+    ),
+    (
+        "x.y named by $params.i is 2",
+        "x.y named by $params.i is 2",
+        &[],
+        &[],
+    ),
+    (
+        "r.x.y named by $params.i does not exist",
+        "r.x.y named by $params.i does not exist",
+        &[],
+        &[],
+    ),
+    (
         "x plus hours elapsed from \"q r\"[0] named by $params.k to .\"a.b\"._k equals 5 and x.q.q equals 1",
         "x plus hours elapsed from \"q r\"[0] named by $params.k to \"a.b\"._k is 5 and x.q.q is 1",
         &[],
