@@ -67,14 +67,19 @@ Three ways to settle it:
 
 [report.hash](semantics.md#statuses) writes the report as RFC 8785 says, and RFC 8785 writes every number as a 64-bit float. Ergo copies numbers from the input into the report with every digit, so a report holding `1.00000000000000000001` hashes as if it held `1`. Two reports that differ only there get the same hash. A number too big or too small for a 64-bit float, like `1e400`, can't be written that way at all, and implementations already write it differently in the report (see [Values](semantics.md#values)). The open question is whether that's fine, or whether the hash should write numbers as the report does.
 
+## The expression of a check with an unknown field
+
+[sentence.print.written_wrong](syntax.md#printing-the-sentence) doesn't say how a check prints when its sentences read but it has a field it doesn't take, or a `for` that isn't a string. `ergo.rego` prints it as written and the Rust port prints it from its parse, so `{"assert": " x  is  1", "zzz": 1}` gives `x  is  1` with one and `x is 1` with the other. Both fail `$well_formed` the same way.
+
 ## Rules without cases
 
-Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about numbers above. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
+Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about numbers above. `report.keys` is about how the report is written out, and a case compares a report as values, where the order of keys doesn't count. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
 
 - `sentence.forms`
 - `sentence.subject.depth`
 - `sentence.argument.subject`
 - `report.engine`
+- `report.keys`
 - `report.hash`
 
 ## Sentences the ABNF and ergo.rego read differently
