@@ -35,7 +35,7 @@ Ergo reads no clock and nothing random, and sorts everything it writes. The same
 Two engines build Ergo reports, and you choose one:
 
 - `ergo.rego` runs on [Open Policy Agent](https://www.openpolicyagent.org/). It is one file with no dependencies. Run it with `opa eval`, or compile it to Wasm and run it with OPA's JavaScript runtime, as [REFERENCE.md](REFERENCE.md#compiling-to-wasm) shows.
-- The Rust engine is experimental. `ergo-engine` runs natively, `ergo-wasm` runs it in a browser, and `ergo-sentences` reads sentences alone, for editors and linters. See [`ports/rust/README.md`](ports/rust/README.md).
+- The Rust engine is experimental. It runs as the `ergo` command, or in a browser through Wasm, and its sentence reader works alone, for editors and linters. See [`ports/rust/README.md`](ports/rust/README.md).
 
 Both run every case in [`spec/cases`](spec/cases) and give the same report, apart from `engine`, which says which one made it.
 
@@ -66,22 +66,21 @@ Each release has a version, like `0.2.0`, and the file says which one it is. To 
 
 #### The Rust engine (experimental)
 
-Nothing of the Rust engine is published yet, so you build it from this repo. Clone it:
+Nothing of the Rust engine is published yet, so you build it from this repo. Install Rust with [rustup](https://rustup.rs/), then clone the repo and build the `ergo` command once:
 
 ```sh
 git clone https://github.com/kosli-dev/ergo.git
+cd ergo/ports/rust
+cargo install --locked --path cli
 ```
 
-Then build it in one of two ways:
+To build it with Docker instead, without Rust, see [`ports/rust/README.md`](ports/rust/README.md#running-from-the-command-line).
 
-- With Docker, you don't need Rust. Build the image once: `docker build -t ergo-rust ergo/ports/rust`.
-- With cargo, install Rust with [rustup](https://rustup.rs/). It picks the Rust version that `ports/rust/rust-toolchain.toml` pins, 1.99.0.
-
-The Rust engine follows the spec on `main`, which is `v0.3-dev` now. So a policy for it says `ergo_spec: v0.3-dev`, while one for the latest `ergo.rego` release says `v0.2`.
+The Rust engine follows the spec on `main` until spec 0.3 is released, so a policy for it says `ergo_spec: v0.3-dev` instead of `v0.2`.
 
 ### 2. Write a policy
 
-Here is a policy that says "_every production deployment must have an approver_". It goes in a YAML file next to `ergo.rego`.
+Here is a policy that says "_every production deployment must have an approver_". It goes in a YAML file in `policy/`, next to `ergo.rego` if that's your engine.
 
 `policy/policy.yaml`:
 
@@ -144,32 +143,6 @@ violations := ergo.violations(report)
 
 The defaults keep the report defined when the file leaves out `ergo_spec:`, `subjects:` or `requirements:`, or spells one wrong. That report still fails: without `ergo_spec` every requirement is written wrong, with no requirements it isn't compliant, and with no subjects the requirement names one that isn't there.
 
-The Rust engine needs no Rego file, but it reads only JSON. Give it the same policy as `policy/policy.json`, with the version it follows:
-
-```json
-{
-  "ergo_spec": "v0.3-dev",
-  "subjects": {
-    "deployment": {
-      "from": "deployments whose environment is \"prod\"",
-      "identified_by": "id"
-    }
-  },
-  "requirements": {
-    "prod_deploy": {
-      "description": "Every production deployment is approved",
-      "subject": "deployment",
-      "checks": {
-        "approved": {
-          "description": "Someone approved the deployment",
-          "assert": "approved_by is a non-empty string"
-        }
-      }
-    }
-  }
-}
-```
-
 #### The old way of writing checks
 
 This part is about `ergo.as_sentences`, a function of `ergo.rego`. Before 0.1, a check was an object with an `op` and a `path`, like `{op: non_empty_string, path: [approved_by]}`, and a subject used `applies_to` filters written the same way. Spec 0.1 stopped reading that syntax, and later versions don't read it either. A policy written that way is written wrong, and the report says so. `ergo.as_sentences` rewrites what it can as sentences, and [Moving a policy to sentences](REFERENCE.md#moving-a-policy-to-sentences) in the reference shows what it leaves for you to rewrite.
@@ -194,19 +167,11 @@ Ask for the report. With `ergo.rego`:
 opa eval -d policy -i deployments.json --format=pretty 'data.deploy.report'
 ```
 
-With the Rust engine and Docker, run this from the folder that holds `deployments.json`, with the clone in `ergo/` next to it:
+With the Rust engine:
 
 ```sh
-docker run --rm -v "$PWD/ergo":/src -v "$PWD":/work -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust cargo run --locked --release -q -p ergo-engine --example report -- /work/deployments.json /work/policy/policy.json
+ergo report --policy policy/policy.yaml --input deployments.json
 ```
-
-Or with cargo:
-
-```sh
-cargo run --manifest-path ergo/ports/rust/Cargo.toml --locked --release -q -p ergo-engine --example report -- deployments.json policy/policy.json
-```
-
-The Rust command prints the report on one line, and on stderr how long it took, like `report: 0.3 ms per run`, because `report` is the example the timings use. Pipe it through `jq .` to read it.
 
 The report records every check Ergo ran, including the ones that passed. It comes in four parts, after the policy's own `description` and `meta`, which this one doesn't have, and `engine` and `ergo`, which say what made the report and which version of the [spec](spec/README.md#versions) it follows:
 
@@ -274,6 +239,14 @@ The report holds every row, passed or failed. To tell someone only what went wro
 opa eval -d policy -i deployments.json --format=pretty 'data.deploy.violations'
 ```
 
+With the Rust engine:
+
+```sh
+ergo violations --policy policy/policy.yaml --input deployments.json
+```
+
+Both print:
+
 ```json
 [
   {
@@ -281,14 +254,23 @@ opa eval -d policy -i deployments.json --format=pretty 'data.deploy.violations'
     "check": "approved",
     "description": "Someone approved the deployment",
     "expression": "approved_by is a non-empty string",
-    "inputs": [{ "name": "approved_by", "value": null, "locations": ["/deployments/1"] }],
+    "inputs": [
+      {
+        "locations": [
+          "/deployments/1"
+        ],
+        "name": "approved_by",
+        "value": null
+      }
+    ],
     "requirement": "prod_deploy",
-    "subject": { "id": "d-2", "type": "deployment" }
+    "subject": {
+      "id": "d-2",
+      "type": "deployment"
+    }
   }
 ]
 ```
-
-The Rust engine has violations only for Rust code: the `violations` function of the `ergo-engine` crate takes the report and gives the same list. The `report` example and `ergo-wasm` give only the report.
 
 `violations` is built from the report. It keeps only the failed rows that are real problems and adds each check's `description` and `expression`, so you have what you need to write a message. `d-3` isn't listed: it failed `$applies`, but being out of scope isn't a problem.
 
@@ -300,7 +282,7 @@ The [reference](REFERENCE.md) covers every field, operator and cause, including 
 
 With `ergo.rego`, download the new file over the old one and run your policy's tests. [`CHANGELOG.md`](CHANGELOG.md) says what each release changed, and which spec version it follows.
 
-With the Rust engine, pull the repo and run it again.
+With the Rust engine, pull the repo and run `cargo install --locked --path cli` again from `ports/rust`.
 
 ## Contributing
 
