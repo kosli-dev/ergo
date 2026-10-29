@@ -12711,5 +12711,519 @@
         "results": []
       }
     ]
+  },
+  {
+    "description": "a child subject whose parent isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "pull_request": {
+          "from": "artifact.pulls",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "min_subjects": 0,
+          "checks": {
+            "c": "approvals exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a string, even with min_subjects 0",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a number, even with min_subjects 0",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            5
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": 5
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a list, even with min_subjects 0",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            [
+              1
+            ]
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": [
+                  1
+                ]
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a boolean, even with min_subjects 0",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            true
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": true
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null, even with min_subjects 0",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "still fails min_subjects as absent when the parent is an object without the field",
+        "rules": [
+          "subjects.chain.not_an_object"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1"
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "still fails min_subjects as null when the field is null",
+        "rules": [
+          "subjects.chain.not_an_object"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "pulls": null
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "still fails min_subjects as unusable when the field is a string",
+        "rules": [
+          "subjects.chain.not_an_object"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "pulls": "x"
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from starts with a position, under a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "pull_request": {
+          "from": "artifact[0].pulls",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "pull_request",
+          "min_subjects": 0,
+          "checks": {
+            "c": "approvals exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable when the parent is a string, because a position reads it as a list",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "path.not_an_object"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as absent when the parent is null, because a position reads it as a list",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "path.not_an_object"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "pull_request",
+              "id": null,
+              "in": {
+                "artifact": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "in-scope pull_request count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a subject that narrows another, with a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "pull_request": {
+          "from": "artifact.pulls",
+          "identified_by": "id"
+        },
+        "open": {
+          "from": "artifact"
+        },
+        "kid": {
+          "from": "open.pulls",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "kid",
+          "min_subjects": 1,
+          "checks": {
+            "c": "approvals exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object when the narrowed parent is a string",
+        "rules": [
+          "subjects.chain.not_an_object"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "kid",
+              "id": null,
+              "in": {
+                "open": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope kid count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
