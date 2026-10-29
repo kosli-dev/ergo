@@ -3389,6 +3389,9 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("l is \"x\"", "l is \"x\"", &[], &[]),
+    ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
+    ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6276,6 +6279,24 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "some zz[$params.k].z as j, some x as i",
         "some zz named by $params.k.z as j, some x as i",
+        &[],
+        &[],
+    ),
+    (
+        "every pull_requests.meta.labels as l",
+        "every pull_requests.meta.labels as l",
+        &[],
+        &[],
+    ),
+    (
+        "first of pull_requests.title as t",
+        "first of pull_requests.title as t",
+        &[],
+        &[],
+    ),
+    (
+        "some pull_requests.title as t",
+        "some pull_requests.title as t",
         &[],
         &[],
     ),
