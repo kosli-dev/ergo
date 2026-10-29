@@ -33,7 +33,7 @@ python3 spec/check_rules.py
 python3 spec/sentences_corpus.py --check
 python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonschema==4.26.0 abnf==2.9.0 && /tmp/ergo-venv/bin/python .github/spec-schemas.py
 /tmp/ergo-venv/bin/python spec/check_grammar.py
-/tmp/ergo-venv/bin/python spec/check_grammar.py --rust 'docker run --rm -i -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust cargo run -q --release -p ergo-sentences --example read'
+/tmp/ergo-venv/bin/python spec/check_grammar.py --rust 'docker run --rm -i -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust cargo run --locked -q --release -p ergo-sentences --example read'
 ```
 
 Run them from the repo root. The last three lines use a virtual environment that holds `jsonschema` and `abnf`, and the last one the Docker image that [`ports/rust/README.md`](ports/rust/README.md) builds; it's outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
