@@ -498,11 +498,23 @@ Most often the writer meant the subject's field. In a `whose` and after `every` 
 
 ## Printing the sentence
 
-**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` and `is not` before a value and `equals` and `does not equal` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash but no single quote, no two backslashes in a row, no backslash at the end and no control character, and in double quotes with JSON escapes otherwise, a dot in front of a field only where [sentence.path.argument](#paths) needs one or where an alias has the same name, numbers in their plain form, and values separated by `, `. Parsing the printed sentence reads the same check.
+**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` and `is not` before a value and `equals` and `does not equal` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash but no single quote, no two backslashes in a row, no backslash at the end and no control character, and in double quotes with JSON escapes otherwise, a dot in front of a field only where [sentence.path.argument](#paths) needs one or where an alias has the same name, numbers in their plain form ([sentence.print.numbers](#printing-the-sentence)), and values separated by `, `. Parsing the printed sentence reads the same check.
 
 **[sentence.print.order]** `whose` conditions and assertions joined with `and` print in the order the author wrote them. The report stays byte for byte the same when the same policy runs again on the same input. That rule is for the same policy, not for two policies that mean the same: `A and B` and `B and A` print differently, because the order changes neither what passes nor the cause, and sorting would have to reach `assert` lists too, and could never reach `for` items, whose order is their nesting. A row's `inputs` stay sorted by name, because they're values that were read, not a sentence.
 
 **[sentence.print.same]** For a sentence written that way, the printed form is byte for byte what the author wrote. Every line in the corpus prints back unchanged, the regular expression `entry does not match '^[A-Za-z0-9._-]+\s*(>=|<=|~=|!=|<|>)'` included, because its single quotes are the canonical spelling.
+
+**[sentence.print.numbers]** A number prints as its exact value in decimal, with every digit, no exponent, no zero at the end of a fraction and no `.` when it's whole. A `-` is only printed for a value below zero. So `1e-7` prints `0.0000001`, `0.10e1` and `1.0` print `1`, `-1.2500E+2` prints `-125`, `-0` prints `0`, and `9007199254740993` stays as written.
+
+**[sentence.print.written_wrong]** A check that isn't a string or an object, or whose `assert`, `any_of`, `for` line or sentences are [written wrong](#written-wrong), still has an `expression`. It's printed from what was written instead of from a parse, so the reader sees the mistake. Each sentence and the `for` line are printed as written, with the whitespace at either end dropped ([sentence.ends](#the-grammar)), in the shape a check written right has: `for <line>: ` in front, lines joined with ` and `, and an `any_of` as [sentence.any_of.expression](#the-shape-of-a-sentence) says. A `description` or `meta` written wrong doesn't change it, so a check that's right apart from those prints from its parse. What can't be printed that way is written in angle brackets:
+
+- a check that's neither a string nor an object: `<invalid check>`
+- an object with neither `assert` nor `any_of`: `<missing assert>`, without its `for` line
+- a line of `assert` that isn't a string: `<invalid assert>`, in the line's place
+- an `any_of` that isn't an object: `<invalid any_of>`, and an empty one: `one of: <empty options>`
+- an option that's an empty list: `<name>(<empty option>)`, and an option that isn't a string or a list of strings: `<name>(<invalid option>)`
+
+A `for` that isn't a string, or that sits next to `any_of`, is left out, and an empty `assert` list prints as `""`. So `{"for": " every  xs ", "assert": [" x  is ", 3]}` prints `for every  xs: x  is and <invalid assert>`. Two cases are [still open](OPEN.md#where-ergorego-and-the-rust-port-differ): sentences that read next to a field the check doesn't take or a `for` that isn't a string, and a sentence written wrong only with `values of mixed types`.
 
 ## Naming a path
 

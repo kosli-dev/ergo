@@ -2412,5 +2412,19 @@
         ]
       }
     ]
+  },
+  {
+    "description": "checks written wrong",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": 5, "b": {"description": "no sentence"}, "c": {"for": "every xs as x"}, "d": {"for": " every  xs ", "assert": [" x  is ", 3]}, "e": {"assert": []}, "f": {"for": 3, "assert": "x is 1"}, "g": " x   is  ", "h": {"any_of": 3}, "i": {"any_of": {}}, "j": {"any_of": {"b": " x   is  1 ", "a": [], "c": 3}}, "k": {"assert": " x  is  1", "description": 3}}}}},
+    "cases": [
+      {
+        "description": "print what was written, with angle brackets where it can't be printed, and from the parse when only the description is wrong",
+        "rules": ["sentence.print.written_wrong"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [],
+        "status": {"s": "not_met"},
+        "expressions": {"s": {"a": "<invalid check>", "b": "<missing assert>", "c": "<missing assert>", "d": "for every  xs: x  is and <invalid assert>", "e": "", "f": "x is 1", "g": "x   is", "h": "<invalid any_of>", "i": "one of: <empty options>", "j": "one of: a(<empty option>) | b(x   is  1) | c(<invalid option>)", "k": "x is 1"}}
+      }
+    ]
   }
 ]
