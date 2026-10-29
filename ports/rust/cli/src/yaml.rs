@@ -6,10 +6,23 @@ use serde_json::{Map, Value};
 use std::collections::HashMap;
 
 type Events<'a> = Parser<'a, saphyr_parser::StrInput<'a>>;
+
+/// Why a YAML file can't be read.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Error {
+    /// The text isn't valid YAML.
+    Invalid(String),
+    /// The YAML is valid, but JSON can't hold one of its values or keys.
+    NotJson(String),
+}
+
+fn invalid(message: impl Into<String>) -> Error {
+    Error::Invalid(message.into())
+}
 type Anchors = HashMap<usize, Value>;
 
 /// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error, on `.inf` and `.nan`, on a tag it doesn't know, on a key that isn't a scalar or is `null`, and on an alias with no anchor.
-pub fn parse(text: &str) -> Result<Value, String> {
+pub fn parse(text: &str) -> Result<Value, Error> {
     let mut events = Parser::new_from_str(text).keep_tags(true);
     let mut anchors = Anchors::new();
     loop {
@@ -20,16 +33,16 @@ pub fn parse(text: &str) -> Result<Value, String> {
                 let first = next(&mut events)?;
                 return node(first, &mut events, &mut anchors);
             }
-            _ => return Err("unexpected content".to_string()),
+            _ => return Err(invalid("unexpected content")),
         }
     }
 }
 
-fn next<'a>(events: &mut Events<'a>) -> Result<Event<'a>, String> {
+fn next<'a>(events: &mut Events<'a>) -> Result<Event<'a>, Error> {
     match events.next_event() {
         Some(Ok((event, _))) => Ok(event),
-        Some(Err(e)) => Err(e.to_string()),
-        None => Err("unexpected end of the file".to_string()),
+        Some(Err(e)) => Err(invalid(e.to_string())),
+        None => Err(invalid("unexpected end of the file")),
     }
 }
 
@@ -37,7 +50,7 @@ fn node<'a>(
     first: Event<'a>,
     events: &mut Events<'a>,
     anchors: &mut Anchors,
-) -> Result<Value, String> {
+) -> Result<Value, Error> {
     match first {
         Event::Scalar(text, style, anchor, tag) => {
             let value = scalar(&text, style, tag.as_deref())?;
@@ -47,7 +60,7 @@ fn node<'a>(
         Event::Alias(id) => anchors
             .get(&id)
             .cloned()
-            .ok_or_else(|| "an alias has no anchor".to_string()),
+            .ok_or_else(|| invalid("an alias has no anchor")),
         Event::SequenceStart(anchor, _) => {
             let mut items = Vec::new();
             loop {
@@ -65,7 +78,7 @@ fn node<'a>(
             remember(anchors, anchor, &value);
             Ok(value)
         }
-        _ => Err("unexpected content".to_string()),
+        _ => Err(invalid("unexpected content")),
     }
 }
 
@@ -75,7 +88,7 @@ fn remember(anchors: &mut Anchors, anchor: usize, value: &Value) {
     }
 }
 
-fn mapping<'a>(events: &mut Events<'a>, anchors: &mut Anchors) -> Result<Value, String> {
+fn mapping<'a>(events: &mut Events<'a>, anchors: &mut Anchors) -> Result<Value, Error> {
     let mut map = Map::new();
     loop {
         let first = match next(events)? {
@@ -98,7 +111,7 @@ fn mapping<'a>(events: &mut Events<'a>, anchors: &mut Anchors) -> Result<Value, 
     Ok(Value::Object(map))
 }
 
-fn merge(into: &mut Map<String, Value>, source: Value) -> Result<(), String> {
+fn merge(into: &mut Map<String, Value>, source: Value) -> Result<(), Error> {
     match source {
         Value::Object(map) => {
             for (k, v) in map {
@@ -112,21 +125,21 @@ fn merge(into: &mut Map<String, Value>, source: Value) -> Result<(), String> {
             }
             Ok(())
         }
-        _ => Err("a merge key needs a mapping or a list of mappings".to_string()),
+        _ => Err(invalid("a merge key needs a mapping or a list of mappings")),
     }
 }
 
-fn key(value: Value) -> Result<String, String> {
+fn key(value: Value) -> Result<String, Error> {
     match value {
         Value::String(s) => Ok(s),
         Value::Bool(b) => Ok(b.to_string()),
         Value::Number(n) => Ok(n.to_string()),
-        Value::Null => Err("a key can't be null".to_string()),
-        _ => Err("a key must be a scalar".to_string()),
+        Value::Null => Err(Error::NotJson("a key is null".to_string())),
+        _ => Err(Error::NotJson("a key is a list or a mapping".to_string())),
     }
 }
 
-fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Value, String> {
+fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Value, Error> {
     if let Some(tag) = tag {
         let core = tag.handle == "!!" || tag.handle == "tag:yaml.org,2002:";
         return match (core, tag.suffix.as_str()) {
@@ -134,10 +147,10 @@ fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Value, St
             (true, "int" | "float" | "bool" | "null") => resolve(text),
             (true, "timestamp") => Ok(Value::String(text.to_string())),
             (true, "binary") => base64(text).map(Value::String),
-            _ => Err(format!(
+            _ => Err(invalid(format!(
                 "the tag {}{} isn't supported",
                 tag.handle, tag.suffix
-            )),
+            ))),
         };
     }
     if style == ScalarStyle::Plain {
@@ -147,7 +160,7 @@ fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Value, St
     }
 }
 
-fn resolve(text: &str) -> Result<Value, String> {
+fn resolve(text: &str) -> Result<Value, Error> {
     match text {
         "" | "~" | "null" | "Null" | "NULL" => Ok(Value::Null),
         "y" | "Y" | "yes" | "Yes" | "YES" | "on" | "On" | "ON" | "true" | "True" | "TRUE" => {
@@ -157,7 +170,7 @@ fn resolve(text: &str) -> Result<Value, String> {
             Ok(Value::Bool(false))
         }
         ".nan" | ".NaN" | ".NAN" | ".inf" | ".Inf" | ".INF" | "+.inf" | "+.Inf" | "+.INF"
-        | "-.inf" | "-.Inf" | "-.INF" => Err(format!("{text} can't be written in JSON")),
+        | "-.inf" | "-.Inf" | "-.INF" => Err(Error::NotJson(format!("{text} isn't a JSON number"))),
         _ => Ok(numeric(text).unwrap_or_else(|| Value::String(text.to_string()))),
     }
 }
@@ -264,7 +277,7 @@ fn float(negative: bool, body: &str) -> Option<String> {
     Some(out)
 }
 
-fn base64(text: &str) -> Result<String, String> {
+fn base64(text: &str) -> Result<String, Error> {
     let mut bytes = Vec::new();
     let mut bits: u32 = 0;
     let mut count = 0;
@@ -280,10 +293,10 @@ fn base64(text: &str) -> Result<String, String> {
                 padding += 1;
                 continue;
             }
-            _ => return Err("!!binary isn't base64".to_string()),
+            _ => return Err(invalid("!!binary isn't base64")),
         };
         if padding > 0 {
-            return Err("!!binary isn't base64".to_string());
+            return Err(invalid("!!binary isn't base64"));
         }
         bits = bits << 6 | digit;
         count += 1;
@@ -297,7 +310,7 @@ fn base64(text: &str) -> Result<String, String> {
         (0, 0) => {}
         (2, 2) => bytes.push((bits >> 4) as u8),
         (3, 1) => bytes.extend([(bits >> 10) as u8, (bits >> 2) as u8]),
-        _ => return Err("!!binary isn't base64".to_string()),
+        _ => return Err(invalid("!!binary isn't base64")),
     }
     Ok(String::from_utf8_lossy(&bytes).into_owned())
 }

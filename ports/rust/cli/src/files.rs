@@ -21,18 +21,18 @@ pub fn load(what: &str, path: &str) -> Result<Value, Failure> {
     };
     let text = fs::read_to_string(path)
         .map_err(|e| Failure::File(format!("can't read the {what} file {path}: {e}")))?;
-    let (kind, parsed) = if is_yaml {
-        ("YAML", yaml::parse(&text))
+    let parsed = if is_yaml {
+        yaml::parse(&text).map_err(|e| match e {
+            yaml::Error::Invalid(m) => ("isn't valid YAML", m),
+            yaml::Error::NotJson(m) => ("is valid YAML that JSON can't hold", m),
+        })
     } else {
-        (
-            "JSON",
-            serde_json::from_str(&text).map_err(|e| e.to_string()),
-        )
+        serde_json::from_str(&text).map_err(|e| ("isn't valid JSON", e.to_string()))
     };
-    parsed.map_err(|e| {
+    parsed.map_err(|(problem, message)| {
         Failure::File(format!(
-            "the {what} file {path} isn't valid {kind}: {}",
-            e.lines().next().unwrap_or("")
+            "the {what} file {path} {problem}: {}",
+            message.lines().next().unwrap_or("")
         ))
     })
 }

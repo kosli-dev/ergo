@@ -332,6 +332,25 @@ fn bad_yaml_fails_and_names_the_file() {
 }
 
 #[test]
+fn yaml_that_json_cannot_hold_is_called_valid_yaml() {
+    let (policy, _) = readme("not-json");
+    let dir = dir("not-json");
+    for (file, text, needle) in [
+        ("inf.yaml", "v: .inf\n", ".inf"),
+        ("null-key.yaml", "~: a\n", "null"),
+    ] {
+        let input = write(&dir, file, text);
+        let output = ergo(&["report", "--policy", &policy, "--input", &input]);
+        assert_eq!(output.status.code(), Some(1));
+        let message = err(&output);
+        assert!(
+            message.contains("is valid YAML that JSON can't hold") && message.contains(needle),
+            "{message:?}"
+        );
+    }
+}
+
+#[test]
 fn an_unknown_extension_fails_and_names_the_file() {
     let (policy, _) = readme("extension");
     let odd = write(&dir("extension"), "input.txt", "{}");
