@@ -294,8 +294,16 @@ def rust_reads(command, samples):
     out = subprocess.run(command, shell=True, input=json.dumps({"rows": rows}), capture_output=True, text=True)
     if out.returncode != 0:
         sys.exit(out.stdout + out.stderr)
-    result = json.loads(out.stdout)
-    assert len(result) == len(rows)
+    try:
+        result = json.loads(out.stdout)
+    except ValueError as error:
+        sys.exit(f"the Rust command did not print JSON: {error}")
+    if not isinstance(result, list) or len(result) != len(rows):
+        sys.exit(f"the Rust command answered {len(result) if isinstance(result, list) else 'something that is not a list'} rows for {len(rows)}")
+    for row, answers in zip(rows, result):
+        kinds = [a.get("kind") if isinstance(a, dict) else None for a in answers] if isinstance(answers, list) else None
+        if kinds != row["kinds"]:
+            sys.exit(f"the Rust command answered {json.dumps(kinds)} for {json.dumps(row['text'])}, which asked for {json.dumps(row['kinds'])}")
     return result
 
 
@@ -304,6 +312,8 @@ def rust_command(argv):
         return None
     if len(argv) != 2 or argv[0] != "--rust":
         sys.exit("usage: check_grammar.py [--rust <command>]")
+    if not argv[1].strip():
+        sys.exit("--rust needs a command to run")
     return argv[1]
 
 
@@ -392,7 +402,7 @@ def main():
             disagreements.append((kind, text, origin, "ergo.rego accepts and the ABNF rejects", problems))
 
     rust_disagreements = []
-    if command:
+    if command is not None:
         for (origin, text, kinds, kind), per_kind, ergo in zip(samples, rust_reads(command, flat), results):
             theirs = abnf_accepts(grammar, kinds, text)
             accepted = any(not r["syntax"] for r in per_kind)
@@ -425,7 +435,7 @@ def main():
         said = f": {'; '.join(why)}" if why else ""
         problems.append(f"{kind} {json.dumps(text)} ({origin}): {side}{said}")
 
-    rust_summary = f", {len(rust_disagreements)} Rust disagreements" if command else ""
+    rust_summary = f", {len(rust_disagreements)} Rust disagreements" if command is not None else ""
     origins = {o: sum(1 for s in samples if s[0] == o) for o in ["corpus", "case", "extra", "generated", "mutated", "edges"]}
     print(f"read {len(samples)} sentences ({origins}) in {time.time() - started:.1f}s; {len(disagreements)} disagreements, {len(listed)} listed{rust_summary}; ergo.rego rejected {semantic} for reasons that aren't syntax; {bad_generated} generated sentences the ABNF parser itself refused")
     for line in problems:
