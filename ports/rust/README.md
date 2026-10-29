@@ -74,7 +74,7 @@ CI loads it in Node with `sentences-wasm/check-node.mjs`, which reads one check 
 
 CI also loads the built module in Node with `wasm/check-node.mjs`, which builds one report and fails when that throws or the report doesn't come from `ergo-engine`. Run it with `node ports/rust/wasm/check-node.mjs` after the build.
 
-The `wasm` profile aborts on a panic. In JavaScript that is a `WebAssembly.RuntimeError: unreachable` with no message about the cause, and the module's memory may be half way through a call, so don't call it again. Make a new instance with `initSync` or `init` instead. Invalid JSON is not a panic: `report` throws an `Error` that says which of the three isn't JSON, and the module stays usable.
+The `wasm` profile aborts on a panic. In JavaScript that is a `WebAssembly.RuntimeError: unreachable` with no message about the cause, and the module's memory may be half way through a call, so don't call it again. Make a new instance with `initSync` or `init` instead. Invalid JSON is not a panic: `report` throws an `Error` that says which of the three isn't JSON, and the module stays usable. An argument that isn't a string makes it throw a `TypeError` that names it, like `input must be a string, not number`.
 
 ## Timing it against `ergo.rego`
 

@@ -18,4 +18,13 @@ if (built.engine?.name !== "ergo-engine") {
 if (built.compliant !== true) {
   throw new Error(`report isn't compliant: ${JSON.stringify(built)}`);
 }
+let thrown;
+try {
+  report(1, "{}", "{}");
+} catch (error) {
+  thrown = error;
+}
+if (!(thrown instanceof TypeError) || thrown.message !== "input must be a string, not number") {
+  throw new Error(`wanted a TypeError for a number input, got ${thrown}`);
+}
 console.log(`ergo-wasm built a report with ${built.engine.name}`);

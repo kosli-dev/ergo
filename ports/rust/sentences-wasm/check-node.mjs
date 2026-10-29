@@ -28,4 +28,19 @@ try {
 if (!(refused instanceof Error) || !refused.message.startsWith("the tree isn't valid JSON")) {
   throw new Error(`a tree that isn't JSON wasn't refused: ${refused}`);
 }
+for (const [call, wanted] of [
+  [() => parse_check(42), "line must be a string, not number"],
+  [() => parse_check(null), "line must be a string, not null"],
+  [() => print_check("{}", undefined), "aliases must be a string, not undefined"],
+]) {
+  let thrown;
+  try {
+    call();
+  } catch (error) {
+    thrown = error;
+  }
+  if (!(thrown instanceof TypeError) || thrown.message !== wanted) {
+    throw new Error(`wanted a TypeError "${wanted}", got ${thrown}`);
+  }
+}
 console.log("ergo-sentences-wasm read a sentence, refused a broken one, listed problems and printed it back");

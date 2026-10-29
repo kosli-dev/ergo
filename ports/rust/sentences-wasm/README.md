@@ -7,7 +7,7 @@ Reads Ergo's sentences in a browser or in Node, without the engine. It wraps [`e
 - `from_problems(tree)` does the same for a `from` line.
 - `print_check(tree, aliases)` and `print_for(tree, aliases)` write a tree back as a line, and `print_from(tree, aliases, parents)` does it for a `from` line.
 
-The problem and print functions throw an `Error` when the tree, the aliases or the parents aren't valid JSON, like `the tree isn't valid JSON: ...`.
+The problem and print functions throw an `Error` when the tree, the aliases or the parents aren't valid JSON, like `the tree isn't valid JSON: ...`. Every function throws a `TypeError` that names the argument when one isn't a string, like `line must be a string, not number`.
 
 ```js
 import { readFileSync } from "node:fs";
