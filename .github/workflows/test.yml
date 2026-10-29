@@ -207,6 +207,13 @@ jobs:
           wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_wasm_bg.wasm -o wasm/pkg/ergo_wasm_bg.wasm
       - name: Load ergo-wasm in Node and build a report
         run: node wasm/check-node.mjs
+      - name: Build ergo-sentences-wasm, wrap it for a browser and shrink it
+        run: |
+          cargo build --locked --profile wasm -p ergo-sentences-wasm --target wasm32-unknown-unknown
+          wasm-bindgen --target web --out-dir sentences-wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_sentences_wasm.wasm
+          wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm -o sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm
+      - name: Load ergo-sentences-wasm in Node and read a sentence
+        run: node sentences-wasm/check-node.mjs
 
   spec:
     runs-on: ubuntu-latest
