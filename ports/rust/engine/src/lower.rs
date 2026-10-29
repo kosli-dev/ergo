@@ -985,7 +985,7 @@ mod tests {
         let number = scope.value(&s::Value::Number("1.50".into())).unwrap();
         assert_eq!(number.to_string(), "1.50");
         let number = scope.value(&s::Value::Number("1e2".into())).unwrap();
-        assert!(crate::value::equal(&number, &json!(100)));
+        assert_eq!(crate::value::equal(&number, &json!(100)), Some(true));
     }
 
     #[test]

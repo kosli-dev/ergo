@@ -115,8 +115,8 @@ fn compared(check: &Compare, l: &Value, r: &Value) -> Cause {
     }
     match check.cmp {
         Cmp::Eq | Cmp::Ne if value::type_name(l) != value::type_name(r) => Cause::Unusable,
-        Cmp::Eq => verdict(value::equal(l, r)),
-        Cmp::Ne => verdict(!value::equal(l, r)),
+        Cmp::Eq => value::equal(l, r).map_or(Cause::Unusable, verdict),
+        Cmp::Ne => value::equal(l, r).map_or(Cause::Unusable, |same| verdict(!same)),
         Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => match (l, r) {
             (Value::Number(a), Value::Number(b)) => value::compare_numbers(a, b)
                 .map_or(Cause::Unusable, |order| verdict(ordered(check.cmp, order))),

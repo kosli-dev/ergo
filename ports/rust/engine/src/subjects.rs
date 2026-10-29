@@ -551,7 +551,9 @@ fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
     let mut groups: Vec<Vec<(usize, &Judged)>> = Vec::new();
     for item in sorted {
         match groups.last_mut() {
-            Some(group) if value::equal(&group[0].1.id, &item.1.id) => group.push(item),
+            Some(group) if value::equal(&group[0].1.id, &item.1.id) != Some(false) => {
+                group.push(item)
+            }
             _ => groups.push(vec![item]),
         }
     }

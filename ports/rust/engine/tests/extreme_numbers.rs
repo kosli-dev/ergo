@@ -135,3 +135,70 @@ fn no_numeric_operator_panics_or_gives_a_cause_the_spec_lacks_on_extreme_numbers
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
+
+fn cause_of(sentence: &str, things: &str) -> String {
+    let policy = json!({
+        "ergo_spec": "v0.3-dev",
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": sentence}}}
+    });
+    let input: Value = serde_json::from_str(&format!(r#"{{"things": [{things}]}}"#)).unwrap();
+    let report = ergo_engine::report(&input, &policy, &json!({}));
+    let results = report["results"].as_array().unwrap();
+    let row = results
+        .iter()
+        .find(|r| r["check"] == "c")
+        .unwrap_or_else(|| panic!("{report}"));
+    row["cause"].as_str().unwrap().to_string()
+}
+
+#[test]
+fn exponents_of_31_digits_that_differ_in_the_last_digit_are_compared_exactly() {
+    let things = r#"{"id": "t", "fa": 1e1000000000000000000000000000000, "fb": 1e1000000000000000000000000000001}"#;
+    assert_eq!(cause_of("fa is at least fb", things), "value");
+    assert_eq!(cause_of("fa is fb", things), "value");
+    assert_eq!(cause_of("fa is not fb", things), "satisfied");
+}
+
+#[test]
+fn a_number_whose_exponent_has_more_than_36_digits_fails_every_comparison_as_unusable() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let bigger = format!("1e1{}1", "0".repeat(35));
+    let things = format!(r#"{{"id": "t", "fa": {big}, "fb": {bigger}, "fl": [{big}]}}"#);
+    for sentence in [
+        "fa is at least fb",
+        "fa is less than fb",
+        "fa is fb",
+        "fa is not fb",
+        "fa equals fb",
+        "fa does not equal fb",
+        "fa is 1",
+        "fa is not one of 1, 2",
+        "fl contains fb",
+        "fl does not contain fb",
+        "fl does not contain 1",
+    ] {
+        assert_eq!(cause_of(sentence, &things), "unusable", "{sentence}");
+    }
+}
+
+#[test]
+fn ids_that_cannot_be_read_count_as_repeated_so_unique_ids_fails() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let bigger = format!("1e1{}1", "0".repeat(35));
+    let things = format!(r#"{{"id": {big}, "fa": 1}}, {{"id": {bigger}, "fa": 1}}"#);
+    let policy = json!({
+        "ergo_spec": "v0.3-dev",
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": "fa is 1"}}}
+    });
+    let input: Value = serde_json::from_str(&format!(r#"{{"things": [{things}]}}"#)).unwrap();
+    let report = ergo_engine::report(&input, &policy, &json!({}));
+    let row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|r| r["check"] == "$unique_ids")
+        .unwrap_or_else(|| panic!("{report}"));
+    assert_eq!(row["passed"], false, "{report}");
+}

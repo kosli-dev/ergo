@@ -32,7 +32,9 @@ pub fn run(check: &Equals, ctx: &Ctx) -> Verdict {
         {
             Cause::Unusable
         }
-        (Outcome::Found, Some(found)) => verdict(value::equal(found, &check.value)),
+        (Outcome::Found, Some(found)) => {
+            value::equal(found, &check.value).map_or(Cause::Unusable, verdict)
+        }
         (other, _) => other.cause().unwrap_or(Cause::Unusable),
     };
     Verdict {
