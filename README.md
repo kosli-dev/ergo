@@ -100,6 +100,8 @@ requirements:
         assert: approved_by is a non-empty string
 ```
 
+With the Rust engine, change `ergo_spec: v0.2` to `ergo_spec: v0.3-dev`.
+
 `ergo_spec` says which version of Ergo's [spec](spec/README.md#versions) the policy is written for. Ergo reads only the version it follows, so a policy without it, or written for another version, fails.
 
 A policy says what to check. First it says what it's about, the things we call _subjects_. Each kind of subject gets a name, here `deployment`, that the report uses for each one, and says where to find them:
