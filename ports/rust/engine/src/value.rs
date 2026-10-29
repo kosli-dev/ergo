@@ -64,6 +64,10 @@ impl Decimal {
         self.digits.is_empty()
     }
 
+    pub fn parts(&self) -> (bool, &str, i128) {
+        (self.negative, &self.digits, self.exponent)
+    }
+
     pub fn is_non_negative_whole(&self) -> bool {
         !self.negative && (self.is_zero() || self.exponent >= 0)
     }

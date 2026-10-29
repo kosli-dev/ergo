@@ -344,12 +344,38 @@ fn a_number_that_cannot_be_read_keeps_its_digits_in_the_report_text() {
 }
 
 #[test]
+fn within_reads_a_zero_and_trailing_zeros_as_the_number_written() {
+    let zeros = "0".repeat(5000);
+    let zero = r#"{"id": "t", "fa": 0e-5000, "fb": 0}"#;
+    assert_eq!(cause_of("fa equals fb within 1", zero), "satisfied");
+    let one = format!(r#"{{"id": "t", "fa": 1.{zeros}, "fb": 1}}"#);
+    assert_eq!(cause_of("fa equals fb within 1", &one), "satisfied");
+    let same = r#"{"id": "t", "fa": 1, "fb": 1}"#;
+    assert_eq!(
+        cause_of(&format!("fa equals fb within 0.{zeros}"), same),
+        "satisfied"
+    );
+}
+
+#[test]
 fn a_zero_whose_exponent_has_more_than_36_digits_is_zero() {
     let big = format!("1{}", "0".repeat(36));
-    for zero in [format!("0e{big}"), format!("-0.0e-{big}"), format!("0E+{big}")] {
+    for zero in [
+        format!("0e{big}"),
+        format!("-0.0e-{big}"),
+        format!("0E+{big}"),
+    ] {
         let things = format!(r#"{{"id": "t", "fa": {zero}, "fb": 0}}"#);
         assert_eq!(cause_of("fa is 0", &things), "satisfied", "{zero}");
-        assert_eq!(cause_of("fa is at least fb", &things), "satisfied", "{zero}");
-        assert_eq!(cause_of("fa is less than 1", &things), "satisfied", "{zero}");
+        assert_eq!(
+            cause_of("fa is at least fb", &things),
+            "satisfied",
+            "{zero}"
+        );
+        assert_eq!(
+            cause_of("fa is less than 1", &things),
+            "satisfied",
+            "{zero}"
+        );
     }
 }

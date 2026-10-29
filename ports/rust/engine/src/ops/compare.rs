@@ -159,18 +159,8 @@ struct Exact {
 }
 
 fn exact(number: &Number) -> Option<Exact> {
-    let text = number.to_string();
-    let (negative, rest) = match text.strip_prefix('-') {
-        Some(rest) => (true, rest),
-        None => (false, text.as_str()),
-    };
-    let (mantissa, exponent) = match rest.split_once(['e', 'E']) {
-        Some((m, e)) => (m, e.trim_start_matches('+').parse::<i64>().ok()?),
-        None => (rest, 0),
-    };
-    let (whole, fraction) = mantissa.split_once('.').unwrap_or((mantissa, ""));
-    let digits = format!("{whole}{fraction}");
-    let digits = digits.trim_start_matches('0');
+    let decimal = value::Decimal::parse(&number.to_string())?;
+    let (negative, digits, exponent) = decimal.parts();
     Some(Exact {
         negative,
         digits: if digits.is_empty() {
@@ -178,7 +168,7 @@ fn exact(number: &Number) -> Option<Exact> {
         } else {
             digits.to_string()
         },
-        exponent: exponent.checked_sub(fraction.len() as i64)?,
+        exponent: i64::try_from(exponent).ok()?,
     })
 }
 
