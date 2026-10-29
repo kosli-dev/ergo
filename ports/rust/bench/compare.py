@@ -4,7 +4,18 @@ import sys
 
 
 def load(path):
-    return json.load(open(path), parse_float=decimal.Decimal, parse_int=decimal.Decimal)
+    try:
+        with open(path) as file:
+            report = json.load(
+                file, parse_float=decimal.Decimal, parse_int=decimal.Decimal
+            )
+    except (OSError, ValueError) as error:
+        print(f"can't read a report from {path}: {error}")
+        sys.exit(1)
+    if report is None:
+        print(f"{path} holds no report")
+        sys.exit(1)
+    return report
 
 
 def same(a, b):
@@ -19,10 +30,6 @@ def same(a, b):
 
 rego = load(sys.argv[1])
 rust = load(sys.argv[2])
-
-if rust is None:
-    print("skipped: ergo-engine gives no report yet")
-    sys.exit(0)
 
 for report in (rego, rust):
     if isinstance(report, dict):

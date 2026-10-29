@@ -9,7 +9,7 @@ It has two crates:
 
 ## The cases
 
-`engine/tests/cases.rs` builds the report for every case in `spec/cases` and compares it the way `spec_test.rego` does, as [`spec/README.md`](../../spec/README.md#cases) describes. It prints how many cases pass, like `0 of 1328 cases pass`.
+`engine/tests/cases.rs` builds the report for every case in `spec/cases` and compares it the way `spec_test.rego` does, as [`spec/README.md`](../../spec/README.md#cases) describes. It prints how many cases pass, like `1365 of 1365 cases pass`.
 
 `known-failures.txt` lists the cases the engine fails, one per line, named like in `spec_test.rego`: the folder, the group's description and the case's description, joined by ` / `. The test fails when a case fails that isn't listed, and when a listed case passes, so the list only shrinks. When a case starts passing, the test names it, and you delete its line.
 
@@ -27,11 +27,11 @@ Then run the same checks as CI:
 docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
   find . -name "*.rs" -exec touch {} + &&
   cargo fmt --check &&
-  cargo clippy -j 4 --all-targets --all-features -- -D warnings &&
-  cargo test -j 4 --all-features -- --show-output &&
-  RUSTDOCFLAGS="-D warnings" cargo doc -j 4 --no-deps --all-features &&
-  cargo test -j 4 -p ergo-engine --features serde_json/preserve_order --test key_order &&
-  cargo build -j 4 -p ergo-sentences --target wasm32-unknown-unknown'
+  cargo clippy -j 4 --locked --all-targets --all-features -- -D warnings &&
+  cargo test -j 4 --locked --all-features -- --show-output &&
+  RUSTDOCFLAGS="-D warnings" cargo doc -j 4 --locked --no-deps --all-features &&
+  cargo test -j 4 --locked -p ergo-engine --features serde_json/preserve_order --test key_order &&
+  cargo build -j 4 --locked -p ergo-sentences --target wasm32-unknown-unknown'
 ```
 
 `ergo-sentences` has an example, `sentences/examples/read.rs`, that reads `{"rows": [{"kinds": [...], "text": "..."}]}` on stdin and prints, for each row and kind (`check`, `for-line`, `from-line`), the `SyntaxError` messages of `parse_check`, `parse_for` or `parse_from`. `spec/check_grammar.py --rust <command>` runs it on the corpus, the cases and a few thousand generated sentences, and fails when Rust accepts a sentence that the ABNF rejects, or the reverse. CI builds it with `cargo build --locked --release -p ergo-sentences --example read` and gives the script `ports/rust/target/release/examples/read`.
@@ -52,8 +52,8 @@ opa eval -d ergo.rego -d /tmp/ergo-bench/bench.rego -d /tmp/ergo-bench/data.json
 jq '.result[0].expressions[0].value' /tmp/ergo-bench/opa.json > /tmp/ergo-bench/rego.json
 jq '.metrics.timer_rego_query_eval_ns / 1e9' /tmp/ergo-bench/opa.json
 docker run --rm -v "$PWD":/src -v /tmp/ergo-bench:/bench -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust \
-  cargo run -j 4 --release -q --example report -- /bench/input-1000.json /bench/policy.json 5 > /tmp/ergo-bench/rust.json
+  cargo run -j 4 --locked --release -q --example report -- /bench/input-1000.json /bench/policy.json 5 > /tmp/ergo-bench/rust.json
 python3 ports/rust/bench/compare.py /tmp/ergo-bench/rego.json /tmp/ergo-bench/rust.json
 ```
 
-The `jq` line prints how many seconds OPA took. The `report` example builds the report the given number of times, here 5, prints the time per run on stderr and the report on stdout. It also takes a params file after the number of runs. `compare.py` fails when the two reports differ, apart from `engine`. While the engine can't build a report yet, it says `skipped: ergo-engine gives no report yet` and doesn't fail.
+The `jq` line prints how many seconds OPA took. The `report` example builds the report the given number of times, here 5, prints the time per run on stderr and the report on stdout. It also takes a params file after the number of runs. `compare.py` fails when the two reports differ, apart from `engine`. It also fails when either file holds no report.

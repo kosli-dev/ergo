@@ -216,6 +216,7 @@ fn list_problems(ids: &[String], failing: &BTreeSet<String>, known: &[String]) -
 #[test]
 fn every_case_passes_unless_known_to_fail() {
     let cases = load_cases(&rust_dir().join("../../spec/cases"));
+    assert!(!cases.is_empty(), "no cases found in spec/cases");
     let known_file = rust_dir().join("known-failures.txt");
     let known: Vec<String> = fs::read_to_string(&known_file)
         .unwrap_or_else(|e| panic!("can't read {}: {e}", known_file.display()))
