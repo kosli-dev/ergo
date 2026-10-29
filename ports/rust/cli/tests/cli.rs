@@ -351,6 +351,30 @@ fn yaml_that_json_cannot_hold_is_called_valid_yaml() {
 }
 
 #[test]
+fn deep_nesting_and_an_alias_bomb_fail_without_crashing() {
+    let (policy, _) = readme("hostile");
+    let dir = dir("hostile");
+    let mut bomb = String::from("a0: &a0 [x, x, x, x, x, x, x, x, x, x]\n");
+    for level in 1..9 {
+        let aliases = vec![format!("*a{}", level - 1); 10].join(", ");
+        bomb += &format!("a{level}: &a{level} [{aliases}]\n");
+    }
+    for (file, text, needle) in [
+        (
+            "deep.yaml",
+            "- ".repeat(1_000_000) + "1\n",
+            "can't be read: it nests more than 10,000 levels",
+        ),
+        ("bomb.yaml", bomb, "can't be read: it uses too many aliases"),
+    ] {
+        let input = write(&dir, file, &text);
+        let output = ergo(&["report", "--policy", &policy, "--input", &input]);
+        assert_eq!(output.status.code(), Some(1), "{file}");
+        assert!(err(&output).contains(needle), "{}", err(&output));
+    }
+}
+
+#[test]
 fn an_unknown_extension_fails_and_names_the_file() {
     let (policy, _) = readme("extension");
     let odd = write(&dir("extension"), "input.txt", "{}");

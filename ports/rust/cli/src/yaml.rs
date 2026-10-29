@@ -14,25 +14,24 @@ pub enum Error {
     Invalid(String),
     /// The YAML is valid, but JSON can't hold one of its values or keys.
     NotJson(String),
+    /// The YAML is valid, but OPA refuses it, so `ergo` does too.
+    Refused(String),
 }
 
 fn invalid(message: impl Into<String>) -> Error {
     Error::Invalid(message.into())
 }
-type Anchors = HashMap<usize, Value>;
 
-/// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error, on `.inf` and `.nan`, on a tag it doesn't know, on a key that isn't a scalar or is `null`, and on an alias with no anchor.
+const MAX_DEPTH: usize = 10_000;
+
+/// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error, on `.inf` and `.nan`, on a tag it doesn't know, on a key that isn't a scalar or is `null`, on an alias with no anchor, on more than 10,000 levels of nesting, and on more aliases than OPA reads.
 pub fn parse(text: &str) -> Result<Value, Error> {
     let mut events = Parser::new_from_str(text).keep_tags(true);
-    let mut anchors = Anchors::new();
     loop {
         match next(&mut events)? {
             Event::StreamStart | Event::Nothing => {}
             Event::StreamEnd => return Ok(Value::Null),
-            Event::DocumentStart(_) => {
-                let first = next(&mut events)?;
-                return node(first, &mut events, &mut anchors);
-            }
+            Event::DocumentStart(_) => return Reader::default().document(&mut events),
             _ => return Err(invalid("unexpected content")),
         }
     }
@@ -46,69 +45,163 @@ fn next<'a>(events: &mut Events<'a>) -> Result<Event<'a>, Error> {
     }
 }
 
-fn node<'a>(
-    first: Event<'a>,
-    events: &mut Events<'a>,
-    anchors: &mut Anchors,
-) -> Result<Value, Error> {
-    match first {
-        Event::Scalar(text, style, anchor, tag) => {
-            let value = scalar(&text, style, tag.as_deref())?;
-            remember(anchors, anchor, &value);
-            Ok(value)
-        }
-        Event::Alias(id) => anchors
-            .get(&id)
-            .cloned()
-            .ok_or_else(|| invalid("an alias has no anchor")),
-        Event::SequenceStart(anchor, _) => {
-            let mut items = Vec::new();
-            loop {
-                match next(events)? {
-                    Event::SequenceEnd => break,
-                    event => items.push(node(event, events, anchors)?),
+struct Anchor {
+    value: Value,
+    size: u64,
+}
+
+enum Slot {
+    Key,
+    Value(String),
+    Merge,
+}
+
+enum Collection {
+    List(Vec<Value>),
+    Map(Map<String, Value>, Slot),
+}
+
+struct Frame {
+    collection: Collection,
+    anchor: usize,
+    size: u64,
+}
+
+#[derive(Default)]
+struct Reader {
+    anchors: HashMap<usize, Anchor>,
+    frames: Vec<Frame>,
+    decoded: u64,
+    aliased: u64,
+}
+
+impl Reader {
+    fn document<'a>(mut self, events: &mut Events<'a>) -> Result<Value, Error> {
+        self.decoded = 1;
+        loop {
+            let (value, size) = match next(events)? {
+                Event::Scalar(text, style, anchor, tag) => {
+                    if self.expects_key()
+                        && style == ScalarStyle::Plain
+                        && tag.is_none()
+                        && text == "<<"
+                    {
+                        self.expect(Slot::Merge);
+                        continue;
+                    }
+                    self.decoded += 1;
+                    let value = scalar(&text, style, tag.as_deref())?;
+                    self.remember(anchor, &value, 1);
+                    (value, 1)
+                }
+                Event::Alias(id) => {
+                    let anchor = self
+                        .anchors
+                        .get(&id)
+                        .ok_or_else(|| invalid("an alias has no anchor"))?;
+                    self.decoded += 1 + anchor.size;
+                    self.aliased += anchor.size;
+                    if excessive(self.decoded, self.aliased) {
+                        return Err(Error::Refused("it uses too many aliases".to_string()));
+                    }
+                    (anchor.value.clone(), 1 + anchor.size)
+                }
+                Event::SequenceStart(anchor, _) => {
+                    self.open(Collection::List(Vec::new()), anchor)?;
+                    continue;
+                }
+                Event::MappingStart(anchor, _) => {
+                    self.open(Collection::Map(Map::new(), Slot::Key), anchor)?;
+                    continue;
+                }
+                Event::SequenceEnd | Event::MappingEnd => {
+                    let frame = self
+                        .frames
+                        .pop()
+                        .ok_or_else(|| invalid("unexpected content"))?;
+                    let value = match frame.collection {
+                        Collection::List(items) => Value::Array(items),
+                        Collection::Map(map, _) => Value::Object(map),
+                    };
+                    self.remember(frame.anchor, &value, frame.size);
+                    (value, frame.size)
+                }
+                _ => return Err(invalid("unexpected content")),
+            };
+            match self.frames.last_mut() {
+                None => return Ok(value),
+                Some(frame) => {
+                    frame.size += size;
+                    place(&mut frame.collection, value)?;
                 }
             }
-            let value = Value::Array(items);
-            remember(anchors, anchor, &value);
-            Ok(value)
         }
-        Event::MappingStart(anchor, _) => {
-            let value = mapping(events, anchors)?;
-            remember(anchors, anchor, &value);
-            Ok(value)
+    }
+
+    fn expects_key(&self) -> bool {
+        matches!(
+            self.frames.last(),
+            Some(Frame {
+                collection: Collection::Map(_, Slot::Key),
+                ..
+            })
+        )
+    }
+
+    fn expect(&mut self, next: Slot) {
+        if let Some(Frame {
+            collection: Collection::Map(_, slot),
+            ..
+        }) = self.frames.last_mut()
+        {
+            *slot = next;
         }
-        _ => Err(invalid("unexpected content")),
+    }
+
+    fn open(&mut self, collection: Collection, anchor: usize) -> Result<(), Error> {
+        if self.frames.len() == MAX_DEPTH {
+            return Err(Error::Refused(
+                "it nests more than 10,000 levels".to_string(),
+            ));
+        }
+        self.decoded += 1;
+        self.frames.push(Frame {
+            collection,
+            anchor,
+            size: 1,
+        });
+        Ok(())
+    }
+
+    fn remember(&mut self, anchor: usize, value: &Value, size: u64) {
+        if anchor != 0 {
+            let value = value.clone();
+            self.anchors.insert(anchor, Anchor { value, size });
+        }
     }
 }
 
-fn remember(anchors: &mut Anchors, anchor: usize, value: &Value) {
-    if anchor != 0 {
-        anchors.insert(anchor, value.clone());
-    }
+fn excessive(decoded: u64, aliased: u64) -> bool {
+    let allowed = match decoded {
+        ..=400_000 => 0.99,
+        4_000_000.. => 0.10,
+        _ => 0.99 - 0.89 * (decoded - 400_000) as f64 / 3_600_000.0,
+    };
+    aliased > 100 && decoded > 1000 && aliased as f64 / decoded as f64 > allowed
 }
 
-fn mapping<'a>(events: &mut Events<'a>, anchors: &mut Anchors) -> Result<Value, Error> {
-    let mut map = Map::new();
-    loop {
-        let first = match next(events)? {
-            Event::MappingEnd => break,
-            event => event,
-        };
-        let is_merge = matches!(
-            &first,
-            Event::Scalar(text, ScalarStyle::Plain, _, None) if text == "<<"
-        );
-        if is_merge {
-            let source = next(events)?;
-            merge(&mut map, node(source, events, anchors)?)?;
-            continue;
-        }
-        let key = key(node(first, events, anchors)?)?;
-        let source = next(events)?;
-        map.insert(key, node(source, events, anchors)?);
+fn place(collection: &mut Collection, value: Value) -> Result<(), Error> {
+    match collection {
+        Collection::List(items) => items.push(value),
+        Collection::Map(map, slot) => match std::mem::replace(slot, Slot::Key) {
+            Slot::Key => *slot = Slot::Value(key(value)?),
+            Slot::Value(name) => {
+                map.insert(name, value);
+            }
+            Slot::Merge => merge(map, value)?,
+        },
     }
-    Ok(Value::Object(map))
+    Ok(())
 }
 
 fn merge(into: &mut Map<String, Value>, source: Value) -> Result<(), Error> {

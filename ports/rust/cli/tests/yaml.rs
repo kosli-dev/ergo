@@ -1,4 +1,4 @@
-use ergo_cli::yaml::parse;
+use ergo_cli::yaml::{Error, parse};
 use serde_json::{Value, json};
 
 fn value(text: &str) -> Value {
@@ -265,4 +265,64 @@ fn nested_lists_and_flow_collections() {
         parse("a: [1, {b: yes}]\n").unwrap(),
         json!({"a": [1, {"b": true}]})
     );
+}
+
+fn nested(levels: usize) -> String {
+    "- ".repeat(levels) + "1\n"
+}
+
+fn refused(text: &str, needle: &str) {
+    match parse(text) {
+        Err(Error::Refused(message)) => assert!(message.contains(needle), "{message}"),
+        other => panic!("{needle}: {:?}", other.map(|_| ())),
+    }
+}
+
+#[test]
+fn ten_thousand_levels_of_nesting_are_read() {
+    std::thread::Builder::new()
+        .stack_size(256 << 20)
+        .spawn(|| {
+            let mut value = parse(&nested(10_000)).unwrap();
+            let mut levels = 0;
+            while let Value::Array(mut items) = value {
+                levels += 1;
+                value = items.pop().unwrap();
+            }
+            assert_eq!(levels, 10_000);
+            assert_eq!(value, json!(1));
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+}
+
+#[test]
+fn more_than_ten_thousand_levels_of_nesting_are_refused_as_opa_refuses_them() {
+    for levels in [10_001, 1_000_000] {
+        refused(&nested(levels), "10,000 levels");
+    }
+}
+
+fn aliases(levels: usize) -> String {
+    let mut text = String::from("a0: &a0 [x, x, x, x, x, x, x, x, x, x]\n");
+    for level in 1..levels {
+        let previous = format!("*a{}", level - 1);
+        text += &format!("a{level}: &a{level} [{}]\n", vec![previous; 10].join(", "));
+    }
+    text
+}
+
+#[test]
+fn a_few_levels_of_aliases_are_read() {
+    let value = parse(&aliases(3)).unwrap();
+    assert_eq!(value["a2"].as_array().unwrap().len(), 10);
+    assert_eq!(value["a2"][9][9][9], json!("x"));
+}
+
+#[test]
+fn too_many_aliases_are_refused_as_opa_refuses_them() {
+    for levels in [4, 6, 9] {
+        refused(&aliases(levels), "aliases");
+    }
 }

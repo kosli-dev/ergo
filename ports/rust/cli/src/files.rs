@@ -25,6 +25,7 @@ pub fn load(what: &str, path: &str) -> Result<Value, Failure> {
         yaml::parse(&text).map_err(|e| match e {
             yaml::Error::Invalid(m) => ("isn't valid YAML", m),
             yaml::Error::NotJson(m) => ("is valid YAML that JSON can't hold", m),
+            yaml::Error::Refused(m) => ("can't be read", m),
         })
     } else {
         serde_json::from_str(&text).map_err(|e| ("isn't valid JSON", e.to_string()))
