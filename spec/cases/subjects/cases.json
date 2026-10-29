@@ -12923,6 +12923,44 @@
             ]
           }
         ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -12977,6 +13015,44 @@
               "id": null,
               "in": {
                 "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": null
               }
             },
             "check": "$min_subjects",
@@ -13047,6 +13123,44 @@
               "id": null,
               "in": {
                 "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": null
               }
             },
             "check": "$min_subjects",
