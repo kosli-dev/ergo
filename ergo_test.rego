@@ -5810,6 +5810,31 @@ test_a_chain_with_no_parent_or_an_unreadable_one_finds_no_subjects if {
 	zero.requirements.r.status == "not_met"
 }
 
+test_a_child_under_a_parent_that_is_not_an_object_fails_min_subjects_as_not_an_object if {
+	every parent in ["x", 5, [1], true, null] {
+		_chain_min_cause(_chain_report({"trail": {"artifacts": [parent]}}, _plain_chain, {"c": "url exists"}, {})) == [["not_an_object", {"type", "id", "in"}]]
+	}
+}
+
+test_a_child_under_an_object_parent_without_the_field_still_fails_min_subjects_as_absent if {
+	_chain_min_cause(_chain_report({"trail": {"artifacts": [{"fingerprint": "a"}]}}, _plain_chain, {"c": "url exists"}, {})) == [["absent", {"type", "id", "in"}]]
+	_chain_min_cause(_chain_report({"trail": {"artifacts": [{"fingerprint": "a", "pull_requests": null}]}}, _plain_chain, {"c": "url exists"}, {})) == [["null", {"type", "id", "in"}]]
+	_chain_min_cause(_chain_report({"trail": {"artifacts": [{"fingerprint": "a", "pull_requests": "x"}]}}, _plain_chain, {"c": "url exists"}, {})) == [["unusable", {"type", "id", "in"}]]
+}
+
+test_a_child_from_that_starts_with_a_position_reads_its_parent_as_a_list if {
+	chain := object.union(_plain_chain, {"pull request": {"from": "artifact[0].pull_requests", "identified_by": "url"}})
+	_chain_min_cause(_chain_report({"trail": {"artifacts": ["x"]}}, chain, {"c": "url exists"}, {})) == [["unusable", {"type", "id", "in"}]]
+	_chain_min_cause(_chain_report({"trail": {"artifacts": [null]}}, chain, {"c": "url exists"}, {})) == [["absent", {"type", "id", "in"}]]
+}
+
+test_a_top_level_subject_read_from_an_input_that_is_not_an_object_keeps_its_cause if {
+	_chain_min_cause(_chain_report("x", _plain_chain, {"c": "url exists"}, {})) == [["unusable", {"type", "id"}]]
+	_chain_min_cause(_chain_report(null, _plain_chain, {"c": "url exists"}, {})) == [["absent", {"type", "id"}]]
+}
+
+_plain_chain := {"artifact": {"from": "trail.artifacts", "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
+
 _kept_subjects := {"artifact": {"from": `trail.artifacts whose env is "prod"`, "identified_by": "fingerprint"}, "pull request": {"from": "artifact.pull_requests", "identified_by": "url"}}
 
 _many_doc := {"trail": {"artifacts": [

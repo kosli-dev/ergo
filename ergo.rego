@@ -543,25 +543,32 @@ _every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v),
 
 _keys_step(req) if "keys" in object.keys(_each_step(req))
 
-default _target_state(_, _) := "absent"
+_target_state(doc, req) := "not_an_object" if {
+	is_object(data.ergo_parent)
+	not is_object(doc)
+	count(_from_keys(req)) > 0
+	not _index_step(_from_keys(req)[0])
+} else := _from_state(doc, req)
 
-_target_state(doc, req) := "null" if _target_read(doc, req) == null
+default _from_state(_, _) := "absent"
 
-_target_state(doc, _) := "unusable" if is_array(doc)
+_from_state(doc, req) := "null" if _target_read(doc, req) == null
 
-_target_state(doc, req) := "unusable" if {
+_from_state(doc, _) := "unusable" if is_array(doc)
+
+_from_state(doc, req) := "unusable" if {
 	_target_read(doc, req) == _absent
 	_blocked(doc, _from_keys(req))
 }
 
-_target_state(doc, req) := "unusable" if {
+_from_state(doc, req) := "unusable" if {
 	v := _target_read(doc, req)
 	v != _absent
 	v != null
 	not _is_collection(v)
 }
 
-_target_state(doc, req) := "value" if {
+_from_state(doc, req) := "value" if {
 	v := _target_read(doc, req)
 	v != _absent
 	_is_collection(v)
