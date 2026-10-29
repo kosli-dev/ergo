@@ -347,9 +347,11 @@ fn order_rank(value: &Value) -> u8 {
 pub(crate) fn order(a: &Value, b: &Value) -> Ordering {
     match (a, b) {
         (Value::Bool(x), Value::Bool(y)) => x.cmp(y),
-        (Value::Number(x), Value::Number(y)) => {
-            value::compare_numbers(x, y).unwrap_or_else(|| x.to_string().cmp(&y.to_string()))
-        }
+        (Value::Number(x), Value::Number(y)) => value::compare_numbers(x, y).unwrap_or_else(|| {
+            value::is_readable(y)
+                .cmp(&value::is_readable(x))
+                .then_with(|| x.to_string().cmp(&y.to_string()))
+        }),
         (Value::String(x), Value::String(y)) => x.cmp(y),
         (Value::Array(x), Value::Array(y)) => {
             for (p, q) in x.iter().zip(y) {
@@ -545,20 +547,27 @@ fn judge<'a>(
         .collect()
 }
 
+fn same_id(a: &Value, b: &Value) -> bool {
+    match value::equal(a, b) {
+        Some(same) => same,
+        None => order(a, b) == Ordering::Equal,
+    }
+}
+
 fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
     let mut sorted: Vec<(usize, &Judged)> = judged.iter().enumerate().collect();
     sorted.sort_by(|a, b| order(&a.1.id, &b.1.id));
     let mut groups: Vec<Vec<(usize, &Judged)>> = Vec::new();
     for item in sorted {
         match groups.last_mut() {
-            Some(group) if value::equal(&group[0].1.id, &item.1.id) != Some(false) => {
-                group.push(item)
-            }
+            Some(group) if same_id(&group[0].1.id, &item.1.id) => group.push(item),
             _ => groups.push(vec![item]),
         }
     }
-    let mut repeated: Vec<Vec<(usize, &Judged)>> =
-        groups.into_iter().filter(|g| g.len() > 1).collect();
+    let mut repeated: Vec<Vec<(usize, &Judged)>> = groups
+        .into_iter()
+        .filter(|g| g.len() > 1 || !value::all_readable(&g[0].1.id))
+        .collect();
     repeated.sort_by(|a, b| {
         json_text(&a[0].1.id)
             .cmp(&json_text(&b[0].1.id))

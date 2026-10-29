@@ -182,23 +182,98 @@ fn a_number_whose_exponent_has_more_than_36_digits_fails_every_comparison_as_unu
     }
 }
 
-#[test]
-fn ids_that_cannot_be_read_count_as_repeated_so_unique_ids_fails() {
-    let big = format!("1e1{}", "0".repeat(36));
-    let bigger = format!("1e1{}1", "0".repeat(35));
-    let things = format!(r#"{{"id": {big}, "fa": 1}}, {{"id": {bigger}, "fa": 1}}"#);
+fn permutations(items: &[String]) -> Vec<Vec<String>> {
+    if items.len() <= 1 {
+        return vec![items.to_vec()];
+    }
+    let mut all = Vec::new();
+    for i in 0..items.len() {
+        let mut rest = items.to_vec();
+        let first = rest.remove(i);
+        for mut tail in permutations(&rest) {
+            tail.insert(0, first.clone());
+            all.push(tail);
+        }
+    }
+    all
+}
+
+fn unique_ids_row(ids: &[String]) -> Value {
+    let things: Vec<String> = ids
+        .iter()
+        .map(|id| format!(r#"{{"id": {id}, "fa": 1}}"#))
+        .collect();
     let policy = json!({
         "ergo_spec": "v0.3-dev",
         "subjects": {"thing": {"from": "things", "identified_by": "id"}},
         "requirements": {"r": {"subject": "thing", "checks": {"c": "fa is 1"}}}
     });
-    let input: Value = serde_json::from_str(&format!(r#"{{"things": [{things}]}}"#)).unwrap();
+    let input: Value =
+        serde_json::from_str(&format!(r#"{{"things": [{}]}}"#, things.join(", "))).unwrap();
     let report = ergo_engine::report(&input, &policy, &json!({}));
-    let row = report["results"]
+    report["results"]
         .as_array()
         .unwrap()
         .iter()
         .find(|r| r["check"] == "$unique_ids")
-        .unwrap_or_else(|| panic!("{report}"));
-    assert_eq!(row["passed"], false, "{report}");
+        .unwrap_or_else(|| panic!("{report}"))
+        .clone()
+}
+
+fn repeated_ids_named(row: &Value) -> Vec<String> {
+    row["inputs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|i| {
+            i["name"]
+                .as_str()
+                .is_some_and(|n| n.starts_with("repeated"))
+        })
+        .unwrap_or_else(|| panic!("{row}"))["value"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.to_string())
+        .collect()
+}
+
+#[test]
+fn ids_that_cannot_be_read_are_named_as_repeated_in_the_same_order_whatever_the_input_order() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let bigger = format!("1e1{}1", "0".repeat(35));
+    let ids: Vec<String> = ["2", "10", &big, "3", &bigger, "3", &big]
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+    let mut seen = std::collections::BTreeSet::new();
+    for order in permutations(&ids) {
+        let row = unique_ids_row(&order);
+        assert_eq!(row["passed"], false, "{row}");
+        seen.insert(repeated_ids_named(&row));
+    }
+    assert_eq!(seen.len(), 1, "{seen:?}");
+    let named = seen.into_iter().next().unwrap();
+    assert_eq!(named.len(), 3, "{named:?}");
+    assert!(named.contains(&"3".to_string()), "{named:?}");
+    assert!(
+        !named.contains(&"2".to_string()) && !named.contains(&"10".to_string()),
+        "{named:?}"
+    );
+}
+
+#[test]
+fn one_id_that_cannot_be_read_fails_unique_ids_and_names_only_itself() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let ids: Vec<String> = ["5", "20", &big, "100", "7", "\"x\"", "-3"]
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+    for order in permutations(&ids).into_iter().step_by(97) {
+        let row = unique_ids_row(&order);
+        assert_eq!(row["passed"], false, "{row}");
+        let named = repeated_ids_named(&row);
+        assert_eq!(named.len(), 1, "{named:?}");
+        assert!(named[0].contains("e"), "{named:?}");
+    }
 }

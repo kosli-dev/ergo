@@ -169,6 +169,15 @@ pub fn is_readable(number: &serde_json::Number) -> bool {
     decimal_of(number).is_some()
 }
 
+pub fn all_readable(value: &Value) -> bool {
+    match value {
+        Value::Number(number) => is_readable(number),
+        Value::Array(items) => items.iter().all(all_readable),
+        Value::Object(map) => map.values().all(all_readable),
+        _ => true,
+    }
+}
+
 pub fn compare_decimals(a: &Decimal, b: &Decimal) -> Ordering {
     match (a.is_zero(), b.is_zero()) {
         (true, true) => return Ordering::Equal,
