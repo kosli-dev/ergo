@@ -3,6 +3,18 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("commit.files", "commit.files"),
+    ("every parent.items", "every parent.items"),
+    (
+        "parent.items whose n is one of 1, \"a\"",
+        "parent.items whose n is one of 1, \"a\"",
+    ),
+    (
+        "parent whose n is one of 1, \"a\"",
+        "parent whose n is one of 1, \"a\"",
+    ),
+    ("parent whose n is 1", "parent whose n is 1"),
+    ("every parent", "every parent"),
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
@@ -1393,6 +1405,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
+    ("parent.items whose zz is $foo", &["unknown name $foo"]),
+    ("parent.items whose", &["doesn't parse"]),
+    ("parent whose n is $foo", &["unknown name $foo"]),
     ("", &["doesn't parse"]),
     ("\"a\\q\"", &["invalid string at column 1"]),
     (
@@ -2482,6 +2497,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("n", "n"),
     ("\tid\n", "id"),
     ("\nmid\t", "mid"),
     ("\u{3000}k\n", "k"),
