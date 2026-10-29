@@ -546,33 +546,28 @@ fn judge<'a>(
 }
 
 fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
-    let mut sorted: Vec<&Judged> = judged.iter().collect();
-    sorted.sort_by(|a, b| order(&a.id, &b.id));
-    let mut groups: Vec<Vec<&Judged>> = Vec::new();
+    let mut sorted: Vec<(usize, &Judged)> = judged.iter().enumerate().collect();
+    sorted.sort_by(|a, b| order(&a.1.id, &b.1.id));
+    let mut groups: Vec<Vec<(usize, &Judged)>> = Vec::new();
     for item in sorted {
         match groups.last_mut() {
-            Some(group) if value::equal(&group[0].id, &item.id) => group.push(item),
+            Some(group) if value::equal(&group[0].1.id, &item.1.id) => group.push(item),
             _ => groups.push(vec![item]),
         }
     }
-    let mut repeated: Vec<Vec<&Judged>> = groups.into_iter().filter(|g| g.len() > 1).collect();
+    let mut repeated: Vec<Vec<(usize, &Judged)>> =
+        groups.into_iter().filter(|g| g.len() > 1).collect();
     repeated.sort_by(|a, b| {
-        json_text(&a[0].id)
-            .cmp(&json_text(&b[0].id))
-            .then_with(|| order(&a[0].id, &b[0].id))
+        json_text(&a[0].1.id)
+            .cmp(&json_text(&b[0].1.id))
+            .then_with(|| order(&a[0].1.id, &b[0].1.id))
     });
     let mut ids = Vec::new();
     let mut locations = Vec::new();
     for group in &mut repeated {
-        ids.push(group[0].id.clone());
-        let mut in_order: Vec<&&Judged> = group.iter().collect();
-        in_order.sort_by_key(|item| {
-            judged
-                .iter()
-                .position(|j| std::ptr::eq(j, **item))
-                .unwrap_or(usize::MAX)
-        });
-        for item in in_order {
+        ids.push(group[0].1.id.clone());
+        group.sort_by_key(|(index, _)| *index);
+        for (_, item) in group.iter() {
             locations.extend(item.id_location.iter().cloned());
         }
     }
@@ -1006,6 +1001,20 @@ mod tests {
         assert_eq!(
             input_of(&rows(&r, "$unique_ids")[0], 0)["value"],
             json!(["b", 10, 3])
+        );
+    }
+
+    #[test]
+    fn the_places_of_repeated_ids_follow_the_order_of_the_list_within_each_id() {
+        let r = run(
+            json!({"thing": {"from": "ds", "identified_by": "id"}}),
+            json!({"ds": [{"id": "b"}, {"id": "a"}, {"id": "b"}, {"id": "a"}, {"id": "c"}, {"id": "b"}]}),
+        );
+        let row = &rows(&r, "$unique_ids")[0];
+        assert_eq!(input_of(row, 0)["value"], json!(["a", "b"]));
+        assert_eq!(
+            input_of(row, 0)["locations"],
+            json!(["/ds/1/id", "/ds/3/id", "/ds/0/id", "/ds/2/id", "/ds/5/id"])
         );
     }
 
