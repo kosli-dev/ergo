@@ -460,3 +460,64 @@ fn yaml_1_1_is_read() {
 fn a_merge_of_an_alias_to_a_list_is_refused_as_opa_refuses_it() {
     refused("l: &l [{a: 1}]\nm:\n  <<: *l\n", "merge");
 }
+
+#[test]
+fn number_keys_are_named_as_opa_names_them() {
+    for (text, name) in [
+        ("1.0", "1"),
+        ("1e3", "1000"),
+        ("100000000.0", "1e+08"),
+        ("3.14159265358979", "3.1415927"),
+        ("1e-7", "1e-07"),
+        ("-1.5e-5", "-1.5e-05"),
+        ("1e21", "1e+21"),
+        ("0.000123", "0.000123"),
+        ("123456.7", "123456.7"),
+        ("1234567.0", "1.234567e+06"),
+        ("16777217.0", "1.6777216e+07"),
+        ("-0", "0"),
+        ("-0.0", "-0"),
+        ("1e-50", "0"),
+        ("-1e-50", "-0"),
+        ("1e-400", "0"),
+        ("18446744073709551616", "1.8446744e+19"),
+        ("1e300", ".inf"),
+        ("1e400", "1e400"),
+        (".inf", ".inf"),
+        ("+.inf", ".inf"),
+        ("-.inf", "-.inf"),
+        (".NaN", ".nan"),
+        ("08", "8"),
+        ("1_000", "1000"),
+        ("0x10", "16"),
+        ("._5", "._5"),
+        ("!!float 1", "1"),
+        ("9223372036854775807", "9223372036854775807"),
+        ("-9223372036854775808", "-9223372036854775808"),
+    ] {
+        assert_eq!(
+            parse(&format!("{text}: a\n")).unwrap(),
+            json!({name: "a"}),
+            "{text}"
+        );
+    }
+}
+
+#[test]
+fn an_alias_used_as_a_key_is_named_like_the_scalar_it_points_to() {
+    assert_eq!(
+        parse("a: &x 1.0\n*x : b\n").unwrap(),
+        json!({"a": 1.0, "1": "b"})
+    );
+}
+
+#[test]
+fn a_key_past_the_largest_signed_64_bit_integer_is_refused_as_opa_refuses_it() {
+    for text in [
+        "9223372036854775808",
+        "18446744073709551615",
+        "0xffffffffffffffff",
+    ] {
+        refused(&format!("{text}: a\n"), text);
+    }
+}

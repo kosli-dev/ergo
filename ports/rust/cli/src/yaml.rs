@@ -81,8 +81,16 @@ fn next<'a>(events: &mut Events<'a>) -> Result<Event<'a>, Error> {
     }
 }
 
+struct Node {
+    value: Result<Value, Error>,
+    key: Result<String, Error>,
+    size: u64,
+    alias: bool,
+}
+
 struct Anchor {
-    value: Value,
+    value: Result<Value, Error>,
+    key: Result<String, Error>,
     size: u64,
 }
 
@@ -115,7 +123,7 @@ impl Reader {
     fn document<'a>(mut self, events: &mut Events<'a>) -> Result<Value, Error> {
         self.decoded = 1;
         loop {
-            let (value, size, alias) = match next(events)? {
+            let node = match next(events)? {
                 Event::Scalar(text, style, anchor, tag) => {
                     if self.expects_key()
                         && style == ScalarStyle::Plain
@@ -126,9 +134,15 @@ impl Reader {
                         continue;
                     }
                     self.decoded += 1;
-                    let value = scalar(&text, style, tag.as_deref())?.value(&text)?;
-                    self.remember(anchor, &value, 1);
-                    (value, 1, false)
+                    let scalar = scalar(&text, style, tag.as_deref())?;
+                    let node = Node {
+                        value: scalar.value(&text),
+                        key: scalar.key(&text),
+                        size: 1,
+                        alias: false,
+                    };
+                    self.remember(anchor, &node);
+                    node
                 }
                 Event::Alias(id) => {
                     let anchor = self
@@ -140,7 +154,12 @@ impl Reader {
                     if excessive(self.decoded, self.aliased) {
                         return Err(Error::Refused("it uses too many aliases".to_string()));
                     }
-                    (anchor.value.clone(), 1 + anchor.size, true)
+                    Node {
+                        value: anchor.value.clone(),
+                        key: anchor.key.clone(),
+                        size: 1 + anchor.size,
+                        alias: true,
+                    }
                 }
                 Event::SequenceStart(anchor, _) => {
                     self.open(Collection::List(Vec::new()), anchor)?;
@@ -159,16 +178,22 @@ impl Reader {
                         Collection::List(items) => Value::Array(items),
                         Collection::Map(map, _) => Value::Object(map),
                     };
-                    self.remember(frame.anchor, &value, frame.size);
-                    (value, frame.size, false)
+                    let node = Node {
+                        value: Ok(value),
+                        key: Err(Error::NotJson("a key is a list or a mapping".to_string())),
+                        size: frame.size,
+                        alias: false,
+                    };
+                    self.remember(frame.anchor, &node);
+                    node
                 }
                 _ => return Err(invalid("unexpected content")),
             };
             match self.frames.last_mut() {
-                None => return Ok(value),
+                None => return node.value,
                 Some(frame) => {
-                    frame.size += size;
-                    place(&mut frame.collection, value, alias)?;
+                    frame.size += node.size;
+                    place(&mut frame.collection, node)?;
                 }
             }
         }
@@ -209,10 +234,14 @@ impl Reader {
         Ok(())
     }
 
-    fn remember(&mut self, anchor: usize, value: &Value, size: u64) {
+    fn remember(&mut self, anchor: usize, node: &Node) {
         if anchor != 0 {
-            let value = value.clone();
-            self.anchors.insert(anchor, Anchor { value, size });
+            let remembered = Anchor {
+                value: node.value.clone(),
+                key: node.key.clone(),
+                size: node.size,
+            };
+            self.anchors.insert(anchor, remembered);
         }
     }
 }
@@ -226,15 +255,15 @@ fn excessive(decoded: u64, aliased: u64) -> bool {
     aliased > 100 && decoded > 1000 && aliased as f64 / decoded as f64 > allowed
 }
 
-fn place(collection: &mut Collection, value: Value, alias: bool) -> Result<(), Error> {
+fn place(collection: &mut Collection, node: Node) -> Result<(), Error> {
     match collection {
-        Collection::List(items) => items.push(value),
+        Collection::List(items) => items.push(node.value?),
         Collection::Map(map, slot) => match std::mem::replace(slot, Slot::Key) {
-            Slot::Key => *slot = Slot::Value(key(value)?),
+            Slot::Key => *slot = Slot::Value(node.key?),
             Slot::Value(name) => {
-                map.insert(name, value);
+                map.insert(name, node.value?);
             }
-            Slot::Merge => merge(map, value, alias)?,
+            Slot::Merge => merge(map, node.value?, node.alias)?,
         },
     }
     Ok(())
@@ -262,37 +291,84 @@ fn merge(into: &mut Map<String, Value>, source: Value, alias: bool) -> Result<()
     }
 }
 
-fn key(value: Value) -> Result<String, Error> {
-    match value {
-        Value::String(s) => Ok(s),
-        Value::Bool(b) => Ok(b.to_string()),
-        Value::Number(n) => Ok(n.to_string()),
-        Value::Null => Err(Error::NotJson("a key is null".to_string())),
-        _ => Err(Error::NotJson("a key is a list or a mapping".to_string())),
-    }
-}
-
 enum Scalar {
     Null,
     Bool(bool),
     Int(String),
     Uint(String),
     Float(String),
-    Special,
+    Special(&'static str),
     Str(String),
 }
 
 impl Scalar {
-    fn value(self, text: &str) -> Result<Value, Error> {
+    fn value(&self, text: &str) -> Result<Value, Error> {
         match self {
             Scalar::Null => Ok(Value::Null),
-            Scalar::Bool(b) => Ok(Value::Bool(b)),
+            Scalar::Bool(b) => Ok(Value::Bool(*b)),
             Scalar::Int(digits) | Scalar::Uint(digits) | Scalar::Float(digits) => {
-                Ok(number(&digits))
+                Ok(number(digits))
             }
-            Scalar::Special => Err(Error::NotJson(format!("{text} isn't a JSON number"))),
-            Scalar::Str(s) => Ok(Value::String(s)),
+            Scalar::Special(_) => Err(Error::NotJson(format!("{text} isn't a JSON number"))),
+            Scalar::Str(s) => Ok(Value::String(s.clone())),
         }
+    }
+
+    fn key(&self, text: &str) -> Result<String, Error> {
+        match self {
+            Scalar::Null => Err(Error::NotJson("a key is null".to_string())),
+            Scalar::Bool(b) => Ok(b.to_string()),
+            Scalar::Int(digits) => Ok(digits.clone()),
+            Scalar::Uint(_) => Err(Error::Refused(format!(
+                "the key {text} is past the largest 64-bit signed integer"
+            ))),
+            Scalar::Float(digits) => Ok(match digits.parse::<f64>() {
+                Ok(f) if f.is_finite() => shortest(f as f32),
+                _ => text.to_string(),
+            }),
+            Scalar::Special(name) => Ok(name.to_string()),
+            Scalar::Str(s) => Ok(s.clone()),
+        }
+    }
+}
+
+fn shortest(f: f32) -> String {
+    if f.is_infinite() {
+        return if f > 0.0 { ".inf" } else { "-.inf" }.to_string();
+    }
+    let scientific = format!("{f:e}");
+    let (mantissa, exponent) = scientific.split_once('e').unwrap_or((&scientific, "0"));
+    let exponent: i32 = exponent.parse().unwrap_or(0);
+    let (sign, mantissa) = match mantissa.strip_prefix('-') {
+        Some(m) => ("-", m),
+        None => ("", mantissa),
+    };
+    let digits: String = mantissa.chars().filter(|c| *c != '.').collect();
+    if !(-4..6).contains(&exponent) {
+        let fraction = if digits.len() > 1 {
+            format!(".{}", &digits[1..])
+        } else {
+            String::new()
+        };
+        let exponent_sign = if exponent < 0 { '-' } else { '+' };
+        return format!(
+            "{sign}{}{fraction}e{exponent_sign}{:02}",
+            &digits[..1],
+            exponent.abs()
+        );
+    }
+    let point = exponent + 1;
+    if point <= 0 {
+        return format!(
+            "{sign}0.{}{digits}",
+            "0".repeat(point.unsigned_abs() as usize)
+        );
+    }
+    let point = point as usize;
+    if digits.len() <= point {
+        format!("{sign}{digits}{}", "0".repeat(point - digits.len()))
+    } else {
+        format!("{sign}{}.{}", &digits[..point], &digits[point..])
     }
 }
 
@@ -318,7 +394,7 @@ fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Scalar, E
         (true, "float") => (
             match resolved {
                 Scalar::Int(digits) => Some(Scalar::Float(digits)),
-                Scalar::Float(_) | Scalar::Special => Some(resolved),
+                Scalar::Float(_) | Scalar::Special(_) => Some(resolved),
                 _ => None,
             },
             "a number",
@@ -347,8 +423,9 @@ fn resolve(text: &str) -> Scalar {
         "n" | "N" | "no" | "No" | "NO" | "off" | "Off" | "OFF" | "false" | "False" | "FALSE" => {
             Scalar::Bool(false)
         }
-        ".nan" | ".NaN" | ".NAN" | ".inf" | ".Inf" | ".INF" | "+.inf" | "+.Inf" | "+.INF"
-        | "-.inf" | "-.Inf" | "-.INF" => Scalar::Special,
+        ".nan" | ".NaN" | ".NAN" => Scalar::Special(".nan"),
+        ".inf" | ".Inf" | ".INF" | "+.inf" | "+.Inf" | "+.INF" => Scalar::Special(".inf"),
+        "-.inf" | "-.Inf" | "-.INF" => Scalar::Special("-.inf"),
         _ => numeric(text).unwrap_or_else(|| Scalar::Str(text.to_string())),
     }
 }
