@@ -2,10 +2,11 @@
 
 A second engine for Ergo, in Rust, that should give the same report as `ergo.rego` for every case in [`spec/cases`](../../spec/cases). It's in progress: see [#319](https://github.com/kosli-dev/ergo/issues/319).
 
-It has two crates:
+It has three crates:
 
 - `ergo-sentences` (`sentences/`) reads check sentences, `for` lines, `from` lines and paths, and nothing else, so an editor or a linter can use it without the engine.
 - `ergo-engine` (`engine/`) builds the report, and reads sentences with `ergo-sentences`.
+- `ergo-wasm` (`wasm/`) wraps the engine for a browser: one function, `report`, that takes the input, the policy and the params as JSON text and gives the report back as JSON text.
 
 ## The cases
 
@@ -41,6 +42,26 @@ The second `cargo test` runs `tests/key_order.rs` again with serde_json's `prese
 The image is `rust:1.99.0`, the version in `rust-toolchain.toml`, with rustfmt, Clippy and the Wasm target added. `touch` is there because Cargo in Docker can miss an edit made outside the container, and then tests the old code.
 
 The build goes to the `ergo-rust-target` volume and not to `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data. When several sessions or people run the checks at the same time, each should give the target volume their own name, like `ergo-rust-target-<name>`, because two builds sharing one volume can fail with "Permission denied". Change the `-v ergo-rust-target:/target` part of the command and keep the rest.
+
+## Building the engine for a browser
+
+The Markdown editor can run this engine in the page, so it needs `ergo-wasm` built to Wasm and wrapped in JavaScript. This builds it into `ports/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. Run it with the image from above, from the root of the repo:
+
+```sh
+docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
+  find . -name "*.rs" -exec touch {} + &&
+  cargo build --locked -j 4 --profile wasm -p ergo-wasm --target wasm32-unknown-unknown &&
+  wasm-bindgen --target web --out-dir wasm/pkg /target/wasm32-unknown-unknown/wasm/ergo_wasm.wasm &&
+  wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_wasm_bg.wasm -o wasm/pkg/ergo_wasm_bg.wasm'
+```
+
+The `wasm` profile in `Cargo.toml` builds for size, and `wasm-opt` from [Binaryen](https://github.com/WebAssembly/binaryen) shrinks the result further. Together they take the Wasm file from about 2.9 MB to about 1.5 MB, and from about 840 KB to about 550 KB gzipped. Without `wasm-opt` the file is 1.6 MB, and a little smaller gzipped, at about 510 KB. The `release` profile stays as it was, because the other builds and the timings use it.
+
+The `wasm-bindgen` tool has to be the same version as the `wasm-bindgen` crate, `=0.2.129` in `wasm/Cargo.toml`. The version is also in the `Dockerfile` and in the `tests-rust` job of `.github/workflows/test.yml`, so change all three together. The same goes for the Binaryen version, `version_133`, which is in the `Dockerfile` and in that job, together with the SHA-256 of each tarball. Both check the download against it before they unpack it.
+
+CI also loads the built module in Node with `wasm/check-node.mjs`, which builds one report and fails when that throws or the report doesn't come from `ergo-engine`. Run it with `node ports/rust/wasm/check-node.mjs` after the build.
+
+The `wasm` profile aborts on a panic. In JavaScript that is a `WebAssembly.RuntimeError: unreachable` with no message about the cause, and the module's memory may be half way through a call, so don't call it again. Make a new instance with `initSync` or `init` instead. Invalid JSON is not a panic: `report` throws an `Error` that says which of the three isn't JSON, and the module stays usable.
 
 ## Timing it against `ergo.rego`
 
