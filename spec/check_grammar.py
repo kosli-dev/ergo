@@ -200,11 +200,10 @@ def mutate(rng, text):
             options.append(text[: m.start()] + m.group(2) + "[" + str(int(m.group(1)) - 1) + "]" + text[m.end() :])
         for m in re.finditer(r"\bfirst +of +([^\s,]+)", text):
             options.append(text[: m.start()] + m.group(1) + "[0]" + text[m.end() :])
-        for m in re.finditer(r"(?:^|, +)(every|some) +", text):
-            options.append(text[: m.start(1)] + text[m.end() :])
-        if not options:
+        dropped = [text[: m.start(1)] + m.group(2) + "[0]" + text[m.end() :] for m in re.finditer(r"(?:^|, +)(every|some) +([^\s,]+)", text)]
+        if not options and not dropped:
             return None
-        return rng.choice(options)
+        return rng.choice(dropped or options)
     if kind == "replace_word":
         i = rng.randrange(len(words))
         words[i] = rng.choice(GRAMMAR_WORDS + VOCABULARY)
