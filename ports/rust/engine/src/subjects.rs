@@ -564,9 +564,10 @@ fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
             _ => groups.push(vec![item]),
         }
     }
+    let several = judged.len() > 1;
     let mut repeated: Vec<Vec<(usize, &Judged)>> = groups
         .into_iter()
-        .filter(|g| g.len() > 1 || !value::all_readable(&g[0].1.id))
+        .filter(|g| g.len() > 1 || (several && !value::all_readable(&g[0].1.id)))
         .collect();
     repeated.sort_by(|a, b| {
         json_text(&a[0].1.id)

@@ -298,3 +298,47 @@ fn within_does_not_overflow_on_exponents_at_both_ends_of_what_it_reads() {
     let ends = r#"{"id": "t", "fa": 1e9000000000000000000, "fb": 1e-9000000000000000000}"#;
     assert_eq!(cause_of("fa equals fb within 1", ends), "unusable");
 }
+
+fn one_item_policy() -> Value {
+    json!({
+        "ergo_spec": "v0.3-dev",
+        "subjects": {"item": {"from": "items"}},
+        "requirements": {"r": {"subject": "item", "checks": {"c": "size is at least 5"}}}
+    })
+}
+
+#[test]
+fn one_subject_whose_id_cannot_be_read_passes_unique_ids() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let input: Value =
+        serde_json::from_str(&format!(r#"{{"items": [{{"size": {big}}}]}}"#)).unwrap();
+    let report = ergo_engine::report(&input, &one_item_policy(), &json!({}));
+    let row = report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|r| r["check"] == "$unique_ids")
+        .unwrap_or_else(|| panic!("{report}"));
+    assert_eq!(row["passed"], true, "{row}");
+    assert_eq!(row["cause"], "satisfied", "{row}");
+}
+
+#[test]
+fn two_subjects_with_the_same_id_that_cannot_be_read_still_fail_unique_ids() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let row = unique_ids_row(&[big.clone(), big]);
+    assert_eq!(row["passed"], false, "{row}");
+}
+
+#[test]
+fn a_number_that_cannot_be_read_keeps_its_digits_in_the_report_text() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let input: Value =
+        serde_json::from_str(&format!(r#"{{"items": [{{"size": {big}}}]}}"#)).unwrap();
+    let text = ergo_engine::report(&input, &one_item_policy(), &json!({})).to_string();
+    assert!(!text.contains(r#""size":null"#), "{text}");
+    assert!(
+        text.contains(&format!(r#""size":1e+1{}"#, "0".repeat(36))),
+        "{text}"
+    );
+}
