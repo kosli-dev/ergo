@@ -528,7 +528,7 @@ fn nel_is_a_line_break_as_in_yaml_1_1() {
         parse("a:\n  b: \"x\u{85}    y\"\n").unwrap(),
         json!({"a": {"b": "x y"}})
     );
-    assert_eq!(parse("a: \"x\u{85}y\"\n"), parse("a: \"x\ny\"\n"));
+    assert_eq!(parse("a: \"x\u{85}y\"\n").unwrap(), json!({"a": "x y"}));
     assert_eq!(
         parse("a: |\n  x\u{85}  y\n").unwrap(),
         json!({"a": "x\ny\n"})
@@ -537,4 +537,31 @@ fn nel_is_a_line_break_as_in_yaml_1_1() {
         parse("a: x\u{85}b: 1\n").unwrap(),
         json!({"a": "x", "b": 1})
     );
+}
+
+#[test]
+fn a_quoted_scalar_can_go_on_at_the_start_of_a_line_as_in_yaml_1_1() {
+    for (text, expected) in [
+        ("a: \"x\ny\"\n", json!({"a": "x y"})),
+        ("a: 'x\ny'\n", json!({"a": "x y"})),
+        ("a: \"x\n\ny\"\n", json!({"a": "x\ny"})),
+        ("a: \"x\\\ny\"\n", json!({"a": "xy"})),
+        ("a: \"x\n \ty\"\n", json!({"a": "x y"})),
+        ("a:\n  b: \"x\ny\"\n", json!({"a": {"b": "x y"}})),
+        ("- \"x\ny\"\n", json!(["x y"])),
+        ("a: \"q\\\"\nz\"\n", json!({"a": "q\" z"})),
+        ("a: 'it''s\nz'\n", json!({"a": "it's z"})),
+        ("a: \"x\ny\"\nb: 'p\nq'\n", json!({"a": "x y", "b": "p q"})),
+        ("a: \"x\n  ---\ny\"\n", json!({"a": "x --- y"})),
+        ("a: \"x\n---y\"\n", json!({"a": "x ---y"})),
+    ] {
+        assert_eq!(parse(text).unwrap(), expected, "{text:?}");
+    }
+}
+
+#[test]
+fn a_quoted_scalar_still_stops_at_a_document_marker_or_the_end_of_the_file() {
+    for text in ["a: \"x\n---\ny\"\n", "a: \"x\n...\ny\"\n", "a: \"x\ny\n"] {
+        assert!(matches!(parse(text), Err(Error::Invalid(_))), "{text:?}");
+    }
 }

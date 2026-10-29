@@ -28,16 +28,89 @@ const MAX_DEPTH: usize = 10_000;
 pub fn parse(text: &str) -> Result<Value, Error> {
     characters(text)?;
     version(text)?;
-    let text = text.replace('\u{85}', "\n");
-    let mut events = Parser::new_from_str(&text).keep_tags(true);
+    let mut text = text.replace('\u{85}', "\n");
+    loop {
+        match read(&text) {
+            Ok(value) => return Ok(value),
+            Err(Stop::Error(error)) => return Err(error),
+            Err(Stop::Quoted(start, error)) => match indent_quoted(&text, start) {
+                Some(indented) => text = indented,
+                None => return Err(error),
+            },
+        }
+    }
+}
+
+enum Stop {
+    Error(Error),
+    Quoted(usize, Error),
+}
+
+impl From<Error> for Stop {
+    fn from(error: Error) -> Self {
+        Stop::Error(error)
+    }
+}
+
+fn read(text: &str) -> Result<Value, Stop> {
+    let mut events = Parser::new_from_str(text).keep_tags(true);
     loop {
         match next(&mut events)? {
             Event::StreamStart | Event::Nothing => {}
             Event::StreamEnd => return Ok(Value::Null),
             Event::DocumentStart(_) => return Reader::default().document(&mut events),
-            _ => return Err(invalid("unexpected content")),
+            _ => return Err(invalid("unexpected content").into()),
         }
     }
+}
+
+fn indent_quoted(text: &str, start: usize) -> Option<String> {
+    let (at, quote) = text.char_indices().nth(start)?;
+    if quote != '"' && quote != '\'' {
+        return None;
+    }
+    let column = text[..at]
+        .chars()
+        .rev()
+        .take_while(|c| *c != '\n' && *c != '\r')
+        .count();
+    let padding = " ".repeat(column + 1);
+    let mut out = String::with_capacity(text.len() + 64);
+    out.push_str(&text[..=at]);
+    let mut padded = false;
+    let mut rest = text[at + 1..].char_indices().peekable();
+    while let Some((i, c)) = rest.next() {
+        out.push(c);
+        match c {
+            '\\' if quote == '"' => {
+                if let Some((_, escaped)) = rest.next_if(|(_, e)| *e != '\n' && *e != '\r') {
+                    out.push(escaped);
+                }
+            }
+            '\'' if quote == '\'' && rest.peek().is_some_and(|(_, n)| *n == '\'') => {
+                rest.next();
+                out.push('\'');
+            }
+            _ if c == quote => {
+                out.push_str(&text[at + 1 + i + 1..]);
+                return padded.then_some(out);
+            }
+            '\n' | '\r' if !(c == '\r' && rest.peek().is_some_and(|(_, n)| *n == '\n')) => {
+                let line = &text[at + 1 + i + 1..];
+                let marker = (line.starts_with("---") || line.starts_with("..."))
+                    && line[3..]
+                        .chars()
+                        .next()
+                        .is_none_or(|n| " \t\r\n".contains(n));
+                if !marker {
+                    out.push_str(&padding);
+                    padded = true;
+                }
+            }
+            _ => {}
+        }
+    }
+    None
 }
 
 fn characters(text: &str) -> Result<(), Error> {
@@ -74,11 +147,14 @@ fn version(text: &str) -> Result<(), Error> {
     Ok(())
 }
 
-fn next<'a>(events: &mut Events<'a>) -> Result<Event<'a>, Error> {
+fn next<'a>(events: &mut Events<'a>) -> Result<Event<'a>, Stop> {
     match events.next_event() {
         Some(Ok((event, _))) => Ok(event),
-        Some(Err(e)) => Err(invalid(e.to_string())),
-        None => Err(invalid("unexpected end of the file")),
+        Some(Err(e)) if e.info() == "invalid indentation in quoted scalar" => {
+            Err(Stop::Quoted(e.marker().index(), invalid(e.to_string())))
+        }
+        Some(Err(e)) => Err(invalid(e.to_string()).into()),
+        None => Err(invalid("unexpected end of the file").into()),
     }
 }
 
@@ -121,7 +197,7 @@ struct Reader {
 }
 
 impl Reader {
-    fn document<'a>(mut self, events: &mut Events<'a>) -> Result<Value, Error> {
+    fn document<'a>(mut self, events: &mut Events<'a>) -> Result<Value, Stop> {
         self.decoded = 1;
         loop {
             let node = match next(events)? {
@@ -153,7 +229,7 @@ impl Reader {
                     self.decoded += 1 + anchor.size;
                     self.aliased += anchor.size;
                     if excessive(self.decoded, self.aliased) {
-                        return Err(Error::Refused("it uses too many aliases".to_string()));
+                        return Err(Error::Refused("it uses too many aliases".to_string()).into());
                     }
                     Node {
                         value: anchor.value.clone(),
@@ -188,10 +264,10 @@ impl Reader {
                     self.remember(frame.anchor, &node);
                     node
                 }
-                _ => return Err(invalid("unexpected content")),
+                _ => return Err(invalid("unexpected content").into()),
             };
             match self.frames.last_mut() {
-                None => return node.value,
+                None => return Ok(node.value?),
                 Some(frame) => {
                     frame.size += node.size;
                     place(&mut frame.collection, node)?;
