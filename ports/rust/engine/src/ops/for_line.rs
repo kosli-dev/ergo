@@ -1271,7 +1271,9 @@ fn same_names_by_place(inputs: &[Input]) -> Vec<Input> {
         }
         done.push(&input.name);
         let mut group: Vec<&Input> = inputs.iter().filter(|i| i.name == input.name).collect();
-        group.sort_by(|a, b| a.locations.cmp(&b.locations));
+        group.sort_by(|a, b| {
+            crate::subjects::order(&a.value, &b.value).then_with(|| a.locations.cmp(&b.locations))
+        });
         out.extend(group.into_iter().cloned());
     }
     out
@@ -1808,6 +1810,23 @@ mod tests {
             .unwrap();
         let names: Vec<&str> = inputs.iter().map(|i| i["name"].as_str().unwrap()).collect();
         assert_eq!(names, ["x.a", "y"]);
+    }
+
+    #[test]
+    fn inputs_with_the_same_name_are_ordered_by_value_before_their_locations() {
+        let found = row(
+            "some approvals.approver as approver",
+            json!(".approver equals approver"),
+            json!({"approver": "", "approvals": [{"approver": "grace"}]}),
+        );
+        let inputs = found["failed_items"][0]["failed_assertions"][0]["inputs"]
+            .as_array()
+            .unwrap();
+        let values: Vec<&str> = inputs
+            .iter()
+            .map(|i| i["value"].as_str().unwrap())
+            .collect();
+        assert_eq!(values, ["", "grace"]);
     }
 
     #[test]
