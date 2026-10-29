@@ -66,6 +66,10 @@ EXTRA = [
     ("check", "x\tis 1"),
     ("check", "x is\t1"),
     ("for-line", "every xs whose days elapsed from p to q is 1 as x"),
+    ("for-line", "t[0] as i"),
+    ("for-line", "t.u[1] as i"),
+    ("for-line", "every t as x, t[0] as i"),
+    ("for-line", "every t as x, t.u[1] as i"),
     ("check", "x is 1 plus days elapsed from p to q"),
     ("check", "every xs whose days elapsed from p to q is 1 is not empty"),
     ("check", 'x is "\\ud800"'),
@@ -164,7 +168,7 @@ def has_surrogate_escape(text):
 
 def mutate(rng, text):
     words = text.split()
-    kind = rng.choice(["drop_quote", "swap_words", "cut_end", "delete_char", "duplicate_word", "insert_punctuation", "replace_word", "uppercase_word"])
+    kind = rng.choice(["drop_quote", "swap_words", "cut_end", "delete_char", "duplicate_word", "insert_punctuation", "replace_word", "uppercase_word", "bracket_pick"])
     if kind == "drop_quote":
         spots = [i for i, c in enumerate(text) if c in "\"'"]
         if not spots:
@@ -190,6 +194,17 @@ def mutate(rng, text):
     if kind == "insert_punctuation":
         i = rng.randrange(len(text) + 1)
         return text[:i] + rng.choice(",.[]'\"$-") + text[i:]
+    if kind == "bracket_pick":
+        options = []
+        for m in re.finditer(r"\bitem +([1-9][0-9]*) +of +([^\s,]+)", text):
+            options.append(text[: m.start()] + m.group(2) + "[" + str(int(m.group(1)) - 1) + "]" + text[m.end() :])
+        for m in re.finditer(r"\bfirst +of +([^\s,]+)", text):
+            options.append(text[: m.start()] + m.group(1) + "[0]" + text[m.end() :])
+        for m in re.finditer(r"(?:^|, +)(every|some) +", text):
+            options.append(text[: m.start(1)] + text[m.end() :])
+        if not options:
+            return None
+        return rng.choice(options)
     if kind == "replace_word":
         i = rng.randrange(len(words))
         words[i] = rng.choice(GRAMMAR_WORDS + VOCABULARY)

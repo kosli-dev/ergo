@@ -1128,7 +1128,7 @@ With `for: some approvals.approver as approver`, where a commit also has an `app
 | `every commits.author does not equal .approver`  | each commit's `author` with its own `approver`   |
 | `.approver equals approver`                      | the subject's `approver` with the name           |
 
-A `for` item can start with a position instead of `every` or `some`, and then its alias stands for that one item: `first of commits`, `item 2 of commits`, `last of commits`, or `item 2 from last of commits`. Positions count from 1. Add `sorted by` and a field of each item to count in the order of that field rather than the order of the list. With this input:
+A `for` item can start with a position instead of `every` or `some`, and then its alias stands for that one item: `first of commits`, `item 2 of commits`, `last of commits`, or `item 2 from last of commits`. Positions count from 1. An index in brackets doesn't pick, so `commits[0] as c` is written wrong, with `for: an item starts with "every", "some" or a position, like "last of"`: write `first of commits as c`. Brackets after `every` or `some`, like `every commits[0].files as f`, are fine. Add `sorted by` and a field of each item to count in the order of that field rather than the order of the list. With this input:
 
 ```json
 {"pull_requests": [{"number": 7,

@@ -8492,6 +8492,36 @@ _picked_author(item, ts) := a if {
 	[row[1] | some row in _for_rows({"for": concat("", [item, " as c"]), "assert": concat("", [`c.author is "`, a, `"`])}, [{"id": 1, "commits": _commits(ts)}], {})] == ["satisfied"]
 }
 
+test_a_for_item_that_picks_with_brackets_is_written_wrong if {
+	msg := [`for: an item starts with "every", "some" or a position, like "last of"`]
+	_sentence_problems({"assert": "i exists", "for": "t[0] as i"}) == msg
+	_sentence_problems({"assert": "i exists", "for": "t[0].u as i"}) == msg
+	_sentence_problems({"assert": "i exists", "for": "t.u[1] as i"}) == msg
+	_sentence_problems({"assert": "i exists", "for": "every t as x, t[0] as i"}) == msg
+	_sentence_problems({"assert": "i exists", "for": "every t as x, t[0].u as i"}) == msg
+	_sentence_problems({"assert": "i exists", "for": "every t as x, t.u[1] as i"}) == msg
+}
+
+test_a_for_item_that_picks_with_brackets_still_lists_the_line_s_other_problems if {
+	_sentence_problems({"assert": "x exists", "for": "every t as x, t as x"}) == [
+		`for: an item starts with "every", "some" or a position, like "last of"`,
+		"for: x is given twice",
+	]
+	_sentence_problems({"assert": "x exists", "for": "every t as x, t[0] as x"}) == [
+		`for: an item starts with "every", "some" or a position, like "last of"`,
+		"for: x is given twice",
+	]
+}
+
+test_brackets_in_a_for_item_that_starts_with_every_some_or_a_position_are_read if {
+	"items" in object.keys(ergo._for_line("first of t as i"))
+	"items" in object.keys(ergo._for_line("some t[0] as i"))
+	"items" in object.keys(ergo._for_line("every t[0].u as i"))
+	"items" in object.keys(ergo._for_line("every t as x, some t[0] as i"))
+	"items" in object.keys(ergo._for_line("every t as x, every t[0].u as i"))
+	"items" in object.keys(ergo._for_line("every t as x, first of x.u as i"))
+}
+
 test_a_for_line_picks_an_item_by_its_position_as_written if {
 	_picked_author("first of commits", [3, 1, 2]) == "ada"
 	_picked_author("item 2 of commits", [3, 1, 2]) == "grace"
