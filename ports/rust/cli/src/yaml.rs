@@ -76,8 +76,7 @@ fn remember(anchors: &mut Anchors, anchor: usize, value: &Value) {
 }
 
 fn mapping<'a>(events: &mut Events<'a>, anchors: &mut Anchors) -> Result<Value, String> {
-    let mut explicit = Map::new();
-    let mut merged = Map::new();
+    let mut map = Map::new();
     loop {
         let first = match next(events)? {
             Event::MappingEnd => break,
@@ -89,27 +88,26 @@ fn mapping<'a>(events: &mut Events<'a>, anchors: &mut Anchors) -> Result<Value, 
         );
         if is_merge {
             let source = next(events)?;
-            merge(&mut merged, node(source, events, anchors)?)?;
+            merge(&mut map, node(source, events, anchors)?)?;
             continue;
         }
         let key = key(node(first, events, anchors)?)?;
         let source = next(events)?;
-        explicit.insert(key, node(source, events, anchors)?);
+        map.insert(key, node(source, events, anchors)?);
     }
-    merged.extend(explicit);
-    Ok(Value::Object(merged))
+    Ok(Value::Object(map))
 }
 
 fn merge(into: &mut Map<String, Value>, source: Value) -> Result<(), String> {
     match source {
         Value::Object(map) => {
             for (k, v) in map {
-                into.entry(k).or_insert(v);
+                into.insert(k, v);
             }
             Ok(())
         }
         Value::Array(items) if items.iter().all(Value::is_object) => {
-            for item in items {
+            for item in items.into_iter().rev() {
                 merge(into, item)?;
             }
             Ok(())
@@ -134,6 +132,8 @@ fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Value, St
         return match (core, tag.suffix.as_str()) {
             (true, "str") => Ok(Value::String(text.to_string())),
             (true, "int" | "float" | "bool" | "null") => resolve(text),
+            (true, "timestamp") => Ok(Value::String(text.to_string())),
+            (true, "binary") => base64(text).map(Value::String),
             _ => Err(format!(
                 "the tag {}{} isn't supported",
                 tag.handle, tag.suffix
@@ -262,4 +262,42 @@ fn float(negative: bool, body: &str) -> Option<String> {
     }
     out.push_str(exponent);
     Some(out)
+}
+
+fn base64(text: &str) -> Result<String, String> {
+    let mut bytes = Vec::new();
+    let mut bits: u32 = 0;
+    let mut count = 0;
+    let mut padding = 0;
+    for c in text.chars().filter(|c| !c.is_whitespace()) {
+        let digit = match c {
+            'A'..='Z' => c as u32 - 'A' as u32,
+            'a'..='z' => c as u32 - 'a' as u32 + 26,
+            '0'..='9' => c as u32 - '0' as u32 + 52,
+            '+' | '-' => 62,
+            '/' | '_' => 63,
+            '=' => {
+                padding += 1;
+                continue;
+            }
+            _ => return Err("!!binary isn't base64".to_string()),
+        };
+        if padding > 0 {
+            return Err("!!binary isn't base64".to_string());
+        }
+        bits = bits << 6 | digit;
+        count += 1;
+        if count == 4 {
+            bytes.extend([(bits >> 16) as u8, (bits >> 8) as u8, bits as u8]);
+            bits = 0;
+            count = 0;
+        }
+    }
+    match count {
+        0 => {}
+        2 => bytes.push((bits >> 4) as u8),
+        3 => bytes.extend([(bits >> 10) as u8, (bits >> 2) as u8]),
+        _ => return Err("!!binary isn't base64".to_string()),
+    }
+    Ok(String::from_utf8_lossy(&bytes).into_owned())
 }

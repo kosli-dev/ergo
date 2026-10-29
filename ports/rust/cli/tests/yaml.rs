@@ -165,6 +165,25 @@ fn explicit_tags() {
 }
 
 #[test]
+fn a_timestamp_tag_keeps_the_text() {
+    assert_eq!(
+        parse("v: !!timestamp 2026-10-29\n").unwrap()["v"],
+        json!("2026-10-29")
+    );
+}
+
+#[test]
+fn a_binary_tag_is_decoded_from_base64() {
+    assert_eq!(parse("v: !!binary aGk=\n").unwrap()["v"], json!("hi"));
+    assert_eq!(
+        parse("v: !!binary |\n  aG\n  k=\n").unwrap()["v"],
+        json!("hi")
+    );
+    assert_eq!(parse("v: !!binary /w==\n").unwrap()["v"], json!("\u{fffd}"));
+    assert!(parse("v: !!binary '!!!'\n").is_err());
+}
+
+#[test]
 fn anchors_aliases_and_merge_keys() {
     let v = parse("base: &b\n  k: 1\ncopy: *b\nmerged:\n  <<: *b\n  j: 2\n").unwrap();
     assert_eq!(
@@ -174,16 +193,22 @@ fn anchors_aliases_and_merge_keys() {
 }
 
 #[test]
-fn explicit_keys_beat_merged_ones() {
-    let v = parse("b: &b\n  k: 1\nm:\n  k: 2\n  <<: *b\no:\n  <<: *b\n  k: 3\n").unwrap();
-    assert_eq!(v["m"], json!({"k": 2}));
-    assert_eq!(v["o"], json!({"k": 3}));
+fn merge_keys_follow_document_order() {
+    let v = parse("b: &b\n  k: 1\n  j: 1\nm:\n  k: 2\n  <<: *b\no:\n  <<: *b\n  k: 3\n").unwrap();
+    assert_eq!(v["m"], json!({"k": 1, "j": 1}));
+    assert_eq!(v["o"], json!({"k": 3, "j": 1}));
 }
 
 #[test]
 fn earlier_maps_in_a_merge_list_win() {
     let v = parse("a: &a {k: 1}\nb: &b {k: 2, j: 3}\nm:\n  <<: [*a, *b]\n").unwrap();
     assert_eq!(v["m"], json!({"k": 1, "j": 3}));
+}
+
+#[test]
+fn the_first_map_of_a_merge_list_wins_over_a_later_explicit_key_only_before_it() {
+    let v = parse("a: &a {k: 1}\nb: &b {k: 2, z: 3}\nm:\n  <<: [*a, *b]\n").unwrap();
+    assert_eq!(v["m"], json!({"k": 1, "z": 3}));
 }
 
 #[test]
