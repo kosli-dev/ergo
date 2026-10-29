@@ -5065,10 +5065,14 @@ _s_assertion_of(text, pat) := out if {
 _s_for_item_of(text, pat) := out if {
 	m := regex.find_all_string_submatch_n(pat.for_item, text, 1)[0]
 	out := object.union(
-		{_s_item_word(m[1]): _s_path_of(m[2], pat), "as": m[7]},
+		{_s_item_word(m[1]): _s_item_path_of(m[1], m[2], pat), "as": m[7]},
 		object.union(object.union(_s_where_of(m[3], pat), _s_if_any(m[6])), _s_sorted_by(m[4], m[5], pat)),
 	)
 }
+
+_s_item_path_of("", text, pat) := _s_unlifted_path_of(text, pat)
+
+_s_item_path_of(q, text, pat) := _s_path_of(text, pat) if q != ""
 
 _s_item_word("") := "pick"
 

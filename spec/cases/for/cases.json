@@ -11677,5 +11677,506 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for item that picks with brackets: t[0] as i",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "t[0] as i",
+              "assert": "i exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "t": [
+                {
+                  "u": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "u": [
+                    3
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: an item starts with \"every\", \"some\" or a position, like \"last of\""
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item that picks with brackets: t.u[1] as i",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "t.u[1] as i",
+              "assert": "i exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "t": [
+                {
+                  "u": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "u": [
+                    3
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: an item starts with \"every\", \"some\" or a position, like \"last of\""
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item that picks with brackets: every t as x, t[0] as i",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every t as x, t[0] as i",
+              "assert": "i exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "t": [
+                {
+                  "u": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "u": [
+                    3
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: an item starts with \"every\", \"some\" or a position, like \"last of\""
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item that picks with brackets: every t as x, t.u[1] as i",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every t as x, t.u[1] as i",
+              "assert": "i exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "t": [
+                {
+                  "u": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "u": [
+                    3
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "checks.c",
+                "value": [
+                  "for: an item starts with \"every\", \"some\" or a position, like \"last of\""
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item that is read as before: first of t as i",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "first of t as i",
+              "assert": "i exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes, and its input is where the item is",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "t": [
+                {
+                  "u": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "u": [
+                    3
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t/0"
+                ],
+                "name": "item 1 of t",
+                "value": {
+                  "u": [
+                    1,
+                    2
+                  ]
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item that is read as before: every t[0].u as i",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every t[0].u as i",
+              "assert": "i exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes, and its input is where the item is",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "t": [
+                {
+                  "u": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "u": [
+                    3
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/t/0/u/0",
+                  "/things/0/t/0/u/1"
+                ],
+                "name": "t[0].u[]",
+                "value": [
+                  1,
+                  2
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
