@@ -93,9 +93,11 @@ docker run --rm -v "$REPO":/src -v "$PWD":/work -v ergo-rust-target:/target -v e
 ]
 ```
 
-`--params <file>` gives the policy its params, and without it they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. The command exits 0 whenever it printed a report, even when `compliant` is `false`. It exits 1 when a file can't be read or parsed and 2 when the command line is wrong, and says why on one line of stderr. `ergo --version` prints the version.
+`--params <file>` gives the policy its params. The file holds the params themselves, like `limit: 9`, without a `params:` key around them, and without `--params` they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. The command exits 0 whenever it printed a report, even when `compliant` is `false`. It exits 1 when a file can't be read or parsed and 2 when the command line is wrong, and says why on one line of stderr. `ergo --version` prints the version.
 
-YAML is read the way OPA reads it: `yes`, `no`, `on` and `off` are booleans, `010` is 8, `0x10` is 16, dates stay strings, `<<` merges, and only the first document counts. Numbers keep the digits they were written with, so `1.10` stays `1.10` and a number too big for a float stays a number.
+YAML is read the way OPA reads it: `yes`, `no`, `on` and `off` are booleans, `010` is 8, `0x10` is 16, dates stay strings, `<<` merges, and only the first document counts. A file OPA refuses is refused too, like one with a control character, a tag that doesn't fit its value like `!!int 1.5`, more than 10,000 levels of nesting, or too many aliases.
+
+Numbers are the one difference. `ergo` keeps a number as it was written, and OPA turns it into a 64-bit float, so `1.10` stays `1.10` where OPA reads 1.1. Outside the range of a float this changes more than the digits: OPA reads `1e400` as the string `"1e400"` and `1e-400` as 0, and `ergo` reads both as the numbers written. So with `size: 1e400`, `size is at least 5` passes in `ergo` and fails in `ergo.rego`, and with `size: 1e-400`, `size is more than 0` does the same.
 
 ## Building for a browser
 

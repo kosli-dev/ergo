@@ -1,4 +1,4 @@
-//! Reads YAML the way OPA 1.20.2 does: YAML 1.1 words and numbers, `<<` merge keys, the last of a repeated key, and only the first document.
+//! Reads YAML the way OPA 1.20.2 does: YAML 1.1 words and numbers, `<<` merge keys, the last of a repeated key, only the first document, and the files OPA refuses. Numbers are the one difference: they keep the digits they were written with, so `1e400` is a number here and the string `"1e400"` in OPA, and `1e-400` isn't 0.
 
 use crate::number::number;
 use saphyr_parser::{Event, Parser, ScalarStyle, Tag};
