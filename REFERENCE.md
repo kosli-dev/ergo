@@ -609,7 +609,7 @@ prod_deploy:
 | `meta`         | Anything else you want to keep with the requirement, like a control id or an owner. It's copied into the report. Ergo never reads it. | `{}`      |
 | `subject`      | The name of the [subject](#subjects) it checks.                                                                                       | required  |
 | `require`      | `"every"`: every subject must pass every check. `"some"`: at least one subject must pass every check.                                 | `"every"` |
-| `min_subjects` | How many subjects must be left after the subject's conditions for the requirement to be met.                                          | `1`       |
+| `min_subjects` | How many subjects must be left after the subject's conditions for the requirement to be met, from 0 to 1,000,000.                     | `1`       |
 | `checks`       | Named checks that each subject must pass.                                                                                             | required  |
 
 A few details:
@@ -621,7 +621,7 @@ A few details:
 - So is a requirement with a check named like one of Ergo's own rows, `$well_formed`, `$min_subjects`, `$unique_ids` or `$applies`, so no two rows share a check's name. The `$well_formed` row says `{"name": "checks.$applies", "value": ["name reserved"], "locations": []}`, and the requirement's entry in `requirements` lists Ergo's check of that name, not yours.
 - So is a requirement without a `subject`, or whose `subject` isn't in `subjects`, like a typo for `deploymnt`. The `$well_formed` row says `{"name": "subject", "value": ["missing"], "locations": []}` or `{"name": "subject", "value": ["not in subjects"], "locations": []}`. If `subjects` itself isn't an object, every requirement that names a subject fails with `{"name": "subjects", "value": ["not an object"], "locations": []}`.
 - So is a requirement with a field that isn't in the table above, like `from` or `requires`, because Ergo would otherwise ignore it and check something you didn't mean. `from` and `identified_by` belong to the [subject](#subjects). The `$well_formed` row lists each one in order and says what's wrong with it, the way it does for a [check that's written wrong](#checks-ergo-adds), like `{"name": "from", "value": ["unknown field"], "locations": []}`.
-- So is a requirement that isn't an object, or whose `checks` isn't an object, whose `min_subjects` isn't a whole number of 0 or more, whose `subject` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it, whose `description` isn't a string, or whose `meta` isn't an object. `null` counts as the wrong type, except for `description` and `meta`: Ergo only copies those, so a `null` one counts as not written, which is what YAML gives for an empty `description:`. `2.0` is a whole number, but `-1` and `0.5` aren't. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and what it should be, like `{"name": "checks", "value": ["not an object"], "locations": []}`, or the whole requirement and its value, like `{"name": "requirement", "value": 5, "locations": []}`.
+- So is a requirement that isn't an object, or whose `checks` isn't an object, whose `min_subjects` isn't a whole number from 0 to 1,000,000, whose `subject` isn't a string with something besides whitespace in it, since rows and descriptions name the subject by it, whose `description` isn't a string, or whose `meta` isn't an object. `null` counts as the wrong type, except for `description` and `meta`: Ergo only copies those, so a `null` one counts as not written, which is what YAML gives for an empty `description:`. `2.0` is a whole number, but `-1` and `0.5` aren't, and `1000001` is too big. It still has its entry in `requirements` and its `$well_formed` row, which shows each such field and what it should be, like `{"name": "checks", "value": ["not an object"], "locations": []}`, or the whole requirement and its value, like `{"name": "requirement", "value": 5, "locations": []}`.
 
 ### A requirement that only applies sometimes
 
@@ -1704,7 +1704,7 @@ the inputs are:
 "inputs": [
   { "name": "count(checks)", "value": 0, "locations": [] },
   { "name": "checks", "value": ["empty"], "locations": [] },
-  { "name": "min_subjects", "value": ["not a whole number of 0 or more"], "locations": [] },
+  { "name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": [] },
   { "name": "require", "value": ["neither every nor some"], "locations": [] },
   { "name": "zz", "value": ["unknown field"], "locations": [] }
 ]
@@ -1716,7 +1716,7 @@ the inputs are:
 | `checks`                                       | `not an object`, `holds a key that isn't a string`, `missing`, `empty`                                                                                                                                                                                 |
 | `checks.$applies` and Ergo's other rows        | `name reserved`                                                                                                                                                                                                                                        |
 | `require`                                      | `neither every nor some`                                                                                                                                                                                                                               |
-| `min_subjects`                                 | `not a whole number of 0 or more`, `number out of range`                                                                                                                                                                                               |
+| `min_subjects`                                 | `not a whole number from 0 to 1000000`, `number out of range`                                                                                                                                                                                          |
 | `subject`                                      | `missing`, `empty or not a string`, `not in subjects`                                                                                                                                                                                                  |
 | `subjects`                                     | `not an object`                                                                                                                                                                                                                                        |
 | `subjects.deployment`                          | `not an object`                                                                                                                                                                                                                                        |

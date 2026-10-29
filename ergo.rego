@@ -147,6 +147,7 @@ _has_type("identified_by", v) if is_string(v)
 _has_type("min_subjects", v) if {
 	is_number(v)
 	v >= 0
+	v <= 1000000
 	v == floor(v)
 }
 
@@ -224,7 +225,7 @@ _not_an_object_inputs(req) := [] if is_object(req)
 
 _wrong_type_problems := {
 	"checks": "not an object",
-	"min_subjects": "not a whole number of 0 or more",
+	"min_subjects": "not a whole number from 0 to 1000000",
 	"subject": "empty or not a string",
 	"description": "not a string",
 	"meta": "not an object",
