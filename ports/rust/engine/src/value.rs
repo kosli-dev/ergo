@@ -137,8 +137,8 @@ fn parse_exponent(text: &str) -> Option<i128> {
         return None;
     }
     let trimmed = digits.trim_start_matches('0');
-    let magnitude: i128 = if trimmed.len() > 30 {
-        10i128.pow(30)
+    let magnitude: i128 = if trimmed.len() > 36 {
+        return None;
     } else if trimmed.is_empty() {
         0
     } else {
@@ -169,6 +169,15 @@ pub fn is_readable(number: &serde_json::Number) -> bool {
     decimal_of(number).is_some()
 }
 
+pub fn all_readable(value: &Value) -> bool {
+    match value {
+        Value::Number(number) => is_readable(number),
+        Value::Array(items) => items.iter().all(all_readable),
+        Value::Object(map) => map.values().all(all_readable),
+        _ => true,
+    }
+}
+
 pub fn compare_decimals(a: &Decimal, b: &Decimal) -> Ordering {
     match (a.is_zero(), b.is_zero()) {
         (true, true) => return Ordering::Equal,
@@ -196,22 +205,31 @@ pub fn compare_decimals(a: &Decimal, b: &Decimal) -> Ordering {
     }
 }
 
-pub fn equal(a: &Value, b: &Value) -> bool {
+pub fn equal(a: &Value, b: &Value) -> Option<bool> {
     match (a, b) {
-        (Value::Null, Value::Null) => true,
-        (Value::Bool(x), Value::Bool(y)) => x == y,
-        (Value::Number(x), Value::Number(y)) => match (decimal_of(x), decimal_of(y)) {
-            (Some(p), Some(q)) => compare_decimals(&p, &q) == Ordering::Equal,
-            _ => false,
-        },
-        (Value::String(x), Value::String(y)) => x == y,
-        (Value::Array(x), Value::Array(y)) => {
-            x.len() == y.len() && x.iter().zip(y).all(|(p, q)| equal(p, q))
+        (Value::Null, Value::Null) => Some(true),
+        (Value::Bool(x), Value::Bool(y)) => Some(x == y),
+        (Value::Number(x), Value::Number(y)) => Some(compare_numbers(x, y)? == Ordering::Equal),
+        (Value::String(x), Value::String(y)) => Some(x == y),
+        (Value::Array(x), Value::Array(y)) if x.len() == y.len() => {
+            all_equal(x.iter().zip(y).map(|(p, q)| equal(p, q)))
         }
-        (Value::Object(x), Value::Object(y)) => {
-            x.len() == y.len() && x.iter().all(|(k, v)| y.get(k).is_some_and(|w| equal(v, w)))
-        }
-        _ => false,
+        (Value::Object(x), Value::Object(y)) if x.len() == y.len() => all_equal(
+            x.iter()
+                .map(|(k, v)| y.get(k).map_or(Some(false), |w| equal(v, w))),
+        ),
+        _ => Some(false),
+    }
+}
+
+fn all_equal(pairs: impl Iterator<Item = Option<bool>>) -> Option<bool> {
+    let pairs: Vec<Option<bool>> = pairs.collect();
+    if pairs.contains(&Some(false)) {
+        Some(false)
+    } else if pairs.contains(&None) {
+        None
+    } else {
+        Some(true)
     }
 }
 
@@ -280,6 +298,10 @@ mod tests {
         serde_json::from_str(text).unwrap()
     }
 
+    fn eq(a: &Value, b: &Value) -> bool {
+        equal(a, b).unwrap()
+    }
+
     fn num(text: &str) -> serde_json::Number {
         match v(text) {
             Value::Number(n) => n,
@@ -290,13 +312,13 @@ mod tests {
     #[test]
     fn one_written_four_ways_is_equal() {
         for other in ["1.0", "1e0", "10e-1", "0.1e1", "1.000"] {
-            assert!(equal(&v("1"), &v(other)), "{other}");
+            assert!(eq(&v("1"), &v(other)), "{other}");
         }
     }
 
     #[test]
     fn numbers_past_a_float_are_compared_exactly() {
-        assert!(!equal(&v("9007199254740993"), &v("9007199254740992")));
+        assert!(!eq(&v("9007199254740993"), &v("9007199254740992")));
         assert_eq!(
             compare_numbers(&num("9007199254740993"), &num("9007199254740992")),
             Some(Ordering::Greater)
@@ -305,9 +327,9 @@ mod tests {
 
     #[test]
     fn huge_exponents_are_compared_without_a_float() {
-        assert!(equal(&v("1e400"), &v("10e399")));
-        assert!(!equal(&v("1e400"), &v("1e401")));
-        assert!(equal(&v("1e-400"), &v("10e-401")));
+        assert!(eq(&v("1e400"), &v("10e399")));
+        assert!(!eq(&v("1e400"), &v("1e401")));
+        assert!(eq(&v("1e-400"), &v("10e-401")));
         assert_eq!(
             compare_numbers(&num("1e400"), &num("1e399")),
             Some(Ordering::Greater)
@@ -319,22 +341,68 @@ mod tests {
     }
 
     #[test]
-    fn an_exponent_too_big_for_any_integer_still_orders() {
-        let big = "1e99999999999999999999999999999999999999999";
+    fn an_exponent_of_36_digits_orders_exactly() {
+        let low = format!("1e1{}", "0".repeat(35));
+        let high = format!("1e1{}1", "0".repeat(34));
         assert_eq!(
-            compare_numbers(&num(big), &num("1e400")),
+            compare_numbers(&num(&high), &num(&low)),
             Some(Ordering::Greater)
         );
         assert_eq!(
-            compare_numbers(&num("1e400"), &num(big)),
+            compare_numbers(&num(&low), &num(&high)),
+            Some(Ordering::Less)
+        );
+        assert_eq!(
+            compare_numbers(
+                &num(&format!("1e-1{}1", "0".repeat(34))),
+                &num(&format!("1e-1{}", "0".repeat(35)))
+            ),
             Some(Ordering::Less)
         );
     }
 
     #[test]
+    fn exponents_of_31_digits_that_differ_in_the_last_digit_are_not_equal() {
+        let low = "1e1000000000000000000000000000000";
+        let high = "1e1000000000000000000000000000001";
+        assert_eq!(
+            compare_numbers(&num(high), &num(low)),
+            Some(Ordering::Greater)
+        );
+        assert_eq!(equal(&v(low), &v(high)), Some(false));
+    }
+
+    #[test]
+    fn a_number_whose_exponent_has_more_than_36_digits_cannot_be_read() {
+        let big = format!("1e1{}", "0".repeat(36));
+        assert_eq!(compare_numbers(&num(&big), &num("1e400")), None);
+        assert_eq!(compare_numbers(&num(&big), &num(&big)), None);
+        assert_eq!(equal(&v(&big), &v(&big)), None);
+        assert_eq!(
+            equal(&v(&format!("[{big}]")), &v(&format!("[{big}]"))),
+            None
+        );
+        assert!(!is_readable(&num(&format!("1e-1{}", "0".repeat(36)))));
+    }
+
+    #[test]
+    fn values_that_differ_elsewhere_are_unequal_even_with_a_number_that_cannot_be_read() {
+        let big = format!("1e1{}", "0".repeat(36));
+        assert_eq!(
+            equal(&v(&format!("[{big}, 1]")), &v(&format!("[{big}, 2]"))),
+            Some(false)
+        );
+        assert_eq!(
+            equal(&v(&format!("[{big}]")), &v(&format!("[{big}, 1]"))),
+            Some(false)
+        );
+        assert_eq!(equal(&v(&big), &v("\"a\"")), Some(false));
+    }
+
+    #[test]
     fn zero_is_zero_however_it_is_written() {
         for zero in ["0", "0.0", "-0", "0e5", "-0.000e-3"] {
-            assert!(equal(&v("0"), &v(zero)), "{zero}");
+            assert!(eq(&v("0"), &v(zero)), "{zero}");
         }
     }
 
@@ -365,42 +433,36 @@ mod tests {
 
     #[test]
     fn a_string_never_equals_a_number() {
-        assert!(!equal(&v("\"1\""), &v("1")));
+        assert!(!eq(&v("\"1\""), &v("1")));
     }
 
     #[test]
     fn types_never_equal_each_other() {
-        assert!(!equal(&v("null"), &v("false")));
-        assert!(!equal(&v("0"), &v("false")));
-        assert!(!equal(&v("[]"), &v("{}")));
-        assert!(!equal(&v("null"), &v("0")));
+        assert!(!eq(&v("null"), &v("false")));
+        assert!(!eq(&v("0"), &v("false")));
+        assert!(!eq(&v("[]"), &v("{}")));
+        assert!(!eq(&v("null"), &v("0")));
     }
 
     #[test]
     fn lists_compare_in_order_and_by_length() {
-        assert!(equal(&v("[1, 2]"), &v("[1.0, 2e0]")));
-        assert!(!equal(&v("[1, 2]"), &v("[2, 1]")));
-        assert!(!equal(&v("[1]"), &v("[1, 1]")));
+        assert!(eq(&v("[1, 2]"), &v("[1.0, 2e0]")));
+        assert!(!eq(&v("[1, 2]"), &v("[2, 1]")));
+        assert!(!eq(&v("[1]"), &v("[1, 1]")));
     }
 
     #[test]
     fn objects_compare_by_keys_whatever_their_order() {
-        assert!(equal(
-            &v("{\"a\": 1, \"b\": 2}"),
-            &v("{\"b\": 2.0, \"a\": 1}")
-        ));
-        assert!(!equal(&v("{\"a\": 1}"), &v("{\"a\": 1, \"b\": 2}")));
-        assert!(!equal(
-            &v("{\"a\": 1, \"b\": 2}"),
-            &v("{\"a\": 1, \"c\": 2}")
-        ));
-        assert!(!equal(&v("{\"a\": null}"), &v("{\"b\": null}")));
+        assert!(eq(&v("{\"a\": 1, \"b\": 2}"), &v("{\"b\": 2.0, \"a\": 1}")));
+        assert!(!eq(&v("{\"a\": 1}"), &v("{\"a\": 1, \"b\": 2}")));
+        assert!(!eq(&v("{\"a\": 1, \"b\": 2}"), &v("{\"a\": 1, \"c\": 2}")));
+        assert!(!eq(&v("{\"a\": null}"), &v("{\"b\": null}")));
     }
 
     #[test]
     fn strings_compare_by_code_points() {
-        assert!(equal(&v("\"\\u00e9\""), &v("\"é\"")));
-        assert!(!equal(&v("\"e\\u0301\""), &v("\"é\"")));
+        assert!(eq(&v("\"\\u00e9\""), &v("\"é\"")));
+        assert!(!eq(&v("\"e\\u0301\""), &v("\"é\"")));
     }
 
     #[test]

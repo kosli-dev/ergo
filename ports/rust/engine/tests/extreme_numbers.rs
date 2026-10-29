@@ -135,3 +135,166 @@ fn no_numeric_operator_panics_or_gives_a_cause_the_spec_lacks_on_extreme_numbers
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
+
+fn cause_of(sentence: &str, things: &str) -> String {
+    let policy = json!({
+        "ergo_spec": "v0.3-dev",
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": sentence}}}
+    });
+    let input: Value = serde_json::from_str(&format!(r#"{{"things": [{things}]}}"#)).unwrap();
+    let report = ergo_engine::report(&input, &policy, &json!({}));
+    let results = report["results"].as_array().unwrap();
+    let row = results
+        .iter()
+        .find(|r| r["check"] == "c")
+        .unwrap_or_else(|| panic!("{report}"));
+    row["cause"].as_str().unwrap().to_string()
+}
+
+#[test]
+fn exponents_of_31_digits_that_differ_in_the_last_digit_are_compared_exactly() {
+    let things = r#"{"id": "t", "fa": 1e1000000000000000000000000000000, "fb": 1e1000000000000000000000000000001}"#;
+    assert_eq!(cause_of("fa is at least fb", things), "value");
+    assert_eq!(cause_of("fa is fb", things), "value");
+    assert_eq!(cause_of("fa is not fb", things), "satisfied");
+}
+
+#[test]
+fn a_number_whose_exponent_has_more_than_36_digits_fails_every_comparison_as_unusable() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let bigger = format!("1e1{}1", "0".repeat(35));
+    let things = format!(r#"{{"id": "t", "fa": {big}, "fb": {bigger}, "fl": [{big}]}}"#);
+    for sentence in [
+        "fa is at least fb",
+        "fa is less than fb",
+        "fa is fb",
+        "fa is not fb",
+        "fa equals fb",
+        "fa does not equal fb",
+        "fa is 1",
+        "fa is not one of 1, 2",
+        "fl contains fb",
+        "fl does not contain fb",
+        "fl does not contain 1",
+    ] {
+        assert_eq!(cause_of(sentence, &things), "unusable", "{sentence}");
+    }
+}
+
+fn permutations(items: &[String]) -> Vec<Vec<String>> {
+    if items.len() <= 1 {
+        return vec![items.to_vec()];
+    }
+    let mut all = Vec::new();
+    for i in 0..items.len() {
+        let mut rest = items.to_vec();
+        let first = rest.remove(i);
+        for mut tail in permutations(&rest) {
+            tail.insert(0, first.clone());
+            all.push(tail);
+        }
+    }
+    all
+}
+
+fn unique_ids_row(ids: &[String]) -> Value {
+    let things: Vec<String> = ids
+        .iter()
+        .map(|id| format!(r#"{{"id": {id}, "fa": 1}}"#))
+        .collect();
+    let policy = json!({
+        "ergo_spec": "v0.3-dev",
+        "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+        "requirements": {"r": {"subject": "thing", "checks": {"c": "fa is 1"}}}
+    });
+    let input: Value =
+        serde_json::from_str(&format!(r#"{{"things": [{}]}}"#, things.join(", "))).unwrap();
+    let report = ergo_engine::report(&input, &policy, &json!({}));
+    report["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|r| r["check"] == "$unique_ids")
+        .unwrap_or_else(|| panic!("{report}"))
+        .clone()
+}
+
+fn repeated_ids_named(row: &Value) -> Vec<String> {
+    row["inputs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|i| {
+            i["name"]
+                .as_str()
+                .is_some_and(|n| n.starts_with("repeated"))
+        })
+        .unwrap_or_else(|| panic!("{row}"))["value"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.to_string())
+        .collect()
+}
+
+#[test]
+fn ids_that_cannot_be_read_are_named_as_repeated_in_the_same_order_whatever_the_input_order() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let bigger = format!("1e1{}1", "0".repeat(35));
+    let ids: Vec<String> = ["2", "10", &big, "3", &bigger, "3", &big]
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+    let mut seen = std::collections::BTreeSet::new();
+    for order in permutations(&ids) {
+        let row = unique_ids_row(&order);
+        assert_eq!(row["passed"], false, "{row}");
+        seen.insert(repeated_ids_named(&row));
+    }
+    assert_eq!(seen.len(), 1, "{seen:?}");
+    let named = seen.into_iter().next().unwrap();
+    assert_eq!(named.len(), 3, "{named:?}");
+    assert!(named.contains(&"3".to_string()), "{named:?}");
+    assert!(
+        !named.contains(&"2".to_string()) && !named.contains(&"10".to_string()),
+        "{named:?}"
+    );
+}
+
+#[test]
+fn one_id_that_cannot_be_read_fails_unique_ids_and_names_only_itself() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let ids: Vec<String> = ["5", "20", &big, "100", "7", "\"x\"", "-3"]
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+    for order in permutations(&ids).into_iter().step_by(97) {
+        let row = unique_ids_row(&order);
+        assert_eq!(row["passed"], false, "{row}");
+        let named = repeated_ids_named(&row);
+        assert_eq!(named.len(), 1, "{named:?}");
+        assert!(named[0].contains("e"), "{named:?}");
+    }
+}
+
+#[test]
+fn within_fails_as_unusable_when_it_cannot_work_the_gap_out_exactly() {
+    let tiny = r#"{"id": "t", "fa": 1e-1000000000000000000000000000000, "fb": 0}"#;
+    assert_eq!(cause_of("fa equals fb within 0", tiny), "unusable");
+    assert_eq!(cause_of("fa is 0 within 0", tiny), "unusable");
+    let spread = r#"{"id": "t", "fa": 1e-5000, "fb": 0}"#;
+    assert_eq!(cause_of("fa equals fb within 0", spread), "unusable");
+    let big = format!("1e1{}", "0".repeat(36));
+    let unreadable = format!(r#"{{"id": "t", "fa": {big}, "fb": {big}}}"#);
+    assert_eq!(cause_of("fa equals fb within 1", &unreadable), "unusable");
+    let near = r#"{"id": "t", "fa": 1e-300, "fb": 0}"#;
+    assert_eq!(cause_of("fa equals fb within 0", near), "value");
+    assert_eq!(cause_of("fa equals fb within 1e-300", near), "satisfied");
+}
+
+#[test]
+fn within_does_not_overflow_on_exponents_at_both_ends_of_what_it_reads() {
+    let ends = r#"{"id": "t", "fa": 1e9000000000000000000, "fb": 1e-9000000000000000000}"#;
+    assert_eq!(cause_of("fa equals fb within 1", ends), "unusable");
+}

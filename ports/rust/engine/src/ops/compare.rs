@@ -109,14 +109,16 @@ pub fn run(check: &Compare, ctx: &Ctx) -> Verdict {
 fn compared(check: &Compare, l: &Value, r: &Value) -> Cause {
     if let Some(distance) = &check.within {
         return match (l, r) {
-            (Value::Number(a), Value::Number(b)) => verdict(within(a, b, distance)),
+            (Value::Number(a), Value::Number(b)) => {
+                within(a, b, distance).map_or(Cause::Unusable, verdict)
+            }
             _ => Cause::Unusable,
         };
     }
     match check.cmp {
         Cmp::Eq | Cmp::Ne if value::type_name(l) != value::type_name(r) => Cause::Unusable,
-        Cmp::Eq => verdict(value::equal(l, r)),
-        Cmp::Ne => verdict(!value::equal(l, r)),
+        Cmp::Eq => value::equal(l, r).map_or(Cause::Unusable, verdict),
+        Cmp::Ne => value::equal(l, r).map_or(Cause::Unusable, |same| verdict(!same)),
         Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => match (l, r) {
             (Value::Number(a), Value::Number(b)) => value::compare_numbers(a, b)
                 .map_or(Cause::Unusable, |order| verdict(ordered(check.cmp, order))),
@@ -250,15 +252,13 @@ fn trimmed(mut reversed: Vec<u8>) -> String {
     String::from_utf8(reversed).unwrap_or_default()
 }
 
-fn within(a: &Number, b: &Number, distance: &Number) -> bool {
-    let (Some(x), Some(y), Some(w)) = (exact(a), exact(b), exact(distance)) else {
-        return within_as_floats(a, b, distance);
-    };
+fn within(a: &Number, b: &Number, distance: &Number) -> Option<bool> {
+    let (x, y, w) = (exact(a)?, exact(b)?, exact(distance)?);
     let exponents = [x.exponent, y.exponent, w.exponent];
     let low = exponents.iter().copied().min().unwrap_or(0);
     let high = exponents.iter().copied().max().unwrap_or(0);
-    if high - low > WIDEST_EXACT_SPREAD {
-        return within_as_floats(a, b, distance);
+    if high.checked_sub(low)? > WIDEST_EXACT_SPREAD {
+        return None;
     }
     let (sx, sy, sw) = (scaled(&x, low), scaled(&y, low), scaled(&w, low));
     let gap = if x.negative != y.negative {
@@ -268,12 +268,7 @@ fn within(a: &Number, b: &Number, distance: &Number) -> bool {
     } else {
         subtract_magnitudes(&sx, &sy)
     };
-    magnitude_order(&gap, &sw) != Ordering::Greater
-}
-
-fn within_as_floats(a: &Number, b: &Number, distance: &Number) -> bool {
-    let float = |n: &Number| n.to_string().parse::<f64>().unwrap_or(f64::NAN);
-    (float(a) - float(b)).abs() <= float(distance)
+    Some(magnitude_order(&gap, &sw) != Ordering::Greater)
 }
 
 pub fn joined<A, B>(
@@ -614,15 +609,15 @@ mod tests {
     }
 
     #[test]
-    fn within_falls_back_to_floats_for_numbers_far_outside_what_a_float_keeps() {
+    fn within_fails_as_unusable_when_the_numbers_are_too_far_apart_to_work_out_exactly() {
         let c = Compare {
             left: field("a"),
             right: Side::Value(parsed("1e-9000")),
             cmp: Cmp::Eq,
             within: Some(number("1")),
         };
-        assert_eq!(cause(json!({"a": parsed("1e9000")}), &c), Cause::Value);
-        assert_eq!(cause(json!({"a": parsed("0.5")}), &c), Cause::Satisfied);
+        assert_eq!(cause(json!({"a": parsed("1e9000")}), &c), Cause::Unusable);
+        assert_eq!(cause(json!({"a": parsed("0.5")}), &c), Cause::Unusable);
     }
 
     #[test]
