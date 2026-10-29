@@ -12,6 +12,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ### Fixed
 
+- A child subject whose parent isn't an object, `null` included, fails `$min_subjects` as `not_an_object`, as [subjects.chain.not_an_object](semantics.md#requirements) now says. The spec didn't say, and `ergo.rego` gave `unusable` for a string, number, list or boolean parent and `absent` for a `null` one. Reports change for such inputs. A parent that is an object without the field still gives `absent`.
 - The spec now says these things that `ergo.rego` already did, so no report changes:
   - the `expression` of a check written wrong ([sentence.print.written_wrong](syntax.md#printing-the-sentence))
   - how a number prints in a sentence ([sentence.print.numbers](syntax.md#printing-the-sentence))
