@@ -342,3 +342,69 @@ fn a_number_that_cannot_be_read_keeps_its_digits_in_the_report_text() {
         "{text}"
     );
 }
+
+#[test]
+fn within_reads_a_zero_and_trailing_zeros_as_the_number_written() {
+    let zeros = "0".repeat(5000);
+    let zero = r#"{"id": "t", "fa": 0e-5000, "fb": 0}"#;
+    assert_eq!(cause_of("fa equals fb within 1", zero), "satisfied");
+    let one = format!(r#"{{"id": "t", "fa": 1.{zeros}, "fb": 1}}"#);
+    assert_eq!(cause_of("fa equals fb within 1", &one), "satisfied");
+    let same = r#"{"id": "t", "fa": 1, "fb": 1}"#;
+    assert_eq!(
+        cause_of(&format!("fa equals fb within 0.{zeros}"), same),
+        "satisfied"
+    );
+}
+
+#[test]
+fn a_zero_whose_exponent_has_more_than_36_digits_is_zero() {
+    let big = format!("1{}", "0".repeat(36));
+    for zero in [
+        format!("0e{big}"),
+        format!("-0.0e-{big}"),
+        format!("0E+{big}"),
+    ] {
+        let things = format!(r#"{{"id": "t", "fa": {zero}, "fb": 0}}"#);
+        assert_eq!(cause_of("fa is 0", &things), "satisfied", "{zero}");
+        assert_eq!(
+            cause_of("fa is at least fb", &things),
+            "satisfied",
+            "{zero}"
+        );
+        assert_eq!(
+            cause_of("fa is less than 1", &things),
+            "satisfied",
+            "{zero}"
+        );
+    }
+}
+
+#[test]
+fn a_match_on_a_readable_item_decides_a_list_check_that_holds_a_number_it_cannot_read() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let things = format!(
+        r#"{{"id": "t", "fl": [{big}, 1], "fa": 1, "fz": 3, "ones": [1], "both": [1, 3]}}"#
+    );
+    for (sentence, cause) in [
+        ("fl contains 1", "satisfied"),
+        ("fl contains fa", "satisfied"),
+        ("fl does not contain 1", "value"),
+        ("fa is in fl", "satisfied"),
+        ("fa is one of fl", "satisfied"),
+        ("fa is not in fl", "value"),
+        ("fa is not one of fl", "value"),
+        ("fl contains all of ones", "satisfied"),
+        ("fl contains none of ones", "value"),
+        ("fl contains none of both", "value"),
+        ("fl contains fz", "unusable"),
+        ("fl does not contain fz", "unusable"),
+        ("fz is in fl", "unusable"),
+        ("fz is one of fl", "unusable"),
+        ("fz is not in fl", "unusable"),
+        ("fz is not one of fl", "unusable"),
+        ("fl contains all of both", "unusable"),
+    ] {
+        assert_eq!(cause_of(sentence, &things), cause, "{sentence}");
+    }
+}

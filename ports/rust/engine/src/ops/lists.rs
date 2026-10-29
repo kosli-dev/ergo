@@ -250,14 +250,10 @@ pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
         if kind.is_some_and(|k| k != value::type_name(&found)) {
             return Cause::Unusable;
         }
-        let Some(hits) = values
-            .iter()
-            .map(|v| value::equal(&found, v))
-            .collect::<Option<Vec<bool>>>()
-        else {
+        let Some(hit) = value::any_equal(values.iter().map(|v| value::equal(&found, v))) else {
             return Cause::Unusable;
         };
-        verdict(hits.contains(&true) != check.not)
+        verdict(hit != check.not)
     })
 }
 
@@ -286,24 +282,15 @@ pub fn run_contains(check: &Contains, ctx: &Ctx) -> Verdict {
         if one_type(items.iter().chain(wanted.iter())).is_err() {
             return Cause::Unusable;
         }
-        let Some(held) = wanted
+        let held = wanted
             .iter()
-            .map(|w| {
-                items
-                    .iter()
-                    .map(|item| value::equal(item, w))
-                    .collect::<Option<Vec<bool>>>()
-                    .map(|hits| hits.contains(&true))
-            })
-            .collect::<Option<Vec<bool>>>()
-        else {
-            return Cause::Unusable;
-        };
-        verdict(if check.not {
-            !held.contains(&true)
+            .map(|w| value::any_equal(items.iter().map(|item| value::equal(item, w))));
+        let decided = if check.not {
+            value::any_equal(held).map(|any| !any)
         } else {
-            !held.contains(&false)
-        })
+            value::all_equal(held)
+        };
+        decided.map_or(Cause::Unusable, verdict)
     })
 }
 
