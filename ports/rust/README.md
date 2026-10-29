@@ -93,7 +93,7 @@ docker run --rm -v "$REPO":/src -v "$PWD":/work -v ergo-rust-target:/target -v e
 ]
 ```
 
-`--params <file>` gives the policy its params, and without it they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. The command exits 0 whenever it printed a report, even when `compliant` is `false`. It exits 1 when a file can't be read or parsed and 2 when the command line is wrong, and says why on one line of stderr.
+`--params <file>` gives the policy its params, and without it they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. The command exits 0 whenever it printed a report, even when `compliant` is `false`. It exits 1 when a file can't be read or parsed and 2 when the command line is wrong, and says why on one line of stderr. `ergo --version` prints the version.
 
 YAML is read the way OPA reads it: `yes`, `no`, `on` and `off` are booleans, `010` is 8, `0x10` is 16, dates stay strings, `<<` merges, and only the first document counts. Numbers keep the digits they were written with, so `1.10` stays `1.10` and a number too big for a float stays a number.
 

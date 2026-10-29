@@ -31,6 +31,8 @@ pub struct Options {
 pub enum Parsed {
     /// Print the usage.
     Help,
+    /// Print the version.
+    Version,
     /// Run a command.
     Run(Options),
 }
@@ -43,6 +45,7 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
     };
     let command = match first.as_str() {
         "help" | "--help" | "-h" => return Ok(Parsed::Help),
+        "--version" => return Ok(Parsed::Version),
         "report" => Command::Report,
         "violations" => Command::Violations,
         other => return Err(usage(format!("unknown command '{other}'"))),

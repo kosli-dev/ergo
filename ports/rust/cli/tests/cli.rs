@@ -357,3 +357,13 @@ fn no_arguments_prints_usage_on_stderr_and_fails() {
     assert!(out(&output).is_empty());
     assert!(err(&output).contains("Usage: ergo"));
 }
+
+#[test]
+fn version_prints_the_crate_version() {
+    let output = ergo(&["--version"]);
+    assert_eq!(output.status.code(), Some(0));
+    assert_eq!(
+        out(&output),
+        format!("ergo {}\n", env!("CARGO_PKG_VERSION"))
+    );
+}

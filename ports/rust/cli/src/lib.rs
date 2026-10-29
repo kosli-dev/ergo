@@ -43,6 +43,8 @@ Commands:
   violations   print what failed in the report as JSON
   help         print this text
 
+ergo --version prints the version.
+
 Files can be .json, .yaml or .yml. Without --params the params are {}.
 The output is pretty-printed with sorted keys; --compact prints one line.
 ";
@@ -58,6 +60,12 @@ pub enum Outcome {
 pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
     let options = match args::parse(arguments)? {
         Parsed::Help => return Ok(Outcome::Print(USAGE.to_string())),
+        Parsed::Version => {
+            return Ok(Outcome::Print(format!(
+                "ergo {}\n",
+                env!("CARGO_PKG_VERSION")
+            )));
+        }
         Parsed::Run(options) => options,
     };
     let policy = files::load("policy", &options.policy)?;
