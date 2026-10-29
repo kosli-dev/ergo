@@ -1726,10 +1726,29 @@ test_keys_that_are_not_strings_get_a_name_each if {
 	names == ["<invalid key null>", "<invalid key false>", "<invalid key true>", "<invalid key 1.5>", "<invalid key 2.5>"]
 }
 
+test_a_min_subjects_over_a_million_says_so_whatever_its_size if {
+	every v in [1000001, 1000000.5, 1e308, 9007199254740993, -1, 1.5, "2", null, true] {
+		rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": v})})
+		problem_inputs(rep) == [{"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]
+	}
+}
+
+test_a_min_subjects_of_a_million_is_well_formed_however_it_is_written if {
+	every v in [1000000, 1e6, 1.0e6, 1000000.0, 0] {
+		rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": v})})
+		problem_inputs(rep) == []
+	}
+}
+
+test_a_min_subjects_past_a_float_is_out_of_range_not_over_a_million if {
+	rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": 1e400})})
+	problem_inputs(rep) == [{"name": "min_subjects", "value": ["number out of range"], "locations": []}]
+}
+
 test_a_min_subjects_that_is_not_a_number_says_so_even_holding_a_number_out_of_range if {
 	every v in [[1e400], {"a": 1e400}] {
 		rep := report({"items": [{"id": 1}]}, {"s": object.union(typed_req, {"min_subjects": v})})
-		problem_inputs(rep) == [{"name": "min_subjects", "value": ["not a whole number of 0 or more"], "locations": []}]
+		problem_inputs(rep) == [{"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]
 	}
 }
 
@@ -1780,7 +1799,7 @@ test_problems_with_several_fields_are_listed_by_field if {
 	row.inputs == [
 		{"name": "count(checks)", "value": 0, "locations": []},
 		{"name": "checks", "value": ["empty"], "locations": []},
-		{"name": "min_subjects", "value": ["not a whole number of 0 or more"], "locations": []},
+		{"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []},
 		{"name": "require", "value": ["neither every nor some"], "locations": []},
 		{"name": "zz", "value": ["unknown field"], "locations": []},
 		{"name": "subjects.subject.from", "value": ["not a string"], "locations": []},
@@ -1827,7 +1846,7 @@ wrong_type_problems := {
 	"checks": "not an object",
 	"from": "not a string",
 	"identified_by": "not a string",
-	"min_subjects": "not a whole number of 0 or more",
+	"min_subjects": "not a whole number from 0 to 1000000",
 	"subject_type": "empty or not a string",
 	"description": "not a string",
 	"meta": "not an object",

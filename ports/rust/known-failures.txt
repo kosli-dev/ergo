@@ -1,0 +1,5 @@
+requirements / min_subjects -1 / is written wrong with not a whole number from 0 to 1000000
+requirements / min_subjects 1.5 / is written wrong with not a whole number from 0 to 1000000
+requirements / min_subjects 1000001 / is written wrong with not a whole number from 0 to 1000000
+requirements / min_subjects 1e308 / is written wrong with not a whole number from 0 to 1000000
+requirements / min_subjects 9007199254740993 / is written wrong with not a whole number from 0 to 1000000
