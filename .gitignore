@@ -1,3 +1,4 @@
 .DS_Store
 .claude/settings.local.json
 ports/rust/wasm/pkg/
+ports/rust/sentences-wasm/pkg/

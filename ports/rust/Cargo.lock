@@ -42,6 +42,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ergo-sentences-wasm"
+version = "0.1.0-dev"
+dependencies = [
+ "ergo-sentences",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "ergo-wasm"
 version = "0.1.0-dev"
 dependencies = [

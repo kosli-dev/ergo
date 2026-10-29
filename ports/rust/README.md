@@ -7,6 +7,7 @@ It has three crates:
 - `ergo-sentences` (`sentences/`) reads check sentences, `for` lines, `from` lines and paths, and nothing else, so an editor or a linter can use it without the engine.
 - `ergo-engine` (`engine/`) builds the report, and reads sentences with `ergo-sentences`.
 - `ergo-wasm` (`wasm/`) wraps the engine for a browser: one function, `report`, that takes the input, the policy and the params as JSON text and gives the report back as JSON text.
+- `ergo-sentences-wasm` (`sentences-wasm/`) wraps `ergo-sentences` for a browser: `parse_check`, `parse_for`, `parse_from` and `parse_path` give a tree or the syntax errors as JSON text, and there are functions for the problems and for printing a tree back.
 
 ## The cases
 
@@ -43,7 +44,7 @@ The image is `rust:1.99.0`, the version in `rust-toolchain.toml`, with rustfmt, 
 
 The build goes to the `ergo-rust-target` volume and not to `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data. When several sessions or people run the checks at the same time, each should give the target volume their own name, like `ergo-rust-target-<name>`, because two builds sharing one volume can fail with "Permission denied". Change the `-v ergo-rust-target:/target` part of the command and keep the rest.
 
-## Building the engine for a browser
+## Building for a browser
 
 The Markdown editor can run this engine in the page, so it needs `ergo-wasm` built to Wasm and wrapped in JavaScript. This builds it into `ports/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. Run it with the image from above, from the root of the repo:
 
@@ -58,6 +59,18 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
 The `wasm` profile in `Cargo.toml` builds for size, and `wasm-opt` from [Binaryen](https://github.com/WebAssembly/binaryen) shrinks the result further. Together they take the Wasm file from about 2.9 MB to about 1.5 MB, and from about 840 KB to about 550 KB gzipped. Without `wasm-opt` the file is 1.6 MB, and a little smaller gzipped, at about 510 KB. The `release` profile stays as it was, because the other builds and the timings use it.
 
 The `wasm-bindgen` tool has to be the same version as the `wasm-bindgen` crate, `=0.2.129` in `wasm/Cargo.toml`. The version is also in the `Dockerfile` and in the `tests-rust` job of `.github/workflows/test.yml`, so change all three together. The same goes for the Binaryen version, `version_133`, which is in the `Dockerfile` and in that job, together with the SHA-256 of each tarball. Both check the download against it before they unpack it.
+
+`ergo-sentences-wasm` builds the same way, with its own folder and no engine. It comes to about 740 KB, or 256 KB gzipped:
+
+```sh
+docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
+  find . -name "*.rs" -exec touch {} + &&
+  cargo build --locked -j 4 --profile wasm -p ergo-sentences-wasm --target wasm32-unknown-unknown &&
+  wasm-bindgen --target web --out-dir sentences-wasm/pkg /target/wasm32-unknown-unknown/wasm/ergo_sentences_wasm.wasm &&
+  wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm -o sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm'
+```
+
+CI loads it in Node with `sentences-wasm/check-node.mjs`, which reads one check sentence and fails when it doesn't give a tree.
 
 CI also loads the built module in Node with `wasm/check-node.mjs`, which builds one report and fails when that throws or the report doesn't come from `ergo-engine`. Run it with `node ports/rust/wasm/check-node.mjs` after the build.
 
