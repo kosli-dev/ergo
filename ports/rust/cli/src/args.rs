@@ -67,11 +67,11 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
             }
             "--policy" | "--input" | "--params" => {
                 let value = match attached {
-                    Some(value) => value,
-                    None => match rest.next() {
-                        Some(value) if !value.starts_with("--") => value.clone(),
-                        _ => return Err(usage(format!("{name} needs a value"))),
-                    },
+                    Some(value) => Some(value),
+                    None => rest.next().filter(|v| !v.starts_with("--")).cloned(),
+                };
+                let Some(value) = value.filter(|v| !v.is_empty()) else {
+                    return Err(usage(format!("{name} needs a value")));
                 };
                 let slot = match name {
                     "--policy" => &mut policy,

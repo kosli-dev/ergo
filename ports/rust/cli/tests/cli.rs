@@ -260,6 +260,19 @@ fn a_flag_without_a_value_fails() {
 }
 
 #[test]
+fn an_empty_value_after_an_equals_sign_is_a_missing_value() {
+    let (policy, input) = readme("empty-value");
+    for args in [
+        ["report", "--policy=", "--input", &input],
+        ["report", "--policy", &policy, "--input="],
+    ] {
+        let output = ergo(&args);
+        assert_eq!(output.status.code(), Some(2), "{args:?}");
+        assert!(err(&output).contains("needs a value"), "{}", err(&output));
+    }
+}
+
+#[test]
 fn an_unknown_flag_fails() {
     let (policy, input) = readme("unknown-flag");
     fails(
