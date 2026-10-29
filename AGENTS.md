@@ -15,7 +15,7 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.
-- `ports/rust/` is a second engine, in Rust. It's experimental and in progress. It's a Cargo workspace with four crates: `ergo-sentences` reads sentences and nothing else, `ergo-engine` builds the report, and `ergo-wasm` and `ergo-sentences-wasm` wrap them for a browser. Its tests run every case in `spec/cases`, and `ports/rust/known-failures.txt` lists the ones it still fails.
+- `ports/rust/` is a second engine, in Rust. It's experimental and in progress. It's a Cargo workspace with five crates: `ergo-sentences` reads sentences and nothing else, `ergo-engine` builds the report, `ergo-cli` is the `ergo` command that prints a report or the violations from JSON or YAML files, and `ergo-wasm` and `ergo-sentences-wasm` wrap them for a browser. Its tests run every case in `spec/cases`, and `ports/rust/known-failures.txt` lists the ones it still fails.
 
 ## Checks
 
