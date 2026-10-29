@@ -294,6 +294,24 @@ fn within_fails_as_unusable_when_it_cannot_work_the_gap_out_exactly() {
 }
 
 #[test]
+fn within_absorbs_the_float_noise_of_numbers_past_fifteen_digits() {
+    for (fa, fb) in [
+        ("0.30000000000000004", "0.3"),
+        ("12.340000000000002", "12.34"),
+        ("1761700000.123456", "1761700000.12"),
+    ] {
+        let item = format!(r#"{{"id": "t", "fa": {fa}, "fb": {fb}}}"#);
+        assert_eq!(
+            cause_of("fa equals fb within 0.01", &item),
+            "satisfied",
+            "{fa}"
+        );
+    }
+    let big = r#"{"id": "t", "fa": 1e9, "fb": 1e9}"#;
+    assert_eq!(cause_of("fa equals fb within 0.000001", big), "satisfied");
+}
+
+#[test]
 fn within_does_not_overflow_on_exponents_at_both_ends_of_what_it_reads() {
     let ends = r#"{"id": "t", "fa": 1e9000000000000000000, "fb": 1e-9000000000000000000}"#;
     assert_eq!(cause_of("fa equals fb within 1", ends), "unusable");
