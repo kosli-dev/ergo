@@ -7,6 +7,7 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [ports/rus
 ### Changed
 
 - This version follows spec 0.3, so a policy says `ergo_spec: v0.3`. One that says `v0.2` is written wrong, with `unsupported version v0.2, expected v0.3`, and still works with 0.2.0. The report's `ergo` changes with it, from `"ergo": "v0.2"` to `"ergo": "v0.3"`.
+- `min_subjects` is a whole number from 0 to 1,000,000. A requirement with a larger one, like `1000001` or `1e308`, is written wrong, with its `$well_formed` row failing and no other row, where before `ergo.rego` read any whole number up to what a 64-bit float holds, and rejected some big ones like `1e308` by accident. The message for every wrong `min_subjects`, `-1`, `1.5`, `"2"` and `1000001` too, is now `not a whole number from 0 to 1000000`, where it was `not a whole number of 0 or more`. A number past a float, like `1e400`, still says `number out of range`. Reports change for such policies: the `$well_formed` row shows the new message.
 
 ### Fixed
 

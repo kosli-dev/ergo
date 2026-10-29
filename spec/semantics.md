@@ -356,7 +356,7 @@ A policy has two sections. `subjects` defines each kind of subject once, and `re
 
 **[require]** `require` is `every` or `some`, and `every` by default. Under `every`, every subject in scope must pass every check. Under `some`, at least one subject in scope must pass every check by itself, so two subjects that each pass half the checks don't meet it.
 
-**[min_subjects]** `min_subjects` is a whole number of 0 or more, and 1 by default. The `$min_subjects` row passes when `from` could be read and at least that many subjects are left after the subject's filters. Its input is the number left. Otherwise it fails with `value`, or with the cause in [subjects.from].
+**[min_subjects]** `min_subjects` is a whole number from 0 to 1,000,000, and 1 by default. The `$min_subjects` row passes when `from` could be read and at least that many subjects are left after the subject's filters. Its input is the number left. Otherwise it fails with `value`, or with the cause in [subjects.from].
 
 **[unique_ids]** No two subjects can share an id, counting the ones the subject's filters leave out, and `null` counts as an id like any other. The `$unique_ids` row fails with `value` when two do. Its input lists each id more than one subject has, once, sorted by its JSON text as shown in [syntax.md](syntax.md#expressions), so `"b"` comes before `10`, and `10` before `3`.
 
