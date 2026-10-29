@@ -11646,5 +11646,19 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line whose two reads share a name",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some approvals.approver as approver", "assert": ".approver equals approver"}}}}},
+    "cases": [
+      {
+        "description": "lists the inputs that share a name by value first, then by location",
+        "rules": ["for.failure_inputs", "location.merged"],
+        "input": {"things": [{"id": "t1", "approver": "", "approvals": [{"approver": "grace"}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": ".approver equals approver", "cause": "value", "inputs": [{"locations": ["/things/0/approver"], "name": "approver", "value": ""}, {"locations": ["/things/0/approvals/0/approver"], "name": "approver", "value": "grace"}]}], "item": "item 1 of approvals", "locations": ["/things/0/approvals/0/approver"], "path": "item 1 of approvals", "value": "grace"}], "inputs": [{"locations": ["/things/0/approvals/0/approver"], "name": "approvals[].approver", "value": ["grace"]}, {"locations": ["/things/0/approver"], "name": "approver", "value": ""}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

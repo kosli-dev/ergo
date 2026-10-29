@@ -12302,5 +12302,21 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line with a key named like its parent",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose b.x equals v", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "prints the from line as written in subjects and the filter with a dot, because there the key is the item's own field",
+        "rules": ["sentence.subject.from", "report.subjects", "sentence.subject.applies", "sentence.print.canonical"],
+        "input": {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1}]}]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/bs/0/kids/0"], "name": "b.x", "value": null}, {"locations": ["/bs/0/kids/0/v"], "name": "v", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}}
+        ],
+        "expressions": {"s": {"$applies": ".b.x equals v"}},
+        "report": {"subjects": {"b": {"description": "", "from": "bs", "identified_by": "id", "parts": {}}, "kid": {"description": "", "from": "b.kids whose b.x equals v", "identified_by": "id", "parts": {}}}}
+      }
+    ]
   }
 ]
