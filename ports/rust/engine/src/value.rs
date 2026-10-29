@@ -234,7 +234,7 @@ pub fn equal(a: &Value, b: &Value) -> Option<bool> {
     }
 }
 
-fn all_equal(pairs: impl Iterator<Item = Option<bool>>) -> Option<bool> {
+pub fn all_equal(pairs: impl Iterator<Item = Option<bool>>) -> Option<bool> {
     let pairs: Vec<Option<bool>> = pairs.collect();
     if pairs.contains(&Some(false)) {
         Some(false)
@@ -242,6 +242,17 @@ fn all_equal(pairs: impl Iterator<Item = Option<bool>>) -> Option<bool> {
         None
     } else {
         Some(true)
+    }
+}
+
+pub fn any_equal(pairs: impl Iterator<Item = Option<bool>>) -> Option<bool> {
+    let pairs: Vec<Option<bool>> = pairs.collect();
+    if pairs.contains(&Some(true)) {
+        Some(true)
+    } else if pairs.contains(&None) {
+        None
+    } else {
+        Some(false)
     }
 }
 

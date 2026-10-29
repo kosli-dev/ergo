@@ -379,3 +379,32 @@ fn a_zero_whose_exponent_has_more_than_36_digits_is_zero() {
         );
     }
 }
+
+#[test]
+fn a_match_on_a_readable_item_decides_a_list_check_that_holds_a_number_it_cannot_read() {
+    let big = format!("1e1{}", "0".repeat(36));
+    let things = format!(
+        r#"{{"id": "t", "fl": [{big}, 1], "fa": 1, "fz": 3, "ones": [1], "both": [1, 3]}}"#
+    );
+    for (sentence, cause) in [
+        ("fl contains 1", "satisfied"),
+        ("fl contains fa", "satisfied"),
+        ("fl does not contain 1", "value"),
+        ("fa is in fl", "satisfied"),
+        ("fa is one of fl", "satisfied"),
+        ("fa is not in fl", "value"),
+        ("fa is not one of fl", "value"),
+        ("fl contains all of ones", "satisfied"),
+        ("fl contains none of ones", "value"),
+        ("fl contains none of both", "value"),
+        ("fl contains fz", "unusable"),
+        ("fl does not contain fz", "unusable"),
+        ("fz is in fl", "unusable"),
+        ("fz is one of fl", "unusable"),
+        ("fz is not in fl", "unusable"),
+        ("fz is not one of fl", "unusable"),
+        ("fl contains all of both", "unusable"),
+    ] {
+        assert_eq!(cause_of(sentence, &things), cause, "{sentence}");
+    }
+}
