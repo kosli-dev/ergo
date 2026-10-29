@@ -521,3 +521,20 @@ fn a_key_past_the_largest_signed_64_bit_integer_is_refused_as_opa_refuses_it() {
         refused(&format!("{text}: a\n"), text);
     }
 }
+
+#[test]
+fn nel_is_a_line_break_as_in_yaml_1_1() {
+    assert_eq!(
+        parse("a:\n  b: \"x\u{85}    y\"\n").unwrap(),
+        json!({"a": {"b": "x y"}})
+    );
+    assert_eq!(parse("a: \"x\u{85}y\"\n"), parse("a: \"x\ny\"\n"));
+    assert_eq!(
+        parse("a: |\n  x\u{85}  y\n").unwrap(),
+        json!({"a": "x\ny\n"})
+    );
+    assert_eq!(
+        parse("a: x\u{85}b: 1\n").unwrap(),
+        json!({"a": "x", "b": 1})
+    );
+}

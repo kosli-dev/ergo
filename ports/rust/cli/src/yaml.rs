@@ -28,7 +28,8 @@ const MAX_DEPTH: usize = 10_000;
 pub fn parse(text: &str) -> Result<Value, Error> {
     characters(text)?;
     version(text)?;
-    let mut events = Parser::new_from_str(text).keep_tags(true);
+    let text = text.replace('\u{85}', "\n");
+    let mut events = Parser::new_from_str(&text).keep_tags(true);
     loop {
         match next(&mut events)? {
             Event::StreamStart | Event::Nothing => {}
