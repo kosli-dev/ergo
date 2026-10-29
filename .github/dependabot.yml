@@ -23,3 +23,26 @@ updates:
       - "dependabot"
       - "dependencies"
       - "github-actions"
+  # Rust
+  - package-ecosystem: "cargo"
+    open-pull-requests-limit: 10
+    directory: "/ports/rust"
+    schedule:
+      # Check for updates to Rust dependencies every week
+      interval: "weekly"
+      day: "tuesday"
+      time: "11:00"
+    commit-message:
+      prefix: "rust"
+    # Group minor and patch updates
+    groups:
+      rust-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    labels:
+      - "dependabot"
+      - "dependencies"
+      - "rust"
