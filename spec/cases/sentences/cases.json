@@ -7465,5 +7465,26 @@
         }
       }
     ]
+  },
+  {
+    "description": "numbers in a sentence",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is 1e-7", "b": "x is -0", "c": "x is 0.10e1", "d": "x is -1.2500E+2", "e": "x is one of 1e1, -0.0, 2.50", "f": "x is 9007199254740993", "g": "x is 1e21"}}}},
+    "cases": [
+      {
+        "description": "print as their exact value in decimal, with no exponent, no zero at the end of a fraction and no minus on zero",
+        "rules": ["sentence.print.numbers", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "g", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+        ],
+        "expressions": {"s": {"a": "x is 0.0000001", "b": "x is 0", "c": "x is 1", "d": "x is -125", "e": "x is one of 10, 0, 2.5", "f": "x is 9007199254740993", "g": "x is 1000000000000000000000"}}
+      }
+    ]
   }
 ]
