@@ -246,6 +246,25 @@ fn relation_of(line: &s::FromLine, own_name: &str, names: &BTreeSet<String>) -> 
     }
 }
 
+fn unread_relation(
+    from: &Text,
+    errors: &[String],
+    own_name: &str,
+    names: &BTreeSet<String>,
+) -> Relation {
+    let Text::Written(text) = from else {
+        return Relation::Root;
+    };
+    if !errors.iter().all(|e| e.starts_with("unknown name ")) {
+        return Relation::Root;
+    }
+    let trimmed = text.trim();
+    let before = trimmed
+        .find(" whose ")
+        .map_or(trimmed, |at| trimmed[..at].trim_end());
+    s::parse_from(before).map_or(Relation::Root, |line| relation_of(&line, own_name, names))
+}
+
 fn synthesized(name: &str) -> s::FromLine {
     s::FromLine {
         every: false,
@@ -550,7 +569,8 @@ impl Reading {
             };
             let relation = match &from {
                 FromState::Parsed(line) => relation_of(line, name, &names),
-                _ => Relation::Root,
+                FromState::Errors(errors) => unread_relation(&def.from, errors, name, &names),
+                FromState::NotText => Relation::Root,
             };
             let mut own_problems = Problems::new();
             let mut own = BTreeMap::new();
@@ -768,6 +788,7 @@ impl Reading {
                 Text::Missing | Text::Invalid => {}
             }
             if matches!(found.relation, Relation::Narrows(_))
+                && matches!(&found.from, FromState::Parsed(line) if !line.every)
                 && !matches!(found.def.identified_by, Text::Missing)
             {
                 add_problem(
@@ -988,7 +1009,8 @@ fn resolved_id_text(
             .and_then(|p| p.get(&from_at))
             .is_some_and(|texts| texts.iter().any(|text| text != NARROWING_A_CHILD_PROBLEM));
         if let Relation::Narrows(parent) = &found.relation
-            && read_ok
+            && (read_ok
+                || (matches!(found.def.identified_by, Text::Missing) && !parent.trim().is_empty()))
         {
             at = parent.clone();
             continue;
@@ -1017,7 +1039,7 @@ fn entry_of(
 ) -> Value {
     let from_at = field_name(&["subjects", name, "from"]);
     let invalid = problems.get(name).is_some_and(|p| p.contains_key(&from_at));
-    let from = if invalid || matches!(found.from, FromState::NotText) {
+    let from = if invalid || found.def.says_how || matches!(found.from, FromState::NotText) {
         INVALID_FROM.to_string()
     } else {
         match &found.from {
