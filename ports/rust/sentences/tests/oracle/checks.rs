@@ -1,4 +1,5 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("approvals exists", "approvals exists", &[], &[]),
     (" x   is  1 ", "x is 1", &[], &[]),
     (" x  is  1", "x is 1", &[], &[]),
     (

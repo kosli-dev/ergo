@@ -13,6 +13,7 @@ Each version says whether reports changed, so that anyone who only stores report
 ### Fixed
 
 - [for.flaws](semantics.md#for) now says that an item of a `for` line whose path goes on into a value that isn't an object, `null` included, fails as `not_an_object`, with `some` and a position too, as `every` does. It used to say so only for a second item that reads into the first, and the spec didn't say what the other items fail as. [for.walk](semantics.md#for) says it too. Reports change for such inputs: with `t` set to `["a"]`, `for: every t.k as x` failed `item 1 of t` as `unusable` and now fails it as `not_an_object`. `ergo.rego` also failed `null` items as `absent`, and `count of` and `sum of` on a `null` item as `absent` where [tally.walk](semantics.md#counts-and-sums-in-sentences) says `not_an_object`. Only the cause changes, not whether a check fails.
+- A child subject whose parent isn't an object, `null` included, fails `$min_subjects` as `not_an_object`, as [subjects.chain.not_an_object](semantics.md#requirements) now says. The spec didn't say, and `ergo.rego` gave `unusable` for a string, number, list or boolean parent and `absent` for a `null` one. Reports change for such inputs. A parent that is an object without the field still gives `absent`.
 - The spec now says these things that `ergo.rego` already did, so no report changes:
   - the `expression` of a check written wrong ([sentence.print.written_wrong](syntax.md#printing-the-sentence))
   - how a number prints in a sentence ([sentence.print.numbers](syntax.md#printing-the-sentence))
