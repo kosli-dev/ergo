@@ -400,7 +400,9 @@ fn compare_keys(a: &Key, b: &Key) -> Ordering {
     match (a, b) {
         (Key::Text(x), Key::Text(y)) => x.cmp(y),
         (Key::Time(x), Key::Time(y)) => time::compare_times(x, y).unwrap_or(Ordering::Equal),
-        (Key::Number(x), Key::Number(y)) => crate::value::compare_numbers(x, y),
+        (Key::Number(x), Key::Number(y)) => {
+            crate::value::compare_numbers(x, y).unwrap_or(Ordering::Equal)
+        }
         _ => Ordering::Equal,
     }
 }
@@ -413,6 +415,7 @@ fn sort_key(value: &Value, alphabetically: bool) -> Option<Key> {
         };
     }
     match time::read_time(value)? {
+        Time::Number(n) if !crate::value::is_readable(&n) => None,
         Time::Number(n) => Some(Key::Number(n)),
         other => Some(Key::Time(other)),
     }

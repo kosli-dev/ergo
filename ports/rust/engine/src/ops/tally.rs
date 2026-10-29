@@ -271,10 +271,7 @@ fn decide(test: &Test, left: &Value, right: Option<Value>, ctx: &Ctx) -> Cause {
             compare::run(&compare, ctx).cause
         }
         (Test::Between { min, max }, None) => match left {
-            Value::Number(n) => verdict(
-                value::compare_numbers(min, n) != Ordering::Greater
-                    && value::compare_numbers(n, max) != Ordering::Greater,
-            ),
+            Value::Number(n) => value::between(min, n, max).map_or(Cause::Unusable, verdict),
             _ => Cause::Unusable,
         },
         _ => Cause::Unusable,
@@ -596,9 +593,9 @@ fn micro_units_text(micro_units: i128) -> Result<Number, Cause> {
 
 fn seconds_in_micros(n: &Number) -> Result<i128, Cause> {
     let limit = |v: i64| Number::from(v);
-    if value::compare_numbers(n, &limit(-MOST_SECONDS)) == Ordering::Less
-        || value::compare_numbers(n, &limit(MOST_SECONDS)) == Ordering::Greater
-    {
+    let below = value::compare_numbers(n, &limit(-MOST_SECONDS)).ok_or(Cause::Unusable)?;
+    let above = value::compare_numbers(n, &limit(MOST_SECONDS)).ok_or(Cause::Unusable)?;
+    if below == Ordering::Less || above == Ordering::Greater {
         return Err(Cause::Unusable);
     }
     let parts = Parts::of(&n.to_string()).ok_or(Cause::Unusable)?;

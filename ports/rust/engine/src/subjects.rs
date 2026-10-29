@@ -347,7 +347,9 @@ fn order_rank(value: &Value) -> u8 {
 pub(crate) fn order(a: &Value, b: &Value) -> Ordering {
     match (a, b) {
         (Value::Bool(x), Value::Bool(y)) => x.cmp(y),
-        (Value::Number(x), Value::Number(y)) => value::compare_numbers(x, y),
+        (Value::Number(x), Value::Number(y)) => {
+            value::compare_numbers(x, y).unwrap_or_else(|| x.to_string().cmp(&y.to_string()))
+        }
         (Value::String(x), Value::String(y)) => x.cmp(y),
         (Value::Array(x), Value::Array(y)) => {
             for (p, q) in x.iter().zip(y) {

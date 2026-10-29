@@ -151,11 +151,22 @@ fn decimal_of(number: &serde_json::Number) -> Option<Decimal> {
     Decimal::parse(&number.to_string())
 }
 
-pub fn compare_numbers(a: &serde_json::Number, b: &serde_json::Number) -> Ordering {
-    match (decimal_of(a), decimal_of(b)) {
-        (Some(x), Some(y)) => compare_decimals(&x, &y),
-        _ => Ordering::Equal,
-    }
+pub fn compare_numbers(a: &serde_json::Number, b: &serde_json::Number) -> Option<Ordering> {
+    Some(compare_decimals(&decimal_of(a)?, &decimal_of(b)?))
+}
+
+pub fn between(
+    min: &serde_json::Number,
+    n: &serde_json::Number,
+    max: &serde_json::Number,
+) -> Option<bool> {
+    let low = compare_numbers(min, n)?;
+    let high = compare_numbers(n, max)?;
+    Some(low != Ordering::Greater && high != Ordering::Greater)
+}
+
+pub fn is_readable(number: &serde_json::Number) -> bool {
+    decimal_of(number).is_some()
 }
 
 pub fn compare_decimals(a: &Decimal, b: &Decimal) -> Ordering {
@@ -288,7 +299,7 @@ mod tests {
         assert!(!equal(&v("9007199254740993"), &v("9007199254740992")));
         assert_eq!(
             compare_numbers(&num("9007199254740993"), &num("9007199254740992")),
-            Ordering::Greater
+            Some(Ordering::Greater)
         );
     }
 
@@ -299,19 +310,25 @@ mod tests {
         assert!(equal(&v("1e-400"), &v("10e-401")));
         assert_eq!(
             compare_numbers(&num("1e400"), &num("1e399")),
-            Ordering::Greater
+            Some(Ordering::Greater)
         );
         assert_eq!(
             compare_numbers(&num("1e-400"), &num("0")),
-            Ordering::Greater
+            Some(Ordering::Greater)
         );
     }
 
     #[test]
     fn an_exponent_too_big_for_any_integer_still_orders() {
         let big = "1e99999999999999999999999999999999999999999";
-        assert_eq!(compare_numbers(&num(big), &num("1e400")), Ordering::Greater);
-        assert_eq!(compare_numbers(&num("1e400"), &num(big)), Ordering::Less);
+        assert_eq!(
+            compare_numbers(&num(big), &num("1e400")),
+            Some(Ordering::Greater)
+        );
+        assert_eq!(
+            compare_numbers(&num("1e400"), &num(big)),
+            Some(Ordering::Less)
+        );
     }
 
     #[test]
@@ -324,17 +341,26 @@ mod tests {
     #[test]
     fn numbers_order_by_sign_then_size() {
         let order = |a, b| compare_numbers(&num(a), &num(b));
-        assert_eq!(order("-1", "1"), Ordering::Less);
-        assert_eq!(order("-2", "-1"), Ordering::Less);
-        assert_eq!(order("-1", "-2"), Ordering::Greater);
-        assert_eq!(order("-1", "0"), Ordering::Less);
-        assert_eq!(order("0", "-1"), Ordering::Greater);
-        assert_eq!(order("0", "1"), Ordering::Less);
-        assert_eq!(order("1", "0"), Ordering::Greater);
-        assert_eq!(order("0.5", "0.25"), Ordering::Greater);
-        assert_eq!(order("12", "123"), Ordering::Less);
-        assert_eq!(order("99", "100"), Ordering::Less);
-        assert_eq!(order("0.001", "0.01"), Ordering::Less);
+        assert_eq!(order("-1", "1"), Some(Ordering::Less));
+        assert_eq!(order("-2", "-1"), Some(Ordering::Less));
+        assert_eq!(order("-1", "-2"), Some(Ordering::Greater));
+        assert_eq!(order("-1", "0"), Some(Ordering::Less));
+        assert_eq!(order("0", "-1"), Some(Ordering::Greater));
+        assert_eq!(order("0", "1"), Some(Ordering::Less));
+        assert_eq!(order("1", "0"), Some(Ordering::Greater));
+        assert_eq!(order("0.5", "0.25"), Some(Ordering::Greater));
+        assert_eq!(order("12", "123"), Some(Ordering::Less));
+        assert_eq!(order("99", "100"), Some(Ordering::Less));
+        assert_eq!(order("0.001", "0.01"), Some(Ordering::Less));
+    }
+
+    #[test]
+    fn between_includes_both_ends() {
+        let inside = |lo, n, hi| between(&num(lo), &num(n), &num(hi));
+        assert_eq!(inside("1", "1", "3"), Some(true));
+        assert_eq!(inside("1", "3", "3"), Some(true));
+        assert_eq!(inside("1", "0.9", "3"), Some(false));
+        assert_eq!(inside("1", "3.1", "3"), Some(false));
     }
 
     #[test]

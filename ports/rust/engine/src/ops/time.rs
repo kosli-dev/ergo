@@ -45,7 +45,7 @@ pub fn compare_times(a: &Time, b: &Time) -> Option<Ordering> {
     match (a, b) {
         (Time::Instant(x), Time::Instant(y)) => Some(x.cmp(y)),
         (Time::Date(x), Time::Date(y)) => Some(x.cmp(y)),
-        (Time::Number(x), Time::Number(y)) => Some(value::compare_numbers(x, y)),
+        (Time::Number(x), Time::Number(y)) => value::compare_numbers(x, y),
         _ => None,
     }
 }

@@ -3,7 +3,6 @@ use crate::cause::Cause;
 use crate::path::{self, Ctx, Outcome, Path};
 use crate::value;
 use serde_json::{Number, Value};
-use std::cmp::Ordering;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Range {
@@ -21,10 +20,9 @@ impl Range {
 pub fn run(check: &Range, ctx: &Ctx) -> Verdict {
     let read = read_path(&check.path, ctx);
     let cause = match (read.outcome, &read.value) {
-        (Outcome::Found, Some(Value::Number(n))) => verdict(
-            value::compare_numbers(&check.min, n) != Ordering::Greater
-                && value::compare_numbers(n, &check.max) != Ordering::Greater,
-        ),
+        (Outcome::Found, Some(Value::Number(n))) => {
+            value::between(&check.min, n, &check.max).map_or(Cause::Unusable, verdict)
+        }
         (Outcome::Found, _) => Cause::Unusable,
         (other, _) => other.cause().unwrap_or(Cause::Unusable),
     };
