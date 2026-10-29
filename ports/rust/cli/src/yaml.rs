@@ -4,6 +4,7 @@ use crate::number::number;
 use saphyr_parser::{Event, Parser, ScalarStyle, Tag};
 use serde_json::{Map, Value};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 type Events<'a> = Parser<'a, saphyr_parser::StrInput<'a>>;
 
@@ -158,15 +159,21 @@ fn next<'a>(events: &mut Events<'a>) -> Result<Event<'a>, Stop> {
     }
 }
 
+enum Tree {
+    Leaf(Value),
+    List(Vec<Rc<Tree>>),
+    Map(Vec<(String, Rc<Tree>)>),
+}
+
 struct Node {
-    value: Result<Value, Error>,
+    value: Result<Rc<Tree>, Error>,
     key: Result<String, Error>,
     size: u64,
     alias: bool,
 }
 
 struct Anchor {
-    value: Result<Value, Error>,
+    value: Result<Rc<Tree>, Error>,
     key: Result<String, Error>,
     size: u64,
 }
@@ -178,8 +185,8 @@ enum Slot {
 }
 
 enum Collection {
-    List(Vec<Value>),
-    Map(Map<String, Value>, Slot),
+    List(Vec<Rc<Tree>>),
+    Map(Vec<(String, Rc<Tree>)>, Slot),
 }
 
 struct Frame {
@@ -213,7 +220,7 @@ impl Reader {
                     self.decoded += 1;
                     let scalar = scalar(&text, style, tag.as_deref())?;
                     let node = Node {
-                        value: scalar.value(&text),
+                        value: scalar.value(&text).map(|v| Rc::new(Tree::Leaf(v))),
                         key: scalar.key(&text),
                         size: 1,
                         alias: false,
@@ -243,7 +250,7 @@ impl Reader {
                     continue;
                 }
                 Event::MappingStart(anchor, _) => {
-                    self.open(Collection::Map(Map::new(), Slot::Key), anchor)?;
+                    self.open(Collection::Map(Vec::new(), Slot::Key), anchor)?;
                     continue;
                 }
                 Event::SequenceEnd | Event::MappingEnd => {
@@ -251,12 +258,12 @@ impl Reader {
                         .frames
                         .pop()
                         .ok_or_else(|| invalid("unexpected content"))?;
-                    let value = match frame.collection {
-                        Collection::List(items) => Value::Array(items),
-                        Collection::Map(map, _) => Value::Object(map),
+                    let tree = match frame.collection {
+                        Collection::List(items) => Tree::List(items),
+                        Collection::Map(entries, _) => Tree::Map(entries),
                     };
                     let node = Node {
-                        value: Ok(value),
+                        value: Ok(Rc::new(tree)),
                         key: Err(Error::NotJson("a key is a list or a mapping".to_string())),
                         size: frame.size,
                         alias: false,
@@ -267,7 +274,10 @@ impl Reader {
                 _ => return Err(invalid("unexpected content").into()),
             };
             match self.frames.last_mut() {
-                None => return Ok(node.value?),
+                None => {
+                    let root: Rc<Tree> = node.value?;
+                    return Ok(json(&root));
+                }
                 Some(frame) => {
                     frame.size += node.size;
                     place(&mut frame.collection, node)?;
@@ -335,37 +345,73 @@ fn excessive(decoded: u64, aliased: u64) -> bool {
 fn place(collection: &mut Collection, node: Node) -> Result<(), Error> {
     match collection {
         Collection::List(items) => items.push(node.value?),
-        Collection::Map(map, slot) => match std::mem::replace(slot, Slot::Key) {
+        Collection::Map(entries, slot) => match std::mem::replace(slot, Slot::Key) {
             Slot::Key => *slot = Slot::Value(node.key?),
-            Slot::Value(name) => {
-                map.insert(name, node.value?);
+            Slot::Value(name) => entries.push((name, node.value?)),
+            Slot::Merge => {
+                let source: Rc<Tree> = node.value?;
+                merge(entries, &source, node.alias)?;
             }
-            Slot::Merge => merge(map, node.value?, node.alias)?,
         },
     }
     Ok(())
 }
 
-fn merge(into: &mut Map<String, Value>, source: Value, alias: bool) -> Result<(), Error> {
+fn merge(into: &mut Vec<(String, Rc<Tree>)>, source: &Tree, alias: bool) -> Result<(), Error> {
     match source {
-        Value::Object(map) => {
-            for (k, v) in map {
-                into.insert(k, v);
-            }
+        Tree::Map(entries) => {
+            into.extend(entries.iter().cloned());
             Ok(())
         }
-        Value::Array(_) if alias => Err(Error::Refused(
+        Tree::List(_) if alias => Err(Error::Refused(
             "a merge key takes an alias to a list, and only an alias to a mapping is merged"
                 .to_string(),
         )),
-        Value::Array(items) if items.iter().all(Value::is_object) => {
-            for item in items.into_iter().rev() {
+        Tree::List(items) if items.iter().all(|item| matches!(**item, Tree::Map(_))) => {
+            for item in items.iter().rev() {
                 merge(into, item, false)?;
             }
             Ok(())
         }
         _ => Err(invalid("a merge key needs a mapping or a list of mappings")),
     }
+}
+
+fn json(root: &Tree) -> Value {
+    enum Step<'a> {
+        Enter(&'a Tree),
+        List(usize),
+        Map(&'a [(String, Rc<Tree>)]),
+    }
+    let mut steps = vec![Step::Enter(root)];
+    let mut values = Vec::new();
+    while let Some(step) = steps.pop() {
+        match step {
+            Step::Enter(Tree::Leaf(value)) => values.push(value.clone()),
+            Step::Enter(Tree::List(items)) => {
+                steps.push(Step::List(items.len()));
+                steps.extend(items.iter().rev().map(|item| Step::Enter(item)));
+            }
+            Step::Enter(Tree::Map(entries)) => {
+                steps.push(Step::Map(entries));
+                steps.extend(entries.iter().rev().map(|(_, item)| Step::Enter(item)));
+            }
+            Step::List(count) => {
+                let items = values.split_off(values.len() - count);
+                values.push(Value::Array(items));
+            }
+            Step::Map(entries) => {
+                let items = values.split_off(values.len() - entries.len());
+                let map: Map<String, Value> = entries
+                    .iter()
+                    .map(|(name, _)| name.clone())
+                    .zip(items)
+                    .collect();
+                values.push(Value::Object(map));
+            }
+        }
+    }
+    values.pop().unwrap_or(Value::Null)
 }
 
 enum Scalar {

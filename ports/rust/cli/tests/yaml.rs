@@ -565,3 +565,29 @@ fn a_quoted_scalar_still_stops_at_a_document_marker_or_the_end_of_the_file() {
         assert!(matches!(parse(text), Err(Error::Invalid(_))), "{text:?}");
     }
 }
+
+fn anchored(levels: usize) -> String {
+    (0..levels)
+        .map(|level| format!("{}k: &a{level}\n", " ".repeat(level)))
+        .collect()
+}
+
+#[test]
+fn an_anchor_on_every_level_of_a_deep_file_stays_cheap() {
+    std::thread::Builder::new()
+        .stack_size(256 << 20)
+        .spawn(|| {
+            let started = std::time::Instant::now();
+            let mut value = parse(&anchored(5_000)).unwrap();
+            let mut levels = 0;
+            while let Value::Object(mut map) = value {
+                levels += 1;
+                value = map.remove("k").unwrap();
+            }
+            assert_eq!(levels, 5_000);
+            assert!(started.elapsed().as_secs() < 30, "{:?}", started.elapsed());
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+}
