@@ -109,8 +109,8 @@ pub(crate) struct FromRead {
 }
 
 impl FromRead {
-    pub(crate) fn build(self) -> From {
-        From {
+    pub(crate) fn build(self) -> FromLine {
+        FromLine {
             every: self.every,
             path: self.path,
             named_by_each_of: self.named_by_each_of,

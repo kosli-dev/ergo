@@ -6,21 +6,21 @@ Reads Ergo's check sentences, `for` lines, `from` lines and paths into a tree, a
 
 ```rust,ignore
 pub fn parse_check(line: &str) -> Result<Check, Vec<SyntaxError>>;
-pub fn parse_for(line: &str) -> Result<For, Vec<SyntaxError>>;
-pub fn parse_from(line: &str) -> Result<From, Vec<SyntaxError>>;
+pub fn parse_for(line: &str) -> Result<ForLine, Vec<SyntaxError>>;
+pub fn parse_from(line: &str) -> Result<FromLine, Vec<SyntaxError>>;
 pub fn parse_path(line: &str) -> Result<Path, Vec<SyntaxError>>;
 
 pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String>;
-pub fn for_problems(line: &For, aliases: &[&str]) -> Vec<String>;
-pub fn from_problems(line: &From) -> Vec<String>;
+pub fn for_problems(line: &ForLine, aliases: &[&str]) -> Vec<String>;
+pub fn from_problems(line: &FromLine) -> Vec<String>;
 
 pub fn print_check(check: &Check, aliases: &[&str]) -> String;
 pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String;
-pub fn print_for(line: &For, aliases: &[&str]) -> String;
+pub fn print_for(line: &ForLine, aliases: &[&str]) -> String;
 pub fn print_for_item(item: &ForItem, aliases: &[&str]) -> String;
-pub fn print_from(line: &From, aliases: &[&str]) -> String;
+pub fn print_from(line: &FromLine, aliases: &[&str]) -> String;
 pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> String;
-pub fn print_from_with(line: &From, aliases: &[&str], parents: &[&str]) -> String;
+pub fn print_from_with(line: &FromLine, aliases: &[&str], parents: &[&str]) -> String;
 pub fn print_from_condition_with(condition: &FromCondition, aliases: &[&str], parents: &[&str]) -> String;
 pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String;
 pub fn print_term(term: &Term, aliases: &[&str]) -> String;
@@ -91,10 +91,10 @@ Every type derives `Debug`, `Clone`, `PartialEq`, `Eq` and `Hash`, and `SyntaxEr
 | `Start`         | `start`, `plain-right`, `it`    | `it`, `$params`, `$input`, `name`, `.name`                   |
 | `Step`          | `step`                          | `.key`, `named by k`, `[k]`, `["a b"]`, `[2]`                |
 | `Reference`     | `reference`                     | `$params.k`, `$input.k`, `k`                                 |
-| `For`           | `for-line`                      | `every xs as x, last of ys as y`                             |
+| `ForLine`       | `for-line`                      | `every xs as x, last of ys as y`                             |
 | `ForItem`       | `for-item`                      | `some xs whose a is 1 as x`, `last of ys sorted by d as y`   |
 | `SortedBy`      | `sorted-by`                     | `sorted by created alphabetically`                           |
-| `From`          | `from-line`                     | `every a.b named by each of $params.l whose c is 1`          |
+| `FromLine`      | `from-line`                     | `every a.b named by each of $params.l whose c is 1`          |
 | `FromCondition` | `from-condition`                | `c is 1`, `some d.e, if any, exists`                         |
 | `Side`          | none                            | where a path is printed: left of a phrase, or right of it    |
 | `SyntaxError`   | none                            | `unclosed quote at column 14`                                |

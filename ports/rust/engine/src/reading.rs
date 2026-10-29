@@ -79,7 +79,7 @@ pub struct Reading {
 }
 
 enum FromState {
-    Parsed(s::From),
+    Parsed(s::FromLine),
     Errors(Vec<String>),
     NotText,
 }
@@ -219,7 +219,7 @@ fn reach(links: &BTreeMap<String, Vec<String>>, start: &[String]) -> BTreeSet<St
 }
 
 fn names_a_subject<'a>(
-    line: &'a s::From,
+    line: &'a s::FromLine,
     own_name: &str,
     names: &BTreeSet<String>,
 ) -> Option<&'a str> {
@@ -231,7 +231,7 @@ fn names_a_subject<'a>(
     }
 }
 
-fn relation_of(line: &s::From, own_name: &str, names: &BTreeSet<String>) -> Relation {
+fn relation_of(line: &s::FromLine, own_name: &str, names: &BTreeSet<String>) -> Relation {
     match names_a_subject(line, own_name, names) {
         Some(parent) if line.path.position.is_none() => {
             if !line.path.steps.is_empty() {
@@ -246,8 +246,8 @@ fn relation_of(line: &s::From, own_name: &str, names: &BTreeSet<String>) -> Rela
     }
 }
 
-fn synthesized(name: &str) -> s::From {
-    s::From {
+fn synthesized(name: &str) -> s::FromLine {
+    s::FromLine {
         every: false,
         path: s::Path {
             position: None,
@@ -383,7 +383,7 @@ fn scope_of(
 
 fn from_problems(
     name: &str,
-    line: &s::From,
+    line: &s::FromLine,
     raw: &BTreeMap<String, Raw>,
     names: &BTreeSet<String>,
     links: &BTreeMap<String, Vec<String>>,
@@ -466,7 +466,7 @@ fn read_id(text: &str) -> Option<(Vec<Step>, String)> {
 
 fn source_of(
     name: &str,
-    line: &s::From,
+    line: &s::FromLine,
     relation: &Relation,
     scope: &Scope,
 ) -> Result<Source, Vec<String>> {

@@ -519,7 +519,7 @@ pub enum Reference {
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct For {
+pub struct ForLine {
     /// The items, in the order written.
     pub items: Vec<ForItem>,
 }
@@ -582,7 +582,7 @@ pub struct SortedBy {
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct From {
+pub struct FromLine {
     /// True when the line starts with `every`.
     pub every: bool,
     /// The path to the items.

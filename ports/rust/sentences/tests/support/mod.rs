@@ -57,7 +57,7 @@ pub fn field(name: &str) -> Operand {
     Operand::Field(vec![Term::Path(key(name))])
 }
 
-pub fn from(line: &str) -> From {
+pub fn from(line: &str) -> FromLine {
     match parse_from(line) {
         Ok(read) => read,
         Err(errors) => panic!("{line:?} did not parse: {errors:?}"),
@@ -110,7 +110,7 @@ pub fn check(line: &str) -> Check {
     }
 }
 
-pub fn for_line(line: &str) -> For {
+pub fn for_line(line: &str) -> ForLine {
     match parse_for(line) {
         Ok(read) => read,
         Err(errors) => panic!("{line:?} did not parse: {errors:?}"),

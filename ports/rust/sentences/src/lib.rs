@@ -51,7 +51,7 @@ pub fn parse_path(line: &str) -> Result<Path, Vec<SyntaxError>> {
 /// assert!(parse_from("every items whose x is 1").is_ok());
 /// assert!(parse_from("every").is_err());
 /// ```
-pub fn parse_from(line: &str) -> Result<From, Vec<SyntaxError>> {
+pub fn parse_from(line: &str) -> Result<FromLine, Vec<SyntaxError>> {
     let text = trim(line);
     let parser = Parser::new(text, false);
     parser
@@ -90,7 +90,7 @@ pub fn parse_check(line: &str) -> Result<Check, Vec<SyntaxError>> {
 /// assert!(parse_for("every xs as x").is_ok());
 /// assert!(parse_for("every xs").is_err());
 /// ```
-pub fn parse_for(line: &str) -> Result<For, Vec<SyntaxError>> {
+pub fn parse_for(line: &str) -> Result<ForLine, Vec<SyntaxError>> {
     let text = trim(line);
     let parser = Parser::new(text, false);
     parser

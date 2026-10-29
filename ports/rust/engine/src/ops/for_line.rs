@@ -174,7 +174,7 @@ fn lower_whose(whose: &[s::Condition], scope: &Scope, problems: &mut Vec<String>
 }
 
 pub fn lower_for(
-    line: &s::For,
+    line: &s::ForLine,
     assertions: &[s::Assertion],
     places: &[String],
     scope: &Scope,

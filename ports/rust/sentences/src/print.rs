@@ -130,7 +130,7 @@ fn from_condition_text(
 /// let line = parse_from("every  items whose x is 1").unwrap();
 /// assert_eq!(print_from(&line, &[]), "every items whose x is 1");
 /// ```
-pub fn print_from(line: &From, aliases: &[&str]) -> String {
+pub fn print_from(line: &FromLine, aliases: &[&str]) -> String {
     print_from_with(line, aliases, &[])
 }
 
@@ -139,7 +139,7 @@ pub fn print_from(line: &From, aliases: &[&str]) -> String {
 /// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 ///
 /// `parents` holds the names of a child subject's parents. On the left of a `whose`, a key named like a parent reads the item's own field, so it prints with a dot.
-pub fn print_from_with(line: &From, aliases: &[&str], parents: &[&str]) -> String {
+pub fn print_from_with(line: &FromLine, aliases: &[&str], parents: &[&str]) -> String {
     let mut out = String::new();
     if line.every {
         out.push_str("every ");
@@ -645,7 +645,7 @@ pub fn print_for_item(item: &ForItem, aliases: &[&str]) -> String {
 /// let line = parse_for("every  xs as x").unwrap();
 /// assert_eq!(print_for(&line, &[]), "every xs as x");
 /// ```
-pub fn print_for(line: &For, aliases: &[&str]) -> String {
+pub fn print_for(line: &ForLine, aliases: &[&str]) -> String {
     let all: Vec<&str> = aliases
         .iter()
         .copied()

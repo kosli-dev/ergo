@@ -613,7 +613,7 @@ fn unsupported_assertion(assertion: &s::Assertion, scope: &Scope) -> Vec<String>
 }
 
 pub fn lower_for(
-    line: &s::For,
+    line: &s::ForLine,
     assertions: &[s::Assertion],
     places: &[String],
     scope: &Scope,

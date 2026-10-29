@@ -321,10 +321,10 @@ impl Parser {
         )
     }
 
-    pub(crate) fn read_for(&self, most: usize) -> Option<(For, Notes)> {
+    pub(crate) fn read_for(&self, most: usize) -> Option<(ForLine, Notes)> {
         self.whole(self.for_items(most)).map(|chain| {
             let (items, notes) = flatten(&chain);
-            (For { items }, notes)
+            (ForLine { items }, notes)
         })
     }
 }

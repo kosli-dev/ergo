@@ -26,7 +26,7 @@ pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
 /// Lists what is written wrong in a `for` line that was read.
 ///
 /// The messages are in `ergo.rego`'s words and sorted. It only reads the tree and the names in `aliases`. Rules that need the policy's names, like an alias named like a subject, are left to the engine. The list is empty when nothing is wrong.
-pub fn for_problems(line: &For, aliases: &[&str]) -> Vec<String> {
+pub fn for_problems(line: &ForLine, aliases: &[&str]) -> Vec<String> {
     let mut found = for_base(line, &[]);
     if found.is_empty() {
         found.extend(for_self(line, aliases));
@@ -37,7 +37,7 @@ pub fn for_problems(line: &For, aliases: &[&str]) -> Vec<String> {
 /// Lists what is written wrong in a `from` line that was read.
 ///
 /// The messages are in `ergo.rego`'s words and sorted. Rules that need the policy's names are left to the engine. The list is empty when nothing is wrong.
-pub fn from_problems(line: &From) -> Vec<String> {
+pub fn from_problems(line: &FromLine) -> Vec<String> {
     from_base(line).into_iter().collect()
 }
 
@@ -52,7 +52,7 @@ pub(crate) fn check_base(check: &Check, hidden: &[Condition]) -> BTreeSet<String
     walk.finish()
 }
 
-pub(crate) fn for_base(line: &For, hidden: &[Condition]) -> BTreeSet<String> {
+pub(crate) fn for_base(line: &ForLine, hidden: &[Condition]) -> BTreeSet<String> {
     let mut walk = Walk::default();
     for condition in hidden {
         walk.condition(condition, false);
@@ -73,7 +73,7 @@ pub(crate) fn path_base(path: &Path) -> BTreeSet<String> {
     walk.finish()
 }
 
-pub(crate) fn from_base(line: &From) -> BTreeSet<String> {
+pub(crate) fn from_base(line: &FromLine) -> BTreeSet<String> {
     let mut walk = Walk::default();
     walk.path(&line.path);
     if let Some(each) = &line.named_by_each_of {
@@ -704,7 +704,7 @@ fn check_self(check: &Check, aliases: &[&str]) -> BTreeSet<String> {
     out
 }
 
-fn for_self(line: &For, aliases: &[&str]) -> BTreeSet<String> {
+fn for_self(line: &ForLine, aliases: &[&str]) -> BTreeSet<String> {
     let mut out = BTreeSet::new();
     for (n, item) in line.items.iter().enumerate() {
         let names: Vec<&str> = aliases

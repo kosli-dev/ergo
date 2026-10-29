@@ -11,7 +11,7 @@ fn a_from_line_survives_a_trip_through_json() {
         "every a1.b named by each of $params.l whose some c1, if any, matches \"x\" and count of d1 is at least 2",
     );
     let json = serde_json::to_string(&line).unwrap();
-    let back: From = serde_json::from_str(&json).unwrap();
+    let back: FromLine = serde_json::from_str(&json).unwrap();
     assert_eq!(back, line);
 }
 
