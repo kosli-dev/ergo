@@ -11,7 +11,7 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
 - `CONTRIBUTING.md` tells people how to report bugs and send changes, and points them here for the rules.
-- `CHANGELOG.md` says what each release of `ergo.rego` changed. The spec has its own in `spec/CHANGELOG.md`.
+- `CHANGELOG.md` says what each release of `ergo.rego` changed. The spec has its own in `spec/CHANGELOG.md`, and the Rust engine in `ports/rust/CHANGELOG.md`. A change in what a check means goes in `spec/CHANGELOG.md`, and an engine's own fixes go in that engine's file.
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.

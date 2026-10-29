@@ -1,6 +1,6 @@
 # Changes to ergo.rego
 
-Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](spec/CHANGELOG.md).
+This file is about `ergo.rego` only. The Rust engine's changes are in [ports/rust/CHANGELOG.md](ports/rust/CHANGELOG.md), and the spec's in [spec/CHANGELOG.md](spec/CHANGELOG.md). Each release names the version of the spec it follows.
 
 ## 0.3.0
 
