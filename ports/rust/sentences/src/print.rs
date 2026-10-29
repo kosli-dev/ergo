@@ -52,13 +52,6 @@ pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String {
     condition_text(condition, aliases)
 }
 
-/// Prints one `whose` condition of a `from` line as a canonical sentence.
-///
-/// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
-pub fn print_from_condition(condition: &FromCondition, aliases: &[&str]) -> String {
-    print_from_condition_with(condition, aliases, &[])
-}
-
 fn left_of_whose(path: &Path, aliases: &[&str], parents: &[&str], own: bool) -> String {
     match &path.start {
         Start::Field { key, .. } if parents.contains(&key.as_str()) => {
@@ -73,12 +66,12 @@ fn left_of_whose(path: &Path, aliases: &[&str], parents: &[&str], own: bool) -> 
     }
 }
 
-/// Prints one `whose` condition of a `from` line, for a child subject.
+/// Prints one `whose` condition of a `from` line as a canonical sentence.
 ///
 /// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 ///
-/// `parents` holds the names of a child subject's parents. On the left of a `whose`, a key named like a parent reads the item's own field, so it prints with a dot.
-pub fn print_from_condition_with(
+/// `parents` holds the names of a child subject's parents. On the left of a `whose`, a key named like a parent reads the item's own field, so it prints with a dot. Pass `&[]` for a subject with no parents.
+pub fn print_from_condition(
     condition: &FromCondition,
     aliases: &[&str],
     parents: &[&str],

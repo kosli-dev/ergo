@@ -672,8 +672,7 @@ impl Reading {
                     found_problems.extend(syntax_problems);
                     let mut filters = Vec::new();
                     for condition in line.whose.iter().filter(|_| reads) {
-                        let text =
-                            s::print_from_condition_with(condition, &alias_refs, &parent_refs);
+                        let text = s::print_from_condition(condition, &alias_refs, &parent_refs);
                         match condition {
                             s::FromCondition::Condition(condition) => {
                                 found_problems.extend(lower::condition_elapsed_problems(condition));

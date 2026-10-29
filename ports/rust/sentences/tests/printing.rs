@@ -231,10 +231,13 @@ fn print_term_and_print_path_follow_the_side() {
 fn print_condition_and_print_from_condition_print_one_condition() {
     let line = from("x whose some y.z, if any, is empty and count of w is 3");
     assert_eq!(
-        print_from_condition(&line.whose[0], &[]),
+        print_from_condition(&line.whose[0], &[], &[]),
         "some y.z, if any, is empty"
     );
-    assert_eq!(print_from_condition(&line.whose[1], &[]), "count of w is 3");
+    assert_eq!(
+        print_from_condition(&line.whose[1], &[], &[]),
+        "count of w is 3"
+    );
     let FromCondition::Condition(c) = &line.whose[1] else {
         panic!()
     };
@@ -474,4 +477,17 @@ fn a_bracket_index_too_big_to_be_a_position_prints_as_written() {
     assert_eq!(print_check(&check, &[]), "xs[9007199254740992] is 1");
     let check = parse_check("xs[2] is 1").unwrap();
     assert_eq!(print_check(&check, &[]), "item 3 of xs is 1");
+}
+
+#[test]
+fn a_parent_name_on_the_left_of_a_from_condition_prints_with_a_dot() {
+    let line = from("b.kids whose b.x equals v");
+    assert_eq!(
+        print_from_condition(&line.whose[0], &["b"], &["b"]),
+        ".b.x equals v"
+    );
+    assert_eq!(
+        print_from_condition(&line.whose[0], &["b"], &[]),
+        "b.x equals v"
+    );
 }
