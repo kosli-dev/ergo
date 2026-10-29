@@ -70,7 +70,7 @@ jobs:
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
-      - run: opa check --strict . --ignore .github --ignore ports
+      - run: opa check --strict . --ignore .github
       - name: Check the test workflow passed on this commit
         shell: bash
         run: |
@@ -133,7 +133,7 @@ jobs:
           minor=${VERSION#*.}
           minor=${minor%%.*}
           next="$major.$((10#$minor + 1)).0-dev"
-          branch="rego/version-$next"
+          branch="core/version-$next"
           title="rego: move main to $next"
           if grep -qxF "version := \"$next\"" ergo.rego; then
             echo "main already says $next"
