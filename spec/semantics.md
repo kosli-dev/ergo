@@ -413,11 +413,11 @@ A subject can have parts: named paths inside itself, each with an alias, written
 **[report.subjects]** The report has `subjects` at its top, with an entry for each subject a requirement uses, by name. That's the subject it names, the subjects that one narrows or reads from, and so on all the way back. A subject no requirement uses isn't listed. An entry has:
 
 - `description`, the subject's description, or `""` when it has none or it isn't a string
-- `from`, how the subject is found, written as a `from` line: the line itself, printed the same way whatever spaces it was written with. A subject without `from` reads the input field named like it. A `from` that is written wrong, or isn't a string, is `<invalid from>`.
-- `identified_by`, the path of the subject's id, or `null` when it has none, because the whole subject is its id. A subject that narrows another has the id of the one it narrows. An id that is written wrong is `<invalid identified_by>`.
+- `from`, how the subject is found, written as a `from` line: the line itself, printed the same way whatever spaces it was written with. A subject without `from` reads the input field named like it. A `from` that is written wrong, or isn't a string, is `<invalid from>`, even when the line reads and has only a problem like `values of mixed types`. So is the `from` of a subject with `applies_to` or `of`, because those fields said how it was found.
+- `identified_by`, the path of the subject's id, or `null` when it has none, because the whole subject is its id. A subject that narrows another has the id of the one it narrows, also when its `from` is written wrong. An id that is written wrong is `<invalid identified_by>`.
 - `parts`, every part the subject has, including the ones it keeps from a subject it narrows, by alias. Each is `{"from": ..., "identified_by": ...}`: `from` is the part's path written the way a sentence writes it, so `  dd.b ` is `dd.b` and `x[$params.k]` is `x named by $params.k`, and `identified_by` is the path of the part's id, or `null` when it has none. A part written as one line has no id. A part written wrong is listed as best it can be: `<invalid from>` for a path that can't be read and `<invalid identified_by>` for an id that can't, and a part that is neither a string nor an object has `<invalid from>` and `null`.
 
-A subject that is written wrong still has its entry.
+A subject that is written wrong still has its entry. A subject whose `from` starts at another subject lists that subject even when the line is written wrong. A `from` that doesn't parse, or isn't a string, lists no other subject.
 
 **[report.causes]** `causes` lists the causes of the rows that would be [violations](#violations) of the requirement, each with `rows`, the number of rows that have it. It counts rows, not subjects, and lists the causes in the order of [causes](#causes), worst first. A requirement that's `met` or `not_applicable` has an empty list.
 

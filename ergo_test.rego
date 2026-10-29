@@ -10235,3 +10235,24 @@ test_a_for_alias_named_like_a_part_of_a_subject_with_a_space_in_its_name_quotes_
 	rep := ergo.report(_clash_doc, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": {"for": "every xs as pull", "assert": "pull.v is 1"}}}}}, {})
 	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["pull can't be an alias: it's a part of \"pull request\""]]
 }
+
+test_subjects_that_narrow_each_other_with_unknown_names_are_listed_without_looping if {
+	policy := {
+		"ergo_spec": "v0.3-dev",
+		"subjects": {"a": {"from": "b whose x is $foo"}, "b": {"from": "a whose x is $foo"}},
+		"requirements": {"r": {"subject": "a", "checks": {"c": "n exists"}}},
+	}
+	report := ergo.report({}, policy, {})
+	object.keys(report.subjects) == {"a", "b"}
+	report.subjects.a.from == "<invalid from>"
+	report.subjects.a.identified_by == null
+}
+
+test_a_from_that_reads_names_with_an_unknown_name_lists_no_other_subject if {
+	policy := {
+		"ergo_spec": "v0.3-dev",
+		"subjects": {"p": {"from": "things", "identified_by": "id"}, "k": {"from": "p.items named by $foo", "identified_by": "n"}},
+		"requirements": {"r": {"subject": "k", "checks": {"c": "n exists"}}},
+	}
+	object.keys(ergo.report({}, policy, {}).subjects) == {"k"}
+}
