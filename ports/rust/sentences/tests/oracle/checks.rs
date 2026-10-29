@@ -1,4 +1,41 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (" x   is  1 ", "x is 1", &[], &[]),
+    (" x  is  1", "x is 1", &[], &[]),
+    (
+        "count of rows is at least m",
+        "count of rows is at least m",
+        &[],
+        &[],
+    ),
+    (
+        "some rows.n is at least x.v",
+        "some rows.n is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "some x.tags is in x.nums",
+        "some x.tags is in x.nums",
+        &[],
+        &[],
+    ),
+    ("v matches '^a\\b'", "v matches '^a\\b'", &[], &[]),
+    ("x is -0", "x is 0", &[], &[]),
+    ("x is -1.2500E+2", "x is -125", &[], &[]),
+    ("x is 0.10e1", "x is 1", &[], &[]),
+    ("x is 1e-7", "x is 0.0000001", &[], &[]),
+    ("x is 1e21", "x is 1000000000000000000000", &[], &[]),
+    ("x is 9007199254740993", "x is 9007199254740993", &[], &[]),
+    (
+        "x is one of 1e1, -0.0, 2.50",
+        "x is one of 10, 0, 2.5",
+        &[],
+        &[],
+    ),
+    ("x matches '^\\d$'", "x matches '^\\d$'", &[], &[]),
+    ("x.v is at most m", "x.v is at most m", &[], &[]),
+    ("y matches '^\\w$'", "y matches '^\\w$'", &[], &[]),
+    ("z matches '^\\s+$'", "z matches '^\\s+$'", &[], &[]),
     ("p.z is 1", "p.z is 1", &[], &[]),
     ("q.w is 2", "q.w is 2", &[], &[]),
     ("\tx is 1\n", "x is 1", &[], &[]),
@@ -3355,6 +3392,8 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
+    (" x   is  ", &["doesn't parse"]),
+    (" x  is ", &["doesn't parse"]),
     ("\u{feff}x is 1", &["doesn't parse"]),
     (
         "\"$s\" equals \"s\" and .true is equals \"s\"",
@@ -6243,6 +6282,10 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
+    (
+        " every  xs ",
+        &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
+    ),
     (
         "$input.i whose sum of \"q r\".z.q is not 1 as l",
         &["an item starts with \"every\", \"some\" or a position, like \"last of\""],
