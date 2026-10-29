@@ -11660,5 +11660,22 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a failed sentence on a for line lists its inputs in the order of its kind",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"walk": {"for": "every xs as x", "assert": "some rows.n is at least x.v"}, "aliases": {"for": "every xs as x", "assert": "some x.tags is in x.nums"}, "compare": {"for": "every xs as x", "assert": "x.v is at most m"}, "count": {"for": "every xs as x", "assert": "count of rows is at least m"}}}}},
+    "cases": [
+      {
+        "description": "a walk lists what starts at an alias first, both in name order, and a comparison or a count lists its left side and then its right side",
+        "rules": ["for.failure_inputs"],
+        "input": {"things": [{"id": "t1", "m": 3, "rows": [{"n": 1}], "xs": [{"v": 5, "tags": ["t"], "nums": ["u"]}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "aliases", "passed": false, "cause": "value", "inputs": [{"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.nums", "value": ["u"], "locations": ["/things/0/xs/0/nums"]}, {"name": "x.tags[]", "value": ["t"], "locations": ["/things/0/xs/0/tags/0"]}], "assertion": "some x.tags is in x.nums"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "compare", "passed": false, "cause": "value", "inputs": [{"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "x.v is at most m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "count", "passed": false, "cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "count of rows is at least m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "walk", "passed": false, "cause": "value", "inputs": [{"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}], "assertion": "some rows.n is at least x.v"}], "item": "item 1 of xs", "path": "item 1 of xs"}]}
+        ]
+      }
+    ]
   }
 ]

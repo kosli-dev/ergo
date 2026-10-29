@@ -7,10 +7,18 @@ Each version says whether reports changed, so that anyone who only stores report
 ### Changed
 
 - A policy says `ergo_spec: v0.3`, and the report's `ergo` changes from `"ergo": "v0.2"` to `"ergo": "v0.3"`. A policy that says `v0.2` is written wrong, with `unsupported version v0.2, expected v0.3`. The schemas are under `https://ergo.kosli.com/spec/0.3/`.
+- An implementation may fail a check as `unusable` when it can't read or compare a number exactly, like one whose exponent is too long to hold ([Values](semantics.md#values)). It used to have to compare every number it was given. `ergo.rego` compares such numbers as before, so its reports don't change.
 - Whitespace of any kind at either end of a sentence, a `for` line or a `from` line is dropped before it's read, not only spaces: every character with Unicode's `White_Space` property, like a tab, a newline or U+3000 ([sentence.ends](syntax.md#the-grammar)). So a YAML block like `assert: |`, which ends in a newline, reads as the sentence it holds. `ergo.rego` already read these lines, so no report changes. A byte order mark or a zero-width space at either end still makes a line not read. The same goes for the path of an `identified_by` or a part, which `ergo.rego` also trimmed already.
 
 ### Fixed
 
+- The spec now says these things that `ergo.rego` already did, so no report changes:
+  - the `expression` of a check written wrong ([sentence.print.written_wrong](syntax.md#printing-the-sentence))
+  - how a number prints in a sentence ([sentence.print.numbers](syntax.md#printing-the-sentence))
+  - that a subject that isn't an object is its own id ([subjects.id](semantics.md#requirements))
+  - that `\d`, `\w`, `\s` and `\b` in a pattern only know ASCII ([patterns.syntax](semantics.md#matches_any-and-not_matches_any))
+  - that the keys of every object in a report are sorted ([report.keys](semantics.md#statuses))
+  - the order of the `inputs` of a failed sentence on a `for` line ([for.failure_inputs](semantics.md#for))
 - [tally.sum](semantics.md#counts-and-sums-in-sentences) now says when a `sum_of` or an `add` fails as `unusable`: when a number added, or the result, isn't a whole number below 10^15 once scaled by 10^p, where p is the most decimal places any of them has, counted on the value, or when p is above 15. It used to say such sums are added as the runtime adds them, which gave different answers in different runtimes. Reports change for such inputs, like `0.123456789012345` plus `100`, which now fails as `unusable` with a `null` entry.
 - A `from` line with `named by each of` fails `$min_subjects` when the path before it doesn't lead to an object, as [subjects.sentence](semantics.md#requirements) now says: as `absent` or `null` when the object is missing or `null`, and as `unusable` when it's a list, a string or a number. Each listed key is still a subject, as before, so its checks still show what's missing, but the requirement is never met. A list of keys that holds anything but strings makes no subjects and fails `$min_subjects` as `unusable`. The spec didn't say, and `ergo.rego` met the requirement whenever every check passed, so with `from: scans named by each of $params.required` and no `scans` in the input, `x does not exist` passed for every key and the policy was compliant. The same holds when a ref step before `named by each of` can't be used, like `named by $params.env` with `env` set to `5`, which was met too. Reports change for such inputs: `$min_subjects` fails and the requirement is `not_met`, a key list with a non-string key gives no subject rows, and a child subject of such a parent gets one `$min_subjects` row and one `$unique_ids` row with no `in`, as [subjects.chain.count](semantics.md#requirements) says, instead of a row per key.
 

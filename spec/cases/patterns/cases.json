@@ -163,5 +163,22 @@
         ]
       }
     ]
+  },
+  {
+    "description": "the classes \\d, \\w, \\s and \\b",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"d": "x matches '^\\d$'", "w": "y matches '^\\w$'", "s": "z matches '^\\s+$'", "b": "v matches '^a\\b'"}}}},
+    "cases": [
+      {
+        "description": "only know ASCII, as in RE2, so a digit or a letter outside ASCII doesn't match and a letter outside ASCII ends a word",
+        "rules": ["patterns.syntax"],
+        "input": {"things": [{"id": "t1", "x": "٣", "y": "é", "z": "\u000b\u00a0", "v": "aé"}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "v", "value": "aé", "locations": ["/things/0/v"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "٣", "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "s", "passed": false, "cause": "value", "inputs": [{"name": "z", "value": "\u000b\u00a0", "locations": ["/things/0/z"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "w", "passed": false, "cause": "value", "inputs": [{"name": "y", "value": "é", "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
   }
 ]
