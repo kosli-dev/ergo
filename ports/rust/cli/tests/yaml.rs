@@ -184,6 +184,13 @@ fn a_binary_tag_is_decoded_from_base64() {
 }
 
 #[test]
+fn a_binary_tag_takes_only_padded_standard_base64_as_opa_does() {
+    for text in ["aGk", "a-_k", "'aG k='", "aG=k", "a==="] {
+        assert!(parse(&format!("v: !!binary {text}\n")).is_err(), "{text}");
+    }
+}
+
+#[test]
 fn anchors_aliases_and_merge_keys() {
     let v = parse("base: &b\n  k: 1\ncopy: *b\nmerged:\n  <<: *b\n  j: 2\n").unwrap();
     assert_eq!(

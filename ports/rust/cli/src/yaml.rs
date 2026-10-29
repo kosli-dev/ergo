@@ -269,13 +269,13 @@ fn base64(text: &str) -> Result<String, String> {
     let mut bits: u32 = 0;
     let mut count = 0;
     let mut padding = 0;
-    for c in text.chars().filter(|c| !c.is_whitespace()) {
+    for c in text.chars().filter(|c| !matches!(c, '\r' | '\n')) {
         let digit = match c {
             'A'..='Z' => c as u32 - 'A' as u32,
             'a'..='z' => c as u32 - 'a' as u32 + 26,
             '0'..='9' => c as u32 - '0' as u32 + 52,
-            '+' | '-' => 62,
-            '/' | '_' => 63,
+            '+' => 62,
+            '/' => 63,
             '=' => {
                 padding += 1;
                 continue;
@@ -293,10 +293,10 @@ fn base64(text: &str) -> Result<String, String> {
             count = 0;
         }
     }
-    match count {
-        0 => {}
-        2 => bytes.push((bits >> 4) as u8),
-        3 => bytes.extend([(bits >> 10) as u8, (bits >> 2) as u8]),
+    match (count, padding) {
+        (0, 0) => {}
+        (2, 2) => bytes.push((bits >> 4) as u8),
+        (3, 1) => bytes.extend([(bits >> 10) as u8, (bits >> 2) as u8]),
         _ => return Err("!!binary isn't base64".to_string()),
     }
     Ok(String::from_utf8_lossy(&bytes).into_owned())
