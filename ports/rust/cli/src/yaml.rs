@@ -1,4 +1,4 @@
-//! Reads YAML the way OPA 1.20.2 does: YAML 1.1 words and numbers, `<<` merge keys, the last of a repeated key, only the first document, and the files OPA refuses. Numbers are the one difference: they keep the digits they were written with, so `1e400` is a number here and the string `"1e400"` in OPA, and `1e-400` isn't 0.
+//! Reads YAML the way OPA 1.20.2 does: YAML 1.1 words and numbers, `<<` merge keys, the last of a repeated key, only the first document, and most of the files OPA refuses. Numbers keep the digits they were written with, so `1e400` is a number here and the string `"1e400"` in OPA. The Rust README lists the other known differences: a few malformed files OPA refuses are read here, and a few files OPA reads are refused.
 
 use crate::number::number;
 use saphyr_parser::{Event, Parser, ScalarStyle, Tag};
