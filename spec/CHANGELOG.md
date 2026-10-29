@@ -13,6 +13,7 @@ Each version says whether reports changed, so that anyone who only stores report
 ### Fixed
 
 - [sentence.for.pick](syntax.md#the-for-line) now says that an index in brackets doesn't pick, so a `for` item like `t[0] as i` is written wrong, as the grammar already had it. `ergo.rego` read it as a position, so `t[0] as i` meant `first of t as i`, and a second item was read the same way. Reports change for such a policy: the check fails `$well_formed` and the requirement gets no other row.
+- A child subject whose parent isn't an object, `null` included, fails `$min_subjects` as `not_an_object`, as [subjects.chain.not_an_object](semantics.md#requirements) now says. The spec didn't say, and `ergo.rego` gave `unusable` for a string, number, list or boolean parent and `absent` for a `null` one. Reports change for such inputs. A parent that is an object without the field still gives `absent`.
 - The spec now says these things that `ergo.rego` already did, so no report changes:
   - the `expression` of a check written wrong ([sentence.print.written_wrong](syntax.md#printing-the-sentence))
   - how a number prints in a sentence ([sentence.print.numbers](syntax.md#printing-the-sentence))
