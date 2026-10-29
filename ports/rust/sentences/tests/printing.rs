@@ -174,22 +174,22 @@ fn a_later_key_never_gets_a_dot() {
 #[test]
 fn a_dot_written_before_an_alias_name_is_kept_on_the_right() {
     let read = from("x whose y equals .pr");
-    assert_eq!(print_from(&read, &["pr"]), "x whose y equals .pr");
-    assert_eq!(print_from(&read, &["other"]), "x whose y equals pr");
-    assert_eq!(print_from(&read, &[]), "x whose y equals pr");
+    assert_eq!(print_from(&read, &["pr"], &[]), "x whose y equals .pr");
+    assert_eq!(print_from(&read, &["other"], &[]), "x whose y equals pr");
+    assert_eq!(print_from(&read, &[], &[]), "x whose y equals pr");
 }
 
 #[test]
 fn a_bare_name_that_is_an_alias_prints_without_a_dot() {
     let read = from("x whose y equals pr");
-    assert_eq!(print_from(&read, &["pr"]), "x whose y equals pr");
+    assert_eq!(print_from(&read, &["pr"], &[]), "x whose y equals pr");
 }
 
 #[test]
 fn the_left_of_a_condition_never_gets_an_alias_dot() {
     let read = from("x whose .pr is 1 and count of .pr is 2 and days elapsed from .pr to .pr is 1");
     assert_eq!(
-        print_from(&read, &["pr"]),
+        print_from(&read, &["pr"], &[]),
         "x whose pr is 1 and count of pr is 2 and days elapsed from pr to pr is 1"
     );
 }
@@ -204,7 +204,7 @@ fn a_dotted_path_in_the_path_of_a_from_line_keeps_its_dot_for_an_alias() {
 #[test]
 fn a_list_path_never_gets_an_alias_dot() {
     let read = from("x whose y is in .pr");
-    assert_eq!(print_from(&read, &["pr"]), "x whose y is in pr");
+    assert_eq!(print_from(&read, &["pr"], &[]), "x whose y is in pr");
 }
 
 #[test]
@@ -437,11 +437,11 @@ fn params_and_input_print_with_their_dollar() {
 fn a_parent_name_on_the_left_of_a_whose_is_the_items_field_and_prints_with_a_dot() {
     let read = from("b.kids whose b.x equals v and some b.ls is empty");
     assert_eq!(
-        print_from_with(&read, &["b"], &["b"]),
+        print_from(&read, &["b"], &["b"]),
         "b.kids whose .b.x equals v and some .b.ls is empty"
     );
     assert_eq!(
-        print_from_with(&read, &["b"], &[]),
+        print_from(&read, &["b"], &[]),
         "b.kids whose b.x equals v and some b.ls is empty"
     );
 }
@@ -450,7 +450,7 @@ fn a_parent_name_on_the_left_of_a_whose_is_the_items_field_and_prints_with_a_dot
 fn a_dot_on_the_path_of_some_in_a_from_line_stays_because_it_reads_the_field_and_not_the_part() {
     let read = from("ds whose some .cov.x exists");
     assert_eq!(
-        print_from_with(&read, &["cov"], &[]),
+        print_from(&read, &["cov"], &[]),
         "ds whose some .cov.x exists"
     );
 }
@@ -459,11 +459,11 @@ fn a_dot_on_the_path_of_some_in_a_from_line_stays_because_it_reads_the_field_and
 fn a_name_that_is_both_a_parent_and_an_alias_prints_with_a_dot_only_on_the_left_of_a_whose() {
     let read = from("b.kids whose b.x equals b.y");
     assert_eq!(
-        print_from_with(&read, &["b"], &["b"]),
+        print_from(&read, &["b"], &["b"]),
         "b.kids whose .b.x equals b.y"
     );
     assert_eq!(
-        print_from_with(&read, &["b"], &[]),
+        print_from(&read, &["b"], &[]),
         "b.kids whose b.x equals b.y"
     );
 }

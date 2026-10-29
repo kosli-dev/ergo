@@ -14,8 +14,7 @@ pub use error::SyntaxError;
 pub use numbers::rust_pattern;
 pub use print::{
     print_assertion, print_check, print_condition, print_for, print_for_item, print_from,
-    print_from_condition, print_from_condition_with, print_from_with, print_left_term, print_path,
-    print_term,
+    print_from_condition, print_from_condition_with, print_left_term, print_path, print_term,
 };
 pub use rules::{check_problems, for_problems, from_problems};
 pub use tree::*;

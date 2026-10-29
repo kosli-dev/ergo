@@ -92,12 +92,12 @@ pub fn phrase(line: &str) -> Phrase {
 }
 
 pub fn printed(line: &str) -> String {
-    print_from(&from(line), &[])
+    print_from(&from(line), &[], &[])
 }
 
 pub fn printed_phrase(line: &str) -> String {
     let read = from(&format!("x whose y {line}"));
-    print_from(&read, &[])
+    print_from(&read, &[], &[])
         .strip_prefix("x whose y ")
         .unwrap_or_default()
         .to_string()
