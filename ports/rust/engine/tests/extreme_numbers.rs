@@ -277,3 +277,24 @@ fn one_id_that_cannot_be_read_fails_unique_ids_and_names_only_itself() {
         assert!(named[0].contains("e"), "{named:?}");
     }
 }
+
+#[test]
+fn within_fails_as_unusable_when_it_cannot_work_the_gap_out_exactly() {
+    let tiny = r#"{"id": "t", "fa": 1e-1000000000000000000000000000000, "fb": 0}"#;
+    assert_eq!(cause_of("fa equals fb within 0", tiny), "unusable");
+    assert_eq!(cause_of("fa is 0 within 0", tiny), "unusable");
+    let spread = r#"{"id": "t", "fa": 1e-5000, "fb": 0}"#;
+    assert_eq!(cause_of("fa equals fb within 0", spread), "unusable");
+    let big = format!("1e1{}", "0".repeat(36));
+    let unreadable = format!(r#"{{"id": "t", "fa": {big}, "fb": {big}}}"#);
+    assert_eq!(cause_of("fa equals fb within 1", &unreadable), "unusable");
+    let near = r#"{"id": "t", "fa": 1e-300, "fb": 0}"#;
+    assert_eq!(cause_of("fa equals fb within 0", near), "value");
+    assert_eq!(cause_of("fa equals fb within 1e-300", near), "satisfied");
+}
+
+#[test]
+fn within_does_not_overflow_on_exponents_at_both_ends_of_what_it_reads() {
+    let ends = r#"{"id": "t", "fa": 1e9000000000000000000, "fb": 1e-9000000000000000000}"#;
+    assert_eq!(cause_of("fa equals fb within 1", ends), "unusable");
+}
