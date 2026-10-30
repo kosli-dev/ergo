@@ -3551,6 +3551,8 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "every \"#rows\".n is at least x.v",
         &[],
         &[],
+    ),
+    (
         "i is one of 1, 'a' and y is at least y",
         "i is one of 1, \"a\" and y is at least y",
         &["y is compared with itself"],
