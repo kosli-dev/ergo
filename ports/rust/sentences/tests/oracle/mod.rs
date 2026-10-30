@@ -1408,6 +1408,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("first of $input", "first of $input"),
     ("p whose x is 1", "p whose x is 1"),
     ("p.commits", "p.commits"),
+    ("artifact[0].c", "artifact[0].c"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
