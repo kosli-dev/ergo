@@ -61,19 +61,9 @@ test_the_deep_walks_cases_pass if {
 	_compiled_differences("deep_walks") == set()
 }
 
-test_the_derived_cases_pass if {
-	_topic_failures("derived") == _known_in("derived")
-	_compiled_differences("derived") == set()
-}
-
 test_the_equals_cases_pass if {
 	_topic_failures("equals") == _known_in("equals")
 	_compiled_differences("equals") == set()
-}
-
-test_the_for_cases_pass if {
-	_topic_failures("for") == _known_in("for")
-	_compiled_differences("for") == set()
 }
 
 test_the_in_cases_pass if {
@@ -121,25 +111,84 @@ test_the_requirements_cases_pass if {
 	_compiled_differences("requirements") == set()
 }
 
-_half(topic, n) := [group | some i, group in data.spec.cases[topic]; i % 2 == n]
+_part(topic, n, parts) := [group | some i, group in data.spec.cases[topic]; i % parts == n]
 
-_half_passes(topic, n) if _failures(topic, _half(topic, n)) == known_differences & {concat(" / ", [topic, group.description, c.description]) |
-	some group in _half(topic, n)
+_part_passes(topic, n, parts) if _failures(topic, _part(topic, n, parts)) == known_differences & {concat(" / ", [topic, group.description, c.description]) |
+	some group in _part(topic, n, parts)
 	some c in group.cases
 }
 
-test_the_even_sentences_cases_pass if _half_passes("sentences", 0)
+test_the_even_sentences_cases_pass if _part_passes("sentences", 0, 2)
 
-test_the_odd_sentences_cases_pass if _half_passes("sentences", 1)
+test_the_odd_sentences_cases_pass if _part_passes("sentences", 1, 2)
 
-test_the_even_sentences_cases_pass_compiled if _differences_compiled("sentences", _half("sentences", 0)) == set()
+test_the_even_sentences_cases_pass_compiled if _differences_compiled("sentences", _part("sentences", 0, 2)) == set()
 
-test_the_odd_sentences_cases_pass_compiled if _differences_compiled("sentences", _half("sentences", 1)) == set()
+test_the_odd_sentences_cases_pass_compiled if _differences_compiled("sentences", _part("sentences", 1, 2)) == set()
 
-test_the_subjects_cases_pass if {
-	_topic_failures("subjects") == _known_in("subjects")
-	_compiled_differences("subjects") == set()
-}
+test_the_subjects_cases_pass_part_1_of_6 if _part_passes("subjects", 0, 6)
+
+test_the_subjects_cases_pass_part_2_of_6 if _part_passes("subjects", 1, 6)
+
+test_the_subjects_cases_pass_part_3_of_6 if _part_passes("subjects", 2, 6)
+
+test_the_subjects_cases_pass_part_4_of_6 if _part_passes("subjects", 3, 6)
+
+test_the_subjects_cases_pass_part_5_of_6 if _part_passes("subjects", 4, 6)
+
+test_the_subjects_cases_pass_part_6_of_6 if _part_passes("subjects", 5, 6)
+
+test_the_subjects_cases_pass_compiled_part_1_of_6 if _differences_compiled("subjects", _part("subjects", 0, 6)) == set()
+
+test_the_subjects_cases_pass_compiled_part_2_of_6 if _differences_compiled("subjects", _part("subjects", 1, 6)) == set()
+
+test_the_subjects_cases_pass_compiled_part_3_of_6 if _differences_compiled("subjects", _part("subjects", 2, 6)) == set()
+
+test_the_subjects_cases_pass_compiled_part_4_of_6 if _differences_compiled("subjects", _part("subjects", 3, 6)) == set()
+
+test_the_subjects_cases_pass_compiled_part_5_of_6 if _differences_compiled("subjects", _part("subjects", 4, 6)) == set()
+
+test_the_subjects_cases_pass_compiled_part_6_of_6 if _differences_compiled("subjects", _part("subjects", 5, 6)) == set()
+
+test_the_derived_cases_pass_part_1_of_6 if _part_passes("derived", 0, 6)
+
+test_the_derived_cases_pass_part_2_of_6 if _part_passes("derived", 1, 6)
+
+test_the_derived_cases_pass_part_3_of_6 if _part_passes("derived", 2, 6)
+
+test_the_derived_cases_pass_part_4_of_6 if _part_passes("derived", 3, 6)
+
+test_the_derived_cases_pass_part_5_of_6 if _part_passes("derived", 4, 6)
+
+test_the_derived_cases_pass_part_6_of_6 if _part_passes("derived", 5, 6)
+
+test_the_derived_cases_pass_compiled_part_1_of_6 if _differences_compiled("derived", _part("derived", 0, 6)) == set()
+
+test_the_derived_cases_pass_compiled_part_2_of_6 if _differences_compiled("derived", _part("derived", 1, 6)) == set()
+
+test_the_derived_cases_pass_compiled_part_3_of_6 if _differences_compiled("derived", _part("derived", 2, 6)) == set()
+
+test_the_derived_cases_pass_compiled_part_4_of_6 if _differences_compiled("derived", _part("derived", 3, 6)) == set()
+
+test_the_derived_cases_pass_compiled_part_5_of_6 if _differences_compiled("derived", _part("derived", 4, 6)) == set()
+
+test_the_derived_cases_pass_compiled_part_6_of_6 if _differences_compiled("derived", _part("derived", 5, 6)) == set()
+
+test_the_for_cases_pass_part_1_of_4 if _part_passes("for", 0, 4)
+
+test_the_for_cases_pass_part_2_of_4 if _part_passes("for", 1, 4)
+
+test_the_for_cases_pass_part_3_of_4 if _part_passes("for", 2, 4)
+
+test_the_for_cases_pass_part_4_of_4 if _part_passes("for", 3, 4)
+
+test_the_for_cases_pass_compiled_part_1_of_4 if _differences_compiled("for", _part("for", 0, 4)) == set()
+
+test_the_for_cases_pass_compiled_part_2_of_4 if _differences_compiled("for", _part("for", 1, 4)) == set()
+
+test_the_for_cases_pass_compiled_part_3_of_4 if _differences_compiled("for", _part("for", 2, 4)) == set()
+
+test_the_for_cases_pass_compiled_part_4_of_4 if _differences_compiled("for", _part("for", 3, 4)) == set()
 
 test_the_walks_cases_pass if {
 	_topic_failures("walks") == _known_in("walks")

@@ -24,20 +24,31 @@ use problems::{Kind, errors};
 
 /// Reads a path, like `x.y[1]` or `item 2 of xs`.
 ///
-/// Whitespace at both ends is dropped. It returns the `SyntaxError`s `ergo.rego` gives for the same line when the line is not a path.
+/// Whitespace at both ends is dropped. It returns the `SyntaxError`s `ergo.rego` gives for the same line when the line is not a path, and when the path holds an unknown name, like `$foo`.
 ///
 /// ```
 /// use ergo_sentences::parse_path;
 ///
 /// assert!(parse_path("x.y[1]").is_ok());
 /// assert!(parse_path("x.y[").is_err());
+/// assert!(parse_path("$foo").is_err());
 /// ```
 pub fn parse_path(line: &str) -> Result<Path, Vec<SyntaxError>> {
     let text = trim(line);
     let parser = Parser::new(text, false);
-    parser
+    let path = parser
         .whole(parser.path(0, Side::Left))
-        .ok_or_else(|| errors(text, Kind::Path))
+        .ok_or_else(|| errors(text, Kind::Path))?;
+    let names: Vec<SyntaxError> = rules::path_base(&path)
+        .into_iter()
+        .filter(|problem| problem.starts_with("unknown name "))
+        .map(SyntaxError::new)
+        .collect();
+    if names.is_empty() {
+        Ok(path)
+    } else {
+        Err(names)
+    }
 }
 
 /// Reads a `from` line, like `every items whose x is 1`.

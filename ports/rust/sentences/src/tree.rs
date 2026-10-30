@@ -449,6 +449,7 @@ pub enum Position {
 /// it
 /// $params
 /// $input
+/// $other
 /// name
 /// .name
 /// ```
@@ -461,6 +462,8 @@ pub enum Start {
     Params,
     /// `$input`.
     Input,
+    /// Any other `$` name, like `$foo`, kept with its `$`. It reads by the grammar and is written wrong, as an unknown name.
+    Unknown(String),
     /// A field name.
     Field {
         /// The name, decoded.
@@ -499,6 +502,8 @@ pub enum Step {
 /// ```text
 /// $params.k
 /// $input.k
+/// $other
+/// $other.k
 /// k
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -508,6 +513,13 @@ pub enum Reference {
     Params(String),
     /// `$input.k`.
     Input(String),
+    /// Any other `$` name, like `$foo` or `$foo.k`. It reads by the grammar and is written wrong, as an unknown name.
+    Unknown {
+        /// The name, with its `$`.
+        name: String,
+        /// The key after a dot, decoded.
+        key: Option<String>,
+    },
     /// A bare name.
     Name(String),
 }

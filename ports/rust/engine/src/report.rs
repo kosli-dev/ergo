@@ -348,10 +348,15 @@ pub fn check_defs(
     let keyed = policy.subject_of(requirement).is_some_and(|(name, _)| {
         matches!(
             reading.lowered(name).map(|lowered| &lowered.source),
-            Some(Source::Root {
-                each_of: Some(_),
-                ..
-            })
+            Some(
+                Source::Root {
+                    each_of: Some(_),
+                    ..
+                } | Source::Child {
+                    each_of: Some(_),
+                    ..
+                }
+            )
         )
     });
     let (min_description, min_expression) = if is_zero(&requirement.min_subjects) && !keyed {
