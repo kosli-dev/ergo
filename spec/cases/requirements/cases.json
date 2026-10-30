@@ -330,6 +330,84 @@
     ]
   },
   {
+    "description": "named by each of on the whole input when it is a list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "subject": {
+          "from": "$input named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a",
+        "0"
+      ]
+    },
+    "cases": [
+      {
+        "description": "ends unusable, with no subject, because a key needs an object",
+        "rules": [
+          "subjects.from",
+          "path.unusable"
+        ],
+        "input": [
+          {
+            "x": 1
+          },
+          {
+            "y": 2
+          }
+        ],
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope subject count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated subject ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "the whole input as a list, with a condition",
     "policy": {"ergo_spec": "v0.3-dev", "subjects": {"subject": {"from": "$input whose x is 1"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [

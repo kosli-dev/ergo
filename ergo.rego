@@ -492,11 +492,13 @@ default _array_read(_, _) := false
 
 _array_read(doc, req) if {
 	is_array(doc)
+	not _keys_step(req)
 	_from_keys(req) == []
 }
 
 _array_read(doc, req) if {
 	is_array(doc)
+	not _keys_step(req)
 	_index_step(_from_keys(req)[0])
 }
 
@@ -585,7 +587,6 @@ _from_state(doc, req) := "null" if _target_read(doc, req) == null
 
 _from_state(doc, req) := "unusable" if {
 	is_array(doc)
-	_from_keys(req) != []
 	not _array_read(doc, req)
 }
 
