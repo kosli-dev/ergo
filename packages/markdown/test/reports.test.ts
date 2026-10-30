@@ -24,6 +24,15 @@ const report = (policy: unknown, params: unknown, input: string): string => {
   }
 };
 
+const engine = '"name": "ergo.rego",\n    "version": "ergo.rego\'s version"';
+const version = /^version := "(.+)"$/m.exec(readFileSync(ergo, "utf8"))?.[1] ?? "no version in ergo.rego";
+
+const expected = (dir: string): string => {
+  const text = readFileSync(join(dir, "report.json"), "utf8");
+  assert.ok(text.includes(engine), `${dir}/report.json says "ergo.rego's version" for the engine's version, so a new ergo.rego version doesn't break it`);
+  return text.replace(engine, engine.replace("ergo.rego's version", version));
+};
+
 const withReports = existsSync(cases) ? readdirSync(cases).filter((name) => existsSync(join(cases, name, "report.json"))).sort() : [];
 
 for (const name of withReports) {
@@ -32,6 +41,6 @@ for (const name of withReports) {
     const {policy, problems} = compile(readFileSync(join(dir, "policy.ergo.md"), "utf8"));
     assert.deepEqual(problems, []);
     const params = existsSync(join(dir, "params.json")) ? JSON.parse(readFileSync(join(dir, "params.json"), "utf8")) : {};
-    assert.equal(report(policy, params, join(dir, "input.json")), readFileSync(join(dir, "report.json"), "utf8"));
+    assert.equal(report(policy, params, join(dir, "input.json")), expected(dir));
   });
 }
