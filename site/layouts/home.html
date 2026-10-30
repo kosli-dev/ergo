@@ -124,13 +124,12 @@
         <span class="flow__label mono">inputs</span>
         <ul>
           <li class="flow__card"><span class="flow__k mono">input</span><span class="flow__v">deployments.json</span></li>
-          <li class="flow__card"><span class="flow__k mono">policy</span><span class="flow__v">requirements.yaml</span></li>
-          <li class="flow__card"><span class="flow__k mono">spec</span><span class="flow__v">{{ partial "mark.html" . }}<span class="flow__v--ergo">Ergo spec</span></span></li>
+          <li class="flow__card"><span class="flow__k mono">policy</span><span class="flow__v">policy.yaml</span></li>
         </ul>
       </li>
       <li class="flow__group flow__group--live">
         <svg class="flow__ants" aria-hidden="true" focusable="false"><rect></rect></svg>
-        <span class="flow__label mono">evaluation</span>
+        <span class="flow__label mono">engines, following the Ergo spec</span>
         <ul>
           {{- range $c.architecture.engines }}
           <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v"><span><span class="flow__v--ergo">{{ .name }}</span> {{ .on }}{{ if .opa }} {{ site.Params.opaVersion }}{{ end }}</span></span></li>

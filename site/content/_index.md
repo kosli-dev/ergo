@@ -89,7 +89,7 @@ manifesto:
 architecture:
   title: One language.
   muted: Two engines.
-  lede: "The spec defines the language: what each check means and what the report holds. `ergo.rego` runs it on Open Policy Agent. The Rust engine runs it as the `ergo` command or in a browser, and is still experimental. Both pass every case in the spec and give the same report, apart from the engine's name."
+  lede: "The spec is the rules every engine follows: how a policy is written, what each check means and what the report holds. `ergo.rego` runs your policies on Open Policy Agent. The Rust engine runs them as the `ergo` command or in a browser, and is still experimental. Both pass every case in the spec and give the same report, apart from the engine's name."
   engines:
     - name: ergo.rego
       on: on OPA
