@@ -59,7 +59,7 @@ For the Rust engine, the tag is `rust-vX.Y.Z`, and it publishes the crates `ergo
 2. After it merges and the test workflow passed, run `.github/release.sh rust-vX.Y.Z`. It refuses a version with `-dev`, a version that isn't the one in `Cargo.toml` on `main`, and a changelog without that heading.
 3. The workflow checks the same things and that the three crates package, builds the `ergo` binary for Linux (x86_64) and macOS (arm64), publishes the three crates in that order with crates.io's trusted publishing, and creates a GitHub release with the two binaries as `.tar.gz` files. That release is never the latest, so `releases/latest` stays the newest `ergo.rego`. Then it opens a pull request that moves `main` to the next `-dev` version, like the one for `ergo.rego`. Merge it once its checks pass.
 
-The first publish is by hand, because crates.io's trusted publishing can only be set up for a crate that exists. With the first release prepared as in step 1, a maintainer with a crates.io API token runs this in `engines/rust`, in this order, because each crate needs the one before it on crates.io. The token needs the `publish-new` and `change-owners` scopes, with the crate pattern `ergo-policy*`, which works for crates that don't exist yet. Run `cargo login` in a shell that won't keep the token:
+The first publish is by hand, because crates.io's trusted publishing can only be set up for a crate that exists. With the first release prepared as in step 1, a maintainer with a crates.io API token runs this in `engines/rust`, in this order, because each crate needs the one before it on crates.io. The token needs the `publish-new` and `change-owners` scopes, with the crate pattern `ergo-policy*`, which works for crates that don't exist yet. Run `cargo login` in a shell that won't keep the token. If a `cargo publish` fails partway, fix the cause and go on from the crate that failed, skipping the ones already on crates.io:
 
 ```sh
 cargo publish --locked -p ergo-policy-sentences
@@ -69,7 +69,7 @@ cargo publish --locked -p ergo-policy-cli
 
 Then:
 
-1. For each crate, add a `kosli-dev` GitHub team and a second maintainer as owners, so publishing doesn't depend on one account: `cargo owner --add github:kosli-dev:<team> <crate>` and `cargo owner --add <login> <crate>`.
+1. For each crate, add a `kosli-dev` GitHub team and a second maintainer as owners, so publishing doesn't depend on one account: `cargo owner --add github:kosli-dev:<team> <crate>` and `cargo owner --add <login> <crate>`. Adding the team only works when the person running it is in that team, and when the `kosli-dev` organization lets crates.io read its teams, which an organization owner allows under the organization's third-party (OAuth app) access settings.
 2. Create a GitHub environment named `crates-io` and limit it to `rust-v*` tags with a deployment tag rule, so only a tag can publish.
 3. For each crate, open its Settings on crates.io and add a trusted publisher for GitHub, with the owner `kosli-dev`, the repository `ergo`, the workflow `release.yml` and the environment `crates-io`.
 4. Revoke the API token on crates.io straight away.
@@ -80,7 +80,7 @@ The site at https://ergo.kosli.com shows the latest published `rego-vX.Y.Z` rele
 
 Releases are only made by the release workflow, never by hand in GitHub or with `gh release create`. GitHub marks a release made by hand as the latest unless you untick it, and then `releases/latest/download/ergo.rego` stops working. The workflow marks an `ergo.rego` release as the latest only when it's the highest `rego-vX.Y.Z` version, so a fix to an older version doesn't take it, and never marks a spec release as the latest. Its release notes are that version's section of the changelog, with links to `.md` files pointing at the tag. The one exception so far is `spec-v0.1`, which was tagged before the workflow published spec releases, so its release was made once by hand with the same title, notes, files and `--latest=false`.
 
-If a release job fails after its tag is pushed, fix the cause and run it again from the Actions tab, or with `gh workflow run release.yml --ref main -f tag=<tag>`. It runs the same checks and steps on that existing tag. For a spec tag whose release is already there, it skips creating it again.
+If a release job fails after its tag is pushed, fix the cause and run it again from the Actions tab, or with `gh workflow run release.yml --ref main -f tag=<tag>`. It runs the same checks and steps on that existing tag. For a spec tag whose release is already there, it skips creating it again. For a `rust-vX.Y.Z` tag, run it from the tag instead, with `gh workflow run release.yml --ref rust-vX.Y.Z -f tag=rust-vX.Y.Z` or by picking the tag in the Actions tab. A run from `main` can't publish, because the `crates-io` environment only lets `rust-v*` tags in, and that's on purpose. It skips the crates and the release that are already there.
 
 When both tags are pushed together, the `ergo.rego` job can start the site deploy before the spec's release is published, and that deploy fails, leaving the old site up. The spec job starts another deploy once its release is out, so check the site after both jobs have finished.
 
