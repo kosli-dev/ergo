@@ -270,6 +270,28 @@ fn fail_exits_three_when_the_policy_is_written_wrong() {
 }
 
 #[test]
+fn fail_exits_three_when_the_policy_has_no_requirements_because_no_check_ran() {
+    let (_, input) = readme("fail-empty");
+    let dir = dir("fail-empty");
+    for (file, text) in [
+        ("empty.json", "{}"),
+        ("future.json", r#"{"ergo_spec": "v9.9"}"#),
+        ("none.json", r#"{"ergo_spec": "v0.3"}"#),
+        ("null.yaml", "null\n"),
+        ("list.yaml", "- 1\n"),
+    ] {
+        let policy = write(&dir, file, text);
+        for command in COMMANDS {
+            assert_eq!(
+                exits(command, &policy, &input, true).status.code(),
+                Some(3),
+                "{command} {file}"
+            );
+        }
+    }
+}
+
+#[test]
 fn fail_exits_three_rather_than_one_when_a_check_failed_and_a_requirement_is_written_wrong() {
     let (_, input) = readme("fail-both");
     let policy = one_requirement_written_wrong_policy("fail-both");
@@ -299,8 +321,8 @@ fn help_lists_fail_and_every_exit_code() {
         "Exit codes:
   0  the output was printed: the policy is met, or --fail isn't given
   1  with --fail, a check failed
-  2  the command line is wrong, or a file can't be read
-  3  with --fail, the policy is written wrong: a $well_formed row failed
+  2  the command line is wrong, a file can't be read, or the output couldn't be written
+  3  with --fail, the policy is written wrong or has no requirements
 "
     ));
 }

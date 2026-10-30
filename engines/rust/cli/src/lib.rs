@@ -50,8 +50,8 @@ The output is pretty-printed with sorted keys; --compact prints one line.
 Exit codes:
   0  the output was printed: the policy is met, or --fail isn't given
   1  with --fail, a check failed
-  2  the command line is wrong, or a file can't be read
-  3  with --fail, the policy is written wrong: a $well_formed row failed
+  2  the command line is wrong, a file can't be read, or the output couldn't be written
+  3  with --fail, the policy is written wrong or has no requirements
 ";
 
 /// What a run gives back.
@@ -59,15 +59,17 @@ Exit codes:
 pub enum Outcome {
     /// Text for stdout, exit code 0.
     Print(String),
-    /// Text for stdout, then a non-zero exit code: 1 when a check failed and 3 when the policy is written wrong.
+    /// Text for stdout, then a non-zero exit code: 1 when a check failed and 3 when the policy is written wrong or has no requirements.
     PrintAndFail(String, u8),
 }
 
-/// The exit code `--fail` gives a report: 0 when it's compliant, 3 when a `$well_formed` row failed, and 1 otherwise.
+/// The exit code `--fail` gives a report: 3 when a `$well_formed` row failed or no check ran, 0 when it's compliant, and 1 otherwise.
 pub fn fail_code(report: &serde_json::Value) -> u8 {
     let written_wrong = report["results"].as_array().is_none_or(|rows| {
-        rows.iter()
-            .any(|row| row["check"] == "$well_formed" && row["passed"] != true)
+        rows.is_empty()
+            || rows
+                .iter()
+                .any(|row| row["check"] == "$well_formed" && row["passed"] != true)
     });
     if written_wrong {
         3

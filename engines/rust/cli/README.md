@@ -10,4 +10,4 @@ ergo report --policy policy.yaml --input deployments.json
 ergo violations --policy policy.yaml --input deployments.json
 ```
 
-The policy, the input and the optional `--params` file are each `.json`, `.yaml` or `.yml`. `report` prints the whole report as JSON and `violations` prints only what failed. The command exits 2 when the command line is wrong or a file can't be read. Otherwise it exits 0, unless `--fail` is given: then it exits 1 when a check failed and 3 when the policy is written wrong, after printing the output in full.
+The policy, the input and the optional `--params` file are each `.json`, `.yaml` or `.yml`. `report` prints the whole report as JSON and `violations` prints only what failed. The command exits 2 when the command line is wrong, a file can't be read or the output couldn't be written. Otherwise it exits 0, unless `--fail` is given: then it prints the output in full and exits 1 when a check failed, or 3 when the policy is written wrong or has no requirements.
