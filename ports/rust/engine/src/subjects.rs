@@ -337,6 +337,14 @@ fn read_entries<'a>(
             each_of: Some(each_of),
         } => each_of_entries(env, empty, path, each_of, anc),
         Source::Root { path, .. } | Source::Child { path, .. } => {
+            if matches!(&lowered.source, Source::Child { .. })
+                && matches!(path.steps.first(), Some(Step::Index(_)))
+                && anc
+                    .last()
+                    .is_some_and(|parent| std::ptr::eq(parent.at.value, empty))
+            {
+                return Read::Failed(Cause::Absent);
+            }
             let ctx = context(env, input_root(env), anc);
             let read = path::read(path, &ctx);
             match read.outcome {
@@ -639,7 +647,15 @@ fn min_row(env: &Env, count: u64, locations: &[String], read: Option<Cause>) -> 
 fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> Evaluation {
     let (entries, broken) = match read_entries(env, empty, lowered, anc) {
         Read::Entries { entries, broken } => (entries, broken),
-        Read::Failed(cause) => return failed_level(env, anc, cause, true),
+        Read::Failed(cause) => {
+            let mut level = failed_level(env, anc, cause, true);
+            if matches!(&lowered.source, Source::Root { every: true, .. }) {
+                for row in &mut level.min_subjects {
+                    row.failed_items = Some(Value::Array(Vec::new()));
+                }
+            }
+            return level;
+        }
     };
     let judged = judge(env, lowered, entries, anc);
     let (repeated, id_locations) = repeated_ids(&judged);
@@ -1341,6 +1357,47 @@ mod tests {
             json!([{"path": "arts.prs", "item": "arts.prs", "cause": "unusable", "value": {"u": 1}, "locations": ["/arts/prs"]}])
         );
         assert_eq!(input_of(min, 0)["value"], json!(0));
+    }
+
+    #[test]
+    fn every_whose_named_by_reads_a_param_that_is_missing_keeps_the_requirement_and_fails_absent() {
+        let subjects = json!({"thing": {"from": "every x named by $params.k"}});
+        for (params, cause) in [
+            (json!({}), "absent"),
+            (json!({"k": null}), "null"),
+            (json!({"k": ["x"]}), "unusable"),
+        ] {
+            let r = report(
+                &json!({"x": [{"id": 1}]}),
+                &policy(subjects.clone(), json!(1)),
+                &params,
+            );
+            let min = &rows(&r, "$min_subjects")[0];
+            assert_eq!(min["cause"], json!(cause));
+            assert_eq!(min["failed_items"], json!([]));
+            assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
+        }
+    }
+
+    #[test]
+    fn a_position_under_a_keyed_parent_the_object_lacks_fails_absent_and_not_unusable() {
+        for from in ["p[0]", "first of p", "p[0].x"] {
+            let policy = json!({
+                "ergo_spec": "v0.3-dev",
+                "subjects": {"p": {"from": "m named by each of $params.ks"}, "k": {"from": from}},
+                "requirements": {"r": {"subject": "k", "checks": {"c": "x exists"}}}
+            });
+            let r = report(
+                &json!({"m": {"a": [{"x": 1}]}}),
+                &policy,
+                &json!({"ks": ["c"]}),
+            );
+            let causes: Vec<Value> = rows(&r, "$min_subjects")
+                .iter()
+                .map(|row| row["cause"].clone())
+                .collect();
+            assert_eq!(causes, vec![json!("absent")], "{from}");
+        }
     }
 
     #[test]

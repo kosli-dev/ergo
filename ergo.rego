@@ -540,6 +540,7 @@ _walkable(doc) if is_array(doc)
 
 _every_cause(doc, req) := c if {
 	not _walkable(doc)
+	doc != null
 	c := _target_state(doc, req)
 	c != "value"
 } else := _worst_of({f.cause | some f in fails}) if {
@@ -680,6 +681,14 @@ _raw_entries(doc, req) := [] if {
 	_every_from(req)
 	not _walkable(doc)
 }
+
+_raw_entries(_, req) := [] if {
+	_from_well_formed(req)
+	_every_from(req)
+	not _from_keys_read(req)
+}
+
+_from_keys_read(req) if _from_keys(req)
 
 _raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k], _absent), "at": _pointer(_doc_at, doc, array.concat(_from_keys(req), [k]))} | some k in sort({k | some k in _listed_keys(_each_step(req))})] if {
 	_from_well_formed(req)
@@ -6371,8 +6380,19 @@ _s_descends(name, fl, subjects) if {
 	"named_by_each_of" in object.keys(fl)
 }
 
+_s_descends(name, fl, subjects) if {
+	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
+	fl.path.steps == [fl.path.steps[0]]
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] != name
+	fl.path.steps[0] in object.keys(subjects)
+	"position" in object.keys(fl.path)
+}
+
 _s_narrows(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
+	not "position" in object.keys(fl.path)
 	object.get(fl.path, "dot", false) != true
 	fl.path.steps == [fl.path.steps[0]]
 	is_string(fl.path.steps[0])
@@ -7476,6 +7496,8 @@ _s_model_step(s) := {"named_by_field": s.named_by.steps[0]} if {
 _s_model_position(p) := [p.position - 1] if is_number(object.get(p, "position", null))
 
 _s_model_position(p) := [0] if object.get(p, "position", null) == "first"
+
+_s_model_position(p) := [0] if object.get(p, "position", null) == "last"
 
 _s_model_position(p) := [] if not "position" in object.keys(p)
 
