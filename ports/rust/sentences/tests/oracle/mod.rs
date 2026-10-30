@@ -1402,6 +1402,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("every $input", "every $input"),
     ("every $input.commits", "every $input.commits"),
     ("every commits", "every commits"),
+    ("$input whose x is 1", "$input whose x is 1"),
+    ("$input.commits", "$input.commits"),
+    ("$input[5]", "item 6 of $input"),
+    ("first of $input", "first of $input"),
+    ("p whose x is 1", "p whose x is 1"),
+    ("p.commits", "p.commits"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

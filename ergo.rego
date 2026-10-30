@@ -471,10 +471,7 @@ _listed_keys(step) := v if {
 
 _target(doc, req) := object.get(doc, _from_keys(req), null) if is_object(doc)
 
-_target(doc, req) := doc if {
-	is_array(doc)
-	_from_keys(req) == []
-}
+_target(doc, req) := object.get({"v": doc}, array.concat(["v"], _from_keys(req)), null) if _array_read(doc, req)
 
 _target_read(doc, req) := object.get(doc, _from_keys(req), _absent) if is_object(doc)
 
@@ -483,14 +480,24 @@ _target_read(doc, req) := doc if {
 	_from_keys(req) == []
 }
 
-_target_read(doc, req) := doc if {
-	is_array(doc)
-	_from_keys(req) == []
-}
+_target_read(doc, req) := object.get({"v": doc}, array.concat(["v"], _from_keys(req)), _absent) if _array_read(doc, req)
 
 _target_read(doc, req) := _absent if {
 	not is_object(doc)
 	count(_from_keys(req)) > 0
+	not _array_read(doc, req)
+}
+
+default _array_read(_, _) := false
+
+_array_read(doc, req) if {
+	is_array(doc)
+	_from_keys(req) == []
+}
+
+_array_read(doc, req) if {
+	is_array(doc)
+	_index_step(_from_keys(req)[0])
 }
 
 _target_cause(doc, req) := c if {
@@ -573,6 +580,7 @@ _from_state(doc, req) := "null" if _target_read(doc, req) == null
 _from_state(doc, req) := "unusable" if {
 	is_array(doc)
 	_from_keys(req) != []
+	not _array_read(doc, req)
 }
 
 _from_state(doc, req) := "unusable" if {
