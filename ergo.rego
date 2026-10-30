@@ -6444,7 +6444,7 @@ _s_dotted(subjects, lines) := {name: true |
 	l.path.steps[0] in object.keys(subjects)
 }
 
-_s_subject_sentences(subjects, reads, parts) := {"dotted": _s_dotted(subjects, parts.lines), "from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "listed": {name: _s_listed_parent(r) | some name, r in reads; _s_listed_parent(r) != null}, "narrowing": {name: [parent] | some name, r in reads; parent := _s_narrowed_parent(r); is_string(parent); trim_space(parent) != ""}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
+_s_subject_sentences(subjects, reads, parts) := {"dotted": _s_dotted(subjects, parts.lines), "from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "listed": {name: _s_listed_parent(r) | some name, r in reads; _s_listed_parent(r) != null}, "narrowing": {name: [parent] | some name, r in reads; parent := _s_narrowed_parent(r); is_string(parent); trim_space(parent) != ""}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads, parts.lines); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
 
 _s_listed_parent(r) := object.get(r, "parent", null) if object.get(r, "parent", null) != null
 
@@ -6456,31 +6456,39 @@ _s_narrowed_parent(r) := object.get(object.get(r, "fields", {}), "of", null)
 
 _s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "listed": {}, "narrowing": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}, "dotted": {}} if not is_object(subjects)
 
-_s_subject_problems(name, def, reads) := {f: ps | some f in ["applies_to", "from", "identified_by", "of"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
+_s_subject_problems(name, def, reads, lines) := {f: ps | some f in ["applies_to", "from", "identified_by", "of"]; ps := _s_field_problems(name, def, f, reads, lines); ps != []} if is_object(def)
 
-_s_subject_problems(_, def, _) := {} if not is_object(def)
+_s_subject_problems(_, def, _, _) := {} if not is_object(def)
 
-_s_field_problems(name, def, "from", reads) := reads[name].problems if is_string(object.get(def, "from", null))
+_s_field_problems(name, def, "from", reads, _) := reads[name].problems if is_string(object.get(def, "from", null))
 
-_s_field_problems(name, def, "identified_by", reads) := object.get(reads[name].identified_by, "problems", []) if is_string(object.get(def, "identified_by", null))
+_s_field_problems(name, def, "identified_by", reads, lines) := sort(array.concat(object.get(reads[name].identified_by, "problems", []), [p | some p in _s_keyed_id_problem(object.get(lines, name, {}))])) if is_string(object.get(def, "identified_by", null))
 
-_s_field_problems(_, def, f, _) := ["not a string"] if {
-	f in {"from", "identified_by"}
-	f in object.keys(def)
-	not is_string(def[f])
+_s_keyed_id_problem(line) := {"not allowed with named by each of: the key is the id"} if "named_by_each_of" in object.keys(line)
+
+_s_keyed_id_problem(line) := set() if not "named_by_each_of" in object.keys(line)
+
+_s_field_problems(_, def, "from", _, _) := ["not a string"] if {
+	"from" in object.keys(def)
+	not is_string(def.from)
 }
 
-_s_field_problems(_, def, f, _) := [] if {
+_s_field_problems(name, def, "identified_by", _, lines) := sort(array.concat(["not a string"], [p | some p in _s_keyed_id_problem(object.get(lines, name, {}))])) if {
+	"identified_by" in object.keys(def)
+	not is_string(def.identified_by)
+}
+
+_s_field_problems(_, def, f, _, _) := [] if {
 	f in {"from", "identified_by"}
 	not f in object.keys(def)
 }
 
-_s_field_problems(_, def, f, _) := ["unknown field"] if {
+_s_field_problems(_, def, f, _, _) := ["unknown field"] if {
 	f in {"applies_to", "of"}
 	f in object.keys(def)
 }
 
-_s_field_problems(_, def, f, _) := [] if {
+_s_field_problems(_, def, f, _, _) := [] if {
 	f in {"applies_to", "of"}
 	not f in object.keys(def)
 }

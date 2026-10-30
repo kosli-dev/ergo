@@ -1,4 +1,5 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("aid exists", "aid exists", &[], &[]),
     (
         "count of items.x.y whose k is \"a\" is 1",
         "count of items.x.y whose k is \"a\" is 1",
