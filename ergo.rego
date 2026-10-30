@@ -471,6 +471,8 @@ _listed_keys(step) := v if {
 
 _target(doc, req) := object.get(doc, _from_keys(req), null) if is_object(doc)
 
+_target(doc, req) := object.get({"v": doc}, array.concat(["v"], _from_keys(req)), null) if _array_read(doc, req)
+
 _target_read(doc, req) := object.get(doc, _from_keys(req), _absent) if is_object(doc)
 
 _target_read(doc, req) := doc if {
@@ -478,9 +480,26 @@ _target_read(doc, req) := doc if {
 	_from_keys(req) == []
 }
 
+_target_read(doc, req) := object.get({"v": doc}, array.concat(["v"], _from_keys(req)), _absent) if _array_read(doc, req)
+
 _target_read(doc, req) := _absent if {
 	not is_object(doc)
 	count(_from_keys(req)) > 0
+	not _array_read(doc, req)
+}
+
+default _array_read(_, _) := false
+
+_array_read(doc, req) if {
+	is_array(doc)
+	not _keys_step(req)
+	_from_keys(req) == []
+}
+
+_array_read(doc, req) if {
+	is_array(doc)
+	not _keys_step(req)
+	_index_step(_from_keys(req)[0])
 }
 
 _target_cause(doc, req) := c if {
@@ -513,8 +532,15 @@ _keyed_state(doc, req) := c if {
 
 _keyed_state(doc, req) := "unusable" if is_array(_target_read(doc, req))
 
+default _walkable(_) := false
+
+_walkable(doc) if is_object(doc)
+
+_walkable(doc) if is_array(doc)
+
 _every_cause(doc, req) := c if {
-	not is_object(doc)
+	not _walkable(doc)
+	doc != null
 	c := _target_state(doc, req)
 	c != "value"
 } else := _worst_of({f.cause | some f in fails}) if {
@@ -560,7 +586,10 @@ default _from_state(_, _) := "absent"
 
 _from_state(doc, req) := "null" if _target_read(doc, req) == null
 
-_from_state(doc, _) := "unusable" if is_array(doc)
+_from_state(doc, req) := "unusable" if {
+	is_array(doc)
+	not _array_read(doc, req)
+}
 
 _from_state(doc, req) := "unusable" if {
 	_target_read(doc, req) == _absent
@@ -644,14 +673,22 @@ _raw_entries(doc, req) := [entry | some entry in _listed_subjects(doc, req)] if 
 _raw_entries(doc, req) := _every_walk(doc, _from_keys(req)).subjects if {
 	_from_well_formed(req)
 	_every_from(req)
-	is_object(doc)
+	_walkable(doc)
 }
 
 _raw_entries(doc, req) := [] if {
 	_from_well_formed(req)
 	_every_from(req)
-	not is_object(doc)
+	not _walkable(doc)
 }
+
+_raw_entries(_, req) := [] if {
+	_from_well_formed(req)
+	_every_from(req)
+	not _from_keys_read(req)
+}
+
+_from_keys_read(req) if _from_keys(req)
 
 _raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k], _absent), "at": _pointer(_doc_at, doc, array.concat(_from_keys(req), [k]))} | some k in sort({k | some k in _listed_keys(_each_step(req))})] if {
 	_from_well_formed(req)
@@ -1570,17 +1607,21 @@ _field_path_name(path) := concat(".", [_segment_name(path[i]) | some i in _names
 
 _path_name([]) := "it"
 
-_path_name(path) := _visible_path_name(_visible(path)) if path != []
+_path_name(path) := _visible_path_name(_visible(path), "it") if path != []
 
-_visible_path_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _steps_name(array.slice(path, 0, count(path) - 1))]) if {
+_input_path_name([]) := "$input"
+
+_input_path_name(path) := _visible_path_name(_visible(path), "$input") if path != []
+
+_visible_path_name(path, root) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
 	is_array(path)
 	count(path) > 1
 	_index_step(path[count(path) - 1])
-} else := concat("", ["item ", _literal_text(path[0] + 1), " of it"]) if {
+} else := concat("", ["item ", _literal_text(path[0] + 1), " of ", root]) if {
 	is_array(path)
 	count(path) == 1
 	_index_step(path[0])
-} else := _steps_name(path)
+} else := _rooted_steps_name(path, root)
 
 _ref_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _plain_steps_name(array.slice(path, 0, count(path) - 1))]) if {
 	_builtin(path)
@@ -1593,11 +1634,13 @@ _index_step(s) if {
 	_is_key(s)
 }
 
-_steps_name(path) := concat("", array.concat(_it_root(visible), [_step_name(i, visible[i]) | some i in _names(visible)])) if visible := _visible(path)
+_steps_name(path) := _rooted_steps_name(path, "it")
 
-_it_root(visible) := ["it"] if _index_step(visible[0])
+_rooted_steps_name(path, root) := concat("", array.concat(_it_root(visible, root), [_step_name(i, visible[i]) | some i in _names(visible)])) if visible := _visible(path)
 
-_it_root(visible) := [] if not _index_step(visible[0])
+_it_root(visible, root) := [root] if _index_step(visible[0])
+
+_it_root(visible, _) := [] if not _index_step(visible[0])
 
 _plain_steps_name(path) := concat("", [_plain_step_name(i, path[i]) | some i in _names(path)])
 
@@ -3341,7 +3384,7 @@ _from_text(req) := _path_name(array.concat([_subject_step(data.ergo_subject_sent
 	not _chain_part(req)
 }
 
-_from_text(req) := "$input" if {
+_from_text(req) := concat("", [_every_word(req), "$input"]) if {
 	_from_well_formed(req)
 	_from_path(req) == []
 	not _chained(req)
@@ -3349,7 +3392,7 @@ _from_text(req) := "$input" if {
 
 _from_text(req) := "<invalid from>" if not _from_well_formed(req)
 
-_from_name(p) := _path_name(_from_steps(p))
+_from_name(p) := _input_path_name(_from_steps(p))
 
 _from_steps(p) := array.concat([{"literal": p[0]}], array.slice(p, 1, count(p))) if _starts_with_dollar_key(p)
 
@@ -3583,14 +3626,13 @@ _min_subjects_row(doc, req, req_name, matching, at) := object.union(
 	_every_failed_items(doc, req),
 )
 
-_every_failed_items(doc, req) := {"failed_items": [{"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
+_every_failed_items(doc, req) := {"failed_items": [{"path": _input_path_name(f.path), "item": _input_path_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
 	fails := _every_walk(doc, _from_keys(req)).fails
 	some p in sort({f.path | some f in fails})
 	some f in fails
 	f.path == p
 ]} if {
 	_every_from(req)
-	is_object(doc)
 	_from_well_formed(req)
 	not _from_unreadable(req)
 } else := {"failed_items": []} if _every_from(req)
@@ -6343,8 +6385,19 @@ _s_descends(name, fl, subjects) if {
 	"named_by_each_of" in object.keys(fl)
 }
 
+_s_descends(name, fl, subjects) if {
+	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
+	fl.path.steps == [fl.path.steps[0]]
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] != name
+	fl.path.steps[0] in object.keys(subjects)
+	"position" in object.keys(fl.path)
+}
+
 _s_narrows(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
+	not "position" in object.keys(fl.path)
 	object.get(fl.path, "dot", false) != true
 	fl.path.steps == [fl.path.steps[0]]
 	is_string(fl.path.steps[0])
@@ -7448,6 +7501,8 @@ _s_model_step(s) := {"named_by_field": s.named_by.steps[0]} if {
 _s_model_position(p) := [p.position - 1] if is_number(object.get(p, "position", null))
 
 _s_model_position(p) := [0] if object.get(p, "position", null) == "first"
+
+_s_model_position(p) := [0] if object.get(p, "position", null) == "last"
 
 _s_model_position(p) := [] if not "position" in object.keys(p)
 

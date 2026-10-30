@@ -1135,9 +1135,96 @@ test_min_subjects_accepts_a_single_object_from_as_one_subject if {
 
 test_min_subjects_with_an_empty_from_fails_when_the_document_is_not_an_object if {
 	req := {"s": object.union(min_subjects_req(0).s, {"from": "$input"})}
-	every doc, cause in {"null": "null", `"x"`: "unusable", "3": "unusable", `[{"id": "a"}]`: "unusable"} {
+	every doc, cause in {"null": "null", `"x"`: "unusable", "3": "unusable", "true": "unusable"} {
 		rep := report(json.unmarshal(doc), req)
 		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, cause]]
+	}
+}
+
+test_from_input_on_a_list_makes_each_item_a_subject_and_an_empty_list_fails_as_value if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input"})}
+	[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations] | some r in rows_for(report([{"id": "a"}, 1], req), "s", "$min_subjects")] == [[true, "satisfied", 2, ["/0", "/1"]]]
+	[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations] | some r in rows_for(report([], req), "s", "$min_subjects")] == [[false, "value", 0, []]]
+}
+
+test_from_every_input_on_a_list_makes_each_item_a_subject_and_prints_every if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "every $input"})}
+	rep := report([{"id": "a"}, 1], req)
+	[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations, r.failed_items] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied", 2, ["/0", "/1"], []]]
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(every $input)) >= 1"
+	[[r.passed, r.cause, r.inputs[0].value, r.failed_items] | some r in rows_for(report([], req), "s", "$min_subjects")] == [[false, "value", 0, []]]
+}
+
+test_from_every_input_on_an_input_that_is_not_a_list_fails_and_names_the_input_from_input if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "every $input"})}
+	every doc, cause in {"null": "null", `"x"`: "unusable", "3": "unusable", "true": "unusable"} {
+		[[r.passed, r.cause, r.failed_items] | some r in rows_for(report(json.unmarshal(doc), req), "s", "$min_subjects")] == [[false, cause, [{"path": "$input", "item": "$input", "cause": cause, "value": json.unmarshal(doc), "locations": [""]}]]]
+	}
+	[[r.passed, r.cause, r.failed_items[0].path, r.failed_items[0].item] | some r in rows_for(report({"id": "a"}, req), "s", "$min_subjects")] == [[false, "unusable", "$input", "$input"]]
+}
+
+test_every_walks_that_start_at_a_list_input_read_the_lists_inside_its_items if {
+	doc := [{"commits": [{"id": "a"}]}, {"commits": []}]
+	every from in ["every $input.commits", "every commits"] {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations] | some r in rows_for(report(doc, req), "s", "$min_subjects")] == [[true, "satisfied", 1, ["/0/commits/0"]]]
+	}
+}
+
+test_every_walk_that_starts_at_a_list_input_fails_an_item_that_is_not_an_object_or_has_no_list if {
+	every doc, cause in {`[1]`: "unusable", `[{}]`: "absent", `[{"commits": null}]`: "null", `[{"commits": 1}]`: "unusable"} {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": "every commits"})}
+		[[r.passed, r.cause] | some r in rows_for(report(json.unmarshal(doc), req), "s", "$min_subjects")] == [[false, cause]]
+	}
+}
+
+test_every_walk_that_starts_at_a_list_input_names_where_it_broke_from_input if {
+	every from in ["every $input.commits", "every commits"] {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		[[f.path, f.item, f.locations] | some r in rows_for(report([{"commits": [{"id": "a"}]}, {"commits": 5}, 7], req), "s", "$min_subjects"); some f in r.failed_items] == [["$input[1].commits", "$input[1].commits", ["/1/commits"]], ["$input[2].commits", "$input[2].commits", ["/2"]]]
+	}
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "every $input[1].commits"})}
+	[[f.path, f.item] | some r in rows_for(report([{"commits": []}, 5], req), "s", "$min_subjects"); some f in r.failed_items] == [["item 2 of $input", "item 2 of $input"]]
+}
+
+test_a_from_line_with_a_position_on_a_list_input_names_it_from_input_in_expressions if {
+	every from, want in {
+		"every $input[1].commits": ["count(matching(every $input[1].commits)) >= 1", "count(repeated(ids(every $input[1].commits))) == 0"],
+		"$input[1]": ["count(matching(item 2 of $input)) >= 1", "count(repeated(ids(item 2 of $input))) == 0"],
+		"first of $input": ["count(matching(item 1 of $input)) >= 1", "count(repeated(ids(item 1 of $input))) == 0"],
+		"every $input.commits": ["count(matching(every commits)) >= 1", "count(repeated(ids(every commits))) == 0"],
+	} {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		rep := report([{"commits": [{"id": "a"}]}, {"commits": [{"id": "b"}]}], req)
+		[rep.requirements.s.checks[c].expression | some c in ["$min_subjects", "$unique_ids"]] == want
+	}
+}
+
+test_a_child_subject_reads_the_items_of_a_list_input_as_its_parents if {
+	reqs := {"s": {"subject_type": "kid", "from": "parent.kids", "checks": {"c": "id exists"}}, "p": {"subject_type": "parent", "from": "$input", "checks": {"c": "kids exists"}}}
+	rep := report([{"kids": [{"id": "a"}]}, {"kids": []}], reqs)
+	[[r.passed, r.cause, r.inputs[0].locations] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied", ["/0/kids/0"]], [false, "value", []]]
+}
+
+test_a_position_on_a_list_input_reads_the_item_and_ends_absent_past_the_end if {
+	every from in ["$input[0]", "first of $input"] {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations] | some r in rows_for(report([{"id": "a"}, 1], req), "s", "$min_subjects")] == [[true, "satisfied", 1, ["/0"]]]
+		[[r.passed, r.cause, r.inputs[0].value] | some r in rows_for(report([], req), "s", "$min_subjects")] == [[false, "absent", 0]]
+	}
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input[5]"})}
+	[[r.passed, r.cause] | some r in rows_for(report([{"id": "a"}], req), "s", "$min_subjects")] == [[false, "absent"]]
+}
+
+test_a_position_on_a_list_input_that_leads_to_a_list_reads_its_items if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input[0].commits"})}
+	[[r.passed, r.cause, r.inputs[0].locations] | some r in rows_for(report([{"commits": [{"id": "a"}]}], req), "s", "$min_subjects")] == [[true, "satisfied", ["/0/commits/0"]]]
+}
+
+test_a_field_on_a_list_input_is_unusable if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input.commits"})}
+	every doc in [[{"commits": [{"id": "a"}]}], []] {
+		[[r.passed, r.cause] | some r in rows_for(report(doc, req), "s", "$min_subjects")] == [[false, "unusable"]]
 	}
 }
 
@@ -3219,6 +3306,63 @@ test_a_from_line_can_read_a_key_named_by_a_param_before_naming_each_subject if {
 	}
 }
 
+position_child_policy(from) := {"ergo_spec": "v0.3-dev", "subjects": {"p": {"from": "ps"}, "k": {"from": from}}, "requirements": {"r": {"subject": "k", "checks": {"c": "x exists"}}}}
+
+test_a_position_after_a_parents_name_is_read_and_never_drops_to_narrowing_the_parent if {
+	every from in ["p[0]", "p[1]", "first of p", "item 2 of p"] {
+		rep := ergo.report({"ps": [{"x": 1}]}, position_child_policy(from), {})
+		rep.compliant == false
+		rep.requirements.r.status == "not_met"
+		[[r.passed, r.cause] | some r in rows_for(rep, "r", "$min_subjects")] == [[false, "unusable"]]
+		count(rows_for(rep, "r", "c")) == 0
+		count(ergo.violations(rep)) == 1
+	}
+}
+
+test_a_position_after_a_parents_name_picks_the_item_of_each_parent_that_is_a_list if {
+	rep := ergo.report({"ps": [[{"x": 1}, {"x": 2}], [{"x": 3}]]}, position_child_policy("p[1]"), {})
+	[r.cause | some r in rows_for(rep, "r", "$min_subjects")] == ["satisfied", "absent"]
+	rep2 := ergo.report({"ps": [[{"x": 1}, {"x": 2}]]}, position_child_policy("item 2 of p"), {})
+	rep2.compliant == true
+	[[r.passed, r.cause] | some r in rows_for(rep2, "r", "c")] == [[true, "satisfied"]]
+}
+
+test_a_position_of_a_list_input_in_a_from_line_is_read_and_every_over_it_reads_its_items if {
+	every from in ["$input[0]", "first of $input", "item 1 of $input", "every $input[0]"] {
+		rep := ergo.report([[{"x": 1}], [{"x": 2}]], position_child_policy(from), {})
+		[[r.passed, r.cause] | some r in rows_for(rep, "r", "$min_subjects")] == [[true, "satisfied"]]
+	}
+}
+
+test_last_of_after_a_parents_name_in_a_from_line_is_written_wrong_and_still_lists_the_parent if {
+	rep := ergo.report({"ps": [[{"x": 1}]]}, position_child_policy("last of p"), {})
+	rep.requirements.r.status == "not_met"
+	object.keys(rep.subjects) == {"k", "p"}
+	some row in rows_for(rep, "r", "$well_formed")
+	some entry in row.inputs
+	entry.name == "subjects.k.from"
+	entry.value == [`last of isn't supported yet here: pick the item on a for line, like "for: last of commits as commit"`]
+}
+
+test_a_from_line_with_every_that_reads_a_missing_param_keeps_its_requirement_and_fails_min_subjects if {
+	policy := {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "every x named by $params.k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}}
+	every case in [[{}, "absent"], [{"k": null}, "null"], [{"k": ["x"]}, "unusable"]] {
+		rep := ergo.report({"x": [{"id": 1}]}, policy, case[0])
+		rep.requirements.s.status == "not_met"
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, case[1]]]
+		count(ergo.violations(rep)) == 1
+	}
+}
+
+test_a_from_line_with_every_on_a_null_input_fails_min_subjects_as_null_like_the_place_its_walk_breaks if {
+	every from in ["every commits", "every $input[0]", "every $input[0].y", "every x.y", "every x[0]", "every commits named by $params.k"] {
+		policy := {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": from}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}}
+		rep := ergo.report(null, policy, {"k": "a"})
+		rep.requirements.s.status == "not_met"
+		[[r.passed, r.cause, [f.cause | some f in r.failed_items]] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "null", ["null"]]]
+	}
+}
+
 test_named_by_each_of_on_an_object_that_cant_be_read_fails_min_subjects_so_a_check_for_a_missing_field_cant_meet_the_requirement if {
 	policy := {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "m named by each of $params.keys"}}, "requirements": {"s": {"subject": "b", "checks": {"c": "x does not exist"}}}}
 	every run in [
@@ -3341,7 +3485,9 @@ test_an_input_that_is_a_string_without_from_is_not_compliant if {
 }
 
 test_an_input_that_is_a_list_without_from_is_not_compliant if {
-	report([{"id": 1}], {"s": {"checks": {"c": "id exists"}}}).compliant == false
+	rep := ergo.report([{"id": 1}], {"ergo_spec": "v0.3-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}}, {})
+	rep.compliant == false
+	[r.cause | some r in rep.results; r.check == "$min_subjects"] == ["unusable"]
 }
 
 json_only_req := {"s": {"subject_type": "thing", "from": "items", "identified_by": "id", "checks": {"c": "x is 1"}}}
@@ -8296,9 +8442,8 @@ test_a_from_line_with_every_fails_where_its_path_stops_as_every_does_in_a_check 
 }
 
 test_a_from_line_with_every_on_an_input_that_is_not_an_object_fails_as_one_without_every if {
-	[r.cause | some r in _from_report([1], _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["unusable"]
-	[r.failed_items | some r in _from_report([1], _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == [[]]
-	[r.cause | some r in _from_report(null, _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["absent"]
+	[r.cause | some r in _from_report("x", _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["unusable"]
+	[r.failed_items | some r in _from_report("x", _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == [[{"path": "$input", "item": "$input", "cause": "unusable", "value": "x", "locations": [""]}]]
 }
 
 test_a_from_line_through_a_list_without_every_still_fails if {

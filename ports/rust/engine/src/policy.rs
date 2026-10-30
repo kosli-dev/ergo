@@ -76,6 +76,7 @@ pub struct SubjectDef {
     pub from: Text,
     pub identified_by: Text,
     pub has: Has,
+    pub says_how: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -281,6 +282,7 @@ fn read_subject(name: &str, value: &Value) -> Subject {
             from: Text::Missing,
             identified_by: Text::Missing,
             has: Has::Missing,
+            says_how: false,
         }),
         Value::Object(map) => {
             for key in map.keys() {
@@ -317,6 +319,7 @@ fn read_subject(name: &str, value: &Value) -> Subject {
                 from: text_of(map, "from"),
                 identified_by: text_of(map, "identified_by"),
                 has,
+                says_how: map.contains_key("applies_to") || map.contains_key("of"),
             })
         }
         _ => {

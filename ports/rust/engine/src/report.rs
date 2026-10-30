@@ -533,15 +533,10 @@ fn subject_entry(reading: &Reading, name: &str, extra: &Problems) -> Value {
     if extra.contains_key(&field_name(&["subjects", name, "from"])) {
         entry["from"] = json!(INVALID_FROM);
     }
-    let from_broken = extra
-        .get(&field_name(&["subjects", name, "from"]))
-        .is_some_and(|texts| {
-            texts
-                .iter()
-                .any(|text| text != crate::reading::NARROWING_A_CHILD_PROBLEM)
-        });
-    let follows_parent =
-        matches!(info.relation, crate::reading::Relation::Narrows(_)) && !from_broken;
+    let follows_parent = matches!(
+        &info.relation,
+        crate::reading::Relation::Narrows(parent) if !parent.trim().is_empty()
+    );
     let id_unreadable = extra
         .get(&field_name(&["subjects", name, "identified_by"]))
         .is_some_and(|texts| {
@@ -1299,6 +1294,87 @@ mod tests {
             report["requirements"]["s"]["checks"]["$unique_ids"]["expression"],
             json!("count(repeated(ids(<invalid from>))) == 0")
         );
+    }
+
+    fn subjects_of(subjects: Value, subject: &str) -> Value {
+        let mut p = policy(json!({"s": {"subject": subject, "checks": {"c": "n exists"}}}));
+        p["subjects"] = subjects;
+        report_of(p, Value::Null)["subjects"].clone()
+    }
+
+    fn entry(from: &str, id: Option<&str>) -> Value {
+        json!({"description": "", "from": from, "identified_by": id, "parts": {}})
+    }
+
+    #[test]
+    fn a_subject_with_applies_to_or_of_has_an_invalid_from() {
+        let applies = subjects_of(
+            json!({"d": {"from": "ds", "identified_by": "id", "applies_to": {"f": {"op": "present", "path": ["x"]}}}}),
+            "d",
+        );
+        assert_eq!(applies["d"], entry("<invalid from>", Some("id")));
+        let of = subjects_of(
+            json!({"d": {"from": "ds", "identified_by": "id", "of": "ds"}}),
+            "d",
+        );
+        assert_eq!(of["d"], entry("<invalid from>", Some("id")));
+    }
+
+    #[test]
+    fn a_subject_that_narrows_another_keeps_its_id_when_its_from_is_written_wrong() {
+        for line in [
+            "parent whose n is one of 1, \"a\"",
+            "parent whose n is $foo",
+            "every parent",
+        ] {
+            let found = subjects_of(
+                json!({"parent": {"from": "things", "identified_by": "id"}, "kid": {"from": line}}),
+                "kid",
+            );
+            assert_eq!(found["kid"], entry("<invalid from>", Some("id")), "{line}");
+            assert_eq!(found["parent"], entry("things", Some("id")), "{line}");
+        }
+    }
+
+    #[test]
+    fn a_subject_that_narrows_another_has_its_id_when_its_from_is_written_wrong_even_with_an_id_of_its_own()
+     {
+        for line in [
+            "every parent",
+            "parent whose n is 1",
+            "parent whose n is one of 1, \"a\"",
+        ] {
+            let found = subjects_of(
+                json!({"parent": {"from": "things", "identified_by": "id"}, "kid": {"from": line, "identified_by": "n"}}),
+                "kid",
+            );
+            let from = if line == "parent whose n is 1" {
+                line
+            } else {
+                "<invalid from>"
+            };
+            assert_eq!(found["kid"], entry(from, Some("id")), "{line}");
+        }
+    }
+
+    #[test]
+    fn a_child_whose_from_has_an_unknown_name_lists_the_subject_it_starts_at() {
+        let found = subjects_of(
+            json!({"parent": {"from": "things", "identified_by": "id"}, "kid": {"from": "parent.items whose zz is $foo", "identified_by": "n"}}),
+            "kid",
+        );
+        assert_eq!(found["kid"], entry("<invalid from>", Some("n")));
+        assert_eq!(found["parent"], entry("things", Some("id")));
+    }
+
+    #[test]
+    fn every_on_a_subject_start_is_one_problem_under_from_and_none_under_identified_by() {
+        let mut p = policy(json!({"r": {"subject": "kid", "checks": {"c": "n exists"}}}));
+        p["subjects"] = json!({"parent": {"from": "things", "identified_by": "id"}, "kid": {"from": "every parent", "identified_by": "n"}});
+        let reading = Reading::of(&Policy::read(&p));
+        let problems = &reading.infos["kid"].problems;
+        assert_eq!(problems.len(), 1);
+        assert!(problems.contains_key("subjects.kid.from"));
     }
 
     #[test]

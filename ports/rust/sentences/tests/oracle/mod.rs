@@ -3,6 +3,9 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("$input whose x is 1", "$input whose x is 1"),
+    ("$input.commits", "$input.commits"),
+    ("$input[5]", "item 6 of $input"),
     (".artifact", "artifact"),
     (".artifact.p[0]", "item 1 of artifact.p"),
     (
@@ -24,6 +27,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact[0] named by each of $params.k",
         "item 1 of artifact named by each of $params.k",
     ),
+    ("artifact[0].c", "artifact[0].c"),
+    ("every $input", "every $input"),
+    ("every $input.commits", "every $input.commits"),
+    ("every commits", "every commits"),
+    ("first of $input", "first of $input"),
     ("fam.kids", "fam.kids"),
     ("fams", "fams"),
     ("commit.files", "commit.files"),
@@ -46,6 +54,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("k.items", "k.items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
+    ("every x named by $params.k", "every x named by $params.k"),
+    (
+        "m named by each of $params.ks",
+        "m named by each of $params.ks",
+    ),
     (
         "artifact.scans named by each of $params.k",
         "artifact.scans named by each of $params.k",
@@ -61,6 +74,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
+    ("p whose x is 1", "p whose x is 1"),
+    ("p.commits", "p.commits"),
     ("suite.items", "suite.items"),
     (
         "suites named by $params.group",
@@ -1470,6 +1485,15 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "zz[k].q whose .empty.y is .it plus item 3 of $input.i[$params.k]",
         "zz named by k.q whose .empty.y equals .it plus item 3 of $input.i named by $params.k",
     ),
+    ("$input[0].y", "$input[0].y"),
+    ("every $input[0]", "every item 1 of $input"),
+    ("every $input[0].y", "every $input[0].y"),
+    ("first of p", "first of p"),
+    ("item 2 of $input", "item 2 of $input"),
+    ("item 2 of p", "item 2 of p"),
+    ("last of p", "last of p"),
+    ("p[0]", "item 1 of p"),
+    ("p[1]", "item 2 of p"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

@@ -2,8 +2,3 @@ for / a second for item picking after the first alias, whose list can't be walke
 for / a second for item picking after the first alias, whose list can't be walked, lists that list once / a null second list is listed once, not under each first item
 for / a second for item picking after the first alias, whose list can't be walked, lists that list once / a second list that is text is listed once, not under each first item
 for / a second for item picking after the first alias, whose list can't be walked, still lists a first item that failed for another reason / a first item its whose can't decide is listed beside the second list
-subjects / a child subject whose from is every, with an identified_by / gives one problem, under from, and none under identified_by
-subjects / a subject that narrows a subject that narrows another with every / has the id of the subject at the top of its chain, not mid's own
-subjects / a subject with applies_to or of / is <invalid from> with applies_to, because the field said how the subject was found
-subjects / a subject with of / is <invalid from> with of, because the field said how the subject was found
-subjects / two subjects that narrow each other, each with an identified_by / have no id, because no subject is at the top of the loop
