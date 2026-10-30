@@ -403,7 +403,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   - An empty list, like `sha-2`'s, adds nothing and fails nothing.
   - A list that's missing, like `sha-3`'s, `null` or not a list fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`. The row's `failed_items` says where, and the pull requests that could be read are still checked. So does a value at the end that isn't an object, and a path with no list along it, as `every` does in a check.
   - Without `every`, a path through a list reads nothing, and `$min_subjects` fails as `unusable`.
-  - `every` can't go with a path that starts at another subject's name or with `named by each of`. Both are written wrong. A child subject reads names one parent at a time.
+  - `every` can't go with a path that starts at another subject's name or with `named by each of`. Both are written wrong. A path that starts with a dot, like `every .artifact.p`, reads the input field and is fine. A child subject reads names one parent at a time.
 - A `from` or `identified_by` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"], "locations": []}`.
 
 ### A subject built on another
@@ -1214,6 +1214,7 @@ picks `a1`, the commit with the latest `timestamp`, wherever it is in the list, 
 - When another item has the same value as the one picked, nothing is picked and the check fails as `ambiguous`, listing the items that tie. With both commits at `1760000200` above, `failed_items` holds `item 1 of commits` and `item 2 of commits`, each with the `timestamp` as `value`. A tie elsewhere in the list doesn't matter.
 - A position past the end of the list, or an empty list, fails as `absent`.
 - `sorted by` reads a field of the item, so it can't start with `$params` or `$input`. A field with the same name as a name from the `for` line needs a dot in front, `sorted by .c`. It can't go after `every` or `some`, and `, if any,` can't go with a position.
+- A picked second item can read the first item's name in its `whose`, and is picked again for each item of the first list: `for: every xs as p, first of ys whose k is p.k as q` gives each `p` the first `y` with the same `k`. `inputs` lists each item picked, like `item 2 of ys`. A first item for which nothing is picked isn't listed in `failed_items`, and a `ys` that can't be walked is listed once.
 - A field of the picked item is read through its name, `last_commit.author_username`. In a sentence, `last of commits.author_username` would be the last of a list at `commits.author_username`.
 
 `count of`, `sum of` and `plus` work out a number to compare. With this input:
