@@ -1,6 +1,0 @@
-for / a name whose path goes on past a null or a number / a null pull request fails as not_an_object
-for / a name whose path goes on past a null or a number / a number pull request fails as not_an_object
-for / a name whose path goes on past a null or a number / a pull request that isn't an object fails beside one that passes
-for / a name whose path goes on past its list / a title under a value that isn't an object fails as not_an_object
-for / first of over a name whose path goes on past its list / fails as not_an_object when the pull request is text
-for / some over a name whose path goes on past its list / fails as not_an_object when the only pull_request is null
