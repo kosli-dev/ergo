@@ -540,6 +540,7 @@ _walkable(doc) if is_array(doc)
 
 _every_cause(doc, req) := c if {
 	not _walkable(doc)
+	doc != null
 	c := _target_state(doc, req)
 	c != "value"
 } else := _worst_of({f.cause | some f in fails}) if {

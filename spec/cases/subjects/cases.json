@@ -4903,6 +4903,126 @@
     ]
   },
   {
+    "description": "a from line with every on a null input",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "every commits"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as null, as its walk breaks on the input",
+        "rules": ["subjects.every.broken"],
+        "input": null,
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "failed_items": [
+              {
+                "cause": "null",
+                "item": "$input",
+                "locations": [
+                  ""
+                ],
+                "path": "$input",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with every that starts with a position, on a null input",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "every $input[0].y"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as null, as its walk breaks on the input",
+        "rules": ["subjects.every.broken"],
+        "input": null,
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "failed_items": [
+              {
+                "cause": "null",
+                "item": "$input",
+                "locations": [
+                  ""
+                ],
+                "path": "$input",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a from line with every and named by a param that is a list",
     "policy": {
       "ergo_spec": "v0.3-dev",

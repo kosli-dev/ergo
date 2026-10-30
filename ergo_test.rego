@@ -3354,6 +3354,15 @@ test_a_from_line_with_every_that_reads_a_missing_param_keeps_its_requirement_and
 	}
 }
 
+test_a_from_line_with_every_on_a_null_input_fails_min_subjects_as_null_like_the_place_its_walk_breaks if {
+	every from in ["every commits", "every $input[0]", "every $input[0].y", "every x.y", "every x[0]", "every commits named by $params.k"] {
+		policy := {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": from}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}}
+		rep := ergo.report(null, policy, {"k": "a"})
+		rep.requirements.s.status == "not_met"
+		[[r.passed, r.cause, [f.cause | some f in r.failed_items]] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, "null", ["null"]]]
+	}
+}
+
 test_named_by_each_of_on_an_object_that_cant_be_read_fails_min_subjects_so_a_check_for_a_missing_field_cant_meet_the_requirement if {
 	policy := {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "m named by each of $params.keys"}}, "requirements": {"s": {"subject": "b", "checks": {"c": "x does not exist"}}}}
 	every run in [
@@ -8359,7 +8368,6 @@ test_a_from_line_with_every_fails_where_its_path_stops_as_every_does_in_a_check 
 test_a_from_line_with_every_on_an_input_that_is_not_an_object_fails_as_one_without_every if {
 	[r.cause | some r in _from_report("x", _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["unusable"]
 	[r.failed_items | some r in _from_report("x", _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == [[{"path": "$input", "item": "$input", "cause": "unusable", "value": "x", "locations": [""]}]]
-	[r.cause | some r in _from_report(null, _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["absent"]
 }
 
 test_a_from_line_through_a_list_without_every_still_fails if {
