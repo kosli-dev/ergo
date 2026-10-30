@@ -4966,6 +4966,91 @@ test_sum_of_adds_up_the_field_across_the_items_left_in if {
 	[row[1] | some row in _tally_rows("sum of xs.n is 0.3", [{"id": 1, "xs": [{"n": 0.1}, {"n": 0.2}]}], {})] == ["satisfied"]
 }
 
+test_within_works_out_the_gap_exactly_in_a_whose if {
+	[row[1] | some row in _tally_rows("count of xs whose x equals y within 0.2 is 1", [{"id": 1, "xs": [{"x": 0.3, "y": 0.1}]}], {})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("count of xs whose x equals y within 0.19999 is 0", [{"id": 1, "xs": [{"x": 0.3, "y": 0.1}]}], {})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("count of xs whose x equals y within 0.2 is 1", [{"id": 1, "xs": [{"x": 1e15, "y": 1e15}]}], {})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("count of xs whose x equals y within 1 is 1", [{"id": 1, "xs": [{"x": 1e5000, "y": 1}]}], {})] == ["unusable"]
+}
+
+_within_cause(x, y, w) := cause if {
+	rows := [row[1] | some row in _tally_rows(concat("", ["x equals y within ", w]), [{"id": 1, "x": x, "y": y}], {})]
+	cause := rows[0]
+}
+
+test_within_reads_numbers_opa_counts_as_equal_by_their_digits if {
+	_within_cause(1234567890.1209567990, 0, "1234567890.1209567890") == "value"
+	_within_cause(123964818.71664440535747000531389400, 123964818.7166444053574700053138940000000000000002244422625687264764923070, "0.0000000000000000000000000000000000000002244422625687264764923069") == "value"
+	_within_cause(123964818.71664440535747000531389400, 123964818.7166444053574700053138940000000000000002244422625687264764923070, "0.0000000000000000000000000000000000000002244422625687264764923070") == "satisfied"
+}
+
+test_within_compares_more_than_fifteen_digits_exactly_on_both_sides_of_the_boundary if {
+	_within_cause(12345678901234567890.5, 12345678901234567890.4, "0.1") == "satisfied"
+	_within_cause(12345678901234567890.5, 12345678901234567890.4, "0.09") == "value"
+	_within_cause(12345678901234567890.4, 12345678901234567890.5, "0.1") == "satisfied"
+	_within_cause(12345678901234567890.4, 12345678901234567890.5, "0.09") == "value"
+	_within_cause(0.30000000000000004, 0.3, "0.01") == "satisfied"
+	_within_cause(0.30000000000000004, 0.3, "0.000000000000000001") == "value"
+}
+
+test_within_passes_the_float_noise_of_a_cost_and_its_total if {
+	_within_cause(0.30000000000000004, 0.3, "0.01") == "satisfied"
+	_within_cause(12.340000000000002, 12.34, "0.01") == "satisfied"
+	_within_cause(1761700000.123456, 1761700000.12, "0.01") == "satisfied"
+}
+
+test_within_carries_across_chunk_boundaries if {
+	_within_cause(99999999999999999999, -1, "100000000000000000000") == "satisfied"
+	_within_cause(99999999999999999999, -1, "99999999999999999999") == "value"
+	_within_cause(-1, 99999999999999999999, "100000000000000000000") == "satisfied"
+	_within_cause(9999999999999999999999999999, 1, "9999999999999999999999999998") == "satisfied"
+	_within_cause(9999999999999999999999999999, 1, "9999999999999999999999999997") == "value"
+	_within_cause(10000000000000000000000000000, 1, "9999999999999999999999999999") == "satisfied"
+	_within_cause(10000000000000000000000000000, 1, "9999999999999999999999999998") == "value"
+}
+
+test_within_adds_the_sizes_when_the_signs_differ_and_takes_the_difference_when_they_match if {
+	_within_cause(-5000000000000000000000, 5000000000000000000000, "10000000000000000000000") == "satisfied"
+	_within_cause(-5000000000000000000000, 5000000000000000000001, "10000000000000000000000") == "value"
+	_within_cause(-5000000000000000000001, 5000000000000000000000, "10000000000000000000000") == "value"
+	_within_cause(-5000000000000000000000, -5000000000000000000003, "3") == "satisfied"
+	_within_cause(-5000000000000000000000, -5000000000000000000003, "2") == "value"
+}
+
+test_within_treats_zero_and_negative_zero_as_having_no_sign if {
+	_within_cause(0, -0, "0") == "satisfied"
+	_within_cause(-0, -1e20, "100000000000000000000") == "satisfied"
+	_within_cause(0, -1e20, "99999999999999999999") == "value"
+	_within_cause(1e20, 0, "100000000000000000000") == "satisfied"
+	_within_cause(-1e-30, 0, "0.000000000000000000000000000001") == "satisfied"
+}
+
+test_within_compares_tiny_exponents_exactly if {
+	_within_cause(3e-30, 1e-30, "0.000000000000000000000000000002") == "satisfied"
+	_within_cause(3e-30, 1e-30, "0.000000000000000000000000000001") == "value"
+	_within_cause(1e-30, -1e-30, "0.000000000000000000000000000002") == "satisfied"
+}
+
+test_within_compares_big_numbers_that_need_no_decimals_exactly if {
+	_within_cause(1e9, 1e9, "0.000001") == "satisfied"
+	_within_cause(1000000000.000001, 1e9, "0.000001") == "satisfied"
+	_within_cause(1000000000.000002, 1e9, "0.000001") == "value"
+}
+
+test_within_gives_up_as_unusable_when_the_exponents_are_more_than_4096_apart if {
+	_within_cause(1e5000, 1, "1") == "unusable"
+	_within_cause(1, 1e5000, "1") == "unusable"
+	_within_cause(1e4097, 1, "1") == "unusable"
+	_within_cause(1e4000, 1e4000, "1e-300") == "unusable"
+}
+
+test_within_compares_when_the_exponents_are_exactly_4096_apart if {
+	_within_cause(1e4096, 1, "1") == "value"
+	_within_cause(1e4096, 1e4096, "1") == "satisfied"
+	_within_cause(-1e4096, 1e4096, "1") == "value"
+	_within_cause(-1e4096, -1e4096, "0") == "satisfied"
+}
+
 test_plus_adds_paths_numbers_counts_and_sums if {
 	_tally_rows("claude_found is count of personas_ran plus 1", [_review], {}) == [["pr-7", "satisfied", [
 		{"name": "claude_found", "value": 2, "locations": ["/things/0/claude_found"]},
