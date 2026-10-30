@@ -27,7 +27,7 @@ fn string(value: JsValue, name: &str) -> Result<String, JsValue> {
     value.as_string().ok_or_else(|| not_a_string(name, &value))
 }
 
-/// Builds the report for `input`, `policy` and `params`, each given as JSON text, and returns it as JSON text. Throws a `TypeError` when one of them isn't a string, and an `Error` when one of them isn't valid JSON, and the module stays usable. If the engine panics, the `wasm` profile aborts, which a caller sees as a `WebAssembly.RuntimeError: unreachable`, and then the module must be instantiated again before it is used.
+/// Builds the report for `input`, `policy` and `params`, each given as JSON text, and returns it as JSON text. Throws a `TypeError` when one of them isn't a string, and an `Error` when one of them isn't valid JSON, and the module stays usable. If the engine panics, the `wasm` profile aborts, which a caller sees as a `WebAssembly.RuntimeError: unreachable`, and then the module must not be called again. `initSync` and `init` give back the same instance, so load the module again, in a browser by reloading the page.
 #[wasm_bindgen]
 pub fn report(
     #[wasm_bindgen(unchecked_param_type = "string")] input: JsValue,
