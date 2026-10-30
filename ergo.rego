@@ -3378,7 +3378,7 @@ _from_text(req) := concat("", [_every_word(req), "$input"]) if {
 
 _from_text(req) := "<invalid from>" if not _from_well_formed(req)
 
-_from_name(p) := _path_name(_from_steps(p))
+_from_name(p) := _input_path_name(_from_steps(p))
 
 _from_steps(p) := array.concat([{"literal": p[0]}], array.slice(p, 1, count(p))) if _starts_with_dollar_key(p)
 
@@ -3612,7 +3612,7 @@ _min_subjects_row(doc, req, req_name, matching, at) := object.union(
 	_every_failed_items(doc, req),
 )
 
-_every_failed_items(doc, req) := {"failed_items": [{"path": _from_item_name(req, f.path), "item": _from_item_name(req, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
+_every_failed_items(doc, req) := {"failed_items": [{"path": _input_path_name(f.path), "item": _input_path_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
 	fails := _every_walk(doc, _from_keys(req)).fails
 	some p in sort({f.path | some f in fails})
 	some f in fails
@@ -3625,10 +3625,6 @@ _every_failed_items(doc, req) := {"failed_items": [{"path": _from_item_name(req,
 } else := {"failed_items": []} if _every_from(req)
 
 else := {}
-
-_from_item_name(req, path) := _path_name(path) if _chained(req)
-
-else := _input_path_name(path)
 
 default _enough_subjects(_, _, _) := false
 
