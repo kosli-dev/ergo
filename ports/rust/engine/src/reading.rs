@@ -57,6 +57,16 @@ pub struct Lowered {
     pub from_text: String,
 }
 
+impl Info {
+    fn only_narrows_a_child(&self, name: &str) -> bool {
+        !self.unsupported
+            && self
+                .problems
+                .get(&field_name(&["subjects", name, "from"]))
+                .is_some_and(|texts| texts.iter().all(|t| t == NARROWING_A_CHILD_PROBLEM))
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Info {
     pub relation: Relation,
@@ -787,9 +797,13 @@ impl Reading {
                 },
                 Text::Missing | Text::Invalid => {}
             }
+            let in_a_loop = problems
+                .get(&from_at)
+                .is_some_and(|texts| texts.contains("leads to a loop"));
             if matches!(found.relation, Relation::Narrows(_))
                 && matches!(&found.from, FromState::Parsed(line) if !line.every)
                 && !matches!(found.def.identified_by, Text::Missing)
+                && !in_a_loop
             {
                 add_problem(
                     &mut problems,
@@ -878,7 +892,18 @@ impl Reading {
             }
         }
         if let SubjectName::Named(name) = &requirement.subject {
-            for used in self.used(name) {
+            let mut listed = self.used(name);
+            for used in listed.clone() {
+                if self.infos[&used].only_narrows_a_child(&used)
+                    && let Relation::Narrows(child) = &self.infos[&used].relation
+                    && self.infos.contains_key(child)
+                {
+                    listed.push(child.clone());
+                }
+            }
+            listed.sort();
+            listed.dedup();
+            for used in listed {
                 merge_problems(&mut problems, &self.infos[&used].problems);
                 if let Some(subject) = policy.subject(&used) {
                     merge_problems(&mut problems, &subject.problems);
@@ -1000,16 +1025,14 @@ fn resolved_id_text(
     let mut seen = BTreeSet::new();
     loop {
         if !seen.insert(at.clone()) {
-            return None;
+            return match raw.get(name)?.def.identified_by {
+                Text::Missing => None,
+                _ => Some(INVALID_IDENTIFIED_BY.to_string()),
+            };
         }
         let found = raw.get(&at)?;
-        let from_at = field_name(&["subjects", &at, "from"]);
-        let read_ok = !problems
-            .get(&at)
-            .and_then(|p| p.get(&from_at))
-            .is_some_and(|texts| texts.iter().any(|text| text != NARROWING_A_CHILD_PROBLEM));
         if let Relation::Narrows(parent) = &found.relation
-            && (read_ok || !parent.trim().is_empty())
+            && !parent.trim().is_empty()
         {
             at = parent.clone();
             continue;
@@ -1435,5 +1458,68 @@ mod tests {
         }));
         assert_eq!(r.filters_text("n").unwrap(), "x exists and y exists");
         assert!(r.filters_text("nope").is_none());
+    }
+
+    fn requirement_problems(subjects: Value) -> Problems {
+        let policy = Policy::read(&json!({
+            "ergo_spec": "v0.3-dev",
+            "subjects": subjects,
+            "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}}
+        }));
+        Reading::of(&policy).problems_of(&policy, &policy.requirements["r"])
+    }
+
+    #[test]
+    fn a_narrowed_child_with_an_unknown_name_lists_its_own_problem_for_the_requirement() {
+        let problems = requirement_problems(json!({
+            "parent": {"from": "things", "identified_by": "id"},
+            "mid": {"from": "parent.items whose zz is $foo", "identified_by": "n"},
+            "kid": {"from": "mid whose n is 1"}
+        }));
+        assert!(problems.contains_key("subjects.mid.from"));
+        assert!(problems["subjects.kid.from"].contains(NARROWING_A_CHILD_PROBLEM));
+    }
+
+    #[test]
+    fn a_narrowed_child_with_mixed_types_lists_its_own_problem_for_the_requirement() {
+        let problems = requirement_problems(json!({
+            "parent": {"from": "things", "identified_by": "id"},
+            "mid": {"from": "parent.items whose n is one of 1, \"a\"", "identified_by": "n"},
+            "kid": {"from": "mid whose n is 1"}
+        }));
+        assert!(problems.contains_key("subjects.mid.from"));
+        assert!(problems.contains_key("subjects.kid.from"));
+    }
+
+    #[test]
+    fn subjects_in_a_loop_each_with_an_identified_by_show_it_as_invalid() {
+        let (_, r) = reading(json!({
+            "pp": {"from": "kid whose n is 1", "identified_by": "x"},
+            "kid": {"from": "pp whose n is 1", "identified_by": "y"}
+        }));
+        assert_eq!(
+            r.infos["pp"].entry["identified_by"],
+            "<invalid identified_by>"
+        );
+        assert_eq!(
+            r.infos["kid"].entry["identified_by"],
+            "<invalid identified_by>"
+        );
+        assert_eq!(texts(&r, "kid", "subjects.kid.from"), ["leads to a loop"]);
+        assert!(
+            !r.infos["kid"]
+                .problems
+                .contains_key("subjects.kid.identified_by")
+        );
+    }
+
+    #[test]
+    fn subjects_in_a_loop_without_an_identified_by_show_none() {
+        let (_, r) = reading(json!({
+            "pp": {"from": "kid whose n is 1"},
+            "kid": {"from": "pp whose n is 1"}
+        }));
+        assert_eq!(r.infos["pp"].entry["identified_by"], Value::Null);
+        assert_eq!(r.infos["kid"].entry["identified_by"], Value::Null);
     }
 }

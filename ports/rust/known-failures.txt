@@ -1,2 +1,0 @@
-subjects / a subject that narrows a subject that narrows another with every / has the id of the subject at the top of its chain, not mid's own
-subjects / two subjects that narrow each other, each with an identified_by / have no id, because no subject is at the top of the loop
