@@ -3219,6 +3219,37 @@ test_a_from_line_can_read_a_key_named_by_a_param_before_naming_each_subject if {
 	}
 }
 
+position_child_policy(from) := {"ergo_spec": "v0.3-dev", "subjects": {"p": {"from": "ps"}, "k": {"from": from}}, "requirements": {"r": {"subject": "k", "checks": {"c": "x exists"}}}}
+
+test_a_position_after_a_parents_name_is_read_and_never_drops_to_narrowing_the_parent if {
+	every from in ["p[0]", "p[1]", "first of p", "item 2 of p"] {
+		rep := ergo.report({"ps": [{"x": 1}]}, position_child_policy(from), {})
+		rep.compliant == false
+		rep.requirements.r.status == "not_met"
+		[[r.passed, r.cause] | some r in rows_for(rep, "r", "$min_subjects")] == [[false, "unusable"]]
+		count(rows_for(rep, "r", "c")) == 0
+		count(ergo.violations(rep)) == 1
+	}
+}
+
+test_a_position_after_a_parents_name_picks_the_item_of_each_parent_that_is_a_list if {
+	rep := ergo.report({"ps": [[{"x": 1}, {"x": 2}], [{"x": 3}]]}, position_child_policy("p[1]"), {})
+	[r.cause | some r in rows_for(rep, "r", "$min_subjects")] == ["satisfied", "absent"]
+	rep2 := ergo.report({"ps": [[{"x": 1}, {"x": 2}]]}, position_child_policy("item 2 of p"), {})
+	rep2.compliant == true
+	[[r.passed, r.cause] | some r in rows_for(rep2, "r", "c")] == [[true, "satisfied"]]
+}
+
+test_a_from_line_with_every_that_reads_a_missing_param_keeps_its_requirement_and_fails_min_subjects if {
+	policy := {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "every x named by $params.k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}}
+	every case in [[{}, "absent"], [{"k": null}, "null"], [{"k": ["x"]}, "unusable"]] {
+		rep := ergo.report({"x": [{"id": 1}]}, policy, case[0])
+		rep.requirements.s.status == "not_met"
+		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, case[1]]]
+		count(ergo.violations(rep)) == 1
+	}
+}
+
 test_named_by_each_of_on_an_object_that_cant_be_read_fails_min_subjects_so_a_check_for_a_missing_field_cant_meet_the_requirement if {
 	policy := {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "m named by each of $params.keys"}}, "requirements": {"s": {"subject": "b", "checks": {"c": "x does not exist"}}}}
 	every run in [

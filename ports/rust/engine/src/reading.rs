@@ -235,8 +235,8 @@ fn names_a_subject<'a>(
 fn relation_of(line: &s::FromLine, own_name: &str, names: &BTreeSet<String>) -> Relation {
     match names_a_subject(line, own_name, names) {
         Some(parent) if line.named_by_each_of.is_some() => Relation::Child(parent.to_string()),
-        Some(parent) if line.path.position.is_none() => {
-            if line.path.steps.is_empty() {
+        Some(parent) => {
+            if line.path.steps.is_empty() && line.path.position.is_none() {
                 Relation::Narrows(parent.to_string())
             } else {
                 Relation::Child(parent.to_string())
@@ -1227,6 +1227,19 @@ mod tests {
         assert_eq!(r.infos["b"].relation, Relation::Narrows("art".into()));
         assert_eq!(r.lowered("b").unwrap().filters.len(), 1);
         assert_eq!(r.infos["b"].entry["identified_by"], json!("id"));
+    }
+
+    #[test]
+    fn a_position_after_a_subjects_name_is_a_child_that_reads_the_position_and_does_not_narrow() {
+        let (_, r) = reading(json!({
+            "art": {"from": "arts"},
+            "a": {"from": "art[1]"},
+            "b": {"from": "first of art"},
+            "c": {"from": "item 2 of art"},
+        }));
+        for name in ["a", "b", "c"] {
+            assert_eq!(r.infos[name].relation, Relation::Child("art".into()));
+        }
     }
 
     #[test]

@@ -471,7 +471,17 @@ _listed_keys(step) := v if {
 
 _target(doc, req) := object.get(doc, _from_keys(req), null) if is_object(doc)
 
+_target(doc, req) := object.get({"": doc}, array.concat([""], _from_keys(req)), null) if {
+	is_array(doc)
+	_starts_at_position(req)
+}
+
 _target_read(doc, req) := object.get(doc, _from_keys(req), _absent) if is_object(doc)
+
+_target_read(doc, req) := object.get({"": doc}, array.concat([""], _from_keys(req)), _absent) if {
+	is_array(doc)
+	_starts_at_position(req)
+}
 
 _target_read(doc, req) := doc if {
 	not _is_collection(doc)
@@ -481,6 +491,12 @@ _target_read(doc, req) := doc if {
 _target_read(doc, req) := _absent if {
 	not is_object(doc)
 	count(_from_keys(req)) > 0
+	not _position_on_list(doc, req)
+}
+
+_position_on_list(doc, req) if {
+	is_array(doc)
+	_starts_at_position(req)
 }
 
 _target_cause(doc, req) := c if {
@@ -560,7 +576,10 @@ default _from_state(_, _) := "absent"
 
 _from_state(doc, req) := "null" if _target_read(doc, req) == null
 
-_from_state(doc, _) := "unusable" if is_array(doc)
+_from_state(doc, req) := "unusable" if {
+	is_array(doc)
+	not _starts_at_position(req)
+}
 
 _from_state(doc, req) := "unusable" if {
 	_target_read(doc, req) == _absent
@@ -652,6 +671,14 @@ _raw_entries(doc, req) := [] if {
 	_every_from(req)
 	not is_object(doc)
 }
+
+_raw_entries(_, req) := [] if {
+	_from_well_formed(req)
+	_every_from(req)
+	not _from_keys_read(req)
+}
+
+_from_keys_read(req) if _from_keys(req)
 
 _raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k], _absent), "at": _pointer(_doc_at, doc, array.concat(_from_keys(req), [k]))} | some k in sort({k | some k in _listed_keys(_each_step(req))})] if {
 	_from_well_formed(req)
@@ -6334,8 +6361,19 @@ _s_descends(name, fl, subjects) if {
 	"named_by_each_of" in object.keys(fl)
 }
 
+_s_descends(name, fl, subjects) if {
+	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
+	fl.path.steps == [fl.path.steps[0]]
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] != name
+	fl.path.steps[0] in object.keys(subjects)
+	"position" in object.keys(fl.path)
+}
+
 _s_narrows(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
+	not "position" in object.keys(fl.path)
 	object.get(fl.path, "dot", false) != true
 	fl.path.steps == [fl.path.steps[0]]
 	is_string(fl.path.steps[0])

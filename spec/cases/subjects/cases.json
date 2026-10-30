@@ -4716,6 +4716,697 @@
     ]
   },
   {
+    "description": "a from line with every and named by a param that is missing",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "every x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds a list",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds an object",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with every and named by a param that is null",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "every x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": null
+    },
+    "cases": [
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds a list",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds an object",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with every and named by a param that is a list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "every x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds a list",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds an object",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with every and named by a param that is a number",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "every x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 1
+    },
+    "cases": [
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds an object",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "item": "item 2 of x",
+                "locations": [
+                  "/x"
+                ],
+                "path": "item 2 of x",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by a param that is missing",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds a list",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds an object",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by a param that is null",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": null
+    },
+    "cases": [
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds a list",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds an object",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by a param that is a list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds a list",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": [
+            {
+              "id": 1
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds an object",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by a param that is a number",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 1
+    },
+    "cases": [
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds an object",
+        "rules": ["subjects.from", "subjects.sentence"],
+        "input": {
+          "x": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a from line with named by each of a param list",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -14794,6 +15485,742 @@
                 "locations": []
               }
             ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from is p[0], a position after its parent's name and nothing more",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "ps"
+        },
+        "k": {
+          "from": "p[0]"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable when the parent is an object, because a position reads it as a list and never drops it",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            {
+              "x": 1
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": {
+                  "x": 1
+                }
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the position inside the parent when the parent is a list",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            [
+              {
+                "x": 1
+              },
+              {
+                "x": 2
+              }
+            ]
+          ]
+        },
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 1
+              },
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as absent when the parent is an empty list",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            []
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": []
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from is p[1], a position after its parent's name and nothing more",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "ps"
+        },
+        "k": {
+          "from": "p[1]"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable when the parent is an object, because a position reads it as a list and never drops it",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            {
+              "x": 1
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": {
+                  "x": 1
+                }
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the position inside the parent when the parent is a list",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            [
+              {
+                "x": 1
+              },
+              {
+                "x": 2
+              }
+            ]
+          ]
+        },
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/1"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/1/x"
+                ],
+                "name": "x",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 2
+              },
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as absent when the parent list is too short",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            [
+              {
+                "x": 1
+              }
+            ]
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from is first of p, a position after its parent's name and nothing more",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "ps"
+        },
+        "k": {
+          "from": "first of p"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable when the parent is an object, because a position reads it as a list and never drops it",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            {
+              "x": 1
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": {
+                  "x": 1
+                }
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the position inside the parent when the parent is a list",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            [
+              {
+                "x": 1
+              },
+              {
+                "x": 2
+              }
+            ]
+          ]
+        },
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 1
+              },
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as absent when the parent is an empty list",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            []
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": []
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from is item 2 of p, a position after its parent's name and nothing more",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "ps"
+        },
+        "k": {
+          "from": "item 2 of p"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable when the parent is an object, because a position reads it as a list and never drops it",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            {
+              "x": 1
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": {
+                  "x": 1
+                }
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the position inside the parent when the parent is a list",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            [
+              {
+                "x": 1
+              },
+              {
+                "x": 2
+              }
+            ]
+          ]
+        },
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/1"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/1/x"
+                ],
+                "name": "x",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 2
+              },
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  },
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as absent when the parent list is too short",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "ps": [
+            [
+              {
+                "x": 1
+              }
+            ]
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": [
+                  {
+                    "x": 1
+                  }
+                ]
+              },
+              "type": "k"
+            }
           }
         ]
       }
