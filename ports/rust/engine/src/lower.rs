@@ -332,22 +332,20 @@ impl Scope {
             if parts && let Some(part) = self.parts.get(key) {
                 return (part_start(key, self.base(), part), steps);
             }
-            if parents {
-                if let Some(found) = self.parents.get(key) {
-                    if let Some(Step::Key(next)) = steps.first()
-                        && let Some(part) = found.get(next)
-                    {
-                        let name = format!(
-                            "{}.{}",
-                            crate::name::key_text(key),
-                            crate::name::key_text(next)
-                        );
-                        let start = part_start(&name, Start::Alias(key.to_string()), part);
-                        steps.remove(0);
-                        return (start, steps);
-                    }
-                    return (Start::Alias(key.to_string()), steps);
+            if parents && let Some(found) = self.parents.get(key) {
+                if let Some(Step::Key(next)) = steps.first()
+                    && let Some(part) = found.get(next)
+                {
+                    let name = format!(
+                        "{}.{}",
+                        crate::name::key_text(key),
+                        crate::name::key_text(next)
+                    );
+                    let start = part_start(&name, Start::Alias(key.to_string()), part);
+                    steps.remove(0);
+                    return (start, steps);
                 }
+                return (Start::Alias(key.to_string()), steps);
             }
             if aliases && self.for_aliases.contains(key) {
                 return (Start::Alias(key.to_string()), steps);

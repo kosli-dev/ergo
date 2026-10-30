@@ -86,10 +86,17 @@ test_the_non_empty_string_cases_pass if {
 	_compiled_differences("non_empty_string") == set()
 }
 
-test_the_parts_cases_pass if {
-	_topic_failures("parts") == _known_in("parts")
-	_compiled_differences("parts") == set()
-}
+test_the_parts_cases_pass_part_1_of_3 if _part_passes("parts", 0, 3)
+
+test_the_parts_cases_pass_part_2_of_3 if _part_passes("parts", 1, 3)
+
+test_the_parts_cases_pass_part_3_of_3 if _part_passes("parts", 2, 3)
+
+test_the_parts_cases_pass_compiled_part_1_of_3 if _differences_compiled("parts", _part("parts", 0, 3)) == set()
+
+test_the_parts_cases_pass_compiled_part_2_of_3 if _differences_compiled("parts", _part("parts", 1, 3)) == set()
+
+test_the_parts_cases_pass_compiled_part_3_of_3 if _differences_compiled("parts", _part("parts", 2, 3)) == set()
 
 test_the_patterns_cases_pass if {
 	_topic_failures("patterns") == _known_in("patterns")
