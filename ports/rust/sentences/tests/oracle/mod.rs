@@ -1411,6 +1411,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "suites named by each of $params.names",
         "suites named by each of $params.names",
     ),
+    ("suite.items", "suite.items"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2565,6 +2566,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("x[3]", "item 4 of x"),
     ("xs", "xs"),
     ("ys", "ys"),
+    ("aid", "aid"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[
