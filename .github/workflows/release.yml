@@ -367,19 +367,19 @@ jobs:
           path: ${{ runner.temp }}/pack
           if-no-files-found: error
 
-  release-rust:
+  publish-rust:
     needs: [check-rust, build-rust]
     runs-on: ubuntu-latest
+    environment: crates-io
     permissions:
-      contents: write
+      contents: read
       id-token: write
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.tag || github.ref }}
           fetch-depth: 0
+          persist-credentials: false
       - name: Read the version from the tag
         shell: bash
         run: |
@@ -402,6 +402,23 @@ jobs:
             fi
             cargo publish --locked -p "$crate"
           done
+
+  release-rust:
+    needs: [check-rust, build-rust, publish-rust]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - name: Read the version from the tag
+        shell: bash
+        run: |
+          echo "VERSION=${TAG#rust-v}" >> "$GITHUB_ENV"
       - uses: actions/download-artifact@v8
         with:
           pattern: ergo-*
