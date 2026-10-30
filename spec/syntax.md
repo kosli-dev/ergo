@@ -341,7 +341,7 @@ The field equals, or doesn't equal, what's on the right, as [value.equal](semant
 <path> equals <field> within <number>
 ```
 
-Two numbers at most that far apart. The gap is worked out exactly on the decimals, however many digits they have, so `0.3` and `0.1` are within `0.2`, and `0.30000000000000004` is within `0.01` of `0.3`. An implementation that can't compare the numbers exactly fails the check as `unusable`, as [Values](semantics.md#values) says. `ergo.rego` and the Rust engine do when the exponents of the two sides and the number after `within` are more than 4096 apart, counted on the value, so `1e5000` and `1` within `1` fails as `unusable`. The number is 0 or more. A value before `within` that isn't a number is written wrong, with `"within" only compares numbers`, because the check could only fail. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
+Two numbers at most that far apart. The gap is worked out exactly on the decimals, so `0.3` and `0.1` are within `0.2`. That holds for the numbers [Values](semantics.md#values) covers, with at most 15 significant digits, and the spec doesn't say how longer ones compare. An implementation that can't compare the numbers exactly fails the check as `unusable`, as [Values](semantics.md#values) says. `ergo.rego` and the Rust engine do when the exponents of the two sides and the number after `within` are more than 4096 apart, counted on the value, so `1e5000` and `1` within `1` fails as `unusable`. The number is 0 or more. A value before `within` that isn't a number is written wrong, with `"within" only compares numbers`, because the check could only fail. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
 
 **[sentence.phrase.one_of]**
 ```
