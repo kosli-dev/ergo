@@ -3240,6 +3240,23 @@ test_a_position_after_a_parents_name_picks_the_item_of_each_parent_that_is_a_lis
 	[[r.passed, r.cause] | some r in rows_for(rep2, "r", "c")] == [[true, "satisfied"]]
 }
 
+test_a_position_of_a_list_input_in_a_from_line_is_read_and_every_over_it_reads_its_items if {
+	every from in ["$input[0]", "first of $input", "item 1 of $input", "every $input[0]"] {
+		rep := ergo.report([[{"x": 1}], [{"x": 2}]], position_child_policy(from), {})
+		[[r.passed, r.cause] | some r in rows_for(rep, "r", "$min_subjects")] == [[true, "satisfied"]]
+	}
+}
+
+test_last_of_after_a_parents_name_in_a_from_line_is_written_wrong_and_still_lists_the_parent if {
+	rep := ergo.report({"ps": [[{"x": 1}]]}, position_child_policy("last of p"), {})
+	rep.requirements.r.status == "not_met"
+	object.keys(rep.subjects) == {"k", "p"}
+	some row in rows_for(rep, "r", "$well_formed")
+	some entry in row.inputs
+	entry.name == "subjects.k.from"
+	entry.value == [`last of isn't supported yet here: pick the item on a for line, like "for: last of commits as commit"`]
+}
+
 test_a_from_line_with_every_that_reads_a_missing_param_keeps_its_requirement_and_fails_min_subjects if {
 	policy := {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "every x named by $params.k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}}
 	every case in [[{}, "absent"], [{"k": null}, "null"], [{"k": ["x"]}, "unusable"]] {

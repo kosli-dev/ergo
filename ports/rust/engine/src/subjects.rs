@@ -323,6 +323,14 @@ fn read_entries<'a>(
             each_of: Some(each_of),
         } => each_of_entries(env, empty, path, each_of, anc),
         Source::Root { path, .. } | Source::Child { path, .. } => {
+            if matches!(&lowered.source, Source::Child { .. })
+                && matches!(path.steps.first(), Some(Step::Index(_)))
+                && anc
+                    .last()
+                    .is_some_and(|parent| std::ptr::eq(parent.at.value, empty))
+            {
+                return Read::Failed(Cause::Absent);
+            }
             let ctx = context(env, input_root(env), anc);
             let read = path::read(path, &ctx);
             let whole_input =
@@ -1286,6 +1294,27 @@ mod tests {
             assert_eq!(min["cause"], json!(cause));
             assert_eq!(min["failed_items"], json!([]));
             assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
+        }
+    }
+
+    #[test]
+    fn a_position_under_a_keyed_parent_the_object_lacks_fails_absent_and_not_unusable() {
+        for from in ["p[0]", "first of p", "p[0].x"] {
+            let policy = json!({
+                "ergo_spec": "v0.3-dev",
+                "subjects": {"p": {"from": "m named by each of $params.ks"}, "k": {"from": from}},
+                "requirements": {"r": {"subject": "k", "checks": {"c": "x exists"}}}
+            });
+            let r = report(
+                &json!({"m": {"a": [{"x": 1}]}}),
+                &policy,
+                &json!({"ks": ["c"]}),
+            );
+            let causes: Vec<Value> = rows(&r, "$min_subjects")
+                .iter()
+                .map(|row| row["cause"].clone())
+                .collect();
+            assert_eq!(causes, vec![json!("absent")], "{from}");
         }
     }
 

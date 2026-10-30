@@ -530,7 +530,7 @@ _keyed_state(doc, req) := c if {
 _keyed_state(doc, req) := "unusable" if is_array(_target_read(doc, req))
 
 _every_cause(doc, req) := c if {
-	not is_object(doc)
+	not _every_doc(doc, req)
 	c := _target_state(doc, req)
 	c != "value"
 } else := _worst_of({f.cause | some f in fails}) if {
@@ -663,14 +663,18 @@ _raw_entries(doc, req) := [entry | some entry in _listed_subjects(doc, req)] if 
 _raw_entries(doc, req) := _every_walk(doc, _from_keys(req)).subjects if {
 	_from_well_formed(req)
 	_every_from(req)
-	is_object(doc)
+	_every_doc(doc, req)
 }
 
 _raw_entries(doc, req) := [] if {
 	_from_well_formed(req)
 	_every_from(req)
-	not is_object(doc)
+	not _every_doc(doc, req)
 }
+
+_every_doc(doc, _) if is_object(doc)
+
+_every_doc(doc, req) if _position_on_list(doc, req)
 
 _raw_entries(_, req) := [] if {
 	_from_well_formed(req)
@@ -3612,7 +3616,7 @@ _every_failed_items(doc, req) := {"failed_items": [{"path": _path_name(f.path), 
 	f.path == p
 ]} if {
 	_every_from(req)
-	is_object(doc)
+	_every_doc(doc, req)
 	_from_well_formed(req)
 	not _from_unreadable(req)
 } else := {"failed_items": []} if _every_from(req)
@@ -7481,6 +7485,8 @@ _s_model_step(s) := {"named_by_field": s.named_by.steps[0]} if {
 _s_model_position(p) := [p.position - 1] if is_number(object.get(p, "position", null))
 
 _s_model_position(p) := [0] if object.get(p, "position", null) == "first"
+
+_s_model_position(p) := [0] if object.get(p, "position", null) == "last"
 
 _s_model_position(p) := [] if not "position" in object.keys(p)
 

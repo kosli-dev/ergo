@@ -5407,6 +5407,176 @@
     ]
   },
   {
+    "description": "a from line with named by a param that is the number 0, over a list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 0
+    },
+    "cases": [
+      {
+        "description": "reads the first item when the param is 0",
+        "rules": ["subjects.sentence", "subjects.from"],
+        "input": {
+          "x": [
+            {
+              "id": 1,
+              "v": 1
+            },
+            {
+              "id": 2,
+              "v": 2
+            }
+          ]
+        },
+        "status": {
+          "s": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/x/0"
+                ],
+                "name": "in-scope thing count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/x/0/id"
+                ],
+                "name": "id",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": 1,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by a param that is the number 1, over a list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "x named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 1
+    },
+    "cases": [
+      {
+        "description": "reads the second item when the param is 1",
+        "rules": ["subjects.sentence", "subjects.from"],
+        "input": {
+          "x": [
+            {
+              "id": 1,
+              "v": 1
+            },
+            {
+              "id": 2,
+              "v": 2
+            }
+          ]
+        },
+        "status": {
+          "s": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/x/1"
+                ],
+                "name": "in-scope thing count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/x/1/id"
+                ],
+                "name": "id",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": 2,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a from line with named by each of a param list",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -16218,6 +16388,835 @@
                     "x": 1
                   }
                 ]
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from is p[0], under a parent listed by named by each of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "m named by each of $params.ks"
+        },
+        "k": {
+          "from": "p[0]"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "ks": [
+        "a",
+        "c"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads the position of a parent that is there and fails min_subjects as absent for a parent the object lacks",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "m": {
+            "a": [
+              {
+                "x": 1
+              }
+            ]
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/m/a/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": "a"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": "c"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/m/a/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 1
+              },
+              "in": {
+                "p": "a"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from is first of p, under a parent listed by named by each of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "m named by each of $params.ks"
+        },
+        "k": {
+          "from": "first of p"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "ks": [
+        "a",
+        "c"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads the position of a parent that is there and fails min_subjects as absent for a parent the object lacks",
+        "rules": ["subjects.sentence", "subjects.chain.not_an_object", "path.not_an_object"],
+        "input": {
+          "m": {
+            "a": [
+              {
+                "x": 1
+              }
+            ]
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/m/a/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": "a"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": "c"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/m/a/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 1
+              },
+              "in": {
+                "p": "a"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from is last of p",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "ps"
+        },
+        "k": {
+          "from": "last of p"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, because last of isn't supported in a from line",
+        "rules": ["subjects.sentence", "sentence.subject.from"],
+        "input": {
+          "ps": [
+            [
+              {
+                "x": 1
+              }
+            ]
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.k.from",
+                "value": [
+                  "last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that is $input[0], over a list input",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "k": {
+          "from": "$input[0]"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the position of the input when the input is a list",
+        "rules": ["subjects.from", "path.not_an_object"],
+        "input": [
+          {
+            "x": 1,
+            "y": [
+              {
+                "x": 5
+              }
+            ]
+          },
+          {
+            "x": 2
+          }
+        ],
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 1,
+                "y": [
+                  {
+                    "x": 5
+                  }
+                ]
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects when the input is an empty list",
+        "rules": ["subjects.from", "path.not_an_object"],
+        "input": [],
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that is first of $input, over a list input",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "k": {
+          "from": "first of $input"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the position of the input when the input is a list",
+        "rules": ["subjects.from", "path.not_an_object"],
+        "input": [
+          {
+            "x": 1
+          },
+          {
+            "x": 2
+          }
+        ],
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 1
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects when the input is an empty list",
+        "rules": ["subjects.from", "path.not_an_object"],
+        "input": [],
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that is item 2 of $input, over a list input",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "k": {
+          "from": "item 2 of $input"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the position of the input when the input is a list",
+        "rules": ["subjects.from", "path.not_an_object"],
+        "input": [
+          {
+            "x": 1
+          },
+          {
+            "x": 2
+          }
+        ],
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/1"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/1/x"
+                ],
+                "name": "x",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 2
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects when the input is an empty list",
+        "rules": ["subjects.from", "path.not_an_object"],
+        "input": [],
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that is $input[0].y, over a list input",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "k": {
+          "from": "$input[0].y"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the position of the input when the input is a list",
+        "rules": ["subjects.from", "path.not_an_object"],
+        "input": [
+          {
+            "x": 1,
+            "y": [
+              {
+                "x": 5
+              }
+            ]
+          },
+          {
+            "x": 2
+          }
+        ],
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/0/y/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/0/y/0/x"
+                ],
+                "name": "x",
+                "value": 5
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 5
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects when the input is an empty list",
+        "rules": ["subjects.from", "path.not_an_object"],
+        "input": [],
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with every that is $input[0], over a list input",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "k": {
+          "from": "every $input[0]"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the first item of the input as a list and makes a subject of each item in it",
+        "rules": ["subjects.from", "path.not_an_object"],
+        "input": [
+          [
+            {
+              "x": 1
+            }
+          ],
+          [
+            {
+              "x": 2
+            }
+          ]
+        ],
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/0/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/0/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "x": 1
               },
               "type": "k"
             }
