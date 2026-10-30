@@ -8102,7 +8102,12 @@ _for_inner_pairs(check, _, _, _, _) := set() if count(check.items) == 1
 _for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check, check.items[1].path, walked), values, locations]} if {
 	count(check.items) == 2
 	_for_from_first(check)
-	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) | some e in w.items]
+	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) |
+		some e in w.items
+		wh := _for_whose(item, e, names)
+		wh.undecided == []
+		wh.kept
+	]
 	walked := {i | some iw in inner; some i in iw.walked}
 	values := [_walk_shown(e2.v) | some iw in inner; some e2 in iw.items]
 	locations := [_walk_at(iw, e2) | some iw in inner; some e2 in iw.items]

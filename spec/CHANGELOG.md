@@ -13,6 +13,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ### Fixed
 
+- On a `for` line whose first item has a `whose` and whose second item starts at the first item's alias, the row's `inputs` showed the second list's values under every first item, including the ones `whose` left out or couldn't decide. They're shown only under the first items that `whose` kept now, as [for.inputs](semantics.md#for) says, and the first item's own entry still lists every item. Reports change for such checks. The verdict, the cause and `failed_items` don't.
 - A child subject whose parent isn't an object, `null` included, fails `$min_subjects` as `not_an_object`, as [subjects.chain.not_an_object](semantics.md#requirements) now says. The spec didn't say, and `ergo.rego` gave `unusable` for a string, number, list or boolean parent and `absent` for a `null` one. Reports change for such inputs. A parent that is an object without the field still gives `absent`.
 - The spec now says these things that `ergo.rego` already did, so no report changes:
   - the `expression` of a check written wrong ([sentence.print.written_wrong](syntax.md#printing-the-sentence))

@@ -11677,5 +11677,779 @@
         ]
       }
     ]
+  },
+  {
+    "description": "every over the subs of the first item that whose kept",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every items whose k is 1 as z, every z.subs as y",
+              "assert": "y is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes, and the subs under the item whose left out aren't shown",
+        "rules": [
+          "for.inputs",
+          "for.walk",
+          "sentence.for.line"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "items": [
+                {
+                  "k": 1,
+                  "subs": [
+                    1
+                  ]
+                },
+                {
+                  "k": 2,
+                  "subs": [
+                    5,
+                    6
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0",
+                  "/things/0/items/1"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "subs": [
+                      1
+                    ]
+                  },
+                  {
+                    "k": 2,
+                    "subs": [
+                      5,
+                      6
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/items/0/subs/0"
+                ],
+                "name": "z.subs[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an item whose can't decide shows nothing under it",
+        "rules": [
+          "for.inputs",
+          "for.walk",
+          "sentence.for.line"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "items": [
+                {
+                  "k": 1,
+                  "subs": [
+                    1
+                  ]
+                },
+                {
+                  "subs": [
+                    8
+                  ]
+                },
+                {
+                  "k": 2,
+                  "subs": [
+                    5
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 2 of items",
+                "locations": [
+                  "/things/0/items/1"
+                ],
+                "path": "item 2 of items",
+                "value": {
+                  "subs": [
+                    8
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0",
+                  "/things/0/items/1",
+                  "/things/0/items/2"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "subs": [
+                      1
+                    ]
+                  },
+                  {
+                    "subs": [
+                      8
+                    ]
+                  },
+                  {
+                    "k": 2,
+                    "subs": [
+                      5
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/items/0/subs/0"
+                ],
+                "name": "z.subs[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over the subs of the first item that whose kept, failing",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every items whose k is 1 as z, every z.subs as y",
+              "assert": "y is 2"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, and the subs under the item whose left out aren't shown",
+        "rules": [
+          "for.inputs",
+          "for.walk",
+          "sentence.for.line"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "items": [
+                {
+                  "k": 1,
+                  "subs": [
+                    1
+                  ]
+                },
+                {
+                  "k": 2,
+                  "subs": [
+                    5,
+                    6
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "y is 2",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/items/0/subs/0"
+                            ],
+                            "name": "y",
+                            "value": 1
+                          }
+                        ],
+                        "item": "item 1 of z.subs"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of items",
+                "locations": [
+                  "/things/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "k": 1,
+                  "subs": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0",
+                  "/things/0/items/1"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "subs": [
+                      1
+                    ]
+                  },
+                  {
+                    "k": 2,
+                    "subs": [
+                      5,
+                      6
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/items/0/subs/0"
+                ],
+                "name": "z.subs[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over the subs of the first item that whose kept, with every leaf checked",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every deep whose k is 1 as z, every z.subs as y",
+              "assert": "every y.leaves is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails, and the subs under the item whose left out aren't shown",
+        "rules": [
+          "for.inputs",
+          "for.walk",
+          "sentence.for.line"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "deep": [
+                {
+                  "k": 1,
+                  "subs": [
+                    {
+                      "m": 1,
+                      "leaves": [
+                        1
+                      ]
+                    },
+                    {
+                      "m": 2,
+                      "leaves": [
+                        9
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "k": 2,
+                  "subs": [
+                    {
+                      "m": 1,
+                      "leaves": [
+                        7
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "every y.leaves is 1",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/deep/0/subs/1/leaves/0"
+                            ],
+                            "name": "y.leaves[]",
+                            "value": [
+                              9
+                            ]
+                          }
+                        ],
+                        "item": "item 2 of z.subs"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of deep",
+                "locations": [
+                  "/things/0/deep/0"
+                ],
+                "path": "item 1 of deep",
+                "value": {
+                  "k": 1,
+                  "subs": [
+                    {
+                      "leaves": [
+                        1
+                      ],
+                      "m": 1
+                    },
+                    {
+                      "leaves": [
+                        9
+                      ],
+                      "m": 2
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/deep/0",
+                  "/things/0/deep/1"
+                ],
+                "name": "deep[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "subs": [
+                      {
+                        "leaves": [
+                          1
+                        ],
+                        "m": 1
+                      },
+                      {
+                        "leaves": [
+                          9
+                        ],
+                        "m": 2
+                      }
+                    ]
+                  },
+                  {
+                    "k": 2,
+                    "subs": [
+                      {
+                        "leaves": [
+                          7
+                        ],
+                        "m": 1
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/deep/0/subs/0",
+                  "/things/0/deep/0/subs/1"
+                ],
+                "name": "z.subs[]",
+                "value": [
+                  {
+                    "leaves": [
+                      1
+                    ],
+                    "m": 1
+                  },
+                  {
+                    "leaves": [
+                      9
+                    ],
+                    "m": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every over the subs of the first item that whose kept, with a whose of its own",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every deep whose k is 1 as z, every z.subs whose m is 1 as y",
+              "assert": "every y.leaves is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes, and the sub its own whose left out is still shown",
+        "rules": [
+          "for.inputs",
+          "for.walk",
+          "sentence.for.line"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "deep": [
+                {
+                  "k": 1,
+                  "subs": [
+                    {
+                      "m": 1,
+                      "leaves": [
+                        1
+                      ]
+                    },
+                    {
+                      "m": 2,
+                      "leaves": [
+                        9
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "k": 2,
+                  "subs": [
+                    {
+                      "m": 1,
+                      "leaves": [
+                        7
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/deep/0",
+                  "/things/0/deep/1"
+                ],
+                "name": "deep[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "subs": [
+                      {
+                        "leaves": [
+                          1
+                        ],
+                        "m": 1
+                      },
+                      {
+                        "leaves": [
+                          9
+                        ],
+                        "m": 2
+                      }
+                    ]
+                  },
+                  {
+                    "k": 2,
+                    "subs": [
+                      {
+                        "leaves": [
+                          7
+                        ],
+                        "m": 1
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/deep/0/subs/0",
+                  "/things/0/deep/0/subs/1"
+                ],
+                "name": "z.subs[]",
+                "value": [
+                  {
+                    "leaves": [
+                      1
+                    ],
+                    "m": 1
+                  },
+                  {
+                    "leaves": [
+                      9
+                    ],
+                    "m": 2
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "some over the subs of the first item that whose kept",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "some items whose k is 1 as z, some z.subs as y",
+              "assert": "y is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "passes, and the subs under the item whose left out aren't shown",
+        "rules": [
+          "for.inputs",
+          "for.walk",
+          "sentence.for.line"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "items": [
+                {
+                  "k": 1,
+                  "subs": [
+                    1
+                  ]
+                },
+                {
+                  "k": 2,
+                  "subs": [
+                    5,
+                    6
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0",
+                  "/things/0/items/1"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "subs": [
+                      1
+                    ]
+                  },
+                  {
+                    "k": 2,
+                    "subs": [
+                      5,
+                      6
+                    ]
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/items/0/subs/0"
+                ],
+                "name": "z.subs[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

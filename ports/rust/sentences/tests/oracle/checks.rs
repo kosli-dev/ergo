@@ -3390,6 +3390,8 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every y.leaves is 1", "every y.leaves is 1", &[], &[]),
+    ("y is 2", "y is 2", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6277,6 +6279,30 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "some zz[$params.k].z as j, some x as i",
         "some zz named by $params.k.z as j, some x as i",
+        &[],
+        &[],
+    ),
+    (
+        "every deep whose k is 1 as z, every z.subs as y",
+        "every deep whose k is 1 as z, every z.subs as y",
+        &[],
+        &[],
+    ),
+    (
+        "every deep whose k is 1 as z, every z.subs whose m is 1 as y",
+        "every deep whose k is 1 as z, every z.subs whose m is 1 as y",
+        &[],
+        &[],
+    ),
+    (
+        "every items whose k is 1 as z, every z.subs as y",
+        "every items whose k is 1 as z, every z.subs as y",
+        &[],
+        &[],
+    ),
+    (
+        "some items whose k is 1 as z, some z.subs as y",
+        "some items whose k is 1 as z, some z.subs as y",
         &[],
         &[],
     ),
