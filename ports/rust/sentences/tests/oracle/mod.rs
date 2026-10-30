@@ -3,6 +3,41 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("$input whose x is 1", "$input whose x is 1"),
+    ("$input.commits", "$input.commits"),
+    ("$input[5]", "item 6 of $input"),
+    (".artifact.p[0]", "item 1 of artifact.p"),
+    (
+        ".artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (".artifact.p", "artifact.p"),
+    (
+        "artifact.x[0] named by each of $params.k",
+        "item 1 of artifact.x named by each of $params.k",
+    ),
+    (
+        "artifact[0] named by each of $params.k",
+        "item 1 of artifact named by each of $params.k",
+    ),
+    ("artifact[0].c", "artifact[0].c"),
+    ("every $input", "every $input"),
+    ("every $input.commits", "every $input.commits"),
+    ("every commits", "every commits"),
+    ("first of $input", "first of $input"),
+    (
+        "first of artifact named by each of $params.k",
+        "first of artifact named by each of $params.k",
+    ),
+    (
+        "artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (
+        "artifact.x named by each of $params.k",
+        "artifact.x named by each of $params.k",
+    ),
+    ("k.items", "k.items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
     (
         "artifact.scans named by each of $params.k",
@@ -15,6 +50,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
+    ("p whose x is 1", "p whose x is 1"),
+    ("p.commits", "p.commits"),
     (
         "things whose x.y named by $params.i does not exist",
         "things whose x.y named by $params.i does not exist",
@@ -1399,16 +1436,6 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "zz[k].q whose .empty.y is .it plus item 3 of $input.i[$params.k]",
         "zz named by k.q whose .empty.y equals .it plus item 3 of $input.i named by $params.k",
     ),
-    ("every $input", "every $input"),
-    ("every $input.commits", "every $input.commits"),
-    ("every commits", "every commits"),
-    ("$input whose x is 1", "$input whose x is 1"),
-    ("$input.commits", "$input.commits"),
-    ("$input[5]", "item 6 of $input"),
-    ("first of $input", "first of $input"),
-    ("p whose x is 1", "p whose x is 1"),
-    ("p.commits", "p.commits"),
-    ("artifact[0].c", "artifact[0].c"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
