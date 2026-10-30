@@ -1,2 +1,4 @@
 subjects / a child subject listed by named by each of that has identified_by / is written wrong, and $well_formed names identified_by on the child
 subjects / a subject listed by named by each of that has identified_by / is written wrong, because the key is the id, and $well_formed is the requirement's only row
+subjects / a keyed subject with identified_by, as the parent of a requirement's subject / is written wrong, and $well_formed of the child's requirement names identified_by on the parent
+subjects / a subject listed by named by each of whose identified_by isn't a string / is written wrong with both problems
