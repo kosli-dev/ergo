@@ -1,10 +1,166 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("aid exists", "aid exists", &[], &[]),
+    (
+        "count of items.x.y whose k is \"a\" is 1",
+        "count of items.x.y whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of items.x whose k is \"a\" is 1",
+        "count of items.x whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    ("every y.leaves is 1", "every y.leaves is 1", &[], &[]),
+    ("n exists", "n exists", &[], &[]),
+    ("q.n is 1", "q.n is 1", &[], &[]),
+    ("size exists", "size exists", &[], &[]),
+    (
+        "sum of items.x whose k is \"a\" is 1",
+        "sum of items.x whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of items.x.y whose k is \"a\" is 1",
+        "sum of items.x.y whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
     ("approvals exists", "approvals exists", &[], &[]),
     (" x   is  1 ", "x is 1", &[], &[]),
     (" x  is  1", "x is 1", &[], &[]),
     (
+        "count of items whose lo is at least days elapsed from fam.t to hi is 1",
+        "count of items whose lo is at least days elapsed from fam.t to hi is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of items whose lo is at least days elapsed from pa.t to hi is 1",
+        "count of items whose lo is at least days elapsed from pa.t to hi is 1",
+        &[],
+        &[],
+    ),
+    (
         "count of rows is at least m",
         "count of rows is at least m",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least $input.w plus hi is \"ok\"",
+        "every items.status whose lo is at least $input.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least $params.w plus hi is \"ok\"",
+        "every items.status whose lo is at least $params.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least 1 plus count of fam.pr.xs is \"ok\"",
+        "every items.status whose lo is at least 1 plus count of fam.pr.xs is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least 1 plus days elapsed from early to fam.t is \"ok\"",
+        "every items.status whose lo is at least 1 plus days elapsed from early to fam.t is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least 1 plus days elapsed from pa.t to hi is \"ok\"",
+        "every items.status whose lo is at least 1 plus days elapsed from pa.t to hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least count of fam.pr.xs is \"ok\"",
+        "every items.status whose lo is at least count of fam.pr.xs is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least days elapsed from early to pa.t is \"ok\"",
+        "every items.status whose lo is at least days elapsed from early to pa.t is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least days elapsed from early to pa.t plus 1 is \"ok\"",
+        "every items.status whose lo is at least days elapsed from early to pa.t plus 1 is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least days elapsed from fam.t to hi is \"ok\"",
+        "every items.status whose lo is at least days elapsed from fam.t to hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least days elapsed from pa.t to hi is \"ok\"",
+        "every items.status whose lo is at least days elapsed from pa.t to hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least fam.w is \"ok\"",
+        "every items.status whose lo is at least fam.w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least fam.w plus hi is \"ok\"",
+        "every items.status whose lo is at least fam.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least hi plus fam.w is \"ok\"",
+        "every items.status whose lo is at least hi plus fam.w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least hi plus pa.w is \"ok\"",
+        "every items.status whose lo is at least hi plus pa.w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least pa.w is \"ok\"",
+        "every items.status whose lo is at least pa.w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least pa.w plus hi is \"ok\"",
+        "every items.status whose lo is at least pa.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least sum of fam.pr.xs is \"ok\"",
+        "every items.status whose lo is at least sum of fam.pr.xs is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every x.items.status whose lo is at least x.w plus hi is \"ok\"",
+        "every x.items.status whose lo is at least x.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    ("i.status is \"ok\"", "i.status is \"ok\"", &[], &[]),
+    (
+        "some items.status whose lo is at least pa.w plus hi is \"ok\"",
+        "some items.status whose lo is at least pa.w plus hi is \"ok\"",
         &[],
         &[],
     ),
@@ -33,8 +189,11 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("x is one of 1.0, 'a'", "x is one of 1, \"a\"", &[], &[]),
     ("x matches '^\\d$'", "x matches '^\\d$'", &[], &[]),
     ("x.v is at most m", "x.v is at most m", &[], &[]),
+    ("x.n is one of 'a', 1.0", "x.n is one of \"a\", 1", &[], &[]),
+    ("y is 2", "y is 2", &[], &[]),
     ("y matches '^\\w$'", "y matches '^\\w$'", &[], &[]),
     ("z matches '^\\s+$'", "z matches '^\\s+$'", &[], &[]),
     ("p.z is 1", "p.z is 1", &[], &[]),
@@ -1486,6 +1645,66 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every items.status whose lo is at least art.q is \"ok\"",
+        "every items.status whose lo is at least art.q is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least w is \"ok\"",
+        "every items.status whose lo is at least w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose $params.min is at most lo is \"ok\"",
+        "every items.status whose $params.min is at most lo is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least $params.min is \"ok\"",
+        "every items.status whose lo is at least $params.min is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least hi plus 1 is \"ok\"",
+        "every items.status whose lo is at least hi plus 1 is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose min is at most count of kids plus 1 is \"ok\"",
+        "every items.status whose min is at most count of kids plus 1 is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose days elapsed from start to stop is at least lo is \"ok\"",
+        "every items.status whose days elapsed from start to stop is at least lo is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose count of kids is at least min is \"ok\"",
+        "every items.status whose count of kids is at least min is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least hi is \"ok\"",
+        "every items.status whose lo is at least hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose min is at most count of kids is \"ok\"",
+        "every items.status whose min is at most count of kids is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
         "every items.p.x equals $input.y",
         "every items.p.x equals $input.y",
         &[],
@@ -2015,6 +2234,16 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every x.z is 1", "every x.z is 1", &[], &[]),
     ("every xs is 1", "every xs is 1", &[], &[]),
+    (
+        "every xs whose k is at least k is one of 1, 'a'",
+        "every xs whose k is at least k is one of 1, \"a\"",
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+    ),
     (
         "every xs named by $params.k is 1",
         "every xs named by $params.k is 1",
@@ -2952,6 +3181,19 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("x equals total", "x equals total", &[], &[]),
     ("x equals y", "x equals y", &[], &[]),
+    (
+        "x equals y within 0.000001",
+        "x equals y within 0.000001",
+        &[],
+        &[],
+    ),
+    (
+        "x equals y within 0.19999",
+        "x equals y within 0.19999",
+        &[],
+        &[],
+    ),
+    ("x equals y within 0.2", "x equals y within 0.2", &[], &[]),
     ("x equals y within 0.5", "x equals y within 0.5", &[], &[]),
     ("x equals y[1]", "x equals item 2 of y", &[], &[]),
     ("x exists", "x exists", &[], &[]),
@@ -3142,6 +3384,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x is one of $params.k", "x is in $params.k", &[], &[]),
     ("x is one of $params.l", "x is in $params.l", &[], &[]),
     ("x is one of 1, \"a\"", "x is one of 1, \"a\"", &[], &[]),
+    (
+        "x is one of 1, 'a' and y is at least y",
+        "x is one of 1, \"a\" and y is at least y",
+        &["y is compared with itself"],
+        &["y is compared with itself"],
+    ),
+    ("x is one of 1, 'a'", "x is one of 1, \"a\"", &[], &[]),
     ("x is one of 1, 2", "x is one of 1, 2", &[], &[]),
     ("x is one of 1, 2.5", "x is one of 1, 2.5", &[], &[]),
     ("x is one of x", "x is in x", &[], &[]),
@@ -3394,10 +3643,68 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
     ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
     ("i exists", "i exists", &[], &[]),
-    ("aid exists", "aid exists", &[], &[]),
+    ("o exists", "o exists", &[], &[]),
+    ("p is 1", "p is 1", &[], &[]),
+    (
+        "every rows.n whose $input.q is at least z is at least x.v",
+        "every rows.n whose $input.q is at least z is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least $input.q is at least x.v",
+        "every rows.n whose z is at least $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least t.x is at least r.v",
+        "every rows.n whose z is at least t.x is at least r.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least x.w is at least $input.k",
+        "every rows.n whose z is at least x.w is at least $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "every y.w whose zz is at least $input.q is at least x.v",
+        "every y.w whose zz is at least $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "some rows.n whose z is at most $input.q is at least x.v",
+        "some rows.n whose z is at most $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every \"#rows\".n is at least x.v",
+        "every \"#rows\".n is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "i is one of 1, 'a' and y is at least y",
+        "i is one of 1, \"a\" and y is at least y",
+        &["y is compared with itself"],
+        &["y is compared with itself"],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "x named by $params is 1 within",
+        &["\"within\" needs a number after it"],
+    ),
+    (
+        "every a every b named by $params exists",
+        &["two quantifiers in one sentence: put them on a for line"],
+    ),
+    ("x is $foo foo bar", &["doesn't parse"]),
     (" x   is  ", &["doesn't parse"]),
     (" x  is ", &["doesn't parse"]),
     ("\u{feff}x is 1", &["doesn't parse"]),
@@ -3423,7 +3730,6 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     ("\"q r\" plus \"q r\" is before \"s\"", &["doesn't parse"]),
     ("\"q r\".\"é\".\"é\" not 1e2 within 2", &["doesn't parse"]),
-    ("$foo.x exists", &["unknown name $foo"]),
     ("$input.i.\"\" 'b\\c'", &["doesn't parse"]),
     ("$params.p does contain -2.50", &["doesn't parse"]),
     (
@@ -4514,6 +4820,8 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("x is x and y is $foo", &["unknown name $foo"]),
+    ("$foo.x exists", &["unknown name $foo"]),
     (
         "\"$s\".\"\" is 'b\\c' and \"$s\" named by $params.k contains none of 1e2, -2.50, -2.50 and some .true, if any, is at most 0.10",
         &["if any can't go with some"],
@@ -5682,6 +5990,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("every cs as c", "every cs as c", &[], &[]),
     ("every d.items as cov", "every d.items as cov", &[], &[]),
     (
+        "every deep whose k is 1 as z, every z.subs as y",
+        "every deep whose k is 1 as z, every z.subs as y",
+        &[],
+        &[],
+    ),
+    (
+        "every deep whose k is 1 as z, every z.subs whose m is 1 as y",
+        "every deep whose k is 1 as z, every z.subs whose m is 1 as y",
+        &[],
+        &[],
+    ),
+    (
         "every dispatched as persona",
         "every dispatched as persona",
         &[],
@@ -5790,6 +6110,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every items whose lo is at least pa.w plus hi as i",
+        "every items whose lo is at least pa.w plus hi as i",
+        &[],
+        &[],
+    ),
+    (
+        "every items whose k is 1 as z, every z.subs as y",
+        "every items whose k is 1 as z, every z.subs as y",
+        &[],
+        &[],
+    ),
+    (
         "every items whose pr equals .pr as i",
         "every items whose pr equals pr as i",
         &[
@@ -5828,6 +6160,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every items, if any, as i",
         "every items, if any, as i",
+        &[],
+        &[],
+    ),
+    (
+        "every items.v as z, every z.subs as y",
+        "every items.v as z, every z.subs as y",
         &[],
         &[],
     ),
@@ -5920,6 +6258,19 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every x, if any, as pr", "every x, if any, as pr", &[], &[]),
     ("every xs as b", "every xs as b", &[], &[]),
+    (
+        "every xs whose name starts with count of ys as x",
+        "every xs whose name starts with count of ys as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is one of 1, 'a' as x",
+        "every xs whose v is one of 1, \"a\" as x",
+        &[],
+        &[],
+    ),
+    ("every xs as i", "every xs as i", &[], &[]),
     ("every xs as entry", "every xs as entry", &[], &[]),
     ("every xs as kid", "every xs as kid", &[], &[]),
     ("every xs as other", "every xs as other", &[], &[]),
@@ -6254,6 +6605,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("some items as i", "some items as i", &[], &[]),
     (
+        "some items whose k is 1 as z, some z.subs as y",
+        "some items whose k is 1 as z, some z.subs as y",
+        &[],
+        &[],
+    ),
+    (
         "some k1.\"\"._k whose .true ends with zz as k1, last of \"$s\" whose days elapsed from \"q r\".q.z to item 2 from last of k1.q named by $params.k is equal to days elapsed from .true to k1 plus 1e2 sorted by \"$s\".y.y as x",
         "some k1.\"\"._k whose .true ends with zz as k1, last of \"$s\" whose days elapsed from \"q r\".q.z to item 2 from last of k1.q named by $params.k equals days elapsed from .true to k1 plus 100 sorted by \"$s\".y.y as x",
         &[],
@@ -6305,9 +6662,58 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every t[0].u as i", "every t[0].u as i", &[], &[]),
     ("first of t as i", "first of t as i", &[], &[]),
+    (
+        "every xs as x, every x.ys as y",
+        "every xs as x, every x.ys as y",
+        &[],
+        &[],
+    ),
+    (
+        "every lists named by q as p, every qs as q",
+        "every lists named by q as p, every qs as q",
+        &[],
+        &[],
+    ),
+    (
+        "every objs whose v named by o is 1 as o",
+        "every objs whose v named by o is 1 as o",
+        &[],
+        &[],
+    ),
+    (
+        "every xs named by x as x",
+        "every xs named by x as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, first of ys whose k is p.k as q",
+        "every xs as p, first of ys whose k equals p.k as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, item 2 of ys whose k is p.k as q",
+        "every xs as p, item 2 of ys whose k equals p.k as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, last of ys whose k is p.k sorted by t as q",
+        "every xs as p, last of ys whose k equals p.k sorted by t as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose k is 1 as p, first of ys whose k is p.k as q",
+        "every xs whose k is 1 as p, first of ys whose k equals p.k as q",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
+    ("every xs whose zz is $foo foo bar as x", &["doesn't parse"]),
     (
         " every  xs ",
         &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
@@ -6737,6 +7143,7 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("every xs whose zz is $foo as x", &["unknown name $foo"]),
     (
         "every \"$s\" named by $params.\"x y\" as it",
         &["it can't be an alias"],

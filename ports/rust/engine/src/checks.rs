@@ -57,14 +57,16 @@ fn read_lines(
         match s::parse_check(line) {
             Ok(tree) => {
                 let found = s::check_problems(&tree, aliases);
-                if found.is_empty() {
-                    trees.push(tree);
-                    places.push(place);
-                    continue;
+                let only_self = found == s::check_self_problems(&tree, aliases);
+                if !found.is_empty() {
+                    ok = false;
                 }
-                ok = false;
                 for problem in found {
                     problems.insert(format!("{place}{problem}"));
+                }
+                if only_self {
+                    trees.push(tree);
+                    places.push(place);
                 }
             }
             Err(errors) => {
@@ -217,7 +219,11 @@ fn read_one(
                             all_of: false,
                         }),
                         Err(found) => {
-                            problems.extend(found);
+                            problems.extend(
+                                found
+                                    .into_iter()
+                                    .filter(|p| !p.starts_with(lower::UNKNOWN_NAME)),
+                            );
                             None
                         }
                     };
@@ -527,6 +533,86 @@ mod tests {
     }
 
     #[test]
+    fn values_of_mixed_types_are_listed_beside_a_field_compared_with_itself_in_a_whose() {
+        let sentence = "every xs whose k is at least k is one of 1, 'a'";
+        let itself = "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert";
+        let read = one(json!({"c": sentence}));
+        assert_eq!(problems(&read), [itself, "values of mixed types"]);
+        let read = one(json!({"c": {"assert": ["x exists", sentence]}}));
+        let second = format!("line 2: {itself}");
+        assert_eq!(
+            problems(&read),
+            [second.as_str(), "line 2: values of mixed types"]
+        );
+    }
+
+    #[test]
+    fn values_of_mixed_types_are_listed_beside_a_field_compared_with_itself() {
+        let sentence = "x is one of 1, 'a' and y is at least y";
+        let both = ["values of mixed types", "y is compared with itself"];
+        let read = one(json!({"c": sentence}));
+        assert_eq!(problems(&read), both);
+        let read = one(json!({"c": {"assert": ["x exists", sentence]}}));
+        assert_eq!(
+            problems(&read),
+            [
+                "line 2: values of mixed types",
+                "line 2: y is compared with itself"
+            ]
+        );
+        let read = one(json!({"c": {"any_of": {"p": sentence}}}));
+        assert_eq!(
+            problems(&read),
+            [
+                "option p: values of mixed types",
+                "option p: y is compared with itself"
+            ]
+        );
+        let read = one(
+            json!({"c": {"for": "every xs as i", "assert": "i is one of 1, 'a' and y is at least y"}}),
+        );
+        assert_eq!(problems(&read), both);
+    }
+
+    #[test]
+    fn values_of_mixed_types_in_a_whose_of_the_for_line_start_with_for() {
+        let read = one(
+            json!({"c": {"for": "every xs whose v is one of 1, 'a' as x", "assert": "x exists"}}),
+        );
+        assert_eq!(problems(&read), ["for: values of mixed types"]);
+    }
+
+    #[test]
+    fn every_problem_found_while_lowering_the_for_line_starts_with_for() {
+        let read = one(
+            json!({"c": {"for": "every xs whose k is one of 1, 'a' as x", "assert": "x exists"}}),
+        );
+        assert_eq!(problems(&read), ["for: values of mixed types"]);
+        let read = one(
+            json!({"c": {"for": "every xs whose k.a.b.c.d.e.f.g.h.i.j.l is 1 as x", "assert": "x exists"}}),
+        );
+        assert!(
+            problems(&read).iter().all(|p| p.starts_with("for: ")),
+            "{:?}",
+            problems(&read)
+        );
+        let read =
+            one(json!({"c": {"for": "every xs.a.b.c.d.e.f.g.h.i.j.k as x", "assert": "x exists"}}));
+        assert_eq!(
+            problems(&read),
+            ["for: every and some over more than ten steps aren't supported yet"]
+        );
+        let read = one(
+            json!({"c": {"for": "every xs as x", "assert": "x starts with count of ys plus 1"}}),
+        );
+        assert!(
+            problems(&read).iter().all(|p| !p.starts_with("for: ")),
+            "{:?}",
+            problems(&read)
+        );
+    }
+
+    #[test]
     fn a_phrase_that_cannot_take_a_count_or_a_plus_is_written_wrong() {
         let read = one(json!({"c": "x ends with y plus z"}));
         assert_eq!(
@@ -613,7 +699,7 @@ mod tests {
         }}));
         assert_eq!(
             problems(&read),
-            ["\"starts with\" can't take a count of, a sum of or a plus"]
+            ["for: \"starts with\" can't take a count of, a sum of or a plus"]
         );
         assert!(read.plan.is_none());
         assert_eq!(

@@ -5,6 +5,8 @@ use crate::words::is_word;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 
+const UNKNOWN_NAME: &str = "unknown name ";
+
 /// Lists what is written wrong in a check that was read.
 ///
 /// The messages are in `ergo.rego`'s words and sorted. It only reads the tree and the names in `aliases`. Rules that need the policy's names, like an alias named like a subject, are left to the engine. The list is empty when nothing is wrong.
@@ -17,10 +19,28 @@ use std::collections::BTreeSet;
 /// ```
 pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
     let mut found = check_base(check, &[]);
-    if found.is_empty() {
+    if found.iter().all(|m| m.starts_with(UNKNOWN_NAME)) {
         found.extend(check_self(check, aliases));
     }
     found.into_iter().collect()
+}
+
+/// Lists only the problems of a check that come from a field compared with itself.
+///
+/// It gives what [`check_problems`] gives when the check has no other problem, and an empty list otherwise.
+///
+/// ```
+/// use ergo_sentences::{check_self_problems, parse_check};
+///
+/// let check = parse_check("x equals x").unwrap();
+/// assert_eq!(check_self_problems(&check, &[]), ["x is compared with itself"]);
+/// ```
+pub fn check_self_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
+    if check_base(check, &[]).is_empty() {
+        check_self(check, aliases).into_iter().collect()
+    } else {
+        Vec::new()
+    }
 }
 
 /// Lists what is written wrong in a `for` line that was read.
@@ -28,7 +48,7 @@ pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
 /// The messages are in `ergo.rego`'s words and sorted. It only reads the tree and the names in `aliases`. Rules that need the policy's names, like an alias named like a subject, are left to the engine. The list is empty when nothing is wrong.
 pub fn for_problems(line: &ForLine, aliases: &[&str]) -> Vec<String> {
     let mut found = for_base(line, &[]);
-    if found.is_empty() {
+    if found.iter().all(|m| m.starts_with(UNKNOWN_NAME)) {
         found.extend(for_self(line, aliases));
     }
     found.into_iter().collect()
@@ -212,11 +232,18 @@ impl Walk {
                         .insert("it is the whole subject: nothing can follow it".to_string());
                 }
             },
+            Start::Unknown(name) => {
+                self.out.insert(format!("unknown name {name}"));
+            }
             _ => {}
         }
         for step in &path.steps {
             match step {
                 Step::Index(digits) => self.index(digits),
+                Step::NamedBy(Reference::Unknown { name, .. })
+                | Step::Brackets(Reference::Unknown { name, .. }) => {
+                    self.out.insert(format!("unknown name {name}"));
+                }
                 Step::NamedBy(Reference::Name(name)) | Step::Brackets(Reference::Name(name)) => {
                     if name == "it" {
                         self.out.insert("it can't name a key".to_string());
@@ -503,7 +530,10 @@ impl Walk {
                 if let Some(sorted) = sorted_by {
                     self.path(&sorted.path);
                     if sorted.path.position.is_some()
-                        || matches!(sorted.path.start, Start::Params | Start::Input)
+                        || matches!(
+                            sorted.path.start,
+                            Start::Params | Start::Input | Start::Unknown(_)
+                        )
                     {
                         self.out
                             .insert("\"sorted by\" reads a field of each item".to_string());
@@ -532,6 +562,7 @@ enum Kind {
     It,
     Params,
     Input,
+    Unknown(String),
     Field(String),
 }
 
@@ -567,6 +598,7 @@ fn kind_of(path: &Path) -> Kind {
         Start::It => Kind::It,
         Start::Params => Kind::Params,
         Start::Input => Kind::Input,
+        Start::Unknown(name) => Kind::Unknown(name.clone()),
         Start::Field { key, .. } => Kind::Field(key.clone()),
     }
 }
@@ -679,6 +711,7 @@ fn check_self(check: &Check, aliases: &[&str]) -> BTreeSet<String> {
                     && term.position.is_none()
                     && term.start != Start::Params
                     && term.start != Start::Input
+                    && !matches!(term.start, Start::Unknown(_))
                     && term.start != Start::It
                     && !matches!(term.steps.last(), Some(Step::Index(_)))
                 {

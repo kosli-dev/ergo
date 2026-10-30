@@ -394,14 +394,35 @@ impl Parser {
         self.bare_key(i).or_else(|| self.dq(i))
     }
 
-    fn reference(&self, i: usize) -> Option<(Reference, usize)> {
-        if let Some(j) = self.lit(i, "$params.") {
-            let (key, end) = self.key(j)?;
-            return Some((Reference::Params(key), end));
+    fn dollar_name(&self, i: usize) -> Option<(String, usize)> {
+        let j = self.lit(i, "$")?;
+        let first = self.at(j)?;
+        if !(first.is_ascii_alphabetic() || first == '_') {
+            return None;
         }
-        if let Some(j) = self.lit(i, "$input.") {
-            let (key, end) = self.key(j)?;
-            return Some((Reference::Input(key), end));
+        let mut end = j + 1;
+        while self
+            .at(end)
+            .is_some_and(|ch| ch.is_ascii_alphanumeric() || ch == '_')
+        {
+            end += 1;
+        }
+        Some((self.c[i..end].iter().collect(), end))
+    }
+
+    fn reference(&self, i: usize) -> Option<(Reference, usize)> {
+        if let Some((name, end)) = self.dollar_name(i) {
+            let keyed = self
+                .lit(end, ".")
+                .and_then(|j| self.key(j))
+                .map(|(key, after)| (Some(key), after));
+            return match (name.as_str(), keyed) {
+                ("$params", Some((Some(key), after))) => Some((Reference::Params(key), after)),
+                ("$input", Some((Some(key), after))) => Some((Reference::Input(key), after)),
+                ("$params" | "$input", _) => None,
+                (_, Some((key, after))) => Some((Reference::Unknown { name, key }, after)),
+                (_, None) => Some((Reference::Unknown { name, key: None }, end)),
+            };
         }
         let (name, end) = self.bare_key(i)?;
         Some((Reference::Name(name), end))
@@ -462,11 +483,13 @@ impl Parser {
     fn start(&self, i: usize, side: Side) -> Option<(Start, usize)> {
         match self.at(i)? {
             '$' => {
-                if let Some(j) = self.lit(i, "$params") {
-                    Some((Start::Params, j))
-                } else {
-                    self.lit(i, "$input").map(|j| (Start::Input, j))
-                }
+                let (name, end) = self.dollar_name(i)?;
+                let start = match name.as_str() {
+                    "$params" => Start::Params,
+                    "$input" => Start::Input,
+                    _ => Start::Unknown(name),
+                };
+                Some((start, end))
             }
             '.' => {
                 let (key, end) = self.key(i + 1)?;

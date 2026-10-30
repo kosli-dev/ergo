@@ -182,8 +182,12 @@ pub fn lower_for(
     let mut problems = Vec::new();
     let mut items = Vec::new();
     let mut bound = scope.clone();
-    for item in &line.items {
-        let item_scope = bound.in_item();
+    for (at, item) in line.items.iter().enumerate() {
+        let later = line.items[at..].iter().map(|item| match item {
+            s::ForItem::Walk { alias, .. } | s::ForItem::Pick { alias, .. } => alias.as_str(),
+        });
+        let here = bound.clone().with_pending(later);
+        let item_scope = here.in_item();
         let (path, whose, alias, how) = match item {
             s::ForItem::Walk {
                 quantifier,
@@ -242,8 +246,11 @@ pub fn lower_for(
                 }
             }
         };
-        let walk_path = match bound.path(path) {
-            Ok(found) => Some(found),
+        let walk_path = match here.path(path) {
+            Ok(found) => {
+                problems.extend(lower::walk_too_long(&found));
+                Some(found)
+            }
             Err(found) => {
                 problems.extend(found);
                 None
@@ -260,6 +267,10 @@ pub fn lower_for(
         }
         bound = bound.with_for_alias(alias);
     }
+    let mut problems: Vec<String> = problems
+        .into_iter()
+        .map(|problem| format!("for: {problem}"))
+        .collect();
     let names = bound.aliases();
     let names: Vec<&str> = names.iter().map(String::as_str).collect();
     let last_alias = line.items.last().map(|item| match item {
@@ -1332,6 +1343,57 @@ mod tests {
             .as_str()
             .unwrap()
             .to_string()
+    }
+
+    fn problems(for_line: &str) -> Value {
+        let policy = json!({
+            "ergo_spec": "v0.3-dev",
+            "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+            "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": "x exists"}}}}
+        });
+        let input = json!({"things": [{"id": 1, "xs": {"a": 1}, "x": "a", "ys": ["a"]}]});
+        let report = crate::report(&input, &policy, &json!({}));
+        let rows = report["results"].as_array().unwrap();
+        assert!(rows.iter().all(|row| row["check"] != "c"));
+        let well_formed = rows
+            .iter()
+            .find(|row| row["check"] == "$well_formed")
+            .unwrap();
+        well_formed["inputs"][2]["value"].clone()
+    }
+
+    #[test]
+    fn a_for_item_that_names_its_own_alias_in_its_path_is_written_wrong() {
+        assert_eq!(
+            problems("every xs named by x as x"),
+            json!(["for: unknown alias x"])
+        );
+    }
+
+    #[test]
+    fn a_for_item_that_names_a_later_alias_in_its_path_is_written_wrong() {
+        assert_eq!(
+            problems("every xs named by q as p, every ys as q"),
+            json!(["for: unknown alias q"])
+        );
+    }
+
+    #[test]
+    fn a_for_item_that_names_its_own_alias_in_a_whose_is_written_wrong() {
+        assert_eq!(
+            problems("every xs whose v named by x is 1 as x"),
+            json!(["for: unknown alias x"])
+        );
+    }
+
+    #[test]
+    fn a_for_item_that_names_an_earlier_alias_in_its_path_is_read() {
+        let found = row(
+            "every ys as y, every xs named by y as x",
+            json!("x is 1"),
+            json!({"xs": {"a": [1]}, "ys": ["a"]}),
+        );
+        assert_eq!(found["cause"], "satisfied");
     }
 
     fn items(row: &Value) -> Vec<String> {

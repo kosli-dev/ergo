@@ -943,3 +943,28 @@ fn compared_with_itself_is_only_named_when_nothing_else_is_wrong() {
         vec!["every can't be an alias".to_string()]
     );
 }
+
+#[test]
+fn a_comparison_with_itself_is_listed_next_to_an_unknown_name_and_next_to_no_other_problem() {
+    assert_eq!(
+        problems("x is x and y is $foo"),
+        vec![
+            "unknown name $foo".to_string(),
+            "x is compared with itself".to_string()
+        ]
+    );
+    assert_eq!(
+        problems("$foo is $foo"),
+        vec![
+            "$foo is compared with itself".to_string(),
+            "unknown name $foo".to_string()
+        ]
+    );
+    assert_eq!(
+        problems("x is x and x is not null and y is $foo"),
+        vec![
+            "\"is not null\" is written \"exists\"".to_string(),
+            "unknown name $foo".to_string()
+        ]
+    );
+}

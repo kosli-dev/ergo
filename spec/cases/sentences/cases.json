@@ -573,6 +573,64 @@
     ]
   },
   {
+    "description": "equals a field within 0.2 exactly",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.2"}}}},
+    "cases": [
+      {
+        "description": "passes when the gap is exactly the number",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.3, "y": 0.1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0.3, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.1, "locations": ["/things/0/y"]}]}
+        ]
+      },
+      {
+        "description": "passes when the left is the smaller",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.1, "y": 0.3}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0.1, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.3, "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a field within 0.19999 exactly",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.19999"}}}},
+    "cases": [
+      {
+        "description": "fails as value when the gap is a little more than the number",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.3, "y": 0.1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0.3, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.1, "locations": ["/things/0/y"]}]}
+        ]
+      },
+      {
+        "description": "fails as value when the left is the smaller",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.1, "y": 0.3}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0.1, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.3, "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a field within 0.000001 exactly",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.000001"}}}},
+    "cases": [
+      {
+        "description": "passes on big equal numbers",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1000000000, "y": 1000000000}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1000000000, "locations": ["/things/0/x"]}, {"name": "y", "value": 1000000000, "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
+  },
+  {
     "description": "is within 0",
     "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 5 within 0"}}}},
     "cases": [
@@ -7484,6 +7542,287 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "g", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"a": "x is 0.0000001", "b": "x is 0", "c": "x is 1", "d": "x is -125", "e": "x is one of 10, 0, 2.5", "f": "x is 9007199254740993", "g": "x is 1000000000000000000000"}}
+      }
+    ]
+  },
+  {
+    "description": "a check sentence with an unknown name and a syntax error",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is $foo foo bar"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says it doesn't parse, and not unknown name",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "doesn't parse"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check sentence that compares a path with itself and has an unknown name",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is x and y is $foo"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the unknown name and the comparison with itself",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "unknown name $foo",
+                  "x is compared with itself"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check sentence with a bare $params after named by and a within with no number",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x named by $params is 1 within"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says the within has no number, as it does without the $params",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "\"within\" needs a number after it"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check sentence with two quantifiers and a bare $params after named by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "every a every b named by $params exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says to put the quantifiers on a for line",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "two quantifiers in one sentence: put them on a for line"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
       }
     ]
   }

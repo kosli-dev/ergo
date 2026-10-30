@@ -1934,7 +1934,7 @@ test_every_badly_written_check_fails_well_formed_and_says_what_is_wrong if {
 }
 
 test_a_bare_word_after_named_by_that_no_for_line_gives_is_an_unknown_alias if {
-	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown alias x"]
+	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["for: unknown alias x"]
 }
 
 test_a_dollar_word_in_a_sentence_is_not_an_alias_so_it_stays_an_unknown_name if {
@@ -3072,13 +3072,13 @@ badly_written := [
 	["empty is 1", "", ["empty is a word of the grammar: write .empty"]],
 	["some xs, if any, exists", "", ["if any can't go with some"]],
 	[`t is before "yesterday"`, "", [`"is before" takes a time or a number`]],
-	[`every xs.v is one of 1, "a"`, ".check", ["values of mixed types"]],
-	[`count of xs whose v is one of 1, "a" is 0`, ".left.whose.0", ["values of mixed types"]],
+	[`every xs.v is one of 1, "a"`, "", ["values of mixed types"]],
+	[`count of xs whose v is one of 1, "a" is 0`, "", ["values of mixed types"]],
 	["count of xs whose v is between 9 and 0 is 0", "", ["min above max"]],
 	[`count of xs whose v matches "(" is 0`, "", [`invalid pattern "("`]],
 	["count of xs whose $foo exists is 0", "", ["unknown name $foo"]],
 	["count of xs whose v[9007199254740992] exists is 0", "", ["9007199254740992 can't be a list position"]],
-	[`every xs whose v is one of 1, "a" is 1`, ".whose.0", ["values of mixed types"]],
+	[`every xs whose v is one of 1, "a" is 1`, "", ["values of mixed types"]],
 	["n exists whose v is 1", "", ["doesn't parse"]],
 	["every xs some ys is 1", "", ["two quantifiers in one sentence: put them on a for line"]],
 	[{"assert": "n exists", "description": 5}, "", ["invalid description"]],
@@ -3091,8 +3091,10 @@ badly_written := [
 	[{"for": "every xs as x"}, "", ["missing assert"]],
 	[{"assert": "x exists", "for": "every xs"}, "", [`for: an item ends with "as" and a name, like "every pull_requests as pr"`]],
 	[{"assert": "x exists", "for": "every xs as x, every x.ys as x"}, "", ["for: x is given twice"]],
-	[{"assert": "x exists", "for": `every xs whose v is one of 1, "a" as x`}, ".items.0.whose.0", ["values of mixed types"]],
-	[{"assert": `x is one of 1, "a"`, "for": "every xs as x"}, ".checks.0", ["values of mixed types"]],
+	[{"assert": "x exists", "for": `every xs whose v is one of 1, "a" as x`}, "", ["for: values of mixed types"]],
+	[{"assert": `x is one of 1, "a"`, "for": "every xs as x"}, "", ["values of mixed types"]],
+	[{"assert": ["n exists", "n is one of 1, \"a\""]}, "", ["line 2: values of mixed types"]],
+	[{"assert": ["n is one of 1, \"a\"", "n is"]}, "", ["line 1: values of mixed types", "line 2: doesn't parse"]],
 	[{"assert": "n exists", "for": 5}, "", ["invalid for"]],
 	[{"any_of": {"o": "n is"}}, "", ["option o: doesn't parse"]],
 	[{"any_of": {"o": ["n exists", "n is one of 1, \"a\""]}}, "", ["option o: line 2: values of mixed types"]],
@@ -3266,7 +3268,7 @@ test_an_identified_by_with_an_index_that_cannot_be_a_key_is_written_wrong if {
 	rep.compliant == false
 }
 
-test_a_problem_inside_a_sentence_is_named_by_the_position_where_it_sits if {
+test_a_problem_inside_a_sentence_is_named_by_its_check_and_the_check_prints_as_written if {
 	rep := ergo.report(
 		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
 			"k": `count of items whose x is one of 1, "a" and y is one of true, 2 is 0`,
@@ -3275,10 +3277,11 @@ test_a_problem_inside_a_sentence_is_named_by_the_position_where_it_sits if {
 		{},
 	)
 	problem_inputs(rep) == [
-		{"name": "checks.e.items.0.whose.0", "value": ["values of mixed types"], "locations": []},
-		{"name": "checks.k.left.whose.0", "value": ["values of mixed types"], "locations": []},
-		{"name": "checks.k.left.whose.1", "value": ["values of mixed types"], "locations": []},
+		{"name": "checks.e", "value": ["for: values of mixed types"], "locations": []},
+		{"name": "checks.k", "value": ["values of mixed types"], "locations": []},
 	]
+	rep.requirements.s.checks.k.expression == "count of items whose x is one of 1, \"a\" and y is one of true, 2 is 0"
+	rep.requirements.s.checks.e.expression == "for every items whose x is one of 1, \"a\" as i: i.y exists"
 }
 
 test_a_range_with_equal_bounds_is_well_written if {
@@ -4081,6 +4084,23 @@ test_is_not_null_is_written_wrong_because_it_could_only_fail if {
 	_sentence_problems(`x does not equal null`) == [`"is not null" is written "exists"`]
 }
 
+test_a_bare_params_or_input_after_named_by_or_in_brackets_does_not_parse_even_with_an_unknown_name if {
+	every text in [`x named by $params is 1`, `x named by $input is 1`, `x[$params] is 1`, `x[$input] is 1`, `x named by $params is $foo`] {
+		_sentence_problems(text) == ["doesn't parse"]
+	}
+}
+
+test_a_bare_params_after_named_by_does_not_hide_a_within_with_no_number_or_two_quantifiers if {
+	_sentence_problems(`x named by $params is 1 within`) == [`"within" needs a number after it`]
+	_sentence_problems(`every a every b named by $params exists`) == ["two quantifiers in one sentence: put them on a for line"]
+}
+
+test_a_comparison_of_a_path_with_itself_is_listed_next_to_an_unknown_name_and_next_to_no_other_problem if {
+	_sentence_problems(`x is x and y is $foo`) == ["unknown name $foo", "x is compared with itself"]
+	_sentence_problems(`$foo is $foo`) == ["$foo is compared with itself", "unknown name $foo"]
+	_sentence_problems(`x is x and x is not null and y is $foo`) == [`"is not null" is written "exists"`, "unknown name $foo"]
+}
+
 test_a_path_compared_with_itself_is_written_wrong_because_it_could_only_pass_or_only_fail if {
 	every text in [
 		`x equals x`, `x does not equal x`, `x is x within 1`, `x is at least x`, `x is less than x`,
@@ -4580,7 +4600,7 @@ test_a_position_and_a_sum_after_plus_on_the_right_and_a_count_in_a_picked_items_
 	_reads("n is count of xs plus sum of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10")
 	_sentence_problems(concat("", ["n is count of xs plus sum of ", _eleven])) == _too_long
 	_reads({"for": "first of xs whose n is count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10 as x", "assert": "x.n is 1"})
-	_sentence_problems({"for": concat("", ["first of xs whose n is count of ", _eleven, " as x"]), "assert": "x.n is 1"}) == _too_long
+	_sentence_problems({"for": concat("", ["first of xs whose n is count of ", _eleven, " as x"]), "assert": "x.n is 1"}) == [concat("", ["for: ", p]) | some p in _too_long]
 }
 
 test_params_is_not_a_step_of_a_walk if {
@@ -4885,7 +4905,7 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
 		["every xs whose last of ys is 1 as x", "last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""],
 		["every b.c.d.e.f.g.h.i.j.k.l.m as x", "every and some over more than ten steps aren't supported yet"],
 	] {
-		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [pair[1]]
+		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [concat("", ["for: ", pair[1]])]
 	}
 }
 
@@ -4966,6 +4986,91 @@ test_sum_of_adds_up_the_field_across_the_items_left_in if {
 	[row[1] | some row in _tally_rows("sum of xs.n is 0.3", [{"id": 1, "xs": [{"n": 0.1}, {"n": 0.2}]}], {})] == ["satisfied"]
 }
 
+test_within_works_out_the_gap_exactly_in_a_whose if {
+	[row[1] | some row in _tally_rows("count of xs whose x equals y within 0.2 is 1", [{"id": 1, "xs": [{"x": 0.3, "y": 0.1}]}], {})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("count of xs whose x equals y within 0.19999 is 0", [{"id": 1, "xs": [{"x": 0.3, "y": 0.1}]}], {})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("count of xs whose x equals y within 0.2 is 1", [{"id": 1, "xs": [{"x": 1e15, "y": 1e15}]}], {})] == ["satisfied"]
+	[row[1] | some row in _tally_rows("count of xs whose x equals y within 1 is 1", [{"id": 1, "xs": [{"x": 1e5000, "y": 1}]}], {})] == ["unusable"]
+}
+
+_within_cause(x, y, w) := cause if {
+	rows := [row[1] | some row in _tally_rows(concat("", ["x equals y within ", w]), [{"id": 1, "x": x, "y": y}], {})]
+	cause := rows[0]
+}
+
+test_within_reads_numbers_opa_counts_as_equal_by_their_digits if {
+	_within_cause(1234567890.1209567990, 0, "1234567890.1209567890") == "value"
+	_within_cause(123964818.71664440535747000531389400, 123964818.7166444053574700053138940000000000000002244422625687264764923070, "0.0000000000000000000000000000000000000002244422625687264764923069") == "value"
+	_within_cause(123964818.71664440535747000531389400, 123964818.7166444053574700053138940000000000000002244422625687264764923070, "0.0000000000000000000000000000000000000002244422625687264764923070") == "satisfied"
+}
+
+test_within_compares_more_than_fifteen_digits_exactly_on_both_sides_of_the_boundary if {
+	_within_cause(12345678901234567890.5, 12345678901234567890.4, "0.1") == "satisfied"
+	_within_cause(12345678901234567890.5, 12345678901234567890.4, "0.09") == "value"
+	_within_cause(12345678901234567890.4, 12345678901234567890.5, "0.1") == "satisfied"
+	_within_cause(12345678901234567890.4, 12345678901234567890.5, "0.09") == "value"
+	_within_cause(0.30000000000000004, 0.3, "0.01") == "satisfied"
+	_within_cause(0.30000000000000004, 0.3, "0.000000000000000001") == "value"
+}
+
+test_within_passes_the_float_noise_of_a_cost_and_its_total if {
+	_within_cause(0.30000000000000004, 0.3, "0.01") == "satisfied"
+	_within_cause(12.340000000000002, 12.34, "0.01") == "satisfied"
+	_within_cause(1761700000.123456, 1761700000.12, "0.01") == "satisfied"
+}
+
+test_within_carries_across_chunk_boundaries if {
+	_within_cause(99999999999999999999, -1, "100000000000000000000") == "satisfied"
+	_within_cause(99999999999999999999, -1, "99999999999999999999") == "value"
+	_within_cause(-1, 99999999999999999999, "100000000000000000000") == "satisfied"
+	_within_cause(9999999999999999999999999999, 1, "9999999999999999999999999998") == "satisfied"
+	_within_cause(9999999999999999999999999999, 1, "9999999999999999999999999997") == "value"
+	_within_cause(10000000000000000000000000000, 1, "9999999999999999999999999999") == "satisfied"
+	_within_cause(10000000000000000000000000000, 1, "9999999999999999999999999998") == "value"
+}
+
+test_within_adds_the_sizes_when_the_signs_differ_and_takes_the_difference_when_they_match if {
+	_within_cause(-5000000000000000000000, 5000000000000000000000, "10000000000000000000000") == "satisfied"
+	_within_cause(-5000000000000000000000, 5000000000000000000001, "10000000000000000000000") == "value"
+	_within_cause(-5000000000000000000001, 5000000000000000000000, "10000000000000000000000") == "value"
+	_within_cause(-5000000000000000000000, -5000000000000000000003, "3") == "satisfied"
+	_within_cause(-5000000000000000000000, -5000000000000000000003, "2") == "value"
+}
+
+test_within_treats_zero_and_negative_zero_as_having_no_sign if {
+	_within_cause(0, -0, "0") == "satisfied"
+	_within_cause(-0, -1e20, "100000000000000000000") == "satisfied"
+	_within_cause(0, -1e20, "99999999999999999999") == "value"
+	_within_cause(1e20, 0, "100000000000000000000") == "satisfied"
+	_within_cause(-1e-30, 0, "0.000000000000000000000000000001") == "satisfied"
+}
+
+test_within_compares_tiny_exponents_exactly if {
+	_within_cause(3e-30, 1e-30, "0.000000000000000000000000000002") == "satisfied"
+	_within_cause(3e-30, 1e-30, "0.000000000000000000000000000001") == "value"
+	_within_cause(1e-30, -1e-30, "0.000000000000000000000000000002") == "satisfied"
+}
+
+test_within_compares_big_numbers_that_need_no_decimals_exactly if {
+	_within_cause(1e9, 1e9, "0.000001") == "satisfied"
+	_within_cause(1000000000.000001, 1e9, "0.000001") == "satisfied"
+	_within_cause(1000000000.000002, 1e9, "0.000001") == "value"
+}
+
+test_within_gives_up_as_unusable_when_the_exponents_are_more_than_4096_apart if {
+	_within_cause(1e5000, 1, "1") == "unusable"
+	_within_cause(1, 1e5000, "1") == "unusable"
+	_within_cause(1e4097, 1, "1") == "unusable"
+	_within_cause(1e4000, 1e4000, "1e-300") == "unusable"
+}
+
+test_within_compares_when_the_exponents_are_exactly_4096_apart if {
+	_within_cause(1e4096, 1, "1") == "value"
+	_within_cause(1e4096, 1e4096, "1") == "satisfied"
+	_within_cause(-1e4096, 1e4096, "1") == "value"
+	_within_cause(-1e4096, -1e4096, "0") == "satisfied"
+}
+
 test_plus_adds_paths_numbers_counts_and_sums if {
 	_tally_rows("claude_found is count of personas_ran plus 1", [_review], {}) == [["pr-7", "satisfied", [
 		{"name": "claude_found", "value": 2, "locations": ["/things/0/claude_found"]},
@@ -5021,6 +5126,35 @@ test_counts_work_in_and_lists_and_under_a_for_line_with_its_names if {
 
 test_a_count_whose_named_by_cant_be_read_fails_with_its_cause if {
 	_tally_rows("count of m named by $params.k is 2", [{"id": 1, "m": {"a": [1, 2]}}], {}) == [[1, "absent", [{"name": "count of m named by $params.k", "value": null, "locations": []}, {"name": "m named by $params.k", "value": [], "locations": []}]]]
+}
+
+_sum_whose_cause(check, items) := [row[1] | some row in _tally_rows(check, [{"id": "t", "items": items}], {})]
+
+test_a_sum_fails_with_the_cause_of_an_item_whose_cant_decide_and_does_not_read_its_field if {
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab", "k": null}]) == ["null"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab"}]) == ["absent"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab", "k": 5}]) == ["unusable"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": 1, "k": null}]) == ["null"]
+	_sum_whose_cause(`sum of items.x.y whose k is "a" is 1`, [{"x": "ab", "k": null}]) == ["null"]
+	_sum_whose_cause(`sum of items.x.y whose k is "a" is 1`, [{"x": {"y": "ab"}, "k": null}]) == ["null"]
+}
+
+test_a_sum_whose_worst_cause_wins_between_an_undecided_item_and_the_bad_field_of_a_kept_item if {
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab"}, {"x": null, "k": "a"}]) == ["absent"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab", "k": null}, {"x": "ab", "k": "a"}]) == ["unusable"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": 1, "k": null}, {"x": null, "k": "a"}]) == ["null"]
+}
+
+test_a_sum_whose_kept_items_are_all_fine_is_still_added if {
+	_sum_whose_cause(`sum of items.x whose k is "a" is 3`, [{"x": 1, "k": "a"}, {"x": "ab", "k": "b"}, {"x": 2, "k": "a"}]) == ["satisfied"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 4`, [{"x": 1, "k": "a"}, {"x": "ab", "k": "b"}, {"x": 2, "k": "a"}]) == ["value"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 3`, [{"x": 3, "k": "a"}, {"x": "ab", "k": "b"}]) == ["satisfied"]
+}
+
+test_a_count_whose_undecided_item_fails_with_its_cause if {
+	_sum_whose_cause(`count of items whose k is "a" is 1`, [{"x": "ab", "k": null}]) == ["null"]
+	_sum_whose_cause(`count of items.x whose k is "a" is 1`, [{"x": "ab"}]) == ["absent"]
+	_sum_whose_cause(`count of items.x whose k is "a" is 1`, [{"x": null, "k": null}, {"x": 1, "k": "a"}]) == ["null"]
 }
 
 test_a_count_fails_on_a_value_it_cant_read_unless_whose_left_its_item_out if {
@@ -6190,9 +6324,9 @@ test_named_by_a_for_name_in_the_second_items_path_reads_the_first_items_key if {
 }
 
 test_named_by_a_for_name_before_it_is_given_is_an_unknown_name if {
-	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown alias x"]
-	_sentence_problems({"for": "every lists named by q as p, every qs as q", "assert": "p is 1"}) == ["unknown alias q"]
-	_sentence_problems({"for": "every objs whose v named by o is 1 as o", "assert": "o exists"}) == ["unknown alias o"]
+	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["for: unknown alias x"]
+	_sentence_problems({"for": "every lists named by q as p, every qs as q", "assert": "p is 1"}) == ["for: unknown alias q"]
+	_sentence_problems({"for": "every objs whose v named by o is 1 as o", "assert": "o exists"}) == ["for: unknown alias o"]
 }
 
 test_named_by_a_for_name_that_holds_no_text_fails_with_its_cause if {
@@ -6967,7 +7101,7 @@ test_the_subjects_section_is_independent_of_the_order_the_policy_is_written_in i
 
 test_a_from_that_cannot_be_printed_is_invalid_even_when_nothing_flagged_it if {
 	every def in [{"from": "ds", "applies_to": {}}, {"from": "ds", "of": "b"}, {"from": 1}, {"of": 1}] {
-		ergo._subject_from_text("d", def) == "<invalid from>" with data.ergo_resolved as {"d": {"problems": set()}} with data.ergo_subjects as {"d": def, "b": {}}
+		ergo._subject_from_text("d", def, set()) == "<invalid from>" with data.ergo_resolved as {"d": {"problems": set()}} with data.ergo_subjects as {"d": def, "b": {}}
 	}
 }
 
@@ -8105,6 +8239,20 @@ test_every_in_a_from_line_cant_start_at_another_subject_or_go_with_named_by_each
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every artifacts named by each of $params.names"}}, {"c": "x exists"}, {"names": ["a"]})) == [{"name": "subjects.s.from", "value": ["every can't go with named by each of: start the from line at a subject to read its names one subject at a time"], "locations": []}]
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every x.b.c.d.e.f.g.h.i.j.k"}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["every over more than ten steps isn't supported yet"], "locations": []}]
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every x.b.c.d.e.f.g.h.i.j"}}, {"c": "x exists"}, {})) == []
+}
+
+test_every_in_a_from_line_with_a_leading_dot_reads_the_top_level_field_even_when_a_subject_has_the_name if {
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "id"}, "p": {"from": "every .artifact.p"}, "q": {"from": "every .artifact"}}
+	input_doc := {"artifacts": [], "artifact": [{"p": [{"x": 1}]}]}
+	rep := ergo.report(input_doc, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "p", "checks": {"c": "x exists"}}, "s": {"subject": "q", "checks": {"c": "p exists"}}}}, {})
+	_from_problems(rep) == []
+	rep.subjects.p.from == "every .artifact.p"
+	rep.subjects.q.from == "every .artifact"
+	[r.cause | some r in rep.results; r.requirement == "r"; r.check == "c"] == ["satisfied"]
+	[r.cause | some r in rep.results; r.requirement == "s"; r.check == "c"] == ["satisfied"]
+	plain := ergo.report({"artifacts": [{"id": "a"}], "artifact": [{"x": 1}]}, {"ergo_spec": "v0.3-dev", "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "q": {"from": ".artifact"}}, "requirements": {"r": {"subject": "q", "checks": {"c": "x exists"}}}}, {})
+	plain.subjects.q.identified_by == null
+	[r.subject.id | some r in plain.results; r.check == "c"] == [{"x": 1}]
 }
 
 test_a_from_line_with_every_does_not_count_input_as_a_step if {
@@ -10344,4 +10492,77 @@ test_identified_by_stays_allowed_with_named_by_and_without_each_of if {
 test_identified_by_that_cannot_be_read_on_a_subject_listed_by_named_by_each_of_gives_both_problems if {
 	rep := _from_report({"suites": {}}, {"suite": {"from": "suites named by each of $params.names", "identified_by": "a b c"}}, {"c": "id exists"}, {"names": ["a"]})
 	_from_problems(rep) == [{"name": "subjects.suite.identified_by", "value": ["identified_by is a path, like \"id\" or \"build.number\"", "not allowed with named by each of: the key is the id"], "locations": []}]
+}
+
+_pick_reads_first_cause(item, xs, ys) := [r.cause |
+	some r in ergo.report({"s": [{"id": "a", "xs": xs, "ys": ys}]}, {"ergo_spec": "v0.3-dev", "subjects": {"s": {"from": "s", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"for": concat("", ["every xs as p, ", item, " as q"]), "assert": "q.n is 1"}}}}}, {}).results
+	r.check == "c"
+][0]
+
+test_a_second_for_item_picks_for_each_first_item_when_its_whose_reads_the_first_alias if {
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"k": 1}], [{"k": 1, "n": 1}]) == "satisfied"
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"k": 1}, {"k": 2}], [{"k": 2, "n": 1}, {"k": 1, "n": 1}, {"k": 1, "n": 9}]) == "satisfied"
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"k": 1}, {"k": 2}], [{"k": 2, "n": 5}, {"k": 1, "n": 1}]) == "value"
+	_pick_reads_first_cause("last of ys whose k is p.k sorted by t", [{"k": 1}], [{"k": 1, "n": 2, "t": 1}, {"k": 1, "n": 1, "t": 3}]) == "satisfied"
+	_pick_reads_first_cause("item 2 of ys whose k is p.k", [{"k": 1}], [{"k": 1, "n": 5}, {"k": 1, "n": 1}]) == "satisfied"
+}
+
+test_a_second_for_item_picking_with_a_whose_that_reads_the_first_alias_fails_when_nothing_matches if {
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"k": 3}], [{"k": 1, "n": 1}]) == "absent"
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"j": 1}], [{"k": 1, "n": 1}]) == "absent"
+	_pick_reads_first_cause("first of ys whose k is p.k", [null], [{"k": 1, "n": 1}]) != "satisfied"
+	_pick_reads_first_cause("last of ys whose k is p.k sorted by t", [{"k": 1}], [{"k": 1, "n": 1, "t": 1}, {"k": 1, "n": 1, "t": 1}]) == "ambiguous"
+}
+
+_pick_row(xs, ys, miss) := [r |
+	some r in ergo.report({"s": [object.union({"id": "a", "xs": xs}, {k: ys | not miss; k := "ys"})]}, {"ergo_spec": "v0.3-dev", "subjects": {"s": {"from": "s", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"for": "every xs as p, first of ys whose k is p.k as q", "assert": "q.n is 1"}}}}}, {}).results
+	r.check == "c"
+][0]
+
+test_a_second_for_item_that_picks_nothing_after_the_first_alias_lists_no_failed_item if {
+	row := _pick_row([{"k": 1}, {"k": 2}], [], false)
+	row.cause == "absent"
+	row.failed_items == []
+	row2 := _pick_row([{"k": 3}], [{"k": 1, "n": 1}], false)
+	row2.cause == "absent"
+	row2.failed_items == []
+}
+
+test_a_second_for_item_after_the_first_alias_lists_only_the_first_items_that_failed_their_check if {
+	row := _pick_row([{"k": 1}, {"k": 2}], [{"k": 1, "n": 2}], false)
+	[f.item | some f in row.failed_items] == ["item 1 of xs"]
+}
+
+test_a_second_for_item_after_the_first_alias_shows_its_list_when_the_first_list_is_empty if {
+	row := _pick_row([], [{"k": 1, "n": 1}], false)
+	[i.name | some i in row.inputs] == ["xs[]", "ys[]"]
+}
+
+test_a_second_list_that_cant_be_walked_is_listed_once_when_the_pick_reads_the_first_alias if {
+	row := _pick_row([{"k": 1}, {"k": 2}], [], true)
+	row.cause == "absent"
+	[f.item | some f in row.failed_items] == ["ys"]
+	not "failed_items" in object.keys(row.failed_items[0])
+}
+
+test_subjects_that_narrow_each_other_with_unknown_names_list_each_other_and_have_no_id if {
+	policy := {
+		"ergo_spec": "v0.3-dev",
+		"subjects": {"a": {"from": "b whose x is $foo"}, "b": {"from": "a whose x is $foo"}},
+		"requirements": {"r": {"subject": "a", "checks": {"c": "n exists"}}},
+	}
+	report := ergo.report({}, policy, {})
+	object.keys(report.subjects) == {"a", "b"}
+	report.subjects.a.from == "<invalid from>"
+	report.subjects.a.identified_by == null
+	report.subjects.b.identified_by == null
+}
+
+test_a_from_that_reads_names_with_an_unknown_name_lists_the_subject_it_starts_at if {
+	policy := {
+		"ergo_spec": "v0.3-dev",
+		"subjects": {"p": {"from": "things", "identified_by": "id"}, "k": {"from": "p.items named by $foo", "identified_by": "n"}},
+		"requirements": {"r": {"subject": "k", "checks": {"c": "n exists"}}},
+	}
+	object.keys(ergo.report({}, policy, {}).subjects) == {"k", "p"}
 }

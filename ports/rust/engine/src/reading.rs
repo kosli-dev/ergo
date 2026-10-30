@@ -47,6 +47,7 @@ pub enum Source {
     },
     Child {
         path: path::Path,
+        each_of: Option<path::Path>,
     },
 }
 
@@ -234,16 +235,38 @@ fn names_a_subject<'a>(
 
 fn relation_of(line: &s::FromLine, own_name: &str, names: &BTreeSet<String>) -> Relation {
     match names_a_subject(line, own_name, names) {
+        Some(parent) if line.named_by_each_of.is_some() => Relation::Child(parent.to_string()),
         Some(parent) if line.path.position.is_none() => {
-            if !line.path.steps.is_empty() {
-                Relation::Child(parent.to_string())
-            } else if line.named_by_each_of.is_none() {
+            if line.path.steps.is_empty() {
                 Relation::Narrows(parent.to_string())
             } else {
-                Relation::Root
+                Relation::Child(parent.to_string())
             }
         }
         _ => Relation::Root,
+    }
+}
+
+fn keeps_dot(line: &s::FromLine, own_name: &str, names: &BTreeSet<String>) -> bool {
+    matches!(
+        &line.path.start,
+        s::Start::Field { key, dot: true } if key != own_name && names.contains(key)
+    )
+}
+
+fn with_kept_dot(text: String, every: bool) -> String {
+    let mut at = if every { "every ".len() } else { 0 };
+    let rest = &text[at..];
+    let positioned = rest.starts_with("first of ")
+        || rest.starts_with("last of ")
+        || (rest.starts_with("item ") && rest.contains(" of "));
+    if positioned && let Some(of) = rest.find(" of ") {
+        at += of + " of ".len();
+    }
+    if text[at..].starts_with('.') {
+        text
+    } else {
+        format!("{}.{}", &text[..at], &text[at..])
     }
 }
 
@@ -483,7 +506,14 @@ fn source_of(
                 steps: line.path.steps.clone(),
             };
             let path = scope.path(&sentence_path)?;
-            Ok(Source::Child { path })
+            let each_of = match &line.named_by_each_of {
+                None => None,
+                Some(each) if each.start == s::Start::It => {
+                    return Err(vec![format!("{name}: it can't name keys")]);
+                }
+                Some(each) => Some(scope.path(each)?),
+            };
+            Ok(Source::Child { path, each_of })
         }
         _ => {
             if let s::Start::Field { key, .. } = &line.path.start {
@@ -502,6 +532,9 @@ fn source_of(
                         }
                         s::Start::It => {
                             return Err(vec![format!("{name}: it can't name keys")]);
+                        }
+                        s::Start::Unknown(unknown) => {
+                            return Err(vec![format!("{}{unknown}", lower::UNKNOWN_NAME)]);
                         }
                     };
                     Some(path::Path {
@@ -735,8 +768,12 @@ impl Reading {
                         } else {
                             match source_of(name, line, &found.relation, &scope) {
                                 Ok(source) => {
+                                    let mut from_text = source_text(&source);
+                                    if keeps_dot(line, name, &names) {
+                                        from_text = with_kept_dot(from_text, line.every);
+                                    }
                                     own = Some(Own {
-                                        from_text: source_text(&source),
+                                        from_text,
                                         source: Some(source),
                                         filters,
                                         id: None,
@@ -801,7 +838,7 @@ impl Reading {
                 None
             };
             let from_text = lowered.as_ref().map(|l: &Lowered| l.from_text.clone());
-            let entry = entry_of(name, found, &problems_by_subject, &raw, &effective);
+            let entry = entry_of(name, found, &problems_by_subject, &raw, &effective, &names);
             infos.insert(
                 name.clone(),
                 Info {
@@ -906,7 +943,11 @@ impl Reading {
                 refs.extend(each_of.iter().filter(|each| path::is_ref(each)).cloned());
                 refs
             }
-            Some(Source::Child { path, .. }) => path::step_refs(path),
+            Some(Source::Child { path, each_of }) => {
+                let mut refs = path::step_refs(path);
+                refs.extend(each_of.iter().filter(|each| path::is_ref(each)).cloned());
+                refs
+            }
             None => Vec::new(),
         }
     }
@@ -983,38 +1024,36 @@ fn resolved_id_text(
 ) -> Option<String> {
     let mut at = name.to_string();
     let mut seen = BTreeSet::new();
-    loop {
+    while let Some(Raw {
+        relation: Relation::Narrows(parent),
+        ..
+    }) = raw.get(&at)
+        && !parent.trim().is_empty()
+    {
         if !seen.insert(at.clone()) {
-            return None;
+            return match raw.get(name)?.def.identified_by {
+                Text::Missing => None,
+                _ => Some(INVALID_IDENTIFIED_BY.to_string()),
+            };
         }
-        let found = raw.get(&at)?;
-        let from_at = field_name(&["subjects", &at, "from"]);
-        let read_ok = !problems
-            .get(&at)
-            .and_then(|p| p.get(&from_at))
-            .is_some_and(|texts| texts.iter().any(|text| text != NARROWING_A_CHILD_PROBLEM));
-        if let Relation::Narrows(parent) = &found.relation
-            && read_ok
-        {
-            at = parent.clone();
-            continue;
-        }
-        let id_at = field_name(&["subjects", &at, "identified_by"]);
-        return match &found.def.identified_by {
-            Text::Missing => None,
-            Text::Invalid => Some(INVALID_IDENTIFIED_BY.to_string()),
-            Text::Written(text) => {
-                let other_problem = problems
-                    .get(&at)
-                    .and_then(|p| p.get(&id_at))
-                    .is_some_and(|texts| texts.iter().any(|text| text != KEYED_ID_PROBLEM));
-                if other_problem {
-                    Some(INVALID_IDENTIFIED_BY.to_string())
-                } else {
-                    Some(read_id(text).map_or(INVALID_IDENTIFIED_BY.to_string(), |r| r.1))
-                }
+        at = parent.clone();
+    }
+    let found = raw.get(&at)?;
+    let id_at = field_name(&["subjects", &at, "identified_by"]);
+    match &found.def.identified_by {
+        Text::Missing => None,
+        Text::Invalid => Some(INVALID_IDENTIFIED_BY.to_string()),
+        Text::Written(text) => {
+            let other_problem = problems
+                .get(&at)
+                .and_then(|p| p.get(&id_at))
+                .is_some_and(|texts| texts.iter().any(|text| text != KEYED_ID_PROBLEM));
+            if other_problem {
+                Some(INVALID_IDENTIFIED_BY.to_string())
+            } else {
+                Some(read_id(text).map_or(INVALID_IDENTIFIED_BY.to_string(), |r| r.1))
             }
-        };
+        }
     }
 }
 
@@ -1024,6 +1063,7 @@ fn entry_of(
     problems: &BTreeMap<String, Problems>,
     raw: &BTreeMap<String, Raw>,
     effective: &BTreeMap<String, BTreeMap<String, PartRead>>,
+    names: &BTreeSet<String>,
 ) -> Value {
     let from_at = field_name(&["subjects", name, "from"]);
     let invalid = problems.get(name).is_some_and(|p| p.contains_key(&from_at));
@@ -1035,7 +1075,12 @@ fn entry_of(
                 let scope = scope_of(name, raw, effective);
                 let aliases = scope.aliases();
                 let refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
-                s::print_from(line, &refs, &[])
+                let printed = s::print_from(line, &refs, &[]);
+                if keeps_dot(line, name, names) {
+                    with_kept_dot(printed, line.every)
+                } else {
+                    printed
+                }
             }
             _ => name::name(&path::Path {
                 start: Start::Subject,
@@ -1134,6 +1179,54 @@ mod tests {
         let (_, r) = reading(json!({"art": {"from": "arts"}, "p": {"from": "art.pulls"}}));
         assert_eq!(r.infos["p"].relation, Relation::Child("art".into()));
         assert_eq!(r.lowered("p").unwrap().from_text, "art.pulls");
+    }
+
+    #[test]
+    fn a_subject_name_with_named_by_each_of_is_a_child_that_keeps_its_keys_inside_its_parent() {
+        let (_, r) = reading(json!({
+            "art": {"from": "arts"},
+            "k": {"from": "art named by each of $params.k"},
+            "j": {"from": "first of art named by each of $params.k"},
+        }));
+        assert_eq!(r.infos["k"].relation, Relation::Child("art".into()));
+        assert_eq!(r.infos["j"].relation, Relation::Child("art".into()));
+        assert!(matches!(
+            r.lowered("k").unwrap().source,
+            Source::Child {
+                each_of: Some(_),
+                ..
+            }
+        ));
+    }
+
+    #[test]
+    fn a_dotted_first_key_named_like_another_subject_keeps_its_dot_in_every_printed_from() {
+        let (_, r) = reading(json!({
+            "art": {"from": "arts"},
+            "k": {"from": ".art named by each of $params.k"},
+            "p": {"from": ".art.p"},
+            "q": {"from": ".other.p"},
+        }));
+        assert_eq!(r.lowered("k").unwrap().from_text, ".art");
+        assert_eq!(r.lowered("p").unwrap().from_text, ".art.p");
+        assert_eq!(r.lowered("q").unwrap().from_text, "other.p");
+        assert_eq!(
+            r.infos["k"].entry["from"],
+            json!(".art named by each of $params.k")
+        );
+        assert_eq!(r.infos["p"].entry["from"], json!(".art.p"));
+        assert_eq!(r.infos["q"].entry["from"], json!("other.p"));
+    }
+
+    #[test]
+    fn a_kept_dot_goes_after_the_position_of_a_printed_from() {
+        let (_, r) = reading(json!({
+            "art": {"from": "arts"},
+            "p": {"from": ".art.p[0]"},
+            "q": {"from": "first of .art.p"},
+        }));
+        assert_eq!(r.infos["p"].entry["from"], json!("item 1 of .art.p"));
+        assert_eq!(r.infos["q"].entry["from"], json!("first of .art.p"));
     }
 
     #[test]
@@ -1493,5 +1586,80 @@ mod tests {
         }));
         assert_eq!(r.filters_text("n").unwrap(), "x exists and y exists");
         assert!(r.filters_text("nope").is_none());
+    }
+
+    #[test]
+    fn a_from_with_an_unknown_name_still_starts_at_its_subject() {
+        for from in [
+            "parent.items whose zz is $foo",
+            "parent.items named by $foo",
+            "parent[$foo] whose n is 1",
+            "parent.items whose zz is $foo.k",
+        ] {
+            let (_, r) = reading(json!({
+                "parent": {"from": "things"}, "kid": {"from": from}
+            }));
+            assert_eq!(
+                r.infos["kid"].relation,
+                Relation::Child("parent".to_string()),
+                "{from}"
+            );
+            assert_eq!(r.listed("kid"), ["kid", "parent"], "{from}");
+            assert_eq!(
+                texts(&r, "kid", "subjects.kid.from"),
+                ["unknown name $foo"],
+                "{from}"
+            );
+            assert_eq!(r.infos["kid"].entry["from"], INVALID_FROM, "{from}");
+        }
+    }
+
+    #[test]
+    fn a_from_with_an_unknown_name_and_a_quoted_parent_with_whose_in_it_starts_at_that_parent() {
+        let (_, r) = reading(json!({
+            "par whose ent": {"from": "things"},
+            "kid": {"from": "\"par whose ent\".items whose zz is $foo"}
+        }));
+        assert_eq!(
+            r.infos["kid"].relation,
+            Relation::Child("par whose ent".to_string())
+        );
+        assert_eq!(r.listed("kid"), ["kid", "par whose ent"]);
+    }
+
+    #[test]
+    fn a_narrowing_subject_with_an_unknown_name_takes_the_id_and_parts_of_its_parent() {
+        let (_, r) = reading(json!({
+            "parent": {"from": "things", "identified_by": "id", "has": {"owner": "owner.name"}},
+            "kid": {"from": "parent whose n is $foo"}
+        }));
+        assert_eq!(
+            r.infos["kid"].relation,
+            Relation::Narrows("parent".to_string())
+        );
+        assert_eq!(r.infos["kid"].entry["identified_by"], "id");
+        assert_eq!(
+            r.infos["kid"].entry["parts"]["owner"]["from"],
+            r.infos["parent"].entry["parts"]["owner"]["from"]
+        );
+        assert_eq!(texts(&r, "kid", "subjects.kid.from"), ["unknown name $foo"]);
+    }
+
+    #[test]
+    fn the_unknown_name_of_a_whose_adds_no_second_problem() {
+        let (_, r) = reading(json!({
+            "parent": {"from": "things"}, "kid": {"from": "parent.items whose zz is $foo"}
+        }));
+        assert_eq!(texts(&r, "kid", "subjects.kid.from"), ["unknown name $foo"]);
+    }
+
+    #[test]
+    fn a_from_with_an_unknown_name_and_a_syntax_error_lists_no_other_subject() {
+        let (_, r) = reading(json!({
+            "parent": {"from": "things"}, "kid": {"from": "parent.items whose zz is $foo foo bar"}
+        }));
+        assert_eq!(r.infos["kid"].relation, Relation::Root);
+        assert_eq!(r.listed("kid"), ["kid"]);
+        assert_eq!(texts(&r, "kid", "subjects.kid.from"), ["doesn't parse"]);
     }
 }

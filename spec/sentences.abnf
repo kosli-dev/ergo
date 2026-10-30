@@ -94,15 +94,31 @@ it-path           = it / position WS "of" WS it
 path              = plain-path / position WS "of" WS plain-path
 plain-path        = start *step
 right-path        = plain-right / position WS "of" WS plain-right
-plain-right       = ("$params" / "$input" / bare-key / "." key) *step
+plain-right       = (dollar-name / bare-key / "." key) *step
 position          = "item" WS positive [WS "from" WS "last"] / "first" / "last"
 positive          = %x31-39 *DIGIT
-start             = "$params" / "$input" / first-key
+start             = dollar-name / first-key
 first-key         = bare-key / "." key / quoted-key
 step              = "." key / WS "named" WS "by" WS reference
                   / "[" reference "]" / "[" quoted-key "]" / "[" int "]"
 key               = bare-key / quoted-key
-reference         = ("$params" / "$input") "." key / alias
+reference         = dollar-name "." key / other-name / alias
+dollar-name       = "$" (ALPHA / "_") *name-char
+name-char         = ALPHA / DIGIT / "_"
+other-name        = "$" ( (%x41-5A / %x5F / %x61-68 / %x6A-6F / %x71-7A) *name-char
+                        / %x70 [ not-a *name-char / %x61 [ not-r *name-char / %x72 [ not-a2 *name-char
+                          / %x61 [ not-m *name-char / %x6D [ not-s *name-char / %x73 1*name-char ] ] ] ] ]
+                        / %x69 [ not-n *name-char / %x6E [ not-p *name-char / %x70 [ not-u *name-char
+                          / %x75 [ not-t *name-char / %x74 1*name-char ] ] ] ] )
+not-a             = DIGIT / "_" / %x41-5A / %x62-7A
+not-r             = DIGIT / "_" / %x41-5A / %x61-71 / %x73-7A
+not-a2            = DIGIT / "_" / %x41-5A / %x62-7A
+not-m             = DIGIT / "_" / %x41-5A / %x61-6C / %x6E-7A
+not-s             = DIGIT / "_" / %x41-5A / %x61-72 / %x74-7A
+not-n             = DIGIT / "_" / %x41-5A / %x61-6D / %x6F-7A
+not-p             = DIGIT / "_" / %x41-5A / %x61-6F / %x71-7A
+not-u             = DIGIT / "_" / %x41-5A / %x61-74 / %x76-7A
+not-t             = DIGIT / "_" / %x41-5A / %x61-73 / %x75-7A
 bare-key          = (ALPHA / "_") *(ALPHA / DIGIT / "_" / "-")
 quoted-key        = dq-string
 
