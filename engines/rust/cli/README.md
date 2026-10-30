@@ -5,7 +5,7 @@
 Part of [Ergo](https://github.com/kosli-dev/ergo), which turns policy evaluation into a report that says what was checked, what failed and why. This crate installs the `ergo` command, which runs the Rust engine, [`ergo-policy-engine`](https://crates.io/crates/ergo-policy-engine).
 
 ```sh
-cargo install ergo-policy-cli
+cargo install --locked ergo-policy-cli
 ergo report --policy policy.yaml --input deployments.json
 ergo violations --policy policy.yaml --input deployments.json
 ```

@@ -340,7 +340,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - runner: ubuntu-latest
+          - runner: ubuntu-22.04
             name: linux-x86_64
           - runner: macos-latest
             name: macos-arm64
@@ -360,7 +360,7 @@ jobs:
       - name: Pack ergo
         run: |
           mkdir "$RUNNER_TEMP/pack"
-          tar -czf "$RUNNER_TEMP/pack/ergo-${TAG#rust-v}-${{ matrix.name }}.tar.gz" -C engines/rust/target/release ergo
+          tar -czf "$RUNNER_TEMP/pack/ergo-${TAG#rust-v}-${{ matrix.name }}.tar.gz" -C engines/rust/target/release ergo -C "$GITHUB_WORKSPACE" LICENSE
       - uses: actions/upload-artifact@v7
         with:
           name: ergo-${{ matrix.name }}
@@ -433,7 +433,8 @@ jobs:
           fi
           git show "$GITHUB_SHA:.github/release-notes.sh" > "$RUNNER_TEMP/release-notes.sh"
           sh "$RUNNER_TEMP/release-notes.sh" engines/rust/CHANGELOG.md "$VERSION" "https://github.com/$GITHUB_REPOSITORY/blob/$TAG/engines/rust/" > "$RUNNER_TEMP/notes.md"
-          gh release create "$TAG" "$RUNNER_TEMP"/binaries/*.tar.gz \
+          (cd "$RUNNER_TEMP/binaries" && sha256sum ergo-*.tar.gz > SHA256SUMS)
+          gh release create "$TAG" "$RUNNER_TEMP"/binaries/*.tar.gz "$RUNNER_TEMP/binaries/SHA256SUMS" \
             --title "Ergo Rust engine $VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md" \
             --latest=false \
@@ -482,6 +483,9 @@ jobs:
           sed -i "s/\bversion = \"$pattern\"/version = \"$next\"/" engines/rust/Cargo.toml engines/rust/engine/Cargo.toml engines/rust/cli/Cargo.toml engines/rust/sentences-wasm/Cargo.toml engines/rust/wasm/Cargo.toml
           sed -i "s/\"name\": \"ergo-policy-engine\", \"version\": \"$pattern\"/\"name\": \"ergo-policy-engine\", \"version\": \"$next\"/" README.md
           (cd engines/rust && cargo update --workspace)
+          awk -v h="## ${next%-dev} (not released yet)" '!done && /^## / { print h; print ""; done = 1 } { print }' engines/rust/CHANGELOG.md > "$RUNNER_TEMP/CHANGELOG.md"
+          mv "$RUNNER_TEMP/CHANGELOG.md" engines/rust/CHANGELOG.md
+          grep -qxF "## ${next%-dev} (not released yet)" engines/rust/CHANGELOG.md
           grep -qxF "version = \"$next\"" engines/rust/Cargo.toml
           if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
             echo "origin/$branch already exists, so there is nothing to commit or push"
