@@ -4885,7 +4885,7 @@ test_a_part_in_the_whose_of_a_from_line_counts_the_parts_path if {
 	_from_problems(reads) == []
 	[[r.subject.id, r.cause] | some r in reads.results; r.check == "$applies"] == [["a", "satisfied"], ["b", "value"]]
 	wrong := _from_report(doc, {"s": {"from": "things whose n is count of x.z", "identified_by": "id", "has": {"x": _ten}}}, {"c": "id exists"}, {})
-	_from_problems(wrong) == [{"name": "subjects.s.from", "value": ["whose: every and some over more than ten steps aren't supported yet"], "locations": []}]
+	_from_problems(wrong) == [{"name": "subjects.s.from", "value": ["every and some over more than ten steps aren't supported yet"], "locations": []}]
 }
 
 test_a_part_used_in_a_path_that_is_not_a_walk_is_never_held_to_ten_steps if {
@@ -8485,7 +8485,7 @@ test_a_from_line_with_every_does_not_count_input_as_a_step if {
 }
 
 test_a_count_of_over_more_than_ten_steps_on_the_right_of_a_from_lines_whose_is_written_wrong if {
-	_from_problems(_from_report({"things": []}, {"s": {"from": concat("", ["things whose n is count of ", _eleven])}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["whose: every and some over more than ten steps aren't supported yet"], "locations": []}]
+	_from_problems(_from_report({"things": []}, {"s": {"from": concat("", ["things whose n is count of ", _eleven])}}, {"c": "x exists"}, {})) == [{"name": "subjects.s.from", "value": ["every and some over more than ten steps aren't supported yet"], "locations": []}]
 	_from_problems(_from_report({"things": []}, {"s": {"from": concat("", ["things whose n is count of ", _ten])}}, {"c": "x exists"}, {})) == []
 }
 

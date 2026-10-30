@@ -3,6 +3,17 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("\"empty\".items", ".empty.items"),
+    ("\"empty\".pa.items", ".empty.pa.items"),
+    (".empty.items", ".empty.items"),
+    (
+        "every xs whose count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11 is 1",
+        "every xs whose count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11 is 1",
+    ),
+    (
+        "things whose count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11 is 1",
+        "things whose count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11 is 1",
+    ),
     (
         "$input named by each of $params.k",
         "$input named by each of $params.k",
@@ -134,6 +145,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("\"$x\".pa.items", "\"$x\".pa.items"),
     ("\"$x\".items", "\"$x\".items"),
+    ("\"$input\".kids", "\"$input\".kids"),
+    ("\"$params\".kids", "\"$params\".kids"),
     (
         "\"$s\" whose .\"a.b\" is not empty",
         "\"$s\" whose \"a.b\" is not empty",

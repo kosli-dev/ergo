@@ -464,6 +464,8 @@ pub enum Start {
     Input,
     /// Any other `$` name, like `$foo`, kept with its `$`. It reads by the grammar and is written wrong, as an unknown name.
     Unknown(String),
+    /// A word of the grammar written in quotes, like `"empty"`. It reads a parent subject called so, and otherwise the field.
+    Quoted(String),
     /// A field name.
     Field {
         /// The name, decoded.

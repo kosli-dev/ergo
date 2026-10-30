@@ -51,6 +51,18 @@ fn a_quoted_first_key_is_a_field_on_the_left() {
 }
 
 #[test]
+fn a_quoted_word_of_the_grammar_is_not_a_dotted_field() {
+    let quoted = path("\"empty\".items");
+    assert_eq!(quoted.start, Start::Quoted("empty".to_string()));
+    assert_ne!(quoted, path(".empty.items"));
+    assert_eq!(print_path(&quoted, Side::Left, &[]), ".empty.items");
+    assert_eq!(
+        print_path(&quoted, Side::Left, &["empty"]),
+        "\"empty\".items"
+    );
+}
+
+#[test]
 fn a_quoted_first_key_on_the_right_needs_a_dot() {
     assert_eq!(
         phrase("equals .\"a b\""),

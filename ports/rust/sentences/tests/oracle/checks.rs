@@ -1,4 +1,17 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (".\"$x\".k is 3", "\"$x\".k is 3", &[], &[]),
+    ("\"$x\".k is 2", "\"$x\".k is 2", &[], &[]),
+    ("\"$x\".pa.k is 1", "\"$x\".pa.k is 1", &[], &[]),
+    ("\"$input\".k is 2", "\"$input\".k is 2", &[], &[]),
+    ("\"$input\".pa.k is 1", "\"$input\".pa.k is 1", &[], &[]),
+    ("\"$params\".k is 2", "\"$params\".k is 2", &[], &[]),
+    ("\"$params\".pa.k is 1", "\"$params\".pa.k is 1", &[], &[]),
+    ("$input.k is 2", "$input.k is 2", &[], &[]),
+    ("$input.k is 3", "$input.k is 3", &[], &[]),
+    ("$params.k is 2", "$params.k is 2", &[], &[]),
+    ("$params.k is 7", "$params.k is 7", &[], &[]),
+    ("\"empty\".k is 7", ".empty.k is 7", &[], &[]),
+    ("\"empty\".pa.k is 1", ".empty.pa.k is 1", &[], &[]),
     ("aid exists", "aid exists", &[], &[]),
     (
         "count of items.x.y whose k is \"a\" is 1",
@@ -6060,6 +6073,12 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every xs as p, every ys whose k is 1 as q",
+        "every xs as p, every ys whose k is 1 as q",
+        &[],
+        &[],
+    ),
     ("\tevery xs as x\n", "every xs as x", &[], &[]),
     ("  every items as i", "every items as i", &[], &[]),
     ("every  items  as  i", "every items as i", &[], &[]),

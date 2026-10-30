@@ -4,6 +4,7 @@ const lastKey = (path) => {
   const steps = path.steps.filter((s) => typeof s === "object" && "Key" in s);
   if (steps.length) return steps.at(-1).Key;
   const start = path.start;
+  if (typeof start === "object" && "Quoted" in start) return start.Quoted;
   return typeof start === "object" && "Field" in start ? start.Field.key : null;
 };
 

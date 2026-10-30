@@ -1226,7 +1226,12 @@ impl For {
             let (shared, mut inner): (Vec<Dead>, Vec<Dead>) =
                 outcome.inner.into_iter().partition(|d| d.shared);
             let nothing_checked = outcome.assertions.is_empty();
-            let dropped = nothing_checked && inner.is_empty() && self.items.len() > 1;
+            let picks_second =
+                matches!(self.items.get(1), Some(item) if matches!(item.how, How::Pick { .. }));
+            let dropped = nothing_checked
+                && inner.is_empty()
+                && self.items.len() > 1
+                && (picks_second || !shared.is_empty());
             if self.items.len() > 1 && !self.shared_second() && !shared.is_empty() {
                 inner.extend(shared.iter().map(Dead::copy));
             }
@@ -1680,6 +1685,18 @@ mod tests {
         );
         assert_eq!(found["cause"], "value");
         assert_eq!(found["failed_items"][0]["failed_items"][0]["item"], "p.ws");
+        assert_eq!(found["failed_items"][0]["failed_assertions"], json!([]));
+    }
+
+    #[test]
+    fn a_second_item_whose_whose_leaves_nothing_in_lists_the_first_item_with_no_sentences() {
+        let found = row(
+            "every xs as p, every ys whose k is 1 as q",
+            json!("q.n is 1"),
+            json!({"xs": [{"v": 1}], "ys": [{"k": 2}]}),
+        );
+        assert_eq!(found["cause"], "value");
+        assert_eq!(items(&found), ["item 1 of xs"]);
         assert_eq!(found["failed_items"][0]["failed_assertions"], json!([]));
     }
 

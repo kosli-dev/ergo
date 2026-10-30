@@ -236,7 +236,9 @@ fn names_a_subject<'a>(
     names: &BTreeSet<String>,
 ) -> Option<&'a str> {
     match &line.path.start {
-        s::Start::Field { key, dot: false } if key != own_name && names.contains(key) => {
+        s::Start::Field { key, dot: false } | s::Start::Quoted(key)
+            if key != own_name && names.contains(key) =>
+        {
             Some(key.as_str())
         }
         _ => None,
@@ -526,7 +528,7 @@ fn source_of(
             Ok(Source::Child { path, each_of })
         }
         _ => {
-            if let s::Start::Field { key, .. } = &line.path.start {
+            if let s::Start::Field { key, .. } | s::Start::Quoted(key) = &line.path.start {
                 steps.insert(0, Step::Key(key.clone()));
             }
             let each_of = match &line.named_by_each_of {
@@ -536,7 +538,7 @@ fn source_of(
                     let start = match &each.start {
                         s::Start::Params => Start::Params,
                         s::Start::Input => Start::Input,
-                        s::Start::Field { key, .. } => {
+                        s::Start::Field { key, .. } | s::Start::Quoted(key) => {
                             each_steps.insert(0, Step::Key(key.clone()));
                             Start::Subject
                         }

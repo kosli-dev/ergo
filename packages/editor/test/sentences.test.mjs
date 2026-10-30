@@ -532,6 +532,22 @@ test("hover prints a quoted first key that is written as a field the way the rep
   assert.match(hoverFirst('"a.b"."c" is 1'), /^Passes when "a\.b"\.c is 1\./);
 });
 
+test("a quoted first key that is a word of the grammar is coloured like any other quoted key", () => {
+  const colours = (line) => pairs(treeTokens("check", parser.read("check", line).tree, line, ["a"], "code"));
+  assert.deepEqual(colours('"a".b is 1'), ['string:"a"', "field:.b", "word:is", "number:1"]);
+  assert.deepEqual(colours('"x".b is 1'), ['string:"x"', "field:.b", "word:is", "number:1"]);
+});
+
+test("no hover over a line that reads says undefined", () => {
+  const quoted = ['"a"."b" is 1', '"empty".items exists', 'every "count".x is 1', 'count of "it".xs is 2'];
+  for (const line of [...corpus, ...quoted]) {
+    const found = kindOf(line);
+    if (!found) continue;
+    const text = describe(found[0], found[1]).join("\n");
+    assert.ok(!text.includes("undefined"), `${line}: ${text}`);
+  }
+});
+
 test("a name after named by that isn't an alias is coloured as a field", () => {
   const { tree } = parser.read("check", "x named by y is 1");
   assert.deepEqual(treeTokens("check", tree, "x named by y is 1", [], "code").filter((t) => t.text === "y"), [{ kind: "field", text: "y" }]);

@@ -57,6 +57,11 @@ const D = (text) => ({ type: "dollar", text });
 
 const variant = (value) => (typeof value === "string" ? [value, null] : Object.entries(value)[0]);
 
+const startOf = (path) => {
+  const [type, value] = variant(path.start);
+  return type === "Quoted" ? ["Field", { key: value, dot: true }] : [type, value];
+};
+
 const refOps = (ref, out, aliases) => {
   const [type, value] = variant(ref);
   if (type === "Params") out.push(D("$params"), K(value, "ref"));
@@ -70,7 +75,7 @@ const refOps = (ref, out, aliases) => {
 const pathOps = (path, out, aliases) => {
   const [kind, position] = path.position ? variant(path.position) : [null, null];
   if (kind === "Item") out.push(N(position.number));
-  const [type, value] = variant(path.start);
+  const [type, value] = startOf(path);
   if (type === "Params") out.push(D("$params"));
   else if (type === "Input") out.push(D("$input"));
   else if (type === "Unknown") out.push(D(value));
@@ -274,7 +279,7 @@ const referenceText = (ref) => {
 
 /** Writes a path as a sentence writes it, like `item 2 of pr.approvers` or `xs named by $params.k`. */
 export const pathText = (path) => {
-  const [type, value] = variant(path.start);
+  const [type, value] = startOf(path);
   const start = type === "It" ? "it" : type === "Params" ? "$params" : type === "Input" ? "$input" : type === "Unknown" ? value : `${value.dot ? "." : ""}${keyText(value.key)}`;
   const steps = path.steps.map((step) => {
     const [name, body] = variant(step);
@@ -425,12 +430,12 @@ const conditionText = (condition) => `${leftText(condition.left)} ${phraseText(c
 const whoseText = (whose) => (whose.length === 0 ? "" : `, kept when ${whose.map(conditionText).join(" and ")},`);
 
 const pathStarts = (path) => {
-  const [type, value] = variant(path.start);
+  const [type, value] = startOf(path);
   return type === "Field" && !value.dot ? value.key : null;
 };
 
 const refKeys = (path, out) => {
-  const [type] = variant(path.start);
+  const [type] = startOf(path);
   if (type === "Params") out.add(`$params.${path.steps[0] ? keyText(variant(path.steps[0])[1]) : ""}`);
   if (type === "Input") out.add(`$input.${path.steps[0] ? keyText(variant(path.steps[0])[1]) : ""}`);
   for (const step of path.steps) {
