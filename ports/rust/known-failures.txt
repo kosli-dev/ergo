@@ -6,8 +6,3 @@ parts / a count of or sum of a parent's part on the right side of a whose, alone
 parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with too many items fails
 parts / a part's alias in an elapsed time on the right side of a whose / reads the part when it's there, and not the item's lack of the field
 parts / a part's alias in an elapsed time on the right side of a whose / reads the part when the part is missing, and not the item's own field of the same name
-subjects / a child subject whose from is every, with an identified_by / gives one problem, under from, and none under identified_by
-subjects / a subject that narrows a subject that narrows another with every / has the id of the subject at the top of its chain, not mid's own
-subjects / a subject with applies_to or of / is <invalid from> with applies_to, because the field said how the subject was found
-subjects / a subject with of / is <invalid from> with of, because the field said how the subject was found
-subjects / two subjects that narrow each other, each with an identified_by / have no id, because no subject is at the top of the loop
