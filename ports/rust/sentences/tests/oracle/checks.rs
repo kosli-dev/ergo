@@ -3115,6 +3115,9 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("x is one of \"a\", 1", "x is one of \"a\", 1", &[], &[]),
+    ("x is one of 1, 'a'", "x is one of 1, \"a\"", &[], &[]),
+    ("x is one of 1.0, 'a'", "x is one of 1, \"a\"", &[], &[]),
+    ("x.n is one of 'a', 1.0", "x.n is one of \"a\", 1", &[], &[]),
     (
         "x is one of \"a\", null",
         "x is one of \"a\", null",

@@ -3053,13 +3053,13 @@ badly_written := [
 	["empty is 1", "", ["empty is a word of the grammar: write .empty"]],
 	["some xs, if any, exists", "", ["if any can't go with some"]],
 	[`t is before "yesterday"`, "", [`"is before" takes a time or a number`]],
-	[`every xs.v is one of 1, "a"`, ".check", ["values of mixed types"]],
-	[`count of xs whose v is one of 1, "a" is 0`, ".left.whose.0", ["values of mixed types"]],
+	[`every xs.v is one of 1, "a"`, "", ["values of mixed types"]],
+	[`count of xs whose v is one of 1, "a" is 0`, "", ["values of mixed types"]],
 	["count of xs whose v is between 9 and 0 is 0", "", ["min above max"]],
 	[`count of xs whose v matches "(" is 0`, "", [`invalid pattern "("`]],
 	["count of xs whose $foo exists is 0", "", ["unknown name $foo"]],
 	["count of xs whose v[9007199254740992] exists is 0", "", ["9007199254740992 can't be a list position"]],
-	[`every xs whose v is one of 1, "a" is 1`, ".whose.0", ["values of mixed types"]],
+	[`every xs whose v is one of 1, "a" is 1`, "", ["values of mixed types"]],
 	["n exists whose v is 1", "", ["doesn't parse"]],
 	["every xs some ys is 1", "", ["two quantifiers in one sentence: put them on a for line"]],
 	[{"assert": "n exists", "description": 5}, "", ["invalid description"]],
@@ -3072,8 +3072,10 @@ badly_written := [
 	[{"for": "every xs as x"}, "", ["missing assert"]],
 	[{"assert": "x exists", "for": "every xs"}, "", [`for: an item ends with "as" and a name, like "every pull_requests as pr"`]],
 	[{"assert": "x exists", "for": "every xs as x, every x.ys as x"}, "", ["for: x is given twice"]],
-	[{"assert": "x exists", "for": `every xs whose v is one of 1, "a" as x`}, ".items.0.whose.0", ["values of mixed types"]],
-	[{"assert": `x is one of 1, "a"`, "for": "every xs as x"}, ".checks.0", ["values of mixed types"]],
+	[{"assert": "x exists", "for": `every xs whose v is one of 1, "a" as x`}, "", ["for: values of mixed types"]],
+	[{"assert": `x is one of 1, "a"`, "for": "every xs as x"}, "", ["values of mixed types"]],
+	[{"assert": ["n exists", "n is one of 1, \"a\""]}, "", ["line 2: values of mixed types"]],
+	[{"assert": ["n is one of 1, \"a\"", "n is"]}, "", ["line 1: values of mixed types", "line 2: doesn't parse"]],
 	[{"assert": "n exists", "for": 5}, "", ["invalid for"]],
 	[{"any_of": {"o": "n is"}}, "", ["option o: doesn't parse"]],
 	[{"any_of": {"o": ["n exists", "n is one of 1, \"a\""]}}, "", ["option o: line 2: values of mixed types"]],
@@ -3247,7 +3249,7 @@ test_an_identified_by_with_an_index_that_cannot_be_a_key_is_written_wrong if {
 	rep.compliant == false
 }
 
-test_a_problem_inside_a_sentence_is_named_by_the_position_where_it_sits if {
+test_a_problem_inside_a_sentence_is_named_by_its_check_and_the_check_prints_as_written if {
 	rep := ergo.report(
 		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
 			"k": `count of items whose x is one of 1, "a" and y is one of true, 2 is 0`,
@@ -3256,10 +3258,11 @@ test_a_problem_inside_a_sentence_is_named_by_the_position_where_it_sits if {
 		{},
 	)
 	problem_inputs(rep) == [
-		{"name": "checks.e.items.0.whose.0", "value": ["values of mixed types"], "locations": []},
-		{"name": "checks.k.left.whose.0", "value": ["values of mixed types"], "locations": []},
-		{"name": "checks.k.left.whose.1", "value": ["values of mixed types"], "locations": []},
+		{"name": "checks.e", "value": ["for: values of mixed types"], "locations": []},
+		{"name": "checks.k", "value": ["values of mixed types"], "locations": []},
 	]
+	rep.requirements.s.checks.k.expression == "count of items whose x is one of 1, \"a\" and y is one of true, 2 is 0"
+	rep.requirements.s.checks.e.expression == "for every items whose x is one of 1, \"a\" as i: i.y exists"
 }
 
 test_a_range_with_equal_bounds_is_well_written if {

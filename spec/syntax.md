@@ -514,7 +514,7 @@ Most often the writer meant the subject's field. In a `whose` and after `every` 
 - an `any_of` that isn't an object: `<invalid any_of>`, and an empty one: `one of: <empty options>`
 - an option that's an empty list: `<name>(<empty option>)`, and an option that isn't a string or a list of strings: `<name>(<invalid option>)`
 
-A `for` that isn't a string, or that sits next to `any_of`, is left out, and an empty `assert` list prints as `""`. So `{"for": " every  xs ", "assert": [" x  is ", 3]}` prints `for every  xs: x  is and <invalid assert>`. Two cases are [still open](OPEN.md#where-ergorego-and-the-rust-port-differ): sentences that read next to a field the check doesn't take or a `for` that isn't a string, and a sentence written wrong only with `values of mixed types`.
+A `for` that isn't a string, or that sits next to `any_of`, is left out, and an empty `assert` list prints as `""`. So `{"for": " every  xs ", "assert": [" x  is ", 3]}` prints `for every  xs: x  is and <invalid assert>`. One case is [still open](OPEN.md#where-ergorego-and-the-rust-port-differ): sentences that read next to a field the check doesn't take or a `for` that isn't a string.
 
 ## Naming a path
 

@@ -2426,5 +2426,21 @@
         "expressions": {"s": {"a": "<invalid check>", "b": "<missing assert>", "c": "<missing assert>", "d": "for every  xs: x  is and <invalid assert>", "e": "", "f": "x is 1", "g": "x   is", "h": "<invalid any_of>", "i": "one of: <empty options>", "j": "one of: a(<empty option>) | b(x   is  1) | c(<invalid option>)", "k": "x is 1"}}
       }
     ]
+  },
+  {
+    "description": "checks with values of mixed types",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1.0, 'a'", "f": {"for": "every xs as x", "assert": "x.n is one of 'a', 1.0"}, "g": {"assert": ["x exists", "x is one of 1.0, 'a'"]}, "h": {"assert": ["x is one of 1, 'a'", "x is"]}, "q": {"any_of": {"o": "x is one of 1.0, 'a'"}}, "r": {"any_of": {"o": ["x exists", "x is one of 1.0, 'a'"], "p": "x exists"}}}}}},
+    "cases": [
+      {
+        "description": "a sentence with values of mixed types is printed as written and named by its check, with the line's number when the check has more than one line",
+        "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.any_of.written_wrong"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 6, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["values of mixed types"], "locations": []}, {"name": "checks.f", "value": ["values of mixed types"], "locations": []}, {"name": "checks.g", "value": ["line 2: values of mixed types"], "locations": []}, {"name": "checks.h", "value": ["line 1: values of mixed types", "line 2: doesn't parse"], "locations": []}, {"name": "checks.q", "value": ["option o: values of mixed types"], "locations": []}, {"name": "checks.r", "value": ["option o: line 2: values of mixed types"], "locations": []}]}
+        ],
+        "status": {"s": "not_met"},
+        "expressions": {"s": {"c": "x is one of 1.0, 'a'", "f": "for every xs as x: x.n is one of 'a', 1.0", "g": "x exists and x is one of 1.0, 'a'", "h": "x is one of 1, 'a' and x is", "q": "one of: o(x is one of 1.0, 'a')", "r": "one of: o(x exists and x is one of 1.0, 'a') | p(x exists)"}}
+      }
+    ]
   }
 ]
