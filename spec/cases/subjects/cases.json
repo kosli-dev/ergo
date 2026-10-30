@@ -13594,5 +13594,191 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a subject that narrows a subject that narrows another with every",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "mid": {
+          "from": "every parent",
+          "identified_by": "x"
+        },
+        "kid": {
+          "from": "mid whose n is 1"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "has the id of the subject at the top of its chain, not mid's own",
+        "rules": [
+          "report.subjects",
+          "subjects.narrow.id"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "mid whose n is 1",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "mid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.mid.from",
+                "value": [
+                  "every can't go with a from line that starts at another subject yet"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "two subjects that narrow each other, each with an identified_by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "pp": {
+          "from": "kid whose n is 1",
+          "identified_by": "x"
+        },
+        "kid": {
+          "from": "pp whose n is 1",
+          "identified_by": "y"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "have no id, because no subject is at the top of the loop",
+        "rules": [
+          "report.subjects",
+          "subjects.narrow.id",
+          "subjects.chain"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "<invalid identified_by>",
+              "parts": {}
+            },
+            "pp": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "<invalid identified_by>",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.kid.from",
+                "value": [
+                  "leads to a loop"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

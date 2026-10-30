@@ -4090,15 +4090,23 @@ _subject_text(name, def) := _path_name([name]) if {
 	object.keys(def) & {"of", "applies_to"} == set()
 }
 
-_subject_id_text(name) := _id_text(data.ergo_resolved[owners[0]].def.identified_by) if {
-	owners := sort([m |
-		some m in graph.reachable({n: object.get(object.get(data.ergo_subject_sentences, "narrowing", {}), n, []) | some n, _ in data.ergo_resolved}, [name])
+_subject_id_text(name) := _top_id_text(tops[0]) if {
+	narrowing := object.get(data.ergo_subject_sentences, "narrowing", {})
+	tops := [m |
+		some m in graph.reachable({n: object.get(narrowing, n, []) | some n, _ in data.ergo_resolved}, [name])
 		m != name
-		"identified_by" in object.keys(data.ergo_resolved[m].def)
-	])
-	count(owners) > 0
+		object.get(narrowing, m, []) == []
+	]
+	count(tops) == 1
+} else := "<invalid identified_by>" if {
+	object.get(object.get(data.ergo_subject_sentences, "narrowing", {}), name, []) != []
+	"identified_by" in object.keys(data.ergo_resolved[name].def)
 } else := _id_text(data.ergo_resolved[name].def.identified_by) if {
 	"identified_by" in object.keys(data.ergo_resolved[name].def)
+} else := null
+
+_top_id_text(top) := _id_text(data.ergo_resolved[top].def.identified_by) if {
+	"identified_by" in object.keys(data.ergo_resolved[top].def)
 } else := null
 
 _id_text(p) := _path_name(p) if {
