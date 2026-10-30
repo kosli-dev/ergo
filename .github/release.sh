@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [ $# -eq 0 ]; then
-  echo "usage: .github/release.sh rego-vX.Y.Z [spec-vX.Y]"
+  echo "usage: .github/release.sh rego-vX.Y.Z [spec-vX.Y] [rust-vX.Y.Z]"
   echo "Tags the commit at origin/main and pushes the tags. The release workflow does the rest."
   exit 2
 fi
@@ -13,7 +13,7 @@ git fetch --quiet --tags origin
 commit=$(git rev-parse origin/main)
 files=$(mktemp -d)
 trap 'rm -rf "$files"' EXIT
-git archive "$commit" engines/rego/ergo.rego CHANGELOG.md spec/CHANGELOG.md spec/policy/schema.json spec/report/schema.json | tar -x -C "$files"
+git archive "$commit" engines/rego/ergo.rego CHANGELOG.md spec/CHANGELOG.md spec/policy/schema.json spec/report/schema.json engines/rust/Cargo.toml engines/rust/CHANGELOG.md engines/rust/engine/Cargo.toml engines/rust/cli/Cargo.toml engines/rust/sentences-wasm/Cargo.toml | tar -x -C "$files"
 
 fail() {
   echo "$1"
@@ -43,13 +43,32 @@ check_spec() {
   grep -qxF "## $version" "$files/spec/CHANGELOG.md" || fail "spec/CHANGELOG.md on main has no \"## $version\" heading"
 }
 
+check_rust() {
+  local version=$1 says dep
+  if [[ $version == *-dev ]]; then
+    fail "rust-v$version has -dev in it. Crates are released without -dev: set the version to ${version%-dev} in a pull request first."
+  fi
+  says=$(awk '/^\[workspace\.package\]$/ { on = 1; next } /^\[/ { on = 0 } on && /^version = / { print }' "$files/engines/rust/Cargo.toml")
+  [ "$says" = "version = \"$version\"" ] || fail "engines/rust/Cargo.toml on main must say version = \"$version\" under [workspace.package], and says ${says:-no version}"
+  for dep in engine/Cargo.toml cli/Cargo.toml sentences-wasm/Cargo.toml; do
+    if grep 'path = "[^"]*"' "$files/engines/rust/$dep" | grep -qv "version = \"$version\""; then
+      fail "engines/rust/$dep has a path dependency that doesn't say version = \"$version\""
+    fi
+  done
+  grep -qxF "## $version" "$files/engines/rust/CHANGELOG.md" || fail "engines/rust/CHANGELOG.md on main has no \"## $version\" heading"
+  notes=$(awk -v h="## $version" '$0 == h { on = 1; next } /^## / { on = 0 } on' "$files/engines/rust/CHANGELOG.md")
+  grep -q '[^[:space:]]' <<<"$notes" || fail "engines/rust/CHANGELOG.md has nothing under \"## $version\", so there are no release notes"
+}
+
 for tag in "$@"; do
-  if [[ $tag =~ ^rego-v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  if [[ $tag =~ ^rust-v[0-9]+\.[0-9]+\.[0-9]+(-dev)?$ ]]; then
+    check_rust "${tag#rust-v}"
+  elif [[ $tag =~ ^rego-v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     check_rego "${tag#rego-v}"
   elif [[ $tag =~ ^spec-v[0-9]+\.[0-9]+$ ]]; then
     check_spec "${tag#spec-v}"
   else
-    fail "Tags look like rego-v0.1.0 or spec-v0.1, not $tag"
+    fail "Tags look like rego-v0.1.0, spec-v0.1 or rust-v0.1.0, not $tag"
   fi
   if git rev-parse --quiet --verify "refs/tags/$tag" >/dev/null; then
     if [ -n "$(git ls-remote --tags origin "refs/tags/$tag")" ]; then

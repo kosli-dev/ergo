@@ -40,6 +40,7 @@ A release is a tag on the commit at the tip of `main`, pushed after the test wor
 ```sh
 .github/release.sh rego-v0.1.0
 .github/release.sh rego-v0.2.0 spec-v0.2
+.github/release.sh rust-v0.1.0
 ```
 
 It runs the checks below on `origin/main` first, so a tag that would fail in the workflow is never pushed, shows the commit and the tags, and pushes only when you answer `y`. It needs `gh` logged in, to see whether the tests passed.
@@ -51,6 +52,22 @@ For `ergo.rego`, the tag is `rego-vX.Y.Z`. On that commit `ergo.rego` says `X.Y.
 GitHub holds the checks of a pull request opened by GitHub Actions until someone approves them, so click "Approve and run" on it, or close and reopen it, then merge it once they pass. Until it's merged, the `checks` job of every pull request stays green but shows a warning that `main` is still at `X.Y.Z-dev`.
 
 For the spec, the tag is `spec-vX.Y`. First a pull request drops `-dev` from `vX.Y-dev` in `_spec`, the `$id` of both schemas and `ergo_spec` in every policy, and moves `ergo_spec` in `README.md` from the last released version to `vX.Y`, with the report output shown there. On the tagged commit they say `X.Y`, without `-dev`, and `spec/CHANGELOG.md` has a line `## X.Y`. The workflow checks that and that the tests passed, runs the spec checks, publishes a GitHub release with both schemas, and starts the site deploy. That release is never marked as the latest, so `releases/latest` stays the newest `ergo.rego`, and `.github/release-latest.py` fails CI if the workflow would change that. It doesn't wait for the deploy, so afterwards check that `https://ergo.kosli.com/spec/X.Y/policy.schema.json` loads.
+
+For the Rust engine, the tag is `rust-vX.Y.Z`, and it publishes the crates `ergo-policy-sentences`, `ergo-policy-engine` and `ergo-policy-cli` to crates.io. The Rust engine is experimental, and its releases are too. Unlike `ergo.rego`, the crates must not say `-dev` on the tagged commit, because that is the version crates.io gets. So a pull request prepares the release first, and one more moves `main` on afterwards:
+
+1. In a pull request, set `version` under `[workspace.package]` in `engines/rust/Cargo.toml` to `X.Y.Z`, and the `version = "..."` of the path dependencies in `engine/Cargo.toml`, `cli/Cargo.toml`, `wasm/Cargo.toml` and `sentences-wasm/Cargo.toml`. Run `cargo update --workspace` in `engines/rust` so `Cargo.lock` follows. Rename the heading in `engines/rust/CHANGELOG.md` to exactly `## X.Y.Z`, and change `0.1.0-dev` to `X.Y.Z` in the line of `README.md` that shows the Rust engine's `engine` field.
+2. After it merges and the test workflow passed, run `.github/release.sh rust-vX.Y.Z`. It refuses a version with `-dev`, a version that isn't the one in `Cargo.toml` on `main`, and a changelog without that heading.
+3. The workflow checks the same things and that the three crates package, builds the `ergo` binary for Linux (x86_64) and macOS (arm64), publishes the three crates in that order with crates.io's trusted publishing, and creates a GitHub release with the two binaries as `.tar.gz` files. That release is never the latest, so `releases/latest` stays the newest `ergo.rego`. Then it opens a pull request that moves `main` to the next `-dev` version, like the one for `ergo.rego`. Merge it once its checks pass.
+
+The first publish is by hand, because crates.io's trusted publishing can only be set up for a crate that exists. With the first release prepared as in step 1, a maintainer with a crates.io API token (`cargo login`) runs this in `engines/rust`, in this order, because each crate needs the one before it on crates.io:
+
+```sh
+cargo publish --locked -p ergo-policy-sentences
+cargo publish --locked -p ergo-policy-engine
+cargo publish --locked -p ergo-policy-cli
+```
+
+Then, for each of the three crates, open its Settings on crates.io, add a trusted publisher for GitHub, with the owner `kosli-dev`, the repository `ergo` and the workflow `release.yml`, and leave the environment empty. After that, tag the same commit with `.github/release.sh rust-v0.1.0`: the workflow sees the crates are already on crates.io, skips them, and makes the GitHub release with the binaries. Every later release goes through the tag alone.
 
 The site at https://ergo.kosli.com shows the latest published `rego-vX.Y.Z` release, not `main`. The tutorial, the docs pages, the bakery example, the home page's examples and the `ergo.rego` they run all come from that release, and the spec link and schemas from the published `spec-vX.Y` releases, so they can teach something on `main` before it's released and reach the site with the release. The home page's layout and words, the other pages and the CSS follow `main`. CI tests the tutorial and the home page's examples against `main`'s `ergo.rego`, and checks that the released tutorial still fits `main`'s layouts and CSS. [`site/README.md`](site/README.md) has the full list, and how to preview either version.
 

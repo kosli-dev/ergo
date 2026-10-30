@@ -43,8 +43,10 @@ fails 's/"$latest" \\$/--latest \\/' "release-rego must create its release with 
 fails '/"$latest" \\$/d' "release-rego must create its release with \"\$latest\" only, and has no --latest"
 fails 's/if \[ "$TAG" = "$highest" \]; then/if true; then/' "release-rego must mark its release as the latest only when it's the highest rego-v version"
 fails 's/| sort -V |/| sort |/' "release-rego must mark its release as the latest only when it's the highest rego-v version"
+fails 's/--latest=false \\$/--latest \\/' "release-rust must create its release with --latest=false only, and has --latest"
 fails 's/^  release-spec:$/  publish-spec:/' "has no release-spec job"
-fails 's/^  release-rego:$/  publish-rego:/' "publish-rego creates a release, and only release-rego and release-spec may"
+fails 's/^  release-rust:$/  publish-rust:/' "has no release-rust job"
+fails 's/^  release-rego:$/  publish-rego:/' "publish-rego creates a release, and only release-rego, release-spec and release-rust may"
 
 copy
 printf '%s\n' 'jobs:' '  edit:' '    steps:' '      - run: gh release edit rego-v0.1.0 --latest' > "$dir/.github/workflows/other.yml"

@@ -40,9 +40,20 @@ else:
         if flags != ["--latest=false"]:
             problems.append(f"release-spec must create its release with --latest=false only, and has {', '.join(flags) or 'no --latest'}")
 
+rust = jobs.get("release-rust")
+if rust is None:
+    problems.append(f"{release} has no release-rust job")
+else:
+    if not creates(rust):
+        problems.append("release-rust creates no release")
+    for command in creates(rust):
+        flags = re.findall(r'"?\$latest"?|--latest(?:=\w+)?', command)
+        if flags != ["--latest=false"]:
+            problems.append(f"release-rust must create its release with --latest=false only, and has {', '.join(flags) or 'no --latest'}")
+
 for job, body in jobs.items():
-    if job not in ("release-rego", "release-spec") and creates(body):
-        problems.append(f"{job} creates a release, and only release-rego and release-spec may")
+    if job not in ("release-rego", "release-spec", "release-rust") and creates(body):
+        problems.append(f"{job} creates a release, and only release-rego, release-spec and release-rust may")
 
 for path in sorted(p for p in root.rglob("*") if p.is_file() and p.suffix in (".yml", ".yaml", ".sh", ".py", ".cjs", ".js") and p.name not in ("release-latest.py", "release-latest_test.sh")):
     body = path.read_text()

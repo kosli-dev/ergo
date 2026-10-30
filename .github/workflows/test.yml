@@ -55,11 +55,12 @@ jobs:
         run: |
           .github/rego-folders.sh
           .github/rego-folders_test.sh
-      - name: Check the release workflow's latest flag and release notes
+      - name: Check the release workflow's latest flag, release notes and tag checks
         run: |
           python3 .github/release-latest.py
           .github/release-latest_test.sh
           .github/release-notes_test.sh
+          .github/release_test.sh
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check engines/rego examples engines/rust/sentences/tests/oracle
       - name: Check there are no comments
