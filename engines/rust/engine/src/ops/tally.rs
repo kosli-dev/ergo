@@ -7,7 +7,7 @@ use crate::lower::{Scope, UNSUPPORTED_SUFFIX};
 use crate::name;
 use crate::path::{self, Ctx, OUTER, Path};
 use crate::value;
-use ergo_sentences as s;
+use ergo_policy_sentences as s;
 use serde_json::{Number, Value};
 use std::cmp::Ordering;
 

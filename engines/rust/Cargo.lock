@@ -30,25 +30,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
-name = "ergo-cli"
+name = "ergo-policy-cli"
 version = "0.1.0-dev"
 dependencies = [
- "ergo-engine",
+ "ergo-policy-engine",
  "saphyr-parser",
  "serde_json",
 ]
 
 [[package]]
-name = "ergo-engine"
+name = "ergo-policy-engine"
 version = "0.1.0-dev"
 dependencies = [
- "ergo-sentences",
+ "ergo-policy-sentences",
  "regex",
  "serde_json",
 ]
 
 [[package]]
-name = "ergo-sentences"
+name = "ergo-policy-sentences"
 version = "0.1.0-dev"
 dependencies = [
  "regex-syntax",
@@ -57,20 +57,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "ergo-sentences-wasm"
+name = "ergo-policy-sentences-wasm"
 version = "0.1.0-dev"
 dependencies = [
- "ergo-sentences",
+ "ergo-policy-sentences",
  "serde",
  "serde_json",
  "wasm-bindgen",
 ]
 
 [[package]]
-name = "ergo-wasm"
+name = "ergo-policy-wasm"
 version = "0.1.0-dev"
 dependencies = [
- "ergo-engine",
+ "ergo-policy-engine",
  "serde_json",
  "wasm-bindgen",
 ]

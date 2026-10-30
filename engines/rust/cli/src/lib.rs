@@ -74,10 +74,10 @@ pub fn run(arguments: &[String]) -> Result<Outcome, Failure> {
         Some(path) => files::load("params", path)?,
         None => serde_json::json!({}),
     };
-    let report = ergo_engine::report(&input, &policy, &params);
+    let report = ergo_policy_engine::report(&input, &policy, &params);
     let value = match options.command {
         Command::Report => report,
-        Command::Violations => ergo_engine::violations(&report),
+        Command::Violations => ergo_policy_engine::violations(&report),
     };
     Ok(Outcome::Print(output::render(&value, options.compact)))
 }

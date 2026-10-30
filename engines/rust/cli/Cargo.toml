@@ -1,17 +1,20 @@
 [package]
-name = "ergo-cli"
+name = "ergo-policy-cli"
 description = "Experimental: prints Ergo reports and violations from policy, input and params files"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-publish.workspace = true
+readme = "README.md"
+include = ["src/**", "Cargo.toml", "README.md", "LICENSE"]
+keywords = ["ergo", "policy", "compliance", "evidence", "cli"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "ergo"
 path = "src/main.rs"
 
 [dependencies]
-ergo-engine = { path = "../engine" }
+ergo-policy-engine = { path = "../engine", version = "0.1.0-dev" }
 saphyr-parser = "0.3"
 serde_json = { version = "1", features = ["arbitrary_precision"] }

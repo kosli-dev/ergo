@@ -7,7 +7,6 @@ version = "0.1.0-dev"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/kosli-dev/ergo"
-publish = false
 
 [profile.wasm]
 inherits = "release"

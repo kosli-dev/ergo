@@ -1,7 +1,7 @@
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
-import { initSync, report as rustReport } from "ergo-wasm";
-import { initSync as initSentences, parse_check, parse_for, parse_from, check_problems, for_problems, from_problems } from "ergo-sentences-wasm";
+import { initSync, report as rustReport } from "ergo-policy-wasm";
+import { initSync as initSentences, parseCheck, parseFor, parseFrom, checkProblems, forProblems, fromProblems } from "ergo-policy-sentences-wasm";
 import { ENGINES, ENGINE_LABELS, readEngine, engineNote, engineMessage, makeRustRunner, stopOnPanic, timed, loadEngine } from "./engines.mjs";
 import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
@@ -67,7 +67,7 @@ const el = (tag, cls, text) => {
 const sentenceParser = (() => {
   try {
     initSentences({ module: decode(sentencesWasm) });
-    return makeParser({ parse_check, parse_for, parse_from, check_problems, for_problems, from_problems });
+    return makeParser({ parseCheck, parseFor, parseFrom, checkProblems, forProblems, fromProblems });
   } catch {
     return null;
   }

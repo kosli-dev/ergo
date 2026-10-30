@@ -2,13 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { compile } from "@kosli/ergo-markdown";
-import * as pkg from "../../../engines/rust/sentences-wasm/pkg/ergo_sentences_wasm.js";
+import * as pkg from "../../../engines/rust/sentences-wasm/pkg/ergo_policy_sentences_wasm.js";
 import { makeParser, readSentence, problemRange, treeTokens, describe } from "../src/sentences.mjs";
 import { markdownSentences, yamlSentences } from "../src/locate.mjs";
 import { makeAnalyser, decorateLines, entryAt, hoverOf, sentenceProblems } from "../src/analyse.mjs";
 import { highlightMarkdown, highlightYaml } from "../src/highlight.mjs";
 
-pkg.initSync({ module: readFileSync(new URL("../../../engines/rust/sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm", import.meta.url)) });
+pkg.initSync({ module: readFileSync(new URL("../../../engines/rust/sentences-wasm/pkg/ergo_policy_sentences_wasm_bg.wasm", import.meta.url)) });
 const parser = makeParser(pkg);
 const corpus = JSON.parse(readFileSync(new URL("../../../spec/sentences-corpus.json", import.meta.url), "utf8")).sentence_corpus;
 
@@ -48,7 +48,7 @@ const kindOf = (line) => {
   return null;
 };
 
-test("a check that is written wrong is underlined in the Markdown with the message of check_problems", () => {
+test("a check that is written wrong is underlined in the Markdown with the message of checkProblems", () => {
   const source = policy(["`x is not null`"]);
   const entries = markdownEntries(source);
   assert.deepEqual(sentenceProblems(entries), [{ line: lineOf(source, "x is not null") + 1, message: '"is not null" is written "exists"' }]);
@@ -87,7 +87,7 @@ test("a for line and a check are read with the aliases of the for line", () => {
   assert.equal(sentenceProblems(markdownEntries(without)).length, 1);
 });
 
-test("a for line is underlined from the message of for_problems and a from line from from_problems", () => {
+test("a for line is underlined from the message of forProblems and a from line from fromProblems", () => {
   const source = policy(["`x exists`"], "`for every xs as x, every x.ys as x`\n  ").replace("`items`", "`every`");
   const messages = sentenceProblems(markdownEntries(source)).map((p) => p.message);
   assert.deepEqual(messages, ["every is a word of the grammar: write .every", "x is given twice"]);
@@ -270,7 +270,7 @@ test("without the sentences Wasm nothing is changed and the pattern colours stay
 });
 
 test("a parser that throws is dropped, and the analyser gives null from then on", () => {
-  const broken = makeParser({ ...pkg, parse_check: () => { throw new WebAssembly.RuntimeError("unreachable"); } });
+  const broken = makeParser({ ...pkg, parseCheck: () => { throw new WebAssembly.RuntimeError("unreachable"); } });
   const source = policy(["`x exists`"]);
   const analyse = makeAnalyser(broken, "code");
   assert.equal(analyse(markdownSentences(source, compile(source).blocks)), null);

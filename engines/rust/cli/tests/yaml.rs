@@ -1,4 +1,4 @@
-use ergo_cli::yaml::{Error, parse};
+use ergo_policy_cli::yaml::{Error, parse};
 use serde_json::{Value, json};
 
 fn value(text: &str) -> Value {

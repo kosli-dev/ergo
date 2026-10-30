@@ -5,7 +5,7 @@ use super::{Check, Input, Part, Verdict, run as run_check};
 use crate::cause::Cause;
 use crate::lower::{self, Scope};
 use crate::path::{self, Ctx, Located, Location, OUTER, Path, Start, Step};
-use ergo_sentences as s;
+use ergo_policy_sentences as s;
 use serde_json::{Value, json};
 use std::cmp::Ordering;
 

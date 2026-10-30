@@ -382,7 +382,7 @@ fn repeats_too_much(ast: &regex_syntax::ast::Ast, left: u32) -> bool {
 /// Validity follows RE2, which `ergo.rego` uses. The result reads `\d`, `\w`, `\s` and `\b` as ASCII only, as RE2 does.
 ///
 /// ```
-/// use ergo_sentences::rust_pattern;
+/// use ergo_policy_sentences::rust_pattern;
 ///
 /// assert!(rust_pattern("^v[0-9]+$").is_some());
 /// assert_eq!(rust_pattern("("), None);

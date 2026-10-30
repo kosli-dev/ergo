@@ -55,11 +55,12 @@ jobs:
         run: |
           .github/rego-folders.sh
           .github/rego-folders_test.sh
-      - name: Check the release workflow's latest flag and release notes
+      - name: Check the release workflow's latest flag, release notes and tag checks
         run: |
           python3 .github/release-latest.py
           .github/release-latest_test.sh
           .github/release-notes_test.sh
+          .github/release_test.sh
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check engines/rego examples engines/rust/sentences/tests/oracle
       - name: Check there are no comments
@@ -193,9 +194,9 @@ jobs:
       - run: cargo test --locked --all-features -- --show-output
       - name: Check the API docs
         run: RUSTDOCFLAGS="-D warnings" cargo doc --locked --no-deps --all-features
-      - run: cargo test --locked -p ergo-engine --features serde_json/preserve_order --test key_order
-      - name: Check ergo-sentences builds for Wasm
-        run: cargo build --locked -p ergo-sentences --target wasm32-unknown-unknown
+      - run: cargo test --locked -p ergo-policy-engine --features serde_json/preserve_order --test key_order
+      - name: Check ergo-policy-sentences builds for Wasm
+        run: cargo build --locked -p ergo-policy-sentences --target wasm32-unknown-unknown
       - name: Install the wasm-bindgen tool, at the version of the crate
         run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
       - name: Install Binaryen
@@ -204,27 +205,27 @@ jobs:
           echo "2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489  $RUNNER_TEMP/binaryen.tar.gz" | sha256sum -c -
           tar -xz -C "$RUNNER_TEMP" -f "$RUNNER_TEMP/binaryen.tar.gz"
           echo "$RUNNER_TEMP/binaryen-version_133/bin" >> "$GITHUB_PATH"
-      - name: Build ergo-wasm, wrap it for a browser and shrink it
+      - name: Build ergo-policy-wasm, wrap it for a browser and shrink it
         run: |
-          cargo build --locked --profile wasm -p ergo-wasm --target wasm32-unknown-unknown
-          wasm-bindgen --target web --out-dir wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_wasm.wasm
-          wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_wasm_bg.wasm -o wasm/pkg/ergo_wasm_bg.wasm
-      - name: Load ergo-wasm in Node and build a report
+          cargo build --locked --profile wasm -p ergo-policy-wasm --target wasm32-unknown-unknown
+          wasm-bindgen --target web --out-dir wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_policy_wasm.wasm
+          wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_policy_wasm_bg.wasm -o wasm/pkg/ergo_policy_wasm_bg.wasm
+      - name: Load ergo-policy-wasm in Node and build a report
         run: node wasm/check-node.mjs
       - uses: actions/upload-artifact@v7
         with:
-          name: ergo-wasm-pkg
+          name: ergo-policy-wasm-pkg
           path: engines/rust/wasm/pkg
-      - name: Build ergo-sentences-wasm, wrap it for a browser and shrink it
+      - name: Build ergo-policy-sentences-wasm, wrap it for a browser and shrink it
         run: |
-          cargo build --locked --profile wasm -p ergo-sentences-wasm --target wasm32-unknown-unknown
-          wasm-bindgen --target web --out-dir sentences-wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_sentences_wasm.wasm
-          wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm -o sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm
-      - name: Load ergo-sentences-wasm in Node and read a sentence
+          cargo build --locked --profile wasm -p ergo-policy-sentences-wasm --target wasm32-unknown-unknown
+          wasm-bindgen --target web --out-dir sentences-wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_policy_sentences_wasm.wasm
+          wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue sentences-wasm/pkg/ergo_policy_sentences_wasm_bg.wasm -o sentences-wasm/pkg/ergo_policy_sentences_wasm_bg.wasm
+      - name: Load ergo-policy-sentences-wasm in Node and read a sentence
         run: node sentences-wasm/check-node.mjs
       - uses: actions/upload-artifact@v7
         with:
-          name: ergo-sentences-wasm-pkg
+          name: ergo-policy-sentences-wasm-pkg
           path: engines/rust/sentences-wasm/pkg
 
   markdown:
@@ -248,11 +249,11 @@ jobs:
           cache-dependency-path: packages/pnpm-lock.yaml
       - uses: actions/download-artifact@v8
         with:
-          name: ergo-wasm-pkg
+          name: ergo-policy-wasm-pkg
           path: engines/rust/wasm/pkg
       - uses: actions/download-artifact@v8
         with:
-          name: ergo-sentences-wasm-pkg
+          name: ergo-policy-sentences-wasm-pkg
           path: engines/rust/sentences-wasm/pkg
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
@@ -281,7 +282,7 @@ jobs:
         run: rustup toolchain install
       - name: Build the Rust sentence reader
         working-directory: engines/rust
-        run: cargo build --locked --release -p ergo-sentences --example read
+        run: cargo build --locked --release -p ergo-policy-sentences --example read
       - name: Check ergo.rego, Rust and the ABNF read the same sentences
         run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py --rust engines/rust/target/release/examples/read'
 

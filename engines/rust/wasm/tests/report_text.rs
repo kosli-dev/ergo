@@ -1,4 +1,4 @@
-use ergo_wasm::report_text;
+use ergo_policy_wasm::report_text;
 use serde_json::Value;
 
 const POLICY: &str = r#"{
@@ -11,7 +11,7 @@ const POLICY: &str = r#"{
 fn a_report_comes_back_as_json_text_from_the_engine() {
     let text = report_text(r#"{"items": [{"id": "a", "n": 1}]}"#, POLICY, "{}").unwrap();
     let report: Value = serde_json::from_str(&text).unwrap();
-    assert_eq!(report["engine"]["name"], "ergo-engine");
+    assert_eq!(report["engine"]["name"], "ergo-policy-engine");
     assert_eq!(report["compliant"], false);
 }
 

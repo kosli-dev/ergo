@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use ergo_sentences::{
+use ergo_policy_sentences::{
     SyntaxError, check_problems, for_problems, from_problems, parse_check, parse_for, parse_from,
 };
 use serde_json::{Value, json};

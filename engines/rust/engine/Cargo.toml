@@ -1,13 +1,16 @@
 [package]
-name = "ergo-engine"
+name = "ergo-policy-engine"
 description = "Experimental: builds Ergo reports"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-publish.workspace = true
+readme = "README.md"
+include = ["src/**", "Cargo.toml", "README.md", "LICENSE"]
+keywords = ["ergo", "policy", "compliance", "evidence", "report"]
+categories = ["development-tools"]
 
 [dependencies]
-ergo-sentences = { path = "../sentences" }
+ergo-policy-sentences = { path = "../sentences", version = "0.1.0-dev" }
 regex = "1"
 serde_json = { version = "1", features = ["arbitrary_precision"] }

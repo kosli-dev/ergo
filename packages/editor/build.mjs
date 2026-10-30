@@ -64,10 +64,10 @@ const buildWasm = () => {
 const rustPkg = join(root, "engines", "rust", "wasm", "pkg");
 
 const rustGlue = () => {
-  const glue = join(rustPkg, "ergo_wasm.js");
-  const bytes = join(rustPkg, "ergo_wasm_bg.wasm");
+  const glue = join(rustPkg, "ergo_policy_wasm.js");
+  const bytes = join(rustPkg, "ergo_policy_wasm_bg.wasm");
   if (!existsSync(glue) || !existsSync(bytes)) {
-    throw new Error(`The Rust Wasm isn't built: ${rustPkg} has no ergo_wasm.js and ergo_wasm_bg.wasm. Build it with the command under "Building for a browser" in engines/rust/README.md.`);
+    throw new Error(`The Rust Wasm isn't built: ${rustPkg} has no ergo_policy_wasm.js and ergo_policy_wasm_bg.wasm. Build it with the command under "Building for a browser" in engines/rust/README.md.`);
   }
   return { glue, bytes: readFileSync(bytes).toString("base64") };
 };
@@ -75,10 +75,10 @@ const rustGlue = () => {
 const sentencesPkg = join(root, "engines", "rust", "sentences-wasm", "pkg");
 
 export const sentencesGlue = (dir = sentencesPkg) => {
-  const glue = join(dir, "ergo_sentences_wasm.js");
-  const bytes = join(dir, "ergo_sentences_wasm_bg.wasm");
+  const glue = join(dir, "ergo_policy_sentences_wasm.js");
+  const bytes = join(dir, "ergo_policy_sentences_wasm_bg.wasm");
   if (!existsSync(glue) || !existsSync(bytes)) {
-    throw new Error(`The sentences Wasm isn't built: ${dir} has no ergo_sentences_wasm.js and ergo_sentences_wasm_bg.wasm. Build it with the command under "Building for a browser" in engines/rust/README.md.`);
+    throw new Error(`The sentences Wasm isn't built: ${dir} has no ergo_policy_sentences_wasm.js and ergo_policy_sentences_wasm_bg.wasm. Build it with the command under "Building for a browser" in engines/rust/README.md.`);
   }
   return { glue, bytes: readFileSync(bytes).toString("base64") };
 };
@@ -95,7 +95,7 @@ export const buildEditor = async (out = join(here, "dist", "editor.html")) => {
     platform: "browser",
     target: "es2022",
     minify: true,
-    alias: { "@open-policy-agent/opa-wasm": opaWasm, "ergo-wasm": rust.glue, "ergo-sentences-wasm": sentences.glue },
+    alias: { "@open-policy-agent/opa-wasm": opaWasm, "ergo-policy-wasm": rust.glue, "ergo-policy-sentences-wasm": sentences.glue },
     define: { "import.meta.url": "undefined" },
   });
   const script = bundled.outputFiles[0].text.replace(/<\/script/gi, "<\\/script");

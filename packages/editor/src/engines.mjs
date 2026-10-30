@@ -4,7 +4,7 @@ export const ENGINES = ["opa", "rust"];
 /** The name each engine shows. */
 export const ENGINE_LABELS = { opa: "Rego engine", rust: "Rust engine (experimental)" };
 
-const RUST_ENGINE_NAME = "ergo-engine";
+const RUST_ENGINE_NAME = "ergo-policy-engine";
 
 /** The engine used when nothing else was chosen. */
 export const DEFAULT_ENGINE = "opa";

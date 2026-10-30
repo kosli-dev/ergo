@@ -2,11 +2,11 @@ name: release
 
 on:
   push:
-    tags: ['rego-v*', 'spec-v*']
+    tags: ['rego-v*', 'spec-v*', 'rust-v*']
   workflow_dispatch:
     inputs:
       tag:
-        description: An existing rego-vX.Y.Z or spec-vX.Y tag to publish
+        description: An existing rego-vX.Y.Z, spec-vX.Y or rust-vX.Y.Z tag to publish
         required: true
         type: string
 
@@ -270,3 +270,239 @@ jobs:
             --verify-tag
       - name: Deploy the site, which now serves this version's schemas
         run: gh workflow run pages.yml --ref main
+
+  check-rust:
+    if: startsWith(inputs.tag || github.ref_name, 'rust-v')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - name: Read the version from the tag
+        shell: bash
+        run: |
+          echo "VERSION=${TAG#rust-v}" >> "$GITHUB_ENV"
+      - name: Check the version has the right shape
+        shell: bash
+        run: |
+          if ! printf '%s\n' "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "rust-v tags look like rust-v0.1.0, not $TAG"
+            exit 1
+          fi
+      - name: Check the tag points at a commit of main
+        shell: bash
+        run: |
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "The tag must point at a commit of main"
+            exit 1
+          fi
+      - name: Check the crates and the changelog say this version, without -dev
+        shell: bash
+        run: |
+          says=$(awk '/^\[workspace\.package\]$/ { on = 1; next } /^\[/ { on = 0 } on && /^version = / { print }' engines/rust/Cargo.toml)
+          if [ "$says" != "version = \"$VERSION\"" ]; then
+            echo "engines/rust/Cargo.toml must say version = \"$VERSION\" under [workspace.package], and says ${says:-no version}"
+            exit 1
+          fi
+          for dep in engine cli sentences-wasm; do
+            if grep 'path = "[^"]*"' "engines/rust/$dep/Cargo.toml" | grep -qv "version = \"$VERSION\""; then
+              echo "engines/rust/$dep/Cargo.toml has a path dependency that doesn't say version = \"$VERSION\""
+              exit 1
+            fi
+          done
+          if ! grep -qxF "## $VERSION" engines/rust/CHANGELOG.md; then
+            echo "engines/rust/CHANGELOG.md has no \"## $VERSION\" heading"
+            exit 1
+          fi
+      - name: Check the test workflow passed on this commit
+        shell: bash
+        run: |
+          passed=$(gh run list --workflow test.yml --commit "$(git rev-parse HEAD)" --status success --json databaseId --jq length)
+          if [ "${passed:-0}" -le 0 ]; then
+            echo "The test workflow hasn't passed on this commit yet. Wait for it, then re-run this job."
+            exit 1
+          fi
+      - name: Install the Rust version in rust-toolchain.toml
+        working-directory: engines/rust
+        run: rustup toolchain install
+      - name: Check Cargo.lock names this version, and the three crates package
+        working-directory: engines/rust
+        run: cargo package --locked -p ergo-policy-sentences -p ergo-policy-engine -p ergo-policy-cli
+
+  build-rust:
+    needs: check-rust
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            name: linux-x86_64
+          - runner: macos-latest
+            name: macos-arm64
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - name: Install the Rust version in rust-toolchain.toml
+        working-directory: engines/rust
+        run: rustup toolchain install
+      - name: Build ergo
+        working-directory: engines/rust
+        run: cargo build --locked --release -p ergo-policy-cli
+      - name: Pack ergo
+        run: |
+          mkdir "$RUNNER_TEMP/pack"
+          tar -czf "$RUNNER_TEMP/pack/ergo-${TAG#rust-v}-${{ matrix.name }}.tar.gz" -C engines/rust/target/release ergo
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ergo-${{ matrix.name }}
+          path: ${{ runner.temp }}/pack
+          if-no-files-found: error
+
+  publish-rust:
+    needs: [check-rust, build-rust]
+    runs-on: ubuntu-latest
+    environment: crates-io
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Read the version from the tag
+        shell: bash
+        run: |
+          echo "VERSION=${TAG#rust-v}" >> "$GITHUB_ENV"
+      - name: Install the Rust version in rust-toolchain.toml
+        working-directory: engines/rust
+        run: rustup toolchain install
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+      - name: Publish the crates, each after the one it needs, and skip one that is already there
+        shell: bash
+        working-directory: engines/rust
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          for crate in ergo-policy-sentences ergo-policy-engine ergo-policy-cli; do
+            if curl -fsS -A "kosli-dev/ergo release" -o /dev/null "https://crates.io/api/v1/crates/$crate/$VERSION"; then
+              echo "$crate $VERSION is already on crates.io"
+              continue
+            fi
+            cargo publish --locked -p "$crate"
+          done
+
+  release-rust:
+    needs: [check-rust, build-rust, publish-rust]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - name: Read the version from the tag
+        shell: bash
+        run: |
+          echo "VERSION=${TAG#rust-v}" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: ergo-*
+          path: ${{ runner.temp }}/binaries
+          merge-multiple: true
+      - name: Create the release, which is never the latest, so releases/latest stays ergo.rego
+        shell: bash
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "The release $TAG already exists"
+            exit 0
+          fi
+          git show "$GITHUB_SHA:.github/release-notes.sh" > "$RUNNER_TEMP/release-notes.sh"
+          sh "$RUNNER_TEMP/release-notes.sh" engines/rust/CHANGELOG.md "$VERSION" "https://github.com/$GITHUB_REPOSITORY/blob/$TAG/engines/rust/" > "$RUNNER_TEMP/notes.md"
+          gh release create "$TAG" "$RUNNER_TEMP"/binaries/*.tar.gz \
+            --title "Ergo Rust engine $VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            --latest=false \
+            --verify-tag
+
+  bump-rust:
+    needs: release-rust
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Read the version from the tag
+        shell: bash
+        run: |
+          echo "VERSION=${TAG#rust-v}" >> "$GITHUB_ENV"
+      - name: Install the Rust version in rust-toolchain.toml
+        working-directory: engines/rust
+        run: rustup toolchain install
+      - name: Open the pull request that moves main to the next version
+        shell: bash
+        run: |
+          major=${VERSION%%.*}
+          minor=${VERSION#*.}
+          minor=${minor%%.*}
+          next="$major.$((10#$minor + 1)).0-dev"
+          branch="rust/version-$next"
+          title="rust: move main to $next"
+          if grep -qxF "version = \"$next\"" engines/rust/Cargo.toml; then
+            echo "main already says $next"
+            exit 0
+          fi
+          if ! grep -qxF "version = \"$VERSION\"" engines/rust/Cargo.toml; then
+            echo "engines/rust/Cargo.toml says $(grep -m 1 '^version = ' engines/rust/Cargo.toml || true) and this job expected $VERSION. Move main to the next version by hand."
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          pattern=${VERSION//./\\.}
+          sed -i "s/\bversion = \"$pattern\"/version = \"$next\"/" engines/rust/Cargo.toml engines/rust/engine/Cargo.toml engines/rust/cli/Cargo.toml engines/rust/sentences-wasm/Cargo.toml engines/rust/wasm/Cargo.toml
+          sed -i "s/\"name\": \"ergo-policy-engine\", \"version\": \"$pattern\"/\"name\": \"ergo-policy-engine\", \"version\": \"$next\"/" README.md
+          (cd engines/rust && cargo update --workspace)
+          grep -qxF "version = \"$next\"" engines/rust/Cargo.toml
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            echo "origin/$branch already exists, so there is nothing to commit or push"
+          else
+            git switch --create "$branch"
+            git commit --all --message "$title" --message "The Rust crates $VERSION were released, so main moves to their next version."
+            git push origin "$branch"
+          fi
+          existing=$(gh pr list --head "$branch" --base main --state open --json url --jq '.[0].url')
+          if [ -n "$existing" ]; then
+            echo "$existing"
+            exit 0
+          fi
+          if ! out=$(gh pr create --base main --head "$branch" --title "$title" \
+            --body "The Rust crates $VERSION were released, so \`main\` moves to $next.
+
+          GitHub holds the checks of a pull request opened by GitHub Actions until someone approves them, so click \"Approve and run\" on this one, or close and reopen it, then merge it once they pass." 2>&1); then
+            echo "$out"
+            case $out in
+              *"not permitted"*) echo "Turn on \"Allow GitHub Actions to create and approve pull requests\" in the repository's Actions settings, or open the PR by hand from $branch." ;;
+            esac
+            exit 1
+          fi
+          echo "$out"

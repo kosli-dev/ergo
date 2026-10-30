@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use ergo_sentences::*;
+use ergo_policy_sentences::*;
 
 pub fn key(name: &str) -> Path {
     Path {

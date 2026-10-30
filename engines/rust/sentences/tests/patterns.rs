@@ -1,6 +1,6 @@
 mod oracle;
 
-use ergo_sentences::*;
+use ergo_policy_sentences::*;
 use support_text::matches_line;
 
 mod support_text {

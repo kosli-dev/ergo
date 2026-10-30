@@ -1,4 +1,8 @@
-# ergo-sentences
+# ergo-policy-sentences
+
+**Experimental.** This crate may change without notice.
+
+Part of [Ergo](https://github.com/kosli-dev/ergo), which turns policy evaluation into a report that says what was checked, what failed and why. This crate is for tools that only need to read Ergo's sentences, like an editor or a linter.
 
 Reads Ergo's check sentences, `for` lines, `from` lines and paths into a tree, and prints a tree back as a canonical sentence. It doesn't build reports, and its only dependency is `regex-syntax`, which it uses to check the patterns of `matches`, so an editor or a linter can use it without the engine. It builds for `wasm32-unknown-unknown`.
 
@@ -32,7 +36,7 @@ pub fn rust_pattern(pattern: &str) -> Option<String>;
 ## Using it
 
 ```rust
-use ergo_sentences::{check_problems, parse_check, print_check};
+use ergo_policy_sentences::{check_problems, parse_check, print_check};
 
 let check = parse_check("approvals   is at least 2").unwrap();
 assert!(check_problems(&check, &[]).is_empty());
@@ -48,7 +52,7 @@ assert_eq!(errors[0].column, Some(6));
 
 An editor reads each line with the `parse_` function for its kind, shows the `SyntaxError`s of a line that doesn't read, and the `_problems` of one that does.
 
-- `parse_check`, `parse_for`, `parse_from` and `parse_path` read what [`spec/sentences.abnf`](../../../spec/sentences.abnf) allows and nothing else. Whitespace at both ends is dropped: every character with Unicode's `White_Space` property, as [sentence.ends](../../../spec/syntax.md#the-grammar) lists them, which is what Rust's `str::trim` drops. Between words only spaces count, so a tab there doesn't read. A bare first key is never a word of the grammar: write `.empty` for a field called `empty`. A quoted first key, like `"empty"`, is read as `.empty`, and prints that way.
+- `parse_check`, `parse_for`, `parse_from` and `parse_path` read what [`spec/sentences.abnf`](https://github.com/kosli-dev/ergo/blob/main/spec/sentences.abnf) allows and nothing else. Whitespace at both ends is dropped: every character with Unicode's `White_Space` property, as [sentence.ends](https://github.com/kosli-dev/ergo/blob/main/spec/syntax.md#the-grammar) lists them, which is what Rust's `str::trim` drops. Between words only spaces count, so a tab there doesn't read. A bare first key is never a word of the grammar: write `.empty` for a field called `empty`. A quoted first key, like `"empty"`, is read as `.empty`, and prints that way.
 - When the grammar allows two readings, the tree is the one `ergo.rego` picks, and a line that the first choice can't finish is read the other way.
 - A failed read gives the messages `ergo.rego` gives for the same line, in its order, as `SyntaxError { column, message }`. `column` counts characters of the trimmed line from 1, and is only set when the message names a column. For a `from` line the columns count from the text after a leading `every`, as `ergo.rego` does.
 - A `$<word>` other than `$params` and `$input` reads as a start or a reference, as `Start::Unknown` and `Reference::Unknown`, and the line is written wrong with `unknown name`. `parse_path` is the exception: it rejects a path that holds one. Keys and strings are decoded. Numbers, positions and bracket indexes keep their digits as written, so the caller decides what a number that is too big means.
@@ -104,7 +108,7 @@ The tree is not part of the spec and carries no promise of staying the same yet.
 
 `spec/check_grammar.py --rust <command>` reads thousands of sentences with this crate, `ergo.rego` and the ABNF, and fails when Rust and the ABNF disagree on whether a line reads, or when Rust and `ergo.rego` give a line different problems. `<command>` runs `examples/read.rs`. `compared with itself` is left out of that comparison, because `ergo.rego` raises it later, from its check model. The tests in `tests/rules.rs` pin it instead.
 
-Run the checks in [`engines/rust/README.md`](../README.md) from the root of the repo. They use `--all-features`, so the `serde` tests run too.
+Run the checks in [`engines/rust/README.md`](https://github.com/kosli-dev/ergo/blob/main/engines/rust/README.md) from the root of the repo. They use `--all-features`, so the `serde` tests run too.
 
 `tests/oracle/mod.rs` holds what `ergo.rego` printed or said for a few hundred `from` lines and paths, taken by running it.
 

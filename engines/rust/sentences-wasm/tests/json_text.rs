@@ -1,4 +1,4 @@
-use ergo_sentences_wasm::*;
+use ergo_policy_sentences_wasm::*;
 use serde_json::Value;
 
 fn json(text: &str) -> Value {
