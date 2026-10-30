@@ -1028,7 +1028,7 @@ An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_o
 ```
 
 - `inputs` names the path with `[]` after each list walked, and holds the value each item's path ended at.
-- Each entry in `failed_items` gives the field that failed as `path`, and the item it belongs to as `item`, so a tool can show the item by reading the input there. A list that's missing, `null`, not a list or empty is listed in its items' place.
+- Each entry in `failed_items` gives the field that failed as `path`, and the item it belongs to as `item`, so a tool can show the item by reading the input there. A list that's missing, `null`, not a list or empty is listed in its items' place. When a `whose` that compares two fields can't decide for an item, the entry names the field it couldn't read, or the left one when it read neither or both, like `hi` for `whose lo is at least hi` on `{"lo": 1}`, with `value` `null`. A field that's `null` counts as not read, and so does the list of a `count of` that isn't a list.
 - An empty list fails `every` as `value`, because no commits isn't proof that every commit is signed. Write `, if any,` after the path to let empty lists pass: `every review.incidents, if any, is not empty`. A missing list still fails.
 - `whose` keeps the items that pass its conditions, read on each item: `some pull_requests.approvers whose state is "APPROVED" exists` passes above, with `bob`'s approval. An item a condition can't decide, because the field it reads is missing, fails the check rather than being left out.
 - In a one-line `every` or `some`, a field on the right of the phrase is the item's too, so `some approvers.timestamp whose state is "APPROVED" is after last_commit` reads both from each approver. To compare with a field of the subject, use a `for` line, below.
@@ -1591,8 +1591,8 @@ The requirement's entry has `"subject": "prod deployment"`, and `subjects` is:
 Each entry has:
 
 - `description` is the subject's, or `""` when it has none. A `description` that isn't a string is [written wrong](#subjects) and shows as `""`.
-- `from` says how the subject is found, as a [from line](#from-lines) is written. A `from` written as a line is printed the same way whatever spaces it had. A subject without `from` reads the input field named like it. A `from` that is written wrong, because it isn't a string or can't be read, shows as `<invalid from>`.
-- `identified_by` is the path of the subject's id, or `null` when it has none, and the whole subject is its id. A subject that narrows another has the id of the one it narrows. An id that is written wrong shows as `<invalid identified_by>`.
+- `from` says how the subject is found, as a [from line](#from-lines) is written. A `from` written as a line is printed the same way whatever spaces it had. A subject without `from` reads the input field named like it. A `from` that is written wrong, because it isn't a string or can't be read, shows as `<invalid from>`. So does one that reads but has a problem, like `values of mixed types`, and the `from` of a subject with `applies_to` or `of`, because those fields said how it was found.
+- `identified_by` is the path of the subject's id, or `null` when it has none, and the whole subject is its id. A subject that narrows another has the id of the one it narrows, also when its `from` is written wrong. An id that is written wrong shows as `<invalid identified_by>`.
 - `parts` lists every [part](#parts) the subject has, including the ones it keeps from a subject it narrows, by alias. Each is `{"from": ..., "identified_by": ...}`, with `from` written the way a sentence writes a path, so `"  dd.b "` is `dd.b` and `x[$params.k]` is `x named by $params.k`, and `identified_by` the path of the part's id or `null` when it has none. For the policy under [Parts](#parts) it is
 
   ```json
@@ -1604,7 +1604,7 @@ Each entry has:
 
   A part that is written wrong is listed as best it can be, with `<invalid from>` for a path that can't be read and `<invalid identified_by>` for an id that can't.
 
-A subject that is written wrong still has its entry, so nothing disappears from the report. With this policy and the same input, where `deployment` writes its `from` and `identified_by` as lists:
+A subject that is written wrong still has its entry, so nothing disappears from the report. A subject whose `from` starts at another subject lists that subject even when the line is written wrong, like `every parent.items`, and a subject that narrows another has that subject's id then. A `from` that doesn't parse, or isn't a string, lists no other subject. In `ergo.rego`, a `from` with an unknown name, like `parent.items whose zz is $foo`, doesn't parse either, so it lists no other subject. With this policy and the same input, where `deployment` writes its `from` and `identified_by` as lists:
 
 ```yaml
 ergo_spec: v0.3-dev
@@ -1688,7 +1688,7 @@ the inputs are:
 ]
 ```
 
-A problem with a sentence in an `any_of` option is listed under the check, with the option's name in front, like `option standard: line 2: doesn't parse` or `option standard: line 1: values of mixed types` under `checks.permitted`. A name that needs quotes is quoted: `checks."a.b"`.
+A problem with a sentence in an `any_of` option is listed under the check, with the option's name in front, like `option standard: line 2: doesn't parse` or `option standard: line 1: values of mixed types` under `checks.permitted`. A problem with one line of an `assert` list of two or more starts with the line's number, like `line 2: values of mixed types` under `checks.signed`, and a problem with the `for` line, its `whose` included, starts with `for: `, like `for: values of mixed types`. A problem with a sentence is listed under the check, never under a place inside it, and a sentence lists every problem it has, so `x is one of 1, 'a' and y is at least y` gives both `values of mixed types` and `y is compared with itself`. A name that needs quotes is quoted: `checks."a.b"`.
 
 The fields of the requirement and its subject get an input of the same form when something is wrong with them. The requirement's own fields come first, named after the field, and then the subject's, named after the subject and the field. Each group is sorted by field. `require` is shown with its value when it's fine, and with what's wrong instead when it isn't, so no name appears twice. With a requirement like this on the same subject, with `from: deployments`:
 
