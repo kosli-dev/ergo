@@ -3,7 +3,7 @@
   "description": "",
   "engine": {
     "name": "ergo.rego",
-    "version": "0.3.0-dev"
+    "version": "ergo.rego's version"
   },
   "ergo": "v0.3",
   "meta": {},

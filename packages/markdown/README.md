@@ -311,5 +311,5 @@ That's README's first policy, where `prod_deploy` is written with `_`, so its he
 
 Each folder in [`cases`](cases) is one example the tool must get right. It holds a `policy.ergo.md` and either:
 
-- `policy.yaml`, the policy it must give, and when there's an input, `input.json`, `report.json` (the report `ergo.rego` gives on that policy and input) and `params.json` if the policy reads params;
+- `policy.yaml`, the policy it must give, and when there's an input, `input.json`, `report.json` (the report `ergo.rego` gives on that policy and input, with `ergo.rego's version` as the engine's version, which the tests fill in from `engines/rego/ergo.rego` so a new version doesn't break them) and `params.json` if the policy reads params;
 - or `problems.json`, the problems it must list.

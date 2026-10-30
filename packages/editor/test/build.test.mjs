@@ -54,9 +54,13 @@ test("the page has a tab label for every view", () => {
 });
 
 const casesDir = join(here, "..", "..", "markdown", "cases");
+const regoVersion = /^version := "(.+)"$/m.exec(readFileSync(join(casesDir, "..", "..", "..", "engines", "rego", "ergo.rego"), "utf8"))[1];
 const expected = (dir, file) => {
   const path = join(casesDir, dir, file);
-  return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : null;
+  if (!existsSync(path)) return null;
+  const value = JSON.parse(readFileSync(path, "utf8"));
+  if (value.engine?.version === "ergo.rego's version") value.engine.version = regoVersion;
+  return value;
 };
 let ergo;
 const runErgoText = async (inputText, policy, paramsText) => {
