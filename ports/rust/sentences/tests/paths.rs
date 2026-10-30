@@ -451,6 +451,54 @@ fn a_dollar_name_other_than_params_and_input_is_not_a_path() {
 }
 
 #[test]
+fn a_dollar_name_other_than_params_and_input_starts_a_path_of_a_line() {
+    let read = from("$foo.x[1]");
+    assert_eq!(
+        read.path,
+        with_steps(
+            Path {
+                position: None,
+                start: Start::Unknown("$foo".into()),
+                steps: Vec::new(),
+            },
+            vec![dot("x"), Step::Index("1".into())]
+        )
+    );
+    assert_eq!(print_from(&read, &[], &[]), "item 2 of $foo.x");
+}
+
+#[test]
+fn a_dollar_name_is_a_letter_or_an_underscore_and_then_word_characters() {
+    assert!(parse_from("$A_1").is_ok());
+    assert!(parse_from("$_").is_ok());
+    assert!(parse_from("$1").is_err());
+    assert!(parse_from("$a-b").is_err());
+    assert!(parse_from("$").is_err());
+}
+
+#[test]
+fn a_reference_can_be_an_unknown_name_with_or_without_a_key() {
+    let read = from("ab named by $foo.\"x y\"[$bar]");
+    assert_eq!(
+        read.path.steps,
+        vec![
+            Step::NamedBy(Reference::Unknown {
+                name: "$foo".into(),
+                key: Some("x y".into())
+            }),
+            Step::Brackets(Reference::Unknown {
+                name: "$bar".into(),
+                key: None
+            }),
+        ]
+    );
+    assert_eq!(
+        print_from(&read, &[], &[]),
+        "ab named by $foo.\"x y\" named by $bar"
+    );
+}
+
+#[test]
 fn a_key_cannot_start_with_a_digit() {
     assert!(parse_path("1a").is_err());
     assert!(parse_path("ab.1").is_err());
