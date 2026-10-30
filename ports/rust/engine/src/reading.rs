@@ -769,7 +769,7 @@ impl Reading {
                 Text::Missing | Text::Invalid => {}
             }
             if matches!(&found.from, FromState::Parsed(line) if line.named_by_each_of.is_some())
-                && matches!(found.def.identified_by, Text::Written(_))
+                && !matches!(found.def.identified_by, Text::Missing)
             {
                 add_problem(&mut problems, id_at.clone(), KEYED_ID_PROBLEM);
             }

@@ -1860,4 +1860,57 @@ mod tests {
         assert_eq!(a[0]["passed"], json!(true));
         assert_eq!(a[0]["inputs"][0]["locations"], json!(["/arts/0/owner"]));
     }
+
+    #[test]
+    fn a_keyed_parent_with_identified_by_is_written_wrong_under_the_childs_requirement() {
+        let mut p = policy(
+            json!({
+                "suite": {"from": "suites named by each of $params.names", "identified_by": "aid"},
+                "thing": {"from": "suite.items", "identified_by": "id"}
+            }),
+            json!(0),
+        );
+        p["requirements"]["s"]["checks"] = json!({"c": "ok is true"});
+        let input = json!({"suites": {"unit": {"aid": "att-u", "items": [{"id": 1, "ok": true}]}}});
+        let r = report(&input, &p, &json!({"names": ["unit"]}));
+        assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
+        let well_formed = &rows(&r, "$well_formed")[0];
+        assert_eq!(well_formed["passed"], json!(false));
+        assert_eq!(
+            well_formed["inputs"][2],
+            json!({
+                "name": "subjects.suite.identified_by",
+                "value": ["not allowed with named by each of: the key is the id"],
+                "locations": []
+            })
+        );
+        assert_eq!(rows(&r, "c").len(), 0);
+    }
+
+    #[test]
+    fn identified_by_that_is_not_a_string_next_to_named_by_each_of_lists_both_problems() {
+        for bad in [json!(5), json!(null), json!(["id"])] {
+            let r = run(
+                json!({"thing": {"from": "suites named by each of $params.names", "identified_by": bad}}),
+                json!({}),
+            );
+            let well_formed = &rows(&r, "$well_formed")[0];
+            assert_eq!(
+                well_formed["inputs"][2],
+                json!({
+                    "name": "subjects.thing.identified_by",
+                    "value": [
+                        "not a string",
+                        "not allowed with named by each of: the key is the id"
+                    ],
+                    "locations": []
+                }),
+                "{bad}"
+            );
+            assert_eq!(
+                r["subjects"]["thing"]["identified_by"],
+                json!("<invalid identified_by>")
+            );
+        }
+    }
 }

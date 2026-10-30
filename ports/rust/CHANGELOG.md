@@ -13,4 +13,4 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - `ergo-wasm` builds the report in a browser, from JSON text.
 - `ergo-sentences-wasm` reads check sentences in a browser, from and to JSON text.
 - A `for` item whose path goes on into a list item that isn't an object, `null` included, fails that item as `not_an_object`, as `every` and `some` do, where it failed as `unusable`.
-- A subject definition with `identified_by` whose `from` uses `named by each of` is written wrong, with `not allowed with named by each of: the key is the id` under `subjects.<name>.identified_by`, as in `ergo.rego`.
+- A subject definition with `identified_by` whose `from` uses `named by each of` is written wrong, with `not allowed with named by each of: the key is the id` under `subjects.<name>.identified_by`, as in `ergo.rego`. An `identified_by` that is not a string lists both problems.
