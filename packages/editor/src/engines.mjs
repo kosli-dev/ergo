@@ -12,14 +12,49 @@ export const DEFAULT_ENGINE = "opa";
 /** Reads an engine from its saved text. Anything that isn't one of `ENGINES` gives `DEFAULT_ENGINE`. */
 export const readEngine = (text) => (ENGINES.includes(text) ? text : DEFAULT_ENGINE);
 
-/** Says which engine made a report, from the report's `engine` field. Gives an empty string when the report doesn't say. */
-export const engineNote = (report) => {
+/** Writes a time in milliseconds with one decimal under 10 ms and as a whole number from 10 ms on. */
+export const formatMs = (ms) => {
+  const tenths = Math.round(ms * 10) / 10;
+  return tenths < 10 ? `${tenths.toFixed(1)} ms` : `${Math.round(ms)} ms`;
+};
+
+/** Says which engine made a report, from the report's `engine` field, and how long the report took when `ms` is a number. Gives an empty string when the report doesn't say. */
+export const engineNote = (report, ms) => {
   const engine = report?.engine;
   if (typeof engine?.name !== "string") return "";
   const made = typeof engine.version === "string" ? `${engine.name} ${engine.version}` : engine.name;
-  if (engine.name === RUST_ENGINE_NAME) return `Report made by the Rust engine (${made}).`;
-  if (engine.name === "ergo.rego") return `Report made by the Rego engine (${made}).`;
-  return `Report made by ${made}.`;
+  const took = typeof ms === "number" ? ` in ${formatMs(ms)}` : "";
+  if (engine.name === RUST_ENGINE_NAME) return `Report made by the Rust engine (${made})${took}.`;
+  if (engine.name === "ergo.rego") return `Report made by the Rego engine (${made})${took}.`;
+  return `Report made by ${made}${took}.`;
+};
+
+/** Wraps `fn` so each call records how many milliseconds it took in the wrapper's `ms`, read from `clock`. `ms` is `null` until the first call ends. */
+export const timed = (fn, clock = () => performance.now()) => {
+  const wrapped = (...args) => {
+    const start = clock();
+    try {
+      return fn(...args);
+    } finally {
+      wrapped.ms = clock() - start;
+    }
+  };
+  wrapped.ms = null;
+  return wrapped;
+};
+
+const attempt = (fn) => {
+  try {
+    return fn();
+  } catch (e) {
+    return e;
+  }
+};
+
+/** Runs `run` once on an empty input, policy and params, so the first report people see isn't slowed by the browser compiling the engine's code, then puts it in `runners` under `name`. Whatever that run gives or throws is ignored. */
+export const loadEngine = (runners, name, run) => {
+  attempt(() => run("{}", {}, "{}"));
+  runners[name] = run;
 };
 
 /** Says that the engine is still loading, didn't load or couldn't run, naming the engine that was picked. `detail` is the error's message and ends the text for `"failed"` and `"run"`. */

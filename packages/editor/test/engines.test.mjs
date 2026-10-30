@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT_ENGINE, ENGINES, ENGINE_LABELS, engineMessage, engineNote, makeRustRunner, readEngine, stopOnPanic } from "../src/engines.mjs";
+import { DEFAULT_ENGINE, ENGINES, ENGINE_LABELS, engineMessage, engineNote, formatMs, loadEngine, makeRustRunner, readEngine, stopOnPanic, timed } from "../src/engines.mjs";
 
 test("the two engines are labelled Rego engine and Rust engine", () => {
   assert.deepEqual(ENGINES.map((e) => ENGINE_LABELS[e]), ["Rego engine", "Rust engine (experimental)"]);
@@ -74,4 +74,49 @@ test("an error that isn't a panic reaches the caller and the runner keeps going"
   });
   assert.throws(() => run(1), (e) => e.stopped === undefined && /isn't valid JSON/.test(e.message));
   assert.deepEqual(run(2), { x: 2 });
+});
+
+test("the note says how long the report took, with one decimal under 10 ms", () => {
+  assert.equal(engineNote({ engine: { name: "ergo-engine", version: "0.1.0-dev" } }, 1.84), "Report made by the Rust engine (ergo-engine 0.1.0-dev) in 1.8 ms.");
+  assert.equal(engineNote({ engine: { name: "ergo.rego", version: "0.3.0-dev" } }, 42.6), "Report made by the Rego engine (ergo.rego 0.3.0-dev) in 43 ms.");
+  assert.equal(engineNote({ engine: { name: "other" } }, 0), "Report made by other in 0.0 ms.");
+  assert.equal(engineNote({ engine: { name: "ergo.rego" } }, null), "Report made by the Rego engine (ergo.rego).");
+  assert.deepEqual([9.94, 9.96, 10, 10.5, 1234.4].map(formatMs), ["9.9 ms", "10 ms", "10 ms", "11 ms", "1234 ms"]);
+});
+
+test("a timed call records how long it took on the clock, even when it throws", () => {
+  const ticks = [100, 101.8, 200, 212.4];
+  const clock = () => ticks.shift();
+  const report = timed((x) => {
+    if (x === "bad") throw new Error("bad");
+    return { x };
+  }, clock);
+  assert.equal(report.ms, null);
+  assert.deepEqual(report("ok"), { x: "ok" });
+  assert.ok(Math.abs(report.ms - 1.8) < 1e-9);
+  assert.throws(() => report("bad"), /bad/);
+  assert.ok(Math.abs(report.ms - 12.4) < 1e-9);
+});
+
+test("each engine runs once untimed when it loads, before it's put in the runners", () => {
+  const runners = {};
+  const calls = { opa: [], rust: [] };
+  for (const name of ["opa", "rust"]) {
+    loadEngine(runners, name, (...args) => {
+      calls[name].push({ args, ready: runners[name] !== undefined });
+      return null;
+    });
+  }
+  assert.deepEqual(calls.opa, [{ args: ["{}", {}, "{}"], ready: false }]);
+  assert.deepEqual(calls.rust, [{ args: ["{}", {}, "{}"], ready: false }]);
+  assert.deepEqual(Object.keys(runners).sort(), ["opa", "rust"]);
+});
+
+test("an engine whose warm-up run throws is still loaded", () => {
+  const runners = {};
+  const run = () => {
+    throw new Error("no policy");
+  };
+  loadEngine(runners, "rust", run);
+  assert.equal(runners.rust, run);
 });
