@@ -259,7 +259,7 @@ peer_approved:
   assert: approver.username does not equal pr.author
 ```
 
-Items nest left to right, so a later one can use an earlier alias, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives.
+Items nest left to right, so a later one can use an earlier alias, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives. A problem with the `for` line, its `whose` included, is listed under the check with `for: ` in front, like `for: doesn't parse` or `for: values of mixed types`.
 
 **[sentence.for.scope]** In `assert` and in a later item, a bare first key is the subject's field and an item is reached by its alias. Inside an item's own `whose`, a bare key is that item's field. So in `for: some approvals whose role is "qa" as approval` with `assert: approval.approved_at is before started_at`, `role` is the approval's and `started_at` the subject's.
 
@@ -341,7 +341,7 @@ The field equals, or doesn't equal, what's on the right, as [value.equal](semant
 <path> equals <field> within <number>
 ```
 
-Two numbers at most that far apart. The number is 0 or more. A value before `within` that isn't a number is written wrong, with `"within" only compares numbers`, because the check could only fail. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
+Two numbers at most that far apart. The gap is worked out exactly on the decimals, so `0.3` and `0.1` are within `0.2`. That holds for the numbers [Values](semantics.md#values) covers, with at most 15 significant digits, and the spec doesn't say how longer ones compare. An implementation that can't compare the numbers exactly fails the check as `unusable`, as [Values](semantics.md#values) says. `ergo.rego` and the Rust engine do when the exponents of the two sides and the number after `within` are more than 4096 apart, counted on the value, so `1e5000` and `1` within `1` fails as `unusable`. The number is 0 or more. A value before `within` that isn't a number is written wrong, with `"within" only compares numbers`, because the check could only fail. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
 
 **[sentence.phrase.one_of]**
 ```
@@ -498,7 +498,7 @@ Most often the writer meant the subject's field. In a `whose` and after `every` 
 
 ## Printing the sentence
 
-**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` and `is not` before a value and `equals` and `does not equal` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash but no single quote, no two backslashes in a row, no backslash at the end and no control character, and in double quotes with JSON escapes otherwise, a dot in front of a field only where [sentence.path.argument](#paths) needs one or where an alias has the same name, numbers in their plain form ([sentence.print.numbers](#printing-the-sentence)), and values separated by `, `. Parsing the printed sentence reads the same check.
+**[sentence.print.canonical]** The report's `expression` is the sentence printed from its parse in one spelling: single spaces, `is` and `is not` before a value and `equals` and `does not equal` before a field, `is one of` before written values and `is in` before a path, no alias, a string in single quotes when it holds a backslash but no single quote, no two backslashes in a row, no backslash at the end and no control character, and in double quotes with JSON escapes otherwise, a dot in front of a field only where [sentence.path.argument](#paths) needs one or where an alias has the same name, and the same where the name of another subject of the policy starts a `from` line written with a dot, like `.artifact.p` (the line without the dot is a child subject of `artifact`), numbers in their plain form ([sentence.print.numbers](#printing-the-sentence)), and values separated by `, `. Parsing the printed sentence reads the same check.
 
 **[sentence.print.order]** `whose` conditions and assertions joined with `and` print in the order the author wrote them. The report stays byte for byte the same when the same policy runs again on the same input. That rule is for the same policy, not for two policies that mean the same: `A and B` and `B and A` print differently, because the order changes neither what passes nor the cause, and sorting would have to reach `assert` lists too, and could never reach `for` items, whose order is their nesting. A row's `inputs` stay sorted by name, because they're values that were read, not a sentence.
 
@@ -514,7 +514,7 @@ Most often the writer meant the subject's field. In a `whose` and after `every` 
 - an `any_of` that isn't an object: `<invalid any_of>`, and an empty one: `one of: <empty options>`
 - an option that's an empty list: `<name>(<empty option>)`, and an option that isn't a string or a list of strings: `<name>(<invalid option>)`
 
-A `for` that isn't a string, or that sits next to `any_of`, is left out, and an empty `assert` list prints as `""`. So `{"for": " every  xs ", "assert": [" x  is ", 3]}` prints `for every  xs: x  is and <invalid assert>`. Two cases are [still open](OPEN.md#where-ergorego-and-the-rust-port-differ): sentences that read next to a field the check doesn't take or a `for` that isn't a string, and a sentence written wrong only with `values of mixed types`.
+A `for` that isn't a string, or that sits next to `any_of`, is left out, and an empty `assert` list prints as `""`. So `{"for": " every  xs ", "assert": [" x  is ", 3]}` prints `for every  xs: x  is and <invalid assert>`. One case is [still open](OPEN.md#where-ergorego-and-the-rust-port-differ): sentences that read next to a field the check doesn't take or a `for` that isn't a string.
 
 ## Naming a path
 

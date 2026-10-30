@@ -84,7 +84,6 @@ OPA crashes when it compares a number whose exponent is beyond ±1e6 with any ot
 The spec doesn't settle these yet, because the two engines give different reports. Both still fail and pass the same checks.
 
 - **A check with a field it doesn't take.** [sentence.print.written_wrong](syntax.md#printing-the-sentence) doesn't say how a check prints when its sentences read but it has an unknown field, a `for` that isn't a string, or `for` or `assert` next to `any_of`. `ergo.rego` prints it as written and Rust prints it from its parse, so `{"assert": " x  is  1", "zzz": 1}` gives `x  is  1` with one and `x is 1` with the other.
-- **A sentence written wrong only with `values of mixed types`.** `ergo.rego` prints it from its parse and Rust as written, so `x is one of 1.0, 'a'` gives `x is one of 1, "a"` with one and `x is one of 1.0, 'a'` with the other.
 
 ## Rules without cases
 

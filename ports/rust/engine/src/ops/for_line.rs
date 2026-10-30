@@ -243,7 +243,10 @@ pub fn lower_for(
             }
         };
         let walk_path = match bound.path(path) {
-            Ok(found) => Some(found),
+            Ok(found) => {
+                problems.extend(lower::walk_too_long(&found));
+                Some(found)
+            }
             Err(found) => {
                 problems.extend(found);
                 None
@@ -260,6 +263,10 @@ pub fn lower_for(
         }
         bound = bound.with_for_alias(alias);
     }
+    let mut problems: Vec<String> = problems
+        .into_iter()
+        .map(|problem| format!("for: {problem}"))
+        .collect();
     let names = bound.aliases();
     let names: Vec<&str> = names.iter().map(String::as_str).collect();
     let last_alias = line.items.last().map(|item| match item {
