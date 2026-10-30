@@ -42,7 +42,7 @@ pub fn parse_check_text(line: &str) -> String {
 }
 
 /// Reads a check sentence and returns `{"tree": ...}`, or `{"errors": [{"column": ..., "message": ...}]}` when it doesn't read. `column` is `null` when the message names none. Throws a `TypeError` when `line` isn't a string.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = parseCheck)]
 pub fn parse_check(
     #[wasm_bindgen(unchecked_param_type = "string")] line: JsValue,
 ) -> Result<String, JsValue> {
@@ -55,7 +55,7 @@ pub fn parse_for_text(line: &str) -> String {
 }
 
 /// Reads a `for` line and returns `{"tree": ...}` or `{"errors": [...]}`, like `parse_check`. Throws a `TypeError` when `line` isn't a string.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = parseFor)]
 pub fn parse_for(
     #[wasm_bindgen(unchecked_param_type = "string")] line: JsValue,
 ) -> Result<String, JsValue> {
@@ -68,7 +68,7 @@ pub fn parse_from_text(line: &str) -> String {
 }
 
 /// Reads a `from` line and returns `{"tree": ...}` or `{"errors": [...]}`, like `parse_check`. Throws a `TypeError` when `line` isn't a string.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = parseFrom)]
 pub fn parse_from(
     #[wasm_bindgen(unchecked_param_type = "string")] line: JsValue,
 ) -> Result<String, JsValue> {
@@ -81,7 +81,7 @@ pub fn parse_path_text(line: &str) -> String {
 }
 
 /// Reads a path and returns `{"tree": ...}` or `{"errors": [...]}`, like `parse_check`. Throws a `TypeError` when `line` isn't a string.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = parsePath)]
 pub fn parse_path(
     #[wasm_bindgen(unchecked_param_type = "string")] line: JsValue,
 ) -> Result<String, JsValue> {
@@ -138,7 +138,7 @@ pub fn print_from_text(tree: &str, aliases: &str, parents: &str) -> Result<Strin
 }
 
 /// Lists what is written wrong in a check's tree, as `{"problems": [...]}`. Throws a `TypeError` when an argument isn't a string, and an `Error` when the tree or the aliases aren't valid JSON.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = checkProblems)]
 pub fn check_problems(
     #[wasm_bindgen(unchecked_param_type = "string")] tree: JsValue,
     #[wasm_bindgen(unchecked_param_type = "string")] aliases: JsValue,
@@ -149,7 +149,7 @@ pub fn check_problems(
 }
 
 /// Lists what is written wrong in a `for` line's tree, as `{"problems": [...]}`. Throws a `TypeError` when an argument isn't a string, and an `Error` when the tree or the aliases aren't valid JSON.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = forProblems)]
 pub fn for_problems(
     #[wasm_bindgen(unchecked_param_type = "string")] tree: JsValue,
     #[wasm_bindgen(unchecked_param_type = "string")] aliases: JsValue,
@@ -160,7 +160,7 @@ pub fn for_problems(
 }
 
 /// Lists what is written wrong in a `from` line's tree, as `{"problems": [...]}`. Throws a `TypeError` when an argument isn't a string, and an `Error` when the tree isn't valid JSON.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = fromProblems)]
 pub fn from_problems(
     #[wasm_bindgen(unchecked_param_type = "string")] tree: JsValue,
 ) -> Result<String, JsValue> {
@@ -169,7 +169,7 @@ pub fn from_problems(
 }
 
 /// Writes a check's tree back as a sentence. Throws a `TypeError` when an argument isn't a string, and an `Error` when the tree or the aliases aren't valid JSON.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = printCheck)]
 pub fn print_check(
     #[wasm_bindgen(unchecked_param_type = "string")] tree: JsValue,
     #[wasm_bindgen(unchecked_param_type = "string")] aliases: JsValue,
@@ -180,7 +180,7 @@ pub fn print_check(
 }
 
 /// Writes a `for` line's tree back as a line. Throws a `TypeError` when an argument isn't a string, and an `Error` when the tree or the aliases aren't valid JSON.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = printFor)]
 pub fn print_for(
     #[wasm_bindgen(unchecked_param_type = "string")] tree: JsValue,
     #[wasm_bindgen(unchecked_param_type = "string")] aliases: JsValue,
@@ -191,7 +191,7 @@ pub fn print_for(
 }
 
 /// Writes a `from` line's tree back as a line. Throws a `TypeError` when an argument isn't a string, and an `Error` when the tree, the aliases or the parents aren't valid JSON.
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = printFrom)]
 pub fn print_from(
     #[wasm_bindgen(unchecked_param_type = "string")] tree: JsValue,
     #[wasm_bindgen(unchecked_param_type = "string")] aliases: JsValue,

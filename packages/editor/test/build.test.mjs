@@ -112,7 +112,7 @@ test("the page holds the sentences Wasm and it reads a sentence", async () => {
   assert.deepEqual(bytes, readFileSync(join(pkgDir, "ergo_policy_sentences_wasm_bg.wasm")));
   const glue = await import("../../../engines/rust/sentences-wasm/pkg/ergo_policy_sentences_wasm.js");
   glue.initSync({ module: bytes });
-  assert.equal(JSON.parse(glue.parse_check("approvals is at least 2")).tree.assertions.length, 1);
+  assert.equal(JSON.parse(glue.parseCheck("approvals is at least 2")).tree.assertions.length, 1);
 });
 
 test("the build says when the sentences Wasm is not built and where to build it", () => {

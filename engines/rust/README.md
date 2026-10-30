@@ -10,7 +10,7 @@ It has five crates. The first three, `ergo-policy-sentences`, `ergo-policy-engin
 - `ergo-policy-engine` (`engine/`) builds the report, and reads sentences with `ergo-policy-sentences`.
 - `ergo-policy-cli` (`cli/`) is the `ergo` command: it reads a policy, an input and params from JSON or YAML files and prints the report or the violations.
 - `ergo-policy-wasm` (`wasm/`) wraps the engine for a browser: one function, `report`, that takes the input, the policy and the params as JSON text and gives the report back as JSON text.
-- `ergo-policy-sentences-wasm` (`sentences-wasm/`) wraps `ergo-policy-sentences` for a browser: `parse_check`, `parse_for`, `parse_from` and `parse_path` give a tree or the syntax errors as JSON text, and there are functions for the problems and for printing a tree back.
+- `ergo-policy-sentences-wasm` (`sentences-wasm/`) wraps `ergo-policy-sentences` for a browser: `parseCheck`, `parseFor`, `parseFrom` and `parsePath` give a tree or the syntax errors as JSON text, and there are functions for the problems and for printing a tree back.
 
 ## The cases
 

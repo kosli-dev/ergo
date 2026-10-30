@@ -2,10 +2,10 @@ import { GRAMMAR_WORDS } from "./highlight.mjs";
 
 const WORDS = new Set([...GRAMMAR_WORDS, "any"]);
 
-const PARSE = { check: "parse_check", for: "parse_for", from: "parse_from" };
-const PROBLEMS = { check: "check_problems", for: "for_problems", from: "from_problems" };
+const PARSE = { check: "parseCheck", for: "parseFor", from: "parseFrom" };
+const PROBLEMS = { check: "checkProblems", for: "forProblems", from: "fromProblems" };
 
-/** Wraps the functions of the sentences Wasm (`parse_check`, `parse_for`, `parse_from`, `check_problems`, `for_problems`, `from_problems`) so callers get objects. Once a call throws, every later call gives `null`, because the module can't be trusted after that. */
+/** Wraps the functions of the sentences Wasm (`parseCheck`, `parseFor`, `parseFrom`, `checkProblems`, `forProblems`, `fromProblems`) so callers get objects. Once a call throws, every later call gives `null`, because the module can't be trusted after that. */
 export const makeParser = (pkg) => {
   let broken = false;
   const call = (name, ...args) => {
