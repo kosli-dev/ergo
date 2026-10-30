@@ -13109,6 +13109,422 @@
     ]
   },
   {
+    "description": "a grandchild subject whose parent isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.pulls",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "pr.commits",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object under a parent that is a string or null, with every ancestor under in",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.chain.levels"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a",
+                "pulls": [
+                  "x",
+                  null
+                ]
+              }
+            ]
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "a",
+                "pr": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "a",
+                "pr": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject with whose, under a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact.pulls whose state is \"open\"",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a string",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject with named by, under a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": "q"
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a string",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject with named by each of, under a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact.scans named by each of $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "q"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a string",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a child subject of a subject that narrows another, with a parent that isn't an object",
     "policy": {
       "ergo_spec": "v0.3-dev",

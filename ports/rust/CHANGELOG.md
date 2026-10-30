@@ -12,3 +12,4 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - `ergo-cli` is the `ergo` command, which prints the report or the violations from policy, input and params files in JSON or YAML.
 - `ergo-wasm` builds the report in a browser, from JSON text.
 - `ergo-sentences-wasm` reads check sentences in a browser, from and to JSON text.
+- A `for` item whose path goes on into a list item that isn't an object, `null` included, fails that item as `not_an_object`, as `every` and `some` do, where it failed as `unusable`.

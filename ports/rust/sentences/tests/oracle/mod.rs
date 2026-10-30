@@ -15,6 +15,15 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("parent whose n is 1", "parent whose n is 1"),
     ("every parent", "every parent"),
+    ("artifact named by $params.k", "artifact named by $params.k"),
+    (
+        "artifact.scans named by each of $params.k",
+        "artifact.scans named by each of $params.k",
+    ),
+    (
+        "artifact.pulls whose state is \"open\"",
+        "artifact.pulls whose state is \"open\"",
+    ),
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
