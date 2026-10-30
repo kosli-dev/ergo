@@ -212,12 +212,14 @@ impl Scope {
     }
 
     pub fn path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
-        self.read_path(path, true, true)
+        self.read_path(path, true, true, true)
     }
 
     pub fn counted_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
-        if self.item {
-            self.read_path(path, false, false)
+        if self.item && self.as_left {
+            self.read_path(path, false, false, false)
+        } else if self.item {
+            self.read_path(path, true, true, true)
         } else if self.as_left {
             self.left_path(path)
         } else {
@@ -246,15 +248,23 @@ impl Scope {
 
     pub fn left_path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
         if self.item {
-            self.read_path(path, false, false)
+            self.read_path(path, false, false, false)
         } else {
-            self.read_path(path, self.left_reads_parents, true)
+            self.read_path(path, self.left_reads_parents, true, self.left_reads_parents)
         }
     }
 
     pub fn in_item(&self) -> Scope {
         Scope {
             item: true,
+            ..self.clone()
+        }
+    }
+
+    pub fn in_tally_item(&self) -> Scope {
+        Scope {
+            item: true,
+            as_left: false,
             ..self.clone()
         }
     }
@@ -279,6 +289,7 @@ impl Scope {
         written: &s::Path,
         parents: bool,
         parts: bool,
+        aliases: bool,
     ) -> Result<path::Path, Vec<String>> {
         let mut problems = Vec::new();
         let mut steps = Vec::new();
@@ -301,7 +312,9 @@ impl Scope {
             s::Start::Params => (Start::Params, steps),
             s::Start::Input => (Start::Input, steps),
             s::Start::Unknown(name) => return Err(vec![format!("{UNKNOWN_NAME}{name}")]),
-            s::Start::Field { key, dot } => self.field_start(key, *dot, parents, parts, steps),
+            s::Start::Field { key, dot } => {
+                self.field_start(key, *dot, parents, parts, aliases, steps)
+            }
         };
         Ok(path::Path { start, steps })
     }
@@ -312,31 +325,30 @@ impl Scope {
         dot: bool,
         parents: bool,
         parts: bool,
+        aliases: bool,
         mut steps: Vec<Step>,
     ) -> (Start, Vec<Step>) {
         if !dot {
             if parts && let Some(part) = self.parts.get(key) {
                 return (part_start(key, self.base(), part), steps);
             }
-            if parents {
-                if let Some(found) = self.parents.get(key) {
-                    if let Some(Step::Key(next)) = steps.first()
-                        && let Some(part) = found.get(next)
-                    {
-                        let name = format!(
-                            "{}.{}",
-                            crate::name::key_text(key),
-                            crate::name::key_text(next)
-                        );
-                        let start = part_start(&name, Start::Alias(key.to_string()), part);
-                        steps.remove(0);
-                        return (start, steps);
-                    }
-                    return (Start::Alias(key.to_string()), steps);
+            if parents && let Some(found) = self.parents.get(key) {
+                if let Some(Step::Key(next)) = steps.first()
+                    && let Some(part) = found.get(next)
+                {
+                    let name = format!(
+                        "{}.{}",
+                        crate::name::key_text(key),
+                        crate::name::key_text(next)
+                    );
+                    let start = part_start(&name, Start::Alias(key.to_string()), part);
+                    steps.remove(0);
+                    return (start, steps);
                 }
-                if self.for_aliases.contains(key) {
-                    return (Start::Alias(key.to_string()), steps);
-                }
+                return (Start::Alias(key.to_string()), steps);
+            }
+            if aliases && self.for_aliases.contains(key) {
+                return (Start::Alias(key.to_string()), steps);
             }
         }
         steps.insert(0, Step::Key(key.to_string()));

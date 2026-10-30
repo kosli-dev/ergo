@@ -419,7 +419,9 @@ fn starts_at(path: &Path, hidden: &[&str]) -> bool {
 
 fn outer_ctx<'a>(ctx: &Ctx<'a>) -> Ctx<'a> {
     let mut outer = ctx.clone();
-    outer.aliases.insert(OUTER.to_string(), ctx.subject.clone());
+    if !outer.aliases.contains_key(OUTER) {
+        outer.aliases.insert(OUTER.to_string(), ctx.subject.clone());
+    }
     outer
 }
 
@@ -454,7 +456,7 @@ fn counted_entries(
             Err(_) => Value::Null,
         },
         locations: list.locations.clone(),
-        part: None,
+        part: list.part.clone(),
     }];
     entries.push(list);
     entries.extend(outside);
@@ -820,7 +822,7 @@ fn lower_counted(
             None
         }
     };
-    let item = scope.in_item();
+    let item = scope.in_tally_item();
     let mut whose = Vec::new();
     for condition in &derived.whose {
         match crate::lower::lower_tally_condition(condition, &item) {
@@ -2398,5 +2400,171 @@ mod tests {
             &[("art", parent)],
         );
         assert_eq!(named(&failed), [("art.q", &json!(null), &json!("/arts/0"))]);
+    }
+
+    fn verdict_in(
+        scope: &Scope,
+        sentence: &str,
+        input: &Value,
+        aliases: &[(&str, Located)],
+    ) -> Verdict {
+        let tree = s::parse_check(sentence).unwrap();
+        let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
+        let ctx = Ctx {
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input,
+            params: None,
+            aliases: aliases
+                .iter()
+                .map(|(name, at)| (name.to_string(), at.clone()))
+                .collect(),
+        };
+        crate::ops::run(&check, &ctx)
+    }
+
+    fn part_x() -> Scope {
+        Scope::new().with_part(
+            "x",
+            crate::lower::PartDef {
+                steps: vec![Step::Key("p".into())],
+                id: None,
+            },
+        )
+    }
+
+    fn rows_with_own_x() -> Value {
+        let item = |n: u64, v: u64| json!({"n": n, "v": v, "x": {"z": [1, 1, 1]}});
+        json!({"things": [{"id": "t", "p": {"z": [1]}, "xs": [item(1, 1), item(1, 1), item(3, 5)]}]})
+    }
+
+    #[test]
+    fn a_count_on_the_right_of_a_whose_reads_the_part_and_not_the_items_field_of_the_same_name() {
+        let input = rows_with_own_x();
+        for (sentence, cause) in [
+            ("every xs.v whose n is count of x.z is 1", Cause::Satisfied),
+            (
+                "every xs.v whose n is at most sum of x.z is 1",
+                Cause::Satisfied,
+            ),
+            ("some xs.v whose n is count of x.z is 5", Cause::Value),
+            ("count of xs whose n is count of x.z is 2", Cause::Satisfied),
+            ("sum of xs.v whose n is count of x.z is 2", Cause::Satisfied),
+        ] {
+            assert_eq!(
+                verdict_in(&part_x(), sentence, &input, &[]).cause,
+                cause,
+                "{sentence}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_count_on_the_left_of_a_whose_and_one_after_a_dot_read_the_items_field_when_a_part_has_the_name()
+     {
+        let input = rows_with_own_x();
+        for (sentence, cause) in [
+            ("count of xs whose count of x.z is 3 is 3", Cause::Satisfied),
+            ("every xs.v whose n is count of .x.z is 1", Cause::Value),
+            (
+                "count of xs whose n is count of .x.z is 1",
+                Cause::Satisfied,
+            ),
+        ] {
+            assert_eq!(
+                verdict_in(&part_x(), sentence, &input, &[]).cause,
+                cause,
+                "{sentence}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_part_on_the_right_of_a_whose_that_is_missing_or_null_or_not_a_list_fails_closed() {
+        for (part, cause) in [
+            (None, Cause::Absent),
+            (Some(json!(null)), Cause::Null),
+            (Some(json!({"z": "abc"})), Cause::Unusable),
+            (Some(json!({"z": {"k": 1}})), Cause::Unusable),
+        ] {
+            let mut input = rows_with_own_x();
+            let thing = input["things"][0].as_object_mut().unwrap();
+            match part {
+                Some(value) => thing.insert("p".into(), value),
+                None => thing.remove("p"),
+            };
+            for sentence in [
+                "every xs.v whose n is count of x.z is 1",
+                "count of xs whose n is count of x.z is 2",
+            ] {
+                assert_eq!(
+                    verdict_in(&part_x(), sentence, &input, &[]).cause,
+                    cause,
+                    "{sentence}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_count_on_the_right_of_a_whose_reads_a_for_alias_and_not_the_items_field_of_the_same_name()
+    {
+        let input = json!({"things": [{"id": "t", "groups": [[1, 1]], "rows": [
+            {"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]},
+            {"n": 5, "v": 9, "g": [5, 5, 5, 5, 5]},
+        ]}]});
+        let group = Located {
+            value: &input["things"][0]["groups"][0],
+            location: Location::input_root()
+                .key("things")
+                .index(0)
+                .key("groups")
+                .index(0),
+        };
+        let scope = Scope::new().with_for_alias("g");
+        for (sentence, cause) in [
+            ("every rows.v whose n is count of g is 1", Cause::Satisfied),
+            ("some rows.v whose n is count of g is 9", Cause::Value),
+            ("count of rows whose n is count of g is 1", Cause::Satisfied),
+            ("sum of rows.v whose n is count of g is 1", Cause::Satisfied),
+            ("count of rows whose count of g is 5 is 2", Cause::Satisfied),
+            ("every rows.v whose n is count of .g is 1", Cause::Value),
+        ] {
+            assert_eq!(
+                verdict_in(&scope, sentence, &input, &[("g", group.clone())]).cause,
+                cause,
+                "{sentence}"
+            );
+        }
+    }
+
+    fn first_entry_part(scope: &Scope, sentence: &str) -> Value {
+        let input = json!({"things": [{"id": "t", "items": [{"w": 1}, {"w": 2}], "pa": {"w": 2, "items": [{"w": 2}]}}]});
+        verdict_in(scope, sentence, &input, &[]).inputs[0]
+            .to_json()
+            .get("part")
+            .cloned()
+            .unwrap_or(Value::Null)
+    }
+
+    #[test]
+    fn a_count_carries_a_part_tag_only_when_its_list_is_read_from_the_part() {
+        let scope = Scope::new().with_part(
+            "pa",
+            crate::lower::PartDef {
+                steps: vec![Step::Key("pa".into())],
+                id: None,
+            },
+        );
+        assert_eq!(
+            first_entry_part(&scope, "count of items whose w is pa.w is 1"),
+            Value::Null
+        );
+        assert_eq!(
+            first_entry_part(&scope, "count of pa.items whose w is pa.w is 1"),
+            json!({"name": "pa", "id": null})
+        );
     }
 }

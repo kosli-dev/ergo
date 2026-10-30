@@ -1055,6 +1055,7 @@ impl For {
         let mut inputs = Vec::new();
         let mut paths: Vec<&Path> = Vec::new();
         let mut in_walk: Vec<*const Path> = Vec::new();
+        let mut in_whose: Vec<*const Path> = Vec::new();
         for sentence in &self.sentences {
             let (found, whose) = match &sentence.check {
                 Check::Tally(tally) => tally_paths(tally, &hidden),
@@ -1064,6 +1065,7 @@ impl For {
                 in_walk.extend(found.iter().map(|path| std::ptr::from_ref(*path)));
             }
             in_walk.extend(whose.iter().map(|path| std::ptr::from_ref(*path)));
+            in_whose.extend(whose.iter().map(|path| std::ptr::from_ref(*path)));
             paths.extend(found);
             paths.extend(whose);
         }
@@ -1090,6 +1092,9 @@ impl For {
             match own {
                 Some((_, if_any)) if !hides(path) && walk::cut_at(path, &hidden).is_none() => {
                     inputs.push(self.list_entry(path, *if_any, ctx));
+                }
+                _ if in_whose.contains(&std::ptr::from_ref(path)) => {
+                    inputs.extend(walk::path_inputs(path, &outer_ctx(ctx), &hidden));
                 }
                 _ => inputs.extend(walk::path_inputs(path, ctx, &hidden)),
             }
@@ -1632,6 +1637,38 @@ mod tests {
             .unwrap();
         assert!(assertions[0].get("inputs").is_some());
         assert!(assertions[0].get("items").is_none());
+    }
+
+    #[test]
+    fn a_failed_count_whose_whose_reads_a_part_lists_the_parts_value_with_its_location() {
+        let policy = json!({
+            "ergo_spec": "v0.3-dev",
+            "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}},
+            "requirements": {"r": {"subject": "thing", "checks": {"c": {
+                "for": "every groups as g",
+                "assert": "count of items whose w is pa.w is 5"
+            }}}}
+        });
+        let input = json!({"things": [{"id": "t", "groups": [1], "items": [{"w": 1}, {"w": 2}], "meta": {"w": 2}}]});
+        let report = crate::report(&input, &policy, &json!({}));
+        let found = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == "c")
+            .unwrap();
+        let failed = &found["failed_items"][0]["failed_assertions"][0]["inputs"];
+        for inputs in [failed, &found["inputs"]] {
+            let part = inputs
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|i| i["name"] == "pa.w")
+                .unwrap();
+            assert_eq!(part["value"], json!(2));
+            assert_eq!(part["locations"], json!(["/things/0/meta/w"]));
+            assert_eq!(part["part"], json!({"id": null, "name": "pa"}));
+        }
     }
 
     #[test]
