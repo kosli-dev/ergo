@@ -14004,6 +14004,979 @@
     ]
   },
   {
+    "cases": [
+      {
+        "description": "lists the alias first, then what the whose reads",
+        "input": {
+          "k": 100,
+          "q": 1,
+          "things": [
+            {
+              "id": "t1",
+              "m": 3,
+              "rows": [
+                {
+                  "n": 1,
+                  "z": 2
+                }
+              ],
+              "xs": [
+                {
+                  "v": 5,
+                  "w": 7
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "every rows.n whose z is at least $input.q is at least x.v",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0/v"
+                        ],
+                        "name": "x.v",
+                        "value": 5
+                      },
+                      {
+                        "locations": [
+                          "/q"
+                        ],
+                        "name": "$input.q",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rows/0/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 5,
+                  "w": 7
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/q"
+                ],
+                "name": "$input.q",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/rows/0/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 5,
+                    "w": 7
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "rules": ["for.failure_inputs", "for.inputs", "for.failed_items", "for.try"]
+      }
+    ],
+    "description": "a walk on a for line whose whose reads $input after the item's alias",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "every rows.n whose z is at least $input.q is at least x.v",
+              "for": "every xs as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "lists the alias first, then what the whose reads",
+        "input": {
+          "k": 100,
+          "q": 1,
+          "things": [
+            {
+              "id": "t1",
+              "m": 3,
+              "rows": [
+                {
+                  "n": 1,
+                  "z": 2
+                }
+              ],
+              "xs": [
+                {
+                  "v": 5,
+                  "w": 7
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n whose z is at most $input.q is at least x.v",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0/v"
+                        ],
+                        "name": "x.v",
+                        "value": 5
+                      },
+                      {
+                        "locations": [
+                          "/q"
+                        ],
+                        "name": "$input.q",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rows/0/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 5,
+                  "w": 7
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/q"
+                ],
+                "name": "$input.q",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/rows/0/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 5,
+                    "w": 7
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "rules": ["for.failure_inputs", "for.inputs", "for.failed_items", "for.try"]
+      }
+    ],
+    "description": "a some walk on a for line whose whose reads $input",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "some rows.n whose z is at most $input.q is at least x.v",
+              "for": "every xs as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "lists the alias first, then $input",
+        "input": {
+          "k": 100,
+          "q": 1,
+          "things": [
+            {
+              "id": "t1",
+              "m": 3,
+              "rows": [
+                {
+                  "n": 1,
+                  "z": 2
+                }
+              ],
+              "xs": [
+                {
+                  "v": 5,
+                  "w": 7
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "every rows.n whose z is at least x.w is at least $input.k",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0/w"
+                        ],
+                        "name": "x.w",
+                        "value": 7
+                      },
+                      {
+                        "locations": [
+                          "/k"
+                        ],
+                        "name": "$input.k",
+                        "value": 100
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rows/0/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 5,
+                  "w": 7
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/k"
+                ],
+                "name": "$input.k",
+                "value": 100
+              },
+              {
+                "locations": [
+                  "/things/0/rows/0/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 5,
+                    "w": 7
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "rules": ["for.failure_inputs", "for.inputs", "for.failed_items", "for.try"]
+      }
+    ],
+    "description": "a walk on a for line whose assertion reads $input and whose whose reads the alias",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "every rows.n whose z is at least x.w is at least $input.k",
+              "for": "every xs as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "lists the alias first, then what the whose reads",
+        "input": {
+          "k": 100,
+          "q": 1,
+          "things": [
+            {
+              "id": "t1",
+              "m": 3,
+              "rows": [
+                {
+                  "n": 1,
+                  "z": 2
+                }
+              ],
+              "xs": [
+                {
+                  "v": 5,
+                  "w": 7
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "every rows.n whose $input.q is at least z is at least x.v",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0/v"
+                        ],
+                        "name": "x.v",
+                        "value": 5
+                      },
+                      {
+                        "locations": [
+                          "/q"
+                        ],
+                        "name": "$input.q",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/things/0/rows/0/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 5,
+                  "w": 7
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/q"
+                ],
+                "name": "$input.q",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/rows/0/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 5,
+                    "w": 7
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "rules": ["for.failure_inputs", "for.inputs", "for.failed_items", "for.try"]
+      }
+    ],
+    "description": "a walk on a for line whose whose reads $input on its left",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "every rows.n whose $input.q is at least z is at least x.v",
+              "for": "every xs as x"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "lists the alias first in the inputs of each second item",
+        "input": {
+          "q": 1,
+          "things": [
+            {
+              "id": "t1",
+              "xs": [
+                {
+                  "v": 5,
+                  "ys": [
+                    {
+                      "w": 1,
+                      "zz": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "every y.w whose zz is at least $input.q is at least x.v",
+                    "cause": "unusable",
+                    "items": [
+                      {
+                        "cause": "unusable",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/xs/0/v"
+                            ],
+                            "name": "x.v",
+                            "value": 5
+                          },
+                          {
+                            "locations": [],
+                            "name": "y.w",
+                            "value": []
+                          },
+                          {
+                            "locations": [
+                              "/q"
+                            ],
+                            "name": "$input.q",
+                            "value": 1
+                          }
+                        ],
+                        "item": "item 1 of x.ys"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 5,
+                  "ys": [
+                    {
+                      "w": 1,
+                      "zz": 2
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/q"
+                ],
+                "name": "$input.q",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0/ys/0"
+                ],
+                "name": "x.ys[]",
+                "value": [
+                  {
+                    "w": 1,
+                    "zz": 2
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 5,
+                    "ys": [
+                      {
+                        "w": 1,
+                        "zz": 2
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "rules": ["for.failure_inputs", "for.inputs", "for.failed_items", "for.try", "for.second_items"]
+      }
+    ],
+    "description": "a walk over the second item of a for line whose whose reads $input",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "every y.w whose zz is at least $input.q is at least x.v",
+              "for": "every xs as x, every x.ys as y"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "lists the alias first, then the parent's field",
+        "input": {
+          "ts": [
+            {
+              "id": "t1",
+              "kids": [
+                {
+                  "id": "k1",
+                  "rows": [
+                    {
+                      "n": 1,
+                      "z": 2
+                    }
+                  ],
+                  "rs": [
+                    {
+                      "v": 5
+                    }
+                  ]
+                }
+              ],
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "every rows.n whose z is at least t.x is at least r.v",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/ts/0/kids/0/rs/0/v"
+                        ],
+                        "name": "r.v",
+                        "value": 5
+                      },
+                      {
+                        "locations": [
+                          "/ts/0/kids/0/rows/0/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/ts/0/x"
+                        ],
+                        "name": "t.x",
+                        "value": 1
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of rs",
+                "locations": [
+                  "/ts/0/kids/0/rs/0"
+                ],
+                "path": "item 1 of rs",
+                "value": {
+                  "v": 5
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/ts/0/kids/0/rows/0/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/kids/0/rs/0"
+                ],
+                "name": "rs[]",
+                "value": [
+                  {
+                    "v": 5
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/ts/0/x"
+                ],
+                "name": "t.x",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "k1",
+              "in": {
+                "t": "t1"
+              },
+              "type": "kid"
+            }
+          }
+        ],
+        "rules": ["for.failure_inputs", "for.inputs", "for.failed_items", "for.try", "subjects.chain"]
+      }
+    ],
+    "description": "a walk on a for line of a child subject whose whose reads the parent",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "requirements": {
+        "s": {
+          "checks": {
+            "c": {
+              "assert": "every rows.n whose z is at least t.x is at least r.v",
+              "for": "every rs as r"
+            }
+          },
+          "subject": "kid"
+        }
+      },
+      "subjects": {
+        "kid": {
+          "from": "t.kids",
+          "identified_by": "id"
+        },
+        "t": {
+          "from": "ts",
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "description": "a walk on a for line whose path is named with a character that sorts before $",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as x",
+              "assert": "every \"#rows\".n is at least x.v"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the alias first, then the walked path, with no whose",
+        "rules": [
+          "for.failure_inputs",
+          "for.inputs",
+          "for.failed_items",
+          "for.try"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "#rows": [
+                {
+                  "n": 1,
+                  "z": 2
+                }
+              ],
+              "xs": [
+                {
+                  "v": 5,
+                  "w": 7
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "every \"#rows\".n is at least x.v",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0/v"
+                        ],
+                        "name": "x.v",
+                        "value": 5
+                      },
+                      {
+                        "locations": [
+                          "/things/0/#rows/0/n"
+                        ],
+                        "name": "\"#rows\"[].n",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 5,
+                  "w": 7
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/#rows/0/n"
+                ],
+                "name": "\"#rows\"[].n",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 5,
+                    "w": 7
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a for item picking the first of a list whose condition reads the first alias",
     "policy": {
       "ergo_spec": "v0.3-dev",
