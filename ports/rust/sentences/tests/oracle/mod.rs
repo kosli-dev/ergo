@@ -3,9 +3,6 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
-    ("\"$x\".pa.items", "\"$x\".pa.items"),
-    ("meta", "meta"),
-    ("\"$x\".items", "\"$x\".items"),
     (".artifact.p[0]", "item 1 of artifact.p"),
     (
         ".artifact named by each of $params.k",
@@ -69,6 +66,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "\"$s\" named by $params.k named by kk whose $input.i named by $params.k._k is equal to -2.50",
         "\"$s\" named by $params.k named by kk whose $input.i named by $params.k._k is -2.5",
     ),
+    ("\"$x\".pa.items", "\"$x\".pa.items"),
+    ("\"$x\".items", "\"$x\".items"),
     (
         "\"$s\" whose .\"a.b\" is not empty",
         "\"$s\" whose \"a.b\" is not empty",
@@ -722,6 +721,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "lockfile whose status is \"COMPLETE\"",
     ),
     ("m whose id exists", "m whose id exists"),
+    ("meta", "meta"),
     ("mid.leaves", "mid.leaves"),
     (
         "modules whose every files.path matches \"^docs/\"",
@@ -2521,8 +2521,6 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
-    ("meta", "meta"),
-    ("n", "n"),
     ("\tid\n", "id"),
     ("\nmid\t", "mid"),
     ("\u{3000}k\n", "k"),
@@ -2570,7 +2568,9 @@ pub const PATH_OK: &[(&str, &str)] = &[
         "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10",
     ),
     ("meta.id", "meta.id"),
+    ("meta", "meta"),
     ("name", "name"),
+    ("n", "n"),
     ("ps", "ps"),
     ("pull_requests.reviews", "pull_requests.reviews"),
     ("reviews", "reviews"),

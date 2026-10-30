@@ -1,9 +1,25 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
-    ("n exists", "n exists", &[], &[]),
-    ("q.n is 1", "q.n is 1", &[], &[]),
+    (
+        "count of items.x.y whose k is \"a\" is 1",
+        "count of items.x.y whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of items.x whose k is \"a\" is 1",
+        "count of items.x whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
     (
         "sum of items.x whose k is \"a\" is 1",
         "sum of items.x whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of items.x.y whose k is \"a\" is 1",
+        "sum of items.x.y whose k is \"a\" is 1",
         &[],
         &[],
     ),
@@ -47,6 +63,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("z matches '^\\s+$'", "z matches '^\\s+$'", &[], &[]),
     ("p.z is 1", "p.z is 1", &[], &[]),
     ("q.w is 2", "q.w is 2", &[], &[]),
+    ("q.n is 1", "q.n is 1", &[], &[]),
     ("\tx is 1\n", "x is 1", &[], &[]),
     ("x is 1\n", "x is 1", &[], &[]),
     ("\n\tx is 1", "x is 1", &[], &[]),
@@ -2272,6 +2289,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("n exists", "n exists", &[], &[]),
     (
         "n is at most $input.limits.high",
         "n is at most $input.limits.high",
@@ -5558,24 +5576,6 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
-    (
-        "every xs as p, first of ys as q",
-        "every xs as p, first of ys as q",
-        &[],
-        &[],
-    ),
-    (
-        "every xs as p, last of ys sorted by n as q",
-        "every xs as p, last of ys sorted by n as q",
-        &[],
-        &[],
-    ),
-    (
-        "some xs as p, first of ys as q",
-        "some xs as p, first of ys as q",
-        &[],
-        &[],
-    ),
     ("\tevery xs as x\n", "every xs as x", &[], &[]),
     ("  every items as i", "every items as i", &[], &[]),
     ("every  items  as  i", "every items as i", &[], &[]),
@@ -5949,6 +5949,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("every xs as kid", "every xs as kid", &[], &[]),
     ("every xs as other", "every xs as other", &[], &[]),
     ("every xs as part", "every xs as part", &[], &[]),
+    (
+        "every xs as p, first of ys as q",
+        "every xs as p, first of ys as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, last of ys sorted by n as q",
+        "every xs as p, last of ys sorted by n as q",
+        &[],
+        &[],
+    ),
     ("every xs as pull", "every xs as pull", &[], &[]),
     ("every xs as x", "every xs as x", &[], &[]),
     (
@@ -6291,6 +6303,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("some x as pr", "some x as pr", &[], &[]),
+    (
+        "some xs as p, first of ys as q",
+        "some xs as p, first of ys as q",
+        &[],
+        &[],
+    ),
     (
         "some x named by $params.\"x y\"._k as k1",
         "some x named by $params.\"x y\"._k as k1",
