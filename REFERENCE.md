@@ -1189,7 +1189,7 @@ picks `a1`, the commit with the latest `timestamp`, wherever it is in the list, 
 - When another item has the same value as the one picked, nothing is picked and the check fails as `ambiguous`, listing the items that tie. With both commits at `1760000200` above, `failed_items` holds `item 1 of commits` and `item 2 of commits`, each with the `timestamp` as `value`. A tie elsewhere in the list doesn't matter.
 - A position past the end of the list, or an empty list, fails as `absent`.
 - `sorted by` reads a field of the item, so it can't start with `$params` or `$input`. A field with the same name as a name from the `for` line needs a dot in front, `sorted by .c`. It can't go after `every` or `some`, and `, if any,` can't go with a position.
-- A picked second item can read the first item's name in its `whose`, and is picked again for each item of the first list: `for: every xs as p, first of ys whose k is p.k as q` gives each `p` the first `y` with the same `k`. `inputs` lists each item picked, like `item 2 of ys`.
+- A picked second item can read the first item's name in its `whose`, and is picked again for each item of the first list: `for: every xs as p, first of ys whose k is p.k as q` gives each `p` the first `y` with the same `k`. `inputs` lists each item picked, like `item 2 of ys`. A first item for which nothing is picked isn't listed in `failed_items`, and a `ys` that can't be walked is listed once.
 - A field of the picked item is read through its name, `last_commit.author_username`. In a sentence, `last of commits.author_username` would be the last of a list at `commits.author_username`.
 
 `count of`, `sum of` and `plus` work out a number to compare. With this input:

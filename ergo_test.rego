@@ -10323,9 +10323,40 @@ test_a_second_for_item_picks_for_each_first_item_when_its_whose_reads_the_first_
 	_pick_reads_first_cause("item 2 of ys whose k is p.k", [{"k": 1}], [{"k": 1, "n": 5}, {"k": 1, "n": 1}]) == "satisfied"
 }
 
-test_a_second_for_item_whose_whose_reads_the_first_alias_fails_when_nothing_matches if {
+test_a_second_for_item_picking_with_a_whose_that_reads_the_first_alias_fails_when_nothing_matches if {
 	_pick_reads_first_cause("first of ys whose k is p.k", [{"k": 3}], [{"k": 1, "n": 1}]) == "absent"
 	_pick_reads_first_cause("first of ys whose k is p.k", [{"j": 1}], [{"k": 1, "n": 1}]) == "absent"
 	_pick_reads_first_cause("first of ys whose k is p.k", [null], [{"k": 1, "n": 1}]) != "satisfied"
 	_pick_reads_first_cause("last of ys whose k is p.k sorted by t", [{"k": 1}], [{"k": 1, "n": 1, "t": 1}, {"k": 1, "n": 1, "t": 1}]) == "ambiguous"
+}
+
+_pick_row(xs, ys, miss) := [r |
+	some r in ergo.report({"s": [object.union({"id": "a", "xs": xs}, {k: ys | not miss; k := "ys"})]}, {"ergo_spec": "v0.3-dev", "subjects": {"s": {"from": "s", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"for": "every xs as p, first of ys whose k is p.k as q", "assert": "q.n is 1"}}}}}, {}).results
+	r.check == "c"
+][0]
+
+test_a_second_for_item_that_picks_nothing_after_the_first_alias_lists_no_failed_item if {
+	row := _pick_row([{"k": 1}, {"k": 2}], [], false)
+	row.cause == "absent"
+	row.failed_items == []
+	row2 := _pick_row([{"k": 3}], [{"k": 1, "n": 1}], false)
+	row2.cause == "absent"
+	row2.failed_items == []
+}
+
+test_a_second_for_item_after_the_first_alias_lists_only_the_first_items_that_failed_their_check if {
+	row := _pick_row([{"k": 1}, {"k": 2}], [{"k": 1, "n": 2}], false)
+	[f.item | some f in row.failed_items] == ["item 1 of xs"]
+}
+
+test_a_second_for_item_after_the_first_alias_shows_its_list_when_the_first_list_is_empty if {
+	row := _pick_row([], [{"k": 1, "n": 1}], false)
+	[i.name | some i in row.inputs] == ["xs[]", "ys[]"]
+}
+
+test_a_second_list_that_cant_be_walked_is_listed_once_when_the_pick_reads_the_first_alias if {
+	row := _pick_row([{"k": 1}, {"k": 2}], [], true)
+	row.cause == "absent"
+	[f.item | some f in row.failed_items] == ["ys"]
+	not "failed_items" in object.keys(row.failed_items[0])
 }

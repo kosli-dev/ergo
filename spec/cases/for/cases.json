@@ -13894,5 +13894,640 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a second for item picking after the first alias lists nothing when it picks nothing",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of ys whose k is p.k as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "an empty second list fails as absent and lists no failed item",
+        "rules": ["sentence.for.pick", "for.pick", "for.inputs", "for.failed_items"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys[]",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a first item that matches nothing fails as absent and lists no failed item",
+        "rules": ["sentence.for.pick", "for.pick", "for.inputs", "for.failed_items"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 3
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 3
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "n": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a first item that fails its check is listed and one that matches nothing is not",
+        "rules": ["sentence.for.pick", "for.pick", "for.inputs", "for.failed_items"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "q.n is 1",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ys/0/n"
+                            ],
+                            "name": "q.n",
+                            "value": 2
+                          }
+                        ],
+                        "item": "item 1 of ys"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "item 1 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 2
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "n": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "an empty first list still shows the second list in inputs",
+        "rules": ["sentence.for.pick", "for.pick", "for.inputs", "for.failed_items"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/things/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "n": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second for item picking after the first alias, whose list can't be walked, lists that list once",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of ys whose k is p.k as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a missing second list is listed once, not under each first item",
+        "rules": ["for.shared_failures", "for.failed_items", "sentence.for.pick"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "ys",
+                "locations": [
+                  "/things/0"
+                ],
+                "path": "ys",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a null second list is listed once, not under each first item",
+        "rules": ["for.shared_failures", "for.failed_items", "sentence.for.pick"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "ys",
+                "locations": [
+                  "/things/0/ys"
+                ],
+                "path": "ys",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a second list that is text is listed once, not under each first item",
+        "rules": ["for.shared_failures", "for.failed_items", "sentence.for.pick"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": "zz"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "ys",
+                "locations": [
+                  "/things/0/ys"
+                ],
+                "path": "ys",
+                "value": "zz"
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second for item picking after the first alias, whose list can't be walked, still lists a first item that failed for another reason",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs whose k is 1 as p, first of ys whose k is p.k as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a first item its whose can't decide is listed beside the second list",
+        "rules": ["for.shared_failures", "for.failed_items", "sentence.for.pick"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "j": 1
+                },
+                {
+                  "k": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "j": 1
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "ys",
+                "locations": [
+                  "/things/0"
+                ],
+                "path": "ys",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "j": 1
+                  },
+                  {
+                    "k": 1
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
