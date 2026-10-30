@@ -13,7 +13,7 @@ git fetch --quiet --tags origin
 commit=$(git rev-parse origin/main)
 files=$(mktemp -d)
 trap 'rm -rf "$files"' EXIT
-git archive "$commit" ergo.rego CHANGELOG.md spec/CHANGELOG.md spec/policy/schema.json spec/report/schema.json | tar -x -C "$files"
+git archive "$commit" engines/rego/ergo.rego CHANGELOG.md spec/CHANGELOG.md spec/policy/schema.json spec/report/schema.json | tar -x -C "$files"
 
 fail() {
   echo "$1"
@@ -22,9 +22,9 @@ fail() {
 
 check_rego() {
   local version=$1 tag=rego-v$1
-  grep -qxF "version := \"$version-dev\"" "$files/ergo.rego" || fail "ergo.rego on main must say version := \"$version-dev\", and says $(grep -m 1 '^version := ' "$files/ergo.rego")"
-  if grep -q '^_spec := "v.*-dev"$' "$files/ergo.rego"; then
-    fail "ergo.rego on main says $(grep -m 1 '^_spec := ' "$files/ergo.rego"), a spec that isn't released. Release the spec first, or in this call: drop -dev from the spec in a pull request, then add its tag, like $tag spec-vX.Y"
+  grep -qxF "version := \"$version-dev\"" "$files/engines/rego/ergo.rego" || fail "ergo.rego on main must say version := \"$version-dev\", and says $(grep -m 1 '^version := ' "$files/engines/rego/ergo.rego")"
+  if grep -q '^_spec := "v.*-dev"$' "$files/engines/rego/ergo.rego"; then
+    fail "ergo.rego on main says $(grep -m 1 '^_spec := ' "$files/engines/rego/ergo.rego"), a spec that isn't released. Release the spec first, or in this call: drop -dev from the spec in a pull request, then add its tag, like $tag spec-vX.Y"
   fi
   grep -qxF "## $version" "$files/CHANGELOG.md" || fail "CHANGELOG.md on main has no \"## $version\" heading"
   notes=$(awk -v h="## $version" '$0 == h { on = 1; next } /^## / { on = 0 } on' "$files/CHANGELOG.md")
@@ -33,13 +33,13 @@ check_rego() {
 
 check_spec() {
   local version=$1 name
-  if grep -q '^_spec := "v.*-dev"$' "$files/ergo.rego"; then
-    fail "ergo.rego on main says $(grep -m 1 '^_spec := ' "$files/ergo.rego"), so spec-v$version can't be tagged. Drop -dev from the spec everywhere in a pull request first."
+  if grep -q '^_spec := "v.*-dev"$' "$files/engines/rego/ergo.rego"; then
+    fail "ergo.rego on main says $(grep -m 1 '^_spec := ' "$files/engines/rego/ergo.rego"), so spec-v$version can't be tagged. Drop -dev from the spec everywhere in a pull request first."
   fi
   for name in policy report; do
     grep -q "^ *\"\\\$id\": *\".*/spec/$version/$name.schema.json\"" "$files/spec/$name/schema.json" || fail "spec/$name/schema.json has a \$id that doesn't end in /spec/$version/$name.schema.json"
   done
-  grep -qxF "_spec := \"v$version\"" "$files/ergo.rego" || fail "ergo.rego on main must say _spec := \"v$version\", and says $(grep -m 1 '^_spec := ' "$files/ergo.rego")"
+  grep -qxF "_spec := \"v$version\"" "$files/engines/rego/ergo.rego" || fail "ergo.rego on main must say _spec := \"v$version\", and says $(grep -m 1 '^_spec := ' "$files/engines/rego/ergo.rego")"
   grep -qxF "## $version" "$files/spec/CHANGELOG.md" || fail "spec/CHANGELOG.md on main has no \"## $version\" heading"
 }
 

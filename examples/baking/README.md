@@ -39,7 +39,7 @@ Its allergens are the string `"nuts"`, not a list, so `has` never finds `"nuts"`
 ## Ergo
 
 ```sh
-opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.report'
+opa eval -d engines/rego/ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.report'
 ```
 
 The rules are in `ergo/baking.yaml`, with each rule's wording as its `description`. Ergo checks every batch and records what it read. Only batch 001 passes, and the violations say why each of the others failed:
@@ -57,7 +57,7 @@ To get those rows yourself, ask for `data.baking.violations` instead of the repo
 The report has everything needed to show the workings clause by clause. `ergo/workings.rego` builds that table from the report, with one row per check for each batch, and `ergo/baking.rego` exposes it as `workings_table`:
 
 ```sh
-opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.workings_table'
+opa eval -d engines/rego/ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.workings_table'
 ```
 
 Each row has the clause's wording, the check, what it read, the expression and the result. Here is batch 004 as a table:
@@ -72,4 +72,4 @@ Each row has the clause's wording, the check, what it read, the expression and t
 
 ## Tests
 
-`plain-rego/baking_test.rego` and `ergo/baking_test.rego` pin what each version reports for these batches, so `opa test . --ignore .github --ignore packages --ignore ports` from the repo root checks them along with Ergo's own tests.
+`plain-rego/baking_test.rego` and `ergo/baking_test.rego` pin what each version reports for these batches, so `opa test engines/rego spec:spec examples:examples` from the repo root checks them along with Ergo's own tests.

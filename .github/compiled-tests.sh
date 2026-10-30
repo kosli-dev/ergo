@@ -7,11 +7,11 @@ trap 'rm -rf "$dir"' EXIT
 git ls-files | grep -v -E '^(\.github|site|packages)/' | tar -cf - -T - | tar -xf - -C "$dir"
 
 plain='} else := _run(doc, policy, _read(policy), params)'
-if [ "$(grep -cxF "$plain" "$dir/ergo.rego")" -ne 1 ]; then
+if [ "$(grep -cxF "$plain" "$dir/engines/rego/ergo.rego")" -ne 1 ]; then
   echo "ergo.rego no longer has the line this script changes: $plain"
   exit 1
 fi
-python3 - "$dir/ergo.rego" "$plain" <<'PY'
+python3 - "$dir/engines/rego/ergo.rego" "$plain" <<'PY'
 import sys
 path, plain = sys.argv[1], sys.argv[2]
 text = open(path).read()
@@ -20,4 +20,4 @@ open(path, "w").write(text.replace(plain + "\n", compiled))
 PY
 
 cd "$dir"
-opa test . --ignore packages --ignore ports --timeout 120s -r "$pattern"
+opa test engines/rego spec:spec examples:examples --timeout 120s -r "$pattern"

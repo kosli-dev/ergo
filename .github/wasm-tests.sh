@@ -9,7 +9,7 @@ total=$(wc -l <<<"$tests" | tr -d ' ')
 ran=0
 while read -r part; do
   pattern=$(tr ' ' '\n' <<<"$part" | .github/test-pattern.sh)
-  out=$("${opa[@]}" test . --ignore .github --ignore packages --ignore ports --target wasm --timeout 120s -r "$pattern") || { echo "$out"; exit 1; }
+  out=$("${opa[@]}" test engines/rego spec:spec examples:examples --target wasm --timeout 120s -r "$pattern") || { echo "$out"; exit 1; }
   echo "$out"
   ran=$((ran + $(sed -nE 's/^PASS: ([0-9]+)\/[0-9]+$/\1/p' <<<"$out")))
 done < <(xargs -n 100 <<<"$tests")

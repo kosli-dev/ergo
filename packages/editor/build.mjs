@@ -48,7 +48,7 @@ const buildWasm = () => {
   const dir = mkdtempSync(join(tmpdir(), "ergo-editor-"));
   try {
     mkdirSync(join(dir, "src"));
-    copyFileSync(join(root, "ergo.rego"), join(dir, "src", "ergo.rego"));
+    copyFileSync(join(root, "engines", "rego", "ergo.rego"), join(dir, "src", "ergo.rego"));
     writeFileSync(
       join(dir, "src", "editor.rego"),
       "package editor\n\nimport data.ergo\n\nreport := ergo.report(input.input, input.policy, input.params)\n",
@@ -61,24 +61,24 @@ const buildWasm = () => {
   }
 };
 
-const rustPkg = join(root, "ports", "rust", "wasm", "pkg");
+const rustPkg = join(root, "engines", "rust", "wasm", "pkg");
 
 const rustGlue = () => {
   const glue = join(rustPkg, "ergo_wasm.js");
   const bytes = join(rustPkg, "ergo_wasm_bg.wasm");
   if (!existsSync(glue) || !existsSync(bytes)) {
-    throw new Error(`The Rust Wasm isn't built: ${rustPkg} has no ergo_wasm.js and ergo_wasm_bg.wasm. Build it with the command under "Building for a browser" in ports/rust/README.md.`);
+    throw new Error(`The Rust Wasm isn't built: ${rustPkg} has no ergo_wasm.js and ergo_wasm_bg.wasm. Build it with the command under "Building for a browser" in engines/rust/README.md.`);
   }
   return { glue, bytes: readFileSync(bytes).toString("base64") };
 };
 
-const sentencesPkg = join(root, "ports", "rust", "sentences-wasm", "pkg");
+const sentencesPkg = join(root, "engines", "rust", "sentences-wasm", "pkg");
 
 export const sentencesGlue = (dir = sentencesPkg) => {
   const glue = join(dir, "ergo_sentences_wasm.js");
   const bytes = join(dir, "ergo_sentences_wasm_bg.wasm");
   if (!existsSync(glue) || !existsSync(bytes)) {
-    throw new Error(`The sentences Wasm isn't built: ${dir} has no ergo_sentences_wasm.js and ergo_sentences_wasm_bg.wasm. Build it with the command under "Building for a browser" in ports/rust/README.md.`);
+    throw new Error(`The sentences Wasm isn't built: ${dir} has no ergo_sentences_wasm.js and ergo_sentences_wasm_bg.wasm. Build it with the command under "Building for a browser" in engines/rust/README.md.`);
   }
   return { glue, bytes: readFileSync(bytes).toString("base64") };
 };

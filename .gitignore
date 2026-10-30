@@ -2,5 +2,5 @@
 .claude/settings.local.json
 dist/
 node_modules
-ports/rust/wasm/pkg/
-ports/rust/sentences-wasm/pkg/
+engines/rust/wasm/pkg/
+engines/rust/sentences-wasm/pkg/

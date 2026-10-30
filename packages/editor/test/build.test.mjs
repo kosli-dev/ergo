@@ -66,7 +66,7 @@ const runErgoText = async (inputText, policy, paramsText) => {
 let rust;
 const runRust = async (input, policy, params) => {
   if (!rust) {
-    const glue = await import("../../../ports/rust/wasm/pkg/ergo_wasm.js");
+    const glue = await import("../../../engines/rust/wasm/pkg/ergo_wasm.js");
     glue.initSync({ module: Buffer.from(/rustWasm: "([^"]+)"/.exec(html)[1], "base64") });
     rust = makeRustRunner(glue.report);
   }
@@ -87,11 +87,11 @@ test("the Wasm inside the page reads a number a JavaScript number can't hold as 
 
 test("the Rust Wasm inside the page reads a number a JavaScript number can't hold as written", async () => {
   const policy = {
-    ergo_spec: /^_spec := "(v[0-9.]+(?:-dev)?)"/m.exec(readFileSync(join(casesDir, "..", "..", "..", "ergo.rego"), "utf8"))[1],
+    ergo_spec: /^_spec := "(v[0-9.]+(?:-dev)?)"/m.exec(readFileSync(join(casesDir, "..", "..", "..", "engines", "rego", "ergo.rego"), "utf8"))[1],
     subjects: { item: { from: "items", identified_by: "id" } },
     requirements: { r: { subject: "item", checks: { exact: "n is 9007199254740993", cap: "n is at most $params.max" } } },
   };
-  const glue = await import("../../../ports/rust/wasm/pkg/ergo_wasm.js");
+  const glue = await import("../../../engines/rust/wasm/pkg/ergo_wasm.js");
   await runRust({}, policy, {});
   const text = glue.report('{"items": [{"id": "a", "n": 9007199254740993}]}', JSON.stringify(policy), '{"max": 9007199254740992}');
   assert.ok(text.includes("9007199254740993"));
@@ -101,22 +101,22 @@ test("the Rust Wasm inside the page reads a number a JavaScript number can't hol
 });
 
 test("the Rust Wasm inside the page throws a plain message for input that isn't JSON", async () => {
-  const glue = await import("../../../ports/rust/wasm/pkg/ergo_wasm.js");
+  const glue = await import("../../../engines/rust/wasm/pkg/ergo_wasm.js");
   await runRust({}, {}, {});
   assert.throws(() => glue.report("{", "{}", "{}"), /^Error: the input isn't valid JSON: /);
 });
 
 test("the page holds the sentences Wasm and it reads a sentence", async () => {
   const bytes = Buffer.from(/sentencesWasm: "([^"]+)"/.exec(html)[1], "base64");
-  const pkgDir = join(here, "..", "..", "..", "ports", "rust", "sentences-wasm", "pkg");
+  const pkgDir = join(here, "..", "..", "..", "engines", "rust", "sentences-wasm", "pkg");
   assert.deepEqual(bytes, readFileSync(join(pkgDir, "ergo_sentences_wasm_bg.wasm")));
-  const glue = await import("../../../ports/rust/sentences-wasm/pkg/ergo_sentences_wasm.js");
+  const glue = await import("../../../engines/rust/sentences-wasm/pkg/ergo_sentences_wasm.js");
   glue.initSync({ module: bytes });
   assert.equal(JSON.parse(glue.parse_check("approvals is at least 2")).tree.assertions.length, 1);
 });
 
 test("the build says when the sentences Wasm is not built and where to build it", () => {
-  assert.throws(() => sentencesGlue(join(here, "no-such-folder")), /The sentences Wasm isn't built: .*no-such-folder has no ergo_sentences_wasm\.js.*"Building for a browser" in ports\/rust\/README\.md/);
+  assert.throws(() => sentencesGlue(join(here, "no-such-folder")), /The sentences Wasm isn't built: .*no-such-folder has no ergo_sentences_wasm\.js.*"Building for a browser" in engines\/rust\/README\.md/);
   assert.equal(sentencesGlue().bytes.length > 1000, true);
 });
 

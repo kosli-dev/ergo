@@ -68,7 +68,7 @@ jobs:
           ergo_sha=$(gh api repos/kosli-dev/ergo/commits/main --jq .sha)
           short=${ergo_sha:0:7}
           echo "ergo=$short" >> "$GITHUB_OUTPUT"
-          ergo_blob=$(gh api "repos/kosli-dev/ergo/contents/ergo.rego?ref=$ergo_sha" --jq .sha)
+          ergo_blob=$(gh api "repos/kosli-dev/ergo/contents/engines/rego/ergo.rego?ref=$ergo_sha" --jq .sha)
 
           # Equal blob SHAs mean equal content, in any repo.
           base_blob=$(gh api "repos/$REPO/contents/$TARGET?ref=$base" --jq .sha)
@@ -96,7 +96,7 @@ jobs:
           fi
 
           # The contents API commits through GitHub, so an app token gets a signed commit.
-          content=$(gh api "repos/kosli-dev/ergo/contents/ergo.rego?ref=$ergo_sha" --jq '.content | gsub("\n"; "")')
+          content=$(gh api "repos/kosli-dev/ergo/contents/engines/rego/ergo.rego?ref=$ergo_sha" --jq '.content | gsub("\n"; "")')
           gh api -X PUT "repos/$REPO/contents/$TARGET" \
             -f branch="$branch" \
             -f sha="$parent_blob" \
@@ -108,7 +108,7 @@ jobs:
           title="Update ergo.rego to ergo $short"
           body="Copies \`ergo.rego\` from kosli-dev/ergo@$ergo_sha into \`$TARGET\`.
 
-          Changes in ergo: https://github.com/kosli-dev/ergo/commits/$ergo_sha/ergo.rego"
+          Changes in ergo: https://github.com/kosli-dev/ergo/commits/$ergo_sha/engines/rego/ergo.rego"
           if [ -n "$pr" ]; then
             gh pr edit "$pr" --title "$title" --body "$body"
             echo "change=refreshed" >> "$GITHUB_OUTPUT"

@@ -1,5 +1,4 @@
 # Deploys site/ to GitHub Pages once the test workflow passes on main.
-# Keys here must not overlap test.yml's: `opa check .` loads every YAML file as data.
 on:
   workflow_run:
     workflows: [test]
@@ -64,14 +63,14 @@ jobs:
         continue-on-error: true
         with:
           name: ergo-wasm-pkg
-          path: ports/rust/wasm/pkg
+          path: engines/rust/wasm/pkg
           run-id: ${{ steps.tests.outputs.run_id }}
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: ergo-sentences-wasm-pkg
-          path: ports/rust/sentences-wasm/pkg
+          path: engines/rust/sentences-wasm/pkg
           run-id: ${{ steps.tests.outputs.run_id }}
           github-token: ${{ github.token }}
       - uses: pnpm/action-setup@v6

@@ -4,18 +4,18 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 
 ## Files
 
-- `ergo.rego` is the whole library.
-- `ergo_test.rego` holds its tests.
+- `engines/rego/ergo.rego` is the whole library, and the Rego engine.
+- `engines/rego/ergo_test.rego` holds its tests.
 - `spec/` is the spec Ergo implements: what each check means as named rules, the syntax, JSON Schemas for a policy and a report, and cases that pin the rules down. `spec/README.md` explains it.
-- `spec_test.rego` runs every case in `spec/cases` against `ergo.rego`.
+- `engines/rego/spec_test.rego` runs every case in `spec/cases` against `ergo.rego`.
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
 - `CONTRIBUTING.md` tells people how to report bugs and send changes, and points them here for the rules.
-- `CHANGELOG.md` says what each release of `ergo.rego` changed. The spec has its own in `spec/CHANGELOG.md`, and the Rust engine in `ports/rust/CHANGELOG.md`. A change in what a check means goes in `spec/CHANGELOG.md`, and an engine's own fixes go in that engine's file.
+- `CHANGELOG.md` says what each release of `ergo.rego` changed. The spec has its own in `spec/CHANGELOG.md`, and the Rust engine in `engines/rust/CHANGELOG.md`. A change in what a check means goes in `spec/CHANGELOG.md`, and an engine's own fixes go in that engine's file.
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.
-- `ports/rust/` is a second engine, in Rust. It's experimental and in progress. It's a Cargo workspace with five crates: `ergo-sentences` reads sentences and nothing else, `ergo-engine` builds the report, `ergo-cli` is the `ergo` command that prints a report or the violations from JSON or YAML files, and `ergo-wasm` and `ergo-sentences-wasm` wrap them for a browser. Its tests run every case in `spec/cases`, and `ports/rust/known-failures.txt` lists the ones it still fails.
+- `engines/rust/` is a second engine, in Rust. It's experimental and in progress. It's a Cargo workspace with five crates: `ergo-sentences` reads sentences and nothing else, `ergo-engine` builds the report, `ergo-cli` is the `ergo` command that prints a report or the violations from JSON or YAML files, and `ergo-wasm` and `ergo-sentences-wasm` wrap them for a browser. Its tests run every case in `spec/cases`, and `engines/rust/known-failures.txt` lists the ones it still fails.
 - `packages/` holds Node tools that build on Ergo, in one pnpm workspace. Someone who only copies `ergo.rego` never needs them.
 - `packages/markdown/` compiles a policy written in Markdown into a policy object. It's an experiment, not published.
 - `packages/editor/` builds a web page for writing those Markdown policies: the source beside what the compiler read, the policy, the document, the YAML and a report from the Rego engine (`ergo.rego`) or the Rust engine, run in the page. It also reads each sentence with the Rust sentence parser, `ergo-sentences-wasm`, to underline what's written wrong, colour the words, say how a sentence reads and suggest what to type next.
@@ -25,13 +25,15 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 Run these before saying a change is done:
 
 ```sh
-opa check --strict . --ignore .github --ignore packages --ignore ports
-opa check --strict --schema .github/closed-input-schema.json ergo.rego
-opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > /tmp/ergo-deterministic.json && opa check --strict --capabilities /tmp/ergo-deterministic.json ergo.rego
-opa fmt --list .
-opa test . --ignore .github --ignore packages --ignore ports --timeout 120s
-opa eval --strict-builtin-errors --ignore .github --ignore packages --ignore ports -d . --format raw 'count(data) > 0'
-regal lint --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
+opa check --strict engines/rego spec:spec examples:examples
+opa check --strict --schema .github/closed-input-schema.json engines/rego/ergo.rego
+opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > /tmp/ergo-deterministic.json && opa check --strict --capabilities /tmp/ergo-deterministic.json engines/rego/ergo.rego
+opa fmt --list engines/rego examples engines/rust/sentences/tests/oracle
+opa test engines/rego spec:spec examples:examples --timeout 120s
+opa eval --strict-builtin-errors -d engines/rego -d spec:spec -d examples:examples --format raw 'count(data) > 0'
+regal lint --disable-all --enable-category bugs --disable redundant-existence-check engines/rego examples engines/rust/sentences/tests/oracle
+.github/rego-folders.sh
+.github/rego-folders_test.sh
 python3 spec/check_rules.py
 python3 spec/sentences_corpus.py --check
 python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonschema==4.26.0 abnf==2.9.0 && /tmp/ergo-venv/bin/python .github/spec-schemas.py
@@ -39,9 +41,9 @@ python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonsch
 /tmp/ergo-venv/bin/python spec/check_grammar.py --rust 'docker run --rm -i -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust cargo run --locked -q --release -p ergo-sentences --example read'
 ```
 
-Run them from the repo root. The last three lines use a virtual environment that holds `jsonschema` and `abnf`, and the last one the Docker image that [`ports/rust/README.md`](ports/rust/README.md) builds; it's outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
+Run them from the repo root. The last three lines use a virtual environment that holds `jsonschema` and `abnf`, and the last one the Docker image that [`engines/rust/README.md`](engines/rust/README.md) builds; it's outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
 
-`opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
+`opa fmt --list` should print nothing. If it prints file names, run `opa fmt -w` on them.
 
 The second `opa check` compiles `ergo.rego` the way a host does when it checks `input` against a closed JSON Schema, and should print nothing. If it fails with `undefined ref: input[...]`, Ergo reads something from `input` that the `METADATA` annotation above `package ergo` doesn't declare.
 
@@ -49,9 +51,9 @@ The third `opa check` compiles `ergo.rego` without the built-ins OPA marks as no
 
 The `opa eval` command runs every test again with `--strict-builtin-errors`, which turns a built-in given the wrong type into an error, and should print `true`. If it prints an error, check the value's type before the built-in on that line, so that Ergo gives the same report with or without the flag.
 
-The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml` because OPA would load that file as data.
+The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml`.
 
-OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, and so do the workspace's files under `packages`, and the Rust port's test data under `ports` isn't Rego's, so the checks ignore all three folders.
+Every OPA command here names the folders it loads, and none of them scans the repo, so the workflow files under `.github`, the workspace under `packages` and the Rust engine's test data under `engines/rust` are never loaded as data. OPA puts a JSON or YAML file at a data path that starts from the folder it was given, so `spec:spec` and `examples:examples` keep the cases at `data.spec` and the examples' inputs at `data.examples`, where the tests read them. `engines/rego` holds no data, so it needs no prefix. A new folder with Rego has to be added to these commands, to `.github/workflows/test.yml` and to `.github/rego-folders.sh`, which fails in CI when a tracked Rego file is in a folder no command loads.
 
 When you change anything under `packages/`, run these too, one at a time:
 
@@ -63,11 +65,11 @@ pnpm test
 pnpm -r bundle
 ```
 
-`pnpm test` fails when a line under `packages/markdown/src` isn't reached by a test. Its tests also run `ergo.report` with opa on every case in `packages/markdown/cases` that has an input. The editor's tests build the page, which compiles `ergo.rego` to Wasm with the `opa` on your PATH, and check that each sample gives the report its case expects. They also need the Rust engine built to Wasm in `ports/rust/wasm/pkg` and the sentence parser in `ports/rust/sentences-wasm/pkg`: see "Building for a browser" in `ports/rust/README.md`.
+`pnpm test` fails when a line under `packages/markdown/src` isn't reached by a test. Its tests also run `ergo.report` with opa on every case in `packages/markdown/cases` that has an input. The editor's tests build the page, which compiles `ergo.rego` to Wasm with the `opa` on your PATH, and check that each sample gives the report its case expects. They also need the Rust engine built to Wasm in `engines/rust/wasm/pkg` and the sentence parser in `engines/rust/sentences-wasm/pkg`: see "Building for a browser" in `engines/rust/README.md`.
 
-When you change `ports/rust/`, run its checks too. There's no need for Rust on your machine: `ports/rust/README.md` has the Docker command, which runs `cargo fmt --check`, Clippy with warnings as errors, the tests, and a Wasm build of `ergo-sentences`. Use `-j 4` and run one at a time, because a full build takes every core otherwise. The Rust version is pinned in `ports/rust/rust-toolchain.toml` and the `Dockerfile` next to it; change both together. CI runs the same checks in the `tests-rust` job.
+When you change `engines/rust/`, run its checks too. There's no need for Rust on your machine: `engines/rust/README.md` has the Docker command, which runs `cargo fmt --check`, Clippy with warnings as errors, the tests, and a Wasm build of `ergo-sentences`. Use `-j 4` and run one at a time, because a full build takes every core otherwise. The Rust version is pinned in `engines/rust/rust-toolchain.toml` and the `Dockerfile` next to it; change both together. CI runs the same checks in the `tests-rust` job.
 
-A change that only adds or changes spec cases can break those checks too, so run the whole `cargo test` for it. Rust runs every case, and the sentence oracle in `ports/rust/sentences/tests/oracle` needs a row for every sentence in the cases. `python3 ports/rust/sentences/tests/oracle/validate.py` checks the rows against `ergo.rego` with the `opa` on your PATH, or the OPA command you give it, and prints the ones that are missing. It fails only when a row differs, so read its output for missing ones. A case Rust fails goes in `known-failures.txt`.
+A change that only adds or changes spec cases can break those checks too, so run the whole `cargo test` for it. Rust runs every case, and the sentence oracle in `engines/rust/sentences/tests/oracle` needs a row for every sentence in the cases. `python3 engines/rust/sentences/tests/oracle/validate.py` checks the rows against `ergo.rego` with the `opa` on your PATH, or the OPA command you give it, and prints the ones that are missing. It fails only when a row differs, so read its output for missing ones. A case Rust fails goes in `known-failures.txt`.
 
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. That's OPA 1.20.2, the version the Kosli CLI embeds. When you change the OPA version, change it in the README, in `CONTRIBUTING.md`, in every job of the workflow, in the Docker command below and in `opaVersion` in `site/hugo.toml`.
 
@@ -83,14 +85,14 @@ CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-w
 npm install --silent --no-save --prefix /tmp/ergo-wasm-js @open-policy-agent/opa-wasm@1.10.0 && node .github/wasm-js.cjs /tmp/ergo-wasm-js
 ```
 
-A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, when Ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`, or when a `$well_formed` row fails without naming what's wrong. `python3 spec/sentences_corpus.py --check` fails when `spec/sentences-corpus.json` no longer holds every line of `spec/sentences-corpus.md`. `spec/check_grammar.py` reads sentences with `ergo.rego` and with a parser built from `spec/sentences.abnf`, and fails when one reads a sentence and the other rejects it as a matter of syntax. With `--rust <command>` it also runs `ports/rust`'s sentence reader (`ergo-sentences`, the `read` example) and fails when Rust and the ABNF disagree, with no list of known ones; CI does this, and the second command above does it locally through Docker. It also fails when Rust and `ergo.rego` give different problems for a sentence, so a change to one of `ergo.rego`'s messages has to change Rust's in the same pull request. It leaves out only a Rust problem that ends in `is compared with itself`. The sentences are the corpus, the cases, and a few thousand generated from the grammar and changed a little, with a fixed seed. A sentence `ergo.rego` rejects for another reason, like an unknown name, isn't a disagreement. The known ones are listed in `spec/OPEN.md`, and the script fails on a new one and when a listed one no longer disagrees. If `ergo.rego` gives a message that isn't about syntax, add it to `NON_SYNTAX` in the script.
+A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, when Ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`, or when a `$well_formed` row fails without naming what's wrong. `python3 spec/sentences_corpus.py --check` fails when `spec/sentences-corpus.json` no longer holds every line of `spec/sentences-corpus.md`. `spec/check_grammar.py` reads sentences with `ergo.rego` and with a parser built from `spec/sentences.abnf`, and fails when one reads a sentence and the other rejects it as a matter of syntax. With `--rust <command>` it also runs `engines/rust`'s sentence reader (`ergo-sentences`, the `read` example) and fails when Rust and the ABNF disagree, with no list of known ones; CI does this, and the second command above does it locally through Docker. It also fails when Rust and `ergo.rego` give different problems for a sentence, so a change to one of `ergo.rego`'s messages has to change Rust's in the same pull request. It leaves out only a Rust problem that ends in `is compared with itself`. The sentences are the corpus, the cases, and a few thousand generated from the grammar and changed a little, with a fixed seed. A sentence `ergo.rego` rejects for another reason, like an unknown name, isn't a disagreement. The known ones are listed in `spec/OPEN.md`, and the script fails on a new one and when a listed one no longer disagrees. If `ergo.rego` gives a message that isn't about syntax, add it to `NON_SYNTAX` in the script.
 
 `main` always carries a `-dev` version, like `0.1.0-dev`, and a test fails without one. The `checks` job shows a warning when that version equals the latest `rego-v*` tag, and fails when it's below it. The spec has its own version, `_spec` in `ergo.rego`. `.github/spec-version.sh` fails when `_spec` and the `$id` of both schemas disagree, when a file that defines the spec (`spec/syntax.md`, `spec/semantics.md`, both schemas, `spec/sentences.abnf` and `spec/cases/`) differs from the latest `spec-v*` tag and `_spec` still equals that tag, and when `_spec` is not the tag's version or one minor above it (with `-dev`, or without it for a release being prepared), or is above it without a heading in `spec/CHANGELOG.md`. So the first change to the spec moves `_spec`, both `$id`s and every `ergo_spec` to `vX.(Y+1)-dev`, except in `README.md`, which goes with the latest release and is moved by hand in the pull request that releases the spec. The site needs no change: it follows the latest published release on its own. `release.sh` and the release workflow refuse a `rego-v*` or `spec-v*` tag on a commit whose `_spec` says `-dev`. A release is a tag, which `.github/release.sh` checks and pushes, and `.github/workflows/release.yml` does the rest, with the steps in `CONTRIBUTING.md`. The site build runs `site/prepare.sh` before Hugo, which takes the schemas of every published `spec-v*` release, so nothing is committed.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
 ```sh
-opa test . --ignore .github --ignore packages --ignore ports --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
+opa test engines/rego spec:spec examples:examples --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
 ```
 
 ## Tests
@@ -103,12 +105,12 @@ There are no comments in the code or the tests, and it should stay that way.
 
 There are two exceptions, both above `package ergo` in `ergo.rego`. The first is the license header. Users copy that file on its own, so the header keeps the license with it. The second is the `METADATA` annotation that declares `input["ergo/names"]` as an object. While Ergo checks, `input` holds Ergo's names, and a host that type-checks `input` against a closed JSON Schema, like Kosli does when a policy is published, would otherwise refuse every read of them. OPA only reads a schema from an annotation, and annotations are comments.
 
-There's one more exception, for code meant for others to call: API doc comments on public items, `///` (and `//!` for a crate) in the Rust crates under `ports/rust`, and JSDoc `/** */` on exported functions and types in `packages/`. They say what the item is, what it takes and what it returns, with an example where it helps, and never why the code is written the way it is. Every other comment stays out, and the Rego files get none.
+There's one more exception, for code meant for others to call: API doc comments on public items, `///` (and `//!` for a crate) in the Rust crates under `engines/rust`, and JSDoc `/** */` on exported functions and types in `packages/`. They say what the item is, what it takes and what it returns, with an example where it helps, and never why the code is written the way it is. Every other comment stays out, and the Rego files get none.
 
 CI fails on any other comment in a `.rego` file. It asks `opa parse` for each file's comments, so a `#` inside a string doesn't count. To list them yourself:
 
 ```sh
-git ls-files '*.rego' | while read -r f; do opa parse "$f" --format json --json-include comments,locations | jq -r --arg f "$f" '.package.location.row as $p | .comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r < $p) | not) | "\($f):\($r)"'; done
+git ls-files '*.rego' | while read -r f; do opa parse "$f" --format json --json-include comments,locations | jq -r --arg f "$f" '.package.location.row as $p | .comments[]? | .Location.row as $r | select(($f == "engines/rego/ergo.rego" and $r < $p) | not) | "\($f):\($r)"'; done
 ```
 
 When something in the code looks like it could be simplified but mustn't be, a test says so instead of a comment. Give the test a name that explains the reason, like `test_out_of_scope_subject_is_recorded_as_evidence`. If you're about to write a comment, write a test.
@@ -149,18 +151,18 @@ When talking to people:
 
 The first line names the part of the repo that changed, then says what the change does, in the imperative and in lowercase:
 
-- `rego:` `ergo.rego` and its tests
-- `rust:` the Rust port in `ports/rust/`
+- `rego:` `engines/rego/ergo.rego` and its tests
+- `rust:` the Rust port in `engines/rust/`
 - `docs:` `README.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`
-- `spec:` the spec in `spec/`, its cases and `spec_test.rego`
+- `spec:` the spec in `spec/`, its cases and `engines/rego/spec_test.rego`
 - `markdown:` the Markdown compiler in `packages/markdown`, the editor in `packages/editor` and the pnpm workspace around them
 
 For example, `rego: fail compare when either side is missing`. Commits from before the Rust port say `core:` for `rego:`.
 
-One area per commit. A `rego:` or `rust:` change that updates `REFERENCE.md` or `spec/` with it keeps its area. A `rego:` change that alters behaviour adds the cases Rust now fails to `ports/rust/known-failures.txt`, and keeps its area. The `rust:` change that ports it deletes those lines.
+One area per commit. A `rego:` or `rust:` change that updates `REFERENCE.md` or `spec/` with it keeps its area. A `rego:` change that alters behaviour adds the cases Rust now fails to `engines/rust/known-failures.txt`, and keeps its area. The `rust:` change that ports it deletes those lines.
 
 When a `rego:` or `rust:` change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
 

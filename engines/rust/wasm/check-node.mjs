@@ -4,7 +4,7 @@ import { initSync, report } from "./pkg/ergo_wasm.js";
 initSync({ module: readFileSync(new URL("./pkg/ergo_wasm_bg.wasm", import.meta.url)) });
 
 const spec = /^_spec := "(.*)"$/m.exec(
-  readFileSync(new URL("../../../ergo.rego", import.meta.url), "utf8"),
+  readFileSync(new URL("../../rego/ergo.rego", import.meta.url), "utf8"),
 )[1];
 const policy = {
   ergo_spec: spec,

@@ -66,16 +66,16 @@ and this is the case:
 
 `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when no case cites a rule. A rule can go without cases only while it's listed under [Rules without cases](OPEN.md#rules-without-cases) in `OPEN.md`, and the script also fails when a rule on that list has a case or doesn't exist.
 
-`spec/sentences-corpus.json` holds every sentence, `for` line and `from` line of `sentences-corpus.md` as a list, so that `ergo_test.rego` can parse each one. `python3 spec/sentences_corpus.py` writes it from the markdown, and `python3 spec/sentences_corpus.py --check` fails when it's out of date.
+`spec/sentences-corpus.json` holds every sentence, `for` line and `from` line of `sentences-corpus.md` as a list, so that [`ergo_test.rego`](../engines/rego/ergo_test.rego) can parse each one. `python3 spec/sentences_corpus.py` writes it from the markdown, and `python3 spec/sentences_corpus.py --check` fails when it's out of date.
 
 `spec/check_grammar.py` reads every sentence of the corpus and the cases, and a few thousand more generated from [`sentences.abnf`](sentences.abnf), with `ergo.rego` and with a parser built from the ABNF (`abnf` on PyPI). It fails when one reads a sentence and the other rejects it as a matter of syntax, apart from the ones listed under [Sentences the ABNF and ergo.rego read differently](OPEN.md#sentences-the-abnf-and-ergorego-read-differently) in `OPEN.md`.
 
 ## Running the cases
 
-`spec_test.rego` runs every case against `ergo.rego`, with one test for each folder of cases, so no test runs long enough to hit the timeout. A new folder needs its test added there too, and a test fails until it is. Its `known_differences` lists the cases an implementation is known to fail, which is where it still differs from the spec. A folder's test fails when another case in it fails, and also when a listed case passes, so the list stays true.
+[`spec_test.rego`](../engines/rego/spec_test.rego) runs every case against `ergo.rego`, with one test for each folder of cases, so no test runs long enough to hit the timeout. A new folder needs its test added there too, and a test fails until it is. Its `known_differences` lists the cases an implementation is known to fail, which is where it still differs from the spec. A folder's test fails when another case in it fails, and also when a listed case passes, so the list stays true.
 
 To list the cases `ergo.rego` fails:
 
 ```sh
-opa eval -d . --ignore .github --ignore packages --ignore ports --format pretty 'data.spec_test.failures'
+opa eval -d engines/rego -d spec:spec --format pretty 'data.spec_test.failures'
 ```

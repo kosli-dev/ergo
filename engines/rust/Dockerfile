@@ -2,7 +2,7 @@ FROM rust:1.99.0
 RUN rustup component add rustfmt clippy && rustup target add wasm32-unknown-unknown
 RUN cargo install wasm-bindgen-cli --version 0.2.129 --locked
 ENV CARGO_TARGET_DIR=/target
-WORKDIR /src/ports/rust
+WORKDIR /src/engines/rust
 RUN arch="$(uname -m)" && \
     case "$arch" in \
       x86_64) sha=2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489 ;; \
