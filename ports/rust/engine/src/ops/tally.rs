@@ -1,7 +1,7 @@
 use super::compare::{self, Cmp, Compare};
 use super::time::{self, NANOS_PER_SECOND, SECONDS_PER_DAY, Time};
 use super::walk::{self, Options};
-use super::{Check, Input, Part, Verdict, read_path, run as run_check, verdict};
+use super::{Check, Input, Part, SidePath, Verdict, read_path, run as run_check, verdict};
 use crate::cause::Cause;
 use crate::lower::{Scope, UNSUPPORTED_SUFFIX};
 use crate::name;
@@ -114,6 +114,29 @@ fn side_paths(side: &Side) -> Vec<&Path> {
     }
 }
 
+fn side_candidates(side: &Side) -> Vec<SidePath<'_>> {
+    let one = |path, needs_list| SidePath { path, needs_list };
+    match side {
+        Side::Plain(compare::Side::Path(path)) => vec![one(path, false)],
+        Side::Plain(compare::Side::Value(_)) => Vec::new(),
+        Side::Derived(derived) => {
+            let mut paths = Vec::new();
+            for term in &derived.terms {
+                match term {
+                    Term::Path(path) => paths.push(one(path, false)),
+                    Term::Number(_) => {}
+                    Term::Elapsed(elapsed) => {
+                        paths.push(one(&elapsed.from, false));
+                        paths.push(one(&elapsed.to, false));
+                    }
+                    Term::Counted(counted) => paths.push(one(&counted.path, true)),
+                }
+            }
+            paths
+        }
+    }
+}
+
 fn reads_hidden_path(path: &Path, hidden: &[&str]) -> bool {
     starts_at(path, hidden) || path.steps.iter().any(|step| match step {
         path::Step::Ref(reference) => {
@@ -202,6 +225,13 @@ impl Tally {
             }
         }
         paths
+    }
+
+    pub fn sides(&self) -> Vec<Vec<SidePath<'_>>> {
+        std::iter::once(&self.left)
+            .chain(self.right.as_ref())
+            .map(side_candidates)
+            .collect()
     }
 
     pub fn paths(&self) -> Vec<&Path> {
@@ -2136,5 +2166,175 @@ mod tests {
             row_names(json!({"assert": ["y is more than x plus 1", "y is 3"]})),
             ["x", "x plus 1", "y"]
         );
+    }
+
+    fn failed_items_of(sentence: &str, items: Value, params: Value) -> Vec<Value> {
+        let input = json!({"things": [{"items": items}]});
+        let ctx = Ctx {
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: Some(&params),
+            aliases: BTreeMap::new(),
+        };
+        crate::ops::run_full(&lowered(sentence), &ctx)
+            .failed_items
+            .unwrap()
+    }
+
+    fn named(failed: &[Value]) -> Vec<(&str, &Value, &Value)> {
+        failed
+            .iter()
+            .map(|f| (f["path"].as_str().unwrap(), &f["value"], &f["locations"][0]))
+            .collect()
+    }
+
+    #[test]
+    fn a_whose_names_the_right_side_when_only_the_right_side_was_not_read() {
+        let failed = failed_items_of(
+            "every items.s whose lo is at least hi is \"ok\"",
+            json!([{"lo": 1, "s": "ok"}, {"hi": 1, "s": "ok"}, {"s": "ok"}, {"lo": 1, "hi": null, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&failed),
+            [
+                ("items[0].hi", &json!(null), &json!("/things/0/items/0")),
+                ("items[1].lo", &json!(null), &json!("/things/0/items/1")),
+                ("items[2].lo", &json!(null), &json!("/things/0/items/2")),
+                ("items[3].hi", &json!(null), &json!("/things/0/items/3/hi")),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_whose_names_the_left_side_when_both_were_read() {
+        let failed = failed_items_of(
+            "every items.s whose lo is at least hi is \"ok\"",
+            json!([{"lo": "x", "hi": 1, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&failed),
+            [("items[0].lo", &json!("x"), &json!("/things/0/items/0/lo"))]
+        );
+    }
+
+    #[test]
+    fn a_whose_with_a_count_names_the_count_list_when_it_is_the_side_not_read() {
+        let on_left = failed_items_of(
+            "every items.s whose count of kids is at least min is \"ok\"",
+            json!([{"kids": [1], "s": "ok"}, {"min": 1, "s": "ok"}, {"s": "ok"}, {"kids": 5, "min": 1, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&on_left),
+            [
+                ("items[0].min", &json!(null), &json!("/things/0/items/0")),
+                ("items[1].kids", &json!(null), &json!("/things/0/items/1")),
+                ("items[2].kids", &json!(null), &json!("/things/0/items/2")),
+                ("items[3].kids", &json!(5), &json!("/things/0/items/3/kids")),
+            ]
+        );
+        let on_right = failed_items_of(
+            "every items.s whose min is at most count of kids is \"ok\"",
+            json!([{"kids": [1], "s": "ok"}, {"min": 1, "s": "ok"}, {"s": "ok"}, {"kids": 5, "min": 1, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&on_right),
+            [
+                ("items[0].min", &json!(null), &json!("/things/0/items/0")),
+                ("items[1].kids", &json!(null), &json!("/things/0/items/1")),
+                ("items[2].min", &json!(null), &json!("/things/0/items/2")),
+                ("items[3].kids", &json!(5), &json!("/things/0/items/3/kids")),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_whose_with_a_plus_side_names_its_first_path_that_was_not_read() {
+        let failed = failed_items_of(
+            "every items.s whose lo is at least hi plus 1 is \"ok\"",
+            json!([{"lo": 1, "s": "ok"}, {"lo": 1, "hi": null, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&failed),
+            [
+                ("items[0].hi", &json!(null), &json!("/things/0/items/0")),
+                ("items[1].hi", &json!(null), &json!("/things/0/items/1/hi")),
+            ]
+        );
+        let counted = failed_items_of(
+            "every items.s whose min is at most count of kids plus 1 is \"ok\"",
+            json!([{"min": 1, "s": "ok"}, {"min": 1, "kids": 5, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&counted),
+            [
+                ("items[0].kids", &json!(null), &json!("/things/0/items/0")),
+                ("items[1].kids", &json!(5), &json!("/things/0/items/1/kids")),
+            ]
+        );
+        let first_of_two = failed_items_of(
+            "every items.s whose lo is at least x plus y is \"ok\"",
+            json!([{"lo": 1, "y": 1, "s": "ok"}, {"lo": 1, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&first_of_two),
+            [
+                ("items[0].x", &json!(null), &json!("/things/0/items/0")),
+                ("items[1].x", &json!(null), &json!("/things/0/items/1")),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_whose_with_an_elapsed_side_names_its_first_path_that_was_not_read() {
+        let failed = failed_items_of(
+            "every items.s whose days elapsed from start to stop is at least lo is \"ok\"",
+            json!([{"start": "2026-01-01T00:00:00Z", "lo": 1, "s": "ok"}, {"lo": 1, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&failed),
+            [
+                ("items[0].stop", &json!(null), &json!("/things/0/items/0")),
+                ("items[1].start", &json!(null), &json!("/things/0/items/1")),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_whose_names_a_param_or_input_by_its_own_path_and_not_under_the_item() {
+        let on_right = failed_items_of(
+            "every items.s whose lo is at least $params.min is \"ok\"",
+            json!([{"lo": 1, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&on_right),
+            [("$params.min", &json!(null), &json!("$params:"))]
+        );
+        let on_left = failed_items_of(
+            "every items.s whose $params.min is at most lo is \"ok\"",
+            json!([{"lo": 1, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(
+            named(&on_left),
+            [("$params.min", &json!(null), &json!("$params:"))]
+        );
+        let input = failed_items_of(
+            "every items.s whose lo is at least $input.min is \"ok\"",
+            json!([{"lo": 1, "s": "ok"}]),
+            json!({}),
+        );
+        assert_eq!(named(&input), [("$input.min", &json!(null), &json!(""))]);
     }
 }
