@@ -53,8 +53,13 @@ def strings(text):
 
 def table(src, name):
     start = src.index(f"pub const {name}:")
-    end = src.find("pub const", start + 1)
-    return src[start : end if end > 0 else len(src)]
+    return src[start : src.index("\n];", start) + 3]
+
+
+def add(rows, kind, line, row):
+    if line in rows[kind]:
+        sys.exit(f"{line!r} is in the oracle twice")
+    rows[kind][line] = row
 
 
 def oracle():
@@ -64,27 +69,27 @@ def oracle():
     rejected = r"\(\s*" + STRING + r",\s*&\[(.*?)\],?\s*\)"
     for kind, prefix in [("checks", "CHECK"), ("fors", "FOR")]:
         for m in re.finditer(ok, table(src, prefix + "_OK"), re.S):
-            rows[kind][unrust(m.group(1))] = {
+            add(rows, kind, unrust(m.group(1)), {
                 "kind": "ok",
                 "printed": unrust(m.group(2)),
                 "plain": strings(m.group(3)),
                 "aliases": strings(m.group(4)),
-            }
+            })
         for suffix in ["_ERRORS", "_WRITTEN_WRONG"]:
             for m in re.finditer(rejected, table(src, prefix + suffix), re.S):
-                rows[kind][unrust(m.group(1))] = {"kind": "rejected", "problems": strings(m.group(2))}
+                add(rows, kind, unrust(m.group(1)), {"kind": "rejected", "problems": strings(m.group(2))})
     src = open(os.path.join(HERE, "mod.rs")).read()
     rows["froms"], rows["paths"] = {}, {}
     pair = r"\(\s*" + STRING + r",\s*" + STRING + r",?\s*\)"
     for m in re.finditer(pair, table(src, "FROM_OK"), re.S):
-        rows["froms"][unrust(m.group(1))] = {"kind": "ok", "printed": unrust(m.group(2))}
+        add(rows, "froms", unrust(m.group(1)), {"kind": "ok", "printed": unrust(m.group(2))})
     for name in ["FROM_ERRORS", "FROM_WRITTEN_WRONG", "FROM_PARTIAL"]:
         for m in re.finditer(rejected, table(src, name), re.S):
-            rows["froms"][unrust(m.group(1))] = {"kind": "rejected", "problems": strings(m.group(2))}
+            add(rows, "froms", unrust(m.group(1)), {"kind": "rejected", "problems": strings(m.group(2))})
     for m in re.finditer(pair, table(src, "PATH_OK"), re.S):
-        rows["paths"][unrust(m.group(1))] = {"kind": "ok", "printed": unrust(m.group(2))}
+        add(rows, "paths", unrust(m.group(1)), {"kind": "ok", "printed": unrust(m.group(2))})
     for line in strings(table(src, "PATH_ERRORS").split("= &[", 1)[1]):
-        rows["paths"][line] = {"kind": "rejected"}
+        add(rows, "paths", line, {"kind": "rejected"})
     return rows
 
 
