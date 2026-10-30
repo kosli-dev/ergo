@@ -3619,7 +3619,6 @@ _every_failed_items(doc, req) := {"failed_items": [{"path": _input_path_name(f.p
 	f.path == p
 ]} if {
 	_every_from(req)
-	_walkable(doc)
 	_from_well_formed(req)
 	not _from_unreadable(req)
 } else := {"failed_items": []} if _every_from(req)
