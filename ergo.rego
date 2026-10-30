@@ -6114,7 +6114,7 @@ _s_from_dot(p, names, keep) := object.union(p, {"field": true, "own": false}) if
 
 _p_from_part(name, fl, subjects, eff) := {"part": rest[0]} if {
 	_s_descends(name, fl, subjects)
-	rest := array.slice(_s_model_path(fl.path), 1, count(fl.path.steps))
+	rest := array.slice(_s_model_path(fl.path), 1, count(_s_model_path(fl.path)))
 	count(rest) > 0
 	is_string(rest[0])
 	rest[0] in object.keys(_p_steps_of(object.get(eff, fl.path.steps[0], {})))
@@ -6122,7 +6122,7 @@ _p_from_part(name, fl, subjects, eff) := {"part": rest[0]} if {
 
 _s_source(name, fl, subjects, eff) := {"of": fl.path.steps[0]} if {
 	_s_narrows(name, fl, subjects)
-} else := {"from": array.concat(_s_from_steps(_p_descend_steps(array.slice(_s_model_path(fl.path), 1, count(fl.path.steps)), object.get(eff, fl.path.steps[0], {}))), _s_each_step(fl))} if {
+} else := {"from": array.concat(_s_from_steps(_p_descend_steps(array.slice(_s_model_path(fl.path), 1, count(_s_model_path(fl.path))), object.get(eff, fl.path.steps[0], {}))), _s_each_step(fl))} if {
 	_s_descends(name, fl, subjects)
 } else := {"from": array.concat(_s_from_steps(_s_model_path(fl.path)), _s_each_step(fl))}
 
@@ -6132,6 +6132,7 @@ else := null
 
 _s_descends(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
 	count(fl.path.steps) > 1
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
@@ -6140,6 +6141,7 @@ _s_descends(name, fl, subjects) if {
 
 _s_descends(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
 	fl.path.steps == [fl.path.steps[0]]
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
