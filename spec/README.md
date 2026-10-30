@@ -1,6 +1,6 @@
 # The Ergo spec
 
-Draft 0.3-dev. Ergo's spec is in these files, and `ergo.rego` is an implementation of it:
+Draft 0.3. Ergo's spec is in these files, and `ergo.rego` is an implementation of it:
 
 - [`semantics.md`](semantics.md) says what a check means, as named rules about a model of checks that doesn't depend on how they're written.
 - [`syntax.md`](syntax.md) says how a policy is written: its sections and fields, its parts, and its checks and `from` lines as one-line sentences like `approved_by is not empty`, how it can be written wrong, and how the report names paths and shows the checks Ergo adds. [`sentences.abnf`](sentences.abnf) is the grammar of the sentences, [`sentences-corpus.md`](sentences-corpus.md) every real check written that way, and [`sentences-findings.md`](sentences-findings.md) what writing them found. `ergo.rego` runs checks written as sentences, apart from the forms [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet) lists as not run yet.
@@ -41,7 +41,7 @@ Here is one case, from `cases/present`. Its group's policy has a `thing` subject
 
 ```json
 {
-  "ergo_spec": "v0.3-dev",
+  "ergo_spec": "v0.3",
   "subjects": {"thing": {"from": "things", "identified_by": "id"}},
   "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
 }

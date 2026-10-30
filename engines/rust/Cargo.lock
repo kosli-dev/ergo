@@ -31,7 +31,7 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
 name = "ergo-policy-cli"
-version = "0.1.0-dev"
+version = "0.1.0"
 dependencies = [
  "ergo-policy-engine",
  "saphyr-parser",
@@ -40,7 +40,7 @@ dependencies = [
 
 [[package]]
 name = "ergo-policy-engine"
-version = "0.1.0-dev"
+version = "0.1.0"
 dependencies = [
  "ergo-policy-sentences",
  "regex",
@@ -49,7 +49,7 @@ dependencies = [
 
 [[package]]
 name = "ergo-policy-sentences"
-version = "0.1.0-dev"
+version = "0.1.0"
 dependencies = [
  "regex-syntax",
  "serde",
@@ -58,7 +58,7 @@ dependencies = [
 
 [[package]]
 name = "ergo-policy-sentences-wasm"
-version = "0.1.0-dev"
+version = "0.1.0"
 dependencies = [
  "ergo-policy-sentences",
  "serde",
@@ -68,7 +68,7 @@ dependencies = [
 
 [[package]]
 name = "ergo-policy-wasm"
-version = "0.1.0-dev"
+version = "0.1.0"
 dependencies = [
  "ergo-policy-engine",
  "serde_json",

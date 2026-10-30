@@ -11,6 +11,6 @@ keywords = ["ergo", "policy", "compliance", "evidence", "report"]
 categories = ["development-tools"]
 
 [dependencies]
-ergo-policy-sentences = { path = "../sentences", version = "0.1.0-dev" }
+ergo-policy-sentences = { path = "../sentences", version = "0.1.0" }
 regex = "1"
 serde_json = { version = "1", features = ["arbitrary_precision"] }

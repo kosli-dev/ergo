@@ -112,7 +112,7 @@ const ofMarkdown = (source, line, col, extras = {}) => {
 };
 
 const doc = (sentence) => `---
-ergo_spec: v0.3-dev
+ergo_spec: v0.3
 ---
 
 # P
