@@ -1,7 +1,7 @@
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
 import { initSync, report as rustReport } from "ergo-wasm";
-import { ENGINES, ENGINE_LABELS, readEngine, engineNote, engineMessage, makeRustRunner, stopOnPanic } from "./engines.mjs";
+import { ENGINES, ENGINE_LABELS, readEngine, engineNote, engineMessage, makeRustRunner, stopOnPanic, timed, loadEngine } from "./engines.mjs";
 import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
 import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
@@ -435,7 +435,7 @@ const showReport = (out, result) => {
     return out.append(el("p", "notice", e.stopped ? e.message : engineMessage(engine, "run", e.message)));
   }
   if (report === null) return out.append(el("p", "notice", "Ergo gave no report for this policy and input."));
-  out.append(el("p", "notice info", [report.compliant ? "Every requirement is met." : "At least one requirement is not met.", engineNote(report)].filter(Boolean).join(" ")));
+  out.append(el("p", "notice info", [report.compliant ? "Every requirement is met." : "At least one requirement is not met.", engineNote(report, timers[engine]?.ms)].filter(Boolean).join(" ")));
   const rounded = [...new Set([...unroundable(reportInput), ...unroundable(reportParams)])];
   if (rounded.length) {
     out.append(
@@ -733,8 +733,10 @@ copy.addEventListener("click", async () => {
 });
 
 const decode = (text) => Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
-const loaded = (name, run) => {
-  runners[name] = run;
+const timers = {};
+const loaded = (name, timer, run) => {
+  timers[name] = timer;
+  loadEngine(runners, name, run);
   if (shows("report") && last) render(last);
 };
 const failed = (name, e) => {
@@ -743,14 +745,16 @@ const failed = (name, e) => {
 };
 opa.loadPolicy(decode(wasm), undefined, { "time.parse_rfc3339_ns": parseTime }).then(
   (policy) => {
-    const run = makeRunner((doc) => policy.evaluate(doc));
-    loaded("opa", (inputText, policyValue, paramsText) => run(reportDocument(inputText, policyValue, paramsText)));
+    const evaluate = timed((doc) => policy.evaluate(doc));
+    const run = makeRunner(evaluate);
+    loaded("opa", evaluate, (inputText, policyValue, paramsText) => run(reportDocument(inputText, policyValue, paramsText)));
   },
   (e) => failed("opa", e),
 );
 try {
   initSync({ module: decode(rustWasm) });
-  loaded("rust", stopOnPanic("rust", makeRustRunner(rustReport)));
+  const report = timed(rustReport);
+  loaded("rust", report, stopOnPanic("rust", makeRustRunner(report)));
 } catch (e) {
   failed("rust", e);
 }
