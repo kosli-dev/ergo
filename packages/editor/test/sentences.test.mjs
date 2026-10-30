@@ -2,13 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { compile } from "@kosli/ergo-markdown";
-import * as pkg from "../../../ports/rust/sentences-wasm/pkg/ergo_sentences_wasm.js";
+import * as pkg from "../../../engines/rust/sentences-wasm/pkg/ergo_sentences_wasm.js";
 import { makeParser, readSentence, problemRange, treeTokens, describe } from "../src/sentences.mjs";
 import { markdownSentences, yamlSentences } from "../src/locate.mjs";
 import { makeAnalyser, decorateLines, entryAt, hoverOf, sentenceProblems } from "../src/analyse.mjs";
 import { highlightMarkdown, highlightYaml } from "../src/highlight.mjs";
 
-pkg.initSync({ module: readFileSync(new URL("../../../ports/rust/sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm", import.meta.url)) });
+pkg.initSync({ module: readFileSync(new URL("../../../engines/rust/sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm", import.meta.url)) });
 const parser = makeParser(pkg);
 const corpus = JSON.parse(readFileSync(new URL("../../../spec/sentences-corpus.json", import.meta.url), "utf8")).sentence_corpus;
 

@@ -24,7 +24,7 @@ jobs:
       - name: Check the version isn't below the latest release
         shell: bash
         run: |
-          version=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' ergo.rego)
+          version=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' engines/rego/ergo.rego)
           if [ -z "$version" ]; then
             echo 'ergo.rego must say version := "X.Y.Z-dev" on main'
             exit 1
@@ -43,27 +43,31 @@ jobs:
           fi
       - name: Check the spec version moved when the spec changed
         run: .github/spec-version.sh
-      - run: opa check --strict . --ignore .github --ignore packages --ignore ports
+      - run: opa check --strict engines/rego spec:spec examples:examples
       - name: Check Ergo compiles where input is checked against a closed schema
-        run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
+        run: opa check --strict --schema .github/closed-input-schema.json engines/rego/ergo.rego
       - name: Check Ergo compiles without built-ins whose answer depends on the machine
         run: |
           opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > "$RUNNER_TEMP/deterministic.json"
-          opa check --strict --capabilities "$RUNNER_TEMP/deterministic.json" ergo.rego
-      - run: opa fmt --list --fail .
+          opa check --strict --capabilities "$RUNNER_TEMP/deterministic.json" engines/rego/ergo.rego
+      - run: opa fmt --list --fail engines/rego examples engines/rust/sentences/tests/oracle
+      - name: Check every folder with Rego is named in the OPA commands
+        run: |
+          .github/rego-folders.sh
+          .github/rego-folders_test.sh
       - name: Check the release workflow's latest flag and release notes
         run: |
           python3 .github/release-latest.py
           .github/release-latest_test.sh
           .github/release-notes_test.sh
       - name: Lint for likely bugs
-        run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
+        run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check engines/rego examples engines/rust/sentences/tests/oracle
       - name: Check there are no comments
         shell: bash
         run: |
           comments=$(git ls-files '*.rego' | while read -r f; do
             opa parse "$f" --format json --json-include comments,locations |
-              jq -r --arg f "$f" '.package.location.row as $p | .comments[]? | .Location.row as $r | select(($f == "ergo.rego" and $r < $p) | not) | "\($f):\($r)"'
+              jq -r --arg f "$f" '.package.location.row as $p | .comments[]? | .Location.row as $r | select(($f == "engines/rego/ergo.rego" and $r < $p) | not) | "\($f):\($r)"'
           done)
           if [ -n "$comments" ]; then
             echo "These lines have comments:"
@@ -71,7 +75,7 @@ jobs:
             exit 1
           fi
       - name: Check the tests give the same results with --strict-builtin-errors
-        run: opa eval --strict-builtin-errors --ignore .github --ignore packages --ignore ports -d . --format raw 'count(data) > 0'
+        run: opa eval --strict-builtin-errors -d engines/rego -d spec:spec -d examples:examples --format raw 'count(data) > 0'
 
   tests-rego:
     runs-on: ubuntu-latest
@@ -89,11 +93,11 @@ jobs:
       - name: Run this part of the tests with coverage
         shell: bash
         run: |
-          if ! opa test . --ignore .github --ignore packages --ignore ports --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
+          if ! opa test engines/rego spec:spec examples:examples --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
             cat "$RUNNER_TEMP/coverage.json"
             exit 1
           fi
-          jq -e '.files["ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
+          jq -e '.files["engines/rego/ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
           jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | range(.start.row; .end.row + 1) | "\($f):\(.)"' "$RUNNER_TEMP/coverage.json" | sort -u > "$RUNNER_TEMP/not-covered-$PART.txt"
       - uses: actions/upload-artifact@v7
         with:
@@ -179,7 +183,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ports/rust
+        working-directory: engines/rust
     steps:
       - uses: actions/checkout@v7
       - name: Install the Rust version in rust-toolchain.toml
@@ -210,7 +214,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: ergo-wasm-pkg
-          path: ports/rust/wasm/pkg
+          path: engines/rust/wasm/pkg
       - name: Build ergo-sentences-wasm, wrap it for a browser and shrink it
         run: |
           cargo build --locked --profile wasm -p ergo-sentences-wasm --target wasm32-unknown-unknown
@@ -221,7 +225,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: ergo-sentences-wasm-pkg
-          path: ports/rust/sentences-wasm/pkg
+          path: engines/rust/sentences-wasm/pkg
 
   markdown:
     needs: tests-rust
@@ -245,11 +249,11 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           name: ergo-wasm-pkg
-          path: ports/rust/wasm/pkg
+          path: engines/rust/wasm/pkg
       - uses: actions/download-artifact@v8
         with:
           name: ergo-sentences-wasm-pkg
-          path: ports/rust/sentences-wasm/pkg
+          path: engines/rust/sentences-wasm/pkg
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm test
@@ -273,13 +277,13 @@ jobs:
       - name: Check the cases' policies and reports match the schemas
         run: '"$RUNNER_TEMP/venv/bin/python" .github/spec-schemas.py'
       - name: Install the Rust version in rust-toolchain.toml
-        working-directory: ports/rust
+        working-directory: engines/rust
         run: rustup toolchain install
       - name: Build the Rust sentence reader
-        working-directory: ports/rust
+        working-directory: engines/rust
         run: cargo build --locked --release -p ergo-sentences --example read
       - name: Check ergo.rego, Rust and the ABNF read the same sentences
-        run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py --rust ports/rust/target/release/examples/read'
+        run: '"$RUNNER_TEMP/venv/bin/python" spec/check_grammar.py --rust engines/rust/target/release/examples/read'
 
   site:
     runs-on: ubuntu-latest

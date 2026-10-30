@@ -23,7 +23,7 @@ It has five crates:
 You don't need Rust installed, only Docker. From the root of the repo, build the image once:
 
 ```sh
-docker build -t ergo-rust ports/rust
+docker build -t ergo-rust engines/rust
 ```
 
 Then run the same checks as CI:
@@ -39,13 +39,13 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
   cargo build -j 4 --locked -p ergo-sentences --target wasm32-unknown-unknown'
 ```
 
-`ergo-sentences` has an example, `sentences/examples/read.rs`, that reads `{"rows": [{"kinds": [...], "text": "..."}]}` on stdin and prints, for each row and kind (`check`, `for-line`, `from-line`), the `SyntaxError` messages of `parse_check`, `parse_for` or `parse_from`. `spec/check_grammar.py --rust <command>` runs it on the corpus, the cases and a few thousand generated sentences, and fails when Rust accepts a sentence that the ABNF rejects, or the reverse. CI builds it with `cargo build --locked --release -p ergo-sentences --example read` and gives the script `ports/rust/target/release/examples/read`.
+`ergo-sentences` has an example, `sentences/examples/read.rs`, that reads `{"rows": [{"kinds": [...], "text": "..."}]}` on stdin and prints, for each row and kind (`check`, `for-line`, `from-line`), the `SyntaxError` messages of `parse_check`, `parse_for` or `parse_from`. `spec/check_grammar.py --rust <command>` runs it on the corpus, the cases and a few thousand generated sentences, and fails when Rust accepts a sentence that the ABNF rejects, or the reverse. CI builds it with `cargo build --locked --release -p ergo-sentences --example read` and gives the script `engines/rust/target/release/examples/read`.
 
 The second `cargo test` runs `tests/key_order.rs` again with serde_json's `preserve_order`, which keeps an object's keys in the order they were read. The report must stay byte for byte the same whatever order a policy, an input or params write their keys in, and if a dependency ever turned that feature on, `meta` and any object copied from the input would follow the order they were written in. The engine sorts every object in the report, and this run checks it does.
 
 The image is `rust:1.99.0`, the version in `rust-toolchain.toml`, with rustfmt, Clippy and the Wasm target added. `touch` is there because Cargo in Docker can miss an edit made outside the container, and then tests the old code.
 
-The build goes to the `ergo-rust-target` volume and not to `ports/rust/target`, because Cargo writes JSON files there and `opa test .` would load them as data. When several sessions or people run the checks at the same time, each should give the target volume their own name, like `ergo-rust-target-<name>`, because two builds sharing one volume can fail with "Permission denied". Change the `-v ergo-rust-target:/target` part of the command and keep the rest.
+The build goes to the `ergo-rust-target` volume and not to `engines/rust/target`, so the build stays out of your checkout. When several sessions or people run the checks at the same time, each should give the target volume their own name, like `ergo-rust-target-<name>`, because two builds sharing one volume can fail with "Permission denied". Change the `-v ergo-rust-target:/target` part of the command and keep the rest.
 
 ## Running from the command line
 
@@ -106,7 +106,7 @@ These differences are known:
 
 ## Building for a browser
 
-The Markdown editor can run this engine in the page, so it needs `ergo-wasm` built to Wasm and wrapped in JavaScript. This builds it into `ports/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. That editor is in `packages/editor`. Run it with the image from above, from the root of the repo:
+The Markdown editor can run this engine in the page, so it needs `ergo-wasm` built to Wasm and wrapped in JavaScript. This builds it into `engines/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. That editor is in `packages/editor`. Run it with the image from above, from the root of the repo:
 
 ```sh
 docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
@@ -132,7 +132,7 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
 
 CI loads it in Node with `sentences-wasm/check-node.mjs`, which reads one check sentence and fails when it doesn't give a tree.
 
-CI also loads the built module in Node with `wasm/check-node.mjs`, which builds one report and fails when that throws or the report doesn't come from `ergo-engine`. Run it with `node ports/rust/wasm/check-node.mjs` after the build.
+CI also loads the built module in Node with `wasm/check-node.mjs`, which builds one report and fails when that throws or the report doesn't come from `ergo-engine`. Run it with `node engines/rust/wasm/check-node.mjs` after the build.
 
 The `wasm` profile aborts on a panic. In JavaScript that is a `WebAssembly.RuntimeError: unreachable` with no message about the cause, and the module's memory may be half way through a call, so don't call it again. Calling `initSync` or `init` again gives back the same instance, so load the module again, in a browser by reloading the page. Invalid JSON is not a panic: `report` throws an `Error` that says which of the three isn't JSON, and the module stays usable. An argument that isn't a string makes it throw a `TypeError` that names it, like `input must be a string, not number`.
 
@@ -141,13 +141,13 @@ The `wasm` profile aborts on a panic. In JavaScript that is a `WebAssembly.Runti
 `bench/make_inputs.py <folder> [deployments]` writes an input with 1,000 deployments (or the number you give), a policy with three checks on the production ones, and the `data.json` and `bench.rego` that OPA needs. The policy's `ergo_spec` is the one `ergo.rego` follows. From the root of the repo:
 
 ```sh
-python3 ports/rust/bench/make_inputs.py /tmp/ergo-bench
-opa eval -d ergo.rego -d /tmp/ergo-bench/bench.rego -d /tmp/ergo-bench/data.json -i /tmp/ergo-bench/input-1000.json --metrics --format json 'data.bench.report' > /tmp/ergo-bench/opa.json
+python3 engines/rust/bench/make_inputs.py /tmp/ergo-bench
+opa eval -d engines/rego/ergo.rego -d /tmp/ergo-bench/bench.rego -d /tmp/ergo-bench/data.json -i /tmp/ergo-bench/input-1000.json --metrics --format json 'data.bench.report' > /tmp/ergo-bench/opa.json
 jq '.result[0].expressions[0].value' /tmp/ergo-bench/opa.json > /tmp/ergo-bench/rego.json
 jq '.metrics.timer_rego_query_eval_ns / 1e9' /tmp/ergo-bench/opa.json
 docker run --rm -v "$PWD":/src -v /tmp/ergo-bench:/bench -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust \
   cargo run -j 4 --locked --release -q --example report -- /bench/input-1000.json /bench/policy.json 5 > /tmp/ergo-bench/rust.json
-python3 ports/rust/bench/compare.py /tmp/ergo-bench/rego.json /tmp/ergo-bench/rust.json
+python3 engines/rust/bench/compare.py /tmp/ergo-bench/rego.json /tmp/ergo-bench/rust.json
 ```
 
 The `jq` line prints how many seconds OPA took. The `report` example builds the report the given number of times, here 5, prints the time per run on stderr and the report on stdout. It also takes a params file after the number of runs. `compare.py` fails when the two reports differ, apart from `engine`. It also fails when either file holds no report.

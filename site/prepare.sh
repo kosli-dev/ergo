@@ -84,7 +84,7 @@ if [ "$mode" = release ]; then
   docs=$dir/tag
   source=$tag
 else
-  rego=ergo.rego
+  rego=engines/rego/ergo.rego
   version=
   docs=.
   source="working tree"

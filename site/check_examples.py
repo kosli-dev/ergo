@@ -54,7 +54,7 @@ def check_report(name, example, ergo, spec, tmp, problems):
 
 def main():
     examples_path = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "site/data/examples.yaml")
-    ergo = pathlib.Path(sys.argv[2] if len(sys.argv) > 2 else "ergo.rego")
+    ergo = pathlib.Path(sys.argv[2] if len(sys.argv) > 2 else "engines/rego/ergo.rego")
     match = re.search(r'^_spec := "(v[^"]+)"$', ergo.read_text(), re.M)
     if not match:
         raise SystemExit(f"{ergo} has no _spec")

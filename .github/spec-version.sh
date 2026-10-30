@@ -17,7 +17,7 @@ defining=(
   spec/cases
 )
 
-rego=$(sed -n 's/^_spec := "v\([0-9][0-9.]*\(-dev\)\{0,1\}\)"$/\1/p' ergo.rego)
+rego=$(sed -n 's/^_spec := "v\([0-9][0-9.]*\(-dev\)\{0,1\}\)"$/\1/p' engines/rego/ergo.rego)
 [ -n "$rego" ] || fail 'ergo.rego must say _spec := "vX.Y" or _spec := "vX.Y-dev"'
 
 for name in policy report; do

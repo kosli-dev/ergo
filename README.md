@@ -35,7 +35,7 @@ Ergo reads no clock and nothing random, and sorts everything it writes. The same
 Two engines build Ergo reports, and you choose one:
 
 - `ergo.rego` runs on [Open Policy Agent](https://www.openpolicyagent.org/). It is one file with no dependencies. Run it with `opa eval`, or compile it to Wasm and run it with OPA's JavaScript runtime, as [REFERENCE.md](REFERENCE.md#compiling-to-wasm) shows.
-- The Rust engine is experimental. It runs as the `ergo` command, or in a browser through Wasm, and its sentence reader works alone, for editors and linters. See [`ports/rust/README.md`](ports/rust/README.md).
+- The Rust engine is experimental. It runs as the `ergo` command, or in a browser through Wasm, and its sentence reader works alone, for editors and linters. See [`engines/rust/README.md`](engines/rust/README.md).
 
 Both run every case in [`spec/cases`](spec/cases) and give the same report, apart from `engine`, which says which one made it.
 
@@ -70,11 +70,11 @@ Nothing of the Rust engine is published yet, so you build it from this repo. Ins
 
 ```sh
 git clone https://github.com/kosli-dev/ergo.git
-cd ergo/ports/rust
+cd ergo/engines/rust
 cargo install --locked --path cli
 ```
 
-To build it with Docker instead, without Rust, see [`ports/rust/README.md`](ports/rust/README.md#running-from-the-command-line).
+To build it with Docker instead, without Rust, see [`engines/rust/README.md`](engines/rust/README.md#running-from-the-command-line).
 
 The Rust engine follows the spec on `main` until spec 0.3 is released, so a policy for it says `ergo_spec: v0.3-dev` instead of `v0.2`.
 
@@ -278,13 +278,13 @@ Both print:
 
 ### Going further
 
-The [reference](REFERENCE.md) covers every field, operator and cause, including the ones this example doesn't use. For the Rust engine, read [`ports/rust/README.md`](ports/rust/README.md).
+The [reference](REFERENCE.md) covers every field, operator and cause, including the ones this example doesn't use. For the Rust engine, read [`engines/rust/README.md`](engines/rust/README.md).
 
 ### Updating
 
 With `ergo.rego`, download the new file over the old one and run your policy's tests. [`CHANGELOG.md`](CHANGELOG.md) says what each release changed, and which spec version it follows.
 
-With the Rust engine, pull the repo and run `cargo install --locked --path cli` again from `ports/rust`.
+With the Rust engine, pull the repo and run `cargo install --locked --path cli` again from `engines/rust`.
 
 ## Contributing
 

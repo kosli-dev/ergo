@@ -55,7 +55,7 @@ jobs:
       - name: Check ergo.rego and CHANGELOG.md are ready for this version
         shell: bash
         run: |
-          if ! grep -qxF "version := \"$VERSION-dev\"" ergo.rego; then
+          if ! grep -qxF "version := \"$VERSION-dev\"" engines/rego/ergo.rego; then
             echo "The tagged ergo.rego must say version := \"$VERSION-dev\""
             exit 1
           fi
@@ -63,14 +63,14 @@ jobs:
             echo "CHANGELOG.md has no \"## $VERSION\" heading"
             exit 1
           fi
-          if grep -q '^_spec := "v.*-dev"$' ergo.rego; then
-            echo "ergo.rego says $(grep -m 1 '^_spec := ' ergo.rego), a spec that isn't released. Release the spec first, or with this tag."
+          if grep -q '^_spec := "v.*-dev"$' engines/rego/ergo.rego; then
+            echo "ergo.rego says $(grep -m 1 '^_spec := ' engines/rego/ergo.rego), a spec that isn't released. Release the spec first, or with this tag."
             exit 1
           fi
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
-      - run: opa check --strict . --ignore .github --ignore packages --ignore ports
+      - run: opa check --strict engines/rego spec:spec examples:examples
       - name: Check the test workflow passed on this commit
         shell: bash
         run: |
@@ -82,7 +82,7 @@ jobs:
       - name: Write the release copy, which says the version without -dev
         shell: bash
         run: |
-          sed "s/^version := \"$VERSION-dev\"$/version := \"$VERSION\"/" ergo.rego > "$RUNNER_TEMP/ergo.rego"
+          sed "s/^version := \"$VERSION-dev\"$/version := \"$VERSION\"/" engines/rego/ergo.rego > "$RUNNER_TEMP/ergo.rego"
           grep -qxF "version := \"$VERSION\"" "$RUNNER_TEMP/ergo.rego"
           opa check --strict "$RUNNER_TEMP/ergo.rego"
       - name: Create the release, which is the latest only when it's the highest ergo.rego version
@@ -135,24 +135,24 @@ jobs:
           next="$major.$((10#$minor + 1)).0-dev"
           branch="core/version-$next"
           title="rego: move main to $next"
-          if grep -qxF "version := \"$next\"" ergo.rego; then
+          if grep -qxF "version := \"$next\"" engines/rego/ergo.rego; then
             echo "main already says $next"
             exit 0
           fi
-          if ! grep -qxF "version := \"$VERSION-dev\"" ergo.rego; then
-            says=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' ergo.rego)
+          if ! grep -qxF "version := \"$VERSION-dev\"" engines/rego/ergo.rego; then
+            says=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' engines/rego/ergo.rego)
             if [ -n "$says" ] && [ "$(printf '%s\n%s\n' "$VERSION" "$says" | sort -V | tail -n 1)" != "$VERSION" ]; then
               echo "main already says $says-dev, which is above $VERSION"
               exit 0
             fi
-            echo "main says $(grep -m 1 '^version := ' ergo.rego || true) and this job expected $VERSION-dev. Move main to the next version by hand."
+            echo "main says $(grep -m 1 '^version := ' engines/rego/ergo.rego || true) and this job expected $VERSION-dev. Move main to the next version by hand."
             exit 1
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           pattern=${VERSION//./\\.}
-          sed -i "s/\b$pattern-dev\b/$next/g" ergo.rego README.md REFERENCE.md
-          grep -qxF "version := \"$next\"" ergo.rego
+          sed -i "s/\b$pattern-dev\b/$next/g" engines/rego/ergo.rego README.md REFERENCE.md
+          grep -qxF "version := \"$next\"" engines/rego/ergo.rego
           if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
             echo "origin/$branch already exists, so there is nothing to commit or push"
           else
@@ -219,8 +219,8 @@ jobs:
       - name: Check the schemas, ergo.rego and the changelog name this version
         shell: bash
         run: |
-          if grep -q '^_spec := "v.*-dev"$' ergo.rego; then
-            echo "ergo.rego says $(grep -m 1 '^_spec := ' ergo.rego), so this spec isn't ready. Drop -dev from the spec everywhere first."
+          if grep -q '^_spec := "v.*-dev"$' engines/rego/ergo.rego; then
+            echo "ergo.rego says $(grep -m 1 '^_spec := ' engines/rego/ergo.rego), so this spec isn't ready. Drop -dev from the spec everywhere first."
             exit 1
           fi
           for name in policy report; do
@@ -229,7 +229,7 @@ jobs:
               exit 1
             fi
           done
-          if ! grep -qxF "_spec := \"v$VERSION\"" ergo.rego; then
+          if ! grep -qxF "_spec := \"v$VERSION\"" engines/rego/ergo.rego; then
             echo "ergo.rego must say _spec := \"v$VERSION\""
             exit 1
           fi

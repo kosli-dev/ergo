@@ -77,5 +77,5 @@ and this is the case:
 To list the cases `ergo.rego` fails:
 
 ```sh
-opa eval -d . --ignore .github --ignore packages --ignore ports --format pretty 'data.spec_test.failures'
+opa eval -d engines/rego -d spec:spec --format pretty 'data.spec_test.failures'
 ```

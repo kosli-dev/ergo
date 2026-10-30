@@ -7,7 +7,7 @@ import sys
 out = pathlib.Path(sys.argv[1])
 n = int(sys.argv[2]) if len(sys.argv) > 2 else 1000
 root = pathlib.Path(__file__).resolve().parents[3]
-spec = re.search(r'^_spec := "(.*)"$', (root / "ergo.rego").read_text(), re.M).group(1)
+spec = re.search(r'^_spec := "(.*)"$', (root / "engines/rego/ergo.rego").read_text(), re.M).group(1)
 random.seed(1)
 
 deployments = [

@@ -58,7 +58,7 @@ PATH=$dir/bin:$PATH
 export PATH
 
 repo=$dir/repo
-mkdir -p "$repo/site/assets/js/tutorial" "$repo/site/assets/css" "$repo/site/layouts" "$repo/site/content" "$repo/examples/demo" "$repo/spec/policy" "$repo/spec/report"
+mkdir -p "$repo/site/assets/js/tutorial" "$repo/site/assets/css" "$repo/site/layouts" "$repo/site/content" "$repo/examples/demo" "$repo/engines/rego" "$repo/spec/policy" "$repo/spec/report"
 cd "$repo"
 git init --quiet
 cp "$root/site/prepare.sh" "$root/site/latest-release.sh" "$root/site/spec-schemas.sh" site/
@@ -71,7 +71,7 @@ echo ".tut {}" > site/assets/css/tutorial.css
 echo ":root {}" > site/assets/css/ergo.css
 echo "<div></div>" > site/layouts/tutorial.html
 echo "---" > site/content/tutorial.md
-printf 'package ergo\n\nversion := "0.1.0-dev"\n\n_spec := "v0.1"\n' > ergo.rego
+printf 'package ergo\n\nversion := "0.1.0-dev"\n\n_spec := "v0.1"\n' > engines/rego/ergo.rego
 for name in policy report; do
   printf '{\n  "$id": "https://ergo.kosli.com/spec/0.1/%s.schema.json"\n}\n' "$name" > "spec/$name/schema.json"
 done
@@ -79,7 +79,7 @@ git add .
 git -c user.name=test -c user.email=test@example.com -c commit.gpgSign=false commit --quiet --message release
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rego-v0.1.0
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag spec-v0.1
-printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > ergo.rego
+printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > engines/rego/ergo.rego
 
 fails() {
   if out=$(site/prepare.sh "$@" 2>&1); then
@@ -191,10 +191,10 @@ has site/prepared/examples/demo/demo.rego.txt
 lacks site/prepared/assets
 has site/assets/tutorial/ergo.wasm
 
-printf 'package ergo\n\nversion := "0.3.0-dev"\n\n_spec := "v0.3"\n' > ergo.rego
+printf 'package ergo\n\nversion := "0.3.0-dev"\n\n_spec := "v0.3"\n' > engines/rego/ergo.rego
 site/prepare.sh --working-tree > /dev/null
 says site/prepared/data/release.json '{"source": "working tree", "rego": "", "spec": "0.1", "ergo_spec": "v0.3"}'
-printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > ergo.rego
+printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > engines/rego/ergo.rego
 
 (expected="usage: site/prepare.sh [--working-tree]"; fails --release)
 (FAKE_RELEASES="rego-v1.0.0-rc1 rego-vlatest spec-v0.1"; expected="kosli-dev/ergo has no published rego-vX.Y.Z release"; fails)

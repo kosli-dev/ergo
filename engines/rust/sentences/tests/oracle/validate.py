@@ -153,7 +153,7 @@ def case_lines():
 
 def ergo_rego(opa, lines):
     query = [
-        "eval", "-d", "ergo.rego", "-d", os.path.relpath(os.path.join(HERE, "oracle_test.rego"), ROOT),
+        "eval", "-d", "engines/rego/ergo.rego", "-d", os.path.relpath(os.path.join(HERE, "oracle_test.rego"), ROOT),
         "-I", "--format", "json", "data.oracle.out",
     ]
     run = subprocess.run(opa + query, input=json.dumps(lines), capture_output=True, text=True, cwd=ROOT)

@@ -10,7 +10,7 @@ source=$(cat site/prepared/source)
 
 if [ "$source" = "working tree" ]; then
   node --test site/assets/js/tutorial/lib.test.mjs
-  python3 site/check_examples.py site/data/examples.yaml ergo.rego
+  python3 site/check_examples.py site/data/examples.yaml engines/rego/ergo.rego
   exit 0
 fi
 

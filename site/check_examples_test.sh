@@ -10,7 +10,7 @@ fails() {
     echo "the change $1 doesn't apply to site/data/examples.yaml" >&2
     exit 1
   fi
-  if out=$(python3 site/check_examples.py "$dir/examples.yaml" ergo.rego); then
+  if out=$(python3 site/check_examples.py "$dir/examples.yaml" engines/rego/ergo.rego); then
     echo "check_examples.py should fail with \"$2\", and passed" >&2
     exit 1
   fi
