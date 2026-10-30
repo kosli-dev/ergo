@@ -1359,7 +1359,7 @@ mod tests {
     fn a_for_item_that_names_its_own_alias_in_its_path_is_written_wrong() {
         assert_eq!(
             problems("every xs named by x as x"),
-            json!(["unknown alias x"])
+            json!(["for: unknown alias x"])
         );
     }
 
@@ -1367,7 +1367,7 @@ mod tests {
     fn a_for_item_that_names_a_later_alias_in_its_path_is_written_wrong() {
         assert_eq!(
             problems("every xs named by q as p, every ys as q"),
-            json!(["unknown alias q"])
+            json!(["for: unknown alias q"])
         );
     }
 
@@ -1375,7 +1375,7 @@ mod tests {
     fn a_for_item_that_names_its_own_alias_in_a_whose_is_written_wrong() {
         assert_eq!(
             problems("every xs whose v named by x is 1 as x"),
-            json!(["unknown alias x"])
+            json!(["for: unknown alias x"])
         );
     }
 

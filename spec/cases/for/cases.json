@@ -12705,7 +12705,7 @@
                 "locations": [],
                 "name": "checks.c",
                 "value": [
-                  "unknown alias x"
+                  "for: unknown alias x"
                 ]
               }
             ],
@@ -12785,7 +12785,7 @@
                 "locations": [],
                 "name": "checks.c",
                 "value": [
-                  "unknown alias q"
+                  "for: unknown alias q"
                 ]
               }
             ],
@@ -12865,7 +12865,7 @@
                 "locations": [],
                 "name": "checks.c",
                 "value": [
-                  "unknown alias o"
+                  "for: unknown alias o"
                 ]
               }
             ],
