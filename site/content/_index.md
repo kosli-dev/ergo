@@ -1,9 +1,9 @@
 ---
-title: "Ergo - An open spec for explainable policies."
+title: "Ergo - An open language for explainable policies."
 
 hero:
-  title: An open spec for explainable policies.
-  lede: ==ergo== is an open source spec for writing policies that explain themselves. Instead of a yes or no, every decision returns an audit report of what was checked, and why it passed or failed. Run your policies on Open Policy Agent with `ergo.rego`, or with the `ergo` command.
+  title: An open language for explainable policies.
+  lede: ==ergo== is an open source language for writing policies that explain themselves. Instead of a yes or no, every decision returns an audit report of what was checked, and why it passed or failed. Run your policies on Open Policy Agent with `ergo.rego`, or with the `ergo` command.
   primary: Get started
   secondary: GitHub
   verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
@@ -87,9 +87,9 @@ manifesto:
     - Everything has a reason.
 
 architecture:
-  title: One spec.
+  title: One language.
   muted: Two engines.
-  lede: The spec says what each check means and what the report holds. `ergo.rego` runs it on Open Policy Agent. The Rust engine runs it as the `ergo` command or in a browser, and is still experimental. Both pass every case in the spec and give the same report, apart from the engine's name.
+  lede: "The spec defines the language: what each check means and what the report holds. `ergo.rego` runs it on Open Policy Agent. The Rust engine runs it as the `ergo` command or in a browser, and is still experimental. Both pass every case in the spec and give the same report, apart from the engine's name."
   engines:
     - name: ergo.rego
       on: on OPA
