@@ -6289,16 +6289,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every deep whose k is 1 as z, every z.subs as y",
         "every deep whose k is 1 as z, every z.subs as y",
-        "every pull_requests.meta.labels as l",
-        "every pull_requests.meta.labels as l",
         &[],
         &[],
     ),
     (
         "every deep whose k is 1 as z, every z.subs whose m is 1 as y",
         "every deep whose k is 1 as z, every z.subs whose m is 1 as y",
-        "first of pull_requests.title as t",
-        "first of pull_requests.title as t",
         &[],
         &[],
     ),
@@ -6314,6 +6310,19 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every pull_requests.meta.labels as l",
+        "every pull_requests.meta.labels as l",
+        &[],
+        &[],
+    ),
+    (
+        "first of pull_requests.title as t",
+        "first of pull_requests.title as t",
+        &[],
+        &[],
+    ),
+    (
         "some pull_requests.title as t",
         "some pull_requests.title as t",
         &[],
