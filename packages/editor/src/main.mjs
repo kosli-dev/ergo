@@ -1,7 +1,7 @@
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
 import { initSync, report as rustReport } from "ergo-wasm";
-import { ENGINES, ENGINE_LABELS, readEngine, engineNote, makeRustRunner } from "./engines.mjs";
+import { ENGINES, ENGINE_LABELS, readEngine, engineNote, engineMessage, makeRustRunner, renewOnPanic } from "./engines.mjs";
 import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
 import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
@@ -422,7 +422,7 @@ const table = (t) => {
 const showReport = (out, result) => {
   out.replaceChildren();
   if (runnerErrors[engine]) return out.append(el("p", "notice", runnerErrors[engine]));
-  if (!runners[engine]) return out.append(el("p", "notice info", "Ergo is still loading."));
+  if (!runners[engine]) return out.append(el("p", "notice info", engineMessage(engine, "loading")));
   if (!result.policy) return out.append(el("p", "notice", "The policy has problems, so it can't run yet. The problems are listed below the editor."));
   const input = parseJson(reportInput, "input");
   if (!input.ok) return out.append(el("p", "notice", input.message));
@@ -432,7 +432,7 @@ const showReport = (out, result) => {
   try {
     report = runners[engine](reportInput, result.policy, reportParams);
   } catch (e) {
-    return out.append(el("p", "notice", "Ergo couldn't run this: " + e.message));
+    return out.append(el("p", "notice", engineMessage(engine, "run", e.message)));
   }
   if (report === null) return out.append(el("p", "notice", "Ergo gave no report for this policy and input."));
   out.append(el("p", "notice info", [report.compliant ? "Every requirement is met." : "At least one requirement is not met.", engineNote(report)].filter(Boolean).join(" ")));
@@ -738,7 +738,7 @@ const loaded = (name, run) => {
   if (shows("report") && last) render(last);
 };
 const failed = (name, e) => {
-  runnerErrors[name] = "Ergo didn't load: " + e.message;
+  runnerErrors[name] = engineMessage(name, "failed", e.message);
   if (shows("report") && last) render(last);
 };
 opa.loadPolicy(decode(wasm), undefined, { "time.parse_rfc3339_ns": parseTime }).then(
@@ -749,8 +749,13 @@ opa.loadPolicy(decode(wasm), undefined, { "time.parse_rfc3339_ns": parseTime }).
   (e) => failed("opa", e),
 );
 try {
-  initSync({ module: decode(rustWasm) });
-  loaded("rust", makeRustRunner(rustReport));
+  loaded(
+    "rust",
+    renewOnPanic(() => {
+      initSync({ module: decode(rustWasm) });
+      return makeRustRunner(rustReport);
+    }),
+  );
 } catch (e) {
   failed("rust", e);
 }
