@@ -2,7 +2,7 @@
 
 Ergo checks that your deployments, pull requests or expenses follow rules written as plain sentences, like `approved_by is a non-empty string`, and gives back a report that says what it checked, what it found and why each check passed or failed. Whoever owns a rule can write it, and whoever has to trust the result can read the report without knowing how it was computed.
 
-Ergo is at 0.2. Any 0.x release may still change what a policy says or what a report shows, and [`CHANGELOG.md`](CHANGELOG.md) says when it does.
+Ergo is at 0.3. Any 0.x release may still change what a policy says or what a report shows, and [`CHANGELOG.md`](CHANGELOG.md) says when it does.
 
 ## What Ergo does
 
@@ -76,8 +76,6 @@ cargo install --locked --path cli
 
 To build it with Docker instead, without Rust, see [`engines/rust/README.md`](engines/rust/README.md#running-from-the-command-line).
 
-The Rust engine follows the spec on `main` until spec 0.3 is released, so a policy for it says `ergo_spec: v0.3-dev` instead of `v0.2`.
-
 ### 2. Write a policy
 
 Here is a policy that says "_every production deployment must have an approver_". It goes in a YAML file in `policy/`, next to `ergo.rego` if that's your engine.
@@ -85,7 +83,7 @@ Here is a policy that says "_every production deployment must have an approver_"
 `policy/policy.yaml`:
 
 ```yaml
-ergo_spec: v0.2
+ergo_spec: v0.3
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -99,8 +97,6 @@ requirements:
         description: Someone approved the deployment
         assert: approved_by is a non-empty string
 ```
-
-With the Rust engine, change `ergo_spec: v0.2` to `ergo_spec: v0.3-dev`.
 
 `ergo_spec` says which version of Ergo's [spec](spec/README.md#versions) the policy is written for. Ergo reads only the version it follows, so a policy without it, or written for another version, fails.
 
@@ -183,9 +179,9 @@ The report records every check Ergo ran, including the ones that passed. It come
   "description": "",
   "engine": {
     "name": "ergo.rego",
-    "version": "0.2.0"
+    "version": "0.3.0-dev"
   },
-  "ergo": "v0.2",
+  "ergo": "v0.3",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
@@ -193,7 +189,7 @@ The report records every check Ergo ran, including the ones that passed. It come
 }
 ```
 
-That is the report from `ergo.rego`. The Rust engine gives the same report, except that `engine` is `{"name": "ergo-policy-engine", "version": "0.1.0"}` and `ergo` is `"v0.3-dev"`.
+That is the report from `ergo.rego`. The Rust engine gives the same report, except that `engine` is `{"name": "ergo-policy-engine", "version": "0.1.0"}`.
 
 - `compliant` is the overall answer. When you need a plain yes or no to allow or block something, this is the one to use: `allow := report.compliant`.
 - `requirements` has an entry for each requirement. It repeats the requirement's `description`, and its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. When it's `not_met`, `causes` says why, worst first, with how many rows each: here `[{"cause": "absent", "rows": 1}]`. It also says how many subjects were found and kept, and lists every check with a readable `expression`, which is the sentence as you wrote it.

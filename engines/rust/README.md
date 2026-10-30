@@ -56,7 +56,7 @@ ergo report --policy policy.yaml --input deployments.json
 ergo violations --policy policy.yaml --input deployments.json
 ```
 
-To build it and run it with Docker, put the policy and the input from the [README](../../README.md#2-write-a-policy) in a folder, with `ergo_spec: v0.3-dev` in the policy because that's the version this engine reads, and run this from that folder, with `$REPO` set to the root of the repo:
+To build it and run it with Docker, put the policy and the input from the [README](../../README.md#2-write-a-policy) in a folder, and run this from that folder, with `$REPO` set to the root of the repo:
 
 ```sh
 docker run --rm -v "$REPO":/src -v "$PWD":/work -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '

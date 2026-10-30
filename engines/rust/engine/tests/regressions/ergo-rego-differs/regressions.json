@@ -12,7 +12,7 @@
       ]
     },
     "policy": {
-      "ergo_spec": "v0.3-dev",
+      "ergo_spec": "v0.3",
       "requirements": {
         "r": {
           "checks": {
@@ -31,7 +31,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.3-dev",
+      "ergo": "v0.3",
       "meta": {},
       "requirements": {
         "r": {

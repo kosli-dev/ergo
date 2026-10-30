@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
-const POLICY_YAML: &str = r#"ergo_spec: v0.3-dev
+const POLICY_YAML: &str = r#"ergo_spec: v0.3
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -188,7 +188,7 @@ fn pretty_output_escapes_like_opa() {
     let policy = write(
         &dir,
         "policy.json",
-        r#"{"ergo_spec":"v0.3-dev","meta":{"k":"a<b>&c\u2028é"}}"#,
+        r#"{"ergo_spec":"v0.3","meta":{"k":"a<b>&c\u2028é"}}"#,
     );
     let input = write(&dir, "input.json", "{}");
     let text = out(&ergo(&["report", "--policy", &policy, "--input", &input]));
@@ -204,7 +204,7 @@ fn params_are_read_from_the_params_file() {
     let policy = write(
         &dir,
         "policy.yaml",
-        "ergo_spec: v0.3-dev\nsubjects:\n  item:\n    from: items\n    identified_by: id\nrequirements:\n  r:\n    subject: item\n    checks:\n      small: n is at most $params.limit\n",
+        "ergo_spec: v0.3\nsubjects:\n  item:\n    from: items\n    identified_by: id\nrequirements:\n  r:\n    subject: item\n    checks:\n      small: n is at most $params.limit\n",
     );
     let input = write(&dir, "input.json", r#"{"items":[{"id":"a","n":5}]}"#);
     let low = write(&dir, "low.yaml", "limit: 3\n");

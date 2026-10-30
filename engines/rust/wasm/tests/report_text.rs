@@ -2,7 +2,7 @@ use ergo_policy_wasm::report_text;
 use serde_json::Value;
 
 const POLICY: &str = r#"{
-  "ergo_spec": "v0.3-dev",
+  "ergo_spec": "v0.3",
   "subjects": {"item": {"from": "items", "identified_by": "id"}},
   "requirements": {"r": {"subject": "item", "checks": {"exact": "n is 9007199254740993"}}}
 }"#;
@@ -57,7 +57,7 @@ fn params_that_are_not_json_are_named_in_the_message() {
 #[test]
 fn a_number_that_cannot_be_read_comes_back_with_its_digits() {
     let big = format!("1e1{}", "0".repeat(36));
-    let policy = r#"{"ergo_spec": "v0.3-dev", "subjects": {"item": {"from": "items"}}, "requirements": {"r": {"subject": "item", "checks": {"c": "size is at least 5"}}}}"#;
+    let policy = r#"{"ergo_spec": "v0.3", "subjects": {"item": {"from": "items"}}, "requirements": {"r": {"subject": "item", "checks": {"c": "size is at least 5"}}}}"#;
     let text = report_text(
         &format!(r#"{{"items": [{{"size": {big}}}]}}"#),
         policy,

@@ -1,7 +1,7 @@
 [
   {
     "description": "a list of strings read as subjects, checked against the params",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every deployment.regions"}}, "requirements": {"allowed": {"subject": "region", "checks": {"allowed": "it is one of $params.allowed_regions"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every deployment.regions"}}, "requirements": {"allowed": {"subject": "region", "checks": {"allowed": "it is one of $params.allowed_regions"}}}},
     "params": {"allowed_regions": ["eu-west-1"]},
     "cases": [
       {
@@ -19,7 +19,7 @@
   },
   {
     "description": "it is checked like a field that holds the same value",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is a string"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is a string"}}}},
     "cases": [
       {
         "description": "a string passes, null fails as null and a number as value",
@@ -35,7 +35,7 @@
   },
   {
     "description": "it is a non-empty string",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is a non-empty string"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is a non-empty string"}}}},
     "cases": [
       {
         "description": "an empty string and null fail",
@@ -51,7 +51,7 @@
   },
   {
     "description": "it exists",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it exists"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it exists"}}}},
     "cases": [
       {
         "description": "null fails as value, as a field holding null does",
@@ -66,7 +66,7 @@
   },
   {
     "description": "it is not empty",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is not empty"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is not empty"}}}},
     "cases": [
       {
         "description": "a string and a non-empty list pass, an empty string, an empty list and null fail",
@@ -84,7 +84,7 @@
   },
   {
     "description": "it compared with a number",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is at least 2"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is at least 2"}}}},
     "cases": [
       {
         "description": "a string is unusable and null fails as null",
@@ -101,7 +101,7 @@
   },
   {
     "description": "it matched against a pattern",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it starts with 'a'"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it starts with 'a'"}}}},
     "cases": [
       {
         "description": "a number is unusable",
@@ -118,7 +118,7 @@
   },
   {
     "description": "it is an object",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is an object"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is an object"}}}},
     "cases": [
       {
         "description": "it works for an object subject, and a string, a number, a list and null fail",
@@ -136,7 +136,7 @@
   },
   {
     "description": "it is a list",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is a list"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is a list"}}}},
     "cases": [
       {
         "description": "a subject that is a list passes",
@@ -152,7 +152,7 @@
   },
   {
     "description": "every and some on a subject that is a list",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"e": "every it is a string", "s": "some it is a string"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"e": "every it is a string", "s": "some it is a string"}}}},
     "cases": [
       {
         "description": "each item of the list is read, and the rows name it with [] and its items by position",
@@ -177,7 +177,7 @@
   },
   {
     "description": "count of and sum of on a subject that is a list",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"n": "count of it is 2", "t": "sum of it is 3"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"n": "count of it is 2", "t": "sum of it is 3"}}}},
     "cases": [
       {
         "description": "the list is counted and summed",
@@ -200,7 +200,7 @@
   },
   {
     "description": "a field called it",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": ".it is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": ".it is 1"}}}},
     "cases": [
       {
         "description": "is written with a dot and reads the field, and the row names it .it",
@@ -217,7 +217,7 @@
   },
   {
     "description": "a field called it and the subject itself in one check",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": ".it is 1 and it is an object"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": ".it is 1 and it is an object"}}}},
     "cases": [
       {
         "description": "the dot picks the field and the bare word picks the subject",
@@ -233,7 +233,7 @@
   },
   {
     "description": "a field called it, written in quotes",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "\"it\" is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "\"it\" is 1"}}}},
     "cases": [
       {
         "description": "is read as the field and printed with a dot",
@@ -248,7 +248,7 @@
   },
   {
     "description": "a bare it where a field called it used to be read",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is an object"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is an object"}}}},
     "cases": [
       {
         "description": "reads the subject, not its field it",
@@ -262,7 +262,7 @@
   },
   {
     "description": "it in a check with and",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is 1 and it is a number"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is 1 and it is a number"}}}},
     "cases": [
       {
         "description": "each assertion reads the subject, and failed_assertions name them with it",
@@ -277,7 +277,7 @@
   },
   {
     "description": "it in the options of an any_of",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"any_of": {"num": "it is a number", "str": ["it is a string", "it is 'a'"]}}}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"any_of": {"num": "it is a number", "str": ["it is a string", "it is 'a'"]}}}}}},
     "cases": [
       {
         "description": "an option passes when its sentences pass",
@@ -293,7 +293,7 @@
   },
   {
     "description": "it after a for line",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every l as e", "assert": ["it is an object", "e is 1"]}}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every l as e", "assert": ["it is an object", "e is 1"]}}}}},
     "cases": [
       {
         "description": "is still the subject, and the alias is the item",
@@ -309,7 +309,7 @@
   },
   {
     "description": "it in the whose of a from line",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"word": {"from": "every ws whose it is a string and it starts with 'b'"}}, "requirements": {"r": {"subject": "word", "checks": {"c": "it is a string"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"word": {"from": "every ws whose it is a string and it starts with 'b'"}}, "requirements": {"r": {"subject": "word", "checks": {"c": "it is a string"}}}},
     "cases": [
       {
         "description": "each item is read as the subject, and the $applies row names it it",
@@ -328,7 +328,7 @@
   },
   {
     "description": "count of it in the whose of a from line",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"group": {"from": "every xs whose count of it is at least 2"}}, "requirements": {"r": {"subject": "group", "checks": {"c": "it is a list"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"group": {"from": "every xs whose count of it is at least 2"}}, "requirements": {"r": {"subject": "group", "checks": {"c": "it is a list"}}}},
     "cases": [
       {
         "description": "each list is counted",
@@ -345,7 +345,7 @@
   },
   {
     "description": "two equal strings read as subjects",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is a string"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is a string"}}}},
     "cases": [
       {
         "description": "fail $unique_ids, and each is still checked",
@@ -364,7 +364,7 @@
   },
   {
     "description": "it followed by a field",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it.name is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it.name is 1"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -378,7 +378,7 @@
   },
   {
     "description": "it followed by a quoted field",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it.\"x y\" is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it.\"x y\" is 1"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -392,7 +392,7 @@
   },
   {
     "description": "it followed by a position in brackets",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it[0] is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it[0] is 1"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -406,7 +406,7 @@
   },
   {
     "description": "it followed by named by",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it named by $params.k is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it named by $params.k is 1"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -420,7 +420,7 @@
   },
   {
     "description": "a position of it written in words",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "first of it is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "first of it is 1"}}}},
     "cases": [
       {
         "description": "reads one item of a subject that is a list, as it reads one of a field's list, and names it item 1 of it",
@@ -438,7 +438,7 @@
   },
   {
     "description": "item 2 of it",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "item 2 of it is 'x'"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "item 2 of it is 'x'"}}}},
     "cases": [
       {
         "description": "reads the second item",
@@ -456,7 +456,7 @@
   },
   {
     "description": "every on a position of it",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "every first of it is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "every first of it is 1"}}}},
     "cases": [
       {
         "description": "names the item and the list it came from",
@@ -473,7 +473,7 @@
   },
   {
     "description": "a position of it on the right side",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "x is first of it"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "x is first of it"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -487,7 +487,7 @@
   },
   {
     "description": "a position of it followed by a field",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "first of it.name is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "first of it.name is 1"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -501,7 +501,7 @@
   },
   {
     "description": "it in brackets followed by a field",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it[0].name is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it[0].name is 1"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -515,7 +515,7 @@
   },
   {
     "description": "it on the right side of a phrase",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "$params.p equals it"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "$params.p equals it"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -529,7 +529,7 @@
   },
   {
     "description": "it as the value of is",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name is it"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name is it"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -543,7 +543,7 @@
   },
   {
     "description": "it as the list of is one of",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name is one of it"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name is one of it"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -557,7 +557,7 @@
   },
   {
     "description": "it as a term of plus",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "count of name is 1 plus it"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "count of name is 1 plus it"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -571,7 +571,7 @@
   },
   {
     "description": "it as the second assertion's value",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is 1 and name is it"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "it is 1 and name is it"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -585,7 +585,7 @@
   },
   {
     "description": "it in the whose of a check",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "every name whose it is 1 is 2"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "every name whose it is 1 is 2"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -599,7 +599,7 @@
   },
   {
     "description": "it on the right side of a whose in a check",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "every name whose x is it is 2"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "every name whose x is it is 2"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -613,7 +613,7 @@
   },
   {
     "description": "it in the whose of a count",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "count of l whose it is 1 is 2"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "count of l whose it is 1 is 2"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -627,7 +627,7 @@
   },
   {
     "description": "it as the path of a for item",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every it as e", "assert": "e is 1"}}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every it as e", "assert": "e is 1"}}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -641,7 +641,7 @@
   },
   {
     "description": "it in the whose of a for item",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every l whose it is 1 as e", "assert": "e is 1"}}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every l whose it is 1 as e", "assert": "e is 1"}}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -655,7 +655,7 @@
   },
   {
     "description": "it as the sorted by of a for item",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "last of l sorted by it as e", "assert": "e is 1"}}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "last of l sorted by it as e", "assert": "e is 1"}}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -669,7 +669,7 @@
   },
   {
     "description": "it as the path of a from line",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every it"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name exists"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every it"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name exists"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -683,7 +683,7 @@
   },
   {
     "description": "it on the right side of a whose in a from line",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "xs whose name is it"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name exists"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "xs whose name is it"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name exists"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -697,7 +697,7 @@
   },
   {
     "description": "it as the key of a named by",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "$params.m named by it is 1"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "$params.m named by it is 1"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -711,7 +711,7 @@
   },
   {
     "description": "it as a for alias",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every l as it", "assert": "it is 1"}}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every l as it", "assert": "it is 1"}}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -725,7 +725,7 @@
   },
   {
     "description": "it as the path of a part",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"region": {"from": "every xs", "has": {"p": "it"}}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name exists"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"region": {"from": "every xs", "has": {"p": "it"}}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "name exists"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -739,7 +739,7 @@
   },
   {
     "description": "a subject called it",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"it": {"from": "xs"}}, "requirements": {"r": {"subject": "it", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"it": {"from": "xs"}}, "requirements": {"r": {"subject": "it", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -753,7 +753,7 @@
   },
   {
     "description": "a subject called it that another requirement doesn't use",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"it": {"from": "xs"}, "b": {"from": "xs"}}, "requirements": {"r": {"subject": "b", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"it": {"from": "xs"}, "b": {"from": "xs"}}, "requirements": {"r": {"subject": "b", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "a requirement that doesn't use the subject called it is read as usual",
@@ -767,7 +767,7 @@
   },
   {
     "description": "subjects called It, items and it x",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"It": {"from": "xs"}, "items": {"from": "xs"}, "it x": {"from": "xs"}}, "requirements": {"r": {"subject": "items", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"It": {"from": "xs"}, "items": {"from": "xs"}, "it x": {"from": "xs"}}, "requirements": {"r": {"subject": "items", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "a requirement that doesn't use the subject called it is read as usual",
@@ -781,7 +781,7 @@
   },
   {
     "description": "some it in a from line's whose",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"tag list": {"from": "every releases.tags whose some it is \"latest\""}}, "requirements": {"r": {"subject": "tag list", "min_subjects": 0, "checks": {"c": "every it is a string"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"tag list": {"from": "every releases.tags whose some it is \"latest\""}}, "requirements": {"r": {"subject": "tag list", "min_subjects": 0, "checks": {"c": "every it is a string"}}}},
     "cases": [
       {
         "description": "keeps the tag lists that have latest, and fails the requirement for a value that isn't a list",
@@ -801,7 +801,7 @@
   },
   {
     "description": "a check that reads it, on a plain value, a list and a from line that keeps lists",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"plain": {"from": "every values"}, "list": {"from": "every lists"}, "kept": {"from": "every sets whose some it is 1"}}, "requirements": {"p": {"subject": "plain", "checks": {"c": "it is 1"}}, "l": {"subject": "list", "checks": {"all": "every it is 1", "size": "count of it is 2"}}, "k": {"subject": "kept", "checks": {"c": "it is not empty"}}}},
+    "policy": {"ergo_spec": "v0.3", "subjects": {"plain": {"from": "every values"}, "list": {"from": "every lists"}, "kept": {"from": "every sets whose some it is 1"}}, "requirements": {"p": {"subject": "plain", "checks": {"c": "it is 1"}}, "l": {"subject": "list", "checks": {"all": "every it is 1", "size": "count of it is 2"}}, "k": {"subject": "kept", "checks": {"c": "it is not empty"}}}},
     "cases": [
       {
         "description": "has the location of the subject itself for it, one for each item for every it and count of it, and where each failed item was read",
