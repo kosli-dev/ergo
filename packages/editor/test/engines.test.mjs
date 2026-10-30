@@ -2,8 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { DEFAULT_ENGINE, ENGINES, ENGINE_LABELS, engineMessage, engineNote, makeRustRunner, readEngine, stopOnPanic } from "../src/engines.mjs";
 
-test("the two engines are labelled by the file they run", () => {
-  assert.deepEqual(ENGINES.map((e) => ENGINE_LABELS[e]), ["ergo.rego", "Rust port (experimental)"]);
+test("the two engines are labelled Rego engine and Rust engine", () => {
+  assert.deepEqual(ENGINES.map((e) => ENGINE_LABELS[e]), ["Rego engine", "Rust engine (experimental)"]);
   assert.deepEqual(Object.keys(ENGINE_LABELS).sort(), [...ENGINES].sort());
 });
 
@@ -17,10 +17,11 @@ test("a missing or unknown saved engine gives ergo.rego", () => {
 });
 
 test("the note names the engine and its version", () => {
-  assert.equal(engineNote({ engine: { name: "ergo-engine", version: "0.1.0-dev" } }), "Report made by the Rust port (ergo-engine 0.1.0-dev).");
-  assert.equal(engineNote({ engine: { name: "ergo-engine" } }), "Report made by the Rust port (ergo-engine).");
-  assert.equal(engineNote({ engine: { name: "ergo.rego", version: "0.2.0" } }), "Report made by ergo.rego 0.2.0.");
-  assert.equal(engineNote({ engine: { name: "ergo.rego" } }), "Report made by ergo.rego.");
+  assert.equal(engineNote({ engine: { name: "ergo-engine", version: "0.1.0-dev" } }), "Report made by the Rust engine (ergo-engine 0.1.0-dev).");
+  assert.equal(engineNote({ engine: { name: "ergo-engine" } }), "Report made by the Rust engine (ergo-engine).");
+  assert.equal(engineNote({ engine: { name: "ergo.rego", version: "0.3.0-dev" } }), "Report made by the Rego engine (ergo.rego 0.3.0-dev).");
+  assert.equal(engineNote({ engine: { name: "ergo.rego" } }), "Report made by the Rego engine (ergo.rego).");
+  assert.equal(engineNote({ engine: { name: "other", version: "1.0" } }), "Report made by other 1.0.");
 });
 
 test("the note is empty when the report doesn't say which engine made it", () => {
@@ -43,16 +44,16 @@ test("the Rust runner gives null for a report of null and lets an error through"
 });
 
 test("the messages name the engine that was picked", () => {
-  assert.equal(engineMessage("rust", "loading"), "The Rust port is still loading.");
-  assert.equal(engineMessage("opa", "loading"), "ergo.rego is still loading.");
-  assert.equal(engineMessage("rust", "failed", "no memory"), "The Rust port didn't load: no memory");
-  assert.equal(engineMessage("opa", "failed", "bad Wasm"), "ergo.rego didn't load: bad Wasm");
-  assert.equal(engineMessage("rust", "stopped"), "The Rust port stopped after an internal error. Reload the page to use it again.");
-  assert.equal(engineMessage("rust", "run", "unreachable"), "The Rust port couldn't run this: unreachable");
-  assert.equal(engineMessage("opa", "run", "boom"), "ergo.rego couldn't run this: boom");
+  assert.equal(engineMessage("rust", "loading"), "The Rust engine is still loading.");
+  assert.equal(engineMessage("opa", "loading"), "The Rego engine is still loading.");
+  assert.equal(engineMessage("rust", "failed", "no memory"), "The Rust engine didn't load: no memory");
+  assert.equal(engineMessage("opa", "failed", "bad Wasm"), "The Rego engine didn't load: bad Wasm");
+  assert.equal(engineMessage("rust", "stopped"), "The Rust engine stopped after an internal error. Reload the page to use it again.");
+  assert.equal(engineMessage("rust", "run", "unreachable"), "The Rust engine couldn't run this: unreachable");
+  assert.equal(engineMessage("opa", "run", "boom"), "The Rego engine couldn't run this: boom");
 });
 
-test("after a panic the Rust port stops and says to reload the page", () => {
+test("after a panic the Rust engine stops and says to reload the page", () => {
   const calls = [];
   const run = stopOnPanic("rust", (x) => {
     calls.push(x);
@@ -61,7 +62,7 @@ test("after a panic the Rust port stops and says to reload the page", () => {
   });
   assert.deepEqual(run(0), { x: 0 });
   for (const x of [1, 2]) {
-    assert.throws(() => run(x), (e) => e.stopped === true && e.message === "The Rust port stopped after an internal error. Reload the page to use it again.");
+    assert.throws(() => run(x), (e) => e.stopped === true && e.message === "The Rust engine stopped after an internal error. Reload the page to use it again.");
   }
   assert.deepEqual(calls, [0, 1]);
 });

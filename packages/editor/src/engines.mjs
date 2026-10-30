@@ -2,7 +2,7 @@
 export const ENGINES = ["opa", "rust"];
 
 /** The name each engine shows. */
-export const ENGINE_LABELS = { opa: "ergo.rego", rust: "Rust port (experimental)" };
+export const ENGINE_LABELS = { opa: "Rego engine", rust: "Rust engine (experimental)" };
 
 const RUST_ENGINE_NAME = "ergo-engine";
 
@@ -16,13 +16,15 @@ export const readEngine = (text) => (ENGINES.includes(text) ? text : DEFAULT_ENG
 export const engineNote = (report) => {
   const engine = report?.engine;
   if (typeof engine?.name !== "string") return "";
-  if (engine.name === RUST_ENGINE_NAME) return typeof engine.version === "string" ? `Report made by the Rust port (${engine.name} ${engine.version}).` : `Report made by the Rust port (${engine.name}).`;
-  return typeof engine.version === "string" ? `Report made by ${engine.name} ${engine.version}.` : `Report made by ${engine.name}.`;
+  const made = typeof engine.version === "string" ? `${engine.name} ${engine.version}` : engine.name;
+  if (engine.name === RUST_ENGINE_NAME) return `Report made by the Rust engine (${made}).`;
+  if (engine.name === "ergo.rego") return `Report made by the Rego engine (${made}).`;
+  return `Report made by ${made}.`;
 };
 
 /** Says that the engine is still loading, didn't load or couldn't run, naming the engine that was picked. `detail` is the error's message and ends the text for `"failed"` and `"run"`. */
 export const engineMessage = (engine, kind, detail = "") => {
-  const name = engine === "rust" ? "The Rust port" : "ergo.rego";
+  const name = engine === "rust" ? "The Rust engine" : "The Rego engine";
   if (kind === "loading") return `${name} is still loading.`;
   if (kind === "failed") return `${name} didn't load: ${detail}`;
   if (kind === "stopped") return `${name} stopped after an internal error. Reload the page to use it again.`;
