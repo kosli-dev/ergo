@@ -67,7 +67,7 @@ const rustGlue = () => {
   const glue = join(rustPkg, "ergo_wasm.js");
   const bytes = join(rustPkg, "ergo_wasm_bg.wasm");
   if (!existsSync(glue) || !existsSync(bytes)) {
-    throw new Error(`The Rust Wasm isn't built: ${rustPkg} has no ergo_wasm.js and ergo_wasm_bg.wasm. Build it with the command under "Building the engine for a browser" in ports/rust/README.md.`);
+    throw new Error(`The Rust Wasm isn't built: ${rustPkg} has no ergo_wasm.js and ergo_wasm_bg.wasm. Build it with the command under "Building for a browser" in ports/rust/README.md.`);
   }
   return { glue, bytes: readFileSync(bytes).toString("base64") };
 };
