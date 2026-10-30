@@ -16577,6 +16577,117 @@
             }
           }
         ]
+      },
+      {
+        "description": "fails as null when a kept item comes before an item with a null k and a field that isn't a number",
+        "rules": [
+          "tally.whose"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "t",
+              "items": [
+                {
+                  "k": "a",
+                  "x": 1
+                },
+                {
+                  "k": null,
+                  "x": "s"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ]
+              },
+              {
+                "name": "items[].x",
+                "value": [
+                  1,
+                  "s"
+                ],
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as null when a kept item comes before an item with a null k and no field",
+        "rules": [
+          "tally.whose"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "t",
+              "items": [
+                {
+                  "k": "a",
+                  "x": 1
+                },
+                {
+                  "k": null
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1"
+                ]
+              },
+              {
+                "name": "items[].x",
+                "value": [
+                  1,
+                  null
+                ],
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1"
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   },
