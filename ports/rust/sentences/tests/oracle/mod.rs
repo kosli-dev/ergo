@@ -775,7 +775,6 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "lockfile whose status is \"COMPLETE\"",
     ),
     ("m whose id exists", "m whose id exists"),
-    ("meta", "meta"),
     ("meta.w", "meta.w"),
     ("mid.leaves", "mid.leaves"),
     (
@@ -2645,10 +2644,8 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ),
     ("meta", "meta"),
     ("meta.id", "meta.id"),
-    ("meta", "meta"),
     ("meta.w", "meta.w"),
     ("name", "name"),
-    ("n", "n"),
     ("ps", "ps"),
     ("p", "p"),
     ("pa", "pa"),
