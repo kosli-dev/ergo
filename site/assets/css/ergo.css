@@ -311,6 +311,9 @@ p code, li code, dd code, td code {
 /* ——— Ops ——— */
 
 /* ——— Steps ——— */
+.steps__way { margin: 48px 0 0; font: 500 14px/1.25 var(--mono); color: var(--muted); }
+.steps__way + .steps { margin-top: 16px; }
+.start__editor { margin: 32px 0 0; color: var(--muted); }
 .steps { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .steps li { padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-3); display: flex; flex-direction: column; }
 .steps__n { color: var(--lime); font-size: 13px; }
@@ -443,8 +446,8 @@ p code, li code, dd code, td code {
 @media (max-width: 640px) {
   .site-footer__inner { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   body { font-size: 16px; }
-  /* Without JavaScript the nav stays inline, so drop Reference to make room. */
-  html:not(.js) .site-nav a:not(.btn):nth-child(2) { display: none; }
+  /* Without JavaScript the nav stays inline, so drop Reference and Editor to make room. */
+  html:not(.js) .site-nav a:not(.btn):nth-child(n+2) { display: none; }
   /* With JavaScript: a burger button opens the nav as a panel under the header. */
   .js .menu-toggle {
     display: grid; place-content: center; gap: 5px; width: 44px; height: 44px; margin-right: -10px;

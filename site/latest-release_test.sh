@@ -16,6 +16,12 @@ rego-v0.2.0
 rego-v1.0.0-rc1
 rego-v2
 rego-vlatest
+rust-v0.2.0
+rust-v0.10.1
+rust-v0.9.0
+rust-v1.0.0-rc1
+rust-v2
+rust-vlatest
 spec-v0.10
 spec-v0.9
 spec-v1.0.0
@@ -24,14 +30,20 @@ spec-v1.0-dev'
 bad='rego-v1.0.0-rc1
 rego-v2
 rego-vlatest
+rust-v1.0.0-rc1
+rust-v2
+rust-vlatest
 spec-v1.0.0
 spec-v2
 spec-v1.0-dev'
 
 check rego "" "" "no tags"
+check rust "" "" "no tags"
 check spec "" "" "no tags"
 check rego "" "$bad" "only bad-shaped tags"
+check rust "" "$bad" "only bad-shaped tags"
 check spec "" "$bad" "only bad-shaped tags"
 check rego rego-v0.10.0 "$all" "mixed tags"
+check rust rust-v0.10.1 "$all" "mixed tags"
 check spec spec-v0.10 "$all" "mixed tags"
 echo "latest-release.sh picks the highest version and ignores other tags"
