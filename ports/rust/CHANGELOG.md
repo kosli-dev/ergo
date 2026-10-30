@@ -13,4 +13,3 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - `ergo-wasm` builds the report in a browser, from JSON text.
 - `ergo-sentences-wasm` reads check sentences in a browser, from and to JSON text.
 - A `for` item whose path goes on into a list item that isn't an object, `null` included, fails that item as `not_an_object`, as `every` and `some` do, where it failed as `unusable`.
-- `from: $input` makes a subject of each item when the whole input is a list, as a `from` path that ends on a list does. It failed `$min_subjects` as `unusable`, and on an empty list it now fails as `value`.
