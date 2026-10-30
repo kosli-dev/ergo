@@ -1591,8 +1591,8 @@ The requirement's entry has `"subject": "prod deployment"`, and `subjects` is:
 Each entry has:
 
 - `description` is the subject's, or `""` when it has none. A `description` that isn't a string is [written wrong](#subjects) and shows as `""`.
-- `from` says how the subject is found, as a [from line](#from-lines) is written. A `from` written as a line is printed the same way whatever spaces it had. A subject without `from` reads the input field named like it. A `from` that is written wrong, because it isn't a string or can't be read, shows as `<invalid from>`.
-- `identified_by` is the path of the subject's id, or `null` when it has none, and the whole subject is its id. A subject that narrows another has the id of the one it narrows. An id that is written wrong shows as `<invalid identified_by>`.
+- `from` says how the subject is found, as a [from line](#from-lines) is written. A `from` written as a line is printed the same way whatever spaces it had. A subject without `from` reads the input field named like it. A `from` that is written wrong, because it isn't a string or can't be read, shows as `<invalid from>`. So does one that reads but has a problem, like `values of mixed types`, and the `from` of a subject with `applies_to` or `of`, because those fields said how it was found.
+- `identified_by` is the path of the subject's id, or `null` when it has none, and the whole subject is its id. A subject that narrows another has the id of the one it narrows, also when its `from` is written wrong. An id that is written wrong shows as `<invalid identified_by>`.
 - `parts` lists every [part](#parts) the subject has, including the ones it keeps from a subject it narrows, by alias. Each is `{"from": ..., "identified_by": ...}`, with `from` written the way a sentence writes a path, so `"  dd.b "` is `dd.b` and `x[$params.k]` is `x named by $params.k`, and `identified_by` the path of the part's id or `null` when it has none. For the policy under [Parts](#parts) it is
 
   ```json
@@ -1604,7 +1604,7 @@ Each entry has:
 
   A part that is written wrong is listed as best it can be, with `<invalid from>` for a path that can't be read and `<invalid identified_by>` for an id that can't.
 
-A subject that is written wrong still has its entry, so nothing disappears from the report. With this policy and the same input, where `deployment` writes its `from` and `identified_by` as lists:
+A subject that is written wrong still has its entry, so nothing disappears from the report. A subject whose `from` starts at another subject lists that subject even when the line is written wrong, like `every parent.items`, and a subject that narrows another has that subject's id then. A `from` that doesn't parse, or isn't a string, lists no other subject. In `ergo.rego`, a `from` with an unknown name, like `parent.items whose zz is $foo`, doesn't parse either, so it lists no other subject. With this policy and the same input, where `deployment` writes its `from` and `identified_by` as lists:
 
 ```yaml
 ergo_spec: v0.3-dev
