@@ -1,5 +1,15 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
+        "every xs whose k is at least k is one of 1, 'a'",
+        "every xs whose k is at least k is one of 1, \"a\"",
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+    ),
+    (
         "i is one of 1, 'a' and y is at least y",
         "i is one of 1, \"a\" and y is at least y",
         &["y is compared with itself"],

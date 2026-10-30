@@ -57,9 +57,7 @@ fn read_lines(
         match s::parse_check(line) {
             Ok(tree) => {
                 let found = s::check_problems(&tree, aliases);
-                let only_self = found
-                    .iter()
-                    .all(|problem| problem.ends_with(" is compared with itself"));
+                let only_self = found == s::check_self_problems(&tree, aliases);
                 if !found.is_empty() {
                     ok = false;
                 }
@@ -528,6 +526,20 @@ mod tests {
         let read = one(json!({"c": "x equals x"}));
         assert_eq!(problems(&read), ["x is compared with itself"]);
         assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn values_of_mixed_types_are_listed_beside_a_field_compared_with_itself_in_a_whose() {
+        let sentence = "every xs whose k is at least k is one of 1, 'a'";
+        let itself = "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert";
+        let read = one(json!({"c": sentence}));
+        assert_eq!(problems(&read), [itself, "values of mixed types"]);
+        let read = one(json!({"c": {"assert": ["x exists", sentence]}}));
+        let second = format!("line 2: {itself}");
+        assert_eq!(
+            problems(&read),
+            [second.as_str(), "line 2: values of mixed types"]
+        );
     }
 
     #[test]
