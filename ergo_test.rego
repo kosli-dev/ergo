@@ -5034,7 +5034,7 @@ test_a_sum_fails_with_the_cause_of_an_item_whose_cant_decide_and_does_not_read_i
 	_sum_whose_cause(`sum of items.x.y whose k is "a" is 1`, [{"x": {"y": "ab"}, "k": null}]) == ["null"]
 }
 
-test_a_sum_whose_undecided_item_comes_before_the_bad_field_of_a_kept_item_in_the_order_of_causes if {
+test_a_sum_whose_worst_cause_wins_between_an_undecided_item_and_the_bad_field_of_a_kept_item if {
 	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab"}, {"x": null, "k": "a"}]) == ["absent"]
 	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab", "k": null}, {"x": "ab", "k": "a"}]) == ["unusable"]
 	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": 1, "k": null}, {"x": null, "k": "a"}]) == ["null"]
