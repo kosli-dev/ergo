@@ -193,7 +193,7 @@ The report records every check Ergo ran, including the ones that passed. It come
 }
 ```
 
-That is the report from `ergo.rego`. The Rust engine gives the same report, except that `engine` is `{"name": "ergo-policy-engine", "version": "0.1.0-dev"}` and `ergo` is `"v0.3-dev"`.
+That is the report from `ergo.rego`. The Rust engine gives the same report, except that `engine` is `{"name": "ergo-policy-engine", "version": "0.1.0"}` and `ergo` is `"v0.3-dev"`.
 
 - `compliant` is the overall answer. When you need a plain yes or no to allow or block something, this is the one to use: `allow := report.compliant`.
 - `requirements` has an entry for each requirement. It repeats the requirement's `description`, and its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. When it's `not_met`, `causes` says why, worst first, with how many rows each: here `[{"cause": "absent", "rows": 1}]`. It also says how many subjects were found and kept, and lists every check with a readable `expression`, which is the sentence as you wrote it.

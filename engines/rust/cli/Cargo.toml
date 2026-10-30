@@ -15,6 +15,6 @@ name = "ergo"
 path = "src/main.rs"
 
 [dependencies]
-ergo-policy-engine = { path = "../engine", version = "0.1.0-dev" }
+ergo-policy-engine = { path = "../engine", version = "0.1.0" }
 saphyr-parser = "0.3"
 serde_json = { version = "1", features = ["arbitrary_precision"] }
