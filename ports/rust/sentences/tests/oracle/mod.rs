@@ -133,6 +133,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("\"$x\".pa.items", "\"$x\".pa.items"),
     ("\"$x\".items", "\"$x\".items"),
+    ("\"$input\".kids", "\"$input\".kids"),
+    ("\"$params\".kids", "\"$params\".kids"),
     (
         "\"$s\" whose .\"a.b\" is not empty",
         "\"$s\" whose \"a.b\" is not empty",

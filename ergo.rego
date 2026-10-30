@@ -276,6 +276,10 @@ _member_problems(members) := union({
 		some m in members
 		m == "it"
 	},
+	{[["subjects", m], concat("", ["a subject can't be named ", m])] |
+		some m in members
+		m in {"$input", "$params"}
+	},
 	{[["subjects", m, f], p] |
 		some m in members
 		some f, ps in object.get(data.ergo_subject_sentences.problems, m, {})

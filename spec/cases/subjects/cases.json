@@ -13261,6 +13261,854 @@
     ]
   },
   {
+    "description": "a subject named $input, with a child that starts at it and the check \"$input\".k is 2",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "$input": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        },
+        "kid": {
+          "from": "\"$input\".kids",
+          "identified_by": "id"
+        },
+        "other": {
+          "from": "others",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "\"$input\".k is 2"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 7
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": [
+          "sentence.subject.quoted",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": 1,
+              "k": 2,
+              "meta": {
+                "k": 1
+              },
+              "kids": [
+                {
+                  "id": "c1",
+                  "k": 5,
+                  "$input": {
+                    "k": 4
+                  }
+                }
+              ]
+            }
+          ],
+          "others": [
+            {
+              "id": "o1",
+              "k": 6,
+              "$input": {
+                "k": 4
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.$input",
+                "value": [
+                  "a subject can't be named $input"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ],
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a subject named $input, with a child that starts at it and the check $input.k is 2",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "$input": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        },
+        "kid": {
+          "from": "\"$input\".kids",
+          "identified_by": "id"
+        },
+        "other": {
+          "from": "others",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "$input.k is 2"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 7
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": [
+          "sentence.subject.quoted",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": 1,
+              "k": 2,
+              "meta": {
+                "k": 1
+              },
+              "kids": [
+                {
+                  "id": "c1",
+                  "k": 5,
+                  "$input": {
+                    "k": 4
+                  }
+                }
+              ]
+            }
+          ],
+          "others": [
+            {
+              "id": "o1",
+              "k": 6,
+              "$input": {
+                "k": 4
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.$input",
+                "value": [
+                  "a subject can't be named $input"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ],
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a subject named $input, with a child that starts at it and the check \"$input\".pa.k is 1",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "$input": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        },
+        "kid": {
+          "from": "\"$input\".kids",
+          "identified_by": "id"
+        },
+        "other": {
+          "from": "others",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "\"$input\".pa.k is 1"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 7
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": [
+          "sentence.subject.quoted",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": 1,
+              "k": 2,
+              "meta": {
+                "k": 1
+              },
+              "kids": [
+                {
+                  "id": "c1",
+                  "k": 5,
+                  "$input": {
+                    "k": 4
+                  }
+                }
+              ]
+            }
+          ],
+          "others": [
+            {
+              "id": "o1",
+              "k": 6,
+              "$input": {
+                "k": 4
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.$input",
+                "value": [
+                  "a subject can't be named $input"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ],
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a subject named $input, with a child that starts at it and the check $input.k is 3",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "$input": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        },
+        "kid": {
+          "from": "\"$input\".kids",
+          "identified_by": "id"
+        },
+        "other": {
+          "from": "others",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "$input.k is 3"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 7
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": [
+          "sentence.subject.quoted",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": 1,
+              "k": 2,
+              "meta": {
+                "k": 1
+              },
+              "kids": [
+                {
+                  "id": "c1",
+                  "k": 5,
+                  "$input": {
+                    "k": 4
+                  }
+                }
+              ]
+            }
+          ],
+          "others": [
+            {
+              "id": "o1",
+              "k": 6,
+              "$input": {
+                "k": 4
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.$input",
+                "value": [
+                  "a subject can't be named $input"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ],
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a subject named $params, with a child that starts at it and the check \"$params\".k is 2",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "$params": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        },
+        "kid": {
+          "from": "\"$params\".kids",
+          "identified_by": "id"
+        },
+        "other": {
+          "from": "others",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "\"$params\".k is 2"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 7
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": [
+          "sentence.subject.quoted",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": 1,
+              "k": 2,
+              "meta": {
+                "k": 1
+              },
+              "kids": [
+                {
+                  "id": "c1",
+                  "k": 5,
+                  "$params": {
+                    "k": 4
+                  }
+                }
+              ]
+            }
+          ],
+          "others": [
+            {
+              "id": "o1",
+              "k": 6,
+              "$params": {
+                "k": 4
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.$params",
+                "value": [
+                  "a subject can't be named $params"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ],
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a subject named $params, with a child that starts at it and the check $params.k is 2",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "$params": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        },
+        "kid": {
+          "from": "\"$params\".kids",
+          "identified_by": "id"
+        },
+        "other": {
+          "from": "others",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "$params.k is 2"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 7
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": [
+          "sentence.subject.quoted",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": 1,
+              "k": 2,
+              "meta": {
+                "k": 1
+              },
+              "kids": [
+                {
+                  "id": "c1",
+                  "k": 5,
+                  "$params": {
+                    "k": 4
+                  }
+                }
+              ]
+            }
+          ],
+          "others": [
+            {
+              "id": "o1",
+              "k": 6,
+              "$params": {
+                "k": 4
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.$params",
+                "value": [
+                  "a subject can't be named $params"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ],
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a subject named $params, with a child that starts at it and the check \"$params\".pa.k is 1",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "$params": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        },
+        "kid": {
+          "from": "\"$params\".kids",
+          "identified_by": "id"
+        },
+        "other": {
+          "from": "others",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "\"$params\".pa.k is 1"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 7
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": [
+          "sentence.subject.quoted",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": 1,
+              "k": 2,
+              "meta": {
+                "k": 1
+              },
+              "kids": [
+                {
+                  "id": "c1",
+                  "k": 5,
+                  "$params": {
+                    "k": 4
+                  }
+                }
+              ]
+            }
+          ],
+          "others": [
+            {
+              "id": "o1",
+              "k": 6,
+              "$params": {
+                "k": 4
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.$params",
+                "value": [
+                  "a subject can't be named $params"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ],
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a subject named $params, with a child that starts at it and the check $params.k is 7",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "$params": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        },
+        "kid": {
+          "from": "\"$params\".kids",
+          "identified_by": "id"
+        },
+        "other": {
+          "from": "others",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "$params.k is 7"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": 7
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": [
+          "sentence.subject.quoted",
+          "written_wrong",
+          "written_wrong.row"
+        ],
+        "input": {
+          "k": 3,
+          "things": [
+            {
+              "id": 1,
+              "k": 2,
+              "meta": {
+                "k": 1
+              },
+              "kids": [
+                {
+                  "id": "c1",
+                  "k": 5,
+                  "$params": {
+                    "k": 4
+                  }
+                }
+              ]
+            }
+          ],
+          "others": [
+            {
+              "id": "o1",
+              "k": 6,
+              "$params": {
+                "k": 4
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.$params",
+                "value": [
+                  "a subject can't be named $params"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ],
+        "compliant": false
+      }
+    ]
+  },
+  {
     "description": "subjects that narrow each other",
     "policy": {
       "ergo_spec": "v0.3-dev",

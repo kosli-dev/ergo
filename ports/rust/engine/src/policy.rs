@@ -338,6 +338,13 @@ fn read_subject(name: &str, value: &Value) -> Subject {
             "it is a word of the grammar, so a subject can't be called it",
         );
     }
+    if name == "$input" || name == "$params" {
+        add_problem(
+            &mut problems,
+            field_name(&["subjects", name]),
+            format!("a subject can't be named {name}"),
+        );
+    }
     Subject { def, problems }
 }
 
