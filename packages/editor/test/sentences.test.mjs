@@ -288,8 +288,9 @@ test("hover reads an every walk with a whose and a param", () => {
   assert.equal(
     reading("every p.items.name whose zz is $params.foo is not empty"),
     [
-      "Passes when every value of p.items.name, kept when zz is $params.foo, is not empty.",
+      "Passes when every value of p.items.name, kept when zz is $params.foo, is not empty. Fails when a value of p.items.name is missing, null or not a list or a string.",
       "every walks into every list along p.items.name, the last one included, and passes when every value passes, and fails when none are left to check.",
+      "An item is left out only when a condition is false for it, or when an exists condition finds the field missing. An item a condition can't decide, because a field is missing, null or of the wrong type, fails instead.",
       "$params.foo is the value of foo in the params the report was given.",
     ].join("\n"),
   );
@@ -304,9 +305,9 @@ test("hover names what an alias of the for line stands for", () => {
   const forTree = parser.read("for", "every pull_requests as pr, some pr.approvers as approver").tree;
   const { tree } = parser.read("check", "approver.username does not equal pr.author");
   assert.deepEqual(describe("check", tree, { forTree }), [
-    "Passes when approver.username is not pr.author.",
-    "approver is each item of pr.approvers. The checks must hold for at least one.",
-    "pr is each item of pull_requests. The checks must hold for every one.",
+    "Passes when approver.username is not pr.author. Fails when approver.username or what it is compared with is missing or null, or the two have different types.",
+    "approver is each item of pr.approvers. pr passes when some approver passes, and approver passes when all the checks hold.",
+    "pr is each item of pull_requests. Every pr must pass.",
   ]);
 });
 
@@ -319,16 +320,15 @@ test("hover does not call a name an alias on the left of a whose", () => {
 test("hover names the path a part of the subject stands for", () => {
   const { tree } = parser.read("check", "coverage.hunks is at least 3");
   assert.deepEqual(describe("check", tree, { parts: { coverage: "compliance_status.cov" } }), [
-    "Passes when coverage.hunks is at least 3.",
+    "Passes when coverage.hunks is at least 3. Fails when coverage.hunks is missing, null or not a number.",
     "coverage is the part of the subject at compliance_status.cov.",
   ]);
 });
 
 test("hover reads a for line, a pick and its sort order", () => {
   assert.deepEqual(reading("last of commits sorted by timestamp as latest, every latest.files as file"), [
-    "Runs the checks under it once for each combination of these items, in order: latest, file.",
-    "latest is the last item of commits, in order of timestamp.",
-    "file is each item of latest.files. The checks must hold for every one.",
+    "latest is the last item of commits, in order of timestamp. When the list has no such item, the check fails as absent. When another item has the same value, the check fails as ambiguous. The picked latest must pass.",
+    "file is each item of latest.files. latest passes when every file passes, and file passes when all the checks hold.",
   ].join("\n"));
 });
 
@@ -337,16 +337,17 @@ test("hover reads a from line that goes on from another subject", () => {
   assert.deepEqual(describe("from", tree, { subjects: ["artifact", "pr"], subject: "pr" }), [
     "The subject's rows come from the rows of the subject artifact, at artifact.pull_requests.",
     "Only rows where base is $params.branch are in scope.",
+    "A subject is left out only when a filter is false for it, or when an exists filter finds its field missing. A filter that can't be decided, because a field is missing, null or of the wrong type, fails the requirement instead.",
     "$params.branch is the value of branch in the params the report was given.",
   ]);
 });
 
 test("hover reads a count, a sum, elapsed time, between and within", () => {
-  assert.equal(reading("count of xs whose n is 1 is at least 2"), "Passes when the number of xs, kept when n is 1, is at least 2.");
-  assert.equal(reading("n is between 5 and 9"), "Passes when n is between 5 and 9, both included.");
-  assert.equal(reading("n is 6 within 1"), "Passes when n is within 1 of 6.");
-  assert.equal(reading("days elapsed from s to e is 2"), "Passes when the days from s to e is 2.");
-  assert.equal(reading("it is a non-empty string"), "Passes when it is a string with at least one character.\nit is the subject itself.");
+  assert.match(reading("count of xs whose n is 1 is at least 2"), /^Passes when the number of xs, kept when n is 1, is at least 2\. Fails when xs is missing, null or not a list\./);
+  assert.equal(reading("n is between 5 and 9"), "Passes when n is between 5 and 9, both included. Fails when n is missing, null or not a number.");
+  assert.equal(reading("n is 6 within 1"), "Passes when n is within 1 of 6. Fails when n is missing, null or not a number.");
+  assert.equal(reading("days elapsed from s to e is 2"), "Passes when the days from s to e is 2. Fails when either time of the days from s to e is missing, null or not a time.");
+  assert.equal(reading("it is a non-empty string"), "Passes when it is a string with at least one character. Fails when it is missing, null or not a string.\nit is the subject itself.");
 });
 
 test("hover shows the reading and the problems of the sentence under the pointer", () => {
@@ -354,7 +355,7 @@ test("hover shows the reading and the problems of the sentence under the pointer
   const entries = markdownEntries(source);
   const line = lineOf(source, "x is at least 2") + 1;
   const entry = entryAt(entries, line, source.split("\n")[line - 1].indexOf("at least"));
-  assert.deepEqual(hoverOf(entry), { problems: [], lines: ["Passes when x is at least 2."] });
+  assert.deepEqual(hoverOf(entry), { problems: [], lines: ["Passes when x is at least 2. Fails when x is missing, null or not a number."] });
   const bad = entryAt(entries, lineOf(source, "x is not null") + 1, 6);
   assert.deepEqual(hoverOf(bad).problems, ['"is not null" is written "exists"']);
   assert.equal(entryAt(entries, 1, 0), null);
@@ -417,4 +418,145 @@ test("yamlSentences gives nothing for text that isn't a policy", () => {
   assert.deepEqual(yamlSentences("").sentences, []);
   assert.deepEqual(yamlSentences("- 1\n- 2").sentences, []);
   assert.deepEqual(yamlSentences("subjects: 4\nrequirements: x").sentences, []);
+});
+
+const hoverFirst = (line, ctx = {}) => {
+  const [kind, tree] = kindOf(line);
+  return describe(kind, tree, ctx)[0];
+};
+
+const failsClosed = [
+  ['x is "a"', "x is missing, null or not a string"],
+  ['x is not "a"', "x is missing, null or not a string"],
+  ["x is 1", "x is missing, null or not a number"],
+  ["x is true", "x is missing, null or not a boolean"],
+  ["x is null", "x is missing"],
+  ["x does not equal y", "x or what it is compared with is missing or null, or the two have different types"],
+  ['x is one of "a", "b"', "x is missing, null or not the same type as the values"],
+  ['x is not one of "a"', "x is missing, null or not the same type as the values"],
+  ["x is not one of $params.k", "x is missing, null or not the type of the values in the list, or the list it is compared with is missing, null or not a list of one type"],
+  ["x exists", "x is missing or null"],
+  ["x does not exist", "x has a value that isn't null"],
+  ["x.y does not exist", "x.y has a value that isn't null, or something it sits in is not an object"],
+  ["x is empty", "x is missing, null or not a list or a string"],
+  ["x is not empty", "x is missing, null or not a list or a string"],
+  ["x is a list", "x is missing, null or not a list"],
+  ["x is an object", "x is missing, null or not an object"],
+  ["x is a non-empty string", "x is missing, null or not a string"],
+  ['x contains "a"', "x is missing, null or not a list, or its items are of another type than the value"],
+  ['labels does not contain "a"', "labels is missing, null or not a list, or its items are of another type than the value"],
+  ["x contains y", "x is missing, null or not a list, or what it is compared with is missing or null or of another type than the items"],
+  ['x contains all of "a"', "x is missing, null or not a list, or its items are of another type than the values"],
+  ['x contains none of "a", "b"', "x is missing, null or not a list, or its items are of another type than the values"],
+  ["x contains none of $params.k", "x is missing, null or not a list, or the list it is compared with is missing, null, empty or not a list of one type"],
+  ['x matches "a"', "x is missing, null or not a string"],
+  ['x does not match "a"', "x is missing, null or not a string"],
+  ["x does not match $params.p", "x is missing, null or not a string, or the patterns are missing, null, not a list or not all valid regular expressions"],
+  ['x starts with "a"', "x is missing, null or not a string"],
+  ['x is alphabetically before "b"', "x is missing, null or not a string"],
+  ["x is at least 2", "x is missing, null or not a number"],
+  ["x is at least y", "x or what it is compared with is missing, null or not a number"],
+  ["x is between 1 and 3", "x is missing, null or not a number"],
+  ['x is before "2026-01-01"', "x is missing, null or not a time in the same format as what it is compared with"],
+  ["x is 3 within 1", "x is missing, null or not a number"],
+  ["sum of x is 3", "x is missing, null or not a list of numbers"],
+  ["count of x is 1", "x is missing, null or not a list"],
+];
+
+test("hover says what fails every kind of check, so a check that can't read its value is never taken for a pass", () => {
+  for (const [line, fails] of failsClosed) assert.match(hoverFirst(line), new RegExp(`\\. Fails when ${fails.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.$`), line);
+});
+
+test("hover says that a value in a list the check walks into fails the check when it is missing", () => {
+  assert.match(hoverFirst("every xs.y is not empty"), /Fails when a value of xs\.y is missing, null or not a list or a string\.$/);
+  assert.match(hoverFirst("some xs.y is 2"), /Fails when a value of xs\.y is missing, null or not a number\.$/);
+});
+
+test("hover says what fails each of several checks", () => {
+  const [kind, tree] = kindOf("x is 1 and y exists");
+  assert.equal(
+    describe(kind, tree, {}).at(-1),
+    "Fails when any of them fails, and in particular when x is missing, null or not a number, or when y is missing or null.",
+  );
+});
+
+test("hover says that a whose that can't decide an item fails the check, in checks, counts and for lines", () => {
+  const note = "An item is left out only when a condition is false for it, or when an exists condition finds the field missing. An item a condition can't decide, because a field is missing, null or of the wrong type, fails instead.";
+  assert.ok(reading("every xs.v whose n is 1 is 5").includes(note));
+  assert.ok(reading("count of xs whose n is 1 is 2").includes(note));
+  assert.ok(!reading("every xs.v is 5").includes("left out"));
+  assert.match(reading("every cs whose n is 1 as c"), /An item the whose can't decide fails the check\./);
+  assert.match(reading("item 1 of cs whose n is 1 as c"), /An item the whose can't decide fails the check\./);
+});
+
+test("hover says that a from filter that can't be decided fails the requirement and does not leave the subject out", () => {
+  const lines = reading('things whose kind is "a"');
+  assert.match(lines, /A subject is left out only when a filter is false for it, or when an exists filter finds its field missing\. A filter that can't be decided, because a field is missing, null or of the wrong type, fails the requirement instead\./);
+  assert.ok(!reading("things").includes("left out"));
+});
+
+test("hover reads named by each of as one subject per listed key, even for a key the object doesn't have", () => {
+  const lines = reading("attestations named by each of $params.keys");
+  assert.match(lines, /attestations is read in the input as an object\./);
+  assert.match(lines, /one subject for each key listed in \$params\.keys, which must be a list of strings\. A listed key the object doesn't have is still a subject, and its checks fail\./);
+  assert.match(lines, /When the object can't be read, the requirement fails, and each listed key is still a subject\./);
+  assert.ok(!lines.includes("rows"));
+  const child = describe("from", parser.read("from", "artifact named by each of $params.keys").tree, { subjects: ["artifact", "att"], subject: "att" });
+  assert.equal(child[0], "The keys belong to each subject artifact, which must be an object.");
+});
+
+test("hover reads a for line with some as each item passing when some of the next items pass", () => {
+  assert.equal(
+    reading("every prs as pr, some pr.approvers as approver"),
+    [
+      "pr is each item of prs. Every pr must pass.",
+      "approver is each item of pr.approvers. pr passes when some approver passes, and approver passes when all the checks hold.",
+    ].join("\n"),
+  );
+  assert.ok(!reading("some prs as pr, every pr.approvers as approver").includes("combination"));
+  assert.match(reading("some prs as pr, every pr.approvers as approver"), /^pr is each item of prs\. At least one pr must pass\.\napprover is each item of pr\.approvers\. pr passes when every approver passes,/);
+});
+
+test("hover says that a pick past the end fails as absent and that equal sort values fail as ambiguous", () => {
+  assert.equal(
+    reading("item 2 of commits sorted by timestamp as c"),
+    "c is item 2 of commits, in order of timestamp. When the list has no such item, the check fails as absent. When another item has the same value, the check fails as ambiguous.",
+  );
+  const plain = reading("first of commits as c");
+  assert.match(plain, /fails as absent\./);
+  assert.ok(!plain.includes("ambiguous"));
+});
+
+test("hover prints a quoted first key that is written as a field the way the report names it", () => {
+  assert.match(hoverFirst('"a"."b" is 1'), /^Passes when \.a\.b is 1\./);
+  assert.match(hoverFirst('"a.b"."c" is 1'), /^Passes when "a\.b"\.c is 1\./);
+});
+
+test("a name after named by that isn't an alias is coloured as a field", () => {
+  const { tree } = parser.read("check", "x named by y is 1");
+  assert.deepEqual(treeTokens("check", tree, "x named by y is 1", [], "code").filter((t) => t.text === "y"), [{ kind: "field", text: "y" }]);
+  assert.deepEqual(treeTokens("check", tree, "x named by y is 1", ["y"], "code").filter((t) => t.text === "y"), [{ kind: "alias", text: "y" }]);
+});
+
+const one = (text, parts, kind = "check") => {
+  const entries = makeAnalyser(parser, "code")({ sentences: [{ kind, text, forText: null, parts, subject: "s", exact: true, start: 10, end: 10 + text.length, line: 1 }], subjects: [] });
+  return entries[0];
+};
+
+test("naming a part after named by is underlined on the part with the message ergo.rego gives", () => {
+  const entry = one("x named by cov is 1", { cov: "a.b" });
+  assert.deepEqual(entry.problems, [{ message: "named by cov reads a part, which isn't supported yet", start: 10 + 11, end: 10 + 14 }]);
+});
+
+test("a part named by in two places gives one message, and a part in a string or an ordinary name gives none", () => {
+  assert.equal(one("x named by cov is 1 and y named by cov is 2", { cov: "a.b" }).problems.length, 1);
+  assert.deepEqual(one('x is "named by cov"', { cov: "a.b" }).problems, []);
+  assert.deepEqual(one("x named by other is 1", { cov: "a.b" }).problems, []);
+  assert.deepEqual(one("x named by cov is 1", {}).problems, []);
+});
+
+test("a part with a quoted dotted key stands for that key in the aliases", () => {
+  const entry = one("cov.x is 1", { cov: 'a."b.c"' });
+  assert.equal(entry.aliasKeys.cov, "b.c");
+  assert.equal(one("cov.x is 1", { cov: "a.b[0]" }).aliasKeys.cov, "b");
 });

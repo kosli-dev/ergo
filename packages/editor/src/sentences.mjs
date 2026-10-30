@@ -57,14 +57,14 @@ const D = (text) => ({ type: "dollar", text });
 
 const variant = (value) => (typeof value === "string" ? [value, null] : Object.entries(value)[0]);
 
-const refOps = (ref, out) => {
+const refOps = (ref, out, aliases) => {
   const [type, value] = variant(ref);
   if (type === "Params") out.push(D("$params"), K(value, "ref"));
   else if (type === "Input") out.push(D("$input"), K(value, "ref"));
   else if (type === "Unknown") {
     out.push(D(value.name));
     if (value.key !== null) out.push(K(value.key, "ref"));
-  } else out.push(K(value, "alias"));
+  } else out.push(K(value, aliases.has(value) ? "alias" : "field"));
 };
 
 const pathOps = (path, out, aliases) => {
@@ -81,7 +81,7 @@ const pathOps = (path, out, aliases) => {
     if (name === "Key") out.push(K(body, rooted && i === 0 ? "ref" : "field"));
     else if (name === "BracketKey") out.push(K(body, "field"));
     else if (name === "Index") out.push(N(body));
-    else refOps(body, out);
+    else refOps(body, out, aliases);
   });
 };
 
@@ -350,6 +350,76 @@ const phraseText = (phrase) => {
   return `is ${TIME[b.time]} ${operandText(b.operand)}, as times`;
 };
 
+const valueNeed = (value) => {
+  const [type] = variant(value);
+  if (type === "String") return "a string";
+  if (type === "Number") return "a number";
+  return "a boolean";
+};
+
+const isValue = (operand) => variant(operand)[0] === "Value";
+const missingOr = (subject, need) => `${subject} is missing, null or ${need}`;
+const withOther = (subject, operand) => (isValue(operand) ? subject : `${subject} or what it is compared with`);
+
+const failText = (subject, phrase, nested) => {
+  const [type, b] = variant(phrase);
+  if (type === "Is") {
+    if (b.within !== null) return missingOr(withOther(subject, b.operand), "not a number");
+    if (isValue(b.operand)) {
+      const value = variant(b.operand)[1];
+      return variant(value)[0] === "Null" ? `${subject} is missing` : missingOr(subject, `not ${valueNeed(value)}`);
+    }
+    const terms = b.operand.Field;
+    if (terms.length === 1 && variant(terms[0])[0] === "Path") return `${subject} or what it is compared with is missing or null, or the two have different types`;
+    return missingOr(withOther(subject, b.operand), "not a number");
+  }
+  if (type === "Order") return missingOr(withOther(subject, b.operand), "not a number");
+  if (type === "Between") return missingOr(subject, "not a number");
+  if (type === "Time") return missingOr(withOther(subject, b.operand), "not a time in the same format as what it is compared with");
+  if (type === "OneOf") {
+    if (variant(b.list)[0] === "Values") return missingOr(subject, "not the same type as the values");
+    return `${subject} is missing, null or not the type of the values in the list, or the list it is compared with is missing, null or not a list of one type`;
+  }
+  if (type === "Exists") return b.not ? `${subject} has a value that isn't null${nested ? ", or something it sits in is not an object" : ""}` : `${subject} is missing or null${nested ? ", or something it sits in is not an object" : ""}`;
+  if (type === "Empty") return missingOr(subject, "not a list or a string");
+  if (type === "NonEmptyString") return missingOr(subject, "not a string");
+  if (type === "Type") return missingOr(subject, `not ${TYPE[b]}`);
+  if (type === "Contains") {
+    return isValue(b.operand)
+      ? missingOr(subject, "not a list, or its items are of another type than the value")
+      : missingOr(subject, "not a list, or what it is compared with is missing or null or of another type than the items");
+  }
+  if (type === "ContainsAll" || type === "ContainsNone") {
+    return variant(b)[0] === "Values"
+      ? missingOr(subject, "not a list, or its items are of another type than the values")
+      : missingOr(subject, "not a list, or the list it is compared with is missing, null, empty or not a list of one type");
+  }
+  if (type === "Matches") {
+    return variant(b.list)[0] === "Values"
+      ? missingOr(subject, "not a string")
+      : missingOr(subject, "not a string, or the patterns are missing, null, not a list or not all valid regular expressions");
+  }
+  if (type === "StartsWith" || type === "EndsWith") return missingOr(withOther(subject, b), "not a string");
+  return missingOr(withOther(subject, b.operand), "not a string");
+};
+
+const termFailText = (term) => {
+  const [type, body] = variant(term);
+  if (type === "Path") return missingOr(pathText(body), "not a number");
+  if (type === "Number") return null;
+  if (type === "Derived") return missingOr(pathText(body.path), body.kind === "Count" ? "not a list" : "not a list of numbers");
+  return `either time of ${termText(term)} is missing, null or not a time`;
+};
+
+const WHOSE_NOTE = "An item is left out only when a condition is false for it, or when an exists condition finds the field missing. An item a condition can't decide, because a field is missing, null or of the wrong type, fails instead.";
+
+const hasWhose = (assertion) => {
+  const [type, b] = variant(assertion);
+  if (type === "Quantified") return b.whose.length > 0;
+  if (type === "Derived") return b.terms.some((t) => variant(t)[0] === "Derived" && variant(t)[1].whose.length > 0);
+  return false;
+};
+
 const conditionText = (condition) => `${leftText(condition.left)} ${phraseText(condition.phrase)}`;
 
 const whoseText = (whose) => (whose.length === 0 ? "" : `, kept when ${whose.map(conditionText).join(" and ")},`);
@@ -438,18 +508,32 @@ const collectPaths = (kind, tree) => {
   return paths;
 };
 
-const forItemText = (item) => {
+const WHOSE_FAILS = " An item the whose can't decide fails the check.";
+
+const forItemText = (item, items = [item]) => {
   const [type, b] = variant(item);
   const kept = whoseText(b.whose).replace(/,$/, "");
+  const decide = b.whose.length ? WHOSE_FAILS : "";
+  const index = items.indexOf(item);
+  const next = items[1] ? variant(items[1])[1] : null;
   if (type === "Walk") {
     const every = b.quantifier === "Every";
-    const tail = every ? (b.if_any ? " (it passes when there are none)" : "") : "";
-    return `${b.alias} is each item of ${pathText(b.path)}${kept}${tail}. ${every ? "The checks must hold for every one." : "The checks must hold for at least one."}`;
+    const tail = every && b.if_any ? " (it passes when there are none)" : "";
+    const head = `${b.alias} is each item of ${pathText(b.path)}${kept}${tail}.${decide}`;
+    if (items.length === 1) return `${head} ${every ? "The checks must hold for every one." : "The checks must hold for at least one."}`;
+    if (index === 0) return `${head} ${every ? `Every ${b.alias} must pass.` : `At least one ${b.alias} must pass.`}`;
+    const first = variant(items[0])[1].alias;
+    return `${head} ${first} passes when ${every ? "every" : "some"} ${b.alias} passes, and ${b.alias} passes when all the checks hold.`;
   }
   const order = b.sorted_by ? `, in order of ${pathText(b.sorted_by.path)}${b.sorted_by.alphabetically ? " alphabetically" : ""}` : "";
   const [place, at] = variant(b.position);
   const which = place === "Item" ? `item ${at.number}${at.from_last ? " from the end" : ""}` : `the ${place === "First" ? "first" : "last"} item`;
-  return `${b.alias} is ${which} of ${pathText(b.path)}${kept}${order}.`;
+  const absent = ` When the list has no such item, the check fails as absent.`;
+  const tie = b.sorted_by ? " When another item has the same value, the check fails as ambiguous." : "";
+  const head = `${b.alias} is ${which} of ${pathText(b.path)}${kept}${order}.${decide}${absent}${tie}`;
+  if (index === 0 && next) return `${head} The picked ${b.alias} must pass.`;
+  if (index > 0) return `${head} ${variant(items[0])[1].alias} passes when its ${b.alias} passes, and ${b.alias} passes when all the checks hold.`;
+  return head;
 };
 
 const fromConditionText = (c) => {
@@ -464,7 +548,8 @@ export const describe = (kind, tree, ctx = {}) => {
   const parts = ctx.parts ?? {};
   const aliasLines = new Map();
   const forAliases = new Map();
-  for (const item of ctx.forTree?.items ?? tree.items ?? []) forAliases.set(variant(item)[1].alias, forItemText(item));
+  const forItems = ctx.forTree?.items ?? tree.items ?? [];
+  for (const item of forItems) forAliases.set(variant(item)[1].alias, forItemText(item, forItems));
   const paths = collectPaths(kind, tree);
   const names = (path) => {
     const key = pathStarts(path);
@@ -475,10 +560,17 @@ export const describe = (kind, tree, ctx = {}) => {
   const lines = [];
   if (kind === "check") {
     const notes = [];
+    const fails = [];
     const said = tree.assertions.map((a) => {
       const [type, b] = variant(a);
-      if (type === "Plain") return `${pathText(b.path)} ${phraseText(b.phrase)}`;
-      if (type === "Derived") return `${b.terms.map(termText).join(" plus ")} ${phraseText(b.phrase)}`;
+      if (type === "Plain") {
+        fails.push(failText(pathText(b.path), b.phrase, b.path.steps.length > 0));
+        return `${pathText(b.path)} ${phraseText(b.phrase)}`;
+      }
+      if (type === "Derived") {
+        fails.push(...b.terms.map(termFailText).filter((t) => t !== null));
+        return `${b.terms.map(termText).join(" plus ")} ${phraseText(b.phrase)}`;
+      }
       const every = b.quantifier === "Every";
       const rule = every
         ? b.if_any
@@ -486,23 +578,33 @@ export const describe = (kind, tree, ctx = {}) => {
           : "passes when every value passes, and fails when none are left to check"
         : "passes when at least one value passes, and fails when none are left to check";
       notes.push(`${every ? "every" : "some"} walks into every list along ${pathText(b.path)}, the last one included, and ${rule}.`);
+      fails.push(failText(`a value of ${pathText(b.path)}`, b.phrase, true));
       return `${every ? "every value of" : "some value of"} ${pathText(b.path)}${whoseText(b.whose)} ${phraseText(b.phrase)}`;
     });
-    if (said.length === 1) lines.push(`Passes when ${said[0]}.`);
-    else lines.push("Passes when all of these hold:", ...said.map((t, i) => `${i + 1}. ${t}`));
+    if (said.length === 1) lines.push(`Passes when ${said[0]}. Fails when ${fails[0] ?? "a value it reads is missing, null or not a number"}.`);
+    else lines.push("Passes when all of these hold:", ...said.map((t, i) => `${i + 1}. ${t}`), `Fails when any of them fails, and in particular when ${fails.join(", or when ")}.`);
     lines.push(...notes);
+    if (tree.assertions.some(hasWhose)) lines.push(WHOSE_NOTE);
   } else if (kind === "for") {
-    lines.push(`Runs the checks under it once for each combination of these items, in order: ${tree.items.map((i) => variant(i)[1].alias).join(", ")}.`);
-    for (const item of tree.items) lines.push(forItemText(item));
+    for (const item of tree.items) lines.push(forItemText(item, tree.items));
   } else {
     const first = pathStarts(tree.path);
     const subjects = ctx.subjects ?? [];
     const own = first !== null && subjects.includes(first) && first !== ctx.subject;
-    lines.push(
-      `${own ? `The subject's rows come from the rows of the subject ${first}, at ${pathText(tree.path)}` : `The subject's rows come from ${pathText(tree.path)} in the input`}${tree.every ? ", walking into every list along it" : ""}.`,
-    );
-    if (tree.named_by_each_of) lines.push(`One row for each key listed in ${pathText(tree.named_by_each_of)}.`);
-    if (tree.whose.length) lines.push(`Only rows where ${tree.whose.map(fromConditionText).join(" and ")} are in scope.`);
+    if (tree.named_by_each_of) {
+      const place = own ? `inside each subject ${first}` : "in the input";
+      lines.push(own && tree.path.steps.length === 0 ? `The keys belong to each subject ${first}, which must be an object.` : `${pathText(tree.path)} is read ${place} as an object.`);
+      lines.push(`There is one subject for each key listed in ${pathText(tree.named_by_each_of)}, which must be a list of strings. A listed key the object doesn't have is still a subject, and its checks fail.`);
+      lines.push("When the object can't be read, the requirement fails, and each listed key is still a subject.");
+    } else {
+      lines.push(
+        `${own ? `The subject's rows come from the rows of the subject ${first}, at ${pathText(tree.path)}` : `The subject's rows come from ${pathText(tree.path)} in the input`}${tree.every ? ", walking into every list along it" : ""}.`,
+      );
+    }
+    if (tree.whose.length) {
+      lines.push(`Only rows where ${tree.whose.map(fromConditionText).join(" and ")} are in scope.`);
+      lines.push("A subject is left out only when a filter is false for it, or when an exists filter finds its field missing. A filter that can't be decided, because a field is missing, null or of the wrong type, fails the requirement instead.");
+    }
   }
   for (const path of paths) names(path);
   for (const step of paths.flatMap((p) => p.steps)) {
@@ -523,3 +625,16 @@ export const describe = (kind, tree, ctx = {}) => {
 
 /** The names a `for` line gives, in order, from its tree. */
 export const forAliases = (tree) => tree.items.map((item) => variant(item)[1].alias);
+
+/** The last key of a path written as text, like `a.b` or `a."b.c"`, with its quotes taken off. Gives `null` when the text holds no key. */
+export const lastKeyOfText = (text) => {
+  const keys = text.replace(/\[[^\]"]*\]/g, "").match(/"(?:[^"\\]|\\.)*"|[^.\s"[\]]+/g);
+  if (!keys) return null;
+  const last = keys.at(-1);
+  if (!last.startsWith('"')) return last;
+  try {
+    return JSON.parse(last);
+  } catch {
+    return last.slice(1, -1);
+  }
+};

@@ -1,4 +1,5 @@
 import { GRAMMAR_WORDS } from "./highlight.mjs";
+import { lastKeyOfText } from "./sentences.mjs";
 
 const WORDS = [...new Set([...GRAMMAR_WORDS, "any"])].sort();
 
@@ -32,13 +33,33 @@ export const fieldsAfter = (input, key) => {
   return [...found].sort();
 };
 
-const accepts = (parser, kind, head, word) => PROBES.some((tail) => parser.read(kind, head + word + tail)?.tree !== undefined);
+const placeholderReading = (parser, kind, text, aliases) => {
+  const read = parser.read(kind, text);
+  if (!read?.tree) return null;
+  return { json: JSON.stringify(read.tree), problems: parser.problems(kind, read.tree, aliases) ?? [] };
+};
+
+const asName = (tree, word) => JSON.stringify(tree).replaceAll(new RegExp(`(?<=[:\\[,])${JSON.stringify(word)}(?=[,\\]}])`, "g"), '"zz9"');
+
+const accepts = (parser, kind, head, word, aliases, memo) =>
+  PROBES.some((tail) => {
+    const read = parser.read(kind, head + word + tail);
+    if (read?.tree === undefined) return false;
+    if (word === "zz9") return true;
+    if (!memo.has(tail)) memo.set(tail, placeholderReading(parser, kind, `${head}zz9${tail}`, aliases));
+    const base = memo.get(tail);
+    if (base === null) return true;
+    if (asName(read.tree, word) === base.json) return false;
+    return (parser.problems(kind, read.tree, aliases) ?? []).every((m) => base.problems.includes(m));
+  });
 
 /** Says what can be typed at `cursor` in a sentence. `ctx` holds the `parser`, the `kind` (`check`, `for` or `from`), the `text` of the sentence, the names in scope (`aliases`, with `aliasKeys` for the list each one stands for, and the subject's `parts`), the `subjects` of the policy and the `subject` this sentence belongs to, and the JSON `input` to read field names from. Gives `{from, to, items}`: replace `from` to `to` with the text of one item, each `{text, kind}`, where kind is `word`, `alias`, `part`, `subject`, `field` or `ref`. */
 export const suggest = (ctx, cursor) => {
   const { parser, kind, text, aliasKeys = {}, subjects = [], subject = null, input = null } = ctx;
   const parts = Object.keys(ctx.parts ?? {});
   const aliases = ctx.aliases ?? [];
+  const names = [...new Set([...parts, ...aliases])];
+  const memo = new Map();
   const before = text.slice(0, cursor);
   const prefix = /[$\w-]*$/.exec(before)[0];
   const start = cursor - prefix.length;
@@ -59,14 +80,14 @@ export const suggest = (ctx, cursor) => {
   }
   const whose = /(?:^|\s)(\S+)\s+whose\s+(?:.*\band\s+)?$/.exec(head);
   if (whose) {
-    field(whose[1].split(".").at(-1).replace(/^"|"$/g, ""));
+    field(lastKeyOfText(whose[1]) ?? "");
     return { from: start, to: cursor, items };
   }
   if (prefix.startsWith("$")) {
     for (const name of ["$params", "$input"]) if (name.startsWith(prefix)) items.push({ text: name, kind: "ref" });
     return { from: start, to: cursor, items };
   }
-  if (accepts(parser, kind, head, "zz9")) {
+  if (accepts(parser, kind, head, "zz9", names, memo)) {
     if (kind === "from" && /^(?:every\s+)?$/.test(head)) {
       for (const name of subjects) if (name !== subject && (starts(name) || name === prefix)) items.push({ text: written(name), kind: "subject" });
     }
@@ -75,7 +96,7 @@ export const suggest = (ctx, cursor) => {
       for (const name of aliases) if (!parts.includes(name) && starts(name)) items.push({ text: name, kind: "alias" });
     }
   }
-  for (const word of WORDS) if (word.startsWith(prefix) && accepts(parser, kind, head, word)) items.push({ text: word, kind: "word" });
+  for (const word of WORDS) if (word.startsWith(prefix) && accepts(parser, kind, head, word, names, memo)) items.push({ text: word, kind: "word" });
   return { from: start, to: cursor, items };
 };
 

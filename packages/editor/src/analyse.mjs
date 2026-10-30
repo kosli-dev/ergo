@@ -1,4 +1,4 @@
-import { readSentence, problemRange, treeTokens, describe, forAliases } from "./sentences.mjs";
+import { readSentence, problemRange, treeTokens, describe, forAliases, lastKeyOfText } from "./sentences.mjs";
 
 const lastKey = (path) => {
   const steps = path.steps.filter((s) => typeof s === "object" && "Key" in s);
@@ -7,7 +7,30 @@ const lastKey = (path) => {
   return typeof start === "object" && "Field" in start ? start.Field.key : null;
 };
 
-const partKey = (path) => path.split(".").at(-1).replace(/^"|"$/g, "");
+const partKey = (path) => lastKeyOfText(path) ?? path;
+
+const namedByNames = (node, out = []) => {
+  if (Array.isArray(node)) node.forEach((n) => namedByNames(n, out));
+  else if (node !== null && typeof node === "object") {
+    if (node.NamedBy && typeof node.NamedBy === "object" && "Name" in node.NamedBy) out.push(node.NamedBy.Name);
+    Object.values(node).forEach((n) => namedByNames(n, out));
+  }
+  return out;
+};
+
+const NAMED_BY = /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\bnamed\s+by\s+([A-Za-z_][\w-]*)/g;
+
+const partProblems = (tree, text, partNames) => {
+  const used = new Set(namedByNames(tree).filter((n) => partNames.includes(n)));
+  const out = [];
+  for (const m of text.matchAll(NAMED_BY)) {
+    const name = m[1];
+    if (name === undefined || !used.delete(name)) continue;
+    const column = Array.from(text.slice(0, m.index + m[0].length - name.length)).length + 1;
+    out.push({ column, message: `named by ${name} reads a part, which isn't supported yet` });
+  }
+  return out;
+};
 
 /** Makes a function that reads a list of located sentences (from `markdownSentences` or `yamlSentences`) with the parser. For each sentence it gives what the line needs: `{...sentence, tree, problems, tokens, lines, aliases, aliasKeys}`. `problems` are `{message, start, end}` with positions in the line, `tokens` colour the sentence from its tree (or are `null` when the text and the tree don't agree, or the text isn't what the line holds), `lines` say how it is read, and `aliasKeys` maps each name in scope to the last key of the list it stands for. The function gives `null` when the parser is missing or stopped. `base` is the kind the tokens that need no colour get. */
 export const makeAnalyser = (parser, base = "plain") => {
@@ -30,6 +53,7 @@ export const makeAnalyser = (parser, base = "plain") => {
     }
     const read = readSentence(parser, s.kind, s.text, aliases);
     if (read === null) return null;
+    if (read.tree && s.kind !== "from") read.problems.push(...partProblems(read.tree, s.text, partNames));
     const ctx = { forTree, parts: s.parts ?? {}, subjects, subject: s.subject };
     return {
       tree: read.tree,

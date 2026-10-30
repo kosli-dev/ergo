@@ -200,3 +200,29 @@ test("completion in YAML works on a line that isn't a value yet", () => {
   assert.ok(assertLine.items.some((i) => i.text === "at"));
   assert.equal(completionAt("yaml", [], "      name: x", 1, 11, { parser }), null);
 });
+
+test("after named by only names are offered, not the words that would be read as a name there", () => {
+  const found = at("x named by |", { aliases: ["pr"] });
+  assert.deepEqual(texts(found, "word"), []);
+  assert.deepEqual(texts(found, "alias"), ["pr"]);
+  assert.deepEqual(texts(at("x named by a|", { aliases: ["pr", "approver"] })), ["approver"]);
+});
+
+test("after is not the word null is not offered, because is not null is written wrong, but it is after is", () => {
+  assert.ok(!texts(at("x is not |"), "word").includes("null"));
+  assert.ok(texts(at("x is |"), "word").includes("null"));
+  assert.ok(texts(at("x is not |"), "word").includes("empty"));
+  assert.ok(!texts(at("x is not |"), "word").includes("is"));
+});
+
+test("a word is offered when the sentence would be read with it as a word, and not when it would only be read as a name", () => {
+  assert.ok(texts(at("approvals |"), "word").includes("starts"));
+  assert.ok(!texts(at("x is not |"), "word").includes("by"));
+  assert.ok(texts(at("every xs |", { kind: "for" }), "word").includes("as"));
+});
+
+test("fields after whose are read under the last key of a path, a quoted key with a dot included", () => {
+  const input = { a: { "x.y": [{ n: 1 }] }, x: [{ m: 1 }] };
+  assert.deepEqual(texts(at('every a."x.y" whose |', { input }), "field"), ["n"]);
+  assert.deepEqual(texts(at("every a.y whose |", { input }), "field"), []);
+});
