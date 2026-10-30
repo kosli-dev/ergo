@@ -3503,6 +3503,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every items.status whose lo is at least 1 plus count of fam.pr.xs is \"ok\"",
+        "every items.status whose lo is at least 1 plus count of fam.pr.xs is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least count of fam.pr.xs is \"ok\"",
+        "every items.status whose lo is at least count of fam.pr.xs is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least sum of fam.pr.xs is \"ok\"",
+        "every items.status whose lo is at least sum of fam.pr.xs is \"ok\"",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

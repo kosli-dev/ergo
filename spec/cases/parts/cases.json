@@ -7915,5 +7915,369 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count of or sum of a parent's part on the right side of a whose, alone and in a plus",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "fam": {
+          "from": "fams",
+          "identified_by": "id",
+          "has": {
+            "pr": "meta"
+          }
+        },
+        "kid": {
+          "from": "fam.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "every items.status whose lo is at least count of fam.pr.xs is \"ok\"",
+            "d": "every items.status whose lo is at least 1 plus count of fam.pr.xs is \"ok\"",
+            "e": "every items.status whose lo is at least sum of fam.pr.xs is \"ok\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "counts the parent's part, not the parent's field of the same name, so a part with too many items fails",
+        "rules": [
+          "parts.where",
+          "tally.walk"
+        ],
+        "input": {
+          "fams": [
+            {
+              "id": "F",
+              "meta": {
+                "xs": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "pr": {
+                "xs": [
+                  1
+                ]
+              },
+              "kids": [
+                {
+                  "id": "K",
+                  "items": [
+                    {
+                      "lo": 2,
+                      "status": "ok"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "d",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "e",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      },
+      {
+        "description": "counts the parent's part, not the parent's field of the same name, so a part with few items passes",
+        "rules": [
+          "parts.where",
+          "tally.walk"
+        ],
+        "input": {
+          "fams": [
+            {
+              "id": "F",
+              "meta": {
+                "xs": [
+                  1
+                ]
+              },
+              "pr": {
+                "xs": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "kids": [
+                {
+                  "id": "K",
+                  "items": [
+                    {
+                      "lo": 2,
+                      "status": "ok"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "status": {
+          "r": "met"
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "e",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

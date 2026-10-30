@@ -6450,23 +6450,23 @@ _p_leaf(m, pc, mode) := object.union(object.union(m, {f: _p_item_side(f, m[f], p
 
 _p_item_side(f, side, pc, mode) := _p_path(_p_own_named(side), pc, "o") if {
 	_p_own_on_item_right(f, side, pc, mode)
-} else := _p_item_right_sides(side, pc, mode) if {
+} else := _p_item_right_sides(_p_side(side, pc, mode), side, pc, mode) if {
 	f == "right"
 	mode == "i"
 	is_object(side)
 } else := _p_side(side, pc, mode)
 
-_p_item_right_sides(side, pc, mode) := object.union(_p_item_right_elapsed(side, pc, mode), {"add": [_p_item_right_one(o, pc, mode) | some o in side.add]}) if is_array(object.get(side, "add", null))
+_p_item_right_sides(done, side, pc, mode) := object.union(_p_item_right_elapsed(done, side, pc, mode), {"add": [_p_item_right_one(done.add[i], o, pc, mode) | some i, o in side.add]}) if is_array(object.get(side, "add", null))
 
-else := _p_item_right_elapsed(side, pc, mode)
+else := _p_item_right_elapsed(done, side, pc, mode)
 
-_p_item_right_one(o, pc, mode) := _p_cond_side("right", o, pc, mode) if is_array(o)
+_p_item_right_one(done, o, pc, mode) := _p_cond_side("right", o, pc, mode) if is_array(o)
 
-else := _p_item_right_elapsed(o, pc, mode) if is_object(o)
+else := _p_item_right_elapsed(done, o, pc, mode) if is_object(o)
 
 else := o
 
-_p_item_right_elapsed(side, pc, mode) := object.union(side, {f: _p_cond_side("right", side[f], pc, mode) | some f in ["elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))})
+_p_item_right_elapsed(done, side, pc, mode) := object.union(done, {f: _p_cond_side("right", side[f], pc, mode) | some f in ["elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))})
 
 _p_own_on_item_right(f, side, pc, mode) if {
 	f == "right"
@@ -6498,7 +6498,7 @@ _p_side_one(side, pc, mode) := object.union(_p_tally(side, pc, mode), object.uni
 
 _p_tally(side, pc, mode) := object.union(side, {f: _p_path(side[f], pc, mode) | some f in ["count_of", "sum_of", "elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))})
 
-_p_cond(c, pc, mode) := object.union(object.union(c, {f: _p_cond_side(f, c[f], pc, mode) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}), {"right": _p_item_right_sides(c.right, pc, mode) | is_object(object.get(c, "right", null))}) if is_object(c)
+_p_cond(c, pc, mode) := object.union(object.union(c, {f: _p_cond_side(f, c[f], pc, mode) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}), {"right": _p_item_right_sides(c.right, c.right, pc, mode) | is_object(object.get(c, "right", null))}) if is_object(c)
 
 _p_cond_side(f, side, pc, mode) := _p_path(_p_own_named(side), pc, "o") if {
 	_p_own_on_item_right(f, side, pc, mode)
