@@ -11,6 +11,7 @@ pub fn parse_from(line: &str) -> Result<FromLine, Vec<SyntaxError>>;
 pub fn parse_path(line: &str) -> Result<Path, Vec<SyntaxError>>;
 
 pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String>;
+pub fn check_self_problems(check: &Check, aliases: &[&str]) -> Vec<String>;
 pub fn for_problems(line: &ForLine, aliases: &[&str]) -> Vec<String>;
 pub fn from_problems(line: &FromLine) -> Vec<String>;
 

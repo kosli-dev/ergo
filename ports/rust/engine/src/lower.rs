@@ -179,7 +179,7 @@ impl Scope {
             s::Step::NamedBy(reference) | s::Step::Brackets(reference) => match reference {
                 s::Reference::Name(name) => {
                     if self.pending.contains(name) {
-                        return Err(vec![format!("for: unknown alias {name}")]);
+                        return Err(vec![format!("unknown alias {name}")]);
                     }
                     if self.parts.contains_key(name) {
                         return Err(vec![format!(
