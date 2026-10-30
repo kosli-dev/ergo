@@ -72,9 +72,21 @@ const rustGlue = () => {
   return { glue, bytes: readFileSync(bytes).toString("base64") };
 };
 
+const sentencesPkg = join(root, "ports", "rust", "sentences-wasm", "pkg");
+
+export const sentencesGlue = (dir = sentencesPkg) => {
+  const glue = join(dir, "ergo_sentences_wasm.js");
+  const bytes = join(dir, "ergo_sentences_wasm_bg.wasm");
+  if (!existsSync(glue) || !existsSync(bytes)) {
+    throw new Error(`The sentences Wasm isn't built: ${dir} has no ergo_sentences_wasm.js and ergo_sentences_wasm_bg.wasm. Build it with the command under "Building for a browser" in ports/rust/README.md.`);
+  }
+  return { glue, bytes: readFileSync(bytes).toString("base64") };
+};
+
 export const buildEditor = async (out = join(here, "dist", "editor.html")) => {
   const opaWasm = join(dirname(require.resolve("@open-policy-agent/opa-wasm")), "..", "dist", "opa-wasm-browser.esm.js");
   const rust = rustGlue();
+  const sentences = sentencesGlue();
   const bundled = await build({
     entryPoints: [join(here, "src", "main.mjs")],
     bundle: true,
@@ -83,7 +95,7 @@ export const buildEditor = async (out = join(here, "dist", "editor.html")) => {
     platform: "browser",
     target: "es2022",
     minify: true,
-    alias: { "@open-policy-agent/opa-wasm": opaWasm, "ergo-wasm": rust.glue },
+    alias: { "@open-policy-agent/opa-wasm": opaWasm, "ergo-wasm": rust.glue, "ergo-sentences-wasm": sentences.glue },
     define: { "import.meta.url": "undefined" },
   });
   const script = bundled.outputFiles[0].text.replace(/<\/script/gi, "<\\/script");
@@ -93,6 +105,7 @@ export const buildEditor = async (out = join(here, "dist", "editor.html")) => {
     .replace("__SAMPLES__", () => escapeJson(samples))
     .replace("__WASM__", () => buildWasm())
     .replace("__RUST_WASM__", () => rust.bytes)
+    .replace("__SENTENCES_WASM__", () => sentences.bytes)
     .replace("__BUNDLE__", () => script);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, html);

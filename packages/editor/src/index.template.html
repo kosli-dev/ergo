@@ -16,7 +16,7 @@
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
   --h-key:#7A3E9D; --h-word:#1B4DB1; --h-string:#1A6F3A; --h-number:#A8521A; --h-ref:#0B6E8E;
-  --h-marker:#8A93A0;
+  --h-marker:#8A93A0; --h-alias:#B0306A;
   --lh:22px; --pad:12px;
 }
 @media (prefers-color-scheme: dark) {
@@ -28,7 +28,7 @@
     --other:#E0A44A; --other-wash:#2A2113;
     --bad:#F08A8A; --bad-wash:#2C1618; --good:#6FD08F; --good-wash:#12271A;
     --h-key:#D29BEA; --h-word:#8FB3FF; --h-string:#8FD3A0; --h-number:#F0A878; --h-ref:#6CC9E0;
-    --h-marker:#6E7988;
+    --h-marker:#6E7988; --h-alias:#F29BC1;
   }
 }
 *,*::before,*::after { box-sizing:border-box; }
@@ -96,6 +96,20 @@ textarea { border:0; resize:none; background:transparent; color:var(--ink);
 .h-ref { color:var(--h-ref); }
 .h-heading,.h-bold,.h-code { color:var(--ink); }
 .h-marker { color:var(--h-marker); }
+.h-field { color:var(--ink); }
+.h-alias { color:var(--h-alias); }
+.h-problem { text-decoration:underline wavy var(--bad); text-decoration-skip-ink:none; text-underline-offset:3px; }
+.tip { position:fixed; z-index:20; max-width:min(34rem,90vw); padding:.5rem .7rem; background:var(--surface); color:var(--ink);
+  border:1px solid var(--hairline); border-radius:3px; box-shadow:0 4px 14px rgb(0 0 0 / .18); font-size:.76rem; line-height:1.4; pointer-events:none; }
+.tip p { margin:0 0 .3rem; }
+.tip p:last-child { margin-bottom:0; }
+.tip .bad { color:var(--bad); }
+.tip .quiet { color:var(--muted); }
+.complete { position:fixed; z-index:21; min-width:9rem; max-height:14rem; overflow:auto; background:var(--surface); border:1px solid var(--hairline);
+  border-radius:3px; box-shadow:0 4px 14px rgb(0 0 0 / .18); font-family:var(--mono); font-size:12px; }
+.complete div { display:flex; justify-content:space-between; gap:1.2rem; padding:.2rem .6rem; cursor:pointer; }
+.complete div[aria-selected="true"] { background:var(--check-wash); }
+.complete small { color:var(--faint); font-family:var(--sans); font-size:.62rem; text-transform:uppercase; letter-spacing:.08em; align-self:center; }
 textarea:focus { outline:none; }
 .foot { flex:none; background:var(--surface); border-top:1px solid var(--hairline); }
 .diags { max-height:7rem; overflow:auto; }
@@ -266,7 +280,7 @@ textarea:focus { outline:none; }
   </div>
 </div>
 
-<script>window.EDITOR = { samples: __SAMPLES__, wasm: "__WASM__", rustWasm: "__RUST_WASM__" };</script>
+<script>window.EDITOR = { samples: __SAMPLES__, wasm: "__WASM__", rustWasm: "__RUST_WASM__", sentencesWasm: "__SENTENCES_WASM__" };</script>
 <script>__BUNDLE__</script>
 </body>
 </html>
