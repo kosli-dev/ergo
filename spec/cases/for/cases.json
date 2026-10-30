@@ -13616,5 +13616,241 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for item that reads its own alias in its path",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every xs named by x as x",
+              "assert": "x is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
+        "rules": [
+          "sentence.for.alias",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "xs": {
+                "a": 1
+              },
+              "x": "a"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "for: unknown alias x"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item that reads the alias of a later item in its path",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every lists named by q as p, every qs as q",
+              "assert": "p is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
+        "rules": [
+          "sentence.for.alias",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "lists": {
+                "a": [
+                  1
+                ]
+              },
+              "qs": [
+                "a"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "for: unknown alias q"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item whose condition reads its own alias in its path",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every objs whose v named by o is 1 as o",
+              "assert": "o exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $well_formed, which lists the problem, and the requirement gets no other row",
+        "rules": [
+          "sentence.for.alias",
+          "written_wrong",
+          "written_wrong.row",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "objs": [
+                {
+                  "v": "a"
+                }
+              ],
+              "o": {
+                "a": 1
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "for: unknown alias o"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
