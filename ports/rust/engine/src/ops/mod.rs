@@ -113,7 +113,39 @@ pub enum Check {
     Empty(kinds::Empty),
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct SidePath<'a> {
+    pub path: &'a Path,
+    pub needs_list: bool,
+}
+
 impl Check {
+    pub fn sides(&self) -> Vec<Vec<SidePath<'_>>> {
+        fn plain(side: &compare::Side) -> Vec<SidePath<'_>> {
+            match side {
+                compare::Side::Path(path) => vec![SidePath {
+                    path,
+                    needs_list: false,
+                }],
+                compare::Side::Value(_) => Vec::new(),
+            }
+        }
+        match self {
+            Check::Compare(check) => vec![plain(&check.left), plain(&check.right)],
+            Check::CompareTime(check) => vec![plain(&check.left), plain(&check.right)],
+            Check::Tally(check) => check.sides(),
+            other => other
+                .left_path()
+                .map(|path| {
+                    vec![vec![SidePath {
+                        path,
+                        needs_list: false,
+                    }]]
+                })
+                .unwrap_or_default(),
+        }
+    }
+
     pub fn left_path(&self) -> Option<&Path> {
         match self {
             Check::Present(check) => Some(&check.path),

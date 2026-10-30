@@ -492,11 +492,13 @@ default _array_read(_, _) := false
 
 _array_read(doc, req) if {
 	is_array(doc)
+	not _keys_step(req)
 	_from_keys(req) == []
 }
 
 _array_read(doc, req) if {
 	is_array(doc)
+	not _keys_step(req)
 	_index_step(_from_keys(req)[0])
 }
 
@@ -569,9 +571,15 @@ _keys_step(req) if "keys" in object.keys(_each_step(req))
 _target_state(doc, req) := "not_an_object" if {
 	is_object(data.ergo_parent)
 	not is_object(doc)
-	count(_from_keys(req)) > 0
-	not _index_step(_from_keys(req)[0])
+	_reads_inside_parent(req)
+	not _starts_at_position(req)
 } else := _from_state(doc, req)
+
+_starts_at_position(req) if _index_step(_from_keys(req)[0])
+
+_reads_inside_parent(req) if count(_from_keys(req)) > 0
+
+_reads_inside_parent(req) if _keys_step(req)
 
 default _from_state(_, _) := "absent"
 
@@ -579,7 +587,6 @@ _from_state(doc, req) := "null" if _target_read(doc, req) == null
 
 _from_state(doc, req) := "unusable" if {
 	is_array(doc)
-	_from_keys(req) != []
 	not _array_read(doc, req)
 }
 
@@ -2146,7 +2153,7 @@ _compared(check, l, r) if {
 	is_number(l)
 	is_number(r)
 	not "max" in object.keys(check)
-	abs(l - r) <= check.within
+	_within_gap(l, r, check.within)
 }
 
 _leaf_op_passed("compare_time", check, subj) if {
@@ -2334,7 +2341,7 @@ _unusable(leaf, x) if {
 	"within" in object.keys(leaf)
 	l := _simple_found(x, leaf.left)
 	r := _simple_found(x, leaf.right)
-	not _numbers(l, r)
+	not _within_usable(leaf, l, r)
 }
 
 _numbers(l, r) if {
@@ -2572,7 +2579,7 @@ _required_fields := {
 	"not_in": {"path", "values"},
 	"has_type": {"path", "type"},
 	"all_of": {"checks", "assertions"},
-	"sentence_any_of": {"checks", "assertions", "option_of", "places"},
+	"sentence_any_of": {"checks", "assertions", "option_of"},
 	"every": {"path", "check", "whose", "if_any"},
 	"for": {"items", "checks", "assertions"},
 	"some": {"path", "check", "whose", "if_any"},
@@ -3329,12 +3336,17 @@ _tail_after_part(req, alias) := concat("", [_step_name(i + 2, rest[i]) | some i 
 
 _matching_count_name(req) := concat("", ["count(matching(", _from_text(req), "))"])
 
-_from_text(req) := concat("", [_every_word(req), _from_name(_from_path(req))]) if {
+_from_text(req) := concat("", [_every_word(req), _with_from_dot(req, _from_name(_from_path(req)))]) if {
 	_from_well_formed(req)
 	_from_path(req) != []
 	not _chained(req)
 	not _chain_part(req)
 }
+
+_with_from_dot(req, name) := concat("", [at, ".", substring(name, count(at), -1)]) if {
+	object.get(object.get(data.ergo_subject_sentences, "dotted", {}), req.subject, false) == true
+	at := regex.find_all_string_submatch_n(`^(?:(?:item [1-9][0-9]*(?: from last)?|first|last) of )?`, name, 1)[0][0]
+} else := name
 
 _every_word(req) := "every " if _every_from(req)
 
@@ -3355,6 +3367,7 @@ _from_text(req) := _path_name(array.concat([data.ergo_subject_sentences.chains[r
 _from_text(req) := concat("", [_every_word(req), "$input"]) if {
 	_from_well_formed(req)
 	_from_path(req) == []
+	not _chained(req)
 }
 
 _from_text(req) := "<invalid from>" if not _from_well_formed(req)
@@ -3441,7 +3454,7 @@ _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in pr
 	problems := (_own_check_problems(req) | _reserved_name_problems(req)) | {p | some a in _ancestors_of(req); some p in _own_check_problems({"subject": a, "checks": {}})}
 }
 
-_own_check_problems(req) := {_placed_problem(req, f, n, check, p) |
+_own_check_problems(req) := {[_field_path_name(_problem_at(req, f, n, p[0])), p[1]] |
 	some f in ["applies_to", "checks"]
 	some n, check in _req_checks(req, f)
 	here := _s_written_here(req, f, n)
@@ -3460,13 +3473,6 @@ _req_checks(req, "checks") := _checks_of(req)
 _problem_at(req, "applies_to", n, _) := ["subjects", _resolution_of(req).filter_owners[n], "from"]
 
 _problem_at(_, "checks", n, at) := array.concat(["checks", n], at)
-
-_placed_problem(req, f, n, check, p) := [_field_path_name(["checks", n]), concat("", [check.places[p[0][1]], ": ", p[1]])] if {
-	f == "checks"
-	check.op == "sentence_any_of"
-	count(p[0]) > 1
-	p[0][0] == "checks"
-} else := [_field_path_name(_problem_at(req, f, n, p[0])), p[1]]
 
 _from_names(req, here) := ({n |
 	_from_well_formed(req)
@@ -4101,7 +4107,7 @@ _subject_from_unreadable(name, def) if not _subject_readable(name, def)
 
 _subject_readable(name, def) if _subject_text(name, def)
 
-_subject_text(name, def) := _s_from_line_text(data.ergo_subject_sentences.lines[name]) if {
+_subject_text(name, def) := _s_from_line_text(_s_dotted_line(name, data.ergo_subject_sentences.lines[name])) if {
 	is_string(object.get(def, "from", null))
 	object.keys(def) & {"of", "applies_to"} == set()
 }
@@ -4619,7 +4625,110 @@ _usable_sides(check, l, r) if {
 
 _usable_sides(check, l, r) if {
 	"within" in object.keys(check)
+	_within_usable(check, l, r)
+}
+
+_within_usable(check, l, r) if {
 	_numbers(l, r)
+	is_number(check.within)
+	_within_spread([json.marshal(l), json.marshal(r), json.marshal(check.within)]) <= 4096
+}
+
+_within_gap(l, r, w) if {
+	texts := [json.marshal(l), json.marshal(r), json.marshal(w)]
+	_within_spread(texts) <= 4096
+	_within_texts(texts)
+}
+
+_within_texts(texts) := _at_most(gap, round(to_number(texts[2]) * scale)) if {
+	scale := _text_scale(texts)
+	gap := abs(round(to_number(texts[0]) * scale) - round(to_number(texts[1]) * scale))
+	gap < 1e15
+} else := _within_exact(texts)
+
+_at_most(a, b) := a <= b
+
+_text_scale(texts) := scale if {
+	every t in texts {
+		count(_decimal_parts(t).digits) + _decimal_parts(t).exponent <= 15
+	}
+	places := max([_text_places(t) | some t in texts])
+	places <= 15
+	scale := product([10 | some i in numbers.range(1, 15); i <= places])
+	every t in texts {
+		round(abs(to_number(t)) * scale) < 1e15
+	}
+}
+
+_text_places(text) := max([0, count(trim_right(digits, "0")) - point]) if {
+	m := _number_match(text)
+	digits := concat("", [m[1], m[2]])
+	point := count(m[1]) + _exponent(m[3])
+}
+
+_within_spread(texts) := max(exponents) - min(exponents) if exponents := [_decimal_parts(t).exponent | some t in texts]
+
+_decimal_parts(text) := {"negative": false, "digits": "0", "exponent": 0} if trim_left(_number_digits(text), "0") == ""
+
+_decimal_parts(text) := {"negative": startswith(text, "-"), "digits": trimmed, "exponent": ((_exponent(m[3]) - count(m[2])) + count(stripped)) - count(trimmed)} if {
+	m := _number_match(text)
+	stripped := trim_left(_number_digits(text), "0")
+	stripped != ""
+	trimmed := trim_right(stripped, "0")
+}
+
+_number_match(text) := regex.find_all_string_submatch_n(`^-?([0-9]+)(?:\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?$`, text, 1)[0]
+
+_number_digits(text) := concat("", [m[1], m[2]]) if m := _number_match(text)
+
+_within_exact(texts) if {
+	parts := [_decimal_parts(t) | some t in texts]
+	low := min([p.exponent | some p in parts])
+	mags := [concat("", [p.digits, _zeros(p.exponent - low)]) | some p in parts]
+	width := 7 * ceil((max([count(m) | some m in mags]) + 1) / 7)
+	chunks := [_chunks(m, width) | some m in mags]
+	_within_chunks(parts[0].negative == parts[1].negative, chunks)
+}
+
+_within_chunks(true, chunks) if {
+	chunks[0] <= _sum_chunks(chunks[1], chunks[2])
+	chunks[1] <= _sum_chunks(chunks[0], chunks[2])
+}
+
+_within_chunks(false, chunks) if _sum_chunks(chunks[0], chunks[1]) <= chunks[2]
+
+_chunks(mag, width) := [_chunk(substring(padded, start, 7)) | some i in numbers.range(0, (width / 7) - 1); start := i * 7] if padded := concat("", [_zeros(width - count(mag)), mag])
+
+_chunk(text) := 0 if trim_left(text, "0") == ""
+
+_chunk(text) := to_number(trim_left(text, "0")) if trim_left(text, "0") != ""
+
+_sum_chunks(x, y) := [_normalized(sums, i) | some i, _ in sums] if {
+	sums := [total | some i, v in x; total := v + y[i]]
+}
+
+_normalized(sums, i) := total - 10000000 if {
+	total := sums[i] + _carry(sums, i)
+	total >= 10000000
+}
+
+_normalized(sums, i) := total if {
+	total := sums[i] + _carry(sums, i)
+	total < 10000000
+}
+
+_carry(sums, i) := _carry_from(sums, [j | some j, s in sums; j > i; s != 9999999])
+
+_carry_from(_, []) := 0
+
+_carry_from(sums, later) := 1 if {
+	later != []
+	sums[min(later)] >= 10000000
+}
+
+_carry_from(sums, later) := 0 if {
+	later != []
+	sums[min(later)] < 10000000
 }
 
 _basic_inputs(subj, side) := [_path_input(subj, side)] if _basic_form(side) == "path"
@@ -4671,13 +4780,16 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	flaws := [_cond_flaw(c) | some c in side.whose]
 	judged := [_tally_judge(side, e, flaws) | some e in w.items]
 	kept := [e.v | some i, e in w.items; judged[i].kept]
-	states := ((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, kept)) | {fl | some fl in flaws; fl != ""}
+	read := [e.v | some i, e in w.items; judged[i].read]
+	states := ((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, read)) | {fl | some fl in flaws; fl != ""}
 	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, kept, states))
 }
 
-_tally_judge(side, e, flaws) := {"kept": kept, "states": ({c | some c in causes; not c in {"satisfied", "value", "missing"}} | _tally_mark(kept, e))} if {
+_tally_judge(side, e, flaws) := {"kept": kept, "read": read, "states": (undecided | _tally_mark(read, e))} if {
 	causes := [_tally_cond_cause(c, e.iv, flaws[i]) | some i, c in side.whose]
+	undecided := {c | some c in causes; not c in {"satisfied", "value", "missing"}}
 	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
+	read := count([c | some c in causes; c != "satisfied"]) == 0
 }
 
 _tally_cond_cause(c, item, "") := _eval_cause(passed, _ref_cause(c), states) if {
@@ -4755,13 +4867,17 @@ _sum_state(null) := "null"
 
 _sum_state(n) := "unusable" if n != null
 
-_decimal_sum(nums) := total / scale if {
+_decimal_scale(nums) := scale if {
 	places := max(array.concat([0], [_value_places(n) | some n in nums]))
 	places <= 15
 	scale := product([10 | some i in numbers.range(1, 15); i <= places])
 	every n in nums {
 		round(abs(n) * scale) < 1e15
 	}
+}
+
+_decimal_sum(nums) := total / scale if {
+	scale := _decimal_scale(nums)
 	total := sum([round(n * scale) | some n in nums])
 	abs(total) < 1e15
 }
@@ -5786,6 +5902,8 @@ _s_start_dot(p, side) := "." if {
 	object.get(p, "own", false) != true
 }
 
+else := "." if object.get(p, "kept_dot", false) == true
+
 else := "" if object.get(p, "it", false) == true
 
 else := _s_dot(p.steps[0], side)
@@ -6134,7 +6252,7 @@ _s_from_dot(p, names, keep) := object.union(p, {"field": true, "own": false}) if
 
 _p_from_part(name, fl, subjects, eff) := {"part": rest[0]} if {
 	_s_descends(name, fl, subjects)
-	rest := array.slice(_s_model_path(fl.path), 1, count(fl.path.steps))
+	rest := array.slice(_s_model_path(fl.path), 1, count(_s_model_path(fl.path)))
 	count(rest) > 0
 	is_string(rest[0])
 	rest[0] in object.keys(_p_steps_of(object.get(eff, fl.path.steps[0], {})))
@@ -6142,7 +6260,7 @@ _p_from_part(name, fl, subjects, eff) := {"part": rest[0]} if {
 
 _s_source(name, fl, subjects, eff) := {"of": fl.path.steps[0]} if {
 	_s_narrows(name, fl, subjects)
-} else := {"from": array.concat(_s_from_steps(_p_descend_steps(array.slice(_s_model_path(fl.path), 1, count(fl.path.steps)), object.get(eff, fl.path.steps[0], {}))), _s_each_step(fl))} if {
+} else := {"from": array.concat(_s_from_steps(_p_descend_steps(array.slice(_s_model_path(fl.path), 1, count(_s_model_path(fl.path))), object.get(eff, fl.path.steps[0], {}))), _s_each_step(fl))} if {
 	_s_descends(name, fl, subjects)
 } else := {"from": array.concat(_s_from_steps(_s_model_path(fl.path)), _s_each_step(fl))}
 
@@ -6152,10 +6270,21 @@ else := null
 
 _s_descends(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
 	count(fl.path.steps) > 1
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
 	fl.path.steps[0] in object.keys(subjects)
+}
+
+_s_descends(name, fl, subjects) if {
+	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
+	fl.path.steps == [fl.path.steps[0]]
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] != name
+	fl.path.steps[0] in object.keys(subjects)
+	"named_by_each_of" in object.keys(fl)
 }
 
 _s_narrows(name, fl, subjects) if {
@@ -6252,9 +6381,23 @@ _s_id_field(read) := {"identified_by": read.identified_by.path} if "path" in obj
 
 else := {}
 
-_s_subject_sentences(subjects, reads, parts) := {"from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
+_s_dotted_line(name, line) := object.union(line, {"path": object.union(line.path, {"kept_dot": true})}) if object.get(data.ergo_subject_sentences, "dotted", {})[name] == true
 
-_s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}} if not is_object(subjects)
+else := line
+
+_s_dotted(subjects, lines) := {name: true |
+	some name, l in lines
+	is_object(object.get(l, "path", null))
+	l.path.dot == true
+	not "start" in object.keys(l.path)
+	is_string(l.path.steps[0])
+	l.path.steps[0] != name
+	l.path.steps[0] in object.keys(subjects)
+}
+
+_s_subject_sentences(subjects, reads, parts) := {"dotted": _s_dotted(subjects, parts.lines), "from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
+
+_s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}, "dotted": {}} if not is_object(subjects)
 
 _s_subject_problems(name, def, reads) := {f: ps | some f in ["applies_to", "from", "identified_by", "of"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
 
@@ -6568,15 +6711,15 @@ _s_named_model_leaf(m, names) := _s_named(m, names) if not m.op in {"every", "so
 
 _s_written_check(check) := _p_written(check, set(), set(), _p_context({}, {}, _p_no_parts))
 
-_p_written(check, aliases, parents, pc) := _s_check([check], {}, _p_named_by_problems([check], "", aliases) | _p_part_walk_problems([check], "", pc), aliases | parents) if is_string(check)
+_p_written(check, aliases, parents, pc) := _s_check_mixed([check], {}, (_p_named_by_problems([check], "", aliases) | _p_part_walk_problems([check], "", pc)), aliases | parents) if is_string(check)
 
-_p_written(check, aliases, parents, pc) := _s_check(_s_lines(check.assert), object.filter(check, {"description", "meta"}), ((_s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases)) | _p_part_walk_problems(_s_lines(check.assert), "", pc)), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_mixed(_s_lines(check.assert), object.filter(check, {"description", "meta"}), ((_s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases)) | _p_part_walk_problems(_s_lines(check.assert), "", pc)), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	not "for" in object.keys(check)
 }
 
-_p_written(check, aliases, parents, pc) := _s_check_for(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), (((_s_form_problems(check) | _p_for_clash(check, pc)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases)) | _p_part_walk_problems(_s_lines(check.assert), check.for, pc)), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_for_mixed(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), (((_s_form_problems(check) | _p_for_clash(check, pc)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases)) | _p_part_walk_problems(_s_lines(check.assert), check.for, pc)), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	"for" in object.keys(check)
@@ -6612,11 +6755,10 @@ _s_any_of(check, aliases, names, pc) := object.union(object.filter(check, {"desc
 	"checks": [object.remove(p[0], ["expression"]) | some p in pairs],
 	"assertions": [p[1] | some p in pairs],
 	"option_of": [p[2] | some p in pairs],
-	"places": [place | some nm in _names(options); some place in _s_option_places(nm, _s_lines(check.any_of[nm]))],
 	"expression": _one_of([[_text(nm), _option_text(nm, texts, texts)] | some nm in _names(options); texts := [p[1] | some p in pairs; p[2] == nm]]),
 }) if {
 	count(_s_any_of_problems(check)) == 0
-	options := {nm: _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc), names) | some nm, o in check.any_of}
+	options := {nm: _s_check_mixed(_s_lines(o), {}, (_p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc)), names) | some nm, o in check.any_of}
 	every m in options {
 		not "$sentence" in object.keys(m)
 	}
@@ -6629,12 +6771,6 @@ _s_any_of(check, aliases, names, pc) := object.union(object.filter(check, {"desc
 _s_option_lines(m, nm) := [[c, m.assertions[i], nm] | some i, c in m.checks] if m.op == "all_of"
 
 _s_option_lines(m, nm) := [[m, m.expression, nm]] if m.op != "all_of"
-
-_s_option_places(nm, lines) := [_s_option_place(nm, i, count(lines)) | some i, line in lines; some _ in _sentence(line).assertions]
-
-_s_option_place(nm, _, 1) := concat("", ["option ", _text(nm)])
-
-_s_option_place(nm, i, n) := concat("", ["option ", _text(nm), ": line ", _literal_text(i + 1)]) if n > 1
 
 _s_any_of_problems(check) := {concat("", ["unknown field ", _text(f)]) | some f in object.keys(check); not f in {"any_of", "description", "meta"}} | _s_options_shape(check.any_of)
 
@@ -6666,7 +6802,7 @@ _s_options_problems(options, aliases, names, pc) := {concat("", ["option ", _tex
 	some nm, o in options
 	_s_option_written(o)
 	o != []
-	m := _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc), names)
+	m := _s_check_mixed(_s_lines(o), {}, (_p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc)), names)
 	some p in object.get(m, "$sentence", [])
 } if is_object(options)
 
@@ -6732,6 +6868,23 @@ _s_check(lines, wording, problems, parts) := object.union(wording, object.union(
 	model := _s_model_of(marked)
 } else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable(((problems | _s_lines_problems(lines)) | _s_lines_self(lines, _s_names(set(), parts)))))})
 
+_s_check_mixed(lines, wording, problems, parts) := m if {
+	m := _s_check(lines, wording, problems, parts)
+	not "$sentence" in object.keys(m)
+	not _s_has_mixed([m])
+} else := _s_check(lines, wording, problems | _s_mixed_lines(lines, _s_names(set(), parts)), parts)
+
+_s_check_for_mixed(lines, ftext, wording, problems, parts) := m if {
+	m := _s_check_for(lines, ftext, wording, problems, parts)
+	not "$sentence" in object.keys(m)
+	not _s_has_mixed(array.concat(object.get(m, "checks", []), [c | some item in object.get(m, "items", []); some c in item.whose]))
+} else := _s_check_for(lines, ftext, wording, problems | _s_mixed_for(lines, ftext, parts), parts)
+
+_s_has_mixed(models) if {
+	some node in _walk_nodes([[m, [], [], set()] | some m in models])
+	"values of mixed types" in _values_problem(node[0])
+}
+
 _s_lines_self([line], names) := _s_line_self(line, names)
 
 _s_lines_self(lines, names) := {concat("", ["line ", _literal_text(i + 1), ": ", p]) | some i, line in lines; some p in _s_line_self(line, names)} if count(lines) > 1
@@ -6751,6 +6904,33 @@ _s_model_of(assertions) := {"op": "all_of", "checks": models, "assertions": [_s_
 	models := [_s_model(a) | some a in assertions]
 	count(models) == count(assertions)
 }
+
+_s_mixed_lines([line], names) := _s_line_mixed(line, names)
+
+_s_mixed_lines(lines, names) := {concat("", ["line ", _literal_text(i + 1), ": ", p]) | some i, line in lines; some p in _s_line_mixed(line, names)} if count(lines) > 1
+
+_s_mixed_lines([], _) := set()
+
+_s_line_mixed(line, names) := {"values of mixed types" |
+	some a in parsed.assertions
+	some node in _walk_nodes([[_s_model(_s_aliased(a, names)), [], [], set()]])
+	"values of mixed types" in _values_problem(node[0])
+} if {
+	is_string(line)
+	parsed := _sentence(line)
+	"assertions" in object.keys(parsed)
+} else := set()
+
+_s_mixed_for(lines, ftext, parts) := _s_mixed_lines(lines, _s_names({item.as | some item in fl.items}, parts)) | {"for: values of mixed types" |
+	some i, item in _s_marked_items(fl, parts)
+	some c in _s_for_item_model(item, {earlier.as | some earlier in array.slice(fl.items, 0, i)}).whose
+	some node in _walk_nodes([[c, [], [], set()]])
+	"values of mixed types" in _values_problem(node[0])
+} if {
+	is_string(ftext)
+	fl := _for_line(ftext)
+	"items" in object.keys(fl)
+} else := _s_mixed_lines(lines, _s_names(set(), parts))
 
 _s_lines_problems([line]) := _s_unread_problems(line)
 
@@ -7403,15 +7583,56 @@ _walk_passed([], true, leaf, v) if _op_passed(leaf, v)
 
 _walk_failure(w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": _row_cause(leaf, e.iv, ""), "value": _walk_shown(e.v), "at": _walk_at(w, e)}
 
-_walk_failure(w, e, undecided, _, _, _) := {"path": array.concat(e.i, _walk_first_path(undecided[0][0])), "item": e.i, "cause": undecided[0][1], "value": _walk_first_value(undecided[0][0], e.iv), "at": _item_read_at(w, e, _walk_first_path(undecided[0][0]))} if undecided != []
+_walk_failure(w, e, undecided, _, _, _) := {"path": _walk_named_path(e, p), "item": e.i, "cause": undecided[0][1], "value": _value_at(e.iv, p), "at": _walk_named_at(w, e, p)} if {
+	undecided != []
+	p := _walk_first_path(undecided[0][0], e.iv)
+}
+
+_walk_named_path(_, p) := _as_subject_part(p) if _walk_outside(p)
+
+_walk_named_path(e, p) := array.concat(e.i, p) if not _walk_outside(p)
+
+_walk_named_at(_, _, p) := _ref_at(p) if _walk_outside(p)
+
+_walk_named_at(w, e, p) := _item_read_at(w, e, p) if not _walk_outside(p)
+
+_walk_outside(p) if _read_off_item(p)
+
+_walk_outside(p) if _builtin(p)
 
 _walk_failure(_, _, [], false, _, _) := null
 
 _walk_failure(_, _, [], true, _, true) := null
 
-_walk_first_path(c) := _condition_paths(c)[0]
+_walk_first_path(c, v) := array.concat([e[0] | some e in _walk_sides_paths(c); not _walk_side_read(v, e)], [e[0] | some e in _walk_sides_paths(c)])[0]
 
-_walk_first_value(c, v) := _value_at(v, _condition_paths(c)[0])
+_walk_side_read(v, e) if {
+	_read_state(v, e[0]) == "value"
+	_walk_list_read(e[1], _value_at(v, e[0]))
+}
+
+_walk_list_read("value", _)
+
+_walk_list_read("list", x) if is_array(x)
+
+_walk_sides_paths(c) := [e | some f in ["left", "right"]; some e in _walk_side_paths(c, c[f])] if _two_sided(c)
+
+_walk_sides_paths(c) := [[p, "value"] | some p in _condition_paths(c)] if not _two_sided(c)
+
+_walk_side_paths(_, side) := [[side, "value"]] if is_array(side)
+
+_walk_side_paths(c, side) := [[p, _walk_side_needs(operand)] | some operand in _walk_operands(side); some p in _basic_paths(operand)] if {
+	c.op == "compare"
+	_derived(side)
+}
+
+_walk_operands(side) := side.add if _side_form(side) == "add"
+
+else := [side]
+
+_walk_side_needs(side) := "list" if _basic_form(side) in {"count_of", "sum_of"}
+
+else := "value"
 
 _condition_paths(c) := array.concat(_leaf_paths(c), [p | some side in _derived_sides(c); some p in _side_paths(side)])
 
@@ -7580,7 +7801,7 @@ _s_for_problems(lines, ftext) := _s_lines_problems(lines) if not is_string(ftext
 
 _s_for_line_unsupported(lines, ftext) := _s_lines_problems(lines) if not "items" in object.keys(_for_line(ftext))
 
-_s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, []) | _s_lines_problems(lines) if {
+_s_for_line_unsupported(lines, ftext) := {concat("", ["for: ", u]) | some u in _s_for_unsupported(fl, [])} | _s_lines_problems(lines) if {
 	fl := _for_line(ftext)
 	"items" in object.keys(fl)
 }
