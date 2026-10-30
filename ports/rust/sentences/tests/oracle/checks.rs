@@ -14,6 +14,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every y.leaves is 1", "every y.leaves is 1", &[], &[]),
     ("n exists", "n exists", &[], &[]),
+    ("q.n is 1", "q.n is 1", &[], &[]),
     ("size exists", "size exists", &[], &[]),
     (
         "sum of items.x whose k is \"a\" is 1",
@@ -6501,6 +6502,30 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs named by x as x",
         "every xs named by x as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, first of ys whose k is p.k as q",
+        "every xs as p, first of ys whose k equals p.k as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, item 2 of ys whose k is p.k as q",
+        "every xs as p, item 2 of ys whose k equals p.k as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, last of ys whose k is p.k sorted by t as q",
+        "every xs as p, last of ys whose k equals p.k sorted by t as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose k is 1 as p, first of ys whose k is p.k as q",
+        "every xs whose k is 1 as p, first of ys whose k equals p.k as q",
         &[],
         &[],
     ),
