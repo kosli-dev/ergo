@@ -2,10 +2,6 @@ parts / a part's alias in an elapsed time on the right side of a whose / reads t
 parts / a part's alias in an elapsed time on the right side of a whose / reads the part when the part is missing, and not the item's own field of the same name
 parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with few items passes
 parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with too many items fails
-parts / a for alias and the input on the right side of a whose with plus / reads the alias and the input, and not the item's own field of the same name
-parts / a parent's name in an elapsed time on the right side of a whose / reads the parent when the parent lacks the field, and not the item's own field of the same name
-parts / a parent's name on the right side of a whose, with and without plus / reads the parent when the parent lacks the field, and not the item's own field of the same name
-parts / a part's alias on the right side of a whose, with and without plus / reads the part when the part is missing, and not the item's own field of the same name
 subjects / a child subject of a from line with a path and named by each of / reads each key inside the path of its parent
 subjects / a child subject of a from line with a path and named by each of, with a parent that isn't an object / still fails min_subjects as absent when the parent is an object without the path
 subjects / a child subject of a from line with a position on a path inside the parent and named by each of / reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check
