@@ -2463,6 +2463,103 @@
     ]
   },
   {
+    "description": "a second item whose whose leaves nothing in",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "s": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "c": {
+              "for": "every xs as p, every ys whose k is 1 as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the first item with no failed sentences",
+        "rules": ["for.failed_items", "for.second_failures", "walk.items"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "v": 1
+                }
+              ],
+              "ys": [
+                {
+                  "k": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "ys[]",
+                "value": [
+                  {
+                    "k": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
+          }
+        ],
+        "compliant": false
+      }
+    ]
+  },
+  {
     "description": "a name that hides a field of the subject",
     "policy": {
       "ergo_spec": "v0.3-dev",

@@ -912,7 +912,7 @@ _marker_owner(_, m) := m.of if m.of != null
 
 _tag_name(m) := m.alias if m.of == null
 
-_tag_name(m) := concat("", [_s_key_text(m.of), ".", m.alias]) if m.of != null
+_tag_name(m) := concat("", [_s_parent_key(m.of), ".", m.alias]) if m.of != null
 
 _part_id(ms, steps, read, subj) := _value_at(subj, array.concat(array.concat([ms], steps), path)) if path := _id_path(read)
 
@@ -1277,6 +1277,7 @@ _builtin(path) if {
 	is_array(path)
 	is_string(path[0])
 	startswith(path[0], "$$")
+	not _parent_name(path[0])
 }
 
 _start_of(subj, path) := subj if not _named(path)
@@ -1681,6 +1682,8 @@ _nameable_step(p) if is_string(p)
 
 _nameable_step(p) if _index_step(p)
 
+_nameable_step(p) if _parent_step_form(p)
+
 _nameable_step(p) if {
 	_is_literal(p)
 	is_string(p.literal)
@@ -1697,7 +1700,11 @@ _plain_step_name(0, step) := step if {
 	not _parent_name(step)
 }
 
-_plain_step_name(0, step) := _s_key_text(substring(step, 1, -1)) if _parent_name(step)
+_plain_step_name(0, step) := _s_parent_key(substring(step, 1, -1)) if _parent_name(step)
+
+_s_parent_key(key) := _json_text(key) if key in _s_words
+
+else := _s_key_text(key)
 
 _parent_name(step) if {
 	is_string(step)
@@ -1717,6 +1724,14 @@ _plain_step_name(i, step) := concat("", [".", _s_key_text(step)]) if {
 }
 
 _plain_step_name(0, step) := concat("", [_s_dot(step.literal, "left"), _s_key_text(step.literal)]) if _string_literal(step)
+
+_plain_step_name(0, step) := _s_parent_key(step.parent) if _parent_step_form(step)
+
+_parent_step_form(p) if {
+	is_object(p)
+	object.keys(p) == {"parent"}
+	is_string(p.parent)
+}
 
 _plain_step_name(i, step) := concat("", [".", _s_key_text(step.literal)]) if {
 	i > 0
@@ -2904,7 +2919,7 @@ _name_known(start, names) if {
 }
 
 _name_known(start, names) if {
-	not startswith(start, "$$")
+	not start in {"$$input", "$$params"}
 	substring(start, 1, -1) in names
 }
 
@@ -3348,7 +3363,7 @@ _described(check) := {"expression": _expression_of(check)} if not is_object(chec
 
 _chain_part(req) if data.ergo_subject_sentences.from_parts[req.subject]
 
-_chain_part_name(req) := concat("", [_s_key_text(data.ergo_subject_sentences.chains[req.subject]), ".", _s_key_text(alias), _tail_after_part(req, alias)]) if alias := data.ergo_subject_sentences.from_parts[req.subject]
+_chain_part_name(req) := concat("", [_s_parent_key(data.ergo_subject_sentences.chains[req.subject]), ".", _s_key_text(alias), _tail_after_part(req, alias)]) if alias := data.ergo_subject_sentences.from_parts[req.subject]
 
 _tail_after_part(req, alias) := concat("", [_step_name(i + 2, rest[i]) | some i in _names(rest)]) if {
 	rest := array.slice(_from_of(req), count(data.ergo_subject_sentences.parts[data.ergo_subject_sentences.chains[req.subject]][alias].from.path), count(_from_of(req)))
@@ -3363,10 +3378,14 @@ _from_text(req) := concat("", [_every_word(req), _with_from_dot(req, _from_name(
 	not _chain_part(req)
 }
 
-_with_from_dot(req, name) := concat("", [at, ".", substring(name, count(at), -1)]) if {
+_with_from_dot(req, name) := concat("", [at, _from_dot(substring(name, count(at), -1)), substring(name, count(at), -1)]) if {
 	object.get(object.get(data.ergo_subject_sentences, "dotted", {}), req.subject, false) == true
 	at := regex.find_all_string_submatch_n(`^(?:(?:item [1-9][0-9]*(?: from last)?|first|last) of )?`, name, 1)[0][0]
 } else := name
+
+_from_dot(rest) := "" if startswith(rest, ".")
+
+else := "."
 
 _every_word(req) := "every " if _every_from(req)
 
@@ -3378,7 +3397,7 @@ _from_text(req) := _chain_part_name(req) if {
 	_chain_part(req)
 }
 
-_from_text(req) := _path_name(array.concat([_subject_step(data.ergo_subject_sentences.chains[req.subject])], _from_path(req))) if {
+_from_text(req) := _path_name(array.concat([_parent_step(data.ergo_subject_sentences.chains[req.subject])], _from_path(req))) if {
 	_from_well_formed(req)
 	_chained(req)
 	not _chain_part(req)
@@ -4104,6 +4123,8 @@ _subject_from_text(name, null, _) := _path_name([_subject_step(name)])
 _subject_step(name) := {"literal": name} if startswith(name, "$")
 
 _subject_step(name) := name if not startswith(name, "$")
+
+_parent_step(name) := {"parent": name}
 
 _subject_from_text(_, def, _) := "<invalid from>" if {
 	def != null
@@ -5982,7 +6003,25 @@ _s_start_text(p, _) := "$input" if object.get(p, "start", "") == "input"
 
 _s_start_text(p, _) := p.start if startswith(object.get(p, "start", ""), "$")
 
-_s_start_text(p, side) := concat("", [_s_start_dot(p, side), _s_key_text(p.steps[0])]) if not "start" in object.keys(p)
+_s_start_text(p, side) := concat("", [_s_start_dot(p, side), _s_start_key(p)]) if not "start" in object.keys(p)
+
+_s_start_key(p) := _json_text(p.steps[0]) if _s_quoted_start(p)
+
+else := _s_key_text(p.steps[0])
+
+_s_quoted_start(p) if {
+	p.steps[0] in _s_words
+	object.get(p, "dot", false) != true
+	object.get(p, "field", false) != true
+	object.get(p, "it", false) != true
+	object.get(p, "part", false) == true
+}
+
+_s_quoted_start(p) if {
+	p.steps[0] in _s_words
+	object.get(p, "dot", false) != true
+	object.get(p, "quoted", false) == true
+}
 
 _s_start_dot(p, side) := "." if {
 	object.get(p, "field", false) == true
@@ -5992,6 +6031,8 @@ _s_start_dot(p, side) := "." if {
 else := "." if object.get(p, "kept_dot", false) == true
 
 else := "" if object.get(p, "it", false) == true
+
+else := "" if _s_quoted_start(p)
 
 else := _s_dot(p.steps[0], side)
 
@@ -6311,11 +6352,15 @@ _s_from_read_of(name, fl, subjects, chains) := object.union(object.union({"probl
 	keep := names | object.keys(_p_steps_of(object.get(chains.parts, name, {})))
 	pc := {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}
 	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc), keep), names), pc) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
-	problems := sort(((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {concat("", ["whose: ", p]) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}))
+	problems := sort(((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {_whose_problem(p) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 	every_list := object.get(fl, "every", false) == true
 }
+
+_whose_problem(p) := p if p == "every and some over more than ten steps aren't supported yet"
+
+else := concat("", ["whose: ", p])
 
 _s_from_cond(c, names, keep) := object.union(c, object.union(
 	{q: _s_from_dot(c[q], names, keep) | some q in ["every", "some"]; is_object(object.get(c, q, null))},
@@ -6494,7 +6539,14 @@ else := {}
 
 _s_dotted_line(name, line) := object.union(line, {"path": object.union(line.path, {"kept_dot": true})}) if object.get(data.ergo_subject_sentences, "dotted", {})[name] == true
 
-else := line
+else := object.union(line, {"path": object.union(line.path, {"quoted": true})}) if {
+	is_object(object.get(line, "path", null))
+	not "start" in object.keys(line.path)
+	object.get(line.path, "dot", false) != true
+	is_string(line.path.steps[0])
+	line.path.steps[0] != name
+	line.path.steps[0] in object.keys(data.ergo_resolved)
+} else := line
 
 _s_dotted(subjects, lines) := {name: true |
 	some name, l in lines
@@ -7475,7 +7527,10 @@ _s_model_start(p) := [p.steps[0]] if {
 	not _s_literal_start(p)
 }
 
-_s_literal_start(p) if startswith(p.steps[0], "$")
+_s_literal_start(p) if {
+	startswith(p.steps[0], "$")
+	object.get(p, "part", false) != true
+}
 
 _s_literal_start(p) if object.get(p, "field", false) == true
 

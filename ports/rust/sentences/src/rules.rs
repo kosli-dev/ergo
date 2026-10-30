@@ -599,17 +599,20 @@ fn kind_of(path: &Path) -> Kind {
         Start::Params => Kind::Params,
         Start::Input => Kind::Input,
         Start::Unknown(name) => Kind::Unknown(name.clone()),
-        Start::Field { key, .. } => Kind::Field(key.clone()),
+        Start::Field { key, .. } | Start::Quoted(key) => Kind::Field(key.clone()),
     }
 }
 
 fn dot_of(path: &Path) -> bool {
-    matches!(path.start, Start::Field { dot: true, .. })
+    matches!(
+        path.start,
+        Start::Field { dot: true, .. } | Start::Quoted(_)
+    )
 }
 
 fn first_key(path: &Path) -> Option<&str> {
     match &path.start {
-        Start::Field { key, .. } => Some(key),
+        Start::Field { key, .. } | Start::Quoted(key) => Some(key),
         _ => None,
     }
 }
@@ -653,7 +656,7 @@ fn full_steps(path: &Path) -> Vec<Step> {
     let (_, steps) = lifted(path);
     let mut all = Vec::new();
     match &path.start {
-        Start::Field { key, .. } => all.push(Step::Key(key.clone())),
+        Start::Field { key, .. } | Start::Quoted(key) => all.push(Step::Key(key.clone())),
         Start::It => all.push(Step::Key("it".to_string())),
         _ => {}
     }

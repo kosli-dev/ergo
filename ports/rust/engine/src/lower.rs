@@ -119,7 +119,7 @@ pub fn keyed_steps(path: &s::Path) -> Result<Vec<Step>, Vec<String>> {
 
 pub fn part_steps(path: &s::Path) -> Result<Vec<Step>, Vec<String>> {
     let first = match &path.start {
-        s::Start::Field { key, .. } => Step::Key(key.clone()),
+        s::Start::Field { key, .. } | s::Start::Quoted(key) => Step::Key(key.clone()),
         s::Start::Params | s::Start::Input => {
             return Err(vec![
                 "a part reads inside its subject, so it can't start at $params or $input"
@@ -315,6 +315,7 @@ impl Scope {
             s::Start::Field { key, dot } => {
                 self.field_start(key, *dot, parents, parts, aliases, steps)
             }
+            s::Start::Quoted(key) => self.field_start(key, false, parents, parts, aliases, steps),
         };
         Ok(path::Path { start, steps })
     }
@@ -338,7 +339,7 @@ impl Scope {
                 {
                     let name = format!(
                         "{}.{}",
-                        crate::name::key_text(key),
+                        crate::name::parent_key_text(key),
                         crate::name::key_text(next)
                     );
                     let start = part_start(&name, Start::Alias(key.to_string()), part);

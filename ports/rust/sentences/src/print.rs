@@ -54,7 +54,7 @@ pub fn print_condition(condition: &Condition, aliases: &[&str]) -> String {
 
 fn left_of_whose(path: &Path, aliases: &[&str], parents: &[&str], own: bool) -> String {
     match &path.start {
-        Start::Field { key, .. } if parents.contains(&key.as_str()) => {
+        Start::Field { key, .. } | Start::Quoted(key) if parents.contains(&key.as_str()) => {
             let mut dotted = path.clone();
             dotted.start = Start::Field {
                 key: key.clone(),
@@ -341,6 +341,11 @@ fn path_text_with(path: &Path, side: Side, aliases: &[&str], own: bool, lift: bo
         Start::Params => out.push_str("$params"),
         Start::Input => out.push_str("$input"),
         Start::Unknown(name) => out.push_str(name),
+        Start::Quoted(key) if aliases.contains(&key.as_str()) => out.push_str(&json_string(key)),
+        Start::Quoted(key) => {
+            out.push('.');
+            out.push_str(key);
+        }
         Start::Field { key, dot } => {
             let dotted = is_word(key)
                 || (matches!(side, Side::Right) && !is_bare_key(key))

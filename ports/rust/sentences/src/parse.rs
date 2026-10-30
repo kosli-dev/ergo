@@ -497,8 +497,12 @@ impl Parser {
             }
             '"' if matches!(side, Side::Left) => {
                 let (key, end) = self.dq(i)?;
-                let dot = is_word(&key);
-                Some((Start::Field { key, dot }, end))
+                if is_word(&key) && !self.lenient {
+                    Some((Start::Quoted(key), end))
+                } else {
+                    let dot = is_word(&key);
+                    Some((Start::Field { key, dot }, end))
+                }
             }
             _ => {
                 let (key, end) = self.bare_key(i)?;

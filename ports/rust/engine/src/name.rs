@@ -67,6 +67,14 @@ pub fn key_text(key: &str) -> String {
     }
 }
 
+pub fn parent_key_text(key: &str) -> String {
+    if is_word(key) {
+        serde_json::to_string(key).unwrap_or_default()
+    } else {
+        key_text(key)
+    }
+}
+
 pub fn name(path: &Path) -> String {
     render(path, None)
 }
@@ -88,7 +96,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
         Start::Subject => String::new(),
         Start::Input => "$input".to_string(),
         Start::Params => "$params".to_string(),
-        Start::Alias(alias) => key_text(alias),
+        Start::Alias(alias) => parent_key_text(alias),
         Start::Part(part) => part.name.clone(),
     };
     let last = path.steps.len().saturating_sub(1);
@@ -159,6 +167,18 @@ mod tests {
             start: Start::Params,
             steps,
         }
+    }
+
+    #[test]
+    fn a_parent_named_like_a_grammar_word_is_quoted() {
+        assert_eq!(parent_key_text("empty"), "\"empty\"");
+        assert_eq!(parent_key_text("artifact"), "artifact");
+        assert_eq!(parent_key_text("a b"), "\"a b\"");
+        let child = Path {
+            start: Start::Alias("empty".to_string()),
+            steps: vec![k("items")],
+        };
+        assert_eq!(name(&child), "\"empty\".items");
     }
 
     #[test]

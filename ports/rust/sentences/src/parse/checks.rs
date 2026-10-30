@@ -175,7 +175,7 @@ impl Parser {
             } else {
                 self.plain_path(j, Side::Left)
                     .into_iter()
-                    .filter(|(p, _)| matches!(p.start, Start::Field { .. }))
+                    .filter(|(p, _)| matches!(p.start, Start::Field { .. } | Start::Quoted(_)))
                     .collect()
             };
             for (path, k) in paths {
