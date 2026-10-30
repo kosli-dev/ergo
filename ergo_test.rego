@@ -1135,9 +1135,96 @@ test_min_subjects_accepts_a_single_object_from_as_one_subject if {
 
 test_min_subjects_with_an_empty_from_fails_when_the_document_is_not_an_object if {
 	req := {"s": object.union(min_subjects_req(0).s, {"from": "$input"})}
-	every doc, cause in {"null": "null", `"x"`: "unusable", "3": "unusable", `[{"id": "a"}]`: "unusable"} {
+	every doc, cause in {"null": "null", `"x"`: "unusable", "3": "unusable", "true": "unusable"} {
 		rep := report(json.unmarshal(doc), req)
 		[[r.passed, r.cause] | some r in rows_for(rep, "s", "$min_subjects")] == [[false, cause]]
+	}
+}
+
+test_from_input_on_a_list_makes_each_item_a_subject_and_an_empty_list_fails_as_value if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input"})}
+	[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations] | some r in rows_for(report([{"id": "a"}, 1], req), "s", "$min_subjects")] == [[true, "satisfied", 2, ["/0", "/1"]]]
+	[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations] | some r in rows_for(report([], req), "s", "$min_subjects")] == [[false, "value", 0, []]]
+}
+
+test_from_every_input_on_a_list_makes_each_item_a_subject_and_prints_every if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "every $input"})}
+	rep := report([{"id": "a"}, 1], req)
+	[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations, r.failed_items] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied", 2, ["/0", "/1"], []]]
+	rep.requirements.s.checks["$min_subjects"].expression == "count(matching(every $input)) >= 1"
+	[[r.passed, r.cause, r.inputs[0].value, r.failed_items] | some r in rows_for(report([], req), "s", "$min_subjects")] == [[false, "value", 0, []]]
+}
+
+test_from_every_input_on_an_input_that_is_not_a_list_fails_and_names_the_input_from_input if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "every $input"})}
+	every doc, cause in {"null": "null", `"x"`: "unusable", "3": "unusable", "true": "unusable"} {
+		[[r.passed, r.cause, r.failed_items] | some r in rows_for(report(json.unmarshal(doc), req), "s", "$min_subjects")] == [[false, cause, [{"path": "$input", "item": "$input", "cause": cause, "value": json.unmarshal(doc), "locations": [""]}]]]
+	}
+	[[r.passed, r.cause, r.failed_items[0].path, r.failed_items[0].item] | some r in rows_for(report({"id": "a"}, req), "s", "$min_subjects")] == [[false, "unusable", "$input", "$input"]]
+}
+
+test_every_walks_that_start_at_a_list_input_read_the_lists_inside_its_items if {
+	doc := [{"commits": [{"id": "a"}]}, {"commits": []}]
+	every from in ["every $input.commits", "every commits"] {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations] | some r in rows_for(report(doc, req), "s", "$min_subjects")] == [[true, "satisfied", 1, ["/0/commits/0"]]]
+	}
+}
+
+test_every_walk_that_starts_at_a_list_input_fails_an_item_that_is_not_an_object_or_has_no_list if {
+	every doc, cause in {`[1]`: "unusable", `[{}]`: "absent", `[{"commits": null}]`: "null", `[{"commits": 1}]`: "unusable"} {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": "every commits"})}
+		[[r.passed, r.cause] | some r in rows_for(report(json.unmarshal(doc), req), "s", "$min_subjects")] == [[false, cause]]
+	}
+}
+
+test_every_walk_that_starts_at_a_list_input_names_where_it_broke_from_input if {
+	every from in ["every $input.commits", "every commits"] {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		[[f.path, f.item, f.locations] | some r in rows_for(report([{"commits": [{"id": "a"}]}, {"commits": 5}, 7], req), "s", "$min_subjects"); some f in r.failed_items] == [["$input[1].commits", "$input[1].commits", ["/1/commits"]], ["$input[2].commits", "$input[2].commits", ["/2"]]]
+	}
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "every $input[1].commits"})}
+	[[f.path, f.item] | some r in rows_for(report([{"commits": []}, 5], req), "s", "$min_subjects"); some f in r.failed_items] == [["item 2 of $input", "item 2 of $input"]]
+}
+
+test_a_from_line_with_a_position_on_a_list_input_names_it_from_input_in_expressions if {
+	every from, want in {
+		"every $input[1].commits": ["count(matching(every $input[1].commits)) >= 1", "count(repeated(ids(every $input[1].commits))) == 0"],
+		"$input[1]": ["count(matching(item 2 of $input)) >= 1", "count(repeated(ids(item 2 of $input))) == 0"],
+		"first of $input": ["count(matching(item 1 of $input)) >= 1", "count(repeated(ids(item 1 of $input))) == 0"],
+		"every $input.commits": ["count(matching(every commits)) >= 1", "count(repeated(ids(every commits))) == 0"],
+	} {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		rep := report([{"commits": [{"id": "a"}]}, {"commits": [{"id": "b"}]}], req)
+		[rep.requirements.s.checks[c].expression | some c in ["$min_subjects", "$unique_ids"]] == want
+	}
+}
+
+test_a_child_subject_reads_the_items_of_a_list_input_as_its_parents if {
+	reqs := {"s": {"subject_type": "kid", "from": "parent.kids", "checks": {"c": "id exists"}}, "p": {"subject_type": "parent", "from": "$input", "checks": {"c": "kids exists"}}}
+	rep := report([{"kids": [{"id": "a"}]}, {"kids": []}], reqs)
+	[[r.passed, r.cause, r.inputs[0].locations] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied", ["/0/kids/0"]], [false, "value", []]]
+}
+
+test_a_position_on_a_list_input_reads_the_item_and_ends_absent_past_the_end if {
+	every from in ["$input[0]", "first of $input"] {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations] | some r in rows_for(report([{"id": "a"}, 1], req), "s", "$min_subjects")] == [[true, "satisfied", 1, ["/0"]]]
+		[[r.passed, r.cause, r.inputs[0].value] | some r in rows_for(report([], req), "s", "$min_subjects")] == [[false, "absent", 0]]
+	}
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input[5]"})}
+	[[r.passed, r.cause] | some r in rows_for(report([{"id": "a"}], req), "s", "$min_subjects")] == [[false, "absent"]]
+}
+
+test_a_position_on_a_list_input_that_leads_to_a_list_reads_its_items if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input[0].commits"})}
+	[[r.passed, r.cause, r.inputs[0].locations] | some r in rows_for(report([{"commits": [{"id": "a"}]}], req), "s", "$min_subjects")] == [[true, "satisfied", ["/0/commits/0"]]]
+}
+
+test_a_field_on_a_list_input_is_unusable if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input.commits"})}
+	every doc in [[{"commits": [{"id": "a"}]}], []] {
+		[[r.passed, r.cause] | some r in rows_for(report(doc, req), "s", "$min_subjects")] == [[false, "unusable"]]
 	}
 }
 
@@ -3341,7 +3428,9 @@ test_an_input_that_is_a_string_without_from_is_not_compliant if {
 }
 
 test_an_input_that_is_a_list_without_from_is_not_compliant if {
-	report([{"id": 1}], {"s": {"checks": {"c": "id exists"}}}).compliant == false
+	rep := ergo.report([{"id": 1}], {"ergo_spec": "v0.3-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}}, {})
+	rep.compliant == false
+	[r.cause | some r in rep.results; r.check == "$min_subjects"] == ["unusable"]
 }
 
 json_only_req := {"s": {"subject_type": "thing", "from": "items", "identified_by": "id", "checks": {"c": "x is 1"}}}
@@ -8220,8 +8309,8 @@ test_a_from_line_with_every_fails_where_its_path_stops_as_every_does_in_a_check 
 }
 
 test_a_from_line_with_every_on_an_input_that_is_not_an_object_fails_as_one_without_every if {
-	[r.cause | some r in _from_report([1], _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["unusable"]
-	[r.failed_items | some r in _from_report([1], _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == [[]]
+	[r.cause | some r in _from_report("x", _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["unusable"]
+	[r.failed_items | some r in _from_report("x", _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == [[{"path": "$input", "item": "$input", "cause": "unusable", "value": "x", "locations": [""]}]]
 	[r.cause | some r in _from_report(null, _every_prs, {"c": "x exists"}, {}).results; r.check == "$min_subjects"] == ["absent"]
 }
 
@@ -9584,7 +9673,7 @@ test_a_field_step_adds_the_key_the_field_holds_and_the_field_is_shown_with_its_o
 }
 
 test_a_subject_read_from_the_values_of_an_object_starts_at_its_escaped_key if {
-	policy := {"ergo_spec": "v0.3-dev", "subjects": {"scan": {"from": "scans named by each of $params.required", "identified_by": "name"}}, "requirements": {"s": {"subject": "scan", "checks": {"c": "x exists"}}}}
+	policy := {"ergo_spec": "v0.3-dev", "subjects": {"scan": {"from": "scans named by each of $params.required"}}, "requirements": {"s": {"subject": "scan", "checks": {"c": "x exists"}}}}
 	rep := ergo.report({"scans": {"sast": {"x": 1}, "sca/x": {"x": 2}, "a~b": {}}}, policy, {"required": ["sast", "sca/x", "a~b", "secrets"]})
 	[[r.subject.id, r.inputs[0].locations] | some r in rep.results; r.check == "c"] == [
 		["a~b", ["/scans/a~0b"]],
@@ -10456,6 +10545,42 @@ test_a_for_alias_named_like_a_part_of_a_subject_with_a_space_in_its_name_quotes_
 	subjects := {"pull request": {"from": "bs", "identified_by": "id", "has": {"pull": "k1"}}, "kid": {"from": `"pull request".kids`, "identified_by": "id"}}
 	rep := ergo.report(_clash_doc, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": {"for": "every xs as pull", "assert": "pull.v is 1"}}}}}, {})
 	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["pull can't be an alias: it's a part of \"pull request\""]]
+}
+
+_each_id_problem := [{"name": "subjects.suite.identified_by", "value": ["not allowed with named by each of: the key is the id"], "locations": []}]
+
+test_identified_by_is_written_wrong_on_every_form_of_a_from_line_listed_by_named_by_each_of if {
+	every from in [
+		"suites named by each of $params.names",
+		"suites named by each of $params.names whose id exists",
+		"top named by $params.g named by each of $params.names",
+		"top[$params.g].suites named by each of $params.names",
+		"artifact.suites named by each of $params.names",
+		"artifact.suites named by each of $params.names whose id exists and id is 1",
+	] {
+		subjects := {"artifact": {"from": "artifacts", "identified_by": "id"}, "suite": {"from": from, "identified_by": "id"}}
+		rep := ergo.report({"suites": {"a": {"id": 1}}, "top": {"g": {"a": {"id": 1}}}, "artifacts": [{"id": 9, "suites": {"a": {"id": 1}}}]}, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "suite", "checks": {"c": "id exists"}}}}, {"names": ["a"], "g": "g"})
+		_from_problems(rep) == _each_id_problem
+		[r.check | some r in rep.results] == ["$well_formed"]
+	}
+}
+
+test_identified_by_stays_allowed_on_the_parent_of_a_subject_listed_by_named_by_each_of if {
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "id"}, "suite": {"from": "artifact.suites named by each of $params.names"}}
+	rep := ergo.report({"artifacts": [{"id": 9, "suites": {"a": {"id": 1}}}]}, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "suite", "checks": {"c": "id exists"}}}}, {"names": ["a"]})
+	_from_problems(rep) == []
+	[r.subject.id | some r in rep.results; r.check == "c"] == ["a"]
+}
+
+test_identified_by_stays_allowed_with_named_by_and_without_each_of if {
+	rep := _from_report({"suites": {"g": [{"id": 1}]}}, {"suite": {"from": "suites named by $params.g", "identified_by": "id"}}, {"c": "id exists"}, {"g": "g"})
+	_from_problems(rep) == []
+	[r.subject.id | some r in rep.results; r.check == "c"] == [1]
+}
+
+test_identified_by_that_cannot_be_read_on_a_subject_listed_by_named_by_each_of_gives_both_problems if {
+	rep := _from_report({"suites": {}}, {"suite": {"from": "suites named by each of $params.names", "identified_by": "a b c"}}, {"c": "id exists"}, {"names": ["a"]})
+	_from_problems(rep) == [{"name": "subjects.suite.identified_by", "value": ["identified_by is a path, like \"id\" or \"build.number\"", "not allowed with named by each of: the key is the id"], "locations": []}]
 }
 
 _pick_reads_first_cause(item, xs, ys) := [r.cause |

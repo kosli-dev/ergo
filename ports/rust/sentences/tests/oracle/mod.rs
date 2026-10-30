@@ -3,6 +3,9 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("$input whose x is 1", "$input whose x is 1"),
+    ("$input.commits", "$input.commits"),
+    ("$input[5]", "item 6 of $input"),
     (".artifact", "artifact"),
     (".artifact.p[0]", "item 1 of artifact.p"),
     (
@@ -10,6 +13,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact named by each of $params.k",
     ),
     (".artifact.p", "artifact.p"),
+    (
+        "artifact.suites named by each of $params.names",
+        "artifact.suites named by each of $params.names",
+    ),
     (
         "artifact.x[0] named by each of $params.k",
         "item 1 of artifact.x named by each of $params.k",
@@ -20,6 +27,13 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact[0] named by each of $params.k",
         "item 1 of artifact named by each of $params.k",
     ),
+    ("artifact[0].c", "artifact[0].c"),
+    ("every $input", "every $input"),
+    ("every $input.commits", "every $input.commits"),
+    ("every commits", "every commits"),
+    ("first of $input", "first of $input"),
+    ("fam.kids", "fam.kids"),
+    ("fams", "fams"),
     ("commit.files", "commit.files"),
     ("every .artifact", "every artifact"),
     ("every .artifact.p", "every artifact.p"),
@@ -48,11 +62,24 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact.pulls whose state is \"open\"",
         "artifact.pulls whose state is \"open\"",
     ),
+    ("kids", "kids"),
+    ("meta", "meta"),
     ("kid whose n is 1", "kid whose n is 1"),
     ("mid whose n is 1", "mid whose n is 1"),
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
+    ("p whose x is 1", "p whose x is 1"),
+    ("p.commits", "p.commits"),
+    ("suite.items", "suite.items"),
+    (
+        "suites named by $params.group",
+        "suites named by $params.group",
+    ),
+    (
+        "suites named by each of $params.names",
+        "suites named by each of $params.names",
+    ),
     ("owner.name", "owner.name"),
     ("pp whose n is 1", "pp whose n is 1"),
     (
@@ -88,6 +115,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "\"$s\" named by $params.k named by kk whose $input.i named by $params.k._k is equal to -2.50",
         "\"$s\" named by $params.k named by kk whose $input.i named by $params.k._k is -2.5",
     ),
+    ("\"$x\".pa.items", "\"$x\".pa.items"),
+    ("\"$x\".items", "\"$x\".items"),
     (
         "\"$s\" whose .\"a.b\" is not empty",
         "\"$s\" whose \"a.b\" is not empty",
@@ -741,6 +770,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "lockfile whose status is \"COMPLETE\"",
     ),
     ("m whose id exists", "m whose id exists"),
+    ("meta", "meta"),
     ("meta.w", "meta.w"),
     ("mid.leaves", "mid.leaves"),
     (
@@ -2563,6 +2593,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("$params.x", "$params.x"),
     ("$params.x.y", "$params.x.y"),
     (".empty", ".empty"),
+    ("aid", "aid"),
     ("att", "att"),
     ("att.cov", "att.cov"),
     ("attestation_id", "attestation_id"),
@@ -2597,9 +2628,12 @@ pub const PATH_OK: &[(&str, &str)] = &[
         "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10",
         "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10",
     ),
+    ("meta", "meta"),
     ("meta.id", "meta.id"),
+    ("meta", "meta"),
     ("meta.w", "meta.w"),
     ("name", "name"),
+    ("n", "n"),
     ("ps", "ps"),
     ("pull_requests.reviews", "pull_requests.reviews"),
     ("reviews", "reviews"),
