@@ -363,6 +363,14 @@ jobs:
       - name: Build ergo
         working-directory: engines/rust
         run: cargo build --locked --release -p ergo-policy-cli
+      - name: Check that ergo runs and says this version
+        shell: bash
+        run: |
+          says=$("engines/rust/target/release/ergo${{ matrix.exe }}" --version | tr -d '\r')
+          if [ "$says" != "ergo ${TAG#rust-v}" ]; then
+            echo "ergo --version says \"$says\", and should say \"ergo ${TAG#rust-v}\""
+            exit 1
+          fi
       - name: Pack ergo
         shell: bash
         run: |
