@@ -4,6 +4,7 @@ requirements / the whole input as the subject / makes each item a subject, in li
 requirements / the whole input as a list, with a condition / keeps the items that pass the condition
 requirements / a subject that narrows the whole input when it is a list / keeps the items that pass its condition
 requirements / a child subject of the whole input when it is a list / reads each item, and an item that isn't an object fails not_an_object
+requirements / named by each of on the whole input when it is a list / ends unusable, with no subject, because a key needs an object
 subjects / a child subject of a from line with a path and named by each of / reads each key inside the path of its parent
 subjects / a child subject of a from line with a path and named by each of, with a parent that isn't an object / still fails min_subjects as absent when the parent is an object without the path
 subjects / a child subject of a from line with a position on a path inside the parent and named by each of / reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check

@@ -3,6 +3,7 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("$input named by each of $params.k", "$input named by each of $params.k"),
     ("$input whose x is 1", "$input whose x is 1"),
     ("$input.commits", "$input.commits"),
     ("$input[5]", "item 6 of $input"),
