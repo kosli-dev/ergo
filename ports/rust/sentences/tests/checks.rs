@@ -275,7 +275,6 @@ fn the_check_errors_have_the_same_order_as_a_from_line() {
         parse_check("x is \"\\q\"").unwrap_err()[0].message,
         "invalid string at column 6"
     );
-    assert_eq!(check_failure("x is $z"), vec!["unknown name $z"]);
     assert_eq!(
         check_failure("some l every m is 1"),
         vec!["two quantifiers in one sentence: put them on a for line"]

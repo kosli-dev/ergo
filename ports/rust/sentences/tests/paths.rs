@@ -451,83 +451,49 @@ fn a_dollar_name_other_than_params_and_input_is_not_a_path() {
 }
 
 #[test]
-fn a_key_cannot_start_with_a_digit() {
-    assert!(parse_path("1a").is_err());
-    assert!(parse_path("ab.1").is_err());
-    assert_eq!(path("ab.\"1\""), with_steps(key("ab"), vec![dot("1")]));
-}
-
-#[test]
-fn a_from_line_is_a_path_with_every_named_by_each_of_and_whose() {
-    let line = from("every a1.b named by each of $params.names whose c1 is 1");
-    assert!(line.every);
-    assert_eq!(line.path, with_steps(key("a1"), vec![dot("b")]));
+fn a_dollar_name_other_than_params_and_input_starts_a_path_of_a_line() {
+    let read = from("$foo.x[1]");
     assert_eq!(
-        line.named_by_each_of,
-        Some(Path {
-            position: None,
-            start: Start::Params,
-            steps: vec![dot("names")]
-        })
-    );
-    assert_eq!(line.whose.len(), 1);
-}
-
-#[test]
-fn a_from_line_without_extras_has_none_of_them() {
-    let line = from("items");
-    assert!(!line.every);
-    assert_eq!(line.path, key("items"));
-    assert_eq!(line.named_by_each_of, None);
-    assert!(line.whose.is_empty());
-}
-
-#[test]
-fn each_of_does_not_become_a_named_by_step() {
-    let line = from("a1 named by each of b1");
-    assert_eq!(line.path, key("a1"));
-    assert_eq!(line.named_by_each_of, Some(key("b1")));
-}
-
-#[test]
-fn a_named_by_step_before_each_of_stays_a_step() {
-    let line = from("a1 named by $params.g named by each of $params.names");
-    assert_eq!(
-        line.path,
+        read.path,
         with_steps(
-            key("a1"),
-            vec![Step::NamedBy(Reference::Params("g".into()))]
+            Path {
+                position: None,
+                start: Start::Unknown("$foo".into()),
+                steps: Vec::new(),
+            },
+            vec![dot("x"), Step::Index("1".into())]
         )
     );
-    assert!(line.named_by_each_of.is_some());
+    assert_eq!(print_from(&read, &[], &[]), "item 2 of $foo.x");
 }
 
 #[test]
-fn a_path_named_by_a_word_that_starts_each_of_still_reads() {
-    let line = from("a1 named by each");
+fn a_dollar_name_is_a_letter_or_an_underscore_and_then_word_characters() {
+    assert!(parse_from("$A_1").is_ok());
+    assert!(parse_from("$_").is_ok());
+    assert!(parse_from("$1").is_err());
+    assert!(parse_from("$a-b").is_err());
+    assert!(parse_from("$").is_err());
+}
+
+#[test]
+fn a_reference_can_be_an_unknown_name_with_or_without_a_key() {
+    let read = from("ab named by $foo.\"x y\"[$bar]");
     assert_eq!(
-        line.path,
-        with_steps(
-            key("a1"),
-            vec![Step::NamedBy(Reference::Name("each".into()))]
-        )
+        read.path.steps,
+        vec![
+            Step::NamedBy(Reference::Unknown {
+                name: "$foo".into(),
+                key: Some("x y".into())
+            }),
+            Step::Brackets(Reference::Unknown {
+                name: "$bar".into(),
+                key: None
+            }),
+        ]
     );
-}
-
-#[test]
-fn every_is_a_prefix_not_a_key() {
-    assert!(from("every x").every);
-    assert!(!from("everything").every);
-    assert_eq!(from("everything").path, key("everything"));
-    assert!(parse_from("every").is_err());
-    assert!(parse_from("every every").is_err());
-    assert!(parse_from("everyx").is_ok());
-}
-
-#[test]
-fn the_right_side_of_each_of_is_a_right_path() {
-    assert!(parse_from("x named by each of \"a b\"").is_err());
-    assert!(parse_from("x named by each of .\"a b\"").is_ok());
-    assert!(parse_from("x named by each of empty").is_err());
-    assert!(parse_from("x named by each of .empty").is_ok());
+    assert_eq!(
+        print_from(&read, &[], &[]),
+        "ab named by $foo.\"x y\" named by $bar"
+    );
 }

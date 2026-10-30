@@ -502,6 +502,9 @@ fn source_of(
                         s::Start::It => {
                             return Err(vec![format!("{name}: it can't name keys")]);
                         }
+                        s::Start::Unknown(unknown) => {
+                            return Err(vec![format!("{}{unknown}", lower::UNKNOWN_NAME)]);
+                        }
                     };
                     Some(path::Path {
                         start,
@@ -977,34 +980,32 @@ fn resolved_id_text(
 ) -> Option<String> {
     let mut at = name.to_string();
     let mut seen = BTreeSet::new();
-    loop {
+    while let Some(Raw {
+        relation: Relation::Narrows(parent),
+        ..
+    }) = raw.get(&at)
+        && !parent.trim().is_empty()
+    {
         if !seen.insert(at.clone()) {
-            return None;
+            return match raw.get(name)?.def.identified_by {
+                Text::Missing => None,
+                _ => Some(INVALID_IDENTIFIED_BY.to_string()),
+            };
         }
-        let found = raw.get(&at)?;
-        let from_at = field_name(&["subjects", &at, "from"]);
-        let read_ok = !problems
-            .get(&at)
-            .and_then(|p| p.get(&from_at))
-            .is_some_and(|texts| texts.iter().any(|text| text != NARROWING_A_CHILD_PROBLEM));
-        if let Relation::Narrows(parent) = &found.relation
-            && read_ok
-        {
-            at = parent.clone();
-            continue;
-        }
-        let id_at = field_name(&["subjects", &at, "identified_by"]);
-        return match &found.def.identified_by {
-            Text::Missing => None,
-            Text::Invalid => Some(INVALID_IDENTIFIED_BY.to_string()),
-            Text::Written(text) => {
-                if problems.get(&at).is_some_and(|p| p.contains_key(&id_at)) {
-                    Some(INVALID_IDENTIFIED_BY.to_string())
-                } else {
-                    Some(read_id(text).map_or(INVALID_IDENTIFIED_BY.to_string(), |r| r.1))
-                }
+        at = parent.clone();
+    }
+    let found = raw.get(&at)?;
+    let id_at = field_name(&["subjects", &at, "identified_by"]);
+    match &found.def.identified_by {
+        Text::Missing => None,
+        Text::Invalid => Some(INVALID_IDENTIFIED_BY.to_string()),
+        Text::Written(text) => {
+            if problems.get(&at).is_some_and(|p| p.contains_key(&id_at)) {
+                Some(INVALID_IDENTIFIED_BY.to_string())
+            } else {
+                Some(read_id(text).map_or(INVALID_IDENTIFIED_BY.to_string(), |r| r.1))
             }
-        };
+        }
     }
 }
 
@@ -1414,5 +1415,80 @@ mod tests {
         }));
         assert_eq!(r.filters_text("n").unwrap(), "x exists and y exists");
         assert!(r.filters_text("nope").is_none());
+    }
+
+    #[test]
+    fn a_from_with_an_unknown_name_still_starts_at_its_subject() {
+        for from in [
+            "parent.items whose zz is $foo",
+            "parent.items named by $foo",
+            "parent[$foo] whose n is 1",
+            "parent.items whose zz is $foo.k",
+        ] {
+            let (_, r) = reading(json!({
+                "parent": {"from": "things"}, "kid": {"from": from}
+            }));
+            assert_eq!(
+                r.infos["kid"].relation,
+                Relation::Child("parent".to_string()),
+                "{from}"
+            );
+            assert_eq!(r.listed("kid"), ["kid", "parent"], "{from}");
+            assert_eq!(
+                texts(&r, "kid", "subjects.kid.from"),
+                ["unknown name $foo"],
+                "{from}"
+            );
+            assert_eq!(r.infos["kid"].entry["from"], INVALID_FROM, "{from}");
+        }
+    }
+
+    #[test]
+    fn a_from_with_an_unknown_name_and_a_quoted_parent_with_whose_in_it_starts_at_that_parent() {
+        let (_, r) = reading(json!({
+            "par whose ent": {"from": "things"},
+            "kid": {"from": "\"par whose ent\".items whose zz is $foo"}
+        }));
+        assert_eq!(
+            r.infos["kid"].relation,
+            Relation::Child("par whose ent".to_string())
+        );
+        assert_eq!(r.listed("kid"), ["kid", "par whose ent"]);
+    }
+
+    #[test]
+    fn a_narrowing_subject_with_an_unknown_name_takes_the_id_and_parts_of_its_parent() {
+        let (_, r) = reading(json!({
+            "parent": {"from": "things", "identified_by": "id", "has": {"owner": "owner.name"}},
+            "kid": {"from": "parent whose n is $foo"}
+        }));
+        assert_eq!(
+            r.infos["kid"].relation,
+            Relation::Narrows("parent".to_string())
+        );
+        assert_eq!(r.infos["kid"].entry["identified_by"], "id");
+        assert_eq!(
+            r.infos["kid"].entry["parts"]["owner"]["from"],
+            r.infos["parent"].entry["parts"]["owner"]["from"]
+        );
+        assert_eq!(texts(&r, "kid", "subjects.kid.from"), ["unknown name $foo"]);
+    }
+
+    #[test]
+    fn the_unknown_name_of_a_whose_adds_no_second_problem() {
+        let (_, r) = reading(json!({
+            "parent": {"from": "things"}, "kid": {"from": "parent.items whose zz is $foo"}
+        }));
+        assert_eq!(texts(&r, "kid", "subjects.kid.from"), ["unknown name $foo"]);
+    }
+
+    #[test]
+    fn a_from_with_an_unknown_name_and_a_syntax_error_lists_no_other_subject() {
+        let (_, r) = reading(json!({
+            "parent": {"from": "things"}, "kid": {"from": "parent.items whose zz is $foo foo bar"}
+        }));
+        assert_eq!(r.infos["kid"].relation, Relation::Root);
+        assert_eq!(r.listed("kid"), ["kid"]);
+        assert_eq!(texts(&r, "kid", "subjects.kid.from"), ["doesn't parse"]);
     }
 }

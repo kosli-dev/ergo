@@ -217,7 +217,11 @@ fn read_one(
                             all_of: false,
                         }),
                         Err(found) => {
-                            problems.extend(found);
+                            problems.extend(
+                                found
+                                    .into_iter()
+                                    .filter(|p| !p.starts_with(lower::UNKNOWN_NAME)),
+                            );
                             None
                         }
                     };

@@ -1,15 +1,5 @@
-for / a for line with an unknown name and a syntax error / says it doesn't parse, and not unknown name
-sentences / a check sentence with an unknown name and a syntax error / says it doesn't parse, and not unknown name
 subjects / a child subject whose from is every, with an identified_by / gives one problem, under from, and none under identified_by
-subjects / a from line that narrows a subject, with an unknown name / lists the subject it narrows and keeps its id, because the line still says which subject it narrows
-subjects / a from line that starts at a subject with ' whose ' in its name, with an unknown name / lists the subject it starts at, and kid is <invalid from>
-subjects / a from line with an unknown name after named by / lists the subject it starts at, and kid is <invalid from>
-subjects / a from line with an unknown name and a syntax error / says it doesn't parse and lists no other subject, because the syntax error comes first
-subjects / a from line with an unknown name in a whose / lists the subject it starts at, and kid is <invalid from>
-subjects / a from line with an unknown name in brackets / lists the subject it starts at, and kid is <invalid from>
 subjects / a subject that narrows a subject that narrows another with every / has the id of the subject at the top of its chain, not mid's own
-subjects / a subject that narrows another, with a from that is written wrong / lists the subject it narrows and keeps its id, because the line still says which subject it narrows
-subjects / a subject that narrows another, with a from that starts with every / lists the subject it narrows and keeps its id, because the line still says which subject it narrows
 subjects / a subject with applies_to or of / is <invalid from> with applies_to, because the field said how the subject was found
 subjects / a subject with of / is <invalid from> with of, because the field said how the subject was found
 subjects / two subjects that narrow each other, each with an identified_by / have no id, because no subject is at the top of the loop
