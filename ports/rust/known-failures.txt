@@ -17,5 +17,4 @@ subjects / a from line that starts with a dot and goes on with named by each of 
 subjects / a from line that starts with a dot reads the input field and not the parent, even with a path / reads the top-level field artifact.p, so it finds no subject of the parent's
 subjects / a from line that is a dot and another subject's name reads the input field / reads the top-level list artifact and doesn't narrow the subject artifact
 subjects / a from line with every that is a dot and another subject's name reads the input field / walks the top-level list artifact and keeps the dot in the printed from line
-subjects / a from line with every that starts at another subject's name, without a dot, is written wrong / fails $well_formed even when the input has a top-level artifact
 subjects / a from line with every that starts with a dot reads the input field and not the parent, even with a path / walks the top-level field artifact.p and keeps the dot in the printed from line

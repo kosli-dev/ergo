@@ -12388,16 +12388,6 @@
           "r": "not_met"
         },
         "compliant": false,
-        "report": {
-          "subjects": {
-            "p": {
-              "description": "",
-              "from": "<invalid from>",
-              "identified_by": null,
-              "parts": {}
-            }
-          }
-        },
         "results": [
           {
             "cause": "value",
