@@ -16012,5 +16012,141 @@
         ]
       }
     ]
+  },
+  {
+    "description": "count of a field over a null item",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "count of xs.n is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a null item fails as not_an_object",
+        "rules": [
+          "tally.walk"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "count of xs.n",
+                "value": null,
+                "locations": [
+                  "/things/0/xs/0"
+                ]
+              },
+              {
+                "name": "xs[].n",
+                "value": [
+                  null
+                ],
+                "locations": [
+                  "/things/0/xs/0"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a field over a null item",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "sum of xs.n is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a null item fails as not_an_object",
+        "rules": [
+          "tally.walk"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "sum of xs.n",
+                "value": null,
+                "locations": [
+                  "/things/0/xs/0"
+                ]
+              },
+              {
+                "name": "xs[].n",
+                "value": [
+                  null
+                ],
+                "locations": [
+                  "/things/0/xs/0"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
