@@ -522,6 +522,10 @@ fn subject_name(map: &Map<String, Value>) -> SubjectName {
     }
 }
 
+const MAX_MIN_SUBJECTS: u64 = 1_000_000;
+
+const NOT_A_MIN_SUBJECTS: &str = "not a whole number from 0 to 1000000";
+
 fn read_min_subjects(map: &Map<String, Value>, problems: &mut Problems) -> (Value, u64) {
     match map.get("min_subjects") {
         None => (Value::from(1), 1),
@@ -530,27 +534,20 @@ fn read_min_subjects(map: &Map<String, Value>, problems: &mut Problems) -> (Valu
             (Value::Number(number.clone()), 1)
         }
         Some(Value::Number(number)) => {
-            match Decimal::parse(&number.to_string()).filter(Decimal::is_non_negative_whole) {
-                Some(decimal) => (
-                    Value::Number(number.clone()),
-                    decimal.as_position().unwrap_or(u64::MAX),
-                ),
+            let count = Decimal::parse(&number.to_string())
+                .filter(Decimal::is_non_negative_whole)
+                .and_then(|decimal| decimal.as_position())
+                .filter(|count| *count <= MAX_MIN_SUBJECTS);
+            match count {
+                Some(count) => (Value::Number(number.clone()), count),
                 None => {
-                    add_problem(
-                        problems,
-                        "min_subjects".to_string(),
-                        "not a whole number of 0 or more",
-                    );
+                    add_problem(problems, "min_subjects".to_string(), NOT_A_MIN_SUBJECTS);
                     (Value::Number(number.clone()), 1)
                 }
             }
         }
         Some(other) => {
-            add_problem(
-                problems,
-                "min_subjects".to_string(),
-                "not a whole number of 0 or more",
-            );
+            add_problem(problems, "min_subjects".to_string(), NOT_A_MIN_SUBJECTS);
             (other.clone(), 1)
         }
     }
@@ -1149,7 +1146,7 @@ mod tests {
     }
 
     #[test]
-    fn min_subjects_is_a_whole_number_of_zero_or_more_and_one_by_default() {
+    fn min_subjects_is_a_whole_number_from_zero_to_a_million_and_one_by_default() {
         let min = |m: Value| {
             let mut v = valid();
             v["min_subjects"] = m;
@@ -1161,6 +1158,10 @@ mod tests {
             (json!(2), 2),
             (json!(3.0), 3),
             (json!(1e2), 100),
+            (json!(1000000), 1000000),
+            (serde_json::from_str::<Value>("1e6").unwrap(), 1000000),
+            (serde_json::from_str::<Value>("1.0e6").unwrap(), 1000000),
+            (serde_json::from_str::<Value>("1000000.0").unwrap(), 1000000),
         ] {
             let r = min(good);
             assert!(r.problems.is_empty());
@@ -1169,6 +1170,10 @@ mod tests {
         for bad in [
             json!(-1),
             json!(1.5),
+            json!(1000001),
+            serde_json::from_str::<Value>("1e308").unwrap(),
+            serde_json::from_str::<Value>("9007199254740993").unwrap(),
+            serde_json::from_str::<Value>("1000000.5").unwrap(),
             json!("1"),
             json!(null),
             json!(true),
@@ -1179,7 +1184,7 @@ mod tests {
                 r.problems
                     .get("min_subjects")
                     .map(|p| p.iter().cloned().collect::<Vec<_>>()),
-                Some(vec!["not a whole number of 0 or more".to_string()]),
+                Some(vec!["not a whole number from 0 to 1000000".to_string()]),
                 "{bad}"
             );
             assert_eq!(r.min_subjects, bad);
@@ -1200,15 +1205,6 @@ mod tests {
                 "{text}"
             );
         }
-    }
-
-    #[test]
-    fn a_huge_min_subjects_a_float_holds_is_a_count_nothing_reaches() {
-        let mut v = valid();
-        v["min_subjects"] = serde_json::from_str("1e308").unwrap();
-        let r = read(one(v)).requirements["s"].clone();
-        assert!(r.problems.is_empty());
-        assert_eq!(r.min_subjects_count, u64::MAX);
     }
 
     #[test]

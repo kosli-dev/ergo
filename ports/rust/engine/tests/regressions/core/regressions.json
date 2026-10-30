@@ -15758,7 +15758,7 @@
     }
   },
   {
-    "description": "min_subjects 1.5e308 is a whole number the float range holds, so it's a count nothing reaches, where ergo.rego says it isn't whole because OPA's floor can't hold it",
+    "description": "min_subjects 1.5e308 is over 1,000,000, so it's written wrong, as in ergo.rego",
     "input": {
       "items": [
         {
@@ -15825,14 +15825,14 @@
           "status": "not_met",
           "subject": "d",
           "subjects": {
-            "matching": 1,
-            "total": 1
+            "matching": 0,
+            "total": 0
           }
         }
       },
       "results": [
         {
-          "cause": "satisfied",
+          "cause": "value",
           "check": "$well_formed",
           "inputs": [
             {
@@ -15844,69 +15844,19 @@
               "locations": [],
               "name": "require",
               "value": "every"
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": null,
-            "type": "d"
-          }
-        },
-        {
-          "cause": "value",
-          "check": "$min_subjects",
-          "inputs": [
+            },
             {
-              "locations": [
-                "/items/0"
-              ],
-              "name": "in-scope d count",
-              "value": 1
+              "locations": [],
+              "name": "min_subjects",
+              "value": [
+                "not a whole number from 0 to 1000000"
+              ]
             }
           ],
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "d"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "$unique_ids",
-          "inputs": [
-            {
-              "locations": [],
-              "name": "repeated d ids",
-              "value": []
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": null,
-            "type": "d"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "c",
-          "inputs": [
-            {
-              "locations": [
-                "/items/0/x"
-              ],
-              "name": "x",
-              "value": 1
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": {
-              "x": 1
-            },
             "type": "d"
           }
         }
@@ -15922,7 +15872,7 @@
     }
   },
   {
-    "description": "min_subjects 1e308 is a whole number the float range holds, so it's a count nothing reaches, where ergo.rego says it isn't whole because OPA's floor can't hold it",
+    "description": "min_subjects 1e308 is over 1,000,000, so it's written wrong, as in ergo.rego",
     "input": {
       "items": [
         {
@@ -15989,14 +15939,14 @@
           "status": "not_met",
           "subject": "d",
           "subjects": {
-            "matching": 1,
-            "total": 1
+            "matching": 0,
+            "total": 0
           }
         }
       },
       "results": [
         {
-          "cause": "satisfied",
+          "cause": "value",
           "check": "$well_formed",
           "inputs": [
             {
@@ -16008,69 +15958,19 @@
               "locations": [],
               "name": "require",
               "value": "every"
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": null,
-            "type": "d"
-          }
-        },
-        {
-          "cause": "value",
-          "check": "$min_subjects",
-          "inputs": [
+            },
             {
-              "locations": [
-                "/items/0"
-              ],
-              "name": "in-scope d count",
-              "value": 1
+              "locations": [],
+              "name": "min_subjects",
+              "value": [
+                "not a whole number from 0 to 1000000"
+              ]
             }
           ],
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "d"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "$unique_ids",
-          "inputs": [
-            {
-              "locations": [],
-              "name": "repeated d ids",
-              "value": []
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": null,
-            "type": "d"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "c",
-          "inputs": [
-            {
-              "locations": [
-                "/items/0/x"
-              ],
-              "name": "x",
-              "value": 1
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": {
-              "x": 1
-            },
             "type": "d"
           }
         }

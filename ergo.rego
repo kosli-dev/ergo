@@ -147,6 +147,7 @@ _has_type("identified_by", v) if is_string(v)
 _has_type("min_subjects", v) if {
 	is_number(v)
 	v >= 0
+	v <= 1000000
 	v == floor(v)
 }
 
@@ -224,7 +225,7 @@ _not_an_object_inputs(req) := [] if is_object(req)
 
 _wrong_type_problems := {
 	"checks": "not an object",
-	"min_subjects": "not a whole number of 0 or more",
+	"min_subjects": "not a whole number from 0 to 1000000",
 	"subject": "empty or not a string",
 	"description": "not a string",
 	"meta": "not an object",
@@ -4088,15 +4089,15 @@ _subject_text(name, def) := _path_name([name]) if {
 	object.keys(def) & {"of", "applies_to"} == set()
 }
 
-_subject_id_text(name) := _id_text(data.ergo_resolved[name].def.identified_by) if {
-	"identified_by" in object.keys(data.ergo_resolved[name].def)
-} else := _id_text(data.ergo_resolved[owners[0]].def.identified_by) if {
+_subject_id_text(name) := _id_text(data.ergo_resolved[owners[0]].def.identified_by) if {
 	owners := sort([m |
 		some m in graph.reachable({n: object.get(object.get(data.ergo_subject_sentences, "narrowing", {}), n, []) | some n, _ in data.ergo_resolved}, [name])
 		m != name
 		"identified_by" in object.keys(data.ergo_resolved[m].def)
 	])
 	count(owners) > 0
+} else := _id_text(data.ergo_resolved[name].def.identified_by) if {
+	"identified_by" in object.keys(data.ergo_resolved[name].def)
 } else := null
 
 _id_text(p) := _path_name(p) if {
@@ -4709,7 +4710,15 @@ _cond_flaw(c) := "unusable" if {
 	_unreadable_ref(c)
 } else := ""
 
-_tally_mark(true, e) := {"absent"} if e.v == _absent
+_tally_mark(true, e) := {"not_an_object"} if {
+	e.v == _absent
+	not is_object(e.iv)
+}
+
+_tally_mark(true, e) := {"absent"} if {
+	e.v == _absent
+	is_object(e.iv)
+}
 
 _tally_mark(true, e) := {_read_state(e.iv, e.r)} if e.v == _unusable_mark
 
@@ -5076,10 +5085,14 @@ _s_assertion_of(text, pat) := out if {
 _s_for_item_of(text, pat) := out if {
 	m := regex.find_all_string_submatch_n(pat.for_item, text, 1)[0]
 	out := object.union(
-		{_s_item_word(m[1]): _s_path_of(m[2], pat), "as": m[7]},
+		{_s_item_word(m[1]): _s_item_path_of(m[1], m[2], pat), "as": m[7]},
 		object.union(object.union(_s_where_of(m[3], pat), _s_if_any(m[6])), _s_sorted_by(m[4], m[5], pat)),
 	)
 }
+
+_s_item_path_of("", text, pat) := _s_unlifted_path_of(text, pat)
+
+_s_item_path_of(q, text, pat) := _s_path_of(text, pat) if q != ""
 
 _s_item_word("") := "pick"
 
@@ -6224,42 +6237,15 @@ _s_id_field(read) := {"identified_by": read.identified_by.path} if "path" in obj
 
 else := {}
 
-_s_subject_sentences(subjects, reads, parts) := {"from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "listed": {name: _s_listed_parent(name, subjects, r) | some name, r in reads; _s_listed_parent(name, subjects, r) != null}, "narrowing": {name: [parent] | some name, r in reads; parent := _s_narrowed_parent(name, subjects, r); is_string(parent); trim_space(parent) != ""}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
+_s_subject_sentences(subjects, reads, parts) := {"from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "listed": {name: _s_listed_parent(r) | some name, r in reads; _s_listed_parent(r) != null}, "narrowing": {name: [parent] | some name, r in reads; parent := _s_narrowed_parent(r); is_string(parent); trim_space(parent) != ""}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
 
-_s_listed_parent(name, subjects, r) := object.get(r, "parent", null) if object.get(r, "parent", null) != null
+_s_listed_parent(r) := object.get(r, "parent", null) if object.get(r, "parent", null) != null
 
-else := _s_narrowed_parent(name, subjects, r) if _s_narrowed_parent(name, subjects, r) != null
-
-else := fl.path.steps[0] if {
-	fl := _s_unread_start(name, subjects, r)
-	_s_descends(name, fl, subjects)
-}
+else := _s_narrowed_parent(r) if _s_narrowed_parent(r) != null
 
 else := null
 
-_s_narrowed_parent(name, subjects, r) := object.get(object.get(r, "fields", {}), "of", null) if object.get(object.get(r, "fields", {}), "of", null) != null
-
-else := fl.path.steps[0] if {
-	fl := _s_unread_start(name, subjects, r)
-	_s_narrows(name, fl, subjects)
-}
-
-else := null
-
-_s_unread_start(name, subjects, r) := _s_from_of(_s_before_whose(trim_space(subjects[name].from)), _s_patterns) if {
-	not "path" in object.keys(r)
-	problems := object.get(r, "problems", [])
-	count(problems) > 0
-	every p in problems {
-		startswith(p, "unknown name ")
-	}
-	is_object(subjects[name])
-	is_string(subjects[name].from)
-}
-
-_s_before_whose(text) := m[1] if {
-	m := regex.find_all_string_submatch_n(`^(.*?) +whose +`, text, 1)[0]
-} else := text
+_s_narrowed_parent(r) := object.get(object.get(r, "fields", {}), "of", null)
 
 _s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "listed": {}, "narrowing": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}} if not is_object(subjects)
 
@@ -7915,21 +7901,32 @@ _for_judge_inner(check, subj, names, item, e, w) := {"passed": res.passed, "kept
 	res := _for_inner_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept)
 }
 
-_for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e.v), "kept": kept} if {
+_for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e), "kept": kept} if {
 	causes := [_row_cause(c, e.iv, "") | some c in item.whose] with input as {"ergo/names": names}
 	undecided := [c | some c in causes; not c in {"satisfied", "value"}]
 	kept := count([c | some c in causes; c == "value"]) == 0
 }
 
-_for_undecided(undecided, true, v) := array.concat(undecided, _for_mark_cause(v))
+_for_undecided(undecided, true, e) := array.concat(undecided, _for_mark_cause(e))
 
 _for_undecided(undecided, false, _) := undecided
 
-_for_mark_cause(v) := ["absent"] if v == _absent
+_for_mark_cause(e) := ["not_an_object"] if {
+	_walk_marked(e.v)
+	not is_object(e.iv)
+}
 
-_for_mark_cause(v) := ["unusable"] if v == _unusable_mark
+_for_mark_cause(e) := ["absent"] if {
+	e.v == _absent
+	is_object(e.iv)
+}
 
-_for_mark_cause(v) := [] if not _walk_marked(v)
+_for_mark_cause(e) := ["unusable"] if {
+	e.v == _unusable_mark
+	is_object(e.iv)
+}
+
+_for_mark_cause(e) := [] if not _walk_marked(e.v)
 
 _for_outer_next(_, _, _, undecided, _, _) := {"passed": false, "cause": undecided[0], "lines": []} if undecided != []
 
