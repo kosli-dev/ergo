@@ -596,7 +596,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 let (steps, outside): (Vec<Step>, bool) = match &named {
                     Some((path, _)) => (
                         path.steps.clone(),
-                        matches!(path.start, Start::Input | Start::Params),
+                        reads_outside(path) || path.start == Start::Params,
                     ),
                     None => (Vec::new(), false),
                 };

@@ -2337,4 +2337,66 @@ mod tests {
         );
         assert_eq!(named(&input), [("$input.min", &json!(null), &json!(""))]);
     }
+
+    fn failed_items_with(
+        scope: &Scope,
+        sentence: &str,
+        input: Value,
+        aliases: &[(&str, Located)],
+    ) -> Vec<Value> {
+        let tree = s::parse_check(sentence).unwrap();
+        let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
+        let ctx = Ctx {
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: None,
+            aliases: aliases
+                .iter()
+                .map(|(name, at)| (name.to_string(), at.clone()))
+                .collect(),
+        };
+        crate::ops::run_full(&check, &ctx).failed_items.unwrap()
+    }
+
+    #[test]
+    fn a_whose_names_a_part_of_the_subject_by_its_alias_with_the_subjects_location() {
+        let scope = Scope::new().with_part(
+            "w",
+            crate::lower::PartDef {
+                steps: vec![Step::Key("meta".into()), Step::Key("w".into())],
+                id: None,
+            },
+        );
+        let input = json!({"things": [{"id": "t", "meta": {}, "items": [{"lo": 1, "s": "ok"}]}]});
+        let failed = failed_items_with(
+            &scope,
+            "every items.s whose lo is at least w is \"ok\"",
+            input,
+            &[],
+        );
+        assert_eq!(
+            named(&failed),
+            [("w", &json!(null), &json!("/things/0/meta"))]
+        );
+    }
+
+    #[test]
+    fn a_whose_names_a_parents_field_with_the_parents_location() {
+        let scope = Scope::new().with_parent("art", BTreeMap::new());
+        let input = json!({"arts": [{"id": "a"}], "things": [{"id": "t", "items": [{"lo": 1, "s": "ok"}]}]});
+        let parent = Located {
+            value: &input["arts"][0],
+            location: Location::input_root().key("arts").index(0),
+        };
+        let failed = failed_items_with(
+            &scope,
+            "every items.s whose lo is at least art.q is \"ok\"",
+            input.clone(),
+            &[("art", parent)],
+        );
+        assert_eq!(named(&failed), [("art.q", &json!(null), &json!("/arts/0"))]);
+    }
 }
