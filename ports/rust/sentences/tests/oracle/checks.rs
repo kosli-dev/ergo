@@ -12,6 +12,8 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every y.leaves is 1", "every y.leaves is 1", &[], &[]),
+    ("n exists", "n exists", &[], &[]),
+    ("size exists", "size exists", &[], &[]),
     (
         "sum of items.x whose k is \"a\" is 1",
         "sum of items.x whose k is \"a\" is 1",
