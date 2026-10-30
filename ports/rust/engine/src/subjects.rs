@@ -268,6 +268,20 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
             each.cause = if null { Cause::Absent } else { Cause::Unusable };
         }
     }
+    if anc.is_empty() {
+        for each in &mut broken {
+            match each.order.first() {
+                Some(walk::Seg::Index(_)) => {
+                    each.path = crate::name::name(&Path {
+                        start: Start::Input,
+                        steps: each.order.iter().map(walk::Seg::to_step).collect(),
+                    });
+                }
+                None => each.path = "$input".to_string(),
+                _ => {}
+            }
+        }
+    }
     broken.sort_by(|a, b| a.order.cmp(&b.order));
     Read::Entries { entries, broken }
 }
@@ -325,12 +339,7 @@ fn read_entries<'a>(
         Source::Root { path, .. } | Source::Child { path, .. } => {
             let ctx = context(env, input_root(env), anc);
             let read = path::read(path, &ctx);
-            let whole_input =
-                matches!(&lowered.source, Source::Root { .. }) && path.steps.is_empty();
             match read.outcome {
-                Outcome::Found if whole_input && read.value.is_some_and(Value::is_array) => {
-                    Read::Failed(Cause::Unusable)
-                }
                 Outcome::Found => match plain_entries(&read) {
                     Ok(entries) => Read::Entries {
                         entries,
@@ -973,13 +982,25 @@ mod tests {
     }
 
     #[test]
-    fn the_whole_input_is_one_subject_when_it_is_an_object_and_unusable_as_a_list() {
+    fn the_whole_input_is_one_subject_when_it_is_an_object_and_a_list_of_subjects_when_it_is_a_list()
+     {
         let r = run(json!({"thing": {"from": "$input"}}), json!({"x": 1}));
         assert_eq!(
             input_of(&rows(&r, "$min_subjects")[0], 0),
             json!({"name": "in-scope thing count", "value": 1, "locations": [""]})
         );
-        let r = run(json!({"thing": {"from": "$input"}}), json!([1]));
+        let r = run(
+            json!({"thing": {"from": "$input"}}),
+            json!([{"a": 1}, {"a": 2}]),
+        );
+        assert_eq!(
+            r["requirements"]["s"]["subjects"],
+            json!({"total": 2, "matching": 2})
+        );
+        let p = policy(json!({"thing": {"from": "$input"}}), json!(1));
+        let r = report(&json!([]), &p, &json!({}));
+        assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("value"));
+        let r = run(json!({"thing": {"from": "$input"}}), json!("x"));
         assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("unusable"));
         let r = run(json!({"thing": {"from": "$input"}}), Value::Null);
         assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("null"));
@@ -1244,6 +1265,67 @@ mod tests {
             ])
         );
         assert_eq!(input_of(min, 0)["value"], json!(1));
+    }
+
+    #[test]
+    fn every_names_a_broken_walk_from_a_list_input_from_dollar_input() {
+        let r = run(
+            json!({"thing": {"from": "every $input.commits"}}),
+            json!([{"commits": [{"x": 1}]}, {"commits": 5}]),
+        );
+        let min = &rows(&r, "$min_subjects")[0];
+        assert_eq!(
+            min["failed_items"],
+            json!([{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "unusable", "value": 5, "locations": ["/1/commits"]}])
+        );
+        let r = run(
+            json!({"thing": {"from": "every $input[1].commits"}}),
+            json!([{"commits": []}, 5]),
+        );
+        let min = &rows(&r, "$min_subjects")[0];
+        assert_eq!(min["failed_items"][0]["path"], json!("item 2 of $input"));
+        assert_eq!(min["failed_items"][0]["item"], json!("item 2 of $input"));
+    }
+
+    #[test]
+    fn every_dollar_input_names_an_input_that_is_not_a_list_dollar_input() {
+        let r = run(json!({"thing": {"from": "every $input"}}), json!({"x": 1}));
+        let min = &rows(&r, "$min_subjects")[0];
+        assert_eq!(
+            min["failed_items"],
+            json!([{"path": "$input", "item": "$input", "cause": "unusable", "value": {"x": 1}, "locations": [""]}])
+        );
+    }
+
+    #[test]
+    fn a_position_on_a_list_input_is_named_from_dollar_input_in_expressions() {
+        let cases = [
+            ("$input[0]", "item 1 of $input"),
+            ("$input[1]", "item 2 of $input"),
+            ("first of $input", "item 1 of $input"),
+            ("every $input[1].commits", "every $input[1].commits"),
+            ("every $input.commits", "every commits"),
+            ("$input", "$input"),
+            ("every $input", "every $input"),
+        ];
+        for (from, name) in cases {
+            let r = report(
+                &json!([]),
+                &policy(json!({"thing": {"from": from}}), json!(1)),
+                &json!({}),
+            );
+            let checks = &r["requirements"]["s"]["checks"];
+            assert_eq!(
+                checks["$min_subjects"]["expression"],
+                json!(format!("count(matching({name})) >= 1")),
+                "{from}"
+            );
+            assert_eq!(
+                checks["$unique_ids"]["expression"],
+                json!(format!("count(repeated(ids({name}))) == 0")),
+                "{from}"
+            );
+        }
     }
 
     #[test]
