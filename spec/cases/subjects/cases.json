@@ -12763,6 +12763,422 @@
     ]
   },
   {
+    "description": "a grandchild subject whose parent isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "trail.artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.pulls",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "pr.commits",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object under a parent that is a string or null, with every ancestor under in",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.chain.levels"
+        ],
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a",
+                "pulls": [
+                  "x",
+                  null
+                ]
+              }
+            ]
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "a",
+                "pr": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "a",
+                "pr": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject with whose, under a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact.pulls whose state is \"open\"",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a string",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject with named by, under a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": "q"
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a string",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject with named by each of, under a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact.scans named by each of $params.k",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "q"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object when the parent is a string",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as not_an_object when the parent is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            null
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": null
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "not_an_object",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a child subject of a subject that narrows another, with a parent that isn't an object",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -12826,6 +13242,2731 @@
                 "name": "in-scope kid count",
                 "value": 0,
                 "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of, which starts at its parent",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads each key inside its parent and not from a top-level field of the parent's name",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.levels"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1"
+            }
+          ],
+          "artifact": {
+            "x": {
+              "ok": true
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when the parent has the key, with the key's location inside the parent",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.levels"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "ok": true
+              }
+            }
+          ],
+          "artifact": {
+            "x": {
+              "ok": false
+            }
+          }
+        },
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads every parent in turn, so a parent without the key fails its own subject",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.levels"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "ok": true
+              }
+            },
+            {
+              "id": "a2"
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/1"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/1"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of, with a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object, even with min_subjects 0, and gives no subject",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            "s",
+            null,
+            5,
+            [
+              1
+            ],
+            true
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "s"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": null
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": 5
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": [
+                  1
+                ]
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": true
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with a path and named by each of, with a parent that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact.x named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          },
+          "min_subjects": 0
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "p"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object, even with min_subjects 0, and gives no subject",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            "s",
+            null,
+            5,
+            [
+              1
+            ],
+            true
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "s"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": null
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": 5
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": [
+                  1
+                ]
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": true
+              },
+              "type": "k"
+            }
+          }
+        ]
+      },
+      {
+        "description": "still fails min_subjects as absent when the parent is an object without the path",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1"
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of, counted per parent",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          },
+          "min_subjects": 3
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x",
+        "y"
+      ]
+    },
+    "cases": [
+      {
+        "description": "counts the keys of each parent on its own $min_subjects and $unique_ids rows, with its in",
+        "rules": [
+          "subjects.chain.count",
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.levels"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1"
+            },
+            {
+              "id": "a2"
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0",
+                  "/artifacts/0"
+                ],
+                "name": "in-scope k count",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/1",
+                  "/artifacts/1"
+                ],
+                "name": "in-scope k count",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "y",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/1"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/1"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "y",
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with a path and named by each of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact.x named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "p",
+        "q"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads each key inside the path of its parent",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.levels"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "p": {
+                  "ok": true
+                }
+              }
+            },
+            {
+              "id": "a2"
+            }
+          ],
+          "artifact": {
+            "x": {
+              "p": {
+                "ok": true
+              },
+              "q": {
+                "ok": true
+              }
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x/p",
+                  "/artifacts/0/x"
+                ],
+                "name": "in-scope k count",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/1",
+                  "/artifacts/1"
+                ],
+                "name": "in-scope k count",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x/p/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "p",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "q",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/1"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p",
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/1"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "q",
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a grandchild subject of a child subject read with named by each of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        },
+        "item": {
+          "from": "k.items"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "item",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads the items inside the key of each parent, with both ancestors under in",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.levels"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "items": [
+                  {
+                    "ok": true
+                  }
+                ]
+              }
+            },
+            {
+              "id": "a2"
+            }
+          ],
+          "k": {
+            "items": [
+              {
+                "ok": false
+              }
+            ]
+          },
+          "artifact": {
+            "x": {
+              "items": [
+                {
+                  "ok": false
+                }
+              ]
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x/items/0"
+                ],
+                "name": "in-scope item count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1",
+                "k": "x"
+              },
+              "type": "item"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope item count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2",
+                "k": "x"
+              },
+              "type": "item"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x/items/0/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": {
+                "ok": true
+              },
+              "in": {
+                "artifact": "a1",
+                "k": "x"
+              },
+              "type": "item"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that starts with a dot reads the input field and not the parent, even with a path",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": ".artifact.p"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the top-level field artifact.p, so it finds no subject of the parent's",
+        "rules": [
+          "subjects.from",
+          "sentence.path.start",
+          "sentence.subject.chain",
+          "sentence.print.canonical"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "p": [
+                {
+                  "ok": true
+                }
+              ]
+            }
+          ],
+          "artifact": {
+            "p": []
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "expressions": {
+          "r": {
+            "$min_subjects": "count(matching(.artifact.p)) >= 1",
+            "$unique_ids": "count(repeated(ids(.artifact.p))) == 0"
+          }
+        },
+        "report": {
+          "subjects": {
+            "k": {
+              "description": "",
+              "from": ".artifact.p",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that starts with a dot and goes on with named by each of reads the input field and not the parent",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": ".artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads the key x inside the top-level field artifact, with no in",
+        "rules": [
+          "subjects.sentence",
+          "sentence.path.start",
+          "sentence.subject.chain",
+          "sentence.print.canonical"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1"
+            }
+          ],
+          "artifact": {
+            "x": {
+              "ok": true
+            }
+          }
+        },
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "expressions": {
+          "r": {
+            "$min_subjects": "count(matching(.artifact)) >= 1",
+            "$unique_ids": "count(repeated(ids(.artifact))) == 0"
+          }
+        },
+        "report": {
+          "subjects": {
+            "k": {
+              "description": "",
+              "from": ".artifact named by each of $params.k",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifact/x"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifact/x/ok"
+                ],
+                "name": "ok",
+                "value": true
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with a position on the parent and named by each of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact[0] named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check",
+        "rules": [
+          "subjects.chain",
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "x": {
+                  "ok": true
+                }
+              }
+            }
+          ],
+          "artifact": {
+            "p": [],
+            "x": {
+              "ok": true
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with first of the parent and named by each of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "first of artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check",
+        "rules": [
+          "subjects.chain",
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "x": {
+                  "ok": true
+                }
+              }
+            }
+          ],
+          "artifact": {
+            "p": [],
+            "x": {
+              "ok": true
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with a position on a path inside the parent and named by each of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact.x[0] named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check",
+        "rules": [
+          "subjects.chain",
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "x": {
+                  "ok": true
+                }
+              }
+            }
+          ],
+          "artifact": {
+            "p": [],
+            "x": {
+              "ok": true
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/artifacts/0/x"
+                ],
+                "name": "ok",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "x",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of and params.k missing",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects of each parent on its own, with its in, and gives no subject",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "ok": true
+              }
+            },
+            {
+              "id": "a2",
+              "x": {
+                "ok": true
+              }
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of and params.k null",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": null
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects of each parent on its own, with its in, and gives no subject",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "ok": true
+              }
+            },
+            {
+              "id": "a2",
+              "x": {
+                "ok": true
+              }
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of and params.k a string",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": "x"
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects of each parent on its own, with its in, and gives no subject",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "ok": true
+              }
+            },
+            {
+              "id": "a2",
+              "x": {
+                "ok": true
+              }
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of and params.k a list with a number",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x",
+        1
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects of each parent on its own, with its in, and gives no subject",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "x": {
+                "ok": true
+              }
+            },
+            {
+              "id": "a2",
+              "x": {
+                "ok": true
+              }
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$unique_ids",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "repeated k ids",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": "a2"
+              },
+              "type": "k"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with a position that starts with a dot and another subject's name",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "p": {
+          "from": ".artifact.p[0]"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "p",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the top-level field and prints the dot after the position",
+        "rules": [
+          "sentence.path.start",
+          "sentence.print.canonical",
+          "report.subjects"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a",
+              "p": [
+                {
+                  "x": 2
+                }
+              ]
+            }
+          ],
+          "artifact": {
+            "p": [
+              {
+                "x": 1
+              }
+            ]
+          }
+        },
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "expressions": {
+          "r": {
+            "$min_subjects": "count(matching(item 1 of .artifact.p)) >= 1",
+            "$unique_ids": "count(repeated(ids(item 1 of .artifact.p))) == 0"
+          }
+        },
+        "report": {
+          "subjects": {
+            "p": {
+              "description": "",
+              "from": "item 1 of .artifact.p",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "p",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope p count",
+                "value": 1,
+                "locations": [
+                  "/artifact/p/0"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "p",
+              "id": {
+                "x": 1
+              }
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1,
+                "locations": [
+                  "/artifact/p/0/x"
+                ]
               }
             ]
           }

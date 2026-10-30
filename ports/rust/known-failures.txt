@@ -1,6 +1,18 @@
-for / a name whose path goes on past a null or a number / a null pull request fails as not_an_object
-for / a name whose path goes on past a null or a number / a number pull request fails as not_an_object
-for / a name whose path goes on past a null or a number / a pull request that isn't an object fails beside one that passes
-for / a name whose path goes on past its list / a title under a value that isn't an object fails as not_an_object
-for / first of over a name whose path goes on past its list / fails as not_an_object when the pull request is text
-for / some over a name whose path goes on past its list / fails as not_an_object when the only pull_request is null
+subjects / a child subject of a from line with a path and named by each of / reads each key inside the path of its parent
+subjects / a child subject of a from line with a path and named by each of, with a parent that isn't an object / still fails min_subjects as absent when the parent is an object without the path
+subjects / a child subject of a from line with a position on a path inside the parent and named by each of / reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check
+subjects / a child subject of a from line with a position on the parent and named by each of / reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check
+subjects / a child subject of a from line with first of the parent and named by each of / reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check
+subjects / a child subject of a from line with named by each of and params.k a list with a number / fails min_subjects of each parent on its own, with its in, and gives no subject
+subjects / a child subject of a from line with named by each of and params.k a string / fails min_subjects of each parent on its own, with its in, and gives no subject
+subjects / a child subject of a from line with named by each of and params.k missing / fails min_subjects of each parent on its own, with its in, and gives no subject
+subjects / a child subject of a from line with named by each of and params.k null / fails min_subjects of each parent on its own, with its in, and gives no subject
+subjects / a child subject of a from line with named by each of, counted per parent / counts the keys of each parent on its own $min_subjects and $unique_ids rows, with its in
+subjects / a child subject of a from line with named by each of, which starts at its parent / passes when the parent has the key, with the key's location inside the parent
+subjects / a child subject of a from line with named by each of, which starts at its parent / reads each key inside its parent and not from a top-level field of the parent's name
+subjects / a child subject of a from line with named by each of, which starts at its parent / reads every parent in turn, so a parent without the key fails its own subject
+subjects / a child subject of a from line with named by each of, with a parent that isn't an object / fails min_subjects as not_an_object, even with min_subjects 0, and gives no subject
+subjects / a from line that starts with a dot and goes on with named by each of reads the input field and not the parent / reads the key x inside the top-level field artifact, with no in
+subjects / a from line that starts with a dot reads the input field and not the parent, even with a path / reads the top-level field artifact.p, so it finds no subject of the parent's
+subjects / a from line with a position that starts with a dot and another subject's name / reads the top-level field and prints the dot after the position
+subjects / a grandchild subject of a child subject read with named by each of / reads the items inside the key of each parent, with both ancestors under in
