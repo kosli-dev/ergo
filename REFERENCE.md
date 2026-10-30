@@ -831,6 +831,28 @@ The time phrases can take a written time or number too, like `opened is before "
 
 `every conditions.value is at least errorThreshold` would pass, since `"9"` comes after `"80"` as text. A written value that isn't a number, like `score is at least "3"`, is written wrong, with `"is at least" takes a number`.
 
+`ergo.rego` compares numbers with OPA, and OPA can treat two decimals as the same when they only differ after the 15th significant digit. Whole numbers are always compared exactly. With this policy and this input:
+
+```yaml
+ergo_spec: v0.3-dev
+subjects:
+  row:
+    from: rows
+    identified_by: id
+requirements:
+  r:
+    subject: row
+    checks:
+      most: l is at most 1234567890.1209567890
+      within: l equals r within 1234567889.6209567890
+```
+
+```json
+{"rows": [{"id": "a", "l": 1234567890.1209567890, "r": 0.5}, {"id": "b", "l": 1234567890.1209567990, "r": 0.5}]}
+```
+
+`most` passes on `b`, even though its `l` is bigger than the limit. OPA also remembers the result of a comparison and reuses it for any number it treats as the same, so the answer can depend on the other rows: `within` fails on `b` when `b` is the only row, but passes on `b` when `a` is also in the input. The Rust engine compares every digit and fails both checks on `b`. So keep the decimals you compare to at most 15 significant digits, or use the Rust engine. [#426](https://github.com/kosli-dev/ergo/issues/426) is about fixing `ergo.rego`.
+
 After `is in`, `is not in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match`, the thing on the right can be a field too, read like the field after `is at least`: from the subject, from the name of a `for` line or from the item of a one-line `every` or `some` and a `whose`. With this policy and this input:
 
 ```yaml
