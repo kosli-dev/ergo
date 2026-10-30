@@ -9629,7 +9629,7 @@ test_a_field_step_adds_the_key_the_field_holds_and_the_field_is_shown_with_its_o
 }
 
 test_a_subject_read_from_the_values_of_an_object_starts_at_its_escaped_key if {
-	policy := {"ergo_spec": "v0.3-dev", "subjects": {"scan": {"from": "scans named by each of $params.required", "identified_by": "name"}}, "requirements": {"s": {"subject": "scan", "checks": {"c": "x exists"}}}}
+	policy := {"ergo_spec": "v0.3-dev", "subjects": {"scan": {"from": "scans named by each of $params.required"}}, "requirements": {"s": {"subject": "scan", "checks": {"c": "x exists"}}}}
 	rep := ergo.report({"scans": {"sast": {"x": 1}, "sca/x": {"x": 2}, "a~b": {}}}, policy, {"required": ["sast", "sca/x", "a~b", "secrets"]})
 	[[r.subject.id, r.inputs[0].locations] | some r in rep.results; r.check == "c"] == [
 		["a~b", ["/scans/a~0b"]],
@@ -10501,6 +10501,42 @@ test_a_for_alias_named_like_a_part_of_a_subject_with_a_space_in_its_name_quotes_
 	subjects := {"pull request": {"from": "bs", "identified_by": "id", "has": {"pull": "k1"}}, "kid": {"from": `"pull request".kids`, "identified_by": "id"}}
 	rep := ergo.report(_clash_doc, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": {"for": "every xs as pull", "assert": "pull.v is 1"}}}}}, {})
 	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["pull can't be an alias: it's a part of \"pull request\""]]
+}
+
+_each_id_problem := [{"name": "subjects.suite.identified_by", "value": ["not allowed with named by each of: the key is the id"], "locations": []}]
+
+test_identified_by_is_written_wrong_on_every_form_of_a_from_line_listed_by_named_by_each_of if {
+	every from in [
+		"suites named by each of $params.names",
+		"suites named by each of $params.names whose id exists",
+		"top named by $params.g named by each of $params.names",
+		"top[$params.g].suites named by each of $params.names",
+		"artifact.suites named by each of $params.names",
+		"artifact.suites named by each of $params.names whose id exists and id is 1",
+	] {
+		subjects := {"artifact": {"from": "artifacts", "identified_by": "id"}, "suite": {"from": from, "identified_by": "id"}}
+		rep := ergo.report({"suites": {"a": {"id": 1}}, "top": {"g": {"a": {"id": 1}}}, "artifacts": [{"id": 9, "suites": {"a": {"id": 1}}}]}, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "suite", "checks": {"c": "id exists"}}}}, {"names": ["a"], "g": "g"})
+		_from_problems(rep) == _each_id_problem
+		[r.check | some r in rep.results] == ["$well_formed"]
+	}
+}
+
+test_identified_by_stays_allowed_on_the_parent_of_a_subject_listed_by_named_by_each_of if {
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "id"}, "suite": {"from": "artifact.suites named by each of $params.names"}}
+	rep := ergo.report({"artifacts": [{"id": 9, "suites": {"a": {"id": 1}}}]}, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "suite", "checks": {"c": "id exists"}}}}, {"names": ["a"]})
+	_from_problems(rep) == []
+	[r.subject.id | some r in rep.results; r.check == "c"] == ["a"]
+}
+
+test_identified_by_stays_allowed_with_named_by_and_without_each_of if {
+	rep := _from_report({"suites": {"g": [{"id": 1}]}}, {"suite": {"from": "suites named by $params.g", "identified_by": "id"}}, {"c": "id exists"}, {"g": "g"})
+	_from_problems(rep) == []
+	[r.subject.id | some r in rep.results; r.check == "c"] == [1]
+}
+
+test_identified_by_that_cannot_be_read_on_a_subject_listed_by_named_by_each_of_gives_both_problems if {
+	rep := _from_report({"suites": {}}, {"suite": {"from": "suites named by each of $params.names", "identified_by": "a b c"}}, {"c": "id exists"}, {"names": ["a"]})
+	_from_problems(rep) == [{"name": "subjects.suite.identified_by", "value": ["identified_by is a path, like \"id\" or \"build.number\"", "not allowed with named by each of: the key is the id"], "locations": []}]
 }
 
 _pick_reads_first_cause(item, xs, ys) := [r.cause |
