@@ -294,6 +294,48 @@ fn within_fails_as_unusable_when_it_cannot_work_the_gap_out_exactly() {
 }
 
 #[test]
+fn within_tells_apart_numbers_that_differ_past_the_digits_a_float_holds() {
+    let close = r#"{"id": "t", "fa": 1234567890.1209567990, "fb": 0}"#;
+    assert_eq!(
+        cause_of("fa equals fb within 1234567890.1209567890", close),
+        "value"
+    );
+    let long = r#"{"id": "t", "fa": 123964818.71664440535747000531389400, "fb": 123964818.7166444053574700053138940000000000000002244422625687264764923070}"#;
+    assert_eq!(
+        cause_of(
+            "fa equals fb within 0.0000000000000000000000000000000000000002244422625687264764923069",
+            long
+        ),
+        "value"
+    );
+    assert_eq!(
+        cause_of(
+            "fa equals fb within 0.0000000000000000000000000000000000000002244422625687264764923070",
+            long
+        ),
+        "satisfied"
+    );
+}
+
+#[test]
+fn within_absorbs_the_float_noise_of_numbers_past_fifteen_digits() {
+    for (fa, fb) in [
+        ("0.30000000000000004", "0.3"),
+        ("12.340000000000002", "12.34"),
+        ("1761700000.123456", "1761700000.12"),
+    ] {
+        let item = format!(r#"{{"id": "t", "fa": {fa}, "fb": {fb}}}"#);
+        assert_eq!(
+            cause_of("fa equals fb within 0.01", &item),
+            "satisfied",
+            "{fa}"
+        );
+    }
+    let big = r#"{"id": "t", "fa": 1e9, "fb": 1e9}"#;
+    assert_eq!(cause_of("fa equals fb within 0.000001", big), "satisfied");
+}
+
+#[test]
 fn within_does_not_overflow_on_exponents_at_both_ends_of_what_it_reads() {
     let ends = r#"{"id": "t", "fa": 1e9000000000000000000, "fb": 1e-9000000000000000000}"#;
     assert_eq!(cause_of("fa equals fb within 1", ends), "unusable");
