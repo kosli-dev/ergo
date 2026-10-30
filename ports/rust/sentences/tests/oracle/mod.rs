@@ -49,6 +49,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
+    ("owner.name", "owner.name"),
     ("pp whose n is 1", "pp whose n is 1"),
     (
         "parent.items whose n is one of 1, \"a\"",
@@ -1450,9 +1451,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
-    ("parent.items whose zz is $foo", &["unknown name $foo"]),
     ("parent.items whose", &["doesn't parse"]),
-    ("parent whose n is $foo", &["unknown name $foo"]),
     ("", &["doesn't parse"]),
     ("\"a\\q\"", &["invalid string at column 1"]),
     (
@@ -1474,9 +1473,6 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("\"u every not.z", &["unclosed quote at column 1"]),
     ("$", &["doesn't parse"]),
     ("$1", &["doesn't parse"]),
-    ("$A", &["unknown name $A"]),
-    ("$_a", &["unknown name $_a"]),
-    ("$aa", &["unknown name $aa"]),
     (
         "$input.i named by k.a whose every .it.empty[3] equals one named by $input.q.a plus it",
         &[
@@ -1488,8 +1484,6 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         "$input.i whose every $input.i equals \"s\" and some y, if any, equals count of item of $params.p.\"\" plus 5 and \"q r\" equals 1 plus \"$s\"",
         &["doesn't parse"],
     ),
-    ("$other", &["unknown name $other"]),
-    ("$other.x", &["unknown name $other"]),
     (
         "$params.p named by k whose .empty.z is not count of \"$s\" within 2",
         &["doesn't parse"],
@@ -1499,8 +1493,6 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         &["doesn't parse"],
     ),
     ("$params.x.$other", &["doesn't parse"]),
-    ("$paramsx", &["unknown name $paramsx"]),
-    ("$paramsx.y", &["unknown name $paramsx"]),
     ("(x)", &["doesn't parse"]),
     (", y.\"w v\"", &["doesn't parse"]),
     (".", &["doesn't parse"]),
@@ -1748,6 +1740,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         "one named by each of y whose a.z.a does not .empty.q.z",
         &["doesn't parse"],
     ),
+    ("parent.items whose zz is $foo foo bar", &["doesn't parse"]),
     (
         "plus named by it.q whose item 3 of empty is between 2.5 and 4e2",
         &[
@@ -1800,7 +1793,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         "whose some equals item 3 of one and named is equal to \"s\" within 2 and some is hours elapsed from .it to of",
         &["doesn't parse"],
     ),
-    ("x $aa", &["unknown name $aa"]),
+    ("x $aa", &["doesn't parse"]),
     ("x WHOSE aa is 1", &["doesn't parse"]),
     ("x exists", &["doesn't parse"]),
     ("x is 1", &["doesn't parse"]),
@@ -1810,7 +1803,6 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("x named by $params", &["doesn't parse"]),
     ("x named by each of", &["doesn't parse"]),
     ("x named by each of \"a b\"", &["doesn't parse"]),
-    ("x named by each of $aa", &["unknown name $aa"]),
     (
         "x named by each of ._x-1 whose sum of .empty is in $input.i",
         &["is one of can't follow a count of, a sum of or a plus"],
@@ -1845,8 +1837,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("x where aa is 1", &["doesn't parse"]),
     ("x whose", &["doesn't parse"]),
     ("x whose ", &["doesn't parse"]),
-    ("x whose $e", &["unknown name $e"]),
-    ("x whose $other is 1", &["unknown name $other"]),
+    ("x whose $e", &["doesn't parse"]),
     ("x whose (aa is 1)", &["doesn't parse"]),
     ("x whose 1 is 1", &["doesn't parse"]),
     ("x whose 1 plus 2 is 3", &["doesn't parse"]),
@@ -1854,15 +1845,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("x whose aa = 1", &["doesn't parse"]),
     ("x whose aa == 1", &["doesn't parse"]),
     ("x whose aa IS 1", &["doesn't parse"]),
-    ("x whose aa equals $b.c", &["unknown name $b"]),
-    ("x whose aa equals $inputx.y", &["unknown name $inputx"]),
-    ("x whose aa equals $other", &["unknown name $other"]),
     ("x whose aa equals $params$b", &["doesn't parse"]),
-    (
-        "x whose aa equals $params.c and d equals $e",
-        &["unknown name $e"],
-    ),
-    ("x whose aa equals $paramsx", &["unknown name $paramsx"]),
     (
         "x whose aa equals and",
         &["and is a word of the grammar: write .and"],
@@ -1927,11 +1910,6 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         &["unclosed quote at column 15"],
     ),
     ("x whose aa is \"unclosed", &["unclosed quote at column 15"]),
-    ("x whose aa is $b", &["unknown name $b"]),
-    (
-        "x whose aa is $b and c is $d",
-        &["unknown name $b", "unknown name $d"],
-    ),
     ("x whose aa is 'a\\'", &["unclosed quote at column 15"]),
     ("x whose aa is 'unclosed", &["unclosed quote at column 15"]),
     ("x whose aa is .5", &["doesn't parse"]),
@@ -1939,7 +1917,6 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("x whose aa is 007", &["doesn't parse"]),
     ("x whose aa is 1 AND b is 2", &["doesn't parse"]),
     ("x whose aa is 1 and", &["doesn't parse"]),
-    ("x whose aa is 1 and $b exists", &["unknown name $b"]),
     ("x whose aa is 1 and (b is 2)", &["doesn't parse"]),
     ("x whose aa is 1 and and b is 2", &["doesn't parse"]),
     (
@@ -1972,7 +1949,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("x whose aa is 1;", &["doesn't parse"]),
     ("x whose aa is 1e", &["doesn't parse"]),
     ("x whose aa is 1e+", &["doesn't parse"]),
-    ("x whose aa is [$aa", &["unknown name $aa"]),
+    ("x whose aa is [$aa", &["doesn't parse"]),
     ("x whose aa is a", &["a is a word of the grammar: write .a"]),
     ("x whose aa is a empty", &["doesn't parse"]),
     ("x whose aa is a nonempty string", &["doesn't parse"]),
@@ -2015,16 +1992,13 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     ("x whose aa is not not empty", &["doesn't parse"]),
     ("x whose aa is one of", &["doesn't parse"]),
-    (
-        "x whose aa is one of $aa, $b",
-        &["unknown name $aa", "unknown name $b"],
-    ),
+    ("x whose aa is one of $aa, $b", &["doesn't parse"]),
     ("x whose aa is one of ,1", &["doesn't parse"]),
     ("x whose aa is one of 1 , 2", &["doesn't parse"]),
     ("x whose aa is one of 1,", &["doesn't parse"]),
     ("x whose aa is one of 1, 2,", &["doesn't parse"]),
     ("x whose aa is one of 1, 2,3 ,4", &["doesn't parse"]),
-    ("x whose aa is one of 1,$b", &["unknown name $b"]),
+    ("x whose aa is one of 1,$b", &["doesn't parse"]),
     ("x whose aa is one of 1;2", &["doesn't parse"]),
     (
         "x whose aa is one of it",
@@ -2165,11 +2139,9 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("x y z", &["doesn't parse"]),
     ("x\"y", &["unclosed quote at column 2"]),
     ("x'y", &["unclosed quote at column 2"]),
-    ("x,$aa", &["unknown name $aa"]),
+    ("x,$aa", &["doesn't parse"]),
     ("x[ 1]", &["doesn't parse"]),
     ("x[ aa]", &["doesn't parse"]),
-    ("x[$aa]", &["unknown name $aa"]),
-    ("x[$other.k]", &["unknown name $other"]),
     ("x[$params.]", &["doesn't parse"]),
     ("x[$params.aa.b]", &["doesn't parse"]),
     ("x[$params]", &["doesn't parse"]),
@@ -2193,6 +2165,39 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("x[$other.k]", &["unknown name $other"]),
+    ("x[$aa]", &["unknown name $aa"]),
+    ("x whose aa is 1 and $b exists", &["unknown name $b"]),
+    (
+        "x whose aa is $b and c is $d",
+        &["unknown name $b", "unknown name $d"],
+    ),
+    ("x whose aa is $b", &["unknown name $b"]),
+    ("x whose aa equals $paramsx", &["unknown name $paramsx"]),
+    (
+        "x whose aa equals $params.c and d equals $e",
+        &["unknown name $e"],
+    ),
+    ("x whose aa equals $other", &["unknown name $other"]),
+    ("x whose aa equals $inputx.y", &["unknown name $inputx"]),
+    ("x whose aa equals $b.c", &["unknown name $b"]),
+    ("x whose $other is 1", &["unknown name $other"]),
+    ("x named by each of $aa", &["unknown name $aa"]),
+    ("$paramsx.y", &["unknown name $paramsx"]),
+    ("$paramsx", &["unknown name $paramsx"]),
+    ("$other.x", &["unknown name $other"]),
+    ("$other", &["unknown name $other"]),
+    ("$aa", &["unknown name $aa"]),
+    ("$_a", &["unknown name $_a"]),
+    ("$A", &["unknown name $A"]),
+    ("parent whose n is $foo", &["unknown name $foo"]),
+    ("parent.items whose zz is $foo", &["unknown name $foo"]),
+    ("parent[$foo] whose n is 1", &["unknown name $foo"]),
+    ("parent.items named by $foo", &["unknown name $foo"]),
+    (
+        "\"par whose ent\".items whose zz is $foo",
+        &["unknown name $foo"],
+    ),
     (
         "\"$s\" whose x does not match \"s\", -2.50, 1e2 and last of .it contains all of 0.10",
         &["invalid pattern -2.5", "invalid pattern 100"],
@@ -2542,6 +2547,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("owner.name", "owner.name"),
     ("y", "y"),
     ("n", "n"),
     ("\tid\n", "id"),

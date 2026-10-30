@@ -79,12 +79,15 @@ OPA crashes when it compares a number whose exponent is beyond ±1e6 with any ot
 
 [Values](semantics.md#values) allows a fix that fails such a check as `unusable`. That can't cover the sort of subject ids, because no check row reads them. Both wait for a real need, or for OPA to fix the crash.
 
+## Numbers with more than 15 significant digits
+
+OPA treats some decimals as the same when they only differ after the 15th significant digit, like `1234567890.1209567890` and `1234567890.1209567990`, and reuses the result of a comparison for any number it treats as the same. Whole numbers are always compared exactly. So `ergo.rego` can pass `l is at most 1234567890.1209567890` on the bigger one, and a `within` check can give a row the answer of an earlier row. The Rust port compares every digit. [Values](semantics.md#values) leaves such numbers out of the spec, so neither engine breaks a spec rule. [#426](https://github.com/kosli-dev/ergo/issues/426) tracks making `ergo.rego` compare them exactly. Then the spec could promise exact comparison at any number of digits.
+
 ## Where ergo.rego and the Rust port differ
 
 The spec doesn't settle these yet, because the two engines give different reports. Both still fail and pass the same checks.
 
 - **A check with a field it doesn't take.** [sentence.print.written_wrong](syntax.md#printing-the-sentence) doesn't say how a check prints when its sentences read but it has an unknown field, a `for` that isn't a string, or `for` or `assert` next to `any_of`. `ergo.rego` prints it as written and Rust prints it from its parse, so `{"assert": " x  is  1", "zzz": 1}` gives `x  is  1` with one and `x is 1` with the other.
-- **A `from` with an unknown name that starts at another subject.** [report.subjects](semantics.md#statuses) lists the subject a `from` starts at even when the line is written wrong, and an unknown name only makes it written wrong ([sentence.path.start](syntax.md#paths)). So a child keeps its parent, and a subject that narrows another keeps that subject's id and parts. Rust follows that. `ergo.rego` reads names while it parses, so an unknown name stops the parse, and the line starts at no other subject. With `parent` from `things` and `kid` from `parent.items whose zz is $foo`, `report.subjects` holds `kid` and `parent` in Rust, and only `kid` in `ergo.rego`. With `kid` from `parent whose zz is $foo` instead, Rust gives `kid` the parent's `identified_by` and parts and lists `parent`, and `ergo.rego` gives `kid` an `identified_by` of `null`, no parts, and lists only `kid`.
 - **A walk on a `for` line whose `whose` reads outside the item.** With `for: every xs as x`, `every rows.n whose z is at least $input.q is at least x.v` fails with `inputs` named `$input.q`, `x.v`, `rows[].n` in `ergo.rego`, and `x.v`, `$input.q`, `rows[].n` in Rust, which is what [for.failure_inputs](semantics.md#for) says for a walk without such a `whose`.
 
 ## Rules without cases
