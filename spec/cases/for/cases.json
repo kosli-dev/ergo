@@ -6405,9 +6405,9 @@
         ]
       },
       {
-        "description": "a title under a value that isn't an object fails as unusable",
+        "description": "a title under a value that isn't an object fails as not_an_object",
         "rules": [
-          "for.walk",
+          "for.flaws",
           "for.failed_items"
         ],
         "input": {
@@ -6422,11 +6422,11 @@
         },
         "results": [
           {
-            "cause": "unusable",
+            "cause": "not_an_object",
             "check": "c",
             "failed_items": [
               {
-                "cause": "unusable",
+                "cause": "not_an_object",
                 "failed_assertions": [],
                 "item": "item 1 of pull_requests",
                 "path": "item 1 of pull_requests",
@@ -11674,6 +11674,471 @@
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "compare", "passed": false, "cause": "value", "inputs": [{"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "x.v is at most m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "count", "passed": false, "cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "count of rows is at least m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "walk", "passed": false, "cause": "value", "inputs": [{"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}], "assertion": "some rows.n is at least x.v"}], "item": "item 1 of xs", "path": "item 1 of xs"}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a name whose path goes on past a null or a number",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every pull_requests.title as t",
+              "assert": "t is not \"WIP\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a null pull request fails as not_an_object",
+        "rules": [
+          "for.flaws",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].title",
+                "value": [
+                  null
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a number pull request fails as not_an_object",
+        "rules": [
+          "for.flaws",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                7
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].title",
+                "value": [
+                  null
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a pull request that isn't an object fails beside one that passes",
+        "rules": [
+          "for.flaws",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "title": "Fix"
+                },
+                "text"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [],
+                "item": "item 2 of pull_requests",
+                "path": "item 2 of pull_requests",
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/1"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].title",
+                "value": [
+                  "Fix",
+                  null
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title",
+                  "/releases/0/pull_requests/1"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "some over a name whose path goes on past its list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "some pull_requests.title as t",
+              "assert": "t is \"Fix\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as not_an_object when the only pull_request is null",
+        "rules": [
+          "for.flaws",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].title",
+                "value": [
+                  null
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when another pull request has the title",
+        "rules": [
+          "for.flaws",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "title": "Fix"
+                },
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "name": "pull_requests[].title",
+                "value": [
+                  "Fix",
+                  null
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/title",
+                  "/releases/0/pull_requests/1"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "first of over a name whose path goes on past its list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "first of pull_requests.title as t",
+              "assert": "t is \"Fix\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as not_an_object when the pull request is text",
+        "rules": [
+          "for.flaws",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                "text"
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].title",
+                "value": [
+                  null
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a name whose path goes on past a field that isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": {
+              "for": "every pull_requests.meta.labels as l",
+              "assert": "l is \"x\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a pull request whose field is text fails as unusable, not as not_an_object",
+        "rules": [
+          "for.walk",
+          "for.failed_items"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "r1",
+              "pull_requests": [
+                {
+                  "meta": "text"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of pull_requests",
+                "path": "item 1 of pull_requests",
+                "value": null,
+                "locations": [
+                  "/releases/0/pull_requests/0/meta"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "name": "pull_requests[].meta.labels",
+                "value": [
+                  null
+                ],
+                "locations": [
+                  "/releases/0/pull_requests/0/meta"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
         ]
       }
     ]
