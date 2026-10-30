@@ -6323,6 +6323,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every xs whose k is 1 as p, first of ys whose k is p.k as q",
+        "every xs whose k is 1 as p, first of ys whose k equals p.k as q",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
