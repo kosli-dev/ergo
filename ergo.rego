@@ -471,10 +471,20 @@ _listed_keys(step) := v if {
 
 _target(doc, req) := object.get(doc, _from_keys(req), null) if is_object(doc)
 
+_target(doc, req) := doc if {
+	is_array(doc)
+	_from_keys(req) == []
+}
+
 _target_read(doc, req) := object.get(doc, _from_keys(req), _absent) if is_object(doc)
 
 _target_read(doc, req) := doc if {
 	not _is_collection(doc)
+	_from_keys(req) == []
+}
+
+_target_read(doc, req) := doc if {
+	is_array(doc)
 	_from_keys(req) == []
 }
 
@@ -513,8 +523,14 @@ _keyed_state(doc, req) := c if {
 
 _keyed_state(doc, req) := "unusable" if is_array(_target_read(doc, req))
 
+default _walkable(_) := false
+
+_walkable(doc) if is_object(doc)
+
+_walkable(doc) if is_array(doc)
+
 _every_cause(doc, req) := c if {
-	not is_object(doc)
+	not _walkable(doc)
 	c := _target_state(doc, req)
 	c != "value"
 } else := _worst_of({f.cause | some f in fails}) if {
@@ -554,7 +570,10 @@ default _from_state(_, _) := "absent"
 
 _from_state(doc, req) := "null" if _target_read(doc, req) == null
 
-_from_state(doc, _) := "unusable" if is_array(doc)
+_from_state(doc, req) := "unusable" if {
+	is_array(doc)
+	_from_keys(req) != []
+}
 
 _from_state(doc, req) := "unusable" if {
 	_target_read(doc, req) == _absent
@@ -638,13 +657,13 @@ _raw_entries(doc, req) := [entry | some entry in _listed_subjects(doc, req)] if 
 _raw_entries(doc, req) := _every_walk(doc, _from_keys(req)).subjects if {
 	_from_well_formed(req)
 	_every_from(req)
-	is_object(doc)
+	_walkable(doc)
 }
 
 _raw_entries(doc, req) := [] if {
 	_from_well_formed(req)
 	_every_from(req)
-	not is_object(doc)
+	not _walkable(doc)
 }
 
 _raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k], _absent), "at": _pointer(_doc_at, doc, array.concat(_from_keys(req), [k]))} | some k in sort({k | some k in _listed_keys(_each_step(req))})] if {
@@ -3325,7 +3344,7 @@ _from_text(req) := _path_name(array.concat([data.ergo_subject_sentences.chains[r
 	not _chain_part(req)
 }
 
-_from_text(req) := "$input" if {
+_from_text(req) := concat("", [_every_word(req), "$input"]) if {
 	_from_well_formed(req)
 	_from_path(req) == []
 }
@@ -3580,7 +3599,7 @@ _every_failed_items(doc, req) := {"failed_items": [{"path": _path_name(f.path), 
 	f.path == p
 ]} if {
 	_every_from(req)
-	is_object(doc)
+	_walkable(doc)
 	_from_well_formed(req)
 	not _from_unreadable(req)
 } else := {"failed_items": []} if _every_from(req)
