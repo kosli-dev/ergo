@@ -2125,7 +2125,7 @@ _compared(check, l, r) if {
 	is_number(l)
 	is_number(r)
 	not "max" in object.keys(check)
-	abs(l - r) <= check.within
+	_within_gap(l, r, check.within)
 }
 
 _leaf_op_passed("compare_time", check, subj) if {
@@ -2313,7 +2313,7 @@ _unusable(leaf, x) if {
 	"within" in object.keys(leaf)
 	l := _simple_found(x, leaf.left)
 	r := _simple_found(x, leaf.right)
-	not _numbers(l, r)
+	not _within_usable(leaf, l, r)
 }
 
 _numbers(l, r) if {
@@ -4608,7 +4608,110 @@ _usable_sides(check, l, r) if {
 
 _usable_sides(check, l, r) if {
 	"within" in object.keys(check)
+	_within_usable(check, l, r)
+}
+
+_within_usable(check, l, r) if {
 	_numbers(l, r)
+	is_number(check.within)
+	_within_spread([json.marshal(l), json.marshal(r), json.marshal(check.within)]) <= 4096
+}
+
+_within_gap(l, r, w) if {
+	texts := [json.marshal(l), json.marshal(r), json.marshal(w)]
+	_within_spread(texts) <= 4096
+	_within_texts(texts)
+}
+
+_within_texts(texts) := _at_most(gap, round(to_number(texts[2]) * scale)) if {
+	scale := _text_scale(texts)
+	gap := abs(round(to_number(texts[0]) * scale) - round(to_number(texts[1]) * scale))
+	gap < 1e15
+} else := _within_exact(texts)
+
+_at_most(a, b) := a <= b
+
+_text_scale(texts) := scale if {
+	every t in texts {
+		count(_decimal_parts(t).digits) + _decimal_parts(t).exponent <= 15
+	}
+	places := max([_text_places(t) | some t in texts])
+	places <= 15
+	scale := product([10 | some i in numbers.range(1, 15); i <= places])
+	every t in texts {
+		round(abs(to_number(t)) * scale) < 1e15
+	}
+}
+
+_text_places(text) := max([0, count(trim_right(digits, "0")) - point]) if {
+	m := _number_match(text)
+	digits := concat("", [m[1], m[2]])
+	point := count(m[1]) + _exponent(m[3])
+}
+
+_within_spread(texts) := max(exponents) - min(exponents) if exponents := [_decimal_parts(t).exponent | some t in texts]
+
+_decimal_parts(text) := {"negative": false, "digits": "0", "exponent": 0} if trim_left(_number_digits(text), "0") == ""
+
+_decimal_parts(text) := {"negative": startswith(text, "-"), "digits": trimmed, "exponent": ((_exponent(m[3]) - count(m[2])) + count(stripped)) - count(trimmed)} if {
+	m := _number_match(text)
+	stripped := trim_left(_number_digits(text), "0")
+	stripped != ""
+	trimmed := trim_right(stripped, "0")
+}
+
+_number_match(text) := regex.find_all_string_submatch_n(`^-?([0-9]+)(?:\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?$`, text, 1)[0]
+
+_number_digits(text) := concat("", [m[1], m[2]]) if m := _number_match(text)
+
+_within_exact(texts) if {
+	parts := [_decimal_parts(t) | some t in texts]
+	low := min([p.exponent | some p in parts])
+	mags := [concat("", [p.digits, _zeros(p.exponent - low)]) | some p in parts]
+	width := 7 * ceil((max([count(m) | some m in mags]) + 1) / 7)
+	chunks := [_chunks(m, width) | some m in mags]
+	_within_chunks(parts[0].negative == parts[1].negative, chunks)
+}
+
+_within_chunks(true, chunks) if {
+	chunks[0] <= _sum_chunks(chunks[1], chunks[2])
+	chunks[1] <= _sum_chunks(chunks[0], chunks[2])
+}
+
+_within_chunks(false, chunks) if _sum_chunks(chunks[0], chunks[1]) <= chunks[2]
+
+_chunks(mag, width) := [_chunk(substring(padded, start, 7)) | some i in numbers.range(0, (width / 7) - 1); start := i * 7] if padded := concat("", [_zeros(width - count(mag)), mag])
+
+_chunk(text) := 0 if trim_left(text, "0") == ""
+
+_chunk(text) := to_number(trim_left(text, "0")) if trim_left(text, "0") != ""
+
+_sum_chunks(x, y) := [_normalized(sums, i) | some i, _ in sums] if {
+	sums := [total | some i, v in x; total := v + y[i]]
+}
+
+_normalized(sums, i) := total - 10000000 if {
+	total := sums[i] + _carry(sums, i)
+	total >= 10000000
+}
+
+_normalized(sums, i) := total if {
+	total := sums[i] + _carry(sums, i)
+	total < 10000000
+}
+
+_carry(sums, i) := _carry_from(sums, [j | some j, s in sums; j > i; s != 9999999])
+
+_carry_from(_, []) := 0
+
+_carry_from(sums, later) := 1 if {
+	later != []
+	sums[min(later)] >= 10000000
+}
+
+_carry_from(sums, later) := 0 if {
+	later != []
+	sums[min(later)] < 10000000
 }
 
 _basic_inputs(subj, side) := [_path_input(subj, side)] if _basic_form(side) == "path"
@@ -4747,13 +4850,17 @@ _sum_state(null) := "null"
 
 _sum_state(n) := "unusable" if n != null
 
-_decimal_sum(nums) := total / scale if {
+_decimal_scale(nums) := scale if {
 	places := max(array.concat([0], [_value_places(n) | some n in nums]))
 	places <= 15
 	scale := product([10 | some i in numbers.range(1, 15); i <= places])
 	every n in nums {
 		round(abs(n) * scale) < 1e15
 	}
+}
+
+_decimal_sum(nums) := total / scale if {
+	scale := _decimal_scale(nums)
 	total := sum([round(n * scale) | some n in nums])
 	abs(total) < 1e15
 }
