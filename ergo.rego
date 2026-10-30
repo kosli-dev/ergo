@@ -7861,7 +7861,13 @@ _for_tied(item, w, names) := [{"path": e.i, "item": e.i, "cause": "ambiguous", "
 _for_pre(check, subj, names) := _for_walk(check.items[1], subj, names) if {
 	count(check.items) == 2
 	not _for_from_first(check)
+	not _for_pick_reads_first(check)
 } else := null
+
+_for_pick_reads_first(check) if {
+	"pick" in object.keys(check.items[1])
+	_for_whose_reads(check.items[1].whose, check.items[0].as)
+}
 
 _for_from_first(check) if check.items[1].path[0] == concat("", ["$", check.items[0].as])
 
@@ -8131,9 +8137,17 @@ _for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check, check.i
 	locations := [_walk_at(iw, e2) | some iw in inner; some e2 in iw.items]
 }
 
+_for_inner_pairs(check, subj, names, item, w) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)]) | some iw in inner} if {
+	count(check.items) == 2
+	not _for_from_first(check)
+	_for_pick_reads_first(check)
+	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) | some e in w.items]
+}
+
 _for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)])} if {
 	count(check.items) == 2
 	not _for_from_first(check)
+	not _for_pick_reads_first(check)
 	iw := _for_walk(check.items[1], subj, names)
 }
 

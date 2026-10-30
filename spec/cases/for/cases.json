@@ -12643,5 +12643,1256 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for item picking the first of a list whose condition reads the first alias",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of ys whose k is p.k as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "with one first item, the picked item passes",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                }
+              ],
+              "ys": [
+                {
+                  "k": 2,
+                  "n": 5
+                },
+                {
+                  "k": 1,
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "name": "item 2 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with one first item, the picked item fails",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 2
+                },
+                {
+                  "k": 1,
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "q.n is 1",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ys/0/n"
+                            ],
+                            "name": "q.n",
+                            "value": 2
+                          }
+                        ],
+                        "item": "item 1 of ys"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "item 1 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 2
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with two first items, every picked item passes",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": [
+                {
+                  "k": 2,
+                  "n": 1
+                },
+                {
+                  "k": 1,
+                  "n": 1
+                },
+                {
+                  "k": 1,
+                  "n": 9
+                },
+                {
+                  "k": 2,
+                  "n": 7
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "item 1 of ys",
+                "value": {
+                  "k": 2,
+                  "n": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "name": "item 2 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with two first items, one picked item fails",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": [
+                {
+                  "k": 2,
+                  "n": 5
+                },
+                {
+                  "k": 1,
+                  "n": 1
+                },
+                {
+                  "k": 1,
+                  "n": 9
+                },
+                {
+                  "k": 2,
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "q.n is 1",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ys/0/n"
+                            ],
+                            "name": "q.n",
+                            "value": 5
+                          }
+                        ],
+                        "item": "item 1 of ys"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/things/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "item 1 of ys",
+                "value": {
+                  "k": 2,
+                  "n": 5
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "name": "item 2 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item picking the last of a list sorted by a field, whose condition reads the first alias",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as p, last of ys whose k is p.k sorted by t as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "with one first item, the picked item passes",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 2,
+                  "t": 1
+                },
+                {
+                  "k": 1,
+                  "n": 1,
+                  "t": 3
+                },
+                {
+                  "k": 2,
+                  "n": 5,
+                  "t": 9
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "name": "item 2 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 1,
+                  "t": 3
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with one first item, the picked item fails",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 1,
+                  "t": 1
+                },
+                {
+                  "k": 1,
+                  "n": 2,
+                  "t": 3
+                },
+                {
+                  "k": 2,
+                  "n": 1,
+                  "t": 9
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "q.n is 1",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ys/1/n"
+                            ],
+                            "name": "q.n",
+                            "value": 2
+                          }
+                        ],
+                        "item": "item 2 of ys"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "name": "item 2 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 2,
+                  "t": 3
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with two first items, every picked item passes",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 1,
+                  "t": 3
+                },
+                {
+                  "k": 2,
+                  "n": 1,
+                  "t": 2
+                },
+                {
+                  "k": 1,
+                  "n": 2,
+                  "t": 1
+                },
+                {
+                  "k": 2,
+                  "n": 2,
+                  "t": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "item 1 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 1,
+                  "t": 3
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "name": "item 2 of ys",
+                "value": {
+                  "k": 2,
+                  "n": 1,
+                  "t": 2
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with two first items, one picked item fails",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 1,
+                  "t": 3
+                },
+                {
+                  "k": 2,
+                  "n": 2,
+                  "t": 2
+                },
+                {
+                  "k": 1,
+                  "n": 2,
+                  "t": 1
+                },
+                {
+                  "k": 2,
+                  "n": 1,
+                  "t": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "q.n is 1",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ys/1/n"
+                            ],
+                            "name": "q.n",
+                            "value": 2
+                          }
+                        ],
+                        "item": "item 2 of ys"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/things/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/0"
+                ],
+                "name": "item 1 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 1,
+                  "t": 3
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "name": "item 2 of ys",
+                "value": {
+                  "k": 2,
+                  "n": 2,
+                  "t": 2
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item picking the second of a list whose condition reads the first alias",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as p, item 2 of ys whose k is p.k as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "with one first item, the picked item passes",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 5
+                },
+                {
+                  "k": 2,
+                  "n": 5
+                },
+                {
+                  "k": 1,
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/2"
+                ],
+                "name": "item 3 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with one first item, the picked item fails",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 1
+                },
+                {
+                  "k": 1,
+                  "n": 2
+                },
+                {
+                  "k": 1,
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "q.n is 1",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ys/1/n"
+                            ],
+                            "name": "q.n",
+                            "value": 2
+                          }
+                        ],
+                        "item": "item 2 of ys"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/1"
+                ],
+                "name": "item 2 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 2
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with two first items, every picked item passes",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 5
+                },
+                {
+                  "k": 2,
+                  "n": 5
+                },
+                {
+                  "k": 2,
+                  "n": 1
+                },
+                {
+                  "k": 1,
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/2"
+                ],
+                "name": "item 3 of ys",
+                "value": {
+                  "k": 2,
+                  "n": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/ys/3"
+                ],
+                "name": "item 4 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "with two first items, one picked item fails",
+        "rules": [
+          "sentence.for.line",
+          "sentence.for.pick",
+          "sentence.for.scope"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ],
+              "ys": [
+                {
+                  "k": 1,
+                  "n": 5
+                },
+                {
+                  "k": 2,
+                  "n": 5
+                },
+                {
+                  "k": 2,
+                  "n": 3
+                },
+                {
+                  "k": 1,
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "q.n is 1",
+                    "cause": "value",
+                    "items": [
+                      {
+                        "cause": "value",
+                        "inputs": [
+                          {
+                            "locations": [
+                              "/things/0/ys/2/n"
+                            ],
+                            "name": "q.n",
+                            "value": 3
+                          }
+                        ],
+                        "item": "item 3 of ys"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/things/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ys/2"
+                ],
+                "name": "item 3 of ys",
+                "value": {
+                  "k": 2,
+                  "n": 3
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/ys/3"
+                ],
+                "name": "item 4 of ys",
+                "value": {
+                  "k": 1,
+                  "n": 1
+                }
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

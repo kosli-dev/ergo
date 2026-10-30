@@ -10309,3 +10309,23 @@ test_a_for_alias_named_like_a_part_of_a_subject_with_a_space_in_its_name_quotes_
 	rep := ergo.report(_clash_doc, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": {"for": "every xs as pull", "assert": "pull.v is 1"}}}}}, {})
 	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["pull can't be an alias: it's a part of \"pull request\""]]
 }
+
+_pick_reads_first_cause(item, xs, ys) := [r.cause |
+	some r in ergo.report({"s": [{"id": "a", "xs": xs, "ys": ys}]}, {"ergo_spec": "v0.3-dev", "subjects": {"s": {"from": "s", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"for": concat("", ["every xs as p, ", item, " as q"]), "assert": "q.n is 1"}}}}}, {}).results
+	r.check == "c"
+][0]
+
+test_a_second_for_item_picks_for_each_first_item_when_its_whose_reads_the_first_alias if {
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"k": 1}], [{"k": 1, "n": 1}]) == "satisfied"
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"k": 1}, {"k": 2}], [{"k": 2, "n": 1}, {"k": 1, "n": 1}, {"k": 1, "n": 9}]) == "satisfied"
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"k": 1}, {"k": 2}], [{"k": 2, "n": 5}, {"k": 1, "n": 1}]) == "value"
+	_pick_reads_first_cause("last of ys whose k is p.k sorted by t", [{"k": 1}], [{"k": 1, "n": 2, "t": 1}, {"k": 1, "n": 1, "t": 3}]) == "satisfied"
+	_pick_reads_first_cause("item 2 of ys whose k is p.k", [{"k": 1}], [{"k": 1, "n": 5}, {"k": 1, "n": 1}]) == "satisfied"
+}
+
+test_a_second_for_item_whose_whose_reads_the_first_alias_fails_when_nothing_matches if {
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"k": 3}], [{"k": 1, "n": 1}]) == "absent"
+	_pick_reads_first_cause("first of ys whose k is p.k", [{"j": 1}], [{"k": 1, "n": 1}]) == "absent"
+	_pick_reads_first_cause("first of ys whose k is p.k", [null], [{"k": 1, "n": 1}]) != "satisfied"
+	_pick_reads_first_cause("last of ys whose k is p.k sorted by t", [{"k": 1}], [{"k": 1, "n": 1, "t": 1}, {"k": 1, "n": 1, "t": 1}]) == "ambiguous"
+}
