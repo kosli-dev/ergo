@@ -72,12 +72,14 @@ Install the `ergo` command from crates.io. You need Rust, which [rustup](https:/
 cargo install --locked ergo-policy-cli
 ```
 
-Or download it, without Rust, for Linux (x86_64) or macOS (arm64) from the [latest Rust engine release](https://github.com/kosli-dev/ergo/releases?q=rust-v&expanded=true), unpack it and put `ergo` on your `PATH`:
+Or download it, without Rust, for Linux (x86_64) or macOS (arm64) from the [latest Rust engine release](https://github.com/kosli-dev/ergo/releases?q=rust&expanded=true), unpack it and put `ergo` on your `PATH`:
 
 ```sh
 curl -L https://github.com/kosli-dev/ergo/releases/download/rust-v0.1.0/ergo-0.1.0-macos-arm64.tar.gz | tar xz
 ./ergo --version
 ```
+
+On Linux, the file is `ergo-0.1.0-linux-x86_64.tar.gz`.
 
 To build it from this repo with Docker instead, see [`engines/rust/README.md`](engines/rust/README.md#running-from-the-command-line).
 
@@ -283,7 +285,7 @@ The [reference](REFERENCE.md) covers every field, operator and cause, including 
 
 ### Updating
 
-With `ergo.rego`, download the new file over the old one and run your policy's tests. [`CHANGELOG.md`](CHANGELOG.md) says what each release changed, and which spec version it follows.
+With the Rust engine, run `cargo install --locked ergo-policy-cli` again, or download the binary from the newest Rust engine release.
 
 With the Rust engine, pull the repo and run `cargo install --locked --path cli` again from `engines/rust`.
 
