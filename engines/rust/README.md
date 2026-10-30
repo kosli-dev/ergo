@@ -4,7 +4,7 @@
 
 A second engine for Ergo, in Rust, that should give the same report as `ergo.rego` for every case in [`spec/cases`](../../spec/cases). It's in progress: see [#319](https://github.com/kosli-dev/ergo/issues/319).
 
-It has five crates:
+It has five crates. The first three, `ergo-policy-sentences`, `ergo-policy-engine` and `ergo-policy-cli`, are published on crates.io from `rust-v*` tags, see [CONTRIBUTING.md](../../CONTRIBUTING.md#releases). The two Wasm crates are not published:
 
 - `ergo-policy-sentences` (`sentences/`) reads check sentences, `for` lines, `from` lines and paths, and nothing else, so an editor or a linter can use it without the engine.
 - `ergo-policy-engine` (`engine/`) builds the report, and reads sentences with `ergo-policy-sentences`.

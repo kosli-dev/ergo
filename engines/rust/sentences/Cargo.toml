@@ -5,7 +5,9 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-publish.workspace = true
+readme = "README.md"
+keywords = ["ergo", "policy", "compliance", "sentences", "parser"]
+categories = ["parser-implementations", "text-processing"]
 
 [features]
 serde = ["dep:serde"]
