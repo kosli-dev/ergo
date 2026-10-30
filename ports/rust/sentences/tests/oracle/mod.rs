@@ -1399,6 +1399,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "zz[k].q whose .empty.y is .it plus item 3 of $input.i[$params.k]",
         "zz named by k.q whose .empty.y equals .it plus item 3 of $input.i named by $params.k",
     ),
+    ("fam.kids", "fam.kids"),
+    ("fams", "fams"),
+    ("kids", "kids"),
+    ("meta", "meta"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2553,6 +2557,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("x[3]", "item 4 of x"),
     ("xs", "xs"),
     ("ys", "ys"),
+    ("meta", "meta"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[

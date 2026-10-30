@@ -3394,6 +3394,115 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
     ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
     ("i exists", "i exists", &[], &[]),
+    (
+        "count of items whose lo is at least days elapsed from fam.t to hi is 1",
+        "count of items whose lo is at least days elapsed from fam.t to hi is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of items whose lo is at least days elapsed from pa.t to hi is 1",
+        "count of items whose lo is at least days elapsed from pa.t to hi is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least $input.w plus hi is \"ok\"",
+        "every items.status whose lo is at least $input.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least $params.w plus hi is \"ok\"",
+        "every items.status whose lo is at least $params.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least 1 plus days elapsed from early to fam.t is \"ok\"",
+        "every items.status whose lo is at least 1 plus days elapsed from early to fam.t is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least 1 plus days elapsed from pa.t to hi is \"ok\"",
+        "every items.status whose lo is at least 1 plus days elapsed from pa.t to hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least days elapsed from early to pa.t is \"ok\"",
+        "every items.status whose lo is at least days elapsed from early to pa.t is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least days elapsed from early to pa.t plus 1 is \"ok\"",
+        "every items.status whose lo is at least days elapsed from early to pa.t plus 1 is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least days elapsed from fam.t to hi is \"ok\"",
+        "every items.status whose lo is at least days elapsed from fam.t to hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least days elapsed from pa.t to hi is \"ok\"",
+        "every items.status whose lo is at least days elapsed from pa.t to hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least fam.w is \"ok\"",
+        "every items.status whose lo is at least fam.w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least fam.w plus hi is \"ok\"",
+        "every items.status whose lo is at least fam.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least hi plus fam.w is \"ok\"",
+        "every items.status whose lo is at least hi plus fam.w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least hi plus pa.w is \"ok\"",
+        "every items.status whose lo is at least hi plus pa.w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least pa.w is \"ok\"",
+        "every items.status whose lo is at least pa.w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least pa.w plus hi is \"ok\"",
+        "every items.status whose lo is at least pa.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every x.items.status whose lo is at least x.w plus hi is \"ok\"",
+        "every x.items.status whose lo is at least x.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    ("i.status is \"ok\"", "i.status is \"ok\"", &[], &[]),
+    (
+        "some items.status whose lo is at least pa.w plus hi is \"ok\"",
+        "some items.status whose lo is at least pa.w plus hi is \"ok\"",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6304,6 +6413,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every t[0].u as i", "every t[0].u as i", &[], &[]),
     ("first of t as i", "first of t as i", &[], &[]),
+    (
+        "every items whose lo is at least pa.w plus hi as i",
+        "every items whose lo is at least pa.w plus hi as i",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
