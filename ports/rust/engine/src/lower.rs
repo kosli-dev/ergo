@@ -23,6 +23,7 @@ pub struct Scope {
     parts: BTreeMap<String, PartDef>,
     parents: BTreeMap<String, BTreeMap<String, PartDef>>,
     for_aliases: BTreeSet<String>,
+    pending: BTreeSet<String>,
 }
 
 fn not_a_position(number: &str) -> Vec<String> {
@@ -50,6 +51,8 @@ fn last_unsupported() -> Vec<String> {
     ]
 }
 
+pub const UNKNOWN_NAME: &str = "unknown name ";
+
 fn reference_path(reference: &s::Reference) -> Option<path::Path> {
     match reference {
         s::Reference::Params(key) => Some(path::Path {
@@ -60,7 +63,7 @@ fn reference_path(reference: &s::Reference) -> Option<path::Path> {
             start: Start::Input,
             steps: vec![Step::Key(key.clone())],
         }),
-        s::Reference::Name(_) => None,
+        s::Reference::Name(_) | s::Reference::Unknown { .. } => None,
     }
 }
 
@@ -89,11 +92,15 @@ pub fn keyed_steps(path: &s::Path) -> Result<Vec<Step>, Vec<String>> {
             s::Step::NamedBy(reference) | s::Step::Brackets(reference) => {
                 match reference_path(reference) {
                     Some(reference) => steps.push(Step::Ref(Box::new(reference))),
-                    None => {
-                        if let s::Reference::Name(name) = reference {
+                    None => match reference {
+                        s::Reference::Name(name) => {
                             problems.push(format!("unknown alias {name}"));
                         }
-                    }
+                        s::Reference::Unknown { name, .. } => {
+                            problems.push(format!("{UNKNOWN_NAME}{name}"));
+                        }
+                        s::Reference::Params(_) | s::Reference::Input(_) => {}
+                    },
                 }
             }
         }
@@ -124,6 +131,7 @@ pub fn part_steps(path: &s::Path) -> Result<Vec<Step>, Vec<String>> {
                 "it can only start an assertion: write it first, like it is not empty".to_string(),
             ]);
         }
+        s::Start::Unknown(name) => return Err(vec![format!("{UNKNOWN_NAME}{name}")]),
     };
     let mut steps = vec![first];
     steps.extend(keyed_steps(path)?);
@@ -142,6 +150,11 @@ impl Scope {
 
     pub fn with_parent(mut self, name: &str, parts: BTreeMap<String, PartDef>) -> Scope {
         self.parents.insert(name.to_string(), parts);
+        self
+    }
+
+    pub fn with_pending<'a>(mut self, names: impl IntoIterator<Item = &'a str>) -> Scope {
+        self.pending = names.into_iter().map(str::to_string).collect();
         self
     }
 
@@ -172,6 +185,9 @@ impl Scope {
             s::Step::Index(number) => index_of(number).map(Step::Index),
             s::Step::NamedBy(reference) | s::Step::Brackets(reference) => match reference {
                 s::Reference::Name(name) => {
+                    if self.pending.contains(name) {
+                        return Err(vec![format!("unknown alias {name}")]);
+                    }
                     if self.parts.contains_key(name) {
                         return Err(vec![format!(
                             "named by {name} reads a part, which isn't supported yet"
@@ -284,6 +300,7 @@ impl Scope {
             s::Start::It => (Start::Subject, steps),
             s::Start::Params => (Start::Params, steps),
             s::Start::Input => (Start::Input, steps),
+            s::Start::Unknown(name) => return Err(vec![format!("{UNKNOWN_NAME}{name}")]),
             s::Start::Field { key, dot } => self.field_start(key, *dot, parents, parts, steps),
         };
         Ok(path::Path { start, steps })
