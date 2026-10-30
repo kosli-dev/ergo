@@ -1,3 +1,0 @@
-requirements / the whole input as the subject / fails min_subjects as value on an empty list
-requirements / the whole input as the subject / makes a subject of an item that isn't an object, and its check fails as not_an_object
-requirements / the whole input as the subject / makes each item a subject, in list order, with itself as its id

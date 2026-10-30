@@ -314,12 +314,7 @@ fn read_entries<'a>(
         Source::Root { path, .. } | Source::Child { path, .. } => {
             let ctx = context(env, input_root(env), anc);
             let read = path::read(path, &ctx);
-            let whole_input =
-                matches!(&lowered.source, Source::Root { .. }) && path.steps.is_empty();
             match read.outcome {
-                Outcome::Found if whole_input && read.value.is_some_and(Value::is_array) => {
-                    Read::Failed(Cause::Unusable)
-                }
                 Outcome::Found => match plain_entries(&read) {
                     Ok(entries) => Read::Entries {
                         entries,
@@ -955,13 +950,25 @@ mod tests {
     }
 
     #[test]
-    fn the_whole_input_is_one_subject_when_it_is_an_object_and_unusable_as_a_list() {
+    fn the_whole_input_is_one_subject_when_it_is_an_object_and_a_list_of_subjects_when_it_is_a_list()
+     {
         let r = run(json!({"thing": {"from": "$input"}}), json!({"x": 1}));
         assert_eq!(
             input_of(&rows(&r, "$min_subjects")[0], 0),
             json!({"name": "in-scope thing count", "value": 1, "locations": [""]})
         );
-        let r = run(json!({"thing": {"from": "$input"}}), json!([1]));
+        let r = run(
+            json!({"thing": {"from": "$input"}}),
+            json!([{"a": 1}, {"a": 2}]),
+        );
+        assert_eq!(
+            r["requirements"]["s"]["subjects"],
+            json!({"total": 2, "matching": 2})
+        );
+        let p = policy(json!({"thing": {"from": "$input"}}), json!(1));
+        let r = report(&json!([]), &p, &json!({}));
+        assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("value"));
+        let r = run(json!({"thing": {"from": "$input"}}), json!("x"));
         assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("unusable"));
         let r = run(json!({"thing": {"from": "$input"}}), Value::Null);
         assert_eq!(rows(&r, "$min_subjects")[0]["cause"], json!("null"));
