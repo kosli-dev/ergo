@@ -542,7 +542,14 @@ fn subject_entry(reading: &Reading, name: &str, extra: &Problems) -> Value {
         });
     let follows_parent =
         matches!(info.relation, crate::reading::Relation::Narrows(_)) && !from_broken;
-    if extra.contains_key(&field_name(&["subjects", name, "identified_by"])) && !follows_parent {
+    let id_unreadable = extra
+        .get(&field_name(&["subjects", name, "identified_by"]))
+        .is_some_and(|texts| {
+            texts
+                .iter()
+                .any(|text| text != crate::reading::KEYED_ID_PROBLEM)
+        });
+    if id_unreadable && !follows_parent {
         entry["identified_by"] = json!(crate::reading::INVALID_IDENTIFIED_BY);
     }
     entry

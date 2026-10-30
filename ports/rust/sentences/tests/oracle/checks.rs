@@ -1,4 +1,5 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("aid exists", "aid exists", &[], &[]),
     (
         "count of items.x.y whose k is \"a\" is 1",
         "count of items.x.y whose k is \"a\" is 1",
@@ -197,6 +198,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("z matches '^\\s+$'", "z matches '^\\s+$'", &[], &[]),
     ("p.z is 1", "p.z is 1", &[], &[]),
     ("q.w is 2", "q.w is 2", &[], &[]),
+    ("q.n is 1", "q.n is 1", &[], &[]),
     ("\tx is 1\n", "x is 1", &[], &[]),
     ("x is 1\n", "x is 1", &[], &[]),
     ("\n\tx is 1", "x is 1", &[], &[]),
@@ -2492,6 +2494,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("n exists", "n exists", &[], &[]),
     (
         "n is at most $input.limits.high",
         "n is at most $input.limits.high",
@@ -3644,6 +3647,48 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("i exists", "i exists", &[], &[]),
     ("o exists", "o exists", &[], &[]),
     ("p is 1", "p is 1", &[], &[]),
+    (
+        "every rows.n whose $input.q is at least z is at least x.v",
+        "every rows.n whose $input.q is at least z is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least $input.q is at least x.v",
+        "every rows.n whose z is at least $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least t.x is at least r.v",
+        "every rows.n whose z is at least t.x is at least r.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least x.w is at least $input.k",
+        "every rows.n whose z is at least x.w is at least $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "every y.w whose zz is at least $input.q is at least x.v",
+        "every y.w whose zz is at least $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "some rows.n whose z is at most $input.q is at least x.v",
+        "some rows.n whose z is at most $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every \"#rows\".n is at least x.v",
+        "every \"#rows\".n is at least x.v",
+        &[],
+        &[],
+    ),
     (
         "i is one of 1, 'a' and y is at least y",
         "i is one of 1, \"a\" and y is at least y",
@@ -6232,6 +6277,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("every xs as kid", "every xs as kid", &[], &[]),
     ("every xs as other", "every xs as other", &[], &[]),
     ("every xs as part", "every xs as part", &[], &[]),
+    (
+        "every xs as p, first of ys as q",
+        "every xs as p, first of ys as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, last of ys sorted by n as q",
+        "every xs as p, last of ys sorted by n as q",
+        &[],
+        &[],
+    ),
     ("every xs as pull", "every xs as pull", &[], &[]),
     ("every xs as x", "every xs as x", &[], &[]),
     (
@@ -6581,6 +6638,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("some x as pr", "some x as pr", &[], &[]),
     (
+        "some xs as p, first of ys as q",
+        "some xs as p, first of ys as q",
+        &[],
+        &[],
+    ),
+    (
         "some x named by $params.\"x y\"._k as k1",
         "some x named by $params.\"x y\"._k as k1",
         &[],
@@ -6619,6 +6682,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every t[0].u as i", "every t[0].u as i", &[], &[]),
     ("first of t as i", "first of t as i", &[], &[]),
+    (
+        "every xs as x, every x.ys as y",
+        "every xs as x, every x.ys as y",
+        &[],
+        &[],
+    ),
     (
         "every lists named by q as p, every qs as q",
         "every lists named by q as p, every qs as q",

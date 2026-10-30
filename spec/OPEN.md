@@ -88,7 +88,6 @@ OPA treats some decimals as the same when they only differ after the 15th signif
 The spec doesn't settle these yet, because the two engines give different reports. Both still fail and pass the same checks.
 
 - **A check with a field it doesn't take.** [sentence.print.written_wrong](syntax.md#printing-the-sentence) doesn't say how a check prints when its sentences read but it has an unknown field, a `for` that isn't a string, or `for` or `assert` next to `any_of`. `ergo.rego` prints it as written and Rust prints it from its parse, so `{"assert": " x  is  1", "zzz": 1}` gives `x  is  1` with one and `x is 1` with the other.
-- **A walk on a `for` line whose `whose` reads outside the item.** With `for: every xs as x`, `every rows.n whose z is at least $input.q is at least x.v` fails with `inputs` named `$input.q`, `x.v`, `rows[].n` in `ergo.rego`, and `x.v`, `$input.q`, `rows[].n` in Rust, which is what [for.failure_inputs](semantics.md#for) says for a walk without such a `whose`.
 
 ## Rules without cases
 

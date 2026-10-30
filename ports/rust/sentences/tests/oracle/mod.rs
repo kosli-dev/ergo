@@ -14,6 +14,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     (".artifact.p", "artifact.p"),
     (
+        "artifact.suites named by each of $params.names",
+        "artifact.suites named by each of $params.names",
+    ),
+    (
         "artifact.x[0] named by each of $params.k",
         "item 1 of artifact.x named by each of $params.k",
     ),
@@ -67,6 +71,15 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("artifact[0].pulls", "artifact[0].pulls"),
     ("p whose x is 1", "p whose x is 1"),
     ("p.commits", "p.commits"),
+    ("suite.items", "suite.items"),
+    (
+        "suites named by $params.group",
+        "suites named by $params.group",
+    ),
+    (
+        "suites named by each of $params.names",
+        "suites named by each of $params.names",
+    ),
     ("owner.name", "owner.name"),
     ("pp whose n is 1", "pp whose n is 1"),
     (
@@ -102,6 +115,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "\"$s\" named by $params.k named by kk whose $input.i named by $params.k._k is equal to -2.50",
         "\"$s\" named by $params.k named by kk whose $input.i named by $params.k._k is -2.5",
     ),
+    ("\"$x\".pa.items", "\"$x\".pa.items"),
+    ("\"$x\".items", "\"$x\".items"),
     (
         "\"$s\" whose .\"a.b\" is not empty",
         "\"$s\" whose \"a.b\" is not empty",
@@ -755,6 +770,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "lockfile whose status is \"COMPLETE\"",
     ),
     ("m whose id exists", "m whose id exists"),
+    ("meta", "meta"),
     ("meta.w", "meta.w"),
     ("mid.leaves", "mid.leaves"),
     (
@@ -2577,6 +2593,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("$params.x", "$params.x"),
     ("$params.x.y", "$params.x.y"),
     (".empty", ".empty"),
+    ("aid", "aid"),
     ("att", "att"),
     ("att.cov", "att.cov"),
     ("attestation_id", "attestation_id"),
@@ -2613,8 +2630,10 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ),
     ("meta", "meta"),
     ("meta.id", "meta.id"),
+    ("meta", "meta"),
     ("meta.w", "meta.w"),
     ("name", "name"),
+    ("n", "n"),
     ("ps", "ps"),
     ("pull_requests.reviews", "pull_requests.reviews"),
     ("reviews", "reviews"),
