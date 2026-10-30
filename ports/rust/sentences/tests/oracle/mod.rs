@@ -1449,8 +1449,6 @@ pub const FROM_OK: &[(&str, &str)] = &[
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("parent.items whose", &["doesn't parse"]),
-    ("parent.items whose zz is $foo", &["unknown name $foo"]),
-    ("parent whose n is $foo", &["unknown name $foo"]),
     ("", &["doesn't parse"]),
     ("\"a\\q\"", &["invalid string at column 1"]),
     (

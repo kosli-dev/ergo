@@ -23,6 +23,7 @@ pub struct Scope {
     parts: BTreeMap<String, PartDef>,
     parents: BTreeMap<String, BTreeMap<String, PartDef>>,
     for_aliases: BTreeSet<String>,
+    pending: BTreeSet<String>,
 }
 
 fn not_a_position(number: &str) -> Vec<String> {
@@ -152,6 +153,11 @@ impl Scope {
         self
     }
 
+    pub fn with_pending<'a>(mut self, names: impl IntoIterator<Item = &'a str>) -> Scope {
+        self.pending = names.into_iter().map(str::to_string).collect();
+        self
+    }
+
     pub fn with_for_alias(mut self, alias: &str) -> Scope {
         self.for_aliases.insert(alias.to_string());
         self
@@ -179,6 +185,9 @@ impl Scope {
             s::Step::Index(number) => index_of(number).map(Step::Index),
             s::Step::NamedBy(reference) | s::Step::Brackets(reference) => match reference {
                 s::Reference::Name(name) => {
+                    if self.pending.contains(name) {
+                        return Err(vec![format!("unknown alias {name}")]);
+                    }
                     if self.parts.contains_key(name) {
                         return Err(vec![format!(
                             "named by {name} reads a part, which isn't supported yet"
