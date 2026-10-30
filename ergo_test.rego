@@ -1184,6 +1184,28 @@ test_a_child_subject_reads_the_items_of_a_list_input_as_its_parents if {
 	[[r.passed, r.cause, r.inputs[0].locations] | some r in rows_for(rep, "s", "$min_subjects")] == [[true, "satisfied", ["/0/kids/0"]], [false, "value", []]]
 }
 
+test_a_position_on_a_list_input_reads_the_item_and_ends_absent_past_the_end if {
+	every from in ["$input[0]", "first of $input"] {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		[[r.passed, r.cause, r.inputs[0].value, r.inputs[0].locations] | some r in rows_for(report([{"id": "a"}, 1], req), "s", "$min_subjects")] == [[true, "satisfied", 1, ["/0"]]]
+		[[r.passed, r.cause, r.inputs[0].value] | some r in rows_for(report([], req), "s", "$min_subjects")] == [[false, "absent", 0]]
+	}
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input[5]"})}
+	[[r.passed, r.cause] | some r in rows_for(report([{"id": "a"}], req), "s", "$min_subjects")] == [[false, "absent"]]
+}
+
+test_a_position_on_a_list_input_that_leads_to_a_list_reads_its_items if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input[0].commits"})}
+	[[r.passed, r.cause, r.inputs[0].locations] | some r in rows_for(report([{"commits": [{"id": "a"}]}], req), "s", "$min_subjects")] == [[true, "satisfied", ["/0/commits/0"]]]
+}
+
+test_a_field_on_a_list_input_is_unusable if {
+	req := {"s": object.union(min_subjects_req(1).s, {"from": "$input.commits"})}
+	every doc in [[{"commits": [{"id": "a"}]}], []] {
+		[[r.passed, r.cause] | some r in rows_for(report(doc, req), "s", "$min_subjects")] == [[false, "unusable"]]
+	}
+}
+
 test_min_subjects_fails_when_from_has_steps_and_the_document_is_not_an_object if {
 	every doc, cause in {"null": "absent", `"x"`: "unusable", `[{"items": []}]`: "unusable"} {
 		rep := report(json.unmarshal(doc), min_subjects_req(0))
