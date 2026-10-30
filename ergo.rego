@@ -6235,7 +6235,16 @@ _s_subject_problems(_, def, _) := {} if not is_object(def)
 
 _s_field_problems(name, def, "from", reads) := reads[name].problems if is_string(object.get(def, "from", null))
 
-_s_field_problems(name, def, "identified_by", reads) := object.get(reads[name].identified_by, "problems", []) if is_string(object.get(def, "identified_by", null))
+_s_field_problems(name, def, "identified_by", reads) := sort(array.concat(object.get(reads[name].identified_by, "problems", []), [p | some p in _s_keyed_id_problem(def)])) if is_string(object.get(def, "identified_by", null))
+
+_s_keyed_id_problem(def) := {"not allowed with named by each of: the key is the id"} if _s_keyed(def)
+
+_s_keyed_id_problem(def) := set() if not _s_keyed(def)
+
+_s_keyed(def) if {
+	is_string(object.get(def, "from", null))
+	"named_by_each_of" in object.keys(_from_line(def.from))
+}
 
 _s_field_problems(_, def, f, _) := ["not a string"] if {
 	f in {"from", "identified_by"}

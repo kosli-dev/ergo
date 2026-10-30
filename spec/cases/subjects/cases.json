@@ -4459,8 +4459,7 @@
       "ergo_spec": "v0.3-dev",
       "subjects": {
         "scan": {
-          "from": "scans named by each of $params.required",
-          "identified_by": "name"
+          "from": "scans named by each of $params.required"
         }
       },
       "requirements": {
@@ -4619,8 +4618,7 @@
       },
       "subjects": {
         "scan": {
-          "from": "scans named by each of $params.required",
-          "identified_by": "name"
+          "from": "scans named by each of $params.required"
         }
       }
     },
@@ -4919,8 +4917,7 @@
       },
       "subjects": {
         "scan": {
-          "from": "scans named by each of $params.required",
-          "identified_by": "name"
+          "from": "scans named by each of $params.required"
         }
       }
     },
@@ -5019,8 +5016,7 @@
       },
       "subjects": {
         "scan": {
-          "from": "scans named by each of $params.required",
-          "identified_by": "name"
+          "from": "scans named by each of $params.required"
         }
       }
     },
@@ -5080,8 +5076,7 @@
       },
       "subjects": {
         "scan": {
-          "from": "scans named by each of $params.required",
-          "identified_by": "name"
+          "from": "scans named by each of $params.required"
         }
       }
     },
@@ -5143,8 +5138,7 @@
       },
       "subjects": {
         "scan": {
-          "from": "scans named by each of $params.required",
-          "identified_by": "name"
+          "from": "scans named by each of $params.required"
         }
       }
     },
@@ -5285,8 +5279,7 @@
       },
       "subjects": {
         "scan": {
-          "from": "scans named by $params.env named by each of $params.required",
-          "identified_by": "name"
+          "from": "scans named by $params.env named by each of $params.required"
         }
       }
     },
@@ -5390,8 +5383,7 @@
       },
       "subjects": {
         "scan": {
-          "from": "scans named by $params.env named by each of $params.required",
-          "identified_by": "name"
+          "from": "scans named by $params.env named by each of $params.required"
         }
       }
     },
@@ -10559,6 +10551,294 @@
     ]
   },
   {
+    "description": "a subject listed by named by each of that has identified_by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "suite": {
+          "from": "suites named by each of $params.names",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "suite",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "names": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "is written wrong, because the key is the id, and $well_formed is the requirement's only row",
+        "rules": [
+          "subjects.keyed.id",
+          "written_wrong.row"
+        ],
+        "input": {
+          "suites": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "suite",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.suite.identified_by",
+                "value": [
+                  "not allowed with named by each of: the key is the id"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject listed by named by each of that has identified_by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "suite": {
+          "from": "artifact.suites named by each of $params.names",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "suite",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "names": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and $well_formed names identified_by on the child",
+        "rules": [
+          "subjects.keyed.id",
+          "written_wrong.row"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": 9,
+              "suites": {
+                "a": {
+                  "id": 1
+                }
+              }
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "suite",
+              "id": null
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.suite.identified_by",
+                "value": [
+                  "not allowed with named by each of: the key is the id"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject listed by named by each of that has no identified_by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "suite": {
+          "from": "suites named by each of $params.names"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "suite",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "names": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "takes its key as its id",
+        "rules": [
+          "subjects.keyed.id",
+          "subjects.sentence"
+        ],
+        "input": {
+          "suites": {
+            "a": {
+              "id": 1
+            }
+          }
+        },
+        "status": {
+          "s": "met"
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "suite",
+              "id": "a"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "id",
+                "value": 1,
+                "locations": [
+                  "/suites/a/id"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject listed by named by, without each of, that has identified_by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "suite": {
+          "from": "suites named by $params.group",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "suite",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "group": "g"
+    },
+    "cases": [
+      {
+        "description": "keeps identified_by as its id",
+        "rules": [
+          "subjects.keyed.id",
+          "subjects.sentence"
+        ],
+        "input": {
+          "suites": {
+            "g": [
+              {
+                "id": 1
+              }
+            ]
+          }
+        },
+        "status": {
+          "s": "met"
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "suite",
+              "id": 1
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "id",
+                "value": 1,
+                "locations": [
+                  "/suites/g/0/id"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a from line whose condition is written wrong",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -11960,7 +12240,7 @@
   },
   {
     "description": "a subject read from the values of an object",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"scan": {"from": "scans named by each of $params.required", "identified_by": "name"}}, "requirements": {"s": {"subject": "scan", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"scan": {"from": "scans named by each of $params.required"}}, "requirements": {"s": {"subject": "scan", "checks": {"c": "x exists"}}}},
     "params": {"required": ["sast", "sca/x", "secrets"]},
     "cases": [
       {
@@ -13080,8 +13360,7 @@
           "identified_by": "id"
         },
         "k": {
-          "from": "artifact.scans named by each of $params.k",
-          "identified_by": "id"
+          "from": "artifact.scans named by each of $params.k"
         }
       },
       "requirements": {

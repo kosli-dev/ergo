@@ -1399,6 +1399,18 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "zz[k].q whose .empty.y is .it plus item 3 of $input.i[$params.k]",
         "zz named by k.q whose .empty.y equals .it plus item 3 of $input.i named by $params.k",
     ),
+    (
+        "artifact.suites named by each of $params.names",
+        "artifact.suites named by each of $params.names",
+    ),
+    (
+        "suites named by $params.group",
+        "suites named by $params.group",
+    ),
+    (
+        "suites named by each of $params.names",
+        "suites named by each of $params.names",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
