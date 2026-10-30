@@ -1417,6 +1417,16 @@ pub const FROM_OK: &[(&str, &str)] = &[
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "parent.items whose zz is $foo foo bar",
+        &["unknown name $foo"],
+    ),
+    (
+        "\"par whose ent\".items whose zz is $foo",
+        &["unknown name $foo"],
+    ),
+    ("parent.items named by $foo", &["unknown name $foo"]),
+    ("parent[$foo] whose n is 1", &["unknown name $foo"]),
     ("parent.items whose zz is $foo", &["unknown name $foo"]),
     ("parent.items whose", &["doesn't parse"]),
     ("parent whose n is $foo", &["unknown name $foo"]),

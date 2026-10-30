@@ -3399,6 +3399,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
+    ("x is $foo foo bar", &["unknown name $foo"]),
     (" x   is  ", &["doesn't parse"]),
     (" x  is ", &["doesn't parse"]),
     ("\u{feff}x is 1", &["doesn't parse"]),
@@ -6309,6 +6310,11 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "every xs whose zz is $foo foo bar as x",
+        &["unknown name $foo"],
+    ),
+    ("every xs whose zz is $foo as x", &["unknown name $foo"]),
     (
         " every  xs ",
         &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
