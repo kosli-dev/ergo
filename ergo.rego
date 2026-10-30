@@ -7376,15 +7376,26 @@ _walk_passed([], true, leaf, v) if _op_passed(leaf, v)
 
 _walk_failure(w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": _row_cause(leaf, e.iv, ""), "value": _walk_shown(e.v), "at": _walk_at(w, e)}
 
-_walk_failure(w, e, undecided, _, _, _) := {"path": array.concat(e.i, _walk_first_path(undecided[0][0])), "item": e.i, "cause": undecided[0][1], "value": _walk_first_value(undecided[0][0], e.iv), "at": _item_read_at(w, e, _walk_first_path(undecided[0][0]))} if undecided != []
+_walk_failure(w, e, undecided, _, _, _) := {"path": array.concat(e.i, _walk_first_path(undecided[0][0], e.iv)), "item": e.i, "cause": undecided[0][1], "value": _walk_first_value(undecided[0][0], e.iv), "at": _item_read_at(w, e, _walk_first_path(undecided[0][0], e.iv))} if undecided != []
 
 _walk_failure(_, _, [], false, _, _) := null
 
 _walk_failure(_, _, [], true, _, true) := null
 
-_walk_first_path(c) := _condition_paths(c)[0]
+_walk_first_path(c, v) := array.concat([p | some p in _walk_sides_paths(c); _read_state(v, p) != "value"], _walk_sides_paths(c))[0]
 
-_walk_first_value(c, v) := _value_at(v, _condition_paths(c)[0])
+_walk_first_value(c, v) := _value_at(v, _walk_first_path(c, v))
+
+_walk_sides_paths(c) := [p | some f in ["left", "right"]; some p in _walk_side_paths(c, c[f])] if _two_sided(c)
+
+_walk_sides_paths(c) := _condition_paths(c) if not _two_sided(c)
+
+_walk_side_paths(_, side) := [side] if is_array(side)
+
+_walk_side_paths(c, side) := _side_paths(side) if {
+	c.op == "compare"
+	_derived(side)
+}
 
 _condition_paths(c) := array.concat(_leaf_paths(c), [p | some side in _derived_sides(c); some p in _side_paths(side)])
 

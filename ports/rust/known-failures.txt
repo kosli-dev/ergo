@@ -9,3 +9,7 @@ requirements / min_subjects 1.5 / is written wrong with not a whole number from 
 requirements / min_subjects 1000001 / is written wrong with not a whole number from 0 to 1000000
 requirements / min_subjects 1e308 / is written wrong with not a whole number from 0 to 1000000
 requirements / min_subjects 9007199254740993 / is written wrong with not a whole number from 0 to 1000000
+walks / whose with a count on the left names the side that couldn't be read / names min, kids and the left side, kids, for items missing min, kids and both
+walks / whose with a count on the right names the side that couldn't be read / names min, kids and the left side, min, for items missing min, kids and both
+walks / whose with two fields names the side that couldn't be read / names hi when only lo is there
+walks / whose with two fields names the side that couldn't be read / names hi, with null, when hi is null

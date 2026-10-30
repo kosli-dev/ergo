@@ -1600,6 +1600,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every items.status whose count of kids is at least min is \"ok\"",
+        "every items.status whose count of kids is at least min is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least hi is \"ok\"",
+        "every items.status whose lo is at least hi is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose min is at most count of kids is \"ok\"",
+        "every items.status whose min is at most count of kids is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
         "every items.x does not match \"^a\"",
         "every items.x does not match \"^a\"",
         &[],
