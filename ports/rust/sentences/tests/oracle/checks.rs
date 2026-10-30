@@ -3645,6 +3645,48 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("o exists", "o exists", &[], &[]),
     ("p is 1", "p is 1", &[], &[]),
     (
+        "every rows.n whose $input.q is at least z is at least x.v",
+        "every rows.n whose $input.q is at least z is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least $input.q is at least x.v",
+        "every rows.n whose z is at least $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least t.x is at least r.v",
+        "every rows.n whose z is at least t.x is at least r.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least x.w is at least $input.k",
+        "every rows.n whose z is at least x.w is at least $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "every y.w whose zz is at least $input.q is at least x.v",
+        "every y.w whose zz is at least $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "some rows.n whose z is at most $input.q is at least x.v",
+        "some rows.n whose z is at most $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every \"#rows\".n is at least x.v",
+        "every \"#rows\".n is at least x.v",
+        &[],
+        &[],
+    ),
+    (
         "i is one of 1, 'a' and y is at least y",
         "i is one of 1, \"a\" and y is at least y",
         &["y is compared with itself"],
@@ -6619,6 +6661,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every t[0].u as i", "every t[0].u as i", &[], &[]),
     ("first of t as i", "first of t as i", &[], &[]),
+    (
+        "every xs as x, every x.ys as y",
+        "every xs as x, every x.ys as y",
+        &[],
+        &[],
+    ),
     (
         "every lists named by q as p, every qs as q",
         "every lists named by q as p, every qs as q",

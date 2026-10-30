@@ -8299,7 +8299,7 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 }
 
 _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of_cause(lines), "lines": lines} if {
-	lines := [{"assertion": check.assertions[i], "cause": cause, "inputs": _for_line_inputs(check, read)} |
+	lines := [{"assertion": check.assertions[i], "cause": cause, "inputs": _for_line_inputs(check, c, read)} |
 		some i, c in check.checks
 		cause := _for_cause(c, subj) with input as {"ergo/names": names}
 		cause != "satisfied"
@@ -8325,7 +8325,11 @@ _for_merge_lines(check, cause, fails) := [object.union({"assertion": a, "cause":
 	count(causes) > 0
 ] if cause != "satisfied"
 
-_for_line_inputs(check, inputs) := [object.union(i, {"name": _for_input_name(i.name, {item.as | some item in check.items})}) | some i in inputs]
+_for_line_inputs(check, c, inputs) := array.concat([r | some i in inputs; r := _for_renamed(check, i); r.name != i.name], [i | some i in inputs; _for_renamed(check, i).name == i.name]) if _walks(c)
+
+_for_line_inputs(check, c, inputs) := [_for_renamed(check, i) | some i in inputs] if not _walks(c)
+
+_for_renamed(check, i) := object.union(i, {"name": _for_input_name(i.name, {item.as | some item in check.items})})
 
 _for_input_name(name, aliases) := concat("", [m[1], alias, m[2]]) if {
 	some alias in aliases
