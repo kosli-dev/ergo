@@ -3399,6 +3399,14 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "x named by $params is 1 within",
+        &["\"within\" needs a number after it"],
+    ),
+    (
+        "every a every b named by $params exists",
+        &["two quantifiers in one sentence: put them on a for line"],
+    ),
     ("x is $foo foo bar", &["doesn't parse"]),
     (" x   is  ", &["doesn't parse"]),
     (" x  is ", &["doesn't parse"]),
@@ -4515,6 +4523,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("x is x and y is $foo", &["unknown name $foo"]),
     ("$foo.x exists", &["unknown name $foo"]),
     (
         "\"$s\".\"\" is 'b\\c' and \"$s\" named by $params.k contains none of 1e2, -2.50, -2.50 and some .true, if any, is at most 0.10",

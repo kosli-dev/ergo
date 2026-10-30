@@ -3,6 +3,7 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("owner.name", "owner.name"),
     ("kid whose n is 1", "kid whose n is 1"),
     ("mid whose n is 1", "mid whose n is 1"),
     ("pp whose n is 1", "pp whose n is 1"),
@@ -2513,6 +2514,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("owner.name", "owner.name"),
     ("y", "y"),
     ("n", "n"),
     ("\tid\n", "id"),
