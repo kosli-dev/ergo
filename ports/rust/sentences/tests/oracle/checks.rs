@@ -3394,6 +3394,8 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
     ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
     ("i exists", "i exists", &[], &[]),
+    ("o exists", "o exists", &[], &[]),
+    ("p is 1", "p is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6304,6 +6306,24 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every t[0].u as i", "every t[0].u as i", &[], &[]),
     ("first of t as i", "first of t as i", &[], &[]),
+    (
+        "every lists named by q as p, every qs as q",
+        "every lists named by q as p, every qs as q",
+        &[],
+        &[],
+    ),
+    (
+        "every objs whose v named by o is 1 as o",
+        "every objs whose v named by o is 1 as o",
+        &[],
+        &[],
+    ),
+    (
+        "every xs named by x as x",
+        "every xs named by x as x",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
