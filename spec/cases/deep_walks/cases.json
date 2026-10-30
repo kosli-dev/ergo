@@ -255,6 +255,34 @@
     ]
   },
   {
+    "description": "eleven steps on a for line, starting at a part of ten",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every x.z as y", "assert": "y is 1"}}}}},
+    "cases": [
+      {
+        "description": "is written wrong under for, because the walk is on the for line",
+        "rules": ["sentence.walk.steps", "sentence.path.part", "parts.where", "sentence.for.line", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "xs": [{"n": 1}], "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": {"z": [1]}}}}}}}}}}}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: every and some over more than ten steps aren't supported yet"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "eleven steps in the whose of a for item, through a part of ten",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every xs whose n is count of x.z as y", "assert": "y.n is 1"}}}}},
+    "cases": [
+      {
+        "description": "is written wrong under for, because the part is read on the right side of the item's whose, so x.z is eleven steps",
+        "rules": ["sentence.walk.steps", "sentence.path.part", "parts.where", "sentence.for.line", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "xs": [{"n": 1}], "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": {"z": [1]}}}}}}}}}}}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: every and some over more than ten steps aren't supported yet"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a parent's part of nine names in the whose of a count of",
     "policy": {"ergo_spec": "v0.3-dev", "requirements": {"s": {"checks": {"c": "count of xs whose n is count of b.x.z is 1"}, "subject": "kid"}}, "subjects": {"b": {"from": "bs", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9"}, "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}},
     "cases": [

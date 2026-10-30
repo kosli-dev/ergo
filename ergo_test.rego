@@ -4556,6 +4556,8 @@ _eleven := "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11"
 
 _too_long := ["every and some over more than ten steps aren't supported yet"]
 
+_for_too_long := "for: every and some over more than ten steps aren't supported yet"
+
 test_a_count_of_or_sum_of_on_the_right_of_a_phrase_over_ten_steps_reads_and_gives_the_right_verdicts if {
 	doc := {"things": [
 		{"id": "a", "n": 2, "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": [1, 1]}}}}}}}}}},
@@ -4663,9 +4665,9 @@ test_a_count_of_or_sum_of_through_a_part_counts_the_parts_path_on_either_side if
 test_a_part_on_a_for_line_item_counts_the_parts_path if {
 	doc := {"things": [object.union({"id": "a"}, _k9({"z": [1]})), object.union({"id": "b"}, _k9({"z": [2]}))]}
 	_part_walk_rows({"x": _nine}, {"c": {"for": "every x.z as y", "assert": "y is 1"}}, doc) == [["a", "c", "satisfied"], ["b", "c", "value"]]
-	_part_walk_problems({"x": _ten}, {"for": "every x.z as y", "assert": "y is 1"}) == _too_long
-	_part_walk_problems({"x": _ten}, {"for": "some x.z as y", "assert": "y is 1"}) == _too_long
-	_part_walk_problems({"x": _ten}, {"for": "first of x.z as y", "assert": "y is 1"}) == _too_long
+	_part_walk_problems({"x": _ten}, {"for": "every x.z as y", "assert": "y is 1"}) == [_for_too_long]
+	_part_walk_problems({"x": _ten}, {"for": "some x.z as y", "assert": "y is 1"}) == [_for_too_long]
+	_part_walk_problems({"x": _ten}, {"for": "first of x.z as y", "assert": "y is 1"}) == [_for_too_long]
 	_part_walk_problems({"x": _ten}, {"for": "every xs as y", "assert": "y.n is count of x.z"}) == _too_long
 }
 
@@ -4796,7 +4798,6 @@ test_a_parent_part_in_the_whose_of_every_some_or_a_for_item_is_still_counted_at_
 	has := {"x": _ten}
 	_parent_part_problems(has, "every xs.v whose n is count of b.x.z is 1") == [_too_long]
 	_parent_part_problems(has, "some xs whose n is count of b.x.z is not empty") == [_too_long]
-	_parent_part_problems(has, {"for": "every xs whose n is count of b.x.z as y", "assert": "y.v is 1"}) == [_too_long]
 	_parent_part_problems({"x": _nine}, "every xs.v whose n is count of b.x.z is 1") == []
 }
 
@@ -4805,6 +4806,12 @@ test_a_walk_that_is_already_written_wrong_for_another_reason_gets_no_ten_step_me
 	_part_walk_problems(has, {"for": "every xs as x", "assert": "every x.z is 1"}) == ["x can't be an alias: it's a part of thing"]
 	_part_walk_problems(has, {"for": "every xs as x", "assert": "count of x.z is 1"}) == ["x can't be an alias: it's a part of thing"]
 	_parent_part_problems(has, "count of xs whose sum of b.x.z is 1 is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet"]]
+}
+
+test_a_walk_over_ten_steps_in_a_for_items_whose_is_listed_under_for if {
+	_parent_part_problems({"x": _ten}, {"for": "every xs whose n is count of b.x.z as y", "assert": "y.v is 1"}) == [[_for_too_long]]
+	_part_walk_problems({"x": _ten}, {"for": "every xs whose n is count of x.z as r", "assert": "r.v is 1"}) == [_for_too_long]
+	_part_walk_problems({"x": _ten}, {"for": "every xs as r", "assert": "every r.v whose n is count of x.z is 1"}) == _too_long
 }
 
 test_a_parent_part_on_the_right_of_a_count_whose_gets_the_ten_step_message_beside_another_problem if {
@@ -10419,7 +10426,7 @@ test_a_for_alias_that_clashes_with_nothing_reads_the_item if {
 
 test_a_long_parent_part_walked_from_a_for_alias_named_like_the_parent_is_written_wrong_for_the_clash_only if {
 	has := {"p": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"}
-	_clash_problems(has, {}, {"for": "every xs as y, every b.p.list as z", "assert": "z is 1"}) == [_too_long]
+	_clash_problems(has, {}, {"for": "every xs as y, every b.p.list as z", "assert": "z is 1"}) == [[_for_too_long]]
 	_clash_problems(has, {}, {"for": "every xs as b, every b.p.list as z", "assert": "z is 1"}) == [["b can't be an alias: it's a subject's name"]]
 	_clash_problems({"p": "k1.k2.k3.k4.k5.k6.k7.k8.k9"}, {}, {"for": "every xs as y, every b.p.list as z", "assert": "z is 1"}) == []
 }

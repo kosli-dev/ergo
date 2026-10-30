@@ -6534,17 +6534,17 @@ _p_for_items(check) := object.get(_for_line(check.for), "items", []) if is_strin
 
 _p_part_walk_problems(_, _, pc) := set() if _p_idle(pc)
 
-_p_part_walk_problems(lines, ftext, pc) := {"every and some over more than ten steps aren't supported yet" |
-	some p in _p_part_walks(lines, ftext, pc)
+_p_part_walk_problems(lines, ftext, pc) := {concat("", [prefix, "every and some over more than ten steps aren't supported yet"]) |
+	some [prefix, p] in _p_part_walks(lines, ftext, pc)
 	_p_part_walk_steps(p, pc) > 10
 } if not _p_idle(pc)
 
-_p_part_walks(lines, ftext, pc) := {p |
+_p_part_walks(lines, ftext, pc) := {["", p] |
 	some line in lines
 	is_string(line)
 	some a in object.get(_sentence(line), "assertions", [])
 	some p in _p_walk_paths(_s_aliased(a, _s_names(set(), _p_unaliased(ftext, object.keys(pc.own)) | object.keys(pc.ancestors))))
-} | {p |
+} | {["for: ", p] |
 	is_string(ftext)
 	fl := _for_line(ftext)
 	some item in _s_marked_items(fl, object.keys(pc.own) | object.keys(pc.ancestors))
