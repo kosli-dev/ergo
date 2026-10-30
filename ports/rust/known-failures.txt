@@ -4,6 +4,8 @@ for / a second for item picking after the first alias, whose list can't be walke
 for / a second for item picking after the first alias, whose list can't be walked, still lists a first item that failed for another reason / a first item its whose can't decide is listed beside the second list
 requirements / a child subject of the whole input when it is a list / reads each item, and an item that isn't an object fails not_an_object
 requirements / a subject that narrows the whole input when it is a list / keeps the items that pass its condition
+requirements / a walk that starts at an input that is a list / names a list that breaks from $input
+requirements / a walk that starts at an input that is a list, without $input / names a list that breaks from $input
 requirements / the whole input as a list, with a condition / keeps the items that pass the condition
 requirements / the whole input as the subject / fails min_subjects as value on an empty list
 requirements / the whole input as the subject / makes a subject of an item that isn't an object, and its check fails as not_an_object

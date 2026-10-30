@@ -1593,17 +1593,21 @@ _field_path_name(path) := concat(".", [_segment_name(path[i]) | some i in _names
 
 _path_name([]) := "it"
 
-_path_name(path) := _visible_path_name(_visible(path)) if path != []
+_path_name(path) := _visible_path_name(_visible(path), "it") if path != []
 
-_visible_path_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _steps_name(array.slice(path, 0, count(path) - 1))]) if {
+_input_path_name([]) := "it"
+
+_input_path_name(path) := _visible_path_name(_visible(path), "$input") if path != []
+
+_visible_path_name(path, root) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _rooted_steps_name(array.slice(path, 0, count(path) - 1), root)]) if {
 	is_array(path)
 	count(path) > 1
 	_index_step(path[count(path) - 1])
-} else := concat("", ["item ", _literal_text(path[0] + 1), " of it"]) if {
+} else := concat("", ["item ", _literal_text(path[0] + 1), " of ", root]) if {
 	is_array(path)
 	count(path) == 1
 	_index_step(path[0])
-} else := _steps_name(path)
+} else := _rooted_steps_name(path, root)
 
 _ref_name(path) := concat("", ["item ", _literal_text(path[count(path) - 1] + 1), " of ", _plain_steps_name(array.slice(path, 0, count(path) - 1))]) if {
 	_builtin(path)
@@ -1616,11 +1620,13 @@ _index_step(s) if {
 	_is_key(s)
 }
 
-_steps_name(path) := concat("", array.concat(_it_root(visible), [_step_name(i, visible[i]) | some i in _names(visible)])) if visible := _visible(path)
+_steps_name(path) := _rooted_steps_name(path, "it")
 
-_it_root(visible) := ["it"] if _index_step(visible[0])
+_rooted_steps_name(path, root) := concat("", array.concat(_it_root(visible, root), [_step_name(i, visible[i]) | some i in _names(visible)])) if visible := _visible(path)
 
-_it_root(visible) := [] if not _index_step(visible[0])
+_it_root(visible, root) := [root] if _index_step(visible[0])
+
+_it_root(visible, _) := [] if not _index_step(visible[0])
 
 _plain_steps_name(path) := concat("", [_plain_step_name(i, path[i]) | some i in _names(path)])
 
@@ -3606,7 +3612,7 @@ _min_subjects_row(doc, req, req_name, matching, at) := object.union(
 	_every_failed_items(doc, req),
 )
 
-_every_failed_items(doc, req) := {"failed_items": [{"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
+_every_failed_items(doc, req) := {"failed_items": [{"path": _from_item_name(req, f.path), "item": _from_item_name(req, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
 	fails := _every_walk(doc, _from_keys(req)).fails
 	some p in sort({f.path | some f in fails})
 	some f in fails
@@ -3619,6 +3625,10 @@ _every_failed_items(doc, req) := {"failed_items": [{"path": _path_name(f.path), 
 } else := {"failed_items": []} if _every_from(req)
 
 else := {}
+
+_from_item_name(req, path) := _path_name(path) if _chained(req)
+
+else := _input_path_name(path)
 
 default _enough_subjects(_, _, _) := false
 
