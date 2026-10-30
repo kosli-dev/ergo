@@ -4011,13 +4011,17 @@ _listed_subject_names(reqs) := graph.reachable(_listed_subject_graph, {req.subje
 	_reported_subject_name(req) != null
 })
 
-_reported_subjects(written, reqs) := {name: _reported_subject(name, written[name]) | some name in _listed_subject_names(reqs)} if is_object(written)
+_reported_subjects(written, reqs) := {name: _reported_subject(name, written[name], flagged) | some name in names} if {
+	is_object(written)
+	names := _listed_subject_names(reqs)
+	flagged := {name | some name in names; _from_check_problem(name)}
+}
 
 _reported_subjects(written, _) := {} if not is_object(written)
 
-_reported_subject(name, def) := {
+_reported_subject(name, def, flagged) := {
 	"description": _reported_description(def),
-	"from": _subject_from_text(name, def),
+	"from": _subject_from_text(name, def, flagged),
 	"identified_by": _subject_id_text(name),
 	"parts": _reported_parts(name),
 }
@@ -4043,39 +4047,36 @@ _part_id_text(read) := "<invalid identified_by>" if {
 	not "text" in object.keys(read)
 }
 
-_subject_from_text(name, null) := _path_name([name])
+_subject_from_text(name, null, _) := _path_name([name])
 
-_subject_from_text(_, def) := "<invalid from>" if {
+_subject_from_text(_, def, _) := "<invalid from>" if {
 	def != null
 	not is_object(def)
 }
 
-_subject_from_text(name, def) := "<invalid from>" if {
+_subject_from_text(name, def, flagged) := "<invalid from>" if {
 	is_object(def)
-	_subject_from_unreadable(name, def)
-}
+	_subject_from_unreadable(name, def, flagged)
+} else := _subject_text(name, def) if is_object(def)
 
-_subject_from_text(name, def) := _subject_text(name, def) if {
-	is_object(def)
-	not _subject_from_unreadable(name, def)
-}
+default _subject_from_invalid(_, _) := false
 
-default _subject_from_invalid(_) := false
-
-_subject_from_invalid(name) if {
+_subject_from_invalid(name, _) if {
 	some p in data.ergo_resolved[name].problems
 	some f in ["from", "of"]
 	p[0] == ["subjects", name, f]
 }
 
-_subject_from_invalid(name) if {
+_subject_from_invalid(name, flagged) if name in flagged
+
+_from_check_problem(name) if {
 	some p in _own_check_problems({"subject": name, "checks": {}})
 	p[0] == _field_path_name(["subjects", name, "from"])
 }
 
-_subject_from_unreadable(name, _) if _subject_from_invalid(name)
+_subject_from_unreadable(name, _, flagged) if _subject_from_invalid(name, flagged)
 
-_subject_from_unreadable(name, def) if not _subject_readable(name, def)
+_subject_from_unreadable(name, def, _) if not _subject_readable(name, def)
 
 _subject_readable(name, def) if _subject_text(name, def)
 
