@@ -3,21 +3,36 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
-    ("kid whose n is 1", "kid whose n is 1"),
-    ("mid whose n is 1", "mid whose n is 1"),
-    ("pp whose n is 1", "pp whose n is 1"),
+    (".artifact.p[0]", "item 1 of artifact.p"),
+    (
+        ".artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (".artifact.p", "artifact.p"),
+    (
+        "artifact.x[0] named by each of $params.k",
+        "item 1 of artifact.x named by each of $params.k",
+    ),
+    (
+        "artifact[0] named by each of $params.k",
+        "item 1 of artifact named by each of $params.k",
+    ),
     ("commit.files", "commit.files"),
     ("every parent.items", "every parent.items"),
-    (
-        "parent.items whose n is one of 1, \"a\"",
-        "parent.items whose n is one of 1, \"a\"",
-    ),
-    (
-        "parent whose n is one of 1, \"a\"",
-        "parent whose n is one of 1, \"a\"",
-    ),
-    ("parent whose n is 1", "parent whose n is 1"),
     ("every parent", "every parent"),
+    (
+        "first of artifact named by each of $params.k",
+        "first of artifact named by each of $params.k",
+    ),
+    (
+        "artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (
+        "artifact.x named by each of $params.k",
+        "artifact.x named by each of $params.k",
+    ),
+    ("k.items", "k.items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
     (
         "artifact.scans named by each of $params.k",
@@ -27,9 +42,21 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact.pulls whose state is \"open\"",
         "artifact.pulls whose state is \"open\"",
     ),
+    ("kid whose n is 1", "kid whose n is 1"),
+    ("mid whose n is 1", "mid whose n is 1"),
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
+    ("pp whose n is 1", "pp whose n is 1"),
+    (
+        "parent.items whose n is one of 1, \"a\"",
+        "parent.items whose n is one of 1, \"a\"",
+    ),
+    (
+        "parent whose n is one of 1, \"a\"",
+        "parent whose n is one of 1, \"a\"",
+    ),
+    ("parent whose n is 1", "parent whose n is 1"),
     (
         "things whose x.y named by $params.i does not exist",
         "things whose x.y named by $params.i does not exist",
