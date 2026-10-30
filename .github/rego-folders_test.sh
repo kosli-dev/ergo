@@ -18,13 +18,14 @@ sh "$script"
 mkdir -p tools engines/rust/other
 echo "package tools" > tools/helper.rego
 echo "package other" > engines/rust/other/other_test.rego
+echo "package stray" > spec/stray.rego
 git add .
 echo "rego-folders.sh fails and names each Rego file outside those folders"
 if out=$(sh "$script" 2>&1); then
   echo "rego-folders.sh should fail, and passed" >&2
   exit 1
 fi
-for expected in "tools/helper.rego" "engines/rust/other/other_test.rego" ".github/rego-folders.sh"; do
+for expected in "tools/helper.rego" "engines/rust/other/other_test.rego" "spec/stray.rego" ".github/rego-folders.sh"; do
   case $out in
     *"$expected"*) ;;
     *)

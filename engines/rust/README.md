@@ -14,9 +14,9 @@ It has five crates:
 
 ## The cases
 
-`engine/tests/cases.rs` builds the report for every case in `spec/cases` and compares it the way `spec_test.rego` does, as [`spec/README.md`](../../spec/README.md#cases) describes. It prints how many cases pass, like `1365 of 1365 cases pass`.
+`engine/tests/cases.rs` builds the report for every case in `spec/cases` and compares it the way [`spec_test.rego`](../rego/spec_test.rego) does, as [`spec/README.md`](../../spec/README.md#cases) describes. It prints how many cases pass, like `1365 of 1365 cases pass`.
 
-`known-failures.txt` lists the cases the engine fails, one per line, named like in `spec_test.rego`: the folder, the group's description and the case's description, joined by ` / `. The test fails when a case fails that isn't listed, and when a listed case passes, so the list only shrinks. When a case starts passing, the test names it, and you delete its line.
+`known-failures.txt` lists the cases the engine fails, one per line, named like in [`spec_test.rego`](../rego/spec_test.rego): the folder, the group's description and the case's description, joined by ` / `. The test fails when a case fails that isn't listed, and when a listed case passes, so the list only shrinks. When a case starts passing, the test names it, and you delete its line.
 
 ## Running the checks
 

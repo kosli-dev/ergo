@@ -2,7 +2,7 @@
 set -eu
 cd "$(git rev-parse --show-toplevel)"
 
-stray=$(git ls-files '*.rego' | grep -v -E '^(engines/rego|spec|examples)/|^engines/rust/sentences/tests/oracle/oracle_test\.rego$' || true)
+stray=$(git ls-files '*.rego' | grep -v -E '^(engines/rego|examples)/|^engines/rust/sentences/tests/oracle/oracle_test\.rego$' || true)
 if [ -n "$stray" ]; then
   echo "These Rego files are in a folder no OPA command loads:"
   printf '%s\n' "$stray" | sed 's/^/  /'
