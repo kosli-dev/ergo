@@ -3523,6 +3523,15 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "x named by $params is 1 within",
+        &["\"within\" needs a number after it"],
+    ),
+    (
+        "every a every b named by $params exists",
+        &["two quantifiers in one sentence: put them on a for line"],
+    ),
+    ("x is $foo foo bar", &["doesn't parse"]),
     (" x   is  ", &["doesn't parse"]),
     (" x  is ", &["doesn't parse"]),
     ("\u{feff}x is 1", &["doesn't parse"]),
@@ -3548,7 +3557,6 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     ("\"q r\" plus \"q r\" is before \"s\"", &["doesn't parse"]),
     ("\"q r\".\"é\".\"é\" not 1e2 within 2", &["doesn't parse"]),
-    ("$foo.x exists", &["unknown name $foo"]),
     ("$input.i.\"\" 'b\\c'", &["doesn't parse"]),
     ("$params.p does contain -2.50", &["doesn't parse"]),
     (
@@ -4639,6 +4647,8 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("x is x and y is $foo", &["unknown name $foo"]),
+    ("$foo.x exists", &["unknown name $foo"]),
     (
         "\"$s\".\"\" is 'b\\c' and \"$s\" named by $params.k contains none of 1e2, -2.50, -2.50 and some .true, if any, is at most 0.10",
         &["if any can't go with some"],
@@ -6464,6 +6474,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
+    ("every xs whose zz is $foo foo bar as x", &["doesn't parse"]),
     (
         " every  xs ",
         &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
@@ -6893,6 +6904,7 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("every xs whose zz is $foo as x", &["unknown name $foo"]),
     (
         "every \"$s\" named by $params.\"x y\" as it",
         &["it can't be an alias"],

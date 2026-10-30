@@ -12645,6 +12645,152 @@
     ]
   },
   {
+    "description": "a for line with an unknown name and a syntax error",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs whose zz is $foo foo bar as x",
+              "assert": "x is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says it doesn't parse, and not unknown name",
+        "rules": ["sentence.path.start", "sentence.for.line", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "for: doesn't parse"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with an unknown name",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs whose zz is $foo as x",
+              "assert": "x is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says unknown name and nothing else",
+        "rules": ["sentence.path.start", "sentence.for.line", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "for: unknown name $foo"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a for item that reads its own alias in its path",
     "policy": {
       "ergo_spec": "v0.3-dev",

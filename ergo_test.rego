@@ -4084,6 +4084,23 @@ test_is_not_null_is_written_wrong_because_it_could_only_fail if {
 	_sentence_problems(`x does not equal null`) == [`"is not null" is written "exists"`]
 }
 
+test_a_bare_params_or_input_after_named_by_or_in_brackets_does_not_parse_even_with_an_unknown_name if {
+	every text in [`x named by $params is 1`, `x named by $input is 1`, `x[$params] is 1`, `x[$input] is 1`, `x named by $params is $foo`] {
+		_sentence_problems(text) == ["doesn't parse"]
+	}
+}
+
+test_a_bare_params_after_named_by_does_not_hide_a_within_with_no_number_or_two_quantifiers if {
+	_sentence_problems(`x named by $params is 1 within`) == [`"within" needs a number after it`]
+	_sentence_problems(`every a every b named by $params exists`) == ["two quantifiers in one sentence: put them on a for line"]
+}
+
+test_a_comparison_of_a_path_with_itself_is_listed_next_to_an_unknown_name_and_next_to_no_other_problem if {
+	_sentence_problems(`x is x and y is $foo`) == ["unknown name $foo", "x is compared with itself"]
+	_sentence_problems(`$foo is $foo`) == ["$foo is compared with itself", "unknown name $foo"]
+	_sentence_problems(`x is x and x is not null and y is $foo`) == [`"is not null" is written "exists"`, "unknown name $foo"]
+}
+
 test_a_path_compared_with_itself_is_written_wrong_because_it_could_only_pass_or_only_fail if {
 	every text in [
 		`x equals x`, `x does not equal x`, `x is x within 1`, `x is at least x`, `x is less than x`,
@@ -10427,23 +10444,24 @@ test_a_for_alias_named_like_a_part_of_a_subject_with_a_space_in_its_name_quotes_
 	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["pull can't be an alias: it's a part of \"pull request\""]]
 }
 
-test_subjects_that_narrow_each_other_with_unknown_names_list_no_other_subject if {
+test_subjects_that_narrow_each_other_with_unknown_names_list_each_other_and_have_no_id if {
 	policy := {
 		"ergo_spec": "v0.3-dev",
 		"subjects": {"a": {"from": "b whose x is $foo"}, "b": {"from": "a whose x is $foo"}},
 		"requirements": {"r": {"subject": "a", "checks": {"c": "n exists"}}},
 	}
 	report := ergo.report({}, policy, {})
-	object.keys(report.subjects) == {"a"}
+	object.keys(report.subjects) == {"a", "b"}
 	report.subjects.a.from == "<invalid from>"
 	report.subjects.a.identified_by == null
+	report.subjects.b.identified_by == null
 }
 
-test_a_from_that_reads_names_with_an_unknown_name_lists_no_other_subject if {
+test_a_from_that_reads_names_with_an_unknown_name_lists_the_subject_it_starts_at if {
 	policy := {
 		"ergo_spec": "v0.3-dev",
 		"subjects": {"p": {"from": "things", "identified_by": "id"}, "k": {"from": "p.items named by $foo", "identified_by": "n"}},
 		"requirements": {"r": {"subject": "k", "checks": {"c": "n exists"}}},
 	}
-	object.keys(ergo.report({}, policy, {}).subjects) == {"k"}
+	object.keys(ergo.report({}, policy, {}).subjects) == {"k", "p"}
 }
