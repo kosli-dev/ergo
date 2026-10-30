@@ -1,4 +1,28 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "count of items.x.y whose k is \"a\" is 1",
+        "count of items.x.y whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of items.x whose k is \"a\" is 1",
+        "count of items.x whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of items.x whose k is \"a\" is 1",
+        "sum of items.x whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of items.x.y whose k is \"a\" is 1",
+        "sum of items.x.y whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
     ("approvals exists", "approvals exists", &[], &[]),
     (" x   is  1 ", "x is 1", &[], &[]),
     (" x  is  1", "x is 1", &[], &[]),
@@ -3079,6 +3103,19 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("x equals total", "x equals total", &[], &[]),
     ("x equals y", "x equals y", &[], &[]),
+    (
+        "x equals y within 0.000001",
+        "x equals y within 0.000001",
+        &[],
+        &[],
+    ),
+    (
+        "x equals y within 0.19999",
+        "x equals y within 0.19999",
+        &[],
+        &[],
+    ),
+    ("x equals y within 0.2", "x equals y within 0.2", &[], &[]),
     ("x equals y within 0.5", "x equals y within 0.5", &[], &[]),
     ("x equals y[1]", "x equals item 2 of y", &[], &[]),
     ("x exists", "x exists", &[], &[]),
