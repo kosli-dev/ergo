@@ -24,6 +24,8 @@ pub struct Options {
     pub params: Option<String>,
     /// Whether to print one line.
     pub compact: bool,
+    /// Whether to exit non-zero when the report isn't compliant.
+    pub fail: bool,
 }
 
 /// The result of reading the command line.
@@ -54,6 +56,7 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
     let mut input = None;
     let mut params = None;
     let mut compact = false;
+    let mut fail = false;
     let mut rest = arguments[1..].iter();
     while let Some(argument) = rest.next() {
         let (name, attached) = match argument.split_once('=') {
@@ -62,11 +65,15 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         };
         match name {
             "--help" | "-h" => return Ok(Parsed::Help),
-            "--compact" => {
+            "--compact" | "--fail" => {
                 if attached.is_some() {
-                    return Err(usage("--compact takes no value".to_string()));
+                    return Err(usage(format!("{name} takes no value")));
                 }
-                compact = true;
+                if name == "--compact" {
+                    compact = true;
+                } else {
+                    fail = true;
+                }
             }
             "--policy" | "--input" | "--params" => {
                 let value = match attached {
@@ -97,5 +104,6 @@ pub fn parse(arguments: &[String]) -> Result<Parsed, Failure> {
         input: input.ok_or_else(|| usage("--input is missing".to_string()))?,
         params,
         compact,
+        fail,
     }))
 }
