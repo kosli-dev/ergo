@@ -106,7 +106,7 @@ These differences are known:
 
 ## Building for a browser
 
-The Markdown editor can run this engine in the page, so it needs `ergo-wasm` built to Wasm and wrapped in JavaScript. This builds it into `ports/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. That editor is on the `markdown/sentences` branch for now. Run it with the image from above, from the root of the repo:
+The Markdown editor can run this engine in the page, so it needs `ergo-wasm` built to Wasm and wrapped in JavaScript. This builds it into `ports/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. That editor is in `packages/editor`. Run it with the image from above, from the root of the repo:
 
 ```sh
 docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
