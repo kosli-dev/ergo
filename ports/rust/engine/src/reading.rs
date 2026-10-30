@@ -15,6 +15,7 @@ pub const NARROWING_A_CHILD_PROBLEM: &str =
     "can't build on a subject read from another subject yet";
 
 pub const INVALID_IDENTIFIED_BY: &str = "<invalid identified_by>";
+pub const KEYED_ID_PROBLEM: &str = "not allowed with named by each of: the key is the id";
 const MAX_WALK_STEPS: usize = 10;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -804,6 +805,11 @@ impl Reading {
                 },
                 Text::Missing | Text::Invalid => {}
             }
+            if matches!(&found.from, FromState::Parsed(line) if line.named_by_each_of.is_some())
+                && !matches!(found.def.identified_by, Text::Missing)
+            {
+                add_problem(&mut problems, id_at.clone(), KEYED_ID_PROBLEM);
+            }
             if matches!(found.relation, Relation::Narrows(_))
                 && !matches!(found.def.identified_by, Text::Missing)
             {
@@ -1038,7 +1044,11 @@ fn resolved_id_text(
         Text::Missing => None,
         Text::Invalid => Some(INVALID_IDENTIFIED_BY.to_string()),
         Text::Written(text) => {
-            if problems.get(&at).is_some_and(|p| p.contains_key(&id_at)) {
+            let other_problem = problems
+                .get(&at)
+                .and_then(|p| p.get(&id_at))
+                .is_some_and(|texts| texts.iter().any(|text| text != KEYED_ID_PROBLEM));
+            if other_problem {
                 Some(INVALID_IDENTIFIED_BY.to_string())
             } else {
                 Some(read_id(text).map_or(INVALID_IDENTIFIED_BY.to_string(), |r| r.1))
@@ -1169,6 +1179,15 @@ mod tests {
         let (_, r) = reading(json!({"art": {"from": "arts"}, "p": {"from": "art.pulls"}}));
         assert_eq!(r.infos["p"].relation, Relation::Child("art".into()));
         assert_eq!(r.lowered("p").unwrap().from_text, "art.pulls");
+    }
+
+    #[test]
+    fn a_path_through_a_part_of_a_dollar_subject_quotes_the_subject_name() {
+        let (_, r) = reading(json!({
+            "$x": {"from": "things", "has": {"pa": "meta"}},
+            "kid": {"from": "\"$x\".pa.items"}
+        }));
+        assert_eq!(r.lowered("kid").unwrap().from_text, "\"$x\".pa.items");
     }
 
     #[test]
@@ -1380,6 +1399,75 @@ mod tests {
         assert_eq!(
             texts(&r, "b", "subjects.b.identified_by"),
             ["not allowed on a subject that narrows another"]
+        );
+    }
+
+    #[test]
+    fn identified_by_on_a_subject_listed_by_named_by_each_of_is_written_wrong() {
+        for from in [
+            "suites named by each of $params.names",
+            "artifact.suites named by each of $params.names",
+            "top[$params.g].suites named by each of $params.names",
+            "suites named by each of $params.names whose id exists",
+            "top named by $params.g named by each of $params.names",
+        ] {
+            let (_, r) = reading(json!({"s": {"from": from, "identified_by": "id"}}));
+            assert_eq!(
+                texts(&r, "s", "subjects.s.identified_by"),
+                [KEYED_ID_PROBLEM],
+                "{from}"
+            );
+            assert_eq!(r.infos["s"].entry["identified_by"], json!("id"), "{from}");
+        }
+    }
+
+    #[test]
+    fn identified_by_on_a_child_listed_by_named_by_each_of_is_written_wrong() {
+        for from in [
+            "art.suites named by each of $params.names",
+            "art.suites named by each of $params.names whose id exists and id is 1",
+        ] {
+            let (_, r) = reading(
+                json!({"art": {"from": "arts"}, "c": {"from": from, "identified_by": "id"}}),
+            );
+            assert_eq!(
+                texts(&r, "c", "subjects.c.identified_by"),
+                [KEYED_ID_PROBLEM],
+                "{from}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_keyed_id_problem_sorts_with_a_problem_of_the_path() {
+        let (_, r) = reading(
+            json!({"s": {"from": "suites named by each of $params.names", "identified_by": "id is"}}),
+        );
+        assert_eq!(
+            texts(&r, "s", "subjects.s.identified_by"),
+            [
+                "identified_by is a path, like \"id\" or \"build.number\"".to_string(),
+                KEYED_ID_PROBLEM.to_string()
+            ]
+        );
+    }
+
+    #[test]
+    fn identified_by_is_allowed_with_named_by_and_under_a_keyed_parent() {
+        let (_, r) = reading(json!({
+            "a": {"from": "suites named by $params.g", "identified_by": "id"},
+            "k": {"from": "suites named by each of $params.names"},
+            "c": {"from": "k.runs", "identified_by": "id"}
+        }));
+        assert!(
+            !r.infos["a"]
+                .problems
+                .contains_key("subjects.a.identified_by")
+        );
+        assert!(
+            !r.infos["c"]
+                .problems
+                .contains_key("subjects.c.identified_by")
         );
     }
 

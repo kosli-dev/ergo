@@ -7469,6 +7469,172 @@
     ]
   },
   {
+    "description": "a subject listed by named by each of whose identified_by is null",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "suite": {
+          "from": "suites named by each of $params.names",
+          "identified_by": null
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "suite",
+          "checks": {
+            "c": "aid exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "names": [
+        "unit"
+      ]
+    },
+    "cases": [
+      {
+        "description": "is written wrong with both problems",
+        "rules": [
+          "subjects.keyed.id",
+          "written_wrong.row"
+        ],
+        "input": {
+          "suites": {
+            "unit": {
+              "aid": "att-u",
+              "items": [
+                {
+                  "id": 1,
+                  "ok": true
+                }
+              ]
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.suite.identified_by",
+                "value": [
+                  "not a string",
+                  "not allowed with named by each of: the key is the id"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "suite"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject listed by named by each of whose identified_by is a list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "suite": {
+          "from": "suites named by each of $params.names",
+          "identified_by": [
+            "aid"
+          ]
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "suite",
+          "checks": {
+            "c": "aid exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "names": [
+        "unit"
+      ]
+    },
+    "cases": [
+      {
+        "description": "is written wrong with both problems",
+        "rules": [
+          "subjects.keyed.id",
+          "written_wrong.row"
+        ],
+        "input": {
+          "suites": {
+            "unit": {
+              "aid": "att-u",
+              "items": [
+                {
+                  "id": 1,
+                  "ok": true
+                }
+              ]
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.suite.identified_by",
+                "value": [
+                  "not a string",
+                  "not allowed with named by each of: the key is the id"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "suite"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a subject's own name in its own from",
     "policy": {
       "ergo_spec": "v0.3-dev",
