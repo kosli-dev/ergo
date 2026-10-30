@@ -4590,38 +4590,58 @@ _usable_sides(check, l, r) if {
 _within_usable(check, l, r) if {
 	_numbers(l, r)
 	is_number(check.within)
-	_within_spread([l, r, check.within]) <= 4096
+	_within_spread([json.marshal(l), json.marshal(r), json.marshal(check.within)]) <= 4096
 }
 
 _within_gap(l, r, w) if {
-	scale := _decimal_scale([l, r, w])
-	gap := abs(round(l * scale) - round(r * scale))
+	texts := [json.marshal(l), json.marshal(r), json.marshal(w)]
+	_within_spread(texts) <= 4096
+	_within_texts(texts)
+}
+
+_within_texts(texts) := _at_most(gap, round(to_number(texts[2]) * scale)) if {
+	scale := _text_scale(texts)
+	gap := abs(round(to_number(texts[0]) * scale) - round(to_number(texts[1]) * scale))
 	gap < 1e15
-	gap <= round(w * scale)
+} else := _within_exact(texts)
+
+_at_most(a, b) := a <= b
+
+_text_scale(texts) := scale if {
+	every t in texts {
+		count(_decimal_parts(t).digits) + _decimal_parts(t).exponent <= 15
+	}
+	places := max([_text_places(t) | some t in texts])
+	places <= 15
+	scale := product([10 | some i in numbers.range(1, 15); i <= places])
+	every t in texts {
+		round(abs(to_number(t)) * scale) < 1e15
+	}
 }
 
-_within_gap(l, r, w) if {
-	_within_spread([l, r, w]) <= 4096
-	_within_exact(l, r, w)
+_text_places(text) := max([0, count(trim_right(digits, "0")) - point]) if {
+	m := _number_match(text)
+	digits := concat("", [m[1], m[2]])
+	point := count(m[1]) + _exponent(m[3])
 }
 
-_within_spread(nums) := max(exponents) - min(exponents) if exponents := [_decimal_parts(n).exponent | some n in nums]
+_within_spread(texts) := max(exponents) - min(exponents) if exponents := [_decimal_parts(t).exponent | some t in texts]
 
-_decimal_parts(n) := {"negative": false, "digits": "0", "exponent": 0} if trim_left(_number_digits(n), "0") == ""
+_decimal_parts(text) := {"negative": false, "digits": "0", "exponent": 0} if trim_left(_number_digits(text), "0") == ""
 
-_decimal_parts(n) := {"negative": startswith(json.marshal(n), "-"), "digits": trimmed, "exponent": ((_exponent(m[3]) - count(m[2])) + count(stripped)) - count(trimmed)} if {
-	m := _number_match(n)
-	stripped := trim_left(_number_digits(n), "0")
+_decimal_parts(text) := {"negative": startswith(text, "-"), "digits": trimmed, "exponent": ((_exponent(m[3]) - count(m[2])) + count(stripped)) - count(trimmed)} if {
+	m := _number_match(text)
+	stripped := trim_left(_number_digits(text), "0")
 	stripped != ""
 	trimmed := trim_right(stripped, "0")
 }
 
-_number_match(n) := regex.find_all_string_submatch_n(`^-?([0-9]+)(?:\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?$`, json.marshal(n), 1)[0]
+_number_match(text) := regex.find_all_string_submatch_n(`^-?([0-9]+)(?:\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?$`, text, 1)[0]
 
-_number_digits(n) := concat("", [m[1], m[2]]) if m := _number_match(n)
+_number_digits(text) := concat("", [m[1], m[2]]) if m := _number_match(text)
 
-_within_exact(l, r, w) if {
-	parts := [_decimal_parts(l), _decimal_parts(r), _decimal_parts(w)]
+_within_exact(texts) if {
+	parts := [_decimal_parts(t) | some t in texts]
 	low := min([p.exponent | some p in parts])
 	mags := [concat("", [p.digits, _zeros(p.exponent - low)]) | some p in parts]
 	width := 7 * ceil((max([count(m) | some m in mags]) + 1) / 7)
