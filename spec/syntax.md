@@ -259,7 +259,7 @@ peer_approved:
   assert: approver.username does not equal pr.author
 ```
 
-Items nest left to right, so a later one can use an earlier alias, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives.
+Items nest left to right, so a later one can use an earlier alias, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives. A problem with the `for` line, its `whose` included, is listed under the check with `for: ` in front, like `for: doesn't parse` or `for: values of mixed types`.
 
 **[sentence.for.scope]** In `assert` and in a later item, a bare first key is the subject's field and an item is reached by its alias. Inside an item's own `whose`, a bare key is that item's field. So in `for: some approvals whose role is "qa" as approval` with `assert: approval.approved_at is before started_at`, `role` is the approval's and `started_at` the subject's.
 

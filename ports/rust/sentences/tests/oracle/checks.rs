@@ -5549,6 +5549,12 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every xs whose v is one of 1, 'a' as x",
+        "every xs whose v is one of 1, \"a\" as x",
+        &[],
+        &[],
+    ),
     ("\tevery xs as x\n", "every xs as x", &[], &[]),
     ("  every items as i", "every items as i", &[], &[]),
     ("every  items  as  i", "every items as i", &[], &[]),

@@ -2442,5 +2442,21 @@
         "expressions": {"s": {"c": "x is one of 1.0, 'a'", "f": "for every xs as x: x.n is one of 'a', 1.0", "g": "x exists and x is one of 1.0, 'a'", "h": "x is one of 1, 'a' and x is", "q": "one of: o(x is one of 1.0, 'a')", "r": "one of: o(x exists and x is one of 1.0, 'a') | p(x exists)"}}
       }
     ]
+  },
+  {
+    "description": "a for line with values of mixed types in its whose",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"i": {"for": "every xs whose v is one of 1, 'a' as x", "assert": "x exists"}}}}},
+    "cases": [
+      {
+        "description": "is printed as written and named by its check, with for: in front of the problem",
+        "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.for.line"],
+        "input": {"things": [{"id": "t1", "xs": [{"v": 1}]}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.i", "value": ["for: values of mixed types"], "locations": []}]}
+        ],
+        "status": {"s": "not_met"},
+        "expressions": {"s": {"i": "for every xs whose v is one of 1, 'a' as x: x exists"}}
+      }
+    ]
   }
 ]
