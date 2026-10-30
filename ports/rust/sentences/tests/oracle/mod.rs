@@ -3,6 +3,8 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("\"$x\".pa.items", "\"$x\".pa.items"),
+    ("meta", "meta"),
     ("\"$x\".items", "\"$x\".items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
     (
@@ -2492,6 +2494,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("meta", "meta"),
     ("n", "n"),
     ("\tid\n", "id"),
     ("\nmid\t", "mid"),

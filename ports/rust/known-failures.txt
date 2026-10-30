@@ -1,0 +1,1 @@
+requirements / a subject name with a $ is quoted through a part and with a null definition / a child read through a part of a $ subject, and a $ subject defined as null, quote the name
