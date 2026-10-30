@@ -481,6 +481,8 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 
 A name on the right that's a `for` alias reads the alias ([sentence.for.scope](#the-for-line)), so with `for: every zones as type`, `every conditions.type equals type` compares each condition's `type` with the zone, and isn't written wrong. `every conditions.type equals .type` is.
 
+The sentence lists this problem when it has no other, or when its other problems are all `unknown name $<word>`, like `x is x and y is $foo`. With any other problem, this one is left out.
+
 Most often the writer meant the subject's field. In a `whose` and after `every` or `some` it can't be reached, so the message says where to compare it:
 
 | sentence                                                   | `$well_formed` says                                                                                                                                                    |

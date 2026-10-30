@@ -4087,6 +4087,17 @@ test_a_bare_params_or_input_after_named_by_or_in_brackets_does_not_parse_even_wi
 	}
 }
 
+test_a_bare_params_after_named_by_does_not_hide_a_within_with_no_number_or_two_quantifiers if {
+	_sentence_problems(`x named by $params is 1 within`) == [`"within" needs a number after it`]
+	_sentence_problems(`every a every b named by $params exists`) == ["two quantifiers in one sentence: put them on a for line"]
+}
+
+test_a_comparison_of_a_path_with_itself_is_listed_next_to_an_unknown_name_and_next_to_no_other_problem if {
+	_sentence_problems(`x is x and y is $foo`) == ["unknown name $foo", "x is compared with itself"]
+	_sentence_problems(`$foo is $foo`) == ["$foo is compared with itself", "unknown name $foo"]
+	_sentence_problems(`x is x and x is not null and y is $foo`) == [`"is not null" is written "exists"`, "unknown name $foo"]
+}
+
 test_a_path_compared_with_itself_is_written_wrong_because_it_could_only_pass_or_only_fail if {
 	every text in [
 		`x equals x`, `x does not equal x`, `x is x within 1`, `x is at least x`, `x is less than x`,

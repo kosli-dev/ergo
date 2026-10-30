@@ -7556,5 +7556,216 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a check sentence that compares a path with itself and has an unknown name",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is x and y is $foo"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the unknown name and the comparison with itself",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "unknown name $foo",
+                  "x is compared with itself"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check sentence with a bare $params after named by and a within with no number",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x named by $params is 1 within"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says the within has no number, as it does without the $params",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "\"within\" needs a number after it"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check sentence with two quantifiers and a bare $params after named by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "every a every b named by $params exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says to put the quantifiers on a for line",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "two quantifiers in one sentence: put them on a for line"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

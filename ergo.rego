@@ -5692,12 +5692,12 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 } else := sort(problems) if {
 	problems := _s_sentence_problems(_s_parsed_anyway(text, pat)) | _s_text_names(text)
 	count(problems) > 0
-} else := ["doesn't parse"] if {
-	regex.match(`(?: named +by +|\[)\$(?:params|input)(?:[^.A-Za-z0-9_]|$)`, text)
 } else := ["two quantifiers in one sentence: put them on a for line"] if {
 	regex.match(`^(?:every|some) +\S+ +(?:every|some) `, text)
 } else := [`"within" needs a number after it`] if {
 	regex.match(` within$`, text)
+} else := ["doesn't parse"] if {
+	regex.match(`(?: named +by +|\[)\$(?:params|input)(?:[^.A-Za-z0-9_]|$)`, text)
 } else := [concat("", ["nothing after the path at column ", _json_text(count(text) + 1), `: expected a phrase, like "is" or "exists"`])] if {
 	regex.match(pat.quantified_path, text)
 } else := ["doesn't parse"]
@@ -6060,8 +6060,9 @@ _p_descend(subjects, lines) := {name: lines[name].path.steps[0] | some name, _ i
 _p_parts(subjects) := {"own": own, "effective": {name: _p_merged(name, own, narrow) | some name, _ in subjects}, "problems": _p_problems(subjects, own, narrow, descend), "lines": lines, "narrow": narrow, "descend": descend} if {
 	is_object(subjects)
 	lines := _p_lines(subjects)
-	narrow := _p_narrow(subjects, lines)
-	descend := _p_descend(subjects, lines)
+	read := {name: object.get(line, "parsed", line) | some name, line in lines}
+	narrow := _p_narrow(subjects, read)
+	descend := _p_descend(subjects, read)
 	own := _p_own_reads(subjects)
 }
 
@@ -6797,6 +6798,15 @@ _s_line_self(line, names) := _s_self_problems([_s_aliased(a, names) | some a in 
 	is_string(line)
 	parsed := _sentence(line)
 	"assertions" in object.keys(parsed)
+} else := _s_self_problems([_s_aliased(a, names) | some a in anyway.assertions]) if {
+	is_string(line)
+	parsed := _sentence(line)
+	count(parsed.problems) > 0
+	every p in parsed.problems {
+		startswith(p, "unknown name ")
+	}
+	anyway := _s_parsed_anyway(trim_space(line), _s_patterns)
+	"assertions" in object.keys(anyway)
 } else := set()
 
 _s_model_of([a]) := _s_model(a)
