@@ -26,4 +26,24 @@ for(line) := {"kind": "ok", "printed": ergo._s_for_line_text({"items": plain}), 
 	aliased := ergo._s_marked_items(p, {"pr", "x"})
 }
 
-out := {"checks": {l: check(l) | some l in input.checks}, "fors": {l: for(l) | some l in input.fors}}
+from(line) := {"kind": "rejected", "problems": fl.problems} if {
+	fl := ergo._from_line(line)
+	"problems" in object.keys(fl)
+}
+
+from(line) := {"kind": "ok", "printed": ergo._s_from_line_text(fl)} if {
+	fl := ergo._from_line(line)
+	not "problems" in object.keys(fl)
+}
+
+path(line) := {"kind": "ok", "printed": ergo._s_path_text(fl.path, "left")} if {
+	fl := ergo._from_line(line)
+	object.keys(fl) == {"path"}
+} else := {"kind": "rejected"}
+
+out := {
+	"checks": {l: check(l) | some l in input.checks},
+	"fors": {l: for(l) | some l in input.fors},
+	"froms": {l: from(l) | some l in input.froms},
+	"paths": {l: path(l) | some l in input.paths},
+}

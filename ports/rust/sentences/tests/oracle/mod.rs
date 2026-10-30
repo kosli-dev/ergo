@@ -12,6 +12,15 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact.x named by each of $params.k",
     ),
     ("k.items", "k.items"),
+    ("artifact named by $params.k", "artifact named by $params.k"),
+    (
+        "artifact.scans named by each of $params.k",
+        "artifact.scans named by each of $params.k",
+    ),
+    (
+        "artifact.pulls whose state is \"open\"",
+        "artifact.pulls whose state is \"open\"",
+    ),
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),

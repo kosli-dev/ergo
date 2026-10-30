@@ -4705,7 +4705,15 @@ _cond_flaw(c) := "unusable" if {
 	_unreadable_ref(c)
 } else := ""
 
-_tally_mark(true, e) := {"absent"} if e.v == _absent
+_tally_mark(true, e) := {"not_an_object"} if {
+	e.v == _absent
+	not is_object(e.iv)
+}
+
+_tally_mark(true, e) := {"absent"} if {
+	e.v == _absent
+	is_object(e.iv)
+}
 
 _tally_mark(true, e) := {_read_state(e.iv, e.r)} if e.v == _unusable_mark
 
@@ -7889,21 +7897,32 @@ _for_judge_inner(check, subj, names, item, e, w) := {"passed": res.passed, "kept
 	res := _for_inner_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept)
 }
 
-_for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e.v), "kept": kept} if {
+_for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e), "kept": kept} if {
 	causes := [_row_cause(c, e.iv, "") | some c in item.whose] with input as {"ergo/names": names}
 	undecided := [c | some c in causes; not c in {"satisfied", "value"}]
 	kept := count([c | some c in causes; c == "value"]) == 0
 }
 
-_for_undecided(undecided, true, v) := array.concat(undecided, _for_mark_cause(v))
+_for_undecided(undecided, true, e) := array.concat(undecided, _for_mark_cause(e))
 
 _for_undecided(undecided, false, _) := undecided
 
-_for_mark_cause(v) := ["absent"] if v == _absent
+_for_mark_cause(e) := ["not_an_object"] if {
+	_walk_marked(e.v)
+	not is_object(e.iv)
+}
 
-_for_mark_cause(v) := ["unusable"] if v == _unusable_mark
+_for_mark_cause(e) := ["absent"] if {
+	e.v == _absent
+	is_object(e.iv)
+}
 
-_for_mark_cause(v) := [] if not _walk_marked(v)
+_for_mark_cause(e) := ["unusable"] if {
+	e.v == _unusable_mark
+	is_object(e.iv)
+}
+
+_for_mark_cause(e) := [] if not _walk_marked(e.v)
 
 _for_outer_next(_, _, _, undecided, _, _) := {"passed": false, "cause": undecided[0], "lines": []} if undecided != []
 

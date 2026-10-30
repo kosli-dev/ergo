@@ -1,8 +1,3 @@
-requirements / min_subjects -1 / is written wrong with not a whole number from 0 to 1000000
-requirements / min_subjects 1.5 / is written wrong with not a whole number from 0 to 1000000
-requirements / min_subjects 1000001 / is written wrong with not a whole number from 0 to 1000000
-requirements / min_subjects 1e308 / is written wrong with not a whole number from 0 to 1000000
-requirements / min_subjects 9007199254740993 / is written wrong with not a whole number from 0 to 1000000
 subjects / a child subject of a from line with a path and named by each of / reads each key inside the path of its parent
 subjects / a child subject of a from line with a path and named by each of, with a parent that isn't an object / still fails min_subjects as absent when the parent is an object without the path
 subjects / a child subject of a from line with named by each of, counted per parent / counts the keys of each parent on its own $min_subjects and $unique_ids rows, with its in

@@ -505,11 +505,13 @@ impl For {
                     shown: end.clone(),
                     location: w.end_location.clone(),
                 }),
-                None => dead.push(dead_item(if w.miss == Cause::Absent {
-                    Cause::Absent
-                } else {
-                    Cause::Unusable
-                })),
+                None => dead.push(dead_item(
+                    if matches!(w.miss, Cause::Absent | Cause::NotAnObject) {
+                        w.miss
+                    } else {
+                        Cause::Unusable
+                    },
+                )),
             }
         }
         if depth > 0 {
@@ -1371,11 +1373,25 @@ mod tests {
     }
 
     #[test]
-    fn an_item_whose_path_goes_on_into_a_value_that_is_not_an_object_fails_as_unusable_not_as_not_an_object()
-     {
-        let subject = json!({"xs": ["s", {"t": "a"}]});
+    fn an_item_whose_path_goes_on_into_a_value_that_is_not_an_object_fails_as_not_an_object() {
+        for item in [json!("s"), json!(null), json!(3)] {
+            let subject = json!({"xs": [item, {"t": "a"}]});
+            assert_eq!(
+                cause("every xs.t as t", json!("t is \"a\""), subject.clone()),
+                "not_an_object"
+            );
+            assert_eq!(
+                cause("some xs.t as t", json!("t is \"b\""), subject),
+                "not_an_object"
+            );
+        }
+    }
+
+    #[test]
+    fn an_object_item_whose_path_goes_on_into_a_text_still_fails_as_unusable() {
+        let subject = json!({"xs": [{"meta": "text"}]});
         assert_eq!(
-            cause("every xs.t as t", json!("t is \"a\""), subject),
+            cause("every xs.meta.k as k", json!("k is 1"), subject),
             "unusable"
         );
     }
