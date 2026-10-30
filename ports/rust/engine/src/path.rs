@@ -195,16 +195,26 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
     }
 }
 
+pub static ABSENT: Value = Value::Null;
+
+fn found_or_absent<'a>(at: &Located<'a>) -> Result<(&'a Value, Location, bool), Read<'a>> {
+    if std::ptr::eq(at.value, &ABSENT) {
+        Err(ended(Outcome::Absent, at.location.clone()))
+    } else {
+        Ok((at.value, at.location.clone(), true))
+    }
+}
+
 pub fn start_of<'a>(start: &Start, ctx: &Ctx<'a>) -> Result<(&'a Value, Location, bool), Read<'a>> {
     match start {
-        Start::Subject => Ok((ctx.subject.value, ctx.subject.location.clone(), true)),
+        Start::Subject => found_or_absent(&ctx.subject),
         Start::Input => Ok((ctx.input, Location::input_root(), false)),
         Start::Params => match ctx.params {
             Some(params) => Ok((params, Location::params_root(), false)),
             None => Err(ended(Outcome::Absent, Location::params_root())),
         },
         Start::Alias(name) => match ctx.aliases.get(name) {
-            Some(found) => Ok((found.value, found.location.clone(), true)),
+            Some(found) => found_or_absent(found),
             None => Err(Read {
                 outcome: Outcome::Absent,
                 value: None,

@@ -3,6 +3,10 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    (
+        "$input named by each of $params.k",
+        "$input named by each of $params.k",
+    ),
     ("$input whose x is 1", "$input whose x is 1"),
     ("$input.commits", "$input.commits"),
     ("$input[5]", "item 6 of $input"),
@@ -76,6 +80,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("artifact[0].pulls", "artifact[0].pulls"),
     ("p whose x is 1", "p whose x is 1"),
     ("p.commits", "p.commits"),
+    (
+        "p[0] named by each of $params.k",
+        "item 1 of p named by each of $params.k",
+    ),
     ("suite.items", "suite.items"),
     (
         "suites named by $params.group",
@@ -853,6 +861,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("t.kids", "t.kids"),
     ("teams", "teams"),
     ("things", "things"),
+    (
+        "things named by each of $params.k",
+        "things named by each of $params.k",
+    ),
     (
         "things whose build.fingerprint exists",
         "things whose build.fingerprint exists",
