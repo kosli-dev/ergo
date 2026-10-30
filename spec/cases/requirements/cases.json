@@ -1894,6 +1894,110 @@
     ]
   },
   {
+    "description": "a policy for the version 0.3-dev that came before 0.3",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "subject": {
+          "from": "t",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        },
+        "t": {
+          "subject": "subject",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails the $well_formed row of every requirement, because -dev is a version of its own",
+        "rules": ["policy.version"],
+        "input": {
+          "t": [
+            {
+              "id": 1,
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "ergo": "v0.3"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "unsupported version v0.3-dev, expected v0.3"
+                ],
+                "locations": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "policy ergo_spec",
+                "value": [
+                  "unsupported version v0.3-dev, expected v0.3"
+                ],
+                "locations": []
+              }
+            ],
+            "passed": false,
+            "requirement": "t",
+            "subject": {
+              "id": null,
+              "type": "subject"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a policy whose ergo_spec has a suffix other than -dev",
     "policy": {
       "ergo_spec": "v0.2-beta",
