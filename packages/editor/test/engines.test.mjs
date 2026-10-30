@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { DEFAULT_ENGINE, ENGINES, ENGINE_LABELS, engineNote, makeRustRunner, readEngine } from "../src/engines.mjs";
 
 test("the two engines are labelled by the file they run", () => {
-  assert.deepEqual(ENGINES.map((e) => ENGINE_LABELS[e]), ["ergo.rego (OPA Wasm)", "ergo-engine (Rust Wasm)"]);
+  assert.deepEqual(ENGINES.map((e) => ENGINE_LABELS[e]), ["ergo.rego", "Rust port (experimental)"]);
   assert.deepEqual(Object.keys(ENGINE_LABELS).sort(), [...ENGINES].sort());
 });
 

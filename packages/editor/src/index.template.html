@@ -212,9 +212,12 @@ textarea:focus { outline:none; }
 .edited.unsaved { color:var(--bad); }
 .diags .undo { align-self:flex-start; margin:.35rem .75rem; }
 .run pre { margin:0; font-family:var(--mono); font-size:.72rem; overflow:auto; max-height:24rem; }
+.notice { flex:none; padding:.45rem 1.1rem; font-size:.78rem; background:var(--other-wash); color:var(--ink);
+  border-bottom:1px solid var(--hairline); }
 </style>
 </head>
 <body>
+<p class="notice" id="notice" role="note"><b>Experimental.</b> This editor, the Markdown format and the Rust engine may change or go away. The Rust engine can give a different report from ergo.rego.</p>
 <div class="bar">
   <div class="brand"><h1>Ergo policy editor</h1><span>write a policy as a document</span></div>
   <div class="samples" role="group" aria-label="Sample policy" id="samples">

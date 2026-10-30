@@ -2,7 +2,7 @@
 export const ENGINES = ["opa", "rust"];
 
 /** The name each engine shows. */
-export const ENGINE_LABELS = { opa: "ergo.rego (OPA Wasm)", rust: "ergo-engine (Rust Wasm)" };
+export const ENGINE_LABELS = { opa: "ergo.rego", rust: "Rust port (experimental)" };
 
 /** The engine used when nothing else was chosen. */
 export const DEFAULT_ENGINE = "opa";
