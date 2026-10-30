@@ -214,6 +214,15 @@
         "results": [
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "failed_items": [], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
+      },
+      {
+        "description": "names an input that isn't a list $input when it breaks the walk",
+        "rules": ["subjects.every.broken"],
+        "input": {"x": 1},
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input", "item": "$input", "cause": "unusable", "value": {"x": 1}, "locations": [""]}], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
+        ]
       }
     ]
   },

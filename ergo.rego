@@ -1595,7 +1595,7 @@ _path_name([]) := "it"
 
 _path_name(path) := _visible_path_name(_visible(path), "it") if path != []
 
-_input_path_name([]) := "it"
+_input_path_name([]) := "$input"
 
 _input_path_name(path) := _visible_path_name(_visible(path), "$input") if path != []
 
