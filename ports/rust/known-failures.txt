@@ -6,18 +6,6 @@ parts / a count of or sum of a parent's part on the right side of a whose, alone
 parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with too many items fails
 parts / a part's alias in an elapsed time on the right side of a whose / reads the part when it's there, and not the item's lack of the field
 parts / a part's alias in an elapsed time on the right side of a whose / reads the part when the part is missing, and not the item's own field of the same name
-requirements / a child subject of the whole input when it is a list / reads each item, and an item that isn't an object fails not_an_object
-requirements / a position on the whole input when it is a list / names the position from $input in the expression
-requirements / a subject that narrows the whole input when it is a list / keeps the items that pass its condition
-requirements / a walk that starts at an input that is a list / names a list that breaks from $input
-requirements / a walk that starts at an input that is a list, without $input / names a list that breaks from $input
-requirements / the whole input as a list, from every / names a null input $input when it breaks the walk
-requirements / the whole input as a list, from every / names a string input $input when it breaks the walk
-requirements / the whole input as a list, from every / names an input that isn't a list $input when it breaks the walk
-requirements / the whole input as a list, with a condition / keeps the items that pass the condition
-requirements / the whole input as the subject / fails min_subjects as value on an empty list
-requirements / the whole input as the subject / makes a subject of an item that isn't an object, and its check fails as not_an_object
-requirements / the whole input as the subject / makes each item a subject, in list order, with itself as its id
 subjects / a child subject whose from is every, with an identified_by / gives one problem, under from, and none under identified_by
 subjects / a subject that narrows a subject that narrows another with every / has the id of the subject at the top of its chain, not mid's own
 subjects / a subject with applies_to or of / is <invalid from> with applies_to, because the field said how the subject was found
