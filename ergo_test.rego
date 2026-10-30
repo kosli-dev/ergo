@@ -5023,6 +5023,35 @@ test_a_count_whose_named_by_cant_be_read_fails_with_its_cause if {
 	_tally_rows("count of m named by $params.k is 2", [{"id": 1, "m": {"a": [1, 2]}}], {}) == [[1, "absent", [{"name": "count of m named by $params.k", "value": null, "locations": []}, {"name": "m named by $params.k", "value": [], "locations": []}]]]
 }
 
+_sum_whose_cause(check, items) := [row[1] | some row in _tally_rows(check, [{"id": "t", "items": items}], {})]
+
+test_a_sum_fails_with_the_cause_of_an_item_whose_cant_decide_and_does_not_read_its_field if {
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab", "k": null}]) == ["null"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab"}]) == ["absent"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab", "k": 5}]) == ["unusable"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": 1, "k": null}]) == ["null"]
+	_sum_whose_cause(`sum of items.x.y whose k is "a" is 1`, [{"x": "ab", "k": null}]) == ["null"]
+	_sum_whose_cause(`sum of items.x.y whose k is "a" is 1`, [{"x": {"y": "ab"}, "k": null}]) == ["null"]
+}
+
+test_a_sum_whose_undecided_item_comes_before_the_bad_field_of_a_kept_item_in_the_order_of_causes if {
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab"}, {"x": null, "k": "a"}]) == ["absent"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": "ab", "k": null}, {"x": "ab", "k": "a"}]) == ["unusable"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": 1, "k": null}, {"x": null, "k": "a"}]) == ["null"]
+}
+
+test_a_sum_whose_kept_items_are_all_fine_is_still_added if {
+	_sum_whose_cause(`sum of items.x whose k is "a" is 3`, [{"x": 1, "k": "a"}, {"x": "ab", "k": "b"}, {"x": 2, "k": "a"}]) == ["satisfied"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 4`, [{"x": 1, "k": "a"}, {"x": "ab", "k": "b"}, {"x": 2, "k": "a"}]) == ["value"]
+	_sum_whose_cause(`sum of items.x whose k is "a" is 3`, [{"x": 3, "k": "a"}, {"x": "ab", "k": "b"}]) == ["satisfied"]
+}
+
+test_a_count_whose_undecided_item_fails_with_its_cause if {
+	_sum_whose_cause(`count of items whose k is "a" is 1`, [{"x": "ab", "k": null}]) == ["null"]
+	_sum_whose_cause(`count of items.x whose k is "a" is 1`, [{"x": "ab"}]) == ["absent"]
+	_sum_whose_cause(`count of items.x whose k is "a" is 1`, [{"x": null, "k": null}, {"x": 1, "k": "a"}]) == ["null"]
+}
+
 test_a_count_fails_on_a_value_it_cant_read_unless_whose_left_its_item_out if {
 	[row[1] | some row in _tally_rows("count of xs.t is 1", [{"id": 1, "xs": ["s"]}], {})] == ["not_an_object"]
 	[row[1] | some row in _tally_rows("count of xs.t whose k is 1 is 1", [{"id": 1, "xs": [{"k": 1, "t": 0}, {"k": 2}]}], {})] == ["satisfied"]

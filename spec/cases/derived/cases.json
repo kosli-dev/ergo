@@ -16148,5 +16148,653 @@
         ]
       }
     ]
+  },
+  {
+    "description": "sum of a field with whose, over items it cannot decide",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "sum of items.x whose k is \"a\" is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null, without reading the field, when an item has a null k",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab",
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent, without reading the field, when an item has no k",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.absent"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab"
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when k is a number where the condition compares text",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "compare.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab",
+                  "k": 5
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the item whose condition cannot be decided has a number to add",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": 1,
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails with the cause of the item whose condition cannot be decided, before the bad field of a kept item",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.absent"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab"
+                },
+                {
+                  "x": null,
+                  "k": "a"
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab",
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "adds the kept items and leaves out the others, bad fields included",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": 1,
+                  "k": "a"
+                },
+                {
+                  "x": "ab",
+                  "k": "b"
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  1,
+                  "ab"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a path that goes on, with whose, over items it cannot decide",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "sum of items.x.y whose k is \"a\" is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null, without reading the path, when an item has a null k",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab",
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x.y whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x.y",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the path would have read a number",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": {
+                    "y": 1
+                  },
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x/y"
+                ],
+                "name": "sum of items.x.y whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x/y"
+                ],
+                "name": "items[].x.y",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a path with whose, over items it cannot decide",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "count of items.x whose k is \"a\" is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null when an item has a null k",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab",
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "count of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when an item has no k",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.absent"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab"
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "count of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
