@@ -1127,6 +1127,15 @@ mod tests {
     }
 
     #[test]
+    fn a_path_through_a_part_of_a_dollar_subject_quotes_the_subject_name() {
+        let (_, r) = reading(json!({
+            "$x": {"from": "things", "has": {"pa": "meta"}},
+            "kid": {"from": "\"$x\".pa.items"}
+        }));
+        assert_eq!(r.lowered("kid").unwrap().from_text, "\"$x\".pa.items");
+    }
+
+    #[test]
     fn a_subject_name_and_nothing_more_narrows_that_subject() {
         let (_, r) = reading(
             json!({"art": {"from": "arts", "identified_by": "id"}, "b": {"from": "art whose x exists"}}),

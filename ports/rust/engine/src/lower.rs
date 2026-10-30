@@ -306,7 +306,11 @@ impl Scope {
                     if let Some(Step::Key(next)) = steps.first()
                         && let Some(part) = found.get(next)
                     {
-                        let name = format!("{key}.{next}");
+                        let name = format!(
+                            "{}.{}",
+                            crate::name::key_text(key),
+                            crate::name::key_text(next)
+                        );
                         let start = part_start(&name, Start::Alias(key.to_string()), part);
                         steps.remove(0);
                         return (start, steps);
