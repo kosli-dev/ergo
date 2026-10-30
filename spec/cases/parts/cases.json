@@ -1665,6 +1665,2367 @@
     ]
   },
   {
+    "description": "a part's alias on the right side of a whose, with and without plus",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "kid": {
+          "from": "kids",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "every items.status whose lo is at least pa.w plus hi is \"ok\"",
+            "d": "every items.status whose lo is at least pa.w is \"ok\"",
+            "e": "every items.status whose lo is at least hi plus pa.w is \"ok\"",
+            "f": "some items.status whose lo is at least pa.w plus hi is \"ok\"",
+            "g": {
+              "for": "every items whose lo is at least pa.w plus hi as i",
+              "assert": "i.status is \"ok\""
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the part when the part is missing, and not the item's own field of the same name",
+        "rules": [
+          "parts.where",
+          "sentence.path.part",
+          "sentence.derived.plus",
+          "sentence.argument.item"
+        ],
+        "input": {
+          "kids": [
+            {
+              "id": "K",
+              "meta": {},
+              "items": [
+                {
+                  "lo": 5,
+                  "hi": 1,
+                  "status": "ok",
+                  "pa": {
+                    "w": 1
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta"
+                ],
+                "name": "pa.w",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "d",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta"
+                ],
+                "name": "pa.w",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "e",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta"
+                ],
+                "name": "pa.w",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "f",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta"
+                ],
+                "name": "pa.w",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "g",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0"
+                ],
+                "path": "item 1 of items",
+                "value": {
+                  "hi": 1,
+                  "lo": 5,
+                  "pa": {
+                    "w": 1
+                  },
+                  "status": "ok"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "hi": 1,
+                    "lo": 5,
+                    "pa": {
+                      "w": 1
+                    },
+                    "status": "ok"
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the part when it's there, and not the item's lack of the field",
+        "rules": [
+          "parts.where",
+          "sentence.path.part",
+          "sentence.derived.plus",
+          "sentence.argument.item"
+        ],
+        "input": {
+          "kids": [
+            {
+              "id": "K",
+              "meta": {
+                "w": 1
+              },
+              "items": [
+                {
+                  "lo": 5,
+                  "hi": 1,
+                  "status": "ok"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta/w"
+                ],
+                "name": "pa.w",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta/w"
+                ],
+                "name": "pa.w",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "e",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta/w"
+                ],
+                "name": "pa.w",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "f",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta/w"
+                ],
+                "name": "pa.w",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "g",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "hi": 1,
+                    "lo": 5,
+                    "status": "ok"
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part's alias in an elapsed time on the right side of a whose",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "kid": {
+          "from": "kids",
+          "identified_by": "id",
+          "has": {
+            "pa": "meta"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "from_part": "every items.status whose lo is at least days elapsed from pa.t to hi is \"ok\"",
+            "to_part": "every items.status whose lo is at least days elapsed from early to pa.t is \"ok\"",
+            "plus_from_part": "every items.status whose lo is at least 1 plus days elapsed from pa.t to hi is \"ok\"",
+            "plus_to_part": "every items.status whose lo is at least days elapsed from early to pa.t plus 1 is \"ok\"",
+            "count": "count of items whose lo is at least days elapsed from pa.t to hi is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the part when the part is missing, and not the item's own field of the same name",
+        "rules": [
+          "parts.where",
+          "sentence.derived.elapsed",
+          "sentence.path.part"
+        ],
+        "input": {
+          "kids": [
+            {
+              "id": "K",
+              "meta": {},
+              "items": [
+                {
+                  "lo": 5,
+                  "hi": "2026-01-01",
+                  "early": "2025-12-28",
+                  "status": "ok",
+                  "pa": {
+                    "t": "2025-12-30"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0"
+                ],
+                "name": "count of items whose lo is at least days elapsed from pa.t to hi",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/kids/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "early": "2025-12-28",
+                    "hi": "2026-01-01",
+                    "lo": 5,
+                    "pa": {
+                      "t": "2025-12-30"
+                    },
+                    "status": "ok"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "from_part",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "plus_from_part",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "plus_to_part",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "to_part",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the part when it's there, and not the item's lack of the field",
+        "rules": [
+          "parts.where",
+          "sentence.derived.elapsed",
+          "sentence.path.part"
+        ],
+        "input": {
+          "kids": [
+            {
+              "id": "K",
+              "meta": {
+                "t": "2025-12-30"
+              },
+              "items": [
+                {
+                  "lo": 5,
+                  "hi": "2026-01-01",
+                  "early": "2025-12-28",
+                  "status": "ok"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0"
+                ],
+                "name": "count of items whose lo is at least days elapsed from pa.t to hi",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/kids/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "early": "2025-12-28",
+                    "hi": "2026-01-01",
+                    "lo": 5,
+                    "status": "ok"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta/t"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": "2025-12-30"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "from_part",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta/t"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": "2025-12-30"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "plus_from_part",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta/t"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": "2025-12-30"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "plus_to_part",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta/t"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": "2025-12-30"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "to_part",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              },
+              {
+                "locations": [
+                  "/kids/0/meta/t"
+                ],
+                "name": "pa.t",
+                "part": {
+                  "id": null,
+                  "name": "pa"
+                },
+                "value": "2025-12-30"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's name on the right side of a whose, with and without plus",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "fam": {
+          "from": "fams",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "fam.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "every items.status whose lo is at least fam.w plus hi is \"ok\"",
+            "d": "every items.status whose lo is at least fam.w is \"ok\"",
+            "e": "every items.status whose lo is at least hi plus fam.w is \"ok\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the parent when the parent lacks the field, and not the item's own field of the same name",
+        "rules": [
+          "parts.chain",
+          "parts.where",
+          "sentence.derived.plus"
+        ],
+        "input": {
+          "fams": [
+            {
+              "id": "F",
+              "kids": [
+                {
+                  "id": "K",
+                  "items": [
+                    {
+                      "lo": 5,
+                      "hi": 1,
+                      "status": "ok",
+                      "fam": {
+                        "w": 1
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/fams/0/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0"
+                ],
+                "name": "fam.w",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "d",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/fams/0/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0"
+                ],
+                "name": "fam.w",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "e",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/fams/0/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0"
+                ],
+                "name": "fam.w",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the parent when it has the field, and not the item's lack of it",
+        "rules": [
+          "parts.chain",
+          "parts.where",
+          "sentence.derived.plus"
+        ],
+        "input": {
+          "fams": [
+            {
+              "id": "F",
+              "kids": [
+                {
+                  "id": "K",
+                  "items": [
+                    {
+                      "lo": 5,
+                      "hi": 1,
+                      "status": "ok"
+                    }
+                  ]
+                }
+              ],
+              "w": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/w"
+                ],
+                "name": "fam.w",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/w"
+                ],
+                "name": "fam.w",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "e",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/w"
+                ],
+                "name": "fam.w",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's name in an elapsed time on the right side of a whose",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "fam": {
+          "from": "fams",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "fam.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "from_parent": "every items.status whose lo is at least days elapsed from fam.t to hi is \"ok\"",
+            "plus_to_parent": "every items.status whose lo is at least 1 plus days elapsed from early to fam.t is \"ok\"",
+            "count": "count of items whose lo is at least days elapsed from fam.t to hi is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the parent when the parent lacks the field, and not the item's own field of the same name",
+        "rules": [
+          "parts.chain",
+          "parts.where",
+          "sentence.derived.elapsed"
+        ],
+        "input": {
+          "fams": [
+            {
+              "id": "F",
+              "kids": [
+                {
+                  "id": "K",
+                  "items": [
+                    {
+                      "lo": 5,
+                      "hi": "2026-01-01",
+                      "early": "2025-12-28",
+                      "status": "ok",
+                      "fam": {
+                        "t": "2025-12-30"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0"
+                ],
+                "name": "count of items whose lo is at least days elapsed from fam.t to hi",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "early": "2025-12-28",
+                    "fam": {
+                      "t": "2025-12-30"
+                    },
+                    "hi": "2026-01-01",
+                    "lo": 5,
+                    "status": "ok"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0"
+                ],
+                "name": "fam.t",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "from_parent",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/fams/0/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0"
+                ],
+                "name": "fam.t",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "plus_to_parent",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/fams/0/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0"
+                ],
+                "name": "fam.t",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the parent when it has the field, and not the item's lack of it",
+        "rules": [
+          "parts.chain",
+          "parts.where",
+          "sentence.derived.elapsed"
+        ],
+        "input": {
+          "fams": [
+            {
+              "id": "F",
+              "kids": [
+                {
+                  "id": "K",
+                  "items": [
+                    {
+                      "lo": 5,
+                      "hi": "2026-01-01",
+                      "early": "2025-12-28",
+                      "status": "ok"
+                    }
+                  ]
+                }
+              ],
+              "t": "2025-12-30"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "count",
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0"
+                ],
+                "name": "count of items whose lo is at least days elapsed from fam.t to hi",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0"
+                ],
+                "name": "items[]",
+                "value": [
+                  {
+                    "early": "2025-12-28",
+                    "hi": "2026-01-01",
+                    "lo": 5,
+                    "status": "ok"
+                  }
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/t"
+                ],
+                "name": "fam.t",
+                "value": "2025-12-30"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "from_parent",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/t"
+                ],
+                "name": "fam.t",
+                "value": "2025-12-30"
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "plus_to_parent",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/t"
+                ],
+                "name": "fam.t",
+                "value": "2025-12-30"
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias and the input on the right side of a whose with plus",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "kid": {
+          "from": "kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "alias": {
+              "for": "every xs as x",
+              "assert": "every x.items.status whose lo is at least x.w plus hi is \"ok\""
+            },
+            "input": "every items.status whose lo is at least $input.w plus hi is \"ok\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the alias and the input, and not the item's own field of the same name",
+        "rules": [
+          "sentence.for.scope",
+          "sentence.derived.plus",
+          "sentence.path.start"
+        ],
+        "input": {
+          "kids": [
+            {
+              "id": "K",
+              "xs": [
+                {
+                  "items": [
+                    {
+                      "lo": 5,
+                      "hi": 1,
+                      "status": "ok",
+                      "x": {
+                        "w": 1
+                      },
+                      "w": 1
+                    }
+                  ]
+                }
+              ],
+              "items": [
+                {
+                  "lo": 5,
+                  "hi": 1,
+                  "status": "ok",
+                  "x": {
+                    "w": 1
+                  },
+                  "w": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "alias",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "every x.items.status whose lo is at least x.w plus hi is \"ok\"",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/kids/0/xs/0/items/0/status"
+                        ],
+                        "name": "x.items[].status",
+                        "value": [
+                          "ok"
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/kids/0/xs/0"
+                        ],
+                        "name": "x.w",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/kids/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "items": [
+                    {
+                      "hi": 1,
+                      "lo": 5,
+                      "status": "ok",
+                      "w": 1,
+                      "x": {
+                        "w": 1
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "items": [
+                      {
+                        "hi": 1,
+                        "lo": 5,
+                        "status": "ok",
+                        "w": 1,
+                        "x": {
+                          "w": 1
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "input",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of items",
+                "locations": [
+                  "/kids/0/items/0/lo"
+                ],
+                "path": "items[0].lo",
+                "value": 5
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "$input.w",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the alias and the input when they have the field",
+        "rules": [
+          "sentence.for.scope",
+          "sentence.derived.plus",
+          "sentence.path.start"
+        ],
+        "input": {
+          "w": 1,
+          "kids": [
+            {
+              "id": "K",
+              "xs": [
+                {
+                  "w": 1,
+                  "items": [
+                    {
+                      "lo": 5,
+                      "hi": 1,
+                      "status": "ok"
+                    }
+                  ]
+                }
+              ],
+              "items": [
+                {
+                  "lo": 5,
+                  "hi": 1,
+                  "status": "ok"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "alias",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "items": [
+                      {
+                        "hi": 1,
+                        "lo": 5,
+                        "status": "ok"
+                      }
+                    ],
+                    "w": 1
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "input",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/w"
+                ],
+                "name": "$input.w",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a param on the right side of a whose with plus",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "kid": {
+          "from": "kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "every items.status whose lo is at least $params.w plus hi is \"ok\""
+          }
+        }
+      }
+    },
+    "params": {
+      "w": 7
+    },
+    "cases": [
+      {
+        "description": "reads the param, and not the item's own field of the same name",
+        "rules": [
+          "sentence.derived.plus",
+          "sentence.path.start"
+        ],
+        "input": {
+          "kids": [
+            {
+              "id": "K",
+              "items": [
+                {
+                  "lo": 5,
+                  "hi": 1,
+                  "status": "ok",
+                  "w": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          }
+        ]
+      },
+      {
+        "description": "reads the param when the item has no such field",
+        "rules": [
+          "sentence.derived.plus",
+          "sentence.path.start"
+        ],
+        "input": {
+          "kids": [
+            {
+              "id": "K",
+              "items": [
+                {
+                  "lo": 9,
+                  "hi": 1,
+                  "status": "ok"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of or sum of a parent's part on the right side of a whose, alone and in a plus",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "fam": {
+          "from": "fams",
+          "identified_by": "id",
+          "has": {
+            "pr": "meta"
+          }
+        },
+        "kid": {
+          "from": "fam.kids",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "every items.status whose lo is at least count of fam.pr.xs is \"ok\"",
+            "d": "every items.status whose lo is at least 1 plus count of fam.pr.xs is \"ok\"",
+            "e": "every items.status whose lo is at least sum of fam.pr.xs is \"ok\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "counts the parent's part, not the parent's field of the same name, so a part with too many items fails",
+        "rules": [
+          "parts.where",
+          "tally.walk"
+        ],
+        "input": {
+          "fams": [
+            {
+              "id": "F",
+              "meta": {
+                "xs": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "pr": {
+                "xs": [
+                  1
+                ]
+              },
+              "kids": [
+                {
+                  "id": "K",
+                  "items": [
+                    {
+                      "lo": 2,
+                      "status": "ok"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "d",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "e",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      },
+      {
+        "description": "counts the parent's part, not the parent's field of the same name, so a part with few items passes",
+        "rules": [
+          "parts.where",
+          "tally.walk"
+        ],
+        "input": {
+          "fams": [
+            {
+              "id": "F",
+              "meta": {
+                "xs": [
+                  1
+                ]
+              },
+              "pr": {
+                "xs": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "kids": [
+                {
+                  "id": "K",
+                  "items": [
+                    {
+                      "lo": 2,
+                      "status": "ok"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "status": {
+          "r": "met"
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "e",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/fams/0/meta/xs"
+                ],
+                "name": "fam.pr.xs",
+                "part": {
+                  "id": null,
+                  "name": "fam.pr"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/fams/0/kids/0/items/0/status"
+                ],
+                "name": "items[].status",
+                "value": [
+                  "ok"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "K",
+              "in": {
+                "fam": "F"
+              },
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "an alias that is also a for alias",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -5916,2367 +8277,6 @@
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/kids/0/id"], "name": "id", "value": "k1"}], "passed": true, "requirement": "s", "subject": {"id": "k1", "type": "kid"}}
         ],
         "expressions": {"s": {"$applies": ".att.id is 1"}}
-      }
-    ]
-  },
-  {
-    "description": "a part's alias on the right side of a whose, with and without plus",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "kid": {
-          "from": "kids",
-          "identified_by": "id",
-          "has": {
-            "pa": "meta"
-          }
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "kid",
-          "checks": {
-            "c": "every items.status whose lo is at least pa.w plus hi is \"ok\"",
-            "d": "every items.status whose lo is at least pa.w is \"ok\"",
-            "e": "every items.status whose lo is at least hi plus pa.w is \"ok\"",
-            "f": "some items.status whose lo is at least pa.w plus hi is \"ok\"",
-            "g": {
-              "for": "every items whose lo is at least pa.w plus hi as i",
-              "assert": "i.status is \"ok\""
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "reads the part when the part is missing, and not the item's own field of the same name",
-        "rules": [
-          "parts.where",
-          "sentence.path.part",
-          "sentence.derived.plus",
-          "sentence.argument.item"
-        ],
-        "input": {
-          "kids": [
-            {
-              "id": "K",
-              "meta": {},
-              "items": [
-                {
-                  "lo": 5,
-                  "hi": 1,
-                  "status": "ok",
-                  "pa": {
-                    "w": 1
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "absent",
-            "check": "c",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta"
-                ],
-                "name": "pa.w",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "d",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta"
-                ],
-                "name": "pa.w",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "e",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta"
-                ],
-                "name": "pa.w",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "f",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta"
-                ],
-                "name": "pa.w",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "g",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0"
-                ],
-                "path": "item 1 of items",
-                "value": {
-                  "hi": 1,
-                  "lo": 5,
-                  "pa": {
-                    "w": 1
-                  },
-                  "status": "ok"
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0"
-                ],
-                "name": "items[]",
-                "value": [
-                  {
-                    "hi": 1,
-                    "lo": 5,
-                    "pa": {
-                      "w": 1
-                    },
-                    "status": "ok"
-                  }
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          }
-        ]
-      },
-      {
-        "description": "reads the part when it's there, and not the item's lack of the field",
-        "rules": [
-          "parts.where",
-          "sentence.path.part",
-          "sentence.derived.plus",
-          "sentence.argument.item"
-        ],
-        "input": {
-          "kids": [
-            {
-              "id": "K",
-              "meta": {
-                "w": 1
-              },
-              "items": [
-                {
-                  "lo": 5,
-                  "hi": 1,
-                  "status": "ok"
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta/w"
-                ],
-                "name": "pa.w",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": 1
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "d",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta/w"
-                ],
-                "name": "pa.w",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": 1
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "e",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta/w"
-                ],
-                "name": "pa.w",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": 1
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "f",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta/w"
-                ],
-                "name": "pa.w",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": 1
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "g",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0"
-                ],
-                "name": "items[]",
-                "value": [
-                  {
-                    "hi": 1,
-                    "lo": 5,
-                    "status": "ok"
-                  }
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a part's alias in an elapsed time on the right side of a whose",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "kid": {
-          "from": "kids",
-          "identified_by": "id",
-          "has": {
-            "pa": "meta"
-          }
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "kid",
-          "checks": {
-            "from_part": "every items.status whose lo is at least days elapsed from pa.t to hi is \"ok\"",
-            "to_part": "every items.status whose lo is at least days elapsed from early to pa.t is \"ok\"",
-            "plus_from_part": "every items.status whose lo is at least 1 plus days elapsed from pa.t to hi is \"ok\"",
-            "plus_to_part": "every items.status whose lo is at least days elapsed from early to pa.t plus 1 is \"ok\"",
-            "count": "count of items whose lo is at least days elapsed from pa.t to hi is 1"
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "reads the part when the part is missing, and not the item's own field of the same name",
-        "rules": [
-          "parts.where",
-          "sentence.derived.elapsed",
-          "sentence.path.part"
-        ],
-        "input": {
-          "kids": [
-            {
-              "id": "K",
-              "meta": {},
-              "items": [
-                {
-                  "lo": 5,
-                  "hi": "2026-01-01",
-                  "early": "2025-12-28",
-                  "status": "ok",
-                  "pa": {
-                    "t": "2025-12-30"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "absent",
-            "check": "count",
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0"
-                ],
-                "name": "count of items whose lo is at least days elapsed from pa.t to hi",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              },
-              {
-                "locations": [
-                  "/kids/0/items/0"
-                ],
-                "name": "items[]",
-                "value": [
-                  {
-                    "early": "2025-12-28",
-                    "hi": "2026-01-01",
-                    "lo": 5,
-                    "pa": {
-                      "t": "2025-12-30"
-                    },
-                    "status": "ok"
-                  }
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "from_part",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "plus_from_part",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "plus_to_part",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "to_part",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          }
-        ]
-      },
-      {
-        "description": "reads the part when it's there, and not the item's lack of the field",
-        "rules": [
-          "parts.where",
-          "sentence.derived.elapsed",
-          "sentence.path.part"
-        ],
-        "input": {
-          "kids": [
-            {
-              "id": "K",
-              "meta": {
-                "t": "2025-12-30"
-              },
-              "items": [
-                {
-                  "lo": 5,
-                  "hi": "2026-01-01",
-                  "early": "2025-12-28",
-                  "status": "ok"
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "satisfied",
-            "check": "count",
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0"
-                ],
-                "name": "count of items whose lo is at least days elapsed from pa.t to hi",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": 1
-              },
-              {
-                "locations": [
-                  "/kids/0/items/0"
-                ],
-                "name": "items[]",
-                "value": [
-                  {
-                    "early": "2025-12-28",
-                    "hi": "2026-01-01",
-                    "lo": 5,
-                    "status": "ok"
-                  }
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta/t"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": "2025-12-30"
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "from_part",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta/t"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": "2025-12-30"
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "plus_from_part",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta/t"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": "2025-12-30"
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "plus_to_part",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta/t"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": "2025-12-30"
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "to_part",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              },
-              {
-                "locations": [
-                  "/kids/0/meta/t"
-                ],
-                "name": "pa.t",
-                "part": {
-                  "id": null,
-                  "name": "pa"
-                },
-                "value": "2025-12-30"
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a parent's name on the right side of a whose, with and without plus",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "fam": {
-          "from": "fams",
-          "identified_by": "id"
-        },
-        "kid": {
-          "from": "fam.kids",
-          "identified_by": "id"
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "kid",
-          "checks": {
-            "c": "every items.status whose lo is at least fam.w plus hi is \"ok\"",
-            "d": "every items.status whose lo is at least fam.w is \"ok\"",
-            "e": "every items.status whose lo is at least hi plus fam.w is \"ok\""
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "reads the parent when the parent lacks the field, and not the item's own field of the same name",
-        "rules": [
-          "parts.chain",
-          "parts.where",
-          "sentence.derived.plus"
-        ],
-        "input": {
-          "fams": [
-            {
-              "id": "F",
-              "kids": [
-                {
-                  "id": "K",
-                  "items": [
-                    {
-                      "lo": 5,
-                      "hi": 1,
-                      "status": "ok",
-                      "fam": {
-                        "w": 1
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "absent",
-            "check": "c",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/fams/0/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0"
-                ],
-                "name": "fam.w",
-                "value": null
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "d",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/fams/0/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0"
-                ],
-                "name": "fam.w",
-                "value": null
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "e",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/fams/0/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0"
-                ],
-                "name": "fam.w",
-                "value": null
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          }
-        ]
-      },
-      {
-        "description": "reads the parent when it has the field, and not the item's lack of it",
-        "rules": [
-          "parts.chain",
-          "parts.where",
-          "sentence.derived.plus"
-        ],
-        "input": {
-          "fams": [
-            {
-              "id": "F",
-              "kids": [
-                {
-                  "id": "K",
-                  "items": [
-                    {
-                      "lo": 5,
-                      "hi": 1,
-                      "status": "ok"
-                    }
-                  ]
-                }
-              ],
-              "w": 1
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/w"
-                ],
-                "name": "fam.w",
-                "value": 1
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "d",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/w"
-                ],
-                "name": "fam.w",
-                "value": 1
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "e",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/w"
-                ],
-                "name": "fam.w",
-                "value": 1
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a parent's name in an elapsed time on the right side of a whose",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "fam": {
-          "from": "fams",
-          "identified_by": "id"
-        },
-        "kid": {
-          "from": "fam.kids",
-          "identified_by": "id"
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "kid",
-          "checks": {
-            "from_parent": "every items.status whose lo is at least days elapsed from fam.t to hi is \"ok\"",
-            "plus_to_parent": "every items.status whose lo is at least 1 plus days elapsed from early to fam.t is \"ok\"",
-            "count": "count of items whose lo is at least days elapsed from fam.t to hi is 1"
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "reads the parent when the parent lacks the field, and not the item's own field of the same name",
-        "rules": [
-          "parts.chain",
-          "parts.where",
-          "sentence.derived.elapsed"
-        ],
-        "input": {
-          "fams": [
-            {
-              "id": "F",
-              "kids": [
-                {
-                  "id": "K",
-                  "items": [
-                    {
-                      "lo": 5,
-                      "hi": "2026-01-01",
-                      "early": "2025-12-28",
-                      "status": "ok",
-                      "fam": {
-                        "t": "2025-12-30"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "absent",
-            "check": "count",
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0"
-                ],
-                "name": "count of items whose lo is at least days elapsed from fam.t to hi",
-                "value": null
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0"
-                ],
-                "name": "items[]",
-                "value": [
-                  {
-                    "early": "2025-12-28",
-                    "fam": {
-                      "t": "2025-12-30"
-                    },
-                    "hi": "2026-01-01",
-                    "lo": 5,
-                    "status": "ok"
-                  }
-                ]
-              },
-              {
-                "locations": [
-                  "/fams/0"
-                ],
-                "name": "fam.t",
-                "value": null
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "from_parent",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/fams/0/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0"
-                ],
-                "name": "fam.t",
-                "value": null
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "plus_to_parent",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/fams/0/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0"
-                ],
-                "name": "fam.t",
-                "value": null
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          }
-        ]
-      },
-      {
-        "description": "reads the parent when it has the field, and not the item's lack of it",
-        "rules": [
-          "parts.chain",
-          "parts.where",
-          "sentence.derived.elapsed"
-        ],
-        "input": {
-          "fams": [
-            {
-              "id": "F",
-              "kids": [
-                {
-                  "id": "K",
-                  "items": [
-                    {
-                      "lo": 5,
-                      "hi": "2026-01-01",
-                      "early": "2025-12-28",
-                      "status": "ok"
-                    }
-                  ]
-                }
-              ],
-              "t": "2025-12-30"
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "satisfied",
-            "check": "count",
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0"
-                ],
-                "name": "count of items whose lo is at least days elapsed from fam.t to hi",
-                "value": 1
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0"
-                ],
-                "name": "items[]",
-                "value": [
-                  {
-                    "early": "2025-12-28",
-                    "hi": "2026-01-01",
-                    "lo": 5,
-                    "status": "ok"
-                  }
-                ]
-              },
-              {
-                "locations": [
-                  "/fams/0/t"
-                ],
-                "name": "fam.t",
-                "value": "2025-12-30"
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "from_parent",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/t"
-                ],
-                "name": "fam.t",
-                "value": "2025-12-30"
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "plus_to_parent",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/t"
-                ],
-                "name": "fam.t",
-                "value": "2025-12-30"
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a for alias and the input on the right side of a whose with plus",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "kid": {
-          "from": "kids",
-          "identified_by": "id"
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "kid",
-          "checks": {
-            "alias": {
-              "for": "every xs as x",
-              "assert": "every x.items.status whose lo is at least x.w plus hi is \"ok\""
-            },
-            "input": "every items.status whose lo is at least $input.w plus hi is \"ok\""
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "reads the alias and the input, and not the item's own field of the same name",
-        "rules": [
-          "sentence.for.scope",
-          "sentence.derived.plus",
-          "sentence.path.start"
-        ],
-        "input": {
-          "kids": [
-            {
-              "id": "K",
-              "xs": [
-                {
-                  "items": [
-                    {
-                      "lo": 5,
-                      "hi": 1,
-                      "status": "ok",
-                      "x": {
-                        "w": 1
-                      },
-                      "w": 1
-                    }
-                  ]
-                }
-              ],
-              "items": [
-                {
-                  "lo": 5,
-                  "hi": 1,
-                  "status": "ok",
-                  "x": {
-                    "w": 1
-                  },
-                  "w": 1
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "absent",
-            "check": "alias",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [
-                  {
-                    "assertion": "every x.items.status whose lo is at least x.w plus hi is \"ok\"",
-                    "cause": "absent",
-                    "inputs": [
-                      {
-                        "locations": [
-                          "/kids/0/xs/0/items/0/status"
-                        ],
-                        "name": "x.items[].status",
-                        "value": [
-                          "ok"
-                        ]
-                      },
-                      {
-                        "locations": [
-                          "/kids/0/xs/0"
-                        ],
-                        "name": "x.w",
-                        "value": null
-                      }
-                    ]
-                  }
-                ],
-                "item": "item 1 of xs",
-                "locations": [
-                  "/kids/0/xs/0"
-                ],
-                "path": "item 1 of xs",
-                "value": {
-                  "items": [
-                    {
-                      "hi": 1,
-                      "lo": 5,
-                      "status": "ok",
-                      "w": 1,
-                      "x": {
-                        "w": 1
-                      }
-                    }
-                  ]
-                }
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/xs/0"
-                ],
-                "name": "xs[]",
-                "value": [
-                  {
-                    "items": [
-                      {
-                        "hi": 1,
-                        "lo": 5,
-                        "status": "ok",
-                        "w": 1,
-                        "x": {
-                          "w": 1
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "absent",
-            "check": "input",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "item": "item 1 of items",
-                "locations": [
-                  "/kids/0/items/0/lo"
-                ],
-                "path": "items[0].lo",
-                "value": 5
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  ""
-                ],
-                "name": "$input.w",
-                "value": null
-              },
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          }
-        ]
-      },
-      {
-        "description": "reads the alias and the input when they have the field",
-        "rules": [
-          "sentence.for.scope",
-          "sentence.derived.plus",
-          "sentence.path.start"
-        ],
-        "input": {
-          "w": 1,
-          "kids": [
-            {
-              "id": "K",
-              "xs": [
-                {
-                  "w": 1,
-                  "items": [
-                    {
-                      "lo": 5,
-                      "hi": 1,
-                      "status": "ok"
-                    }
-                  ]
-                }
-              ],
-              "items": [
-                {
-                  "lo": 5,
-                  "hi": 1,
-                  "status": "ok"
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "satisfied",
-            "check": "alias",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/xs/0"
-                ],
-                "name": "xs[]",
-                "value": [
-                  {
-                    "items": [
-                      {
-                        "hi": 1,
-                        "lo": 5,
-                        "status": "ok"
-                      }
-                    ],
-                    "w": 1
-                  }
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "input",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/w"
-                ],
-                "name": "$input.w",
-                "value": 1
-              },
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a param on the right side of a whose with plus",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "kid": {
-          "from": "kids",
-          "identified_by": "id"
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "kid",
-          "checks": {
-            "c": "every items.status whose lo is at least $params.w plus hi is \"ok\""
-          }
-        }
-      }
-    },
-    "params": {
-      "w": 7
-    },
-    "cases": [
-      {
-        "description": "reads the param, and not the item's own field of the same name",
-        "rules": [
-          "sentence.derived.plus",
-          "sentence.path.start"
-        ],
-        "input": {
-          "kids": [
-            {
-              "id": "K",
-              "items": [
-                {
-                  "lo": 5,
-                  "hi": 1,
-                  "status": "ok",
-                  "w": 1
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "value",
-            "check": "c",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          }
-        ]
-      },
-      {
-        "description": "reads the param when the item has no such field",
-        "rules": [
-          "sentence.derived.plus",
-          "sentence.path.start"
-        ],
-        "input": {
-          "kids": [
-            {
-              "id": "K",
-              "items": [
-                {
-                  "lo": 9,
-                  "hi": 1,
-                  "status": "ok"
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "type": "kid"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a count of or sum of a parent's part on the right side of a whose, alone and in a plus",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "fam": {
-          "from": "fams",
-          "identified_by": "id",
-          "has": {
-            "pr": "meta"
-          }
-        },
-        "kid": {
-          "from": "fam.kids",
-          "identified_by": "id"
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "kid",
-          "checks": {
-            "c": "every items.status whose lo is at least count of fam.pr.xs is \"ok\"",
-            "d": "every items.status whose lo is at least 1 plus count of fam.pr.xs is \"ok\"",
-            "e": "every items.status whose lo is at least sum of fam.pr.xs is \"ok\""
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "description": "counts the parent's part, not the parent's field of the same name, so a part with too many items fails",
-        "rules": [
-          "parts.where",
-          "tally.walk"
-        ],
-        "input": {
-          "fams": [
-            {
-              "id": "F",
-              "meta": {
-                "xs": [
-                  1,
-                  1,
-                  1,
-                  1,
-                  1,
-                  1
-                ]
-              },
-              "pr": {
-                "xs": [
-                  1
-                ]
-              },
-              "kids": [
-                {
-                  "id": "K",
-                  "items": [
-                    {
-                      "lo": 2,
-                      "status": "ok"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "status": {
-          "r": "not_met"
-        },
-        "results": [
-          {
-            "cause": "value",
-            "check": "c",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/meta/xs"
-                ],
-                "name": "fam.pr.xs",
-                "part": {
-                  "id": null,
-                  "name": "fam.pr"
-                },
-                "value": [
-                  1,
-                  1,
-                  1,
-                  1,
-                  1,
-                  1
-                ]
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "value",
-            "check": "d",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/meta/xs"
-                ],
-                "name": "fam.pr.xs",
-                "part": {
-                  "id": null,
-                  "name": "fam.pr"
-                },
-                "value": [
-                  1,
-                  1,
-                  1,
-                  1,
-                  1,
-                  1
-                ]
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "value",
-            "check": "e",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/meta/xs"
-                ],
-                "name": "fam.pr.xs",
-                "part": {
-                  "id": null,
-                  "name": "fam.pr"
-                },
-                "value": [
-                  1,
-                  1,
-                  1,
-                  1,
-                  1,
-                  1
-                ]
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          }
-        ]
-      },
-      {
-        "description": "counts the parent's part, not the parent's field of the same name, so a part with few items passes",
-        "rules": [
-          "parts.where",
-          "tally.walk"
-        ],
-        "input": {
-          "fams": [
-            {
-              "id": "F",
-              "meta": {
-                "xs": [
-                  1
-                ]
-              },
-              "pr": {
-                "xs": [
-                  1,
-                  1,
-                  1,
-                  1,
-                  1,
-                  1
-                ]
-              },
-              "kids": [
-                {
-                  "id": "K",
-                  "items": [
-                    {
-                      "lo": 2,
-                      "status": "ok"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "status": {
-          "r": "met"
-        },
-        "results": [
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/meta/xs"
-                ],
-                "name": "fam.pr.xs",
-                "part": {
-                  "id": null,
-                  "name": "fam.pr"
-                },
-                "value": [
-                  1
-                ]
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "d",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/meta/xs"
-                ],
-                "name": "fam.pr.xs",
-                "part": {
-                  "id": null,
-                  "name": "fam.pr"
-                },
-                "value": [
-                  1
-                ]
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "e",
-            "failed_items": [],
-            "inputs": [
-              {
-                "locations": [
-                  "/fams/0/meta/xs"
-                ],
-                "name": "fam.pr.xs",
-                "part": {
-                  "id": null,
-                  "name": "fam.pr"
-                },
-                "value": [
-                  1
-                ]
-              },
-              {
-                "locations": [
-                  "/fams/0/kids/0/items/0/status"
-                ],
-                "name": "items[].status",
-                "value": [
-                  "ok"
-                ]
-              }
-            ],
-            "passed": true,
-            "requirement": "r",
-            "subject": {
-              "id": "K",
-              "in": {
-                "fam": "F"
-              },
-              "type": "kid"
-            }
-          }
-        ]
       }
     ]
   }

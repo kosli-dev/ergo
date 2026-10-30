@@ -3,6 +3,35 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    (".artifact.p[0]", "item 1 of artifact.p"),
+    (
+        ".artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (".artifact.p", "artifact.p"),
+    (
+        "artifact.x[0] named by each of $params.k",
+        "item 1 of artifact.x named by each of $params.k",
+    ),
+    (
+        "artifact[0] named by each of $params.k",
+        "item 1 of artifact named by each of $params.k",
+    ),
+    ("fam.kids", "fam.kids"),
+    ("fams", "fams"),
+    (
+        "first of artifact named by each of $params.k",
+        "first of artifact named by each of $params.k",
+    ),
+    (
+        "artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (
+        "artifact.x named by each of $params.k",
+        "artifact.x named by each of $params.k",
+    ),
+    ("k.items", "k.items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
     (
         "artifact.scans named by each of $params.k",
@@ -12,6 +41,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact.pulls whose state is \"open\"",
         "artifact.pulls whose state is \"open\"",
     ),
+    ("kids", "kids"),
+    ("meta", "meta"),
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
@@ -1399,10 +1430,6 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "zz[k].q whose .empty.y is .it plus item 3 of $input.i[$params.k]",
         "zz named by k.q whose .empty.y equals .it plus item 3 of $input.i named by $params.k",
     ),
-    ("fam.kids", "fam.kids"),
-    ("fams", "fams"),
-    ("kids", "kids"),
-    ("meta", "meta"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2541,6 +2568,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
         "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10",
         "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10",
     ),
+    ("meta", "meta"),
     ("meta.id", "meta.id"),
     ("name", "name"),
     ("ps", "ps"),
@@ -2557,7 +2585,6 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("x[3]", "item 4 of x"),
     ("xs", "xs"),
     ("ys", "ys"),
-    ("meta", "meta"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[
