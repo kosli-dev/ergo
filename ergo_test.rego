@@ -4804,8 +4804,11 @@ test_a_walk_that_is_already_written_wrong_for_another_reason_gets_no_ten_step_me
 	has := {"x": _ten}
 	_part_walk_problems(has, {"for": "every xs as x", "assert": "every x.z is 1"}) == ["x can't be an alias: it's a part of thing"]
 	_part_walk_problems(has, {"for": "every xs as x", "assert": "count of x.z is 1"}) == ["x can't be an alias: it's a part of thing"]
-	_parent_part_problems(has, "count of xs whose n is sum of b.x.z is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet", "every and some over more than ten steps aren't supported yet"]]
 	_parent_part_problems(has, "count of xs whose sum of b.x.z is 1 is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet"]]
+}
+
+test_a_parent_part_on_the_right_of_a_count_whose_gets_the_ten_step_message_beside_another_problem if {
+	_parent_part_problems({"x": _ten}, "count of xs whose n is sum of b.x.z is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet", "every and some over more than ten steps aren't supported yet"]]
 }
 
 test_a_for_alias_named_like_a_parent_subject_still_counts_the_parents_part_beside_the_clash if {

@@ -6531,8 +6531,8 @@ _p_for_items(check) := object.get(_for_line(check.for), "items", []) if is_strin
 _p_part_walk_problems(_, _, pc) := set() if _p_idle(pc)
 
 _p_part_walk_problems(lines, ftext, pc) := {"every and some over more than ten steps aren't supported yet" |
-	some w in _p_part_walks(lines, ftext, pc)
-	_p_part_walk_steps(w, pc) > 10
+	some p in _p_part_walks(lines, ftext, pc)
+	_p_part_walk_steps(p, pc) > 10
 } if not _p_idle(pc)
 
 _p_part_walks(lines, ftext, pc) := {p |
@@ -6552,9 +6552,7 @@ _p_unaliased(ftext, names) := names - {item.as |
 	some item in object.get(_for_line(ftext), "items", [])
 }
 
-_p_walk_paths(x) := {[x[q], false] | some q in ["every", "some", "pick"]; is_object(object.get(x, q, null))} | (({[t[k], false] | some t in _s_nodes(object.remove(x, _p_item_keys(x))); some k in _p_derived_keys(t)} | {[t[k], true] | _p_walks_items(x); some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)}) | {[t[k], "own"] | not _p_walks_items(x); some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)})
-
-_p_walks_items(x) if object.keys(x) & {"every", "some", "pick"} != set()
+_p_walk_paths(x) := ({x[q] | some q in ["every", "some", "pick"]; is_object(object.get(x, q, null))} | {t[k] | some t in _s_nodes(object.remove(x, _p_item_keys(x))); some k in _p_derived_keys(t)}) | {t[k] | some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)}
 
 _p_derived_keys(t) := {k |
 	_s_derived_term(t)
@@ -6566,10 +6564,10 @@ _p_item_keys(x) := ["where", "phrase"] if object.keys(x) & {"every", "some", "pi
 
 else := ["where"]
 
-_p_part_walk_steps(w, pc) := (count(_walk_steps(_s_model_path(w[0]))) - 1) + count(pc.own[w[0].steps[0]]) if {
-	object.get(w[0], "part", false) == true
-	w[0].steps[0] in object.keys(pc.own)
-} else := _p_parent_walk_steps(w[0], pc)
+_p_part_walk_steps(p, pc) := (count(_walk_steps(_s_model_path(p))) - 1) + count(pc.own[p.steps[0]]) if {
+	object.get(p, "part", false) == true
+	p.steps[0] in object.keys(pc.own)
+} else := _p_parent_walk_steps(p, pc)
 
 _p_parent_walk_steps(p, pc) := (count(_walk_steps(_s_model_path(p))) - 2) + count(pc.ancestors[p.steps[0]][p.steps[1]]) if {
 	object.get(p, "part", false) == true
