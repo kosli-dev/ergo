@@ -7084,7 +7084,7 @@ test_the_subjects_section_is_independent_of_the_order_the_policy_is_written_in i
 
 test_a_from_that_cannot_be_printed_is_invalid_even_when_nothing_flagged_it if {
 	every def in [{"from": "ds", "applies_to": {}}, {"from": "ds", "of": "b"}, {"from": 1}, {"of": 1}] {
-		ergo._subject_from_text("d", def) == "<invalid from>" with data.ergo_resolved as {"d": {"problems": set()}} with data.ergo_subjects as {"d": def, "b": {}}
+		ergo._subject_from_text("d", def, set()) == "<invalid from>" with data.ergo_resolved as {"d": {"problems": set()}} with data.ergo_subjects as {"d": def, "b": {}}
 	}
 }
 
@@ -10476,4 +10476,25 @@ test_a_second_list_that_cant_be_walked_is_listed_once_when_the_pick_reads_the_fi
 	row.cause == "absent"
 	[f.item | some f in row.failed_items] == ["ys"]
 	not "failed_items" in object.keys(row.failed_items[0])
+}
+
+test_subjects_that_narrow_each_other_with_unknown_names_list_no_other_subject if {
+	policy := {
+		"ergo_spec": "v0.3-dev",
+		"subjects": {"a": {"from": "b whose x is $foo"}, "b": {"from": "a whose x is $foo"}},
+		"requirements": {"r": {"subject": "a", "checks": {"c": "n exists"}}},
+	}
+	report := ergo.report({}, policy, {})
+	object.keys(report.subjects) == {"a"}
+	report.subjects.a.from == "<invalid from>"
+	report.subjects.a.identified_by == null
+}
+
+test_a_from_that_reads_names_with_an_unknown_name_lists_no_other_subject if {
+	policy := {
+		"ergo_spec": "v0.3-dev",
+		"subjects": {"p": {"from": "things", "identified_by": "id"}, "k": {"from": "p.items named by $foo", "identified_by": "n"}},
+		"requirements": {"r": {"subject": "k", "checks": {"c": "n exists"}}},
+	}
+	object.keys(ergo.report({}, policy, {}).subjects) == {"k"}
 }
