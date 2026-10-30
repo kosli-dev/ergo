@@ -703,6 +703,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("b named by key is 9", "b named by key is 9", &[], &[]),
     ("b.v is 1", "b.v is 1", &[], &[]),
     ("y.v is 1", "y.v is 1", &[], &[]),
+    ("y.n is 1", "y.n is 1", &[], &[]),
     ("b.x is 1 and .b.x is 1", "b.x is 1 and b.x is 1", &[], &[]),
     ("b.x is 1 and b.x is 1", "b.x is 1 and b.x is 1", &[], &[]),
     ("b.x.z is 7", "b.x.z is 7", &[], &[]),
@@ -6459,6 +6460,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every x, if any, as pr", "every x, if any, as pr", &[], &[]),
+    ("every x.z as y", "every x.z as y", &[], &[]),
     ("every xs as b", "every xs as b", &[], &[]),
     (
         "every xs whose name starts with count of ys as x",
