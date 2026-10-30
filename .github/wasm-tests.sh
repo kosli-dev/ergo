@@ -12,7 +12,7 @@ while read -r part; do
   out=$("${opa[@]}" test . --ignore .github --ignore ports --target wasm --timeout 120s -r "$pattern") || { echo "$out"; exit 1; }
   echo "$out"
   ran=$((ran + $(sed -nE 's/^PASS: ([0-9]+)\/[0-9]+$/\1/p' <<<"$out")))
-done < <(xargs -n 150 <<<"$tests")
+done < <(xargs -n 100 <<<"$tests")
 
 echo "Ran $ran of $total tests compiled to Wasm"
 [ "$ran" -eq "$total" ]

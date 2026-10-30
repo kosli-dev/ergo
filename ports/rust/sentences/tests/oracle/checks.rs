@@ -11,6 +11,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every y.leaves is 1", "every y.leaves is 1", &[], &[]),
     ("n exists", "n exists", &[], &[]),
     ("size exists", "size exists", &[], &[]),
     (
@@ -63,6 +64,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x matches '^\\d$'", "x matches '^\\d$'", &[], &[]),
     ("x.v is at most m", "x.v is at most m", &[], &[]),
     ("x.n is one of 'a', 1.0", "x.n is one of \"a\", 1", &[], &[]),
+    ("y is 2", "y is 2", &[], &[]),
     ("y matches '^\\w$'", "y matches '^\\w$'", &[], &[]),
     ("z matches '^\\s+$'", "z matches '^\\s+$'", &[], &[]),
     ("p.z is 1", "p.z is 1", &[], &[]),
@@ -3512,6 +3514,8 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
     ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
     ("i exists", "i exists", &[], &[]),
+    ("o exists", "o exists", &[], &[]),
+    ("p is 1", "p is 1", &[], &[]),
     (
         "i is one of 1, 'a' and y is at least y",
         "i is one of 1, \"a\" and y is at least y",
@@ -3521,6 +3525,15 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "x named by $params is 1 within",
+        &["\"within\" needs a number after it"],
+    ),
+    (
+        "every a every b named by $params exists",
+        &["two quantifiers in one sentence: put them on a for line"],
+    ),
+    ("x is $foo foo bar", &["doesn't parse"]),
     (" x   is  ", &["doesn't parse"]),
     (" x  is ", &["doesn't parse"]),
     ("\u{feff}x is 1", &["doesn't parse"]),
@@ -3546,7 +3559,6 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     ("\"q r\" plus \"q r\" is before \"s\"", &["doesn't parse"]),
     ("\"q r\".\"é\".\"é\" not 1e2 within 2", &["doesn't parse"]),
-    ("$foo.x exists", &["unknown name $foo"]),
     ("$input.i.\"\" 'b\\c'", &["doesn't parse"]),
     ("$params.p does contain -2.50", &["doesn't parse"]),
     (
@@ -4637,6 +4649,8 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("x is x and y is $foo", &["unknown name $foo"]),
+    ("$foo.x exists", &["unknown name $foo"]),
     (
         "\"$s\".\"\" is 'b\\c' and \"$s\" named by $params.k contains none of 1e2, -2.50, -2.50 and some .true, if any, is at most 0.10",
         &["if any can't go with some"],
@@ -5805,6 +5819,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("every cs as c", "every cs as c", &[], &[]),
     ("every d.items as cov", "every d.items as cov", &[], &[]),
     (
+        "every deep whose k is 1 as z, every z.subs as y",
+        "every deep whose k is 1 as z, every z.subs as y",
+        &[],
+        &[],
+    ),
+    (
+        "every deep whose k is 1 as z, every z.subs whose m is 1 as y",
+        "every deep whose k is 1 as z, every z.subs whose m is 1 as y",
+        &[],
+        &[],
+    ),
+    (
         "every dispatched as persona",
         "every dispatched as persona",
         &[],
@@ -5913,6 +5939,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every items whose k is 1 as z, every z.subs as y",
+        "every items whose k is 1 as z, every z.subs as y",
+        &[],
+        &[],
+    ),
+    (
         "every items whose pr equals .pr as i",
         "every items whose pr equals pr as i",
         &[
@@ -5951,6 +5983,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every items, if any, as i",
         "every items, if any, as i",
+        &[],
+        &[],
+    ),
+    (
+        "every items.v as z, every z.subs as y",
+        "every items.v as z, every z.subs as y",
         &[],
         &[],
     ),
@@ -6390,6 +6428,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("some items as i", "some items as i", &[], &[]),
     (
+        "some items whose k is 1 as z, some z.subs as y",
+        "some items whose k is 1 as z, some z.subs as y",
+        &[],
+        &[],
+    ),
+    (
         "some k1.\"\"._k whose .true ends with zz as k1, last of \"$s\" whose days elapsed from \"q r\".q.z to item 2 from last of k1.q named by $params.k is equal to days elapsed from .true to k1 plus 1e2 sorted by \"$s\".y.y as x",
         "some k1.\"\"._k whose .true ends with zz as k1, last of \"$s\" whose days elapsed from \"q r\".q.z to item 2 from last of k1.q named by $params.k equals days elapsed from .true to k1 plus 100 sorted by \"$s\".y.y as x",
         &[],
@@ -6441,9 +6485,28 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every t[0].u as i", "every t[0].u as i", &[], &[]),
     ("first of t as i", "first of t as i", &[], &[]),
+    (
+        "every lists named by q as p, every qs as q",
+        "every lists named by q as p, every qs as q",
+        &[],
+        &[],
+    ),
+    (
+        "every objs whose v named by o is 1 as o",
+        "every objs whose v named by o is 1 as o",
+        &[],
+        &[],
+    ),
+    (
+        "every xs named by x as x",
+        "every xs named by x as x",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
+    ("every xs whose zz is $foo foo bar as x", &["doesn't parse"]),
     (
         " every  xs ",
         &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
@@ -6873,6 +6936,7 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("every xs whose zz is $foo as x", &["unknown name $foo"]),
     (
         "every \"$s\" named by $params.\"x y\" as it",
         &["it can't be an alias"],
