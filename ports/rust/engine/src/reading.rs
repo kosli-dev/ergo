@@ -254,7 +254,14 @@ fn keeps_dot(line: &s::FromLine, own_name: &str, names: &BTreeSet<String>) -> bo
 }
 
 fn with_kept_dot(text: String, every: bool) -> String {
-    let at = if every { "every ".len() } else { 0 };
+    let mut at = if every { "every ".len() } else { 0 };
+    let rest = &text[at..];
+    let positioned = rest.starts_with("first of ")
+        || rest.starts_with("last of ")
+        || (rest.starts_with("item ") && rest.contains(" of "));
+    if positioned && let Some(of) = rest.find(" of ") {
+        at += of + " of ".len();
+    }
     if text[at..].starts_with('.') {
         text
     } else {
@@ -1198,6 +1205,17 @@ mod tests {
         );
         assert_eq!(r.infos["p"].entry["from"], json!(".art.p"));
         assert_eq!(r.infos["q"].entry["from"], json!("other.p"));
+    }
+
+    #[test]
+    fn a_kept_dot_goes_after_the_position_of_a_printed_from() {
+        let (_, r) = reading(json!({
+            "art": {"from": "arts"},
+            "p": {"from": ".art.p[0]"},
+            "q": {"from": "first of .art.p"},
+        }));
+        assert_eq!(r.infos["p"].entry["from"], json!("item 1 of .art.p"));
+        assert_eq!(r.infos["q"].entry["from"], json!("first of .art.p"));
     }
 
     #[test]
