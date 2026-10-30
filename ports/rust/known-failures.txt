@@ -1,5 +1,7 @@
 subjects / a child subject whose from is every, with an identified_by / gives one problem, under from, and none under identified_by
+subjects / a subject that narrows a subject that narrows another with every / has the id of the subject at the top of its chain, not mid's own
 subjects / a subject that narrows another, with a from that is written wrong / lists the subject it narrows and keeps its id, because the line still says which subject it narrows
 subjects / a subject that narrows another, with a from that starts with every / lists the subject it narrows and keeps its id, because the line still says which subject it narrows
 subjects / a subject with applies_to or of / is <invalid from> with applies_to, because the field said how the subject was found
 subjects / a subject with of / is <invalid from> with of, because the field said how the subject was found
+subjects / two subjects that narrow each other, each with an identified_by / have no id, because no subject is at the top of the loop
