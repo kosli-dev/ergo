@@ -1,4 +1,22 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "count of items.x whose k is \"a\" is 1",
+        "count of items.x whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of items.x whose k is \"a\" is 1",
+        "sum of items.x whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of items.x.y whose k is \"a\" is 1",
+        "sum of items.x.y whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
     ("approvals exists", "approvals exists", &[], &[]),
     (" x   is  1 ", "x is 1", &[], &[]),
     (" x  is  1", "x is 1", &[], &[]),
