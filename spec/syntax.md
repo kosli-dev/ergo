@@ -276,7 +276,7 @@ The left side of a `whose` is the item's field even when an alias has the same n
 
 **[sentence.for.fail]** Each item fails closed as a one-line `every` or `some` does: `some` over an empty list fails, `every` over one fails unless the item says `if any`, a missing or non-list path fails as `absent`, `null` or `unusable`, and an item a `whose` can't decide fails the try with its cause.
 
-**[sentence.for.pick]** An item can start with a position instead of `every` or `some`, as [sentence.path.index](#paths) writes it, and then its alias stands for one item: `for: last of commits as last_commit`. After the path and an optional `whose`, `sorted by` and a field counts the position in the order of that field instead of the list's:
+**[sentence.for.pick]** An item can start with a position instead of `every` or `some`, as [sentence.path.index](#paths) writes it, and then its alias stands for one item: `for: last of commits as last_commit`. An index in brackets doesn't pick, so `t[0] as i` is written wrong: write `first of t as i`. After the path and an optional `whose`, `sorted by` and a field counts the position in the order of that field instead of the list's:
 
 ```yaml
 not_last_author:
