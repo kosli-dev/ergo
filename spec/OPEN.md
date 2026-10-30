@@ -79,6 +79,10 @@ OPA crashes when it compares a number whose exponent is beyond ±1e6 with any ot
 
 [Values](semantics.md#values) allows a fix that fails such a check as `unusable`. That can't cover the sort of subject ids, because no check row reads them. Both wait for a real need, or for OPA to fix the crash.
 
+## Numbers with more than 15 significant digits
+
+OPA treats some decimals as the same when they only differ after the 15th significant digit, like `1234567890.1209567890` and `1234567890.1209567990`, and reuses the result of a comparison for any number it treats as the same. Whole numbers are always compared exactly. So `ergo.rego` can pass `l is at most 1234567890.1209567890` on the bigger one, and a `within` check can give a row the answer of an earlier row. The Rust port compares every digit. [Values](semantics.md#values) leaves such numbers out of the spec, so neither engine breaks a spec rule. [#426](https://github.com/kosli-dev/ergo/issues/426) tracks making `ergo.rego` compare them exactly. Then the spec could promise exact comparison at any number of digits.
+
 ## Where ergo.rego and the Rust port differ
 
 The spec doesn't settle these yet, because the two engines give different reports. Both still fail and pass the same checks.
