@@ -7770,7 +7770,7 @@
     }
   },
   {
-    "description": "a phrase on a for line item whose that can't take a plus is written wrong",
+    "description": "a phrase on a for line item whose that can't take a plus is written wrong with for: in front",
     "input": {
       "things": [
         {
@@ -7901,7 +7901,7 @@
               "locations": [],
               "name": "checks.c",
               "value": [
-                "\"starts with\" can't take a count of, a sum of or a plus"
+                "for: \"starts with\" can't take a count of, a sum of or a plus"
               ]
             }
           ],
