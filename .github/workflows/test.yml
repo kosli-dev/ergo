@@ -218,6 +218,10 @@ jobs:
           wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm -o sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm
       - name: Load ergo-sentences-wasm in Node and read a sentence
         run: node sentences-wasm/check-node.mjs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ergo-sentences-wasm-pkg
+          path: ports/rust/sentences-wasm/pkg
 
   markdown:
     needs: tests-rust
@@ -242,6 +246,10 @@ jobs:
         with:
           name: ergo-wasm-pkg
           path: ports/rust/wasm/pkg
+      - uses: actions/download-artifact@v8
+        with:
+          name: ergo-sentences-wasm-pkg
+          path: ports/rust/sentences-wasm/pkg
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm test
