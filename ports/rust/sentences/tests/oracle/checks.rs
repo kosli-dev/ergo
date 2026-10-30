@@ -1,5 +1,17 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
+        "every items.status whose lo is at least art.q is \"ok\"",
+        "every items.status whose lo is at least art.q is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every items.status whose lo is at least w is \"ok\"",
+        "every items.status whose lo is at least w is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
         "every items.status whose $params.min is at most lo is \"ok\"",
         "every items.status whose $params.min is at most lo is \"ok\"",
         &[],

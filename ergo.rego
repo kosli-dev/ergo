@@ -7381,13 +7381,17 @@ _walk_failure(w, e, undecided, _, _, _) := {"path": _walk_named_path(e, p), "ite
 	p := _walk_first_path(undecided[0][0], e.iv)
 }
 
-_walk_named_path(_, p) := p if _builtin(p)
+_walk_named_path(_, p) := _as_subject_part(p) if _walk_outside(p)
 
-_walk_named_path(e, p) := array.concat(e.i, p) if not _builtin(p)
+_walk_named_path(e, p) := array.concat(e.i, p) if not _walk_outside(p)
 
-_walk_named_at(_, _, p) := _ref_at(p) if _builtin(p)
+_walk_named_at(_, _, p) := _ref_at(p) if _walk_outside(p)
 
-_walk_named_at(w, e, p) := _item_read_at(w, e, p) if not _builtin(p)
+_walk_named_at(w, e, p) := _item_read_at(w, e, p) if not _walk_outside(p)
+
+_walk_outside(p) if _read_off_item(p)
+
+_walk_outside(p) if _builtin(p)
 
 _walk_failure(_, _, [], false, _, _) := null
 
