@@ -1,6 +1,3 @@
-requirements / a check with values of mixed types and a field compared with itself / lists both problems, on one line, in a list, in an any_of option and under a for line
-requirements / a for line with a form its whose can't take / is listed with for: in front of the problem, like every problem of the for line
-requirements / a for line with values of mixed types in its whose / is printed as written and named by its check, with for: in front of the problem
 subjects / a child subject of a from line with a path and named by each of / reads each key inside the path of its parent
 subjects / a child subject of a from line with a path and named by each of, with a parent that isn't an object / still fails min_subjects as absent when the parent is an object without the path
 subjects / a child subject of a from line with a position on a path inside the parent and named by each of / reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check
