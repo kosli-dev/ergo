@@ -234,6 +234,142 @@
     ]
   },
   {
+    "description": "a subject name with a $ is quoted where a from starts with it",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "$x": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "\"$x\".items",
+          "identified_by": "n"
+        },
+        "$y": {
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        },
+        "s": {
+          "subject": "$y",
+          "checks": {
+            "c": "id exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "$min_subjects and $unique_ids of a child subject quote it, and report.subjects quotes a subject with no from",
+        "rules": [
+          "name.keys",
+          "added.text",
+          "report.subjects"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "items": [
+                {
+                  "n": 1
+                }
+              ]
+            }
+          ],
+          "$y": [
+            {
+              "id": "b"
+            }
+          ]
+        },
+        "expressions": {
+          "r": {
+            "$min_subjects": "count(matching(\"$x\".items)) >= 1",
+            "$unique_ids": "count(repeated(ids(\"$x\".items))) == 0"
+          },
+          "s": {
+            "$min_subjects": "count(matching(\"$y\")) >= 1",
+            "$unique_ids": "count(repeated(ids(\"$y\"))) == 0"
+          }
+        },
+        "report": {
+          "subjects": {
+            "$x": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "kid": {
+              "description": "",
+              "from": "\"$x\".items",
+              "identified_by": "n",
+              "parts": {}
+            },
+            "$y": {
+              "description": "",
+              "from": "\"$y\"",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "kid",
+              "id": 1,
+              "in": {
+                "$x": "a"
+              }
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "n",
+                "value": 1,
+                "locations": [
+                  "/things/0/items/0/n"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "$y",
+              "id": "b"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "id",
+                "value": "b",
+                "locations": [
+                  "/$y/0/id"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {"description": "a subject name with a $ is quoted through a part and with a null definition", "policy": {"ergo_spec": "v0.3-dev", "subjects": {"$x": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}, "kid": {"from": "\"$x\".pa.items", "identified_by": "n"}, "$z": null}, "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}, "s": {"subject": "$z", "checks": {"c": "n exists"}}}}, "cases": [{"description": "a child read through a part of a $ subject, and a $ subject defined as null, quote the name", "rules": ["name.keys", "added.text", "report.subjects"], "input": {"things": [{"id": "a", "meta": {"items": [{"n": 1}]}}], "$z": [{"n": 1}]}, "expressions": {"r": {"$min_subjects": "count(matching(\"$x\".pa.items)) >= 1", "$unique_ids": "count(repeated(ids(\"$x\".pa.items))) == 0"}, "s": {"$min_subjects": "count(matching(\"$z\")) >= 1", "$unique_ids": "count(repeated(ids(\"$z\"))) == 0"}}, "report": {"subjects": {"$x": {"description": "", "from": "things", "identified_by": "id", "parts": {"pa": {"from": "meta", "identified_by": null}}}, "$z": {"description": "", "from": "\"$z\"", "identified_by": null, "parts": {}}, "kid": {"description": "", "from": "\"$x\".pa.items", "identified_by": "n", "parts": {}}}}, "results": [{"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/meta/items/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": 1, "in": {"$x": "a"}, "type": "kid"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/$z/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": {"n": 1}, "type": "$z"}}]}]},
+  {
     "description": "require some",
     "policy": {"ergo_spec": "v0.3-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "require": "some", "checks": {"a": ".a exists", "b": "b exists"}}}},
     "cases": [

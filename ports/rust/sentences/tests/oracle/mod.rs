@@ -105,6 +105,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "\"$s\" named by $params.k named by kk whose $input.i named by $params.k._k is equal to -2.50",
         "\"$s\" named by $params.k named by kk whose $input.i named by $params.k._k is -2.5",
     ),
+    ("\"$x\".pa.items", "\"$x\".pa.items"),
+    ("\"$x\".items", "\"$x\".items"),
     (
         "\"$s\" whose .\"a.b\" is not empty",
         "\"$s\" whose \"a.b\" is not empty",
@@ -758,6 +760,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "lockfile whose status is \"COMPLETE\"",
     ),
     ("m whose id exists", "m whose id exists"),
+    ("meta", "meta"),
     ("meta.w", "meta.w"),
     ("mid.leaves", "mid.leaves"),
     (
@@ -2617,8 +2620,10 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ),
     ("meta", "meta"),
     ("meta.id", "meta.id"),
+    ("meta", "meta"),
     ("meta.w", "meta.w"),
     ("name", "name"),
+    ("n", "n"),
     ("ps", "ps"),
     ("pull_requests.reviews", "pull_requests.reviews"),
     ("reviews", "reviews"),
