@@ -3,6 +3,9 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("$input whose x is 1", "$input whose x is 1"),
+    ("$input.commits", "$input.commits"),
+    ("$input[5]", "item 6 of $input"),
     (".artifact", "artifact"),
     (".artifact.p[0]", "item 1 of artifact.p"),
     (
@@ -24,6 +27,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact[0] named by each of $params.k",
         "item 1 of artifact named by each of $params.k",
     ),
+    ("artifact[0].c", "artifact[0].c"),
+    ("every $input", "every $input"),
+    ("every $input.commits", "every $input.commits"),
+    ("every commits", "every commits"),
+    ("first of $input", "first of $input"),
     ("fam.kids", "fam.kids"),
     ("fams", "fams"),
     ("commit.files", "commit.files"),
@@ -61,6 +69,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
+    ("p whose x is 1", "p whose x is 1"),
+    ("p.commits", "p.commits"),
     ("suite.items", "suite.items"),
     (
         "suites named by $params.group",
