@@ -1999,7 +1999,7 @@ test_every_badly_written_check_fails_well_formed_and_says_what_is_wrong if {
 }
 
 test_a_bare_word_after_named_by_that_no_for_line_gives_is_an_unknown_alias if {
-	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown alias x"]
+	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["for: unknown alias x"]
 }
 
 test_a_dollar_word_in_a_sentence_is_not_an_alias_so_it_stays_an_unknown_name if {
@@ -3137,13 +3137,13 @@ badly_written := [
 	["empty is 1", "", ["empty is a word of the grammar: write .empty"]],
 	["some xs, if any, exists", "", ["if any can't go with some"]],
 	[`t is before "yesterday"`, "", [`"is before" takes a time or a number`]],
-	[`every xs.v is one of 1, "a"`, ".check", ["values of mixed types"]],
-	[`count of xs whose v is one of 1, "a" is 0`, ".left.whose.0", ["values of mixed types"]],
+	[`every xs.v is one of 1, "a"`, "", ["values of mixed types"]],
+	[`count of xs whose v is one of 1, "a" is 0`, "", ["values of mixed types"]],
 	["count of xs whose v is between 9 and 0 is 0", "", ["min above max"]],
 	[`count of xs whose v matches "(" is 0`, "", [`invalid pattern "("`]],
 	["count of xs whose $foo exists is 0", "", ["unknown name $foo"]],
 	["count of xs whose v[9007199254740992] exists is 0", "", ["9007199254740992 can't be a list position"]],
-	[`every xs whose v is one of 1, "a" is 1`, ".whose.0", ["values of mixed types"]],
+	[`every xs whose v is one of 1, "a" is 1`, "", ["values of mixed types"]],
 	["n exists whose v is 1", "", ["doesn't parse"]],
 	["every xs some ys is 1", "", ["two quantifiers in one sentence: put them on a for line"]],
 	[{"assert": "n exists", "description": 5}, "", ["invalid description"]],
@@ -3156,8 +3156,10 @@ badly_written := [
 	[{"for": "every xs as x"}, "", ["missing assert"]],
 	[{"assert": "x exists", "for": "every xs"}, "", [`for: an item ends with "as" and a name, like "every pull_requests as pr"`]],
 	[{"assert": "x exists", "for": "every xs as x, every x.ys as x"}, "", ["for: x is given twice"]],
-	[{"assert": "x exists", "for": `every xs whose v is one of 1, "a" as x`}, ".items.0.whose.0", ["values of mixed types"]],
-	[{"assert": `x is one of 1, "a"`, "for": "every xs as x"}, ".checks.0", ["values of mixed types"]],
+	[{"assert": "x exists", "for": `every xs whose v is one of 1, "a" as x`}, "", ["for: values of mixed types"]],
+	[{"assert": `x is one of 1, "a"`, "for": "every xs as x"}, "", ["values of mixed types"]],
+	[{"assert": ["n exists", "n is one of 1, \"a\""]}, "", ["line 2: values of mixed types"]],
+	[{"assert": ["n is one of 1, \"a\"", "n is"]}, "", ["line 1: values of mixed types", "line 2: doesn't parse"]],
 	[{"assert": "n exists", "for": 5}, "", ["invalid for"]],
 	[{"any_of": {"o": "n is"}}, "", ["option o: doesn't parse"]],
 	[{"any_of": {"o": ["n exists", "n is one of 1, \"a\""]}}, "", ["option o: line 2: values of mixed types"]],
@@ -3331,7 +3333,7 @@ test_an_identified_by_with_an_index_that_cannot_be_a_key_is_written_wrong if {
 	rep.compliant == false
 }
 
-test_a_problem_inside_a_sentence_is_named_by_the_position_where_it_sits if {
+test_a_problem_inside_a_sentence_is_named_by_its_check_and_the_check_prints_as_written if {
 	rep := ergo.report(
 		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
 			"k": `count of items whose x is one of 1, "a" and y is one of true, 2 is 0`,
@@ -3340,10 +3342,11 @@ test_a_problem_inside_a_sentence_is_named_by_the_position_where_it_sits if {
 		{},
 	)
 	problem_inputs(rep) == [
-		{"name": "checks.e.items.0.whose.0", "value": ["values of mixed types"], "locations": []},
-		{"name": "checks.k.left.whose.0", "value": ["values of mixed types"], "locations": []},
-		{"name": "checks.k.left.whose.1", "value": ["values of mixed types"], "locations": []},
+		{"name": "checks.e", "value": ["for: values of mixed types"], "locations": []},
+		{"name": "checks.k", "value": ["values of mixed types"], "locations": []},
 	]
+	rep.requirements.s.checks.k.expression == "count of items whose x is one of 1, \"a\" and y is one of true, 2 is 0"
+	rep.requirements.s.checks.e.expression == "for every items whose x is one of 1, \"a\" as i: i.y exists"
 }
 
 test_a_range_with_equal_bounds_is_well_written if {
@@ -4647,7 +4650,7 @@ test_a_position_and_a_sum_after_plus_on_the_right_and_a_count_in_a_picked_items_
 	_reads("n is count of xs plus sum of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10")
 	_sentence_problems(concat("", ["n is count of xs plus sum of ", _eleven])) == _too_long
 	_reads({"for": "first of xs whose n is count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10 as x", "assert": "x.n is 1"})
-	_sentence_problems({"for": concat("", ["first of xs whose n is count of ", _eleven, " as x"]), "assert": "x.n is 1"}) == _too_long
+	_sentence_problems({"for": concat("", ["first of xs whose n is count of ", _eleven, " as x"]), "assert": "x.n is 1"}) == [concat("", ["for: ", p]) | some p in _too_long]
 }
 
 test_params_is_not_a_step_of_a_walk if {
@@ -4952,7 +4955,7 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
 		["every xs whose last of ys is 1 as x", "last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""],
 		["every b.c.d.e.f.g.h.i.j.k.l.m as x", "every and some over more than ten steps aren't supported yet"],
 	] {
-		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [pair[1]]
+		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [concat("", ["for: ", pair[1]])]
 	}
 }
 
@@ -6371,9 +6374,9 @@ test_named_by_a_for_name_in_the_second_items_path_reads_the_first_items_key if {
 }
 
 test_named_by_a_for_name_before_it_is_given_is_an_unknown_name if {
-	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown alias x"]
-	_sentence_problems({"for": "every lists named by q as p, every qs as q", "assert": "p is 1"}) == ["unknown alias q"]
-	_sentence_problems({"for": "every objs whose v named by o is 1 as o", "assert": "o exists"}) == ["unknown alias o"]
+	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["for: unknown alias x"]
+	_sentence_problems({"for": "every lists named by q as p, every qs as q", "assert": "p is 1"}) == ["for: unknown alias q"]
+	_sentence_problems({"for": "every objs whose v named by o is 1 as o", "assert": "o exists"}) == ["for: unknown alias o"]
 }
 
 test_named_by_a_for_name_that_holds_no_text_fails_with_its_cause if {
