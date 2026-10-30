@@ -280,6 +280,11 @@ fn reference_text(reference: &Reference) -> String {
     match reference {
         Reference::Params(key) => format!("$params.{}", key_text(key)),
         Reference::Input(key) => format!("$input.{}", key_text(key)),
+        Reference::Unknown { name, key: None } => name.clone(),
+        Reference::Unknown {
+            name,
+            key: Some(key),
+        } => format!("{name}.{}", key_text(key)),
         Reference::Name(name) => name.clone(),
     }
 }
@@ -335,6 +340,7 @@ fn path_text_with(path: &Path, side: Side, aliases: &[&str], own: bool, lift: bo
         Start::It => out.push_str("it"),
         Start::Params => out.push_str("$params"),
         Start::Input => out.push_str("$input"),
+        Start::Unknown(name) => out.push_str(name),
         Start::Field { key, dot } => {
             let dotted = is_word(key)
                 || (matches!(side, Side::Right) && !is_bare_key(key))

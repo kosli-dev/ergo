@@ -5028,10 +5028,11 @@ _s_patterns := {
 	dq := `"(?:[^"\\\x00-\x1f]|\\["\\/bfnrt]|\\u[0-9a-fA-F]{4})*"`
 	sq := `'(?:[^'\\\x00-\x1f]|\\[^\x00-\x1f])*'`
 	num := `-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?`
-	ref := concat("", [`(?:\$params|\$input)\.(?:`, key, `|`, dq, `)|`, key])
+	name := `\$[A-Za-z_]\w*`
+	ref := concat("", [name, `(?:\.(?:`, key, `|`, dq, `))?|`, key])
 	step := concat("", [`\.(?:`, key, `|`, dq, `)| +named +by +(?:`, ref, `)|\[(?:`, ref, `|`, dq, `|0|[1-9][0-9]*)\]`])
-	start := concat("", [`\$params|\$input|\.?(?:`, key, `|`, dq, `)`])
-	rstart := concat("", [`\$params|\$input|`, key, `|\.(?:`, key, `|`, dq, `)`])
+	start := concat("", [name, `|\.?(?:`, key, `|`, dq, `)`])
+	rstart := concat("", [name, `|`, key, `|\.(?:`, key, `|`, dq, `)`])
 	pos := `(?:item +[1-9][0-9]*(?: +from +last)?|first|last) +of +`
 	plain := concat("", [`(?:`, start, `)(?:`, step, `)*`])
 	path := concat("", [`(?:`, pos, `)?`, plain])
@@ -5106,11 +5107,13 @@ _sentence(raw) := {"assertions": [assertion]} if {
 	m := regex.find_all_string_submatch_n(pat.plain, trim_space(raw), 1)[0]
 	assertion := {"path": _s_path_of(m[1], pat), "phrase": _s_phrase_of(m[2], pat)}
 	count(_s_sentence_problems({"assertions": [assertion]})) == 0
+	count(_s_text_names(trim_space(raw))) == 0
 } else := {"assertions": [assertion]} if {
 	pat := _s_patterns
 	m := regex.find_all_string_submatch_n(pat.quantified, trim_space(raw), 1)[0]
 	assertion := {m[1]: _s_path_of(m[2], pat), "phrase": _s_phrase_of(m[3], pat)}
 	count(_s_sentence_problems({"assertions": [assertion]})) == 0
+	count(_s_text_names(trim_space(raw))) == 0
 } else := {"assertions": assertions} if {
 	pat := _s_patterns
 	text := trim_space(raw)
@@ -5119,11 +5122,23 @@ _sentence(raw) := {"assertions": [assertion]} if {
 	count(assertions) == count(pieces)
 	count(pieces) > 0
 	count(_s_sentence_problems({"assertions": assertions})) == 0
+	count(_s_text_names(text)) == 0
 } else := {"problems": _s_problems(trim_space(raw), _s_patterns)}
 
 _for_line(raw) := {"items": items} if {
 	pat := _s_patterns
 	text := trim_space(raw)
+	pieces := _s_pieces(pat.for_items, text)
+	items := [_s_for_item_of(a, pat) | some a in pieces]
+	count(items) == count(pieces)
+	count(pieces) in {1, 2}
+	count(_s_sentence_problems({"items": items})) == 0
+	count(_s_text_names(text)) == 0
+} else := {"problems": sort(names)} if {
+	pat := _s_patterns
+	text := trim_space(raw)
+	names := _s_text_names(text)
+	count(names) > 0
 	pieces := _s_pieces(pat.for_items, text)
 	items := [_s_for_item_of(a, pat) | some a in pieces]
 	count(items) == count(pieces)
@@ -5145,6 +5160,12 @@ _from_line(raw) := line if {
 	pat := _s_patterns
 	line := _s_from_of(trim_space(raw), pat)
 	count(_s_sentence_problems(line)) == 0
+	count(_s_text_names(trim_space(raw))) == 0
+} else := {"problems": sort(names), "parsed": line} if {
+	line := _s_from_of(trim_space(raw), _s_patterns)
+	count(_s_sentence_problems(line)) == 0
+	names := _s_text_names(trim_space(raw))
+	count(names) > 0
 } else := {"problems": _from_problems(_s_after_every(trim_space(raw)), _s_patterns)}
 
 _from_problems(text, pat) := ["a condition after whose can't have a whose of its own"] if {
@@ -5318,6 +5339,11 @@ _s_start_of("$params", steps) := {"start": "params", "steps": steps}
 
 _s_start_of("$input", steps) := {"start": "input", "steps": steps}
 
+_s_start_of(key, steps) := {"start": key, "steps": steps} if {
+	startswith(key, "$")
+	not key in {"$params", "$input"}
+}
+
 _s_start_of("it", steps) := {"steps": array.concat(["it"], steps), "it": true}
 
 _s_start_of(key, steps) := {"steps": array.concat([key], steps), "bare_word": key} if {
@@ -5337,9 +5363,11 @@ _s_key_of(text) := json.unmarshal(text) if startswith(text, `"`)
 
 _s_key_of(text) := text if not startswith(text, `"`)
 
-_s_steps_of(text, pat) := [_s_step_of(m) | some m in matches] if {
+_s_steps_of(text, pat) := steps if {
 	matches := regex.find_all_string_submatch_n(pat.steps, text, -1)
 	concat("", [m[0] | some m in matches]) == text
+	steps := [_s_step_of(m) | some m in matches]
+	count(steps) == count(matches)
 }
 
 _s_step_of(m) := _s_key_of(m[1]) if m[1] != ""
@@ -5359,6 +5387,13 @@ _s_counted(f, digits) := {f: to_number(digits), "bad_index": digits} if to_numbe
 _s_ref_of(text) := {"start": "params", "steps": [_s_key_of(substring(text, 8, -1))]} if startswith(text, "$params.")
 
 _s_ref_of(text) := {"start": "input", "steps": [_s_key_of(substring(text, 7, -1))]} if startswith(text, "$input.")
+
+_s_ref_of(text) := {"start": name, "steps": steps} if {
+	m := regex.find_all_string_submatch_n(`^(\$[A-Za-z_][A-Za-z0-9_]*)(?:\.(.*))?$`, text, 1)[0]
+	name := m[1]
+	not name in {"$params", "$input"}
+	steps := [_s_key_of(m[2]) | m[2] != ""]
+}
 
 _s_ref_of(text) := {"steps": [text]} if {
 	not startswith(text, "$")
@@ -5461,6 +5496,13 @@ _s_sq_char(`\\`) := `\`
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
 _s_sentence_problems(parsed) := _s_base_problems(parsed) | _s_it_problems(parsed)
+
+_s_text_names(text) := {concat("", ["unknown name ", m[1]]) |
+	some m in regex.find_all_string_submatch_n(concat("", [_s_patterns.strings, `|(?:^|[ ,\[])(\$[A-Za-z_]\w*)`]), text, -1)
+	not m[1] in {"", "$params", "$input"}
+} if contains(text, "$")
+
+else := set()
 
 _s_it_problems(parsed) := ({_s_it_step_message(node) |
 	some node in _s_nodes(parsed)
@@ -5763,15 +5805,14 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 	]
 	count(invalid) > 0
 } else := sort(problems) if {
-	problems := _s_sentence_problems(_s_parsed_anyway(text, pat))
+	problems := _s_sentence_problems(_s_parsed_anyway(text, pat)) | _s_text_names(text)
 	count(problems) > 0
-} else := names if {
-	names := sort({concat("", ["unknown name ", m[1]]) | some m in regex.find_all_string_submatch_n(concat("", [pat.strings, `|(?:^|[ ,\[])(\$[A-Za-z_][A-Za-z0-9_]*)`]), text, -1); not m[1] in {"", "$params", "$input"}})
-	count(names) > 0
 } else := ["two quantifiers in one sentence: put them on a for line"] if {
 	regex.match(`^(?:every|some) +\S+ +(?:every|some) `, text)
 } else := [`"within" needs a number after it`] if {
 	regex.match(` within$`, text)
+} else := ["doesn't parse"] if {
+	regex.match(`(?: named +by +|\[)\$(?:params|input)(?:[^.A-Za-z0-9_]|$)`, text)
 } else := [concat("", ["nothing after the path at column ", _json_text(count(text) + 1), `: expected a phrase, like "is" or "exists"`])] if {
 	regex.match(pat.quantified_path, text)
 } else := ["doesn't parse"]
@@ -5887,6 +5928,8 @@ _s_first_step(p) := 1 if not "start" in object.keys(p)
 _s_start_text(p, _) := "$params" if object.get(p, "start", "") == "params"
 
 _s_start_text(p, _) := "$input" if object.get(p, "start", "") == "input"
+
+_s_start_text(p, _) := p.start if startswith(object.get(p, "start", ""), "$")
 
 _s_start_text(p, side) := concat("", [_s_start_dot(p, side), _s_key_text(p.steps[0])]) if not "start" in object.keys(p)
 
@@ -6134,8 +6177,9 @@ _p_descend(subjects, lines) := {name: lines[name].path.steps[0] | some name, _ i
 _p_parts(subjects) := {"own": own, "effective": {name: _p_merged(name, own, narrow) | some name, _ in subjects}, "problems": _p_problems(subjects, own, narrow, descend), "lines": lines, "narrow": narrow, "descend": descend} if {
 	is_object(subjects)
 	lines := _p_lines(subjects)
-	narrow := _p_narrow(subjects, lines)
-	descend := _p_descend(subjects, lines)
+	read := {name: object.get(line, "parsed", line) | some name, line in lines}
+	narrow := _p_narrow(subjects, read)
+	descend := _p_descend(subjects, read)
 	own := _p_own_reads(subjects)
 }
 
@@ -6200,7 +6244,17 @@ _s_from_used(def, read) if {
 	not "of" in object.keys(def)
 }
 
-_s_from_read(name, fl, subjects, chains) := object.union(object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)), _s_follows(name, fl, subjects, chains)) if {
+_s_from_read(name, fl, subjects, chains) := _s_from_read_of(name, fl, subjects, chains) if "path" in object.keys(fl)
+
+else := object.union(r, {"problems": sort(names | ({p | some p in r.problems} - {concat("", ["whose: ", n]) | some n in names}))}) if {
+	r := _s_from_read_of(name, fl.parsed, subjects, chains)
+	"parent" in object.keys(r)
+	names := {n | some n in fl.problems}
+}
+
+else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}}
+
+_s_from_read_of(name, fl, subjects, chains) := object.union(object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)), _s_follows(name, fl, subjects, chains)) if {
 	"path" in object.keys(fl)
 	names := {a | some a in _s_ancestors(name, chains.descend)}
 	keep := names | object.keys(_p_steps_of(object.get(chains.parts, name, {})))
@@ -6210,7 +6264,7 @@ _s_from_read(name, fl, subjects, chains) := object.union(object.union({"problems
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 	every_list := object.get(fl, "every", false) == true
-} else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}}
+}
 
 _s_from_cond(c, names, keep) := object.union(c, object.union(
 	{q: _s_from_dot(c[q], names, keep) | some q in ["every", "some"]; is_object(object.get(c, q, null))},
@@ -6896,6 +6950,15 @@ _s_line_self(line, names) := _s_self_problems([_s_aliased(a, names) | some a in 
 	is_string(line)
 	parsed := _sentence(line)
 	"assertions" in object.keys(parsed)
+} else := _s_self_problems([_s_aliased(a, names) | some a in anyway.assertions]) if {
+	is_string(line)
+	parsed := _sentence(line)
+	count(parsed.problems) > 0
+	every p in parsed.problems {
+		startswith(p, "unknown name ")
+	}
+	anyway := _s_parsed_anyway(trim_space(line), _s_patterns)
+	"assertions" in object.keys(anyway)
 } else := set()
 
 _s_model_of([a]) := _s_model(a)
@@ -8378,7 +8441,12 @@ _for_inner_pairs(check, _, _, _, _) := set() if count(check.items) == 1
 _for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check, check.items[1].path, walked), values, locations]} if {
 	count(check.items) == 2
 	_for_from_first(check)
-	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) | some e in w.items]
+	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) |
+		some e in w.items
+		wh := _for_whose(item, e, names)
+		wh.undecided == []
+		wh.kept
+	]
 	walked := {i | some iw in inner; some i in iw.walked}
 	values := [_walk_shown(e2.v) | some iw in inner; some e2 in iw.items]
 	locations := [_walk_at(iw, e2) | some iw in inner; some e2 in iw.items]
