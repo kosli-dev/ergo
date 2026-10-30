@@ -528,15 +528,10 @@ fn subject_entry(reading: &Reading, name: &str, extra: &Problems) -> Value {
     if extra.contains_key(&field_name(&["subjects", name, "from"])) {
         entry["from"] = json!(INVALID_FROM);
     }
-    let from_broken = extra
-        .get(&field_name(&["subjects", name, "from"]))
-        .is_some_and(|texts| {
-            texts
-                .iter()
-                .any(|text| text != crate::reading::NARROWING_A_CHILD_PROBLEM)
-        });
-    let follows_parent =
-        matches!(info.relation, crate::reading::Relation::Narrows(_)) && !from_broken;
+    let follows_parent = matches!(
+        &info.relation,
+        crate::reading::Relation::Narrows(parent) if !parent.trim().is_empty()
+    );
     if extra.contains_key(&field_name(&["subjects", name, "identified_by"])) && !follows_parent {
         entry["identified_by"] = json!(crate::reading::INVALID_IDENTIFIED_BY);
     }
@@ -1326,6 +1321,27 @@ mod tests {
             );
             assert_eq!(found["kid"], entry("<invalid from>", Some("id")), "{line}");
             assert_eq!(found["parent"], entry("things", Some("id")), "{line}");
+        }
+    }
+
+    #[test]
+    fn a_subject_that_narrows_another_has_its_id_when_its_from_is_written_wrong_even_with_an_id_of_its_own()
+     {
+        for line in [
+            "every parent",
+            "parent whose n is 1",
+            "parent whose n is one of 1, \"a\"",
+        ] {
+            let found = subjects_of(
+                json!({"parent": {"from": "things", "identified_by": "id"}, "kid": {"from": line, "identified_by": "n"}}),
+                "kid",
+            );
+            let from = if line == "parent whose n is 1" {
+                line
+            } else {
+                "<invalid from>"
+            };
+            assert_eq!(found["kid"], entry(from, Some("id")), "{line}");
         }
     }
 

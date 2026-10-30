@@ -1009,8 +1009,7 @@ fn resolved_id_text(
             .and_then(|p| p.get(&from_at))
             .is_some_and(|texts| texts.iter().any(|text| text != NARROWING_A_CHILD_PROBLEM));
         if let Relation::Narrows(parent) = &found.relation
-            && (read_ok
-                || (matches!(found.def.identified_by, Text::Missing) && !parent.trim().is_empty()))
+            && (read_ok || !parent.trim().is_empty())
         {
             at = parent.clone();
             continue;
