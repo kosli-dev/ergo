@@ -11,6 +11,8 @@ requirements / a position on the whole input when it is a list / names the posit
 requirements / a subject that narrows the whole input when it is a list / keeps the items that pass its condition
 requirements / a walk that starts at an input that is a list / names a list that breaks from $input
 requirements / a walk that starts at an input that is a list, without $input / names a list that breaks from $input
+requirements / the whole input as a list, from every / names a null input $input when it breaks the walk
+requirements / the whole input as a list, from every / names a string input $input when it breaks the walk
 requirements / the whole input as a list, from every / names an input that isn't a list $input when it breaks the walk
 requirements / the whole input as a list, with a condition / keeps the items that pass the condition
 requirements / the whole input as the subject / fails min_subjects as value on an empty list
