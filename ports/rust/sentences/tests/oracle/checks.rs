@@ -1600,6 +1600,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every items.status whose days elapsed from start to stop is at least lo is \"ok\"",
+        "every items.status whose days elapsed from start to stop is at least lo is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
         "every items.status whose count of kids is at least min is \"ok\"",
         "every items.status whose count of kids is at least min is \"ok\"",
         &[],

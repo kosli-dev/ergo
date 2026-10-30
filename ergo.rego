@@ -7382,20 +7382,33 @@ _walk_failure(_, _, [], false, _, _) := null
 
 _walk_failure(_, _, [], true, _, true) := null
 
-_walk_first_path(c, v) := array.concat([p | some p in _walk_sides_paths(c); _read_state(v, p) != "value"], _walk_sides_paths(c))[0]
+_walk_first_path(c, v) := array.concat([e[0] | some e in _walk_sides_paths(c); not _walk_side_read(v, e)], [e[0] | some e in _walk_sides_paths(c)])[0]
 
 _walk_first_value(c, v) := _value_at(v, _walk_first_path(c, v))
 
-_walk_sides_paths(c) := [p | some f in ["left", "right"]; some p in _walk_side_paths(c, c[f])] if _two_sided(c)
+_walk_side_read(v, e) if {
+	_read_state(v, e[0]) == "value"
+	_walk_list_read(e[1], _value_at(v, e[0]))
+}
 
-_walk_sides_paths(c) := _condition_paths(c) if not _two_sided(c)
+_walk_list_read("value", _)
 
-_walk_side_paths(_, side) := [side] if is_array(side)
+_walk_list_read("list", x) if is_array(x)
 
-_walk_side_paths(c, side) := _side_paths(side) if {
+_walk_sides_paths(c) := [e | some f in ["left", "right"]; some e in _walk_side_paths(c, c[f])] if _two_sided(c)
+
+_walk_sides_paths(c) := [[p, "value"] | some p in _condition_paths(c)] if not _two_sided(c)
+
+_walk_side_paths(_, side) := [[side, "value"]] if is_array(side)
+
+_walk_side_paths(c, side) := [[p, _walk_side_needs(side)] | some p in _side_paths(side)] if {
 	c.op == "compare"
 	_derived(side)
 }
+
+_walk_side_needs(side) := "list" if _basic_form(side) in {"count_of", "sum_of"}
+
+_walk_side_needs(side) := "value" if not _basic_form(side) in {"count_of", "sum_of"}
 
 _condition_paths(c) := array.concat(_leaf_paths(c), [p | some side in _derived_sides(c); some p in _side_paths(side)])
 

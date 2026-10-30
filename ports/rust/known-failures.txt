@@ -13,3 +13,5 @@ walks / whose with a count on the left names the side that couldn't be read / na
 walks / whose with a count on the right names the side that couldn't be read / names min, kids and the left side, min, for items missing min, kids and both
 walks / whose with two fields names the side that couldn't be read / names hi when only lo is there
 walks / whose with two fields names the side that couldn't be read / names hi, with null, when hi is null
+walks / whose with a count on the right names the side that couldn't be read / names kids, with 5, when kids is found but isn't a list
+walks / whose with an elapsed side names its first path that couldn't be read / names stop, the first path of the elapsed side that wasn't read, when only stop is missing
