@@ -25,6 +25,24 @@ pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
     found.into_iter().collect()
 }
 
+/// Lists only the problems of a check that come from a field compared with itself.
+///
+/// It gives what [`check_problems`] gives when the check has no other problem, and an empty list otherwise.
+///
+/// ```
+/// use ergo_sentences::{check_self_problems, parse_check};
+///
+/// let check = parse_check("x equals x").unwrap();
+/// assert_eq!(check_self_problems(&check, &[]), ["x is compared with itself"]);
+/// ```
+pub fn check_self_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
+    if check_base(check, &[]).is_empty() {
+        check_self(check, aliases).into_iter().collect()
+    } else {
+        Vec::new()
+    }
+}
+
 /// Lists what is written wrong in a `for` line that was read.
 ///
 /// The messages are in `ergo.rego`'s words and sorted. It only reads the tree and the names in `aliases`. Rules that need the policy's names, like an alias named like a subject, are left to the engine. The list is empty when nothing is wrong.

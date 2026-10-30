@@ -3,22 +3,38 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
-    ("owner.name", "owner.name"),
-    ("kid whose n is 1", "kid whose n is 1"),
-    ("mid whose n is 1", "mid whose n is 1"),
-    ("pp whose n is 1", "pp whose n is 1"),
+    (".artifact.p[0]", "item 1 of artifact.p"),
+    (
+        ".artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (".artifact.p", "artifact.p"),
+    (
+        "artifact.x[0] named by each of $params.k",
+        "item 1 of artifact.x named by each of $params.k",
+    ),
+    ("art.things", "art.things"),
+    ("arts", "arts"),
+    (
+        "artifact[0] named by each of $params.k",
+        "item 1 of artifact named by each of $params.k",
+    ),
     ("commit.files", "commit.files"),
     ("every parent.items", "every parent.items"),
-    (
-        "parent.items whose n is one of 1, \"a\"",
-        "parent.items whose n is one of 1, \"a\"",
-    ),
-    (
-        "parent whose n is one of 1, \"a\"",
-        "parent whose n is one of 1, \"a\"",
-    ),
-    ("parent whose n is 1", "parent whose n is 1"),
     ("every parent", "every parent"),
+    (
+        "first of artifact named by each of $params.k",
+        "first of artifact named by each of $params.k",
+    ),
+    (
+        "artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (
+        "artifact.x named by each of $params.k",
+        "artifact.x named by each of $params.k",
+    ),
+    ("k.items", "k.items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
     (
         "artifact.scans named by each of $params.k",
@@ -28,9 +44,22 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact.pulls whose state is \"open\"",
         "artifact.pulls whose state is \"open\"",
     ),
+    ("kid whose n is 1", "kid whose n is 1"),
+    ("mid whose n is 1", "mid whose n is 1"),
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
+    ("owner.name", "owner.name"),
+    ("pp whose n is 1", "pp whose n is 1"),
+    (
+        "parent.items whose n is one of 1, \"a\"",
+        "parent.items whose n is one of 1, \"a\"",
+    ),
+    (
+        "parent whose n is one of 1, \"a\"",
+        "parent whose n is one of 1, \"a\"",
+    ),
+    ("parent whose n is 1", "parent whose n is 1"),
     (
         "things whose x.y named by $params.i does not exist",
         "things whose x.y named by $params.i does not exist",
@@ -708,6 +737,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "lockfile whose status is \"COMPLETE\"",
     ),
     ("m whose id exists", "m whose id exists"),
+    ("meta.w", "meta.w"),
     ("mid.leaves", "mid.leaves"),
     (
         "modules whose every files.path matches \"^docs/\"",
@@ -1418,8 +1448,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
-    ("parent.items whose zz is $foo foo bar", &["doesn't parse"]),
     ("parent.items whose", &["doesn't parse"]),
+    ("parent.items whose zz is $foo", &["unknown name $foo"]),
+    ("parent whose n is $foo", &["unknown name $foo"]),
     ("", &["doesn't parse"]),
     ("\"a\\q\"", &["invalid string at column 1"]),
     (
@@ -1708,6 +1739,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         "one named by each of y whose a.z.a does not .empty.q.z",
         &["doesn't parse"],
     ),
+    ("parent.items whose zz is $foo foo bar", &["doesn't parse"]),
     (
         "plus named by it.q whose item 3 of empty is between 2.5 and 4e2",
         &[
@@ -2564,6 +2596,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
         "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10",
     ),
     ("meta.id", "meta.id"),
+    ("meta.w", "meta.w"),
     ("name", "name"),
     ("ps", "ps"),
     ("pull_requests.reviews", "pull_requests.reviews"),
