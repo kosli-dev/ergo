@@ -6566,12 +6566,10 @@ _p_item_keys(x) := ["where", "phrase"] if object.keys(x) & {"every", "some", "pi
 
 else := ["where"]
 
-_p_part_walk_steps([p, mode], pc) := (count(_walk_steps(_s_model_path(p))) - 1) + count(pc.own[p.steps[0]]) if {
-	object.get(p, "part", false) == true
-	p.steps[0] in object.keys(pc.own)
-} else := _p_parent_walk_steps(p, pc) if mode != "own"
-
-else := 0
+_p_part_walk_steps(w, pc) := (count(_walk_steps(_s_model_path(w[0]))) - 1) + count(pc.own[w[0].steps[0]]) if {
+	object.get(w[0], "part", false) == true
+	w[0].steps[0] in object.keys(pc.own)
+} else := _p_parent_walk_steps(w[0], pc)
 
 _p_parent_walk_steps(p, pc) := (count(_walk_steps(_s_model_path(p))) - 2) + count(pc.ancestors[p.steps[0]][p.steps[1]]) if {
 	object.get(p, "part", false) == true
@@ -7981,9 +7979,9 @@ _s_named_tally(side, _) := side if {
 	object.keys(side) & {"count_of", "sum_of", "elapsed_from"} == set()
 }
 
-_s_named_cond(c, names) := object.union(object.union(c, {f: _s_named_path(c[f], names) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}), {"right": _s_named_elapsed(c.right, names) | is_object(object.get(c, "right", null))})
+_s_named_cond(c, names) := object.union(object.union(c, {f: _s_named_path(c[f], names) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}), {"right": _s_named_right(c.right, names) | is_object(object.get(c, "right", null))})
 
-_s_named_elapsed(side, names) := object.union(side, {f: _s_named_path(side[f], names) | some f in ["elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))})
+_s_named_right(side, names) := object.union(side, {f: _s_named_path(side[f], names) | some f in ["count_of", "sum_of", "elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))})
 
 _s_named_path(p, names) := [_s_named_step(i, step, names) | some i, step in p]
 

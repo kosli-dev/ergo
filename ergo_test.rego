@@ -4763,13 +4763,33 @@ _parent_part_problems(has, check) := [i.value | some r in ergo.report({"bs": []}
 
 _parent_part_cause(has, check, doc) := [r.cause | some r in ergo.report(doc, _parent_part_policy(has, check), {}).results; r.check == "c"]
 
-test_a_count_or_sum_in_the_whose_of_a_count_reads_the_items_field_so_a_parent_part_is_not_counted if {
-	doc := {"bs": [object.union({"id": "b1", "kids": [{"id": "c1", "n": 1, "xs": [{"v": 1, "n": 1, "b": {"x": {"z": [1, 1]}}}]}]}, _k10({"z": [1]}))]}
-	has := {"x": _ten}
-	_parent_part_cause(has, "count of xs whose n is count of b.x.z is 0", doc) == ["satisfied"]
-	_parent_part_cause(has, "count of xs whose n is count of b.x.z is 1", doc) == ["value"]
-	_parent_part_cause(has, "count of xs whose n is at least count of b.x.z is 1", doc) == ["value"]
-	_parent_part_cause(has, "sum of xs.v whose n is count of b.x.z is 0", doc) == ["satisfied"]
+test_a_count_or_sum_on_the_right_of_a_whose_of_a_count_reads_the_parents_part_and_counts_its_path if {
+	doc := {"bs": [object.union({"id": "b1", "kids": [{"id": "c1", "n": 1, "xs": [{"v": 1, "n": 1, "b": {"x": {"z": [1, 1]}}}]}]}, _k9({"z": [1]}))]}
+	has := {"x": _nine}
+	_parent_part_cause(has, "count of xs whose n is count of b.x.z is 1", doc) == ["satisfied"]
+	_parent_part_cause(has, "count of xs whose n is count of b.x.z is 0", doc) == ["value"]
+	_parent_part_cause(has, "count of xs whose n is at least count of b.x.z is 1", doc) == ["satisfied"]
+	_parent_part_cause(has, "sum of xs.v whose n is count of b.x.z is 1", doc) == ["satisfied"]
+	_parent_part_cause(has, "count of xs whose n is count of .b.x.z is 1", doc) == ["value"]
+	_parent_part_cause(has, "count of xs whose count of b.x.z is 2 is 1", doc) == ["satisfied"]
+}
+
+test_a_count_or_sum_on_the_right_of_a_whose_of_a_count_counts_the_parents_part_at_ten_names if {
+	_parent_part_problems({"x": _ten}, "count of xs whose n is count of b.x.z is 1") == [_too_long]
+	_parent_part_problems({"x": _ten}, "sum of xs.v whose n is count of b.x.z is 1") == [_too_long]
+	_parent_part_problems({"x": _nine}, "count of xs whose n is count of b.x.z is 1") == []
+	_parent_part_problems({"x": _ten}, "count of xs whose count of b.x.z is 1 is 1") == []
+}
+
+test_a_count_or_sum_on_the_right_of_a_whose_of_a_count_reads_the_parent_and_fails_closed_when_it_cant if {
+	kid := {"id": "c1", "xs": [{"v": 1, "n": 2, "b": {"z": [1]}}]}
+	_parent_part_cause({}, "count of xs whose n is count of b.z is 1", {"bs": [{"id": "b1", "z": [1, 1], "kids": [kid]}]}) == ["satisfied"]
+	_parent_part_cause({}, "sum of xs.v whose n is count of b.z is 1", {"bs": [{"id": "b1", "z": [1, 1], "kids": [kid]}]}) == ["satisfied"]
+	_parent_part_cause({}, "count of xs whose n is count of .b.z is 1", {"bs": [{"id": "b1", "z": [1, 1], "kids": [kid]}]}) == ["value"]
+	_parent_part_cause({}, "count of xs whose count of b.z is 1 is 1", {"bs": [{"id": "b1", "z": [1, 1], "kids": [kid]}]}) == ["satisfied"]
+	_parent_part_cause({}, "count of xs whose n is count of b.z is 1", {"bs": [{"id": "b1", "kids": [kid]}]}) == ["absent"]
+	_parent_part_cause({}, "count of xs whose n is count of b.z is 1", {"bs": [{"id": "b1", "z": null, "kids": [kid]}]}) == ["null"]
+	_parent_part_cause({}, "sum of xs.v whose n is count of b.z is 1", {"bs": [{"id": "b1", "z": "ab", "kids": [kid]}]}) == ["unusable"]
 }
 
 test_a_parent_part_in_the_whose_of_every_some_or_a_for_item_is_still_counted_at_ten_names if {
@@ -4784,7 +4804,8 @@ test_a_walk_that_is_already_written_wrong_for_another_reason_gets_no_ten_step_me
 	has := {"x": _ten}
 	_part_walk_problems(has, {"for": "every xs as x", "assert": "every x.z is 1"}) == ["x can't be an alias: it's a part of thing"]
 	_part_walk_problems(has, {"for": "every xs as x", "assert": "count of x.z is 1"}) == ["x can't be an alias: it's a part of thing"]
-	_parent_part_problems(has, "count of xs whose n is sum of b.x.z is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet"]]
+	_parent_part_problems(has, "count of xs whose n is sum of b.x.z is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet", "every and some over more than ten steps aren't supported yet"]]
+	_parent_part_problems(has, "count of xs whose sum of b.x.z is 1 is 0") == [["a sum of or a plus in the whose of a count of or a sum of isn't supported yet"]]
 }
 
 test_a_for_alias_named_like_a_parent_subject_still_counts_the_parents_part_beside_the_clash if {

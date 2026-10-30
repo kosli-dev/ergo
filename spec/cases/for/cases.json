@@ -11295,6 +11295,34 @@
     ]
   },
   {
+    "description": "a failed sentence that counts items whose a part matches lists the part's value",
+    "policy": {"ergo_spec": "v0.3-dev", "requirements": {"r": {"checks": {"c": {"assert": "count of items whose w is pa.w is 5", "for": "every groups as g"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"pa": "meta"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "lists the part's value and its location, with the part, beside the count",
+        "rules": ["for.failure_inputs", "parts.tag", "location.failed_items"],
+        "input": {"things": [{"groups": [1], "id": "t", "items": [{"w": 1}, {"w": 2}], "meta": {"w": 2}}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of items whose w equals pa.w is 5", "cause": "value", "inputs": [{"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "count of items whose w equals pa.w", "value": 1}, {"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}, {"locations": ["/things/0/meta/w"], "name": "pa.w", "part": {"id": null, "name": "pa"}, "value": 2}]}], "item": "item 1 of groups", "locations": ["/things/0/groups/0"], "path": "item 1 of groups", "value": 1}], "inputs": [{"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "count of items whose w equals pa.w", "value": 1}, {"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [1]}, {"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}, {"locations": ["/things/0/meta/w"], "name": "pa.w", "part": {"id": null, "name": "pa"}, "value": 2}], "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a failed sentence that counts items whose a parent's field matches lists the parent's value",
+    "policy": {"ergo_spec": "v0.3-dev", "requirements": {"r": {"checks": {"c": {"assert": "count of items whose w is artifact.w is 5", "for": "every groups as g"}}, "subject": "pr"}}, "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "lists the parent's value and its location beside the count",
+        "rules": ["for.failure_inputs", "subjects.chain", "location.failed_items"],
+        "input": {"artifacts": [{"id": "a", "prs": [{"groups": [1], "id": "p", "items": [{"w": 1}, {"w": 2}]}], "w": 2}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of items whose w equals artifact.w is 5", "cause": "value", "inputs": [{"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "count of items whose w equals artifact.w", "value": 1}, {"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}, {"locations": ["/artifacts/0/w"], "name": "artifact.w", "value": 2}]}], "item": "item 1 of groups", "locations": ["/artifacts/0/prs/0/groups/0"], "path": "item 1 of groups", "value": 1}], "inputs": [{"locations": ["/artifacts/0/w"], "name": "artifact.w", "value": 2}, {"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "count of items whose w equals artifact.w", "value": 1}, {"locations": ["/artifacts/0/prs/0/groups/0"], "name": "groups[]", "value": [1]}, {"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}], "passed": false, "requirement": "r", "subject": {"id": "p", "in": {"artifact": "a"}, "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a failed sentence on a picked item lists the values it compared",
     "policy": {
       "ergo_spec": "v0.3-dev",

@@ -31,6 +31,42 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of items whose w is pa.w is 5",
+        "count of items whose w equals pa.w is 5",
+        &[],
+        &[],
+    ),
+    (
+        "count of items whose w is artifact.w is 5",
+        "count of items whose w equals artifact.w is 5",
+        &[],
+        &[],
+    ),
+    (
+        "count of items whose n is count of fam.z is 1",
+        "count of items whose n equals count of fam.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of items.v whose n is count of fam.z is 1",
+        "sum of items.v whose n equals count of fam.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of items whose n is count of .fam.z is 2",
+        "count of items whose n equals count of fam.z is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of items whose count of fam.z is 1 is 3",
+        "count of items whose count of fam.z is 1 is 3",
+        &[],
+        &[],
+    ),
+    (
         "count of items whose w is pa.w is 1",
         "count of items whose w equals pa.w is 1",
         &[],

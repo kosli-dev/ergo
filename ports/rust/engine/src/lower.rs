@@ -20,7 +20,6 @@ pub struct Scope {
     left_reads_parents: bool,
     as_left: bool,
     item: bool,
-    tally_item: bool,
     parts: BTreeMap<String, PartDef>,
     parents: BTreeMap<String, BTreeMap<String, PartDef>>,
     for_aliases: BTreeSet<String>,
@@ -220,7 +219,7 @@ impl Scope {
         if self.item && self.as_left {
             self.read_path(path, false, false, false)
         } else if self.item {
-            self.read_path(path, !self.tally_item, true, true)
+            self.read_path(path, true, true, true)
         } else if self.as_left {
             self.left_path(path)
         } else {
@@ -265,7 +264,6 @@ impl Scope {
     pub fn in_tally_item(&self) -> Scope {
         Scope {
             item: true,
-            tally_item: true,
             as_left: false,
             ..self.clone()
         }

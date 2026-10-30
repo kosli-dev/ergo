@@ -255,18 +255,31 @@
     ]
   },
   {
-    "description": "a parent's part of ten names in the whose of a count of, read on the item",
-    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "bs", "identified_by": "id", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"}}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "count of xs whose n is count of b.x.z is 1"}}}},
+    "description": "a parent's part of nine names in the whose of a count of",
+    "policy": {"ergo_spec": "v0.3-dev", "requirements": {"s": {"checks": {"c": "count of xs whose n is count of b.x.z is 1"}, "subject": "kid"}}, "subjects": {"b": {"from": "bs", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9"}, "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}},
     "cases": [
       {
-        "description": "reads the item's own field, so the part is not counted and the policy reads at ten names",
+        "description": "reads the parent's part on the right side, so the item's own field of the same name is not counted",
         "rules": ["parts.where", "sentence.path.part", "sentence.walk.steps", "sentence.derived.count", "sentence.whose.item", "parts.chain"],
-        "input": {"bs": [{"id": "b1", "kids": [{"id": "c1", "xs": [{"n": 2, "b": {"x": {"z": [1, 1]}}}]}, {"id": "c2", "xs": [{"n": 1, "b": {"x": {"z": [1, 1]}}}]}], "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": {"z": [1]}}}}}}}}}}}]},
+        "input": {"bs": [{"id": "b1", "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"z": [1]}}}}}}}}}, "kids": [{"id": "c1", "xs": [{"b": {"x": {"z": [1, 1]}}, "n": 1}]}, {"id": "c2", "xs": [{"b": {"x": {"z": [1, 1]}}, "n": 2}]}]}]},
         "results": [
-          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/bs/0/kids/0/xs/0"], "name": "count of xs whose n equals count of b.x.z", "value": 1}, {"locations": ["/bs/0/kids/0/xs/0"], "name": "xs[]", "value": [{"b": {"x": {"z": [1, 1]}}, "n": 2}]}], "passed": true, "requirement": "s", "subject": {"id": "c1", "in": {"b": "b1"}, "type": "kid"}},
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/bs/0/kids/1/xs/0"], "name": "count of xs whose n equals count of b.x.z", "value": 0}, {"locations": ["/bs/0/kids/1/xs/0"], "name": "xs[]", "value": [{"b": {"x": {"z": [1, 1]}}, "n": 1}]}], "passed": false, "requirement": "s", "subject": {"id": "c2", "in": {"b": "b1"}, "type": "kid"}}
-        ],
-        "expressions": {"s": {"c": "count of xs whose n equals count of b.x.z is 1"}}
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/bs/0/kids/0/xs/0"], "name": "count of xs whose n equals count of b.x.z", "value": 1}, {"locations": ["/bs/0/kids/0/xs/0"], "name": "xs[]", "value": [{"b": {"x": {"z": [1, 1]}}, "n": 1}]}, {"locations": ["/bs/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/z"], "name": "b.x.z", "part": {"id": null, "name": "b.x"}, "value": [1]}], "passed": true, "requirement": "s", "subject": {"id": "c1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/bs/0/kids/1/xs/0"], "name": "count of xs whose n equals count of b.x.z", "value": 0}, {"locations": ["/bs/0/kids/1/xs/0"], "name": "xs[]", "value": [{"b": {"x": {"z": [1, 1]}}, "n": 2}]}, {"locations": ["/bs/0/k1/k2/k3/k4/k5/k6/k7/k8/k9/z"], "name": "b.x.z", "part": {"id": null, "name": "b.x"}, "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "c2", "in": {"b": "b1"}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's part of ten names in the whose of a count of",
+    "policy": {"ergo_spec": "v0.3-dev", "requirements": {"s": {"checks": {"c": "count of xs whose n is count of b.x.z is 1"}, "subject": "kid"}}, "subjects": {"b": {"from": "bs", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10"}, "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "is written wrong, because the part's path counts on the right side, so b.x.z is eleven steps",
+        "rules": ["parts.where", "sentence.path.part", "sentence.walk.steps", "sentence.derived.count", "sentence.whose.item", "parts.chain", "written_wrong", "written_wrong.row"],
+        "input": {"bs": [{"id": "b1", "k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": {"z": [1]}}}}}}}}}}, "kids": [{"id": "c1", "xs": [{"b": {"x": {"z": [1, 1]}}, "n": 1}]}, {"id": "c2", "xs": [{"b": {"x": {"z": [1, 1]}}, "n": 2}]}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["every and some over more than ten steps aren't supported yet"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "kid"}}
+        ]
       }
     ]
   }
