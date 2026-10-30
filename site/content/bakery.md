@@ -116,7 +116,7 @@ opa eval -d examples/baking/plain-rego -i examples/baking/batches.json -f pretty
 ## What Ergo outputs
 
 ```sh
-opa eval -d engines/rego/ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.report'
+opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.report'
 ```
 
 The report has a row for every check it ran on every batch, with the value it read:
@@ -146,7 +146,7 @@ In this example, Batch 003 fails because Ergo's `does not contain` needs a list,
 The report also writes each check as an expression, so the table comes straight out of it. [`ergo/workings.rego`]({{< release-url "examples/baking/ergo/workings.rego" >}}) builds it from the report, and the policy exposes it as `workings_table`:
 
 ```sh
-opa eval -d engines/rego/ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.workings_table'
+opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.workings_table'
 ```
 
 Here are the rows for batch 001:
@@ -160,7 +160,7 @@ Here are the rows for batch 001:
 When you only want to know what to fix, ask for the violations. There's one for each of the three failing batches. Here's the one for batch 004:
 
 ```sh
-opa eval -d engines/rego/ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.violations'
+opa eval -d ergo.rego -d examples/baking/ergo -i examples/baking/batches.json -f pretty 'data.baking.violations'
 ```
 
 ```json
