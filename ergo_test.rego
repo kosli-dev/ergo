@@ -8107,6 +8107,20 @@ test_every_in_a_from_line_cant_start_at_another_subject_or_go_with_named_by_each
 	_from_problems(_from_report(_flows_doc, {"s": {"from": "every x.b.c.d.e.f.g.h.i.j"}}, {"c": "x exists"}, {})) == []
 }
 
+test_every_in_a_from_line_with_a_leading_dot_reads_the_top_level_field_even_when_a_subject_has_the_name if {
+	subjects := {"artifact": {"from": "artifacts", "identified_by": "id"}, "p": {"from": "every .artifact.p"}, "q": {"from": "every .artifact"}}
+	input_doc := {"artifacts": [], "artifact": [{"p": [{"x": 1}]}]}
+	rep := ergo.report(input_doc, {"ergo_spec": "v0.3-dev", "subjects": subjects, "requirements": {"r": {"subject": "p", "checks": {"c": "x exists"}}, "s": {"subject": "q", "checks": {"c": "p exists"}}}}, {})
+	_from_problems(rep) == []
+	rep.subjects.p.from == "every .artifact.p"
+	rep.subjects.q.from == "every .artifact"
+	[r.cause | some r in rep.results; r.requirement == "r"; r.check == "c"] == ["satisfied"]
+	[r.cause | some r in rep.results; r.requirement == "s"; r.check == "c"] == ["satisfied"]
+	plain := ergo.report({"artifacts": [{"id": "a"}], "artifact": [{"x": 1}]}, {"ergo_spec": "v0.3-dev", "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "q": {"from": ".artifact"}}, "requirements": {"r": {"subject": "q", "checks": {"c": "x exists"}}}}, {})
+	plain.subjects.q.identified_by == null
+	[r.subject.id | some r in plain.results; r.check == "c"] == [{"x": 1}]
+}
+
 test_a_from_line_with_every_does_not_count_input_as_a_step if {
 	doc := {"k1": {"k2": {"k3": {"k4": {"k5": {"k6": {"k7": {"k8": {"k9": {"k10": [{"id": "a"}, {"id": "b"}]}}}}}}}}}}
 	rep := _from_report(doc, {"s": {"from": "every $input.k1.k2.k3.k4.k5.k6.k7.k8.k9.k10", "identified_by": "id"}}, {"c": "id exists"}, {})
