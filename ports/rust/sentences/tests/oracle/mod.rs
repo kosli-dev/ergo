@@ -21,6 +21,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("fam.kids", "fam.kids"),
     ("fams", "fams"),
+    ("commit.files", "commit.files"),
+    ("every parent.items", "every parent.items"),
+    ("every parent", "every parent"),
     (
         "first of artifact named by each of $params.k",
         "first of artifact named by each of $params.k",
@@ -45,9 +48,21 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("kids", "kids"),
     ("meta", "meta"),
+    ("kid whose n is 1", "kid whose n is 1"),
+    ("mid whose n is 1", "mid whose n is 1"),
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
+    ("pp whose n is 1", "pp whose n is 1"),
+    (
+        "parent.items whose n is one of 1, \"a\"",
+        "parent.items whose n is one of 1, \"a\"",
+    ),
+    (
+        "parent whose n is one of 1, \"a\"",
+        "parent whose n is one of 1, \"a\"",
+    ),
+    ("parent whose n is 1", "parent whose n is 1"),
     (
         "things whose x.y named by $params.i does not exist",
         "things whose x.y named by $params.i does not exist",
@@ -1436,6 +1451,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
+    ("parent.items whose zz is $foo", &["unknown name $foo"]),
+    ("parent.items whose", &["doesn't parse"]),
+    ("parent whose n is $foo", &["unknown name $foo"]),
     ("", &["doesn't parse"]),
     ("\"a\\q\"", &["invalid string at column 1"]),
     (
@@ -2525,6 +2543,8 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("y", "y"),
+    ("n", "n"),
     ("\tid\n", "id"),
     ("\nmid\t", "mid"),
     ("\u{3000}k\n", "k"),
