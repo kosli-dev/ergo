@@ -1,4 +1,5 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("aid exists", "aid exists", &[], &[]),
     ("approvals exists", "approvals exists", &[], &[]),
     (" x   is  1 ", "x is 1", &[], &[]),
     (" x  is  1", "x is 1", &[], &[]),
@@ -3394,7 +3395,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
     ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
     ("i exists", "i exists", &[], &[]),
-    ("aid exists", "aid exists", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

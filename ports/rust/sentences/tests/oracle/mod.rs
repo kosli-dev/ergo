@@ -3,6 +3,37 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    (".artifact.p[0]", "item 1 of artifact.p"),
+    (
+        ".artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (".artifact.p", "artifact.p"),
+    (
+        "artifact.suites named by each of $params.names",
+        "artifact.suites named by each of $params.names",
+    ),
+    (
+        "artifact.x[0] named by each of $params.k",
+        "item 1 of artifact.x named by each of $params.k",
+    ),
+    (
+        "artifact[0] named by each of $params.k",
+        "item 1 of artifact named by each of $params.k",
+    ),
+    (
+        "first of artifact named by each of $params.k",
+        "first of artifact named by each of $params.k",
+    ),
+    (
+        "artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (
+        "artifact.x named by each of $params.k",
+        "artifact.x named by each of $params.k",
+    ),
+    ("k.items", "k.items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
     (
         "artifact.scans named by each of $params.k",
@@ -15,6 +46,15 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("open.pulls", "open.pulls"),
     ("artifact", "artifact"),
     ("artifact[0].pulls", "artifact[0].pulls"),
+    ("suite.items", "suite.items"),
+    (
+        "suites named by $params.group",
+        "suites named by $params.group",
+    ),
+    (
+        "suites named by each of $params.names",
+        "suites named by each of $params.names",
+    ),
     (
         "things whose x.y named by $params.i does not exist",
         "things whose x.y named by $params.i does not exist",
@@ -1399,19 +1439,6 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "zz[k].q whose .empty.y is .it plus item 3 of $input.i[$params.k]",
         "zz named by k.q whose .empty.y equals .it plus item 3 of $input.i named by $params.k",
     ),
-    (
-        "artifact.suites named by each of $params.names",
-        "artifact.suites named by each of $params.names",
-    ),
-    (
-        "suites named by $params.group",
-        "suites named by $params.group",
-    ),
-    (
-        "suites named by each of $params.names",
-        "suites named by each of $params.names",
-    ),
-    ("suite.items", "suite.items"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2516,6 +2543,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("$params.x", "$params.x"),
     ("$params.x.y", "$params.x.y"),
     (".empty", ".empty"),
+    ("aid", "aid"),
     ("att", "att"),
     ("att.cov", "att.cov"),
     ("attestation_id", "attestation_id"),
@@ -2566,7 +2594,6 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("x[3]", "item 4 of x"),
     ("xs", "xs"),
     ("ys", "ys"),
-    ("aid", "aid"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[
