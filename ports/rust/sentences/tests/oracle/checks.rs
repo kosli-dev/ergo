@@ -1,4 +1,10 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "i is one of 1, 'a' and y is at least y",
+        "i is one of 1, \"a\" and y is at least y",
+        &["y is compared with itself"],
+        &["y is compared with itself"],
+    ),
     ("approvals exists", "approvals exists", &[], &[]),
     (" x   is  1 ", "x is 1", &[], &[]),
     (" x  is  1", "x is 1", &[], &[]),
@@ -3114,6 +3120,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "x is one of 1, 'a' and y is at least y",
+        "x is one of 1, \"a\" and y is at least y",
+        &["y is compared with itself"],
+        &["y is compared with itself"],
+    ),
     ("x is one of \"a\", 1", "x is one of \"a\", 1", &[], &[]),
     ("x is one of 1, 'a'", "x is one of 1, \"a\"", &[], &[]),
     ("x is one of 1.0, 'a'", "x is one of 1, \"a\"", &[], &[]),
@@ -5923,6 +5935,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every x, if any, as pr", "every x, if any, as pr", &[], &[]),
+    ("every xs as i", "every xs as i", &[], &[]),
     ("every xs as b", "every xs as b", &[], &[]),
     ("every xs as entry", "every xs as entry", &[], &[]),
     ("every xs as kid", "every xs as kid", &[], &[]),
