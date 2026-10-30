@@ -46,6 +46,7 @@ pub enum Source {
     },
     Child {
         path: path::Path,
+        each_of: Option<path::Path>,
     },
 }
 
@@ -233,16 +234,38 @@ fn names_a_subject<'a>(
 
 fn relation_of(line: &s::FromLine, own_name: &str, names: &BTreeSet<String>) -> Relation {
     match names_a_subject(line, own_name, names) {
+        Some(parent) if line.named_by_each_of.is_some() => Relation::Child(parent.to_string()),
         Some(parent) if line.path.position.is_none() => {
-            if !line.path.steps.is_empty() {
-                Relation::Child(parent.to_string())
-            } else if line.named_by_each_of.is_none() {
+            if line.path.steps.is_empty() {
                 Relation::Narrows(parent.to_string())
             } else {
-                Relation::Root
+                Relation::Child(parent.to_string())
             }
         }
         _ => Relation::Root,
+    }
+}
+
+fn keeps_dot(line: &s::FromLine, own_name: &str, names: &BTreeSet<String>) -> bool {
+    matches!(
+        &line.path.start,
+        s::Start::Field { key, dot: true } if key != own_name && names.contains(key)
+    )
+}
+
+fn with_kept_dot(text: String, every: bool) -> String {
+    let mut at = if every { "every ".len() } else { 0 };
+    let rest = &text[at..];
+    let positioned = rest.starts_with("first of ")
+        || rest.starts_with("last of ")
+        || (rest.starts_with("item ") && rest.contains(" of "));
+    if positioned && let Some(of) = rest.find(" of ") {
+        at += of + " of ".len();
+    }
+    if text[at..].starts_with('.') {
+        text
+    } else {
+        format!("{}.{}", &text[..at], &text[at..])
     }
 }
 
@@ -482,7 +505,14 @@ fn source_of(
                 steps: line.path.steps.clone(),
             };
             let path = scope.path(&sentence_path)?;
-            Ok(Source::Child { path })
+            let each_of = match &line.named_by_each_of {
+                None => None,
+                Some(each) if each.start == s::Start::It => {
+                    return Err(vec![format!("{name}: it can't name keys")]);
+                }
+                Some(each) => Some(scope.path(each)?),
+            };
+            Ok(Source::Child { path, each_of })
         }
         _ => {
             if let s::Start::Field { key, .. } = &line.path.start {
@@ -734,8 +764,12 @@ impl Reading {
                         } else {
                             match source_of(name, line, &found.relation, &scope) {
                                 Ok(source) => {
+                                    let mut from_text = source_text(&source);
+                                    if keeps_dot(line, name, &names) {
+                                        from_text = with_kept_dot(from_text, line.every);
+                                    }
                                     own = Some(Own {
-                                        from_text: source_text(&source),
+                                        from_text,
                                         source: Some(source),
                                         filters,
                                         id: None,
@@ -795,7 +829,7 @@ impl Reading {
                 None
             };
             let from_text = lowered.as_ref().map(|l: &Lowered| l.from_text.clone());
-            let entry = entry_of(name, found, &problems_by_subject, &raw, &effective);
+            let entry = entry_of(name, found, &problems_by_subject, &raw, &effective, &names);
             infos.insert(
                 name.clone(),
                 Info {
@@ -900,7 +934,11 @@ impl Reading {
                 refs.extend(each_of.iter().filter(|each| path::is_ref(each)).cloned());
                 refs
             }
-            Some(Source::Child { path, .. }) => path::step_refs(path),
+            Some(Source::Child { path, each_of }) => {
+                let mut refs = path::step_refs(path);
+                refs.extend(each_of.iter().filter(|each| path::is_ref(each)).cloned());
+                refs
+            }
             None => Vec::new(),
         }
     }
@@ -1014,6 +1052,7 @@ fn entry_of(
     problems: &BTreeMap<String, Problems>,
     raw: &BTreeMap<String, Raw>,
     effective: &BTreeMap<String, BTreeMap<String, PartRead>>,
+    names: &BTreeSet<String>,
 ) -> Value {
     let from_at = field_name(&["subjects", name, "from"]);
     let invalid = problems.get(name).is_some_and(|p| p.contains_key(&from_at));
@@ -1025,7 +1064,12 @@ fn entry_of(
                 let scope = scope_of(name, raw, effective);
                 let aliases = scope.aliases();
                 let refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
-                s::print_from(line, &refs, &[])
+                let printed = s::print_from(line, &refs, &[]);
+                if keeps_dot(line, name, names) {
+                    with_kept_dot(printed, line.every)
+                } else {
+                    printed
+                }
             }
             _ => name::name(&path::Path {
                 start: Start::Subject,
@@ -1124,6 +1168,54 @@ mod tests {
         let (_, r) = reading(json!({"art": {"from": "arts"}, "p": {"from": "art.pulls"}}));
         assert_eq!(r.infos["p"].relation, Relation::Child("art".into()));
         assert_eq!(r.lowered("p").unwrap().from_text, "art.pulls");
+    }
+
+    #[test]
+    fn a_subject_name_with_named_by_each_of_is_a_child_that_keeps_its_keys_inside_its_parent() {
+        let (_, r) = reading(json!({
+            "art": {"from": "arts"},
+            "k": {"from": "art named by each of $params.k"},
+            "j": {"from": "first of art named by each of $params.k"},
+        }));
+        assert_eq!(r.infos["k"].relation, Relation::Child("art".into()));
+        assert_eq!(r.infos["j"].relation, Relation::Child("art".into()));
+        assert!(matches!(
+            r.lowered("k").unwrap().source,
+            Source::Child {
+                each_of: Some(_),
+                ..
+            }
+        ));
+    }
+
+    #[test]
+    fn a_dotted_first_key_named_like_another_subject_keeps_its_dot_in_every_printed_from() {
+        let (_, r) = reading(json!({
+            "art": {"from": "arts"},
+            "k": {"from": ".art named by each of $params.k"},
+            "p": {"from": ".art.p"},
+            "q": {"from": ".other.p"},
+        }));
+        assert_eq!(r.lowered("k").unwrap().from_text, ".art");
+        assert_eq!(r.lowered("p").unwrap().from_text, ".art.p");
+        assert_eq!(r.lowered("q").unwrap().from_text, "other.p");
+        assert_eq!(
+            r.infos["k"].entry["from"],
+            json!(".art named by each of $params.k")
+        );
+        assert_eq!(r.infos["p"].entry["from"], json!(".art.p"));
+        assert_eq!(r.infos["q"].entry["from"], json!("other.p"));
+    }
+
+    #[test]
+    fn a_kept_dot_goes_after_the_position_of_a_printed_from() {
+        let (_, r) = reading(json!({
+            "art": {"from": "arts"},
+            "p": {"from": ".art.p[0]"},
+            "q": {"from": "first of .art.p"},
+        }));
+        assert_eq!(r.infos["p"].entry["from"], json!("item 1 of .art.p"));
+        assert_eq!(r.infos["q"].entry["from"], json!("first of .art.p"));
     }
 
     #[test]
