@@ -6,6 +6,33 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("\"$x\".pa.items", "\"$x\".pa.items"),
     ("meta", "meta"),
     ("\"$x\".items", "\"$x\".items"),
+    (".artifact.p[0]", "item 1 of artifact.p"),
+    (
+        ".artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (".artifact.p", "artifact.p"),
+    (
+        "artifact.x[0] named by each of $params.k",
+        "item 1 of artifact.x named by each of $params.k",
+    ),
+    (
+        "artifact[0] named by each of $params.k",
+        "item 1 of artifact named by each of $params.k",
+    ),
+    (
+        "first of artifact named by each of $params.k",
+        "first of artifact named by each of $params.k",
+    ),
+    (
+        "artifact named by each of $params.k",
+        "artifact named by each of $params.k",
+    ),
+    (
+        "artifact.x named by each of $params.k",
+        "artifact.x named by each of $params.k",
+    ),
+    ("k.items", "k.items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
     (
         "artifact.scans named by each of $params.k",
