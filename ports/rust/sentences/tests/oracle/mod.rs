@@ -4,9 +4,7 @@ pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
     (".artifact", "artifact"),
-    ("every .artifact", "every artifact"),
-    ("every .artifact.p", "every artifact.p"),
-    ("every artifact.p", "every artifact.p"),
+    (".artifact.p[0]", "item 1 of artifact.p"),
     (
         ".artifact named by each of $params.k",
         "artifact named by each of $params.k",
@@ -20,6 +18,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact[0] named by each of $params.k",
         "item 1 of artifact named by each of $params.k",
     ),
+    ("every .artifact", "every artifact"),
+    ("every .artifact.p", "every artifact.p"),
+    ("every artifact.p", "every artifact.p"),
     (
         "first of artifact named by each of $params.k",
         "first of artifact named by each of $params.k",
