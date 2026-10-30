@@ -259,7 +259,7 @@ peer_approved:
   assert: approver.username does not equal pr.author
 ```
 
-Items nest left to right, so a later one can use an earlier alias, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives.
+Items nest left to right, so a later one can use an earlier alias, as `pr.approvers` does. A third item is written wrong, because two is the one level of nesting Rego gives. A problem with the `for` line, its `whose` included, is listed under the check with `for: ` in front, like `for: doesn't parse` or `for: values of mixed types`.
 
 **[sentence.for.scope]** In `assert` and in a later item, a bare first key is the subject's field and an item is reached by its alias. Inside an item's own `whose`, a bare key is that item's field. So in `for: some approvals whose role is "qa" as approval` with `assert: approval.approved_at is before started_at`, `role` is the approval's and `started_at` the subject's.
 
@@ -514,7 +514,7 @@ Most often the writer meant the subject's field. In a `whose` and after `every` 
 - an `any_of` that isn't an object: `<invalid any_of>`, and an empty one: `one of: <empty options>`
 - an option that's an empty list: `<name>(<empty option>)`, and an option that isn't a string or a list of strings: `<name>(<invalid option>)`
 
-A `for` that isn't a string, or that sits next to `any_of`, is left out, and an empty `assert` list prints as `""`. So `{"for": " every  xs ", "assert": [" x  is ", 3]}` prints `for every  xs: x  is and <invalid assert>`. Two cases are [still open](OPEN.md#where-ergorego-and-the-rust-port-differ): sentences that read next to a field the check doesn't take or a `for` that isn't a string, and a sentence written wrong only with `values of mixed types`.
+A `for` that isn't a string, or that sits next to `any_of`, is left out, and an empty `assert` list prints as `""`. So `{"for": " every  xs ", "assert": [" x  is ", 3]}` prints `for every  xs: x  is and <invalid assert>`. One case is [still open](OPEN.md#where-ergorego-and-the-rust-port-differ): sentences that read next to a field the check doesn't take or a `for` that isn't a string.
 
 ## Naming a path
 
