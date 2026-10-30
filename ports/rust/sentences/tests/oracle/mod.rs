@@ -14,6 +14,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact.x[0] named by each of $params.k",
         "item 1 of artifact.x named by each of $params.k",
     ),
+    ("art.things", "art.things"),
+    ("arts", "arts"),
     (
         "artifact[0] named by each of $params.k",
         "item 1 of artifact named by each of $params.k",
@@ -723,6 +725,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "lockfile whose status is \"COMPLETE\"",
     ),
     ("m whose id exists", "m whose id exists"),
+    ("meta.w", "meta.w"),
     ("mid.leaves", "mid.leaves"),
     (
         "modules whose every files.path matches \"^docs/\"",
@@ -2569,6 +2572,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
         "k1.k2.k3.k4.k5.k6.k7.k8.k9.k10",
     ),
     ("meta.id", "meta.id"),
+    ("meta.w", "meta.w"),
     ("name", "name"),
     ("ps", "ps"),
     ("pull_requests.reviews", "pull_requests.reviews"),
