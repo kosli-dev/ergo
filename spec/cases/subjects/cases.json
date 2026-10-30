@@ -15859,5 +15859,206 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of, under a parent that isn't an object, with params.k missing",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as absent when params.k is missing, because the params cause comes before not_an_object",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence",
+          "value.ref"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of, under a parent that isn't an object, with params.k null",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": null
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as null when params.k is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence",
+          "value.ref"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of, under a parent that isn't an object, with params.k a string",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": "x"
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable when params.k is a string",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence",
+          "value.ref"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
