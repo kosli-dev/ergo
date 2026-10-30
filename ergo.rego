@@ -7978,6 +7978,7 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 	pre := _for_pre(check, subj, names)
 	pre != null
 	"pick" in object.keys(check.items[1])
+	not _for_pick_reads_first(check)
 	cause := _for_pick_failure(pre)
 } else := {"cause": cause, "inputs": inputs, "failed": failed} if {
 	item := check.items[0]
@@ -8173,7 +8174,21 @@ _for_tied(item, w, names) := [{"path": e.i, "item": e.i, "cause": "ambiguous", "
 _for_pre(check, subj, names) := _for_walk(check.items[1], subj, names) if {
 	count(check.items) == 2
 	not _for_from_first(check)
+	not _for_pick_reads_first(check)
+} else := w if {
+	count(check.items) == 2
+	not _for_from_first(check)
+	_for_pick_reads_first(check)
+	w := _for_plain_walk(check, subj, names)
+	w.walked == set()
 } else := null
+
+_for_plain_walk(check, subj, names) := _for_walk(object.union(object.remove(check.items[1], ["pick", "whose"]), {"if_any": true}), subj, names)
+
+_for_pick_reads_first(check) if {
+	"pick" in object.keys(check.items[1])
+	_for_whose_reads(check.items[1].whose, check.items[0].as)
+}
 
 _for_from_first(check) if check.items[1].path[0] == concat("", ["$", check.items[0].as])
 
@@ -8240,7 +8255,7 @@ _for_failure(_, [], false, _, _) := null
 
 _for_failure(e, undecided, _, res, at) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at} if undecided != []
 
-_for_failure(e, [], true, res, at) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at} if not res.passed
+_for_failure(e, [], true, res, at) := {"path": e.i, "item": e.i, "cause": res.cause, "value": _walk_shown(e.v), "lines": res.lines, "inner": object.get(res, "unchecked", []), "at": at, "nothing_picked": object.get(res, "nothing_picked", false)} if not res.passed
 
 _for_failure(_, [], true, res, _) := null if res.passed
 
@@ -8248,6 +8263,11 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 	check.items[1].path[0] == concat("", ["$", check.items[0].as])
 	count(check.items[1].path) > 1
 	not is_object(names[check.items[0].as])
+} else := {"passed": false, "cause": w.unread, "lines": [], "unchecked": [], "nothing_picked": true} if {
+	"unread" in object.keys(w)
+	"pick" in object.keys(check.items[1])
+	not _for_from_first(check)
+	w.walked != set()
 } else := {"passed": false, "cause": w.unread, "lines": [], "unchecked": _for_unwalked(check, w)} if {
 	"unread" in object.keys(w)
 } else := {"passed": cause == "satisfied", "cause": cause, "lines": lines, "unchecked": [f | some f in fails; f.lines == []]} if {
@@ -8339,9 +8359,10 @@ _for_verdict(item, w, judged, fails) := _walk_stop(w)[0].cause if {
 _for_failed(_, "satisfied", _) := []
 
 _for_failed(check, cause, fails) := [object.union({"path": _path_name(f.path), "item": _path_name(f.item), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f)}, _for_unchecked(check, object.get(f, "inner", []))) |
-	some p in sort({f.path | some f in fails})
+	some p in sort({f.path | some f in fails; not object.get(f, "nothing_picked", false)})
 	some f in fails
 	f.path == p
+	not object.get(f, "nothing_picked", false)
 ] if cause != "satisfied"
 
 _for_unchecked(_, []) := {}
@@ -8448,9 +8469,26 @@ _for_inner_pairs(check, subj, names, item, w) := {[_for_list_name(check, check.i
 	locations := [_walk_at(iw, e2) | some iw in inner; some e2 in iw.items]
 }
 
+_for_inner_pairs(check, subj, names, item, w) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)]) | some iw in inner} if {
+	count(check.items) == 2
+	not _for_from_first(check)
+	_for_pick_reads_first(check)
+	w.items != []
+	inner := [_for_walk(check.items[1], subj, _bound(names, item.as, e.v, _walk_at(w, e))) | some e in w.items]
+}
+
+_for_inner_pairs(check, subj, names, _, w) := {object.get(pw, "input", [_for_list_name(check, check.items[1].path, pw.walked), [_walk_shown(e.v) | some e in pw.items], _walk_locations(pw)])} if {
+	count(check.items) == 2
+	not _for_from_first(check)
+	_for_pick_reads_first(check)
+	w.items == []
+	pw := _for_plain_walk(check, subj, names)
+}
+
 _for_inner_pairs(check, subj, names, _, _) := {object.get(iw, "input", [_for_list_name(check, check.items[1].path, iw.walked), [_walk_shown(e.v) | some e in iw.items], _walk_locations(iw)])} if {
 	count(check.items) == 2
 	not _for_from_first(check)
+	not _for_pick_reads_first(check)
 	iw := _for_walk(check.items[1], subj, names)
 }
 
