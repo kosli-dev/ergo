@@ -7376,15 +7376,24 @@ _walk_passed([], true, leaf, v) if _op_passed(leaf, v)
 
 _walk_failure(w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": _row_cause(leaf, e.iv, ""), "value": _walk_shown(e.v), "at": _walk_at(w, e)}
 
-_walk_failure(w, e, undecided, _, _, _) := {"path": array.concat(e.i, _walk_first_path(undecided[0][0], e.iv)), "item": e.i, "cause": undecided[0][1], "value": _walk_first_value(undecided[0][0], e.iv), "at": _item_read_at(w, e, _walk_first_path(undecided[0][0], e.iv))} if undecided != []
+_walk_failure(w, e, undecided, _, _, _) := {"path": _walk_named_path(e, p), "item": e.i, "cause": undecided[0][1], "value": _value_at(e.iv, p), "at": _walk_named_at(w, e, p)} if {
+	undecided != []
+	p := _walk_first_path(undecided[0][0], e.iv)
+}
+
+_walk_named_path(_, p) := p if _builtin(p)
+
+_walk_named_path(e, p) := array.concat(e.i, p) if not _builtin(p)
+
+_walk_named_at(_, _, p) := _ref_at(p) if _builtin(p)
+
+_walk_named_at(w, e, p) := _item_read_at(w, e, p) if not _builtin(p)
 
 _walk_failure(_, _, [], false, _, _) := null
 
 _walk_failure(_, _, [], true, _, true) := null
 
 _walk_first_path(c, v) := array.concat([e[0] | some e in _walk_sides_paths(c); not _walk_side_read(v, e)], [e[0] | some e in _walk_sides_paths(c)])[0]
-
-_walk_first_value(c, v) := _value_at(v, _walk_first_path(c, v))
 
 _walk_side_read(v, e) if {
 	_read_state(v, e[0]) == "value"
@@ -7401,14 +7410,18 @@ _walk_sides_paths(c) := [[p, "value"] | some p in _condition_paths(c)] if not _t
 
 _walk_side_paths(_, side) := [[side, "value"]] if is_array(side)
 
-_walk_side_paths(c, side) := [[p, _walk_side_needs(side)] | some p in _side_paths(side)] if {
+_walk_side_paths(c, side) := [[p, _walk_side_needs(operand)] | some operand in _walk_operands(side); some p in _basic_paths(operand)] if {
 	c.op == "compare"
 	_derived(side)
 }
 
+_walk_operands(side) := side.add if _side_form(side) == "add"
+
+else := [side]
+
 _walk_side_needs(side) := "list" if _basic_form(side) in {"count_of", "sum_of"}
 
-_walk_side_needs(side) := "value" if not _basic_form(side) in {"count_of", "sum_of"}
+else := "value"
 
 _condition_paths(c) := array.concat(_leaf_paths(c), [p | some side in _derived_sides(c); some p in _side_paths(side)])
 
