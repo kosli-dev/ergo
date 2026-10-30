@@ -1,7 +1,7 @@
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
 import { initSync, report as rustReport } from "ergo-wasm";
-import { ENGINES, ENGINE_LABELS, readEngine, engineNote, engineMessage, makeRustRunner, renewOnPanic } from "./engines.mjs";
+import { ENGINES, ENGINE_LABELS, readEngine, engineNote, engineMessage, makeRustRunner, stopOnPanic } from "./engines.mjs";
 import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
 import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
@@ -432,7 +432,7 @@ const showReport = (out, result) => {
   try {
     report = runners[engine](reportInput, result.policy, reportParams);
   } catch (e) {
-    return out.append(el("p", "notice", engineMessage(engine, "run", e.message)));
+    return out.append(el("p", "notice", e.stopped ? e.message : engineMessage(engine, "run", e.message)));
   }
   if (report === null) return out.append(el("p", "notice", "Ergo gave no report for this policy and input."));
   out.append(el("p", "notice info", [report.compliant ? "Every requirement is met." : "At least one requirement is not met.", engineNote(report)].filter(Boolean).join(" ")));
@@ -749,13 +749,8 @@ opa.loadPolicy(decode(wasm), undefined, { "time.parse_rfc3339_ns": parseTime }).
   (e) => failed("opa", e),
 );
 try {
-  loaded(
-    "rust",
-    renewOnPanic(() => {
-      initSync({ module: decode(rustWasm) });
-      return makeRustRunner(rustReport);
-    }),
-  );
+  initSync({ module: decode(rustWasm) });
+  loaded("rust", stopOnPanic("rust", makeRustRunner(rustReport)));
 } catch (e) {
   failed("rust", e);
 }

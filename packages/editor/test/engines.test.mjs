@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT_ENGINE, ENGINES, ENGINE_LABELS, engineMessage, engineNote, makeRustRunner, renewOnPanic, readEngine } from "../src/engines.mjs";
+import { DEFAULT_ENGINE, ENGINES, ENGINE_LABELS, engineMessage, engineNote, makeRustRunner, readEngine, stopOnPanic } from "../src/engines.mjs";
 
 test("the two engines are labelled by the file they run", () => {
   assert.deepEqual(ENGINES.map((e) => ENGINE_LABELS[e]), ["ergo.rego", "Rust port (experimental)"]);
@@ -47,48 +47,30 @@ test("the messages name the engine that was picked", () => {
   assert.equal(engineMessage("opa", "loading"), "ergo.rego is still loading.");
   assert.equal(engineMessage("rust", "failed", "no memory"), "The Rust port didn't load: no memory");
   assert.equal(engineMessage("opa", "failed", "bad Wasm"), "ergo.rego didn't load: bad Wasm");
+  assert.equal(engineMessage("rust", "stopped"), "The Rust port stopped after an internal error. Reload the page to use it again.");
   assert.equal(engineMessage("rust", "run", "unreachable"), "The Rust port couldn't run this: unreachable");
   assert.equal(engineMessage("opa", "run", "boom"), "ergo.rego couldn't run this: boom");
 });
 
-const stubMake = (failures) => {
-  const made = [];
-  const make = () => {
-    const id = made.length;
-    made.push(id);
-    let calls = 0;
-    return (x) => {
-      if (failures[id] && calls++ === 0) throw failures[id];
-      return { id, x };
-    };
-  };
-  return { make, made };
-};
-
-test("after a panic the next run uses a fresh runner and the panic still reaches the caller", () => {
-  const { make, made } = stubMake([new WebAssembly.RuntimeError("unreachable")]);
-  const run = renewOnPanic(make);
-  assert.throws(() => run(1), WebAssembly.RuntimeError);
-  assert.deepEqual(run(2), { id: 1, x: 2 });
-  assert.deepEqual(run(3), { id: 1, x: 3 });
-  assert.equal(made.length, 2);
-});
-
-test("an error that isn't a panic keeps the runner", () => {
-  const { make, made } = stubMake([new Error("the input isn't valid JSON: x")]);
-  const run = renewOnPanic(make);
-  assert.throws(() => run(1), /isn't valid JSON/);
-  assert.deepEqual(run(2), { id: 0, x: 2 });
-  assert.equal(made.length, 1);
-});
-
-test("a runner that can't be made fails at once and one that can't be made again fails on the next run", () => {
-  assert.throws(() => renewOnPanic(() => { throw new Error("no module"); }), /no module/);
-  let n = 0;
-  const run = renewOnPanic(() => {
-    if (n++) throw new Error("no module");
-    return () => { throw new WebAssembly.RuntimeError("unreachable"); };
+test("after a panic the Rust port stops and says to reload the page", () => {
+  const calls = [];
+  const run = stopOnPanic("rust", (x) => {
+    calls.push(x);
+    if (x === 1) throw new WebAssembly.RuntimeError("unreachable");
+    return { x };
   });
-  assert.throws(() => run(), WebAssembly.RuntimeError);
-  assert.throws(() => run(), /no module/);
+  assert.deepEqual(run(0), { x: 0 });
+  for (const x of [1, 2]) {
+    assert.throws(() => run(x), (e) => e.stopped === true && e.message === "The Rust port stopped after an internal error. Reload the page to use it again.");
+  }
+  assert.deepEqual(calls, [0, 1]);
+});
+
+test("an error that isn't a panic reaches the caller and the runner keeps going", () => {
+  const run = stopOnPanic("rust", (x) => {
+    if (x === 1) throw new Error("the input isn't valid JSON: x");
+    return { x };
+  });
+  assert.throws(() => run(1), (e) => e.stopped === undefined && /isn't valid JSON/.test(e.message));
+  assert.deepEqual(run(2), { x: 2 });
 });

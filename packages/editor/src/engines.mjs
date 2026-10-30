@@ -25,19 +25,22 @@ export const engineMessage = (engine, kind, detail = "") => {
   const name = engine === "rust" ? "The Rust port" : "ergo.rego";
   if (kind === "loading") return `${name} is still loading.`;
   if (kind === "failed") return `${name} didn't load: ${detail}`;
+  if (kind === "stopped") return `${name} stopped after an internal error. Reload the page to use it again.`;
   return `${name} couldn't run this: ${detail}`;
 };
 
-/** Makes a runner with `make` and returns one that calls it. When a call throws a `WebAssembly.RuntimeError`, which is a panic that leaves the module half way through a call, the runner is dropped and the next call makes a new one. Other errors keep it. Every error goes on to the caller. */
-export const renewOnPanic = (make) => {
-  let run = make();
+/** Returns a runner that calls `run` until a call throws a `WebAssembly.RuntimeError`, which is a panic that leaves the module half way through a call. That call and every later one throw an error marked `stopped` that says to reload the page, and `run` isn't called again. Other errors reach the caller as they are. */
+export const stopOnPanic = (engine, run) => {
+  let stopped = false;
+  const stop = () => Object.assign(new Error(engineMessage(engine, "stopped")), { stopped: true });
   return (...args) => {
-    run ??= make();
+    if (stopped) throw stop();
     try {
       return run(...args);
     } catch (e) {
-      if (e instanceof WebAssembly.RuntimeError) run = null;
-      throw e;
+      if (!(e instanceof WebAssembly.RuntimeError)) throw e;
+      stopped = true;
+      throw stop();
     }
   };
 };
