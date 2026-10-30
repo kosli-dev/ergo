@@ -270,11 +270,15 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
     }
     if anc.is_empty() {
         for each in &mut broken {
-            if let Some(walk::Seg::Index(_)) = each.order.first() {
-                each.path = crate::name::name(&Path {
-                    start: Start::Input,
-                    steps: each.order.iter().map(walk::Seg::to_step).collect(),
-                });
+            match each.order.first() {
+                Some(walk::Seg::Index(_)) => {
+                    each.path = crate::name::name(&Path {
+                        start: Start::Input,
+                        steps: each.order.iter().map(walk::Seg::to_step).collect(),
+                    });
+                }
+                None => each.path = "$input".to_string(),
+                _ => {}
             }
         }
     }
@@ -1281,6 +1285,16 @@ mod tests {
         let min = &rows(&r, "$min_subjects")[0];
         assert_eq!(min["failed_items"][0]["path"], json!("item 2 of $input"));
         assert_eq!(min["failed_items"][0]["item"], json!("item 2 of $input"));
+    }
+
+    #[test]
+    fn every_dollar_input_names_an_input_that_is_not_a_list_dollar_input() {
+        let r = run(json!({"thing": {"from": "every $input"}}), json!({"x": 1}));
+        let min = &rows(&r, "$min_subjects")[0];
+        assert_eq!(
+            min["failed_items"],
+            json!([{"path": "$input", "item": "$input", "cause": "unusable", "value": {"x": 1}, "locations": [""]}])
+        );
     }
 
     #[test]
