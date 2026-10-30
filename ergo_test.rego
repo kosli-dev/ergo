@@ -4669,15 +4669,60 @@ test_a_part_on_a_for_line_item_counts_the_parts_path if {
 	_part_walk_problems({"x": _ten}, {"for": "every xs as y", "assert": "y.n is count of x.z"}) == _too_long
 }
 
-test_a_count_or_sum_that_starts_at_a_part_name_inside_a_whose_reads_the_items_field_so_the_part_is_not_counted if {
-	doc := {"things": [object.union({"id": "a", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 2, "x": {"z": [1, 1, 1]}}]}, _k10({"z": [1]}))]}
-	_part_walk_rows({"x": _ten}, {"c": "every xs.v whose n is count of x.z is 1"}, doc) == [["a", "c", "value"]]
+test_a_count_or_sum_that_starts_at_a_part_name_on_the_right_of_a_whose_reads_the_part_so_its_path_is_counted if {
+	doc := {"things": [object.union({"id": "a", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 2, "x": {"z": [1, 1, 1]}}]}, _k9({"z": [1]}))]}
+	_part_walk_rows({"x": _nine}, {"c": "every xs.v whose n is count of x.z is 1"}, doc) == [["a", "c", "satisfied"]]
+	_part_walk_rows({"x": _nine}, {"c": "every xs.v whose n is count of .x.z is 1"}, doc) == [["a", "c", "value"]]
+	_part_walk_rows({"x": _nine}, {"c": "count of xs whose count of x.z is 3 is 2"}, doc) == [["a", "c", "satisfied"]]
 	has := {"x": _ten}
-	_part_walk_reads(has, "every xs.v whose n is count of x.z is 1")
-	_part_walk_reads(has, "some xs whose n is at most sum of x.z is not empty")
-	_part_walk_reads(has, "count of xs whose n is count of x.z is 1")
+	_part_walk_problems(has, "every xs.v whose n is count of x.z is 1") == _too_long
+	_part_walk_problems(has, "some xs whose n is at most sum of x.z is not empty") == _too_long
+	_part_walk_problems(has, "count of xs whose n is count of x.z is 1") == _too_long
+	_part_walk_problems(has, "sum of xs.v whose n is count of x.z is 1") == _too_long
+	_part_walk_reads({"x": _nine}, "every xs.v whose n is count of x.z is 1")
+	_part_walk_reads({"x": _nine}, "some xs whose n is at most sum of x.z is not empty")
+	_part_walk_reads({"x": _nine}, "count of xs whose n is count of x.z is 1")
+	_part_walk_reads({"x": _nine}, "sum of xs.v whose n is count of x.z is 1")
+	_part_walk_reads(has, "every xs.v whose n is count of .x.z is 1")
 	_part_walk_reads(has, "every xs.v whose count of x.z is 1 is 1")
+	_part_walk_reads(has, "count of xs whose count of x.z is 1 is 1")
 	_part_walk_reads({"x": _ten}, "n is 1 and x.z is 1")
+}
+
+test_a_plus_or_an_elapsed_time_on_the_right_of_a_whose_reads_the_part_too if {
+	item := {"n": 1, "v": 1, "x": {"z": [1, 1, 1], "zz": 5, "a": "2026-01-01", "b": "2026-01-03"}}
+	doc := {"things": [{"id": "a", "p": {"z": [1], "zz": 0, "a": "2026-01-01", "b": "2026-01-02"}, "xs": [item]}]}
+	checks := {
+		"plus_number": "every xs.v whose n is count of x.z plus 0 is 1",
+		"plus_path": "every xs.v whose n is x.zz plus count of x.z is 1",
+		"elapsed": "every xs.v whose n is days elapsed from x.a to x.b is 1",
+		"dot_plus_path": "every xs.v whose n is .x.zz plus count of .x.z is 1",
+	}
+	_part_walk_rows({"x": "p"}, checks, doc) == [["a", "dot_plus_path", "value"], ["a", "elapsed", "satisfied"], ["a", "plus_number", "satisfied"], ["a", "plus_path", "satisfied"]]
+}
+
+test_a_plus_reads_the_part_on_the_subject_and_on_the_right_of_a_whose if {
+	doc := {"things": [{"id": "a", "p": {"z": [1], "zz": 0}, "xs": [{"n": 1, "v": 1}]}]}
+	checks := {"on_subject": "x.zz plus count of x.z is 1", "in_whose": "every xs.v whose n is x.zz plus count of x.z is 1"}
+	_part_walk_rows({"x": "p"}, checks, doc) == [["a", "in_whose", "satisfied"], ["a", "on_subject", "satisfied"]]
+}
+
+_tag_of(report, check, name) := [object.get(i, "part", null) | some r in report.results; r.check == check; some i in r.inputs; i.name == name][0]
+
+test_a_count_or_sum_carries_a_part_tag_only_when_its_list_is_read_from_the_part if {
+	policy := _part_walk_policy({"pa": "pa"}, {
+		"on_items": "count of items whose w is pa.w is 1",
+		"on_part": "count of pa.items whose w is pa.w is 1",
+		"sum_on_items": "sum of items.n whose w is pa.w is 3",
+		"sum_on_part": "sum of pa.items.n whose w is 2 is 5",
+	})
+	doc := {"things": [{"id": "a", "items": [{"w": 1, "n": 2}, {"w": 2, "n": 3}], "pa": {"w": 2, "items": [{"w": 2, "n": 5}]}}]}
+	report := ergo.report(doc, policy, {})
+	_tag_of(report, "on_items", "count of items whose w equals pa.w") == null
+	_tag_of(report, "on_items", "pa.w") == {"id": null, "name": "pa"}
+	_tag_of(report, "on_part", "count of pa.items whose w equals pa.w") == {"id": null, "name": "pa"}
+	_tag_of(report, "sum_on_items", "sum of items.n whose w equals pa.w") == null
+	_tag_of(report, "sum_on_part", "sum of pa.items.n whose w is 2") == {"id": null, "name": "pa"}
 }
 
 test_a_part_in_an_option_of_an_any_of_counts_the_parts_path if {

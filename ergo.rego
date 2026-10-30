@@ -850,7 +850,7 @@ _tagging_of(req) if {
 
 _tagged(inputs, _, req, _) := inputs if not _tagging(req)
 
-_tagged(inputs, check, req, subj) := [_tagged_input(i, {{"name": p.name, "id": _part_id(p.ms, p.steps, p.read, subj)} | some p in parts; _mentions(i.name, p.patterns)}) | some i in inputs] if {
+_tagged(inputs, check, req, subj) := [_tagged_input(i, {{"name": p.name, "id": _part_id(p.ms, p.steps, p.read, subj)} | some p in parts; _mentions(_value_source(i.name), p.patterns)}) | some i in inputs] if {
 	_tagging(req)
 	parts := _check_parts(check, req)
 }
@@ -885,6 +885,11 @@ _id_path(read) := path if {
 	is_object(read.identified_by)
 	path := read.identified_by.path
 }
+
+_value_source(name) := substring(name, 0, indexof(name, " whose ")) if {
+	regex.match(`^(count|sum) of `, name)
+	indexof(name, " whose ") > 0
+} else := name
 
 _mentions(name, patterns) if {
 	some pattern in patterns
@@ -6539,7 +6544,7 @@ _p_unaliased(ftext, names) := names - {item.as |
 	some item in object.get(_for_line(ftext), "items", [])
 }
 
-_p_walk_paths(x) := {[x[q], false] | some q in ["every", "some", "pick"]; is_object(object.get(x, q, null))} | ({[t[k], false] | some t in _s_nodes(object.remove(x, _p_item_keys(x))); some k in _p_derived_keys(t)} | {[t[k], true] | _p_walks_items(x); some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)})
+_p_walk_paths(x) := {[x[q], false] | some q in ["every", "some", "pick"]; is_object(object.get(x, q, null))} | (({[t[k], false] | some t in _s_nodes(object.remove(x, _p_item_keys(x))); some k in _p_derived_keys(t)} | {[t[k], true] | _p_walks_items(x); some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)}) | {[t[k], "own"] | not _p_walks_items(x); some t in _s_nodes(object.filter(x, _p_item_keys(x))); some k in _p_derived_keys(t)})
 
 _p_walks_items(x) if object.keys(x) & {"every", "some", "pick"} != set()
 
@@ -6553,12 +6558,12 @@ _p_item_keys(x) := ["where", "phrase"] if object.keys(x) & {"every", "some", "pi
 
 else := ["where"]
 
-_p_part_walk_steps([p, false], pc) := (count(_walk_steps(_s_model_path(p))) - 1) + count(pc.own[p.steps[0]]) if {
+_p_part_walk_steps([p, mode], pc) := (count(_walk_steps(_s_model_path(p))) - 1) + count(pc.own[p.steps[0]]) if {
 	object.get(p, "part", false) == true
 	p.steps[0] in object.keys(pc.own)
-} else := _p_parent_walk_steps(p, pc)
+} else := _p_parent_walk_steps(p, pc) if mode != "own"
 
-_p_part_walk_steps([p, true], pc) := _p_parent_walk_steps(p, pc)
+else := 0
 
 _p_parent_walk_steps(p, pc) := (count(_walk_steps(_s_model_path(p))) - 2) + count(pc.ancestors[p.steps[0]][p.steps[1]]) if {
 	object.get(p, "part", false) == true
@@ -6675,19 +6680,32 @@ _p_sleaf(m, pc) := _p_leaf(m, pc, "s") if not m.op in {"every", "some"}
 
 _p_leaf(m, pc, mode) := object.union(object.union(m, {f: _p_item_side(f, m[f], pc, mode) | some f in ["path", "left", "right"]; f in object.keys(m)}), {"inputs": [_p_side(i, pc, mode) | some i in m.inputs] | is_array(object.get(m, "inputs", null))})
 
-_p_item_side(f, side, pc, mode) := _p_path(_p_own_named(side), pc, "o") if {
-	_p_own_on_item_right(f, side, pc, mode)
-} else := _p_side(side, pc, mode)
-
-_p_own_on_item_right(f, side, pc, mode) if {
+_p_item_side(f, side, pc, mode) := _p_item_path(side, pc) if {
 	f == "right"
 	mode == "i"
 	is_array(side)
-	count(side) > 0
-	is_string(side[0])
-	not startswith(side[0], "$")
-	side[0] in object.keys(pc.own)
-}
+} else := _p_item_right(side, pc) if {
+	f == "right"
+	mode == "i"
+	is_object(side)
+} else := _p_side(side, pc, mode)
+
+_p_item_path(path, pc) := _p_path(_p_own_named(path), pc, "o") if {
+	count(path) > 0
+	is_string(path[0])
+	not startswith(path[0], "$")
+	path[0] in object.keys(pc.own)
+} else := _p_path(path, pc, "i")
+
+_p_item_right(side, pc) := object.union(side, {"add": [_p_item_right_one(o, pc) | some o in side.add]}) if is_array(object.get(side, "add", null))
+
+else := _p_item_right_one(side, pc)
+
+_p_item_right_one(side, pc) := _p_item_path(side, pc) if is_array(side)
+
+else := object.union(side, object.union({f: _p_item_path(side[f], pc) | some f in ["count_of", "sum_of", "elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))}, object.union({"whose": [_p_cond_flat(c, pc, "i") | some c in side.whose] | is_array(object.get(side, "whose", null))}, {"where": _p_cond_flat(side.where, pc, "i") | is_object(object.get(side, "where", null))}))) if is_object(side)
+
+else := side
 
 _p_own_named(side) := array.concat([concat("", ["$", side[0]])], array.slice(side, 1, count(side)))
 
@@ -6709,10 +6727,17 @@ _p_side_one(side, pc, mode) := object.union(_p_tally(side, pc, mode), object.uni
 
 _p_tally(side, pc, mode) := object.union(side, {f: _p_path(side[f], pc, mode) | some f in ["count_of", "sum_of", "elapsed_from", "elapsed_to"]; is_array(object.get(side, f, null))})
 
-_p_cond(c, pc, mode) := object.union(c, {f: _p_cond_side(f, c[f], pc, mode) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}) if is_object(c)
+_p_cond(c, pc, mode) := object.union(_p_cond_flat(c, pc, mode), {"right": _p_item_right(c.right, pc)}) if {
+	is_object(c)
+	mode == "i"
+	is_object(object.get(c, "right", null))
+} else := _p_cond_flat(c, pc, mode)
 
-_p_cond_side(f, side, pc, mode) := _p_path(_p_own_named(side), pc, "o") if {
-	_p_own_on_item_right(f, side, pc, mode)
+_p_cond_flat(c, pc, mode) := object.union(c, {f: _p_cond_side(f, c[f], pc, mode) | some f in ["path", "left", "right"]; is_array(object.get(c, f, null))}) if is_object(c)
+
+_p_cond_side(f, side, pc, mode) := _p_item_path(side, pc) if {
+	f == "right"
+	mode == "i"
 } else := _p_path(side, pc, mode)
 
 _s_requirements(reqs, chains) := _p_requirements(reqs, chains, _p_no_parts)
