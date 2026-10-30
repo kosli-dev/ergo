@@ -11,6 +11,6 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-ergo-policy-engine = { path = "../engine", version = "0.1.0" }
+ergo-policy-engine = { path = "../engine", version = "0.2.0-dev" }
 serde_json = { version = "1", features = ["arbitrary_precision"] }
 wasm-bindgen = "=0.2.129"

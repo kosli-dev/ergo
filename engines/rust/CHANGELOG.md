@@ -2,6 +2,8 @@
 
 Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](../../spec/CHANGELOG.md), and those of `ergo.rego` in [CHANGELOG.md](../../CHANGELOG.md).
 
+## 0.2.0 (not released yet)
+
 ## 0.1.0
 
 ### New
