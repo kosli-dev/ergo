@@ -1284,6 +1284,37 @@ mod tests {
     }
 
     #[test]
+    fn a_position_on_a_list_input_is_named_from_dollar_input_in_expressions() {
+        let cases = [
+            ("$input[0]", "item 1 of $input"),
+            ("$input[1]", "item 2 of $input"),
+            ("first of $input", "item 1 of $input"),
+            ("every $input[1].commits", "every $input[1].commits"),
+            ("every $input.commits", "every commits"),
+            ("$input", "$input"),
+            ("every $input", "every $input"),
+        ];
+        for (from, name) in cases {
+            let r = report(
+                &json!([]),
+                &policy(json!({"thing": {"from": from}}), json!(1)),
+                &json!({}),
+            );
+            let checks = &r["requirements"]["s"]["checks"];
+            assert_eq!(
+                checks["$min_subjects"]["expression"],
+                json!(format!("count(matching({name})) >= 1")),
+                "{from}"
+            );
+            assert_eq!(
+                checks["$unique_ids"]["expression"],
+                json!(format!("count(repeated(ids({name}))) == 0")),
+                "{from}"
+            );
+        }
+    }
+
+    #[test]
     fn every_with_no_list_along_the_path_fails_unusable_at_the_value_it_ends_at() {
         let r = run(
             json!({"thing": {"from": "every arts.prs"}}),
