@@ -18,7 +18,7 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `ports/rust/` is a second engine, in Rust. It's experimental and in progress. It's a Cargo workspace with five crates: `ergo-sentences` reads sentences and nothing else, `ergo-engine` builds the report, `ergo-cli` is the `ergo` command that prints a report or the violations from JSON or YAML files, and `ergo-wasm` and `ergo-sentences-wasm` wrap them for a browser. Its tests run every case in `spec/cases`, and `ports/rust/known-failures.txt` lists the ones it still fails.
 - `packages/` holds Node tools that build on Ergo, in one pnpm workspace. Someone who only copies `ergo.rego` never needs them.
 - `packages/markdown/` compiles a policy written in Markdown into a policy object. It's an experiment, not published.
-- `packages/editor/` builds a web page for writing those Markdown policies: the source beside what the compiler read, the policy, the document, the YAML and a report from the Rego engine (`ergo.rego`) or the Rust engine, run in the page.
+- `packages/editor/` builds a web page for writing those Markdown policies: the source beside what the compiler read, the policy, the document, the YAML and a report from the Rego engine (`ergo.rego`) or the Rust engine, run in the page. It also reads each sentence with the Rust sentence parser, `ergo-sentences-wasm`, to underline what's written wrong, colour the words, say how a sentence reads and suggest what to type next.
 
 ## Checks
 
@@ -63,7 +63,7 @@ pnpm test
 pnpm -r bundle
 ```
 
-`pnpm test` fails when a line under `packages/markdown/src` isn't reached by a test. Its tests also run `ergo.report` with opa on every case in `packages/markdown/cases` that has an input. The editor's tests build the page, which compiles `ergo.rego` to Wasm with the `opa` on your PATH, and check that each sample gives the report its case expects. They also need the Rust engine built to Wasm in `ports/rust/wasm/pkg`: see "Building for a browser" in `ports/rust/README.md`.
+`pnpm test` fails when a line under `packages/markdown/src` isn't reached by a test. Its tests also run `ergo.report` with opa on every case in `packages/markdown/cases` that has an input. The editor's tests build the page, which compiles `ergo.rego` to Wasm with the `opa` on your PATH, and check that each sample gives the report its case expects. They also need the Rust engine built to Wasm in `ports/rust/wasm/pkg` and the sentence parser in `ports/rust/sentences-wasm/pkg`: see "Building for a browser" in `ports/rust/README.md`.
 
 When you change `ports/rust/`, run its checks too. There's no need for Rust on your machine: `ports/rust/README.md` has the Docker command, which runs `cargo fmt --check`, Clippy with warnings as errors, the tests, and a Wasm build of `ergo-sentences`. Use `-j 4` and run one at a time, because a full build takes every core otherwise. The Rust version is pinned in `ports/rust/rust-toolchain.toml` and the `Dockerfile` next to it; change both together. CI runs the same checks in the `tests-rust` job.
 
