@@ -3,6 +3,7 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    (".artifact", "artifact"),
     (".artifact.p[0]", "item 1 of artifact.p"),
     (
         ".artifact named by each of $params.k",
@@ -20,6 +21,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "item 1 of artifact named by each of $params.k",
     ),
     ("commit.files", "commit.files"),
+    ("every .artifact", "every artifact"),
+    ("every .artifact.p", "every artifact.p"),
+    ("every artifact.p", "every artifact.p"),
     ("every parent.items", "every parent.items"),
     ("every parent", "every parent"),
     (
