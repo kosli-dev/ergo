@@ -546,9 +546,15 @@ _keys_step(req) if "keys" in object.keys(_each_step(req))
 _target_state(doc, req) := "not_an_object" if {
 	is_object(data.ergo_parent)
 	not is_object(doc)
-	count(_from_keys(req)) > 0
-	not _index_step(_from_keys(req)[0])
+	_reads_inside_parent(req)
+	not _starts_at_position(req)
 } else := _from_state(doc, req)
+
+_starts_at_position(req) if _index_step(_from_keys(req)[0])
+
+_reads_inside_parent(req) if count(_from_keys(req)) > 0
+
+_reads_inside_parent(req) if _keys_step(req)
 
 default _from_state(_, _) := "absent"
 
@@ -3328,6 +3334,7 @@ _from_text(req) := _path_name(array.concat([data.ergo_subject_sentences.chains[r
 _from_text(req) := "$input" if {
 	_from_well_formed(req)
 	_from_path(req) == []
+	not _chained(req)
 }
 
 _from_text(req) := "<invalid from>" if not _from_well_formed(req)
@@ -6121,6 +6128,15 @@ _s_descends(name, fl, subjects) if {
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
 	fl.path.steps[0] in object.keys(subjects)
+}
+
+_s_descends(name, fl, subjects) if {
+	not "start" in object.keys(fl.path)
+	fl.path.steps == [fl.path.steps[0]]
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] != name
+	fl.path.steps[0] in object.keys(subjects)
+	"named_by_each_of" in object.keys(fl)
 }
 
 _s_narrows(name, fl, subjects) if {
