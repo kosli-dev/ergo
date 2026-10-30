@@ -13,6 +13,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact.x[0] named by each of $params.k",
         "item 1 of artifact.x named by each of $params.k",
     ),
+    ("art.things", "art.things"),
+    ("arts", "arts"),
     (
         "artifact[0] named by each of $params.k",
         "item 1 of artifact named by each of $params.k",
@@ -722,6 +724,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("m whose id exists", "m whose id exists"),
     ("meta", "meta"),
+    ("meta.w", "meta.w"),
     ("mid.leaves", "mid.leaves"),
     (
         "modules whose every files.path matches \"^docs/\"",
@@ -2569,6 +2572,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ),
     ("meta.id", "meta.id"),
     ("meta", "meta"),
+    ("meta.w", "meta.w"),
     ("name", "name"),
     ("n", "n"),
     ("ps", "ps"),
