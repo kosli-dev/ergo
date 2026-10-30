@@ -6330,6 +6330,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every t[0].u as i", "every t[0].u as i", &[], &[]),
     ("first of t as i", "first of t as i", &[], &[]),
+    (
+        "every items.v as z, every z.subs as y",
+        "every items.v as z, every z.subs as y",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

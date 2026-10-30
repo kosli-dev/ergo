@@ -13417,5 +13417,107 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line whose first item has no whose, over a list where one value is missing",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every items.v as z, every z.subs as y",
+              "assert": "y is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "shows nothing of the second item under the value that's missing, and fails as absent",
+        "rules": [
+          "for.inputs",
+          "for.walk",
+          "sentence.for.line"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "items": [
+                {
+                  "v": {
+                    "subs": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "w": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 2 of items",
+                "locations": [
+                  "/things/0/items/1"
+                ],
+                "path": "item 2 of items",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/items/0/v",
+                  "/things/0/items/1"
+                ],
+                "name": "items[].v",
+                "value": [
+                  {
+                    "subs": [
+                      1
+                    ]
+                  },
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/items/0/v/subs/0"
+                ],
+                "name": "z.subs[]",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
