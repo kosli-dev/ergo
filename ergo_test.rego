@@ -1187,6 +1187,19 @@ test_every_walk_that_starts_at_a_list_input_names_where_it_broke_from_input if {
 	[[f.path, f.item] | some r in rows_for(report([{"commits": []}, 5], req), "s", "$min_subjects"); some f in r.failed_items] == [["item 2 of $input", "item 2 of $input"]]
 }
 
+test_a_from_line_with_a_position_on_a_list_input_names_it_from_input_in_expressions if {
+	every from, want in {
+		"every $input[1].commits": ["count(matching(every $input[1].commits)) >= 1", "count(repeated(ids(every $input[1].commits))) == 0"],
+		"$input[1]": ["count(matching(item 2 of $input)) >= 1", "count(repeated(ids(item 2 of $input))) == 0"],
+		"first of $input": ["count(matching(item 1 of $input)) >= 1", "count(repeated(ids(item 1 of $input))) == 0"],
+		"every $input.commits": ["count(matching(every commits)) >= 1", "count(repeated(ids(every commits))) == 0"],
+	} {
+		req := {"s": object.union(min_subjects_req(1).s, {"from": from})}
+		rep := report([{"commits": [{"id": "a"}]}, {"commits": [{"id": "b"}]}], req)
+		[rep.requirements.s.checks[c].expression | some c in ["$min_subjects", "$unique_ids"]] == want
+	}
+}
+
 test_a_child_subject_reads_the_items_of_a_list_input_as_its_parents if {
 	reqs := {"s": {"subject_type": "kid", "from": "parent.kids", "checks": {"c": "id exists"}}, "p": {"subject_type": "parent", "from": "$input", "checks": {"c": "kids exists"}}}
 	rep := report([{"kids": [{"id": "a"}]}, {"kids": []}], reqs)

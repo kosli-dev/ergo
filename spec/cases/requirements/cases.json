@@ -291,6 +291,16 @@
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ]
+      },
+      {
+        "description": "names the position from $input in the expression",
+        "rules": ["added.text"],
+        "input": [],
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
+        ],
+        "violations": [{"cause": "absent", "check": "$min_subjects", "description": "The in-scope subject count is at least 1", "expression": "count(matching(item 1 of $input)) >= 1", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}], "requirement": "s", "subject": {"type": "subject", "id": null}}]
       }
     ]
   },
