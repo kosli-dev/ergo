@@ -4,6 +4,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import urllib.parse
 
 public = pathlib.Path(sys.argv[1])
 site = pathlib.Path(sys.argv[2] if len(sys.argv) > 2 else pathlib.Path(__file__).parent)
@@ -85,6 +86,34 @@ for name in sorted(examples):
     for what, text in (("input", examples[name]["input"]), ("policy", f"ergo_spec: {spec}\n{examples[name]['policy']}")):
         if text.strip() not in shown:
             problems.append(f"the home page doesn't show the {what} of {name} from {examples_file}")
+
+editor_page = public / "editor/index.html"
+sitemap = public / "sitemap.xml"
+origin, base = "https://site.test", "/"
+if sitemap.exists():
+    urls = [urllib.parse.urlsplit(u.strip()) for u in re.findall(r"<loc>(.*?)</loc>", sitemap.read_text(errors="replace"), re.S)]
+    urls = [u for u in urls if u.scheme and u.netloc]
+    if urls:
+        home = min(urls, key=lambda u: len(u.path))
+        origin = f"{home.scheme}://{home.netloc}"
+        base = home.path if home.path.endswith("/") else home.path + "/"
+editor_paths = {base + "editor", base + "editor/", base + "editor/index.html"}
+link = re.compile(r"""\b(href|src|action|content|srcset)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))""", re.I)
+for page_file in sorted(public.rglob("*.html")):
+    if page_file == editor_page:
+        continue
+    address = origin + base + page_file.relative_to(public).as_posix()
+    for match in link.finditer(page_file.read_text(errors="replace")):
+        value = html.unescape(next(g for g in match.groups()[1:] if g is not None)).strip()
+        targets = [e.split()[0] for e in value.split(",") if e.split()] if match.group(1).lower() == "srcset" else [value]
+        for target in targets:
+            resolved = urllib.parse.urlsplit(urllib.parse.urljoin(address, target))
+            if f"{resolved.scheme}://{resolved.netloc}" == origin and resolved.path in editor_paths:
+                problems.append(f"{page_file.relative_to(public)} links to the editor with \"{target}\"")
+if sitemap.exists() and "/editor" in sitemap.read_text():
+    problems.append("sitemap.xml lists the editor")
+if editor_page.exists() and not re.search(r"""<meta\s+name=["']robots["']\s+content=["']noindex["']""", editor_page.read_text(errors="replace"), re.I):
+    problems.append("the editor page has no noindex meta")
 
 if problems:
     print("\n".join(problems))
