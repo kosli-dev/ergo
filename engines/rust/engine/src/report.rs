@@ -551,7 +551,7 @@ fn subject_entry(reading: &Reading, name: &str, extra: &Problems) -> Value {
 }
 
 fn engine() -> Value {
-    json!({"name": "ergo-engine", "version": env!("CARGO_PKG_VERSION")})
+    json!({"name": "ergo-policy-engine", "version": env!("CARGO_PKG_VERSION")})
 }
 
 #[cfg(test)]
@@ -1204,7 +1204,7 @@ mod tests {
         assert_eq!(report["ergo"], json!("v0.3-dev"));
         assert_eq!(
             report["engine"],
-            json!({"name": "ergo-engine", "version": env!("CARGO_PKG_VERSION")})
+            json!({"name": "ergo-policy-engine", "version": env!("CARGO_PKG_VERSION")})
         );
         assert_eq!(report["engine"].as_object().unwrap().len(), 2);
     }
@@ -1772,6 +1772,6 @@ mod tests {
     #[test]
     fn engine_and_spec_are_the_ones_this_engine_follows() {
         assert_eq!(SPEC, "v0.3-dev");
-        assert_eq!(engine()["name"], json!("ergo-engine"));
+        assert_eq!(engine()["name"], json!("ergo-policy-engine"));
     }
 }

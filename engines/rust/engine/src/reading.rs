@@ -6,7 +6,7 @@ use crate::policy::{
     Has, Policy, Problems, Requirement, SubjectDef, SubjectName, Subjects, Text, add_problem,
     field_name, merge_problems,
 };
-use ergo_sentences as s;
+use ergo_policy_sentences as s;
 use serde_json::{Map, Value, json};
 use std::collections::{BTreeMap, BTreeSet};
 

@@ -6,7 +6,7 @@ use crate::cause::Cause;
 use crate::lower::Scope;
 use crate::path::{self, Ctx, Outcome, Path};
 use crate::value;
-use ergo_sentences as tree;
+use ergo_policy_sentences as tree;
 use serde_json::{Number, Value};
 use std::cmp::Ordering;
 

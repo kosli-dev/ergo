@@ -39,7 +39,7 @@ The old port, on the branch `core/conformance-suite`, listed its findings in `co
 
 ### Sentences
 
-`ergo-sentences` reads what `spec/sentences.abnf` allows, and `check_grammar.py --rust` checks that on every sentence it tries. Comparing it with `ergo.rego` on about 18,000 generated and real lines found these differences. No sentence in `spec/cases` or the corpus hits them, which is why `check_grammar.py` doesn't list them in `spec/OPEN.md`.
+`ergo-policy-sentences` reads what `spec/sentences.abnf` allows, and `check_grammar.py --rust` checks that on every sentence it tries. Comparing it with `ergo.rego` on about 18,000 generated and real lines found these differences. No sentence in `spec/cases` or the corpus hits them, which is why `check_grammar.py` doesn't list them in `spec/OPEN.md`.
 
 - **A `for` item with a bracket index and no quantifier.** `ergo.rego` reads `x[3] as i` as `item 4 of x as i`. The ABNF's `for-item` needs `every`, `some` or a position in words, so Rust rejects it with `an item starts with "every", "some" or a position, like "last of"`.
 - **Tabs at either end of a line.** `ergo.rego` drops all whitespace there (`trim_space`), so `x is 1` followed by a tab reads. The ABNF drops only spaces, and so does Rust.
@@ -60,8 +60,8 @@ Here a rule's text says one thing and a case, which `ergo.rego` passes, says ano
 
 ## Where Rust's `regex` reads a pattern differently from RE2
 
-[patterns.syntax] says a pattern is RE2 syntax, and `ergo.rego` runs Go's RE2 through OPA. The port uses the `regex` crate, and reads each pattern through `ergo_sentences::rust_pattern` first, the same text the parser checks for `invalid pattern`. That function rewrites what the two read differently:
+[patterns.syntax] says a pattern is RE2 syntax, and `ergo.rego` runs Go's RE2 through OPA. The port uses the `regex` crate, and reads each pattern through `ergo_policy_sentences::rust_pattern` first, the same text the parser checks for `invalid pattern`. That function rewrites what the two read differently:
 
 - **`\d`, `\w`, `\s` and `\b` are ASCII in RE2 and Unicode in Rust.** With OPA, `^\d$` doesn't match `٣`, `^\w$` doesn't match `é`, `^\s$` matches neither a vertical tab nor a non-breaking space, and `a\b` matches `aé`. Rust's defaults would give the opposite for all of them. So `\d` is written `[0-9]`, `\w` `[0-9A-Za-z_]`, `\s` `[\t\n\x0C\r ]`, their capitals the negated sets, and `\b` and `\B` `(?-u:\b)` and `(?-u:\B)`. Inside brackets the sets are nested, which Rust allows, so `[\d_]` is `[[0-9]_]`. No case pins this. It would take a case like `x matches "^\\d$"` on `"٣"`, which fails as `value`.
-- **Syntax only RE2 has**, like `\Q...\E`, a `{` that isn't a repeat, `[]a]`, and more than 1000 repeats being invalid, was already rewritten or rejected by ergo-sentences. Its oracle test checks validity against RE2.
+- **Syntax only RE2 has**, like `\Q...\E`, a `{` that isn't a repeat, `[]a]`, and more than 1000 repeats being invalid, was already rewritten or rejected by ergo-policy-sentences. Its oracle test checks validity against RE2.
 - **A pattern Rust can't compile** after that, for example one too big for its size limit, fails the check as `unusable`, so it never passes by accident.

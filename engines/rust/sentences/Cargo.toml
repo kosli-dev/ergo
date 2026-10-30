@@ -1,5 +1,5 @@
 [package]
-name = "ergo-sentences"
+name = "ergo-policy-sentences"
 description = "Experimental: reads Ergo's check sentences, without the engine"
 version.workspace = true
 edition.workspace = true

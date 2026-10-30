@@ -4,7 +4,7 @@
 //! described by `spec/report/schema.json`.
 //!
 //! ```
-//! use ergo_engine::{report, violations};
+//! use ergo_policy_engine::{report, violations};
 //! use serde_json::json;
 //!
 //! let policy = json!({

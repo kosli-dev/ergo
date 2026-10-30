@@ -1,6 +1,6 @@
-# ergo-sentences-wasm
+# ergo-policy-sentences-wasm
 
-Reads Ergo's sentences in a browser or in Node, without the engine. It wraps [`ergo-sentences`](../sentences/README.md), and only strings cross the boundary: a line goes in, JSON text comes out.
+Reads Ergo's sentences in a browser or in Node, without the engine. It wraps [`ergo-policy-sentences`](../sentences/README.md), and only strings cross the boundary: a line goes in, JSON text comes out.
 
 - `parse_check(line)`, `parse_for(line)`, `parse_from(line)` and `parse_path(line)` return `{"tree": ...}`, or `{"errors": [{"column": ..., "message": ...}]}` when the line doesn't read. `column` is `null` when the message names none.
 - `check_problems(tree, aliases)` and `for_problems(tree, aliases)` return `{"problems": [...]}` for a tree you give as JSON text. `aliases` is a JSON array of names.
@@ -11,9 +11,9 @@ The problem and print functions throw an `Error` when the tree, the aliases or t
 
 ```js
 import { readFileSync } from "node:fs";
-import { initSync, parse_check, print_check } from "./pkg/ergo_sentences_wasm.js";
+import { initSync, parse_check, print_check } from "./pkg/ergo_policy_sentences_wasm.js";
 
-initSync({ module: readFileSync("./pkg/ergo_sentences_wasm_bg.wasm") });
+initSync({ module: readFileSync("./pkg/ergo_policy_sentences_wasm_bg.wasm") });
 console.log(parse_check('x is "a'));
 const { tree } = JSON.parse(parse_check("approvals is at least 2"));
 console.log(print_check(JSON.stringify(tree), "[]"));

@@ -27,7 +27,7 @@ use problems::{Kind, errors};
 /// Whitespace at both ends is dropped. It returns the `SyntaxError`s `ergo.rego` gives for the same line when the line is not a path, and when the path holds an unknown name, like `$foo`.
 ///
 /// ```
-/// use ergo_sentences::parse_path;
+/// use ergo_policy_sentences::parse_path;
 ///
 /// assert!(parse_path("x.y[1]").is_ok());
 /// assert!(parse_path("x.y[").is_err());
@@ -56,7 +56,7 @@ pub fn parse_path(line: &str) -> Result<Path, Vec<SyntaxError>> {
 /// It accepts what the `from-line` rule of `spec/sentences.abnf` accepts and nothing else. Whitespace at both ends is dropped. It returns the `SyntaxError`s `ergo.rego` gives for the same line when the line does not read.
 ///
 /// ```
-/// use ergo_sentences::parse_from;
+/// use ergo_policy_sentences::parse_from;
 ///
 /// assert!(parse_from("every items whose x is 1").is_ok());
 /// assert!(parse_from("every").is_err());
@@ -75,7 +75,7 @@ pub fn parse_from(line: &str) -> Result<FromLine, Vec<SyntaxError>> {
 /// It accepts what the `check` rule of `spec/sentences.abnf` accepts and nothing else. Whitespace at both ends is dropped. It returns the `SyntaxError`s `ergo.rego` gives for the same line when the line does not read.
 ///
 /// ```
-/// use ergo_sentences::parse_check;
+/// use ergo_policy_sentences::parse_check;
 ///
 /// assert!(parse_check("approvals is at least 2").is_ok());
 /// let errors = parse_check("x is \"a").unwrap_err();
@@ -95,7 +95,7 @@ pub fn parse_check(line: &str) -> Result<Check, Vec<SyntaxError>> {
 /// It accepts what the `for-line` rule of `spec/sentences.abnf` accepts and nothing else. Whitespace at both ends is dropped. It returns the `SyntaxError`s `ergo.rego` gives for the same line when the line does not read.
 ///
 /// ```
-/// use ergo_sentences::parse_for;
+/// use ergo_policy_sentences::parse_for;
 ///
 /// assert!(parse_for("every xs as x").is_ok());
 /// assert!(parse_for("every xs").is_err());

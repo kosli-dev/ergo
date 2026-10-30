@@ -1,7 +1,7 @@
 mod oracle;
 mod support;
 
-use ergo_sentences::*;
+use ergo_policy_sentences::*;
 use serde_json::Value;
 use std::fs;
 use std::path::PathBuf;

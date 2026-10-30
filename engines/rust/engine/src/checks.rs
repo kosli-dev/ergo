@@ -6,7 +6,7 @@ use crate::path::{self, Ctx, Located, Location, Path};
 use crate::policy::{Form, OptionLines, Requirement, SubjectName};
 use crate::reading::Reading;
 use crate::report::written_expression;
-use ergo_sentences as s;
+use ergo_policy_sentences as s;
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
 

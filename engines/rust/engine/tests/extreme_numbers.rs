@@ -117,7 +117,7 @@ fn no_numeric_operator_panics_or_gives_a_cause_the_spec_lacks_on_extreme_numbers
         let input = input(&held);
         let params = json!({"list": [1, 2]});
         let shown: String = text.chars().take(60).collect();
-        match catch_unwind(|| ergo_engine::report(&input, &policy, &params)) {
+        match catch_unwind(|| ergo_policy_engine::report(&input, &policy, &params)) {
             Err(_) => failures.push(format!("panic: {shown} with {}", held.len())),
             Ok(report) => {
                 let mut causes = Vec::new();
@@ -143,7 +143,7 @@ fn cause_of(sentence: &str, things: &str) -> String {
         "requirements": {"r": {"subject": "thing", "checks": {"c": sentence}}}
     });
     let input: Value = serde_json::from_str(&format!(r#"{{"things": [{things}]}}"#)).unwrap();
-    let report = ergo_engine::report(&input, &policy, &json!({}));
+    let report = ergo_policy_engine::report(&input, &policy, &json!({}));
     let results = report["results"].as_array().unwrap();
     let row = results
         .iter()
@@ -210,7 +210,7 @@ fn unique_ids_row(ids: &[String]) -> Value {
     });
     let input: Value =
         serde_json::from_str(&format!(r#"{{"things": [{}]}}"#, things.join(", "))).unwrap();
-    let report = ergo_engine::report(&input, &policy, &json!({}));
+    let report = ergo_policy_engine::report(&input, &policy, &json!({}));
     report["results"]
         .as_array()
         .unwrap()
@@ -354,7 +354,7 @@ fn one_subject_whose_id_cannot_be_read_passes_unique_ids() {
     let big = format!("1e1{}", "0".repeat(36));
     let input: Value =
         serde_json::from_str(&format!(r#"{{"items": [{{"size": {big}}}]}}"#)).unwrap();
-    let report = ergo_engine::report(&input, &one_item_policy(), &json!({}));
+    let report = ergo_policy_engine::report(&input, &one_item_policy(), &json!({}));
     let row = report["results"]
         .as_array()
         .unwrap()
@@ -377,7 +377,7 @@ fn a_number_that_cannot_be_read_keeps_its_digits_in_the_report_text() {
     let big = format!("1e1{}", "0".repeat(36));
     let input: Value =
         serde_json::from_str(&format!(r#"{{"items": [{{"size": {big}}}]}}"#)).unwrap();
-    let text = ergo_engine::report(&input, &one_item_policy(), &json!({})).to_string();
+    let text = ergo_policy_engine::report(&input, &one_item_policy(), &json!({})).to_string();
     assert!(!text.contains(r#""size":null"#), "{text}");
     assert!(
         text.contains(&format!(r#""size":1e+1{}"#, "0".repeat(36))),

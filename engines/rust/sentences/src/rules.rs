@@ -12,7 +12,7 @@ const UNKNOWN_NAME: &str = "unknown name ";
 /// The messages are in `ergo.rego`'s words and sorted. It only reads the tree and the names in `aliases`. Rules that need the policy's names, like an alias named like a subject, are left to the engine. The list is empty when nothing is wrong.
 ///
 /// ```
-/// use ergo_sentences::{check_problems, parse_check};
+/// use ergo_policy_sentences::{check_problems, parse_check};
 ///
 /// let check = parse_check("x is not null").unwrap();
 /// assert_eq!(check_problems(&check, &[]), [r#""is not null" is written "exists""#]);
@@ -30,7 +30,7 @@ pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
 /// It gives what [`check_problems`] gives when the check has no other problem, and an empty list otherwise.
 ///
 /// ```
-/// use ergo_sentences::{check_self_problems, parse_check};
+/// use ergo_policy_sentences::{check_self_problems, parse_check};
 ///
 /// let check = parse_check("x equals x").unwrap();
 /// assert_eq!(check_self_problems(&check, &[]), ["x is compared with itself"]);

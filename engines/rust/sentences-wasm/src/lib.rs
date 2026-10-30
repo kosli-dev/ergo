@@ -1,6 +1,6 @@
 //! Reads Ergo's sentences in a browser, without the engine. Lines go in as strings and trees, names and problems cross as JSON text, so nothing but strings passes the boundary.
 
-use ergo_sentences::SyntaxError;
+use ergo_policy_sentences::SyntaxError;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use wasm_bindgen::prelude::*;
@@ -38,7 +38,7 @@ fn refs(names: &[String]) -> Vec<&str> {
 
 /// Reads a check sentence and returns the same JSON text as `parse_check`.
 pub fn parse_check_text(line: &str) -> String {
-    answer(ergo_sentences::parse_check(line))
+    answer(ergo_policy_sentences::parse_check(line))
 }
 
 /// Reads a check sentence and returns `{"tree": ...}`, or `{"errors": [{"column": ..., "message": ...}]}` when it doesn't read. `column` is `null` when the message names none. Throws a `TypeError` when `line` isn't a string.
@@ -51,7 +51,7 @@ pub fn parse_check(
 
 /// Reads a `for` line and returns the same JSON text as `parse_for`.
 pub fn parse_for_text(line: &str) -> String {
-    answer(ergo_sentences::parse_for(line))
+    answer(ergo_policy_sentences::parse_for(line))
 }
 
 /// Reads a `for` line and returns `{"tree": ...}` or `{"errors": [...]}`, like `parse_check`. Throws a `TypeError` when `line` isn't a string.
@@ -64,7 +64,7 @@ pub fn parse_for(
 
 /// Reads a `from` line and returns the same JSON text as `parse_from`.
 pub fn parse_from_text(line: &str) -> String {
-    answer(ergo_sentences::parse_from(line))
+    answer(ergo_policy_sentences::parse_from(line))
 }
 
 /// Reads a `from` line and returns `{"tree": ...}` or `{"errors": [...]}`, like `parse_check`. Throws a `TypeError` when `line` isn't a string.
@@ -77,7 +77,7 @@ pub fn parse_from(
 
 /// Reads a path and returns the same JSON text as `parse_path`.
 pub fn parse_path_text(line: &str) -> String {
-    answer(ergo_sentences::parse_path(line))
+    answer(ergo_policy_sentences::parse_path(line))
 }
 
 /// Reads a path and returns `{"tree": ...}` or `{"errors": [...]}`, like `parse_check`. Throws a `TypeError` when `line` isn't a string.
@@ -92,7 +92,7 @@ pub fn parse_path(
 pub fn check_problems_text(tree: &str, aliases: &str) -> Result<String, String> {
     let check = read("the tree isn't", tree)?;
     let aliases = names(aliases)?;
-    let problems = ergo_sentences::check_problems(&check, &refs(&aliases));
+    let problems = ergo_policy_sentences::check_problems(&check, &refs(&aliases));
     Ok(serde_json::json!({ "problems": problems }).to_string())
 }
 
@@ -100,14 +100,14 @@ pub fn check_problems_text(tree: &str, aliases: &str) -> Result<String, String> 
 pub fn for_problems_text(tree: &str, aliases: &str) -> Result<String, String> {
     let line = read("the tree isn't", tree)?;
     let aliases = names(aliases)?;
-    let problems = ergo_sentences::for_problems(&line, &refs(&aliases));
+    let problems = ergo_policy_sentences::for_problems(&line, &refs(&aliases));
     Ok(serde_json::json!({ "problems": problems }).to_string())
 }
 
 /// Lists what is written wrong in a `from` line's tree, given as JSON text, as `{"problems": [...]}`. Fails when it isn't valid JSON.
 pub fn from_problems_text(tree: &str) -> Result<String, String> {
     let line = read("the tree isn't", tree)?;
-    let problems = ergo_sentences::from_problems(&line);
+    let problems = ergo_policy_sentences::from_problems(&line);
     Ok(serde_json::json!({ "problems": problems }).to_string())
 }
 
@@ -115,14 +115,14 @@ pub fn from_problems_text(tree: &str) -> Result<String, String> {
 pub fn print_check_text(tree: &str, aliases: &str) -> Result<String, String> {
     let check = read("the tree isn't", tree)?;
     let aliases = names(aliases)?;
-    Ok(ergo_sentences::print_check(&check, &refs(&aliases)))
+    Ok(ergo_policy_sentences::print_check(&check, &refs(&aliases)))
 }
 
 /// Writes a `for` line's tree, given as JSON text, back as a line. `aliases` is a JSON array of names. Fails when either isn't valid JSON.
 pub fn print_for_text(tree: &str, aliases: &str) -> Result<String, String> {
     let line = read("the tree isn't", tree)?;
     let aliases = names(aliases)?;
-    Ok(ergo_sentences::print_for(&line, &refs(&aliases)))
+    Ok(ergo_policy_sentences::print_for(&line, &refs(&aliases)))
 }
 
 /// Writes a `from` line's tree, given as JSON text, back as a line. `aliases` and `parents` are JSON arrays of names. Fails when one isn't valid JSON.
@@ -130,7 +130,7 @@ pub fn print_from_text(tree: &str, aliases: &str, parents: &str) -> Result<Strin
     let line = read("the tree isn't", tree)?;
     let aliases = names(aliases)?;
     let parents = read::<Vec<String>>("the parents aren't", parents)?;
-    Ok(ergo_sentences::print_from(
+    Ok(ergo_policy_sentences::print_from(
         &line,
         &refs(&aliases),
         &refs(&parents),

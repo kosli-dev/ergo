@@ -62,14 +62,14 @@ jobs:
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
-          name: ergo-wasm-pkg
+          name: ergo-policy-wasm-pkg
           path: engines/rust/wasm/pkg
           run-id: ${{ steps.tests.outputs.run_id }}
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
-          name: ergo-sentences-wasm-pkg
+          name: ergo-policy-sentences-wasm-pkg
           path: engines/rust/sentences-wasm/pkg
           run-id: ${{ steps.tests.outputs.run_id }}
           github-token: ${{ github.token }}

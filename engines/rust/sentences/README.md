@@ -1,4 +1,4 @@
-# ergo-sentences
+# ergo-policy-sentences
 
 Reads Ergo's check sentences, `for` lines, `from` lines and paths into a tree, and prints a tree back as a canonical sentence. It doesn't build reports, and its only dependency is `regex-syntax`, which it uses to check the patterns of `matches`, so an editor or a linter can use it without the engine. It builds for `wasm32-unknown-unknown`.
 
@@ -32,7 +32,7 @@ pub fn rust_pattern(pattern: &str) -> Option<String>;
 ## Using it
 
 ```rust
-use ergo_sentences::{check_problems, parse_check, print_check};
+use ergo_policy_sentences::{check_problems, parse_check, print_check};
 
 let check = parse_check("approvals   is at least 2").unwrap();
 assert!(check_problems(&check, &[]).is_empty());

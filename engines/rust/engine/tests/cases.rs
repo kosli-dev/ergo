@@ -228,8 +228,8 @@ fn every_case_passes_unless_known_to_fail() {
         .iter()
         .filter(|c| {
             let report =
-                ergo_engine::report(&c.case["input"], &c.group["policy"], &params(&c.group));
-            !passes(&c.case, &report, &ergo_engine::violations)
+                ergo_policy_engine::report(&c.case["input"], &c.group["policy"], &params(&c.group));
+            !passes(&c.case, &report, &ergo_policy_engine::violations)
         })
         .map(|c| c.id.clone())
         .collect();

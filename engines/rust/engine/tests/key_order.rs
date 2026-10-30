@@ -75,22 +75,22 @@ const PARAMS_REORDERED: &str = r#"{"max": 9, "min": 2}"#;
 #[test]
 fn the_report_is_byte_identical_whatever_order_the_keys_of_the_policy_input_and_params_are_written_in()
  {
-    let first = ergo_engine::report(&read(INPUT), &read(POLICY), &read(PARAMS));
-    let second = ergo_engine::report(
+    let first = ergo_policy_engine::report(&read(INPUT), &read(POLICY), &read(PARAMS));
+    let second = ergo_policy_engine::report(
         &read(INPUT_REORDERED),
         &read(POLICY_REORDERED),
         &read(PARAMS_REORDERED),
     );
     assert_eq!(first.to_string(), second.to_string());
     assert_eq!(
-        ergo_engine::violations(&first).to_string(),
-        ergo_engine::violations(&second).to_string()
+        ergo_policy_engine::violations(&first).to_string(),
+        ergo_policy_engine::violations(&second).to_string()
     );
 }
 
 #[test]
 fn the_report_of_the_key_order_policy_runs_its_checks_rather_than_failing_them_as_written_wrong() {
-    let report = ergo_engine::report(&read(INPUT), &read(POLICY), &read(PARAMS));
+    let report = ergo_policy_engine::report(&read(INPUT), &read(POLICY), &read(PARAMS));
     let results = report["results"].as_array().unwrap();
     assert!(
         results

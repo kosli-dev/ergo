@@ -22,7 +22,7 @@ fn main() {
     let started = Instant::now();
     let mut report = Value::Null;
     for _ in 0..runs {
-        report = ergo_engine::report(&input, &policy, &params);
+        report = ergo_policy_engine::report(&input, &policy, &params);
     }
     eprintln!(
         "report: {:.1} ms per run",

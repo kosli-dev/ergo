@@ -17,8 +17,8 @@ test("a missing or unknown saved engine gives ergo.rego", () => {
 });
 
 test("the note names the engine and its version", () => {
-  assert.equal(engineNote({ engine: { name: "ergo-engine", version: "0.1.0-dev" } }), "Report made by the Rust engine (ergo-engine 0.1.0-dev).");
-  assert.equal(engineNote({ engine: { name: "ergo-engine" } }), "Report made by the Rust engine (ergo-engine).");
+  assert.equal(engineNote({ engine: { name: "ergo-policy-engine", version: "0.1.0-dev" } }), "Report made by the Rust engine (ergo-policy-engine 0.1.0-dev).");
+  assert.equal(engineNote({ engine: { name: "ergo-policy-engine" } }), "Report made by the Rust engine (ergo-policy-engine).");
   assert.equal(engineNote({ engine: { name: "ergo.rego", version: "0.3.0-dev" } }), "Report made by the Rego engine (ergo.rego 0.3.0-dev).");
   assert.equal(engineNote({ engine: { name: "ergo.rego" } }), "Report made by the Rego engine (ergo.rego).");
   assert.equal(engineNote({ engine: { name: "other", version: "1.0" } }), "Report made by other 1.0.");
@@ -77,7 +77,7 @@ test("an error that isn't a panic reaches the caller and the runner keeps going"
 });
 
 test("the note says how long the report took, with one decimal under 10 ms", () => {
-  assert.equal(engineNote({ engine: { name: "ergo-engine", version: "0.1.0-dev" } }, 1.84), "Report made by the Rust engine (ergo-engine 0.1.0-dev) in 1.8 ms.");
+  assert.equal(engineNote({ engine: { name: "ergo-policy-engine", version: "0.1.0-dev" } }, 1.84), "Report made by the Rust engine (ergo-policy-engine 0.1.0-dev) in 1.8 ms.");
   assert.equal(engineNote({ engine: { name: "ergo.rego", version: "0.3.0-dev" } }, 42.6), "Report made by the Rego engine (ergo.rego 0.3.0-dev) in 43 ms.");
   assert.equal(engineNote({ engine: { name: "other" } }, 0), "Report made by other in 0.0 ms.");
   assert.equal(engineNote({ engine: { name: "ergo.rego" } }, null), "Report made by the Rego engine (ergo.rego).");

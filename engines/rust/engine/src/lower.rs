@@ -2,7 +2,7 @@ use crate::ops::walk::{Quantifier, Walk};
 use crate::ops::{Check, present::Present, tally};
 use crate::path::{self, OUTER, PartStart, Start, Step};
 use crate::value::Decimal;
-use ergo_sentences as s;
+use ergo_policy_sentences as s;
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
 

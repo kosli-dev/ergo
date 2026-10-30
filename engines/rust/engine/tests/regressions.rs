@@ -43,7 +43,7 @@ fn every_regression_gives_the_report_it_pins() {
                 .as_str()
                 .expect("a regression has a description");
             let params = entry.get("params").cloned().unwrap_or_else(|| json!({}));
-            let got = without_engine(ergo_engine::report(
+            let got = without_engine(ergo_policy_engine::report(
                 &entry["input"],
                 &entry["policy"],
                 &params,

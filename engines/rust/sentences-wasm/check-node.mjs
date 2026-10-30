@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
-import { check_problems, initSync, parse_check, print_check } from "./pkg/ergo_sentences_wasm.js";
+import { check_problems, initSync, parse_check, print_check } from "./pkg/ergo_policy_sentences_wasm.js";
 
-initSync({ module: readFileSync(new URL("./pkg/ergo_sentences_wasm_bg.wasm", import.meta.url)) });
+initSync({ module: readFileSync(new URL("./pkg/ergo_policy_sentences_wasm_bg.wasm", import.meta.url)) });
 
 const read = JSON.parse(parse_check("approvals is at least 2"));
 if (read.tree === undefined) {
@@ -43,4 +43,4 @@ for (const [call, wanted] of [
     throw new Error(`wanted a TypeError "${wanted}", got ${thrown}`);
   }
 }
-console.log("ergo-sentences-wasm read a sentence, refused a broken one, listed problems and printed it back");
+console.log("ergo-policy-sentences-wasm read a sentence, refused a broken one, listed problems and printed it back");

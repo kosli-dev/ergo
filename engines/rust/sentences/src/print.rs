@@ -7,7 +7,7 @@ use crate::words::{is_bare_key, is_word};
 /// `side` says whether the path is left of a phrase or right of it. `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 ///
 /// ```
-/// use ergo_sentences::{Side, parse_path, print_path};
+/// use ergo_policy_sentences::{Side, parse_path, print_path};
 ///
 /// let path = parse_path("  x.y[1]  ").unwrap();
 /// assert_eq!(print_path(&path, Side::Left, &[]), "item 2 of x.y");
@@ -120,7 +120,7 @@ fn from_condition_text(
 /// `parents` holds the names of a child subject's parents. On the left of a `whose`, a key named like a parent reads the item's own field, so it prints with a dot. Pass `&[]` for a subject with no parents.
 ///
 /// ```
-/// use ergo_sentences::{parse_from, print_from};
+/// use ergo_policy_sentences::{parse_from, print_from};
 ///
 /// let line = parse_from("every  items whose x is 1").unwrap();
 /// assert_eq!(print_from(&line, &[], &[]), "every items whose x is 1");
@@ -563,7 +563,7 @@ pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String {
 /// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 ///
 /// ```
-/// use ergo_sentences::{parse_check, print_check};
+/// use ergo_policy_sentences::{parse_check, print_check};
 ///
 /// let check = parse_check("approvals   is at least 2").unwrap();
 /// assert_eq!(print_check(&check, &[]), "approvals is at least 2");
@@ -640,7 +640,7 @@ pub fn print_for_item(item: &ForItem, aliases: &[&str]) -> String {
 /// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.
 ///
 /// ```
-/// use ergo_sentences::{parse_for, print_for};
+/// use ergo_policy_sentences::{parse_for, print_for};
 ///
 /// let line = parse_for("every  xs as x").unwrap();
 /// assert_eq!(print_for(&line, &[]), "every xs as x");

@@ -8,7 +8,7 @@ pub fn report_text(input: &str, policy: &str, params: &str) -> Result<String, St
     let read = |what: &str, text: &str| {
         serde_json::from_str::<Value>(text).map_err(|e| format!("{what} valid JSON: {e}"))
     };
-    let report = ergo_engine::report(
+    let report = ergo_policy_engine::report(
         &read("the input isn't", input)?,
         &read("the policy isn't", policy)?,
         &read("the params aren't", params)?,

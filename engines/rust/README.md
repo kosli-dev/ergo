@@ -6,11 +6,11 @@ A second engine for Ergo, in Rust, that should give the same report as `ergo.reg
 
 It has five crates:
 
-- `ergo-sentences` (`sentences/`) reads check sentences, `for` lines, `from` lines and paths, and nothing else, so an editor or a linter can use it without the engine.
-- `ergo-engine` (`engine/`) builds the report, and reads sentences with `ergo-sentences`.
-- `ergo-cli` (`cli/`) is the `ergo` command: it reads a policy, an input and params from JSON or YAML files and prints the report or the violations.
-- `ergo-wasm` (`wasm/`) wraps the engine for a browser: one function, `report`, that takes the input, the policy and the params as JSON text and gives the report back as JSON text.
-- `ergo-sentences-wasm` (`sentences-wasm/`) wraps `ergo-sentences` for a browser: `parse_check`, `parse_for`, `parse_from` and `parse_path` give a tree or the syntax errors as JSON text, and there are functions for the problems and for printing a tree back.
+- `ergo-policy-sentences` (`sentences/`) reads check sentences, `for` lines, `from` lines and paths, and nothing else, so an editor or a linter can use it without the engine.
+- `ergo-policy-engine` (`engine/`) builds the report, and reads sentences with `ergo-policy-sentences`.
+- `ergo-policy-cli` (`cli/`) is the `ergo` command: it reads a policy, an input and params from JSON or YAML files and prints the report or the violations.
+- `ergo-policy-wasm` (`wasm/`) wraps the engine for a browser: one function, `report`, that takes the input, the policy and the params as JSON text and gives the report back as JSON text.
+- `ergo-policy-sentences-wasm` (`sentences-wasm/`) wraps `ergo-policy-sentences` for a browser: `parse_check`, `parse_for`, `parse_from` and `parse_path` give a tree or the syntax errors as JSON text, and there are functions for the problems and for printing a tree back.
 
 ## The cases
 
@@ -35,11 +35,11 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
   cargo clippy -j 4 --locked --all-targets --all-features -- -D warnings &&
   cargo test -j 4 --locked --all-features -- --show-output &&
   RUSTDOCFLAGS="-D warnings" cargo doc -j 4 --locked --no-deps --all-features &&
-  cargo test -j 4 --locked -p ergo-engine --features serde_json/preserve_order --test key_order &&
-  cargo build -j 4 --locked -p ergo-sentences --target wasm32-unknown-unknown'
+  cargo test -j 4 --locked -p ergo-policy-engine --features serde_json/preserve_order --test key_order &&
+  cargo build -j 4 --locked -p ergo-policy-sentences --target wasm32-unknown-unknown'
 ```
 
-`ergo-sentences` has an example, `sentences/examples/read.rs`, that reads `{"rows": [{"kinds": [...], "text": "..."}]}` on stdin and prints, for each row and kind (`check`, `for-line`, `from-line`), the `SyntaxError` messages of `parse_check`, `parse_for` or `parse_from`. `spec/check_grammar.py --rust <command>` runs it on the corpus, the cases and a few thousand generated sentences, and fails when Rust accepts a sentence that the ABNF rejects, or the reverse. CI builds it with `cargo build --locked --release -p ergo-sentences --example read` and gives the script `engines/rust/target/release/examples/read`.
+`ergo-policy-sentences` has an example, `sentences/examples/read.rs`, that reads `{"rows": [{"kinds": [...], "text": "..."}]}` on stdin and prints, for each row and kind (`check`, `for-line`, `from-line`), the `SyntaxError` messages of `parse_check`, `parse_for` or `parse_from`. `spec/check_grammar.py --rust <command>` runs it on the corpus, the cases and a few thousand generated sentences, and fails when Rust accepts a sentence that the ABNF rejects, or the reverse. CI builds it with `cargo build --locked --release -p ergo-policy-sentences --example read` and gives the script `engines/rust/target/release/examples/read`.
 
 The second `cargo test` runs `tests/key_order.rs` again with serde_json's `preserve_order`, which keeps an object's keys in the order they were read. The report must stay byte for byte the same whatever order a policy, an input or params write their keys in, and if a dependency ever turned that feature on, `meta` and any object copied from the input would follow the order they were written in. The engine sorts every object in the report, and this run checks it does.
 
@@ -61,7 +61,7 @@ To build it and run it with Docker, put the policy and the input from the [READM
 ```sh
 docker run --rm -v "$REPO":/src -v "$PWD":/work -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
   find . -name "*.rs" -exec touch {} + &&
-  cargo build -j 4 --locked --release -p ergo-cli &&
+  cargo build -j 4 --locked --release -p ergo-policy-cli &&
   cd /work &&
   /target/release/ergo violations --policy policy.yaml --input deployments.json'
 ```
@@ -106,33 +106,33 @@ These differences are known:
 
 ## Building for a browser
 
-The Markdown editor can run this engine in the page, so it needs `ergo-wasm` built to Wasm and wrapped in JavaScript. This builds it into `engines/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. That editor is in `packages/editor`. Run it with the image from above, from the root of the repo:
+The Markdown editor can run this engine in the page, so it needs `ergo-policy-wasm` built to Wasm and wrapped in JavaScript. This builds it into `engines/rust/wasm/pkg`, which Git ignores, and `packages/editor/build.mjs` reads it from there. That editor is in `packages/editor`. Run it with the image from above, from the root of the repo:
 
 ```sh
 docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
   find . -name "*.rs" -exec touch {} + &&
-  cargo build --locked -j 4 --profile wasm -p ergo-wasm --target wasm32-unknown-unknown &&
-  wasm-bindgen --target web --out-dir wasm/pkg /target/wasm32-unknown-unknown/wasm/ergo_wasm.wasm &&
-  wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_wasm_bg.wasm -o wasm/pkg/ergo_wasm_bg.wasm'
+  cargo build --locked -j 4 --profile wasm -p ergo-policy-wasm --target wasm32-unknown-unknown &&
+  wasm-bindgen --target web --out-dir wasm/pkg /target/wasm32-unknown-unknown/wasm/ergo_policy_wasm.wasm &&
+  wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_policy_wasm_bg.wasm -o wasm/pkg/ergo_policy_wasm_bg.wasm'
 ```
 
 The `wasm` profile in `Cargo.toml` builds for size, and `wasm-opt` from [Binaryen](https://github.com/WebAssembly/binaryen) shrinks the result further. Together they take the Wasm file from about 2.9 MB to about 1.5 MB, and from about 840 KB to about 550 KB gzipped. Without `wasm-opt` the file is 1.6 MB, and a little smaller gzipped, at about 510 KB. The `release` profile stays as it was, because the other builds and the timings use it.
 
 The `wasm-bindgen` tool has to be the same version as the `wasm-bindgen` crate, `=0.2.129` in `wasm/Cargo.toml`. The version is also in the `Dockerfile` and in the `tests-rust` job of `.github/workflows/test.yml`, so change all three together. The same goes for the Binaryen version, `version_133`, which is in the `Dockerfile` and in that job, together with the SHA-256 of each tarball. Both check the download against it before they unpack it.
 
-`ergo-sentences-wasm` builds the same way, with its own folder and no engine. It comes to about 740 KB, or 256 KB gzipped:
+`ergo-policy-sentences-wasm` builds the same way, with its own folder and no engine. It comes to about 740 KB, or 256 KB gzipped:
 
 ```sh
 docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust sh -c '
   find . -name "*.rs" -exec touch {} + &&
-  cargo build --locked -j 4 --profile wasm -p ergo-sentences-wasm --target wasm32-unknown-unknown &&
-  wasm-bindgen --target web --out-dir sentences-wasm/pkg /target/wasm32-unknown-unknown/wasm/ergo_sentences_wasm.wasm &&
-  wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm -o sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm'
+  cargo build --locked -j 4 --profile wasm -p ergo-policy-sentences-wasm --target wasm32-unknown-unknown &&
+  wasm-bindgen --target web --out-dir sentences-wasm/pkg /target/wasm32-unknown-unknown/wasm/ergo_policy_sentences_wasm.wasm &&
+  wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue sentences-wasm/pkg/ergo_policy_sentences_wasm_bg.wasm -o sentences-wasm/pkg/ergo_policy_sentences_wasm_bg.wasm'
 ```
 
 CI loads it in Node with `sentences-wasm/check-node.mjs`, which reads one check sentence and fails when it doesn't give a tree.
 
-CI also loads the built module in Node with `wasm/check-node.mjs`, which builds one report and fails when that throws or the report doesn't come from `ergo-engine`. Run it with `node engines/rust/wasm/check-node.mjs` after the build.
+CI also loads the built module in Node with `wasm/check-node.mjs`, which builds one report and fails when that throws or the report doesn't come from `ergo-policy-engine`. Run it with `node engines/rust/wasm/check-node.mjs` after the build.
 
 The `wasm` profile aborts on a panic. In JavaScript that is a `WebAssembly.RuntimeError: unreachable` with no message about the cause, and the module's memory may be half way through a call, so don't call it again. Calling `initSync` or `init` again gives back the same instance, so load the module again, in a browser by reloading the page. Invalid JSON is not a panic: `report` throws an `Error` that says which of the three isn't JSON, and the module stays usable. An argument that isn't a string makes it throw a `TypeError` that names it, like `input must be a string, not number`.
 

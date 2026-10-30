@@ -5,7 +5,7 @@ use crate::cause::Cause;
 use crate::lower::Scope;
 use crate::path::{Ctx, Outcome, Path, Start, is_ref, step_refs};
 use crate::value;
-use ergo_sentences as tree;
+use ergo_policy_sentences as tree;
 use regex::Regex;
 use serde_json::Value;
 
@@ -295,7 +295,7 @@ pub fn run_contains(check: &Contains, ctx: &Ctx) -> Verdict {
 }
 
 pub fn compiled(pattern: &Value) -> Option<Regex> {
-    let text = ergo_sentences::rust_pattern(pattern.as_str()?)?;
+    let text = ergo_policy_sentences::rust_pattern(pattern.as_str()?)?;
     Regex::new(&text).ok()
 }
 

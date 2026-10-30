@@ -1,6 +1,6 @@
 mod support;
 
-use ergo_sentences::*;
+use ergo_policy_sentences::*;
 use support::*;
 
 fn vals(values: Vec<Value>) -> List {
