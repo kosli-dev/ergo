@@ -1729,10 +1729,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/kids/0/items/0/lo"
+                  "/kids/0/meta"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "pa.w",
+                "value": null
               }
             ],
             "inputs": [
@@ -1772,10 +1772,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/kids/0/items/0/lo"
+                  "/kids/0/meta"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "pa.w",
+                "value": null
               }
             ],
             "inputs": [
@@ -1815,10 +1815,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/kids/0/items/0/lo"
+                  "/kids/0/meta"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "pa.w",
+                "value": null
               }
             ],
             "inputs": [
@@ -1858,10 +1858,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/kids/0/items/0/lo"
+                  "/kids/0/meta"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "pa.w",
+                "value": null
               }
             ],
             "inputs": [
@@ -2243,10 +2243,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/kids/0/items/0/lo"
+                  "/kids/0/meta"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "pa.t",
+                "value": null
               }
             ],
             "inputs": [
@@ -2286,10 +2286,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/kids/0/items/0/lo"
+                  "/kids/0/meta"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "pa.t",
+                "value": null
               }
             ],
             "inputs": [
@@ -2329,10 +2329,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/kids/0/items/0/lo"
+                  "/kids/0/meta"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "pa.t",
+                "value": null
               }
             ],
             "inputs": [
@@ -2372,10 +2372,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/kids/0/items/0/lo"
+                  "/kids/0/meta"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "pa.t",
+                "value": null
               }
             ],
             "inputs": [
@@ -2683,10 +2683,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/fams/0/kids/0/items/0/lo"
+                  "/fams/0"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "fam.w",
+                "value": null
               }
             ],
             "inputs": [
@@ -2725,10 +2725,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/fams/0/kids/0/items/0/lo"
+                  "/fams/0"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "fam.w",
+                "value": null
               }
             ],
             "inputs": [
@@ -2767,10 +2767,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/fams/0/kids/0/items/0/lo"
+                  "/fams/0"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "fam.w",
+                "value": null
               }
             ],
             "inputs": [
@@ -3042,10 +3042,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/fams/0/kids/0/items/0/lo"
+                  "/fams/0"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "fam.t",
+                "value": null
               }
             ],
             "inputs": [
@@ -3084,10 +3084,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/fams/0/kids/0/items/0/lo"
+                  "/fams/0"
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "fam.t",
+                "value": null
               }
             ],
             "inputs": [
@@ -3413,10 +3413,10 @@
                 "cause": "absent",
                 "item": "item 1 of items",
                 "locations": [
-                  "/kids/0/items/0/lo"
+                  ""
                 ],
-                "path": "items[0].lo",
-                "value": 5
+                "path": "$input.w",
+                "value": null
               }
             ],
             "inputs": [

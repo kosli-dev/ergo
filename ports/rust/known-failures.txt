@@ -2,6 +2,10 @@ parts / a part's alias in an elapsed time on the right side of a whose / reads t
 parts / a part's alias in an elapsed time on the right side of a whose / reads the part when the part is missing, and not the item's own field of the same name
 parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with few items passes
 parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with too many items fails
+parts / a for alias and the input on the right side of a whose with plus / reads the alias and the input, and not the item's own field of the same name
+parts / a parent's name in an elapsed time on the right side of a whose / reads the parent when the parent lacks the field, and not the item's own field of the same name
+parts / a parent's name on the right side of a whose, with and without plus / reads the parent when the parent lacks the field, and not the item's own field of the same name
+parts / a part's alias on the right side of a whose, with and without plus / reads the part when the part is missing, and not the item's own field of the same name
 requirements / a check with values of mixed types and a field compared with itself / lists both problems, on one line, in a list, in an any_of option and under a for line
 requirements / a for line with a form its whose can't take / is listed with for: in front of the problem, like every problem of the for line
 requirements / a for line with values of mixed types in its whose / is printed as written and named by its check, with for: in front of the problem
