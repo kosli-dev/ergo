@@ -2103,6 +2103,16 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("every x.z is 1", "every x.z is 1", &[], &[]),
     ("every xs is 1", "every xs is 1", &[], &[]),
     (
+        "every xs whose k is at least k is one of 1, 'a'",
+        "every xs whose k is at least k is one of 1, \"a\"",
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+    ),
+    (
         "every xs named by $params.k is 1",
         "every xs named by $params.k is 1",
         &[],

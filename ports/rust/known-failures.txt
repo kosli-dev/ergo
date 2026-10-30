@@ -1,6 +1,3 @@
-requirements / a check with values of mixed types and a field compared with itself / lists both problems, on one line, in a list, in an any_of option and under a for line
-requirements / a for line with a form its whose can't take / is listed with for: in front of the problem, like every problem of the for line
-requirements / a for line with values of mixed types in its whose / is printed as written and named by its check, with for: in front of the problem
 requirements / a subject name with a $ is quoted through a part and with a null definition / a child read through a part of a $ subject, and a $ subject defined as null, quote the name
 subjects / a child subject of a from line with a path and named by each of / reads each key inside the path of its parent
 subjects / a child subject of a from line with a path and named by each of, with a parent that isn't an object / still fails min_subjects as absent when the parent is an object without the path
@@ -20,17 +17,3 @@ subjects / a from line that starts with a dot and goes on with named by each of 
 subjects / a from line that starts with a dot reads the input field and not the parent, even with a path / reads the top-level field artifact.p, so it finds no subject of the parent's
 subjects / a from line with a position that starts with a dot and another subject's name / reads the top-level field and prints the dot after the position
 subjects / a grandchild subject of a child subject read with named by each of / reads the items inside the key of each parent, with both ancestors under in
-walks / whose with $params on the left names the param when it isn't given / names $params.min, with its location, when the param isn't given
-walks / whose with $params on the right names the param when it isn't given / names $params.min, with its location, when the param isn't given
-walks / whose with a count inside a plus side names the count's list when it isn't one / names kids when only min is there
-walks / whose with a count inside a plus side names the count's list when it isn't one / names kids, with 5, when kids is found but isn't a list
-walks / whose with a count on the left names the side that couldn't be read / names min, kids and the left side, kids, for items missing min, kids and both
-walks / whose with a count on the right names the side that couldn't be read / names kids, with 5, when kids is found but isn't a list
-walks / whose with a count on the right names the side that couldn't be read / names min, kids and the left side, min, for items missing min, kids and both
-walks / whose with a parent subject's field on one side names it when it isn't there / names art.q, with the parent's location, when the parent doesn't have q
-walks / whose with a part of the subject on one side names the part when it isn't there / names w, the part, with the subject's location, when the part isn't there
-walks / whose with a plus side names the side that couldn't be read / names hi, the plus side, when only lo is there
-walks / whose with a plus side names the side that couldn't be read / names hi, with null, when hi is null
-walks / whose with an elapsed side names its first path that couldn't be read / names stop, the first path of the elapsed side that wasn't read, when only stop is missing
-walks / whose with two fields names the side that couldn't be read / names hi when only lo is there
-walks / whose with two fields names the side that couldn't be read / names hi, with null, when hi is null
