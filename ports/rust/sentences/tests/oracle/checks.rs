@@ -3430,6 +3430,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every \"#rows\".n is at least x.v",
+        "every \"#rows\".n is at least x.v",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

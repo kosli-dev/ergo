@@ -13490,5 +13490,131 @@
         }
       }
     }
+  },
+  {
+    "description": "a walk on a for line whose path is named with a character that sorts before $",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as x",
+              "assert": "every \"#rows\".n is at least x.v"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the alias first, then the walked path, with no whose",
+        "rules": [
+          "for.failure_inputs",
+          "for.inputs",
+          "for.failed_items",
+          "for.try"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "#rows": [
+                {
+                  "n": 1,
+                  "z": 2
+                }
+              ],
+              "xs": [
+                {
+                  "v": 5,
+                  "w": 7
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "every \"#rows\".n is at least x.v",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/xs/0/v"
+                        ],
+                        "name": "x.v",
+                        "value": 5
+                      },
+                      {
+                        "locations": [
+                          "/things/0/#rows/0/n"
+                        ],
+                        "name": "\"#rows\"[].n",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 5,
+                  "w": 7
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/#rows/0/n"
+                ],
+                "name": "\"#rows\"[].n",
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 5,
+                    "w": 7
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
