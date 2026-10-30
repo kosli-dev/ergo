@@ -16148,5 +16148,138 @@
         ]
       }
     ]
+  },
+  {
+    "description": "sum of over a whose that can't decide an item",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "sum of items.x whose k is \"a\" is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null without reading the field of an item whose k is null",
+        "rules": [
+          "tally.whose"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "items": [
+                {
+                  "k": "a",
+                  "x": 1
+                },
+                {
+                  "k": null,
+                  "x": "s"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null,
+                "locations": [
+                  "/things/0/items/0/x",
+                  "/things/0/items/1/x"
+                ]
+              },
+              {
+                "name": "items[].x",
+                "value": [
+                  1,
+                  "s"
+                ],
+                "locations": [
+                  "/things/0/items/0/x",
+                  "/things/0/items/1/x"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the item whose k is null has no x",
+        "rules": [
+          "tally.whose"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "items": [
+                {
+                  "k": "a",
+                  "x": 1
+                },
+                {
+                  "k": null
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "thing",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null,
+                "locations": [
+                  "/things/0/items/0/x",
+                  "/things/0/items/1"
+                ]
+              },
+              {
+                "name": "items[].x",
+                "value": [
+                  1,
+                  null
+                ],
+                "locations": [
+                  "/things/0/items/0/x",
+                  "/things/0/items/1"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

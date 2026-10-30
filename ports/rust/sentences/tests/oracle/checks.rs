@@ -1,4 +1,12 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("n exists", "n exists", &[], &[]),
+    ("q.n is 1", "q.n is 1", &[], &[]),
+    (
+        "sum of items.x whose k is \"a\" is 1",
+        "sum of items.x whose k is \"a\" is 1",
+        &[],
+        &[],
+    ),
     ("approvals exists", "approvals exists", &[], &[]),
     (" x   is  1 ", "x is 1", &[], &[]),
     (" x  is  1", "x is 1", &[], &[]),
@@ -5550,6 +5558,24 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every xs as p, first of ys as q",
+        "every xs as p, first of ys as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, last of ys sorted by n as q",
+        "every xs as p, last of ys sorted by n as q",
+        &[],
+        &[],
+    ),
+    (
+        "some xs as p, first of ys as q",
+        "some xs as p, first of ys as q",
+        &[],
+        &[],
+    ),
     ("\tevery xs as x\n", "every xs as x", &[], &[]),
     ("  every items as i", "every items as i", &[], &[]),
     ("every  items  as  i", "every items as i", &[], &[]),

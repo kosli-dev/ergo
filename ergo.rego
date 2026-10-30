@@ -3319,7 +3319,7 @@ _from_text(req) := _chain_part_name(req) if {
 	_chain_part(req)
 }
 
-_from_text(req) := _path_name(array.concat([data.ergo_subject_sentences.chains[req.subject]], _from_path(req))) if {
+_from_text(req) := _path_name(array.concat([_subject_step(data.ergo_subject_sentences.chains[req.subject])], _from_path(req))) if {
 	_from_well_formed(req)
 	_chained(req)
 	not _chain_part(req)
@@ -4043,7 +4043,11 @@ _part_id_text(read) := "<invalid identified_by>" if {
 	not "text" in object.keys(read)
 }
 
-_subject_from_text(name, null) := _path_name([name])
+_subject_from_text(name, null) := _path_name([_subject_step(name)])
+
+_subject_step(name) := {"literal": name} if startswith(name, "$")
+
+_subject_step(name) := name if not startswith(name, "$")
 
 _subject_from_text(_, def) := "<invalid from>" if {
 	def != null
@@ -4079,7 +4083,7 @@ _subject_text(name, def) := _s_from_line_text(data.ergo_subject_sentences.lines[
 	object.keys(def) & {"of", "applies_to"} == set()
 }
 
-_subject_text(name, def) := _path_name([name]) if {
+_subject_text(name, def) := _path_name([_subject_step(name)]) if {
 	not "from" in object.keys(def)
 	object.keys(def) & {"of", "applies_to"} == set()
 }
@@ -4650,7 +4654,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 
 _tally_judge(side, e, flaws) := {"kept": kept, "states": ({c | some c in causes; not c in {"satisfied", "value", "missing"}} | _tally_mark(kept, e))} if {
 	causes := [_tally_cond_cause(c, e.iv, flaws[i]) | some i, c in side.whose]
-	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
+	kept := count([c | some c in causes; not c in {"satisfied"}]) == 0
 }
 
 _tally_cond_cause(c, item, "") := _eval_cause(passed, _ref_cause(c), states) if {
@@ -7662,7 +7666,7 @@ _for_row(check, subj) := object.union(_for_outer(check, subj, _for_names), {"cau
 _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": []} if {
 	w := _for_walk(check.items[0], subj, names)
 	"unread" in object.keys(w)
-} else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(check, cause, [object.union(f, {"lines": []}) | some f in pre.fails])} if {
+} else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(check, cause, [object.union(f, {"lines": []}) | some f in _for_pick_fails(check, pre)])} if {
 	pre := _for_pre(check, subj, names)
 	pre != null
 	"pick" in object.keys(check.items[1])
@@ -7681,6 +7685,10 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] if not "unread" in object.keys(w)
 
 else := [object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {}))]
+
+_for_pick_fails(check, pre) := _for_unwalked(check, pre) if pre.walked == set()
+
+else := pre.fails
 
 _for_shared(_, fails, null, _) := fails
 

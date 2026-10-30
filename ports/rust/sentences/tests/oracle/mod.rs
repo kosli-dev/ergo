@@ -3,6 +3,7 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("\"$x\".items", "\"$x\".items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
     (
         "artifact.scans named by each of $params.k",
@@ -2491,6 +2492,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("n", "n"),
     ("\tid\n", "id"),
     ("\nmid\t", "mid"),
     ("\u{3000}k\n", "k"),
