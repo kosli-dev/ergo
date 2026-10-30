@@ -2,6 +2,7 @@ for / a second for item picking after the first alias, whose list can't be walke
 for / a second for item picking after the first alias, whose list can't be walked, lists that list once / a null second list is listed once, not under each first item
 for / a second for item picking after the first alias, whose list can't be walked, lists that list once / a second list that is text is listed once, not under each first item
 for / a second for item picking after the first alias, whose list can't be walked, still lists a first item that failed for another reason / a first item its whose can't decide is listed beside the second list
+requirements / a subject name with a $ is quoted through a part and with a null definition / a child read through a part of a $ subject, and a $ subject defined as null, quote the name
 parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with few items passes
 parts / a count of or sum of a parent's part on the right side of a whose, alone and in a plus / counts the parent's part, not the parent's field of the same name, so a part with too many items fails
 parts / a part's alias in an elapsed time on the right side of a whose / reads the part when it's there, and not the item's lack of the field
