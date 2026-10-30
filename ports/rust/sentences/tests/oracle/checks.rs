@@ -3392,6 +3392,10 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("l is \"x\"", "l is \"x\"", &[], &[]),
+    ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
+    ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
+    ("i exists", "i exists", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6282,6 +6286,26 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every pull_requests.meta.labels as l",
+        "every pull_requests.meta.labels as l",
+        &[],
+        &[],
+    ),
+    (
+        "first of pull_requests.title as t",
+        "first of pull_requests.title as t",
+        &[],
+        &[],
+    ),
+    (
+        "some pull_requests.title as t",
+        "some pull_requests.title as t",
+        &[],
+        &[],
+    ),
+    ("every t[0].u as i", "every t[0].u as i", &[], &[]),
+    ("first of t as i", "first of t as i", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
@@ -6693,6 +6717,22 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "x.y as i",
+        &["an item starts with \"every\", \"some\" or a position, like \"last of\""],
+    ),
+    (
+        "every t as x, t.u[1] as i",
+        &["an item starts with \"every\", \"some\" or a position, like \"last of\""],
+    ),
+    (
+        "every t as x, t[0] as i",
+        &["an item starts with \"every\", \"some\" or a position, like \"last of\""],
+    ),
+    (
+        "t.u[1] as i",
+        &["an item starts with \"every\", \"some\" or a position, like \"last of\""],
+    ),
+    (
+        "t[0] as i",
         &["an item starts with \"every\", \"some\" or a position, like \"last of\""],
     ),
 ];
