@@ -1,4 +1,4 @@
-use super::{Check, Input, Verdict, read_path, run as run_check};
+use super::{Check, Input, SidePath, Verdict, read_path, run as run_check};
 use crate::cause::Cause;
 use crate::name;
 use crate::path::{self, Ctx, Located, Location, OUTER, Outcome, Path, Resolved, Start, Step};
@@ -537,6 +537,36 @@ fn seg_of(step: &Step) -> Seg {
     }
 }
 
+fn side_read<'a>(
+    paths: &[SidePath<'a>],
+    ctx: &Ctx<'a>,
+) -> Option<(&'a Path, path::Read<'a>, bool)> {
+    let mut first = None;
+    for side in paths {
+        let read = path::read(side.path, ctx);
+        let is_read = read.outcome == Outcome::Found
+            && (!side.needs_list || read.value.is_some_and(Value::is_array));
+        if !is_read {
+            return Some((side.path, read, false));
+        }
+        if first.is_none() {
+            first = Some((side.path, read));
+        }
+    }
+    first.map(|(path, read)| (path, read, true))
+}
+
+fn named_side<'a>(check: &'a Check, ctx: &Ctx<'a>) -> Option<(&'a Path, path::Read<'a>)> {
+    let sides = check.sides();
+    let mut sides = sides.iter().map(|paths| side_read(paths, ctx));
+    let left = sides.next().flatten();
+    let right = sides.next().flatten();
+    let right_alone = left.as_ref().is_none_or(|(_, _, read)| *read)
+        && right.as_ref().is_some_and(|(_, _, read)| !*read);
+    let (path, read, _) = if right_alone { right } else { left }?;
+    Some((path, read))
+}
+
 struct Judged {
     kept: bool,
     passed: bool,
@@ -562,14 +592,28 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
             let leaf = run_check(&walk.check.with_left(item.rest_path()), &at);
             let passed = undecided.is_none() && kept && leaf.passed();
             let failure = if let Some((check, verdict)) = undecided {
-                let left = check.left_path();
-                let read = left.map(|left| path::read(left, &at));
-                let steps: Vec<Step> = left.map(|l| l.steps.clone()).unwrap_or_default();
+                let named = named_side(check, &at);
+                let (steps, outside): (Vec<Step>, bool) = match &named {
+                    Some((path, _)) => (
+                        path.steps.clone(),
+                        reads_outside(path) || path.start == Start::Params,
+                    ),
+                    None => (Vec::new(), false),
+                };
                 let mut order = item.item_segs.clone();
-                order.extend(steps.iter().map(seg_of));
-                let mut named_steps: Vec<Step> = item.item_segs.iter().map(Seg::to_step).collect();
-                named_steps.extend(steps);
-                let name = walked.name_of_steps(named_steps, item.unaliased);
+                let name = if outside {
+                    named
+                        .as_ref()
+                        .map(|(path, _)| name::name(path))
+                        .unwrap_or_default()
+                } else {
+                    order.extend(steps.iter().map(seg_of));
+                    let mut named_steps: Vec<Step> =
+                        item.item_segs.iter().map(Seg::to_step).collect();
+                    named_steps.extend(steps);
+                    walked.name_of_steps(named_steps, item.unaliased)
+                };
+                let read = named.map(|(_, read)| read);
                 Some(Failure {
                     order,
                     path: name,
