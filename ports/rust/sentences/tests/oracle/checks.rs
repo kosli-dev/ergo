@@ -57,8 +57,10 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("x is one of 1.0, 'a'", "x is one of 1, \"a\"", &[], &[]),
     ("x matches '^\\d$'", "x matches '^\\d$'", &[], &[]),
     ("x.v is at most m", "x.v is at most m", &[], &[]),
+    ("x.n is one of 'a', 1.0", "x.n is one of \"a\", 1", &[], &[]),
     ("y matches '^\\w$'", "y matches '^\\w$'", &[], &[]),
     ("z matches '^\\s+$'", "z matches '^\\s+$'", &[], &[]),
     ("p.z is 1", "p.z is 1", &[], &[]),
@@ -3239,6 +3241,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x is one of $params.k", "x is in $params.k", &[], &[]),
     ("x is one of $params.l", "x is in $params.l", &[], &[]),
     ("x is one of 1, \"a\"", "x is one of 1, \"a\"", &[], &[]),
+    (
+        "x is one of 1, 'a' and y is at least y",
+        "x is one of 1, \"a\" and y is at least y",
+        &["y is compared with itself"],
+        &["y is compared with itself"],
+    ),
+    ("x is one of 1, 'a'", "x is one of 1, \"a\"", &[], &[]),
     ("x is one of 1, 2", "x is one of 1, 2", &[], &[]),
     ("x is one of 1, 2.5", "x is one of 1, 2.5", &[], &[]),
     ("x is one of x", "x is in x", &[], &[]),
@@ -3491,6 +3500,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
     ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
     ("i exists", "i exists", &[], &[]),
+    (
+        "i is one of 1, 'a' and y is at least y",
+        "i is one of 1, \"a\" and y is at least y",
+        &["y is compared with itself"],
+        &["y is compared with itself"],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6016,6 +6031,19 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every x, if any, as pr", "every x, if any, as pr", &[], &[]),
     ("every xs as b", "every xs as b", &[], &[]),
+    (
+        "every xs whose name starts with count of ys as x",
+        "every xs whose name starts with count of ys as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is one of 1, 'a' as x",
+        "every xs whose v is one of 1, \"a\" as x",
+        &[],
+        &[],
+    ),
+    ("every xs as i", "every xs as i", &[], &[]),
     ("every xs as entry", "every xs as entry", &[], &[]),
     ("every xs as kid", "every xs as kid", &[], &[]),
     ("every xs as other", "every xs as other", &[], &[]),
