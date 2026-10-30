@@ -67,14 +67,37 @@ Three ways to settle it:
 
 [report.hash](semantics.md#statuses) writes the report as RFC 8785 says, and RFC 8785 writes every number as a 64-bit float. Ergo copies numbers from the input into the report with every digit, so a report holding `1.00000000000000000001` hashes as if it held `1`. Two reports that differ only there get the same hash. A number too big or too small for a 64-bit float, like `1e400`, can't be written that way at all, and implementations already write it differently in the report (see [Values](semantics.md#values)). The open question is whether that's fine, or whether the hash should write numbers as the report does.
 
+## Numbers with huge exponents
+
+OPA crashes when it compares a number whose exponent is beyond ±1e6 with any other number, from the input, the params or the policy, so `ergo.rego` gives no report at all. `size is at least 5` on this input stops OPA 1.20.2 with `panic: illegal value` in `ast.NumberCompare`:
+
+```json
+{"items": [{"size": 1e1000001}]}
+```
+
+`1e-1000001` does the same, and so does `size is at least limit` on `{"items": [{"size": 1e1000000, "limit": 1e1000001}]}`. `1e1000000` against `5` is compared correctly, and so is `1e400` against `1e401`. The crash doesn't need a check that compares anything: OPA sorts subject ids, so `identified_by: id` on two subjects with ids `1e1000000` and `1e1000001` crashes too, whatever the check says.
+
+[Values](semantics.md#values) allows a fix that fails such a check as `unusable`. That can't cover the sort of subject ids, because no check row reads them. Both wait for a real need, or for OPA to fix the crash.
+
+## Numbers with more than 15 significant digits
+
+OPA treats some decimals as the same when they only differ after the 15th significant digit, like `1234567890.1209567890` and `1234567890.1209567990`, and reuses the result of a comparison for any number it treats as the same. Whole numbers are always compared exactly. So `ergo.rego` can pass `l is at most 1234567890.1209567890` on the bigger one, and a `within` check can give a row the answer of an earlier row. The Rust port compares every digit. [Values](semantics.md#values) leaves such numbers out of the spec, so neither engine breaks a spec rule. [#426](https://github.com/kosli-dev/ergo/issues/426) tracks making `ergo.rego` compare them exactly. Then the spec could promise exact comparison at any number of digits.
+
+## Where ergo.rego and the Rust port differ
+
+The spec doesn't settle these yet, because the two engines give different reports. Both still fail and pass the same checks.
+
+- **A check with a field it doesn't take.** [sentence.print.written_wrong](syntax.md#printing-the-sentence) doesn't say how a check prints when its sentences read but it has an unknown field, a `for` that isn't a string, or `for` or `assert` next to `any_of`. `ergo.rego` prints it as written and Rust prints it from its parse, so `{"assert": " x  is  1", "zzz": 1}` gives `x  is  1` with one and `x is 1` with the other.
+
 ## Rules without cases
 
-Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about numbers above. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
+Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about hashing numbers above. `report.keys` is about how the report is written out, and a case compares a report as values, where the order of keys doesn't count. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
 
 - `sentence.forms`
 - `sentence.subject.depth`
 - `sentence.argument.subject`
 - `report.engine`
+- `report.keys`
 - `report.hash`
 
 ## Sentences the ABNF and ergo.rego read differently

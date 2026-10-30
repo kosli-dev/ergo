@@ -1,7 +1,7 @@
 [
   {
     "description": "a plain sentence and an object with assert",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"object": {"description": "X is a", "meta": {"owner": "qa"}, "assert": "x is \"a\""}, "plain": "x is \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"object": {"description": "X is a", "meta": {"owner": "qa"}, "assert": "x is \"a\""}, "plain": "x is \"a\""}}}},
     "cases": [
       {
         "description": "both forms run the same sentence and the report shows only description, meta and expression",
@@ -26,7 +26,7 @@
   },
   {
     "description": "an object with assert and a field that isn't description or meta",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": "x is \"a\"", "path": ["x"]}}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": "x is \"a\"", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "is written wrong, and the requirement gets no row but $well_formed",
@@ -47,7 +47,7 @@
   },
   {
     "description": "an object with an assert that is a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": 5}}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": 5}}}}},
     "cases": [
       {
         "description": "is written wrong as invalid assert",
@@ -68,7 +68,7 @@
   },
   {
     "description": "is with a string",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a\""}}}},
     "cases": [
       {
         "description": "passes on the same string",
@@ -115,7 +115,7 @@
   },
   {
     "description": "is with a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1"}}}},
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
@@ -146,7 +146,7 @@
   },
   {
     "description": "is with true",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is true"}}}},
     "cases": [
       {
         "description": "passes on true",
@@ -177,7 +177,7 @@
   },
   {
     "description": "is with false",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is false"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is false"}}}},
     "cases": [
       {
         "description": "passes on false, which is a value and not a missing field",
@@ -200,7 +200,7 @@
   },
   {
     "description": "is with null",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is null"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is null"}}}},
     "cases": [
       {
         "description": "passes when the field is there and null",
@@ -231,7 +231,7 @@
   },
   {
     "description": "is not with a string",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not \"a\""}}}},
     "cases": [
       {
         "description": "passes on another string",
@@ -278,7 +278,7 @@
   },
   {
     "description": "is not with a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not 1"}}}},
     "cases": [
       {
         "description": "passes on 2",
@@ -309,7 +309,7 @@
   },
   {
     "description": "is not with true",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not true"}}}},
     "cases": [
       {
         "description": "passes on false",
@@ -332,7 +332,7 @@
   },
   {
     "description": "equals a field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y"}}}},
     "cases": [
       {
         "description": "passes on 1 and 1.0",
@@ -403,7 +403,7 @@
   },
   {
     "description": "does not equal a field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not equal y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not equal y"}}}},
     "cases": [
       {
         "description": "passes on two different strings",
@@ -450,7 +450,7 @@
   },
   {
     "description": "is with a value within a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 100 within 0.5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 100 within 0.5"}}}},
     "cases": [
       {
         "description": "passes on the same number",
@@ -505,7 +505,7 @@
   },
   {
     "description": "is with a string value within a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a\" within 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a\" within 1"}}}},
     "cases": [
       {
         "description": "is written wrong, because within only compares numbers",
@@ -527,7 +527,7 @@
   },
   {
     "description": "equals a field within a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.5"}}}},
     "cases": [
       {
         "description": "passes when the numbers are close",
@@ -573,8 +573,66 @@
     ]
   },
   {
+    "description": "equals a field within 0.2 exactly",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.2"}}}},
+    "cases": [
+      {
+        "description": "passes when the gap is exactly the number",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.3, "y": 0.1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0.3, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.1, "locations": ["/things/0/y"]}]}
+        ]
+      },
+      {
+        "description": "passes when the left is the smaller",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.1, "y": 0.3}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0.1, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.3, "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a field within 0.19999 exactly",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.19999"}}}},
+    "cases": [
+      {
+        "description": "fails as value when the gap is a little more than the number",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.3, "y": 0.1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0.3, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.1, "locations": ["/things/0/y"]}]}
+        ]
+      },
+      {
+        "description": "fails as value when the left is the smaller",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.1, "y": 0.3}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0.1, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.3, "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a field within 0.000001 exactly",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.000001"}}}},
+    "cases": [
+      {
+        "description": "passes on big equal numbers",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1000000000, "y": 1000000000}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1000000000, "locations": ["/things/0/x"]}, {"name": "y", "value": 1000000000, "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
+  },
+  {
     "description": "is within 0",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 5 within 0"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 5 within 0"}}}},
     "cases": [
       {
         "description": "passes on the same number",
@@ -597,7 +655,7 @@
   },
   {
     "description": "is one of values",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", \"b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", \"b\""}}}},
     "cases": [
       {
         "description": "passes on the first value",
@@ -652,7 +710,7 @@
   },
   {
     "description": "is one of values that include null",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", null"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", null"}}}},
     "cases": [
       {
         "description": "fails as null when the field is null, even though null is listed",
@@ -675,7 +733,7 @@
   },
   {
     "description": "is one of numbers",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1, 2.5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1, 2.5"}}}},
     "cases": [
       {
         "description": "passes on 1.0",
@@ -706,7 +764,7 @@
   },
   {
     "description": "is in a list of params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
     "params": {"k": ["a", "b"]},
     "cases": [
       {
@@ -759,7 +817,7 @@
   },
   {
     "description": "is in an empty list of params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
     "params": {"k": []},
     "cases": [
       {
@@ -775,7 +833,7 @@
   },
   {
     "description": "is in a param that isn't a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
     "params": {"k": "a"},
     "cases": [
       {
@@ -791,7 +849,7 @@
   },
   {
     "description": "is in a param that is missing",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
     "params": {},
     "cases": [
       {
@@ -807,7 +865,7 @@
   },
   {
     "description": "is in a param that is null",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}},
     "params": {"k": null},
     "cases": [
       {
@@ -823,7 +881,7 @@
   },
   {
     "description": "is in a list in the input",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $input.allowed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $input.allowed"}}}},
     "cases": [
       {
         "description": "passes when the field is in the list",
@@ -848,7 +906,7 @@
   },
   {
     "description": "exists",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "passes on a string",
@@ -903,7 +961,7 @@
   },
   {
     "description": "exists on a path below a value that can't hold it",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y exists"}}}},
     "cases": [
       {
         "description": "fails as unusable when x is a string",
@@ -926,7 +984,7 @@
   },
   {
     "description": "does not exist",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not exist"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not exist"}}}},
     "cases": [
       {
         "description": "passes when the field is missing",
@@ -965,7 +1023,7 @@
   },
   {
     "description": "does not exist on a path below a value that can't hold it",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y does not exist"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y does not exist"}}}},
     "cases": [
       {
         "description": "fails as unusable when x is a string",
@@ -980,7 +1038,7 @@
   },
   {
     "description": "is a non-empty string",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is a non-empty string"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is a non-empty string"}}}},
     "cases": [
       {
         "description": "passes on a string",
@@ -1043,7 +1101,7 @@
   },
   {
     "description": "contains a value",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains \"a\""}}}},
     "cases": [
       {
         "description": "passes when the list has it",
@@ -1098,7 +1156,7 @@
   },
   {
     "description": "contains a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains 1"}}}},
     "cases": [
       {
         "description": "passes on 1.0 in the list",
@@ -1121,7 +1179,7 @@
   },
   {
     "description": "contains a param",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains $params.k"}}}},
     "params": {"k": "a"},
     "cases": [
       {
@@ -1156,7 +1214,7 @@
   },
   {
     "description": "contains a param that is missing",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains $params.k"}}}},
     "params": {},
     "cases": [
       {
@@ -1172,7 +1230,7 @@
   },
   {
     "description": "does not contain a value",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain \"a\""}}}},
     "cases": [
       {
         "description": "passes when the list doesn't have it",
@@ -1227,7 +1285,7 @@
   },
   {
     "description": "does not contain a param",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain $params.k"}}}},
     "params": {"k": "a"},
     "cases": [
       {
@@ -1253,7 +1311,7 @@
   },
   {
     "description": "contains all of values",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of \"b\", \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of \"b\", \"a\""}}}},
     "cases": [
       {
         "description": "passes when the list has every value",
@@ -1308,7 +1366,7 @@
   },
   {
     "description": "contains all of a list of params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of $params.k"}}}},
     "params": {"k": ["a", "b"]},
     "cases": [
       {
@@ -1334,7 +1392,7 @@
   },
   {
     "description": "contains all of an empty list of params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of $params.k"}}}},
     "params": {"k": []},
     "cases": [
       {
@@ -1350,7 +1408,7 @@
   },
   {
     "description": "contains all of a param that isn't a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of $params.k"}}}},
     "params": {"k": "a"},
     "cases": [
       {
@@ -1366,7 +1424,7 @@
   },
   {
     "description": "contains none of values",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of \"a\", \"b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of \"a\", \"b\""}}}},
     "cases": [
       {
         "description": "passes when the list has none",
@@ -1421,7 +1479,7 @@
   },
   {
     "description": "contains none of a list of params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.k"}}}},
     "params": {"k": ["a", "b"]},
     "cases": [
       {
@@ -1447,7 +1505,7 @@
   },
   {
     "description": "matches a pattern",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^a\""}}}},
     "cases": [
       {
         "description": "passes on a string that matches",
@@ -1494,7 +1552,7 @@
   },
   {
     "description": "matches one of several patterns",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^a\", \"^b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^a\", \"^b\""}}}},
     "cases": [
       {
         "description": "passes when the second matches",
@@ -1517,7 +1575,7 @@
   },
   {
     "description": "matches is not anchored",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"svc_\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"svc_\""}}}},
     "cases": [
       {
         "description": "passes in the middle of a string",
@@ -1532,7 +1590,7 @@
   },
   {
     "description": "matches a pattern with a comma in it",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^fix(, |: )\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^fix(, |: )\""}}}},
     "cases": [
       {
         "description": "passes on a string with the comma",
@@ -1563,7 +1621,7 @@
   },
   {
     "description": "matches a single-quoted pattern",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches '^\\s*FROM'"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches '^\\s*FROM'"}}}},
     "cases": [
       {
         "description": "keeps the backslash as written",
@@ -1586,7 +1644,7 @@
   },
   {
     "description": "does not match a pattern",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\""}}}},
     "cases": [
       {
         "description": "passes on a string that doesn't match",
@@ -1633,7 +1691,7 @@
   },
   {
     "description": "does not match several patterns",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\", \"^b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\", \"^b\""}}}},
     "cases": [
       {
         "description": "passes when none matches",
@@ -1656,7 +1714,7 @@
   },
   {
     "description": "matches patterns from params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.p"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.p"}}}},
     "params": {"p": ["^a", "^b"]},
     "cases": [
       {
@@ -1682,7 +1740,7 @@
   },
   {
     "description": "matches a pattern from params that isn't a valid regular expression",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.p"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.p"}}}},
     "params": {"p": ["("]},
     "cases": [
       {
@@ -1698,7 +1756,7 @@
   },
   {
     "description": "does not match patterns from params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match $params.p"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match $params.p"}}}},
     "params": {"p": ["^a"]},
     "cases": [
       {
@@ -1724,7 +1782,7 @@
   },
   {
     "description": "is at least a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least 5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least 5"}}}},
     "cases": [
       {
         "description": "passes on 6",
@@ -1779,7 +1837,7 @@
   },
   {
     "description": "is at most a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at most 5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at most 5"}}}},
     "cases": [
       {
         "description": "passes on 4",
@@ -1834,7 +1892,7 @@
   },
   {
     "description": "is more than a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is more than 5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is more than 5"}}}},
     "cases": [
       {
         "description": "passes on 6",
@@ -1881,7 +1939,7 @@
   },
   {
     "description": "is less than a number",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is less than 5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is less than 5"}}}},
     "cases": [
       {
         "description": "passes on 4",
@@ -1928,7 +1986,7 @@
   },
   {
     "description": "is at least a written string",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least \"b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least \"b\""}}}},
     "cases": [
       {
         "description": "is written wrong, because two strings aren't ordered",
@@ -1942,7 +2000,7 @@
   },
   {
     "description": "is alphabetically after a string compares by code point",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is alphabetically after \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is alphabetically after \"a\""}}}},
     "cases": [
       {
         "description": "passes on \"b\"",
@@ -1997,7 +2055,7 @@
   },
   {
     "description": "is alphabetically before a field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is alphabetically before y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is alphabetically before y"}}}},
     "cases": [
       {
         "description": "passes on \"Z\" before \"a\", since uppercase comes first",
@@ -2028,7 +2086,7 @@
   },
   {
     "description": "is alphabetically before a written value that isn't text",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is alphabetically before 3"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is alphabetically before 3"}}}},
     "cases": [
       {
         "description": "is written wrong, because it could only fail",
@@ -2042,7 +2100,7 @@
   },
   {
     "description": "is at least a field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least y"}}}},
     "cases": [
       {
         "description": "passes when the order holds",
@@ -2089,7 +2147,7 @@
   },
   {
     "description": "is at most a field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at most y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at most y"}}}},
     "cases": [
       {
         "description": "passes when the order holds",
@@ -2136,7 +2194,7 @@
   },
   {
     "description": "is more than a field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is more than y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is more than y"}}}},
     "cases": [
       {
         "description": "passes when the order holds",
@@ -2183,7 +2241,7 @@
   },
   {
     "description": "is less than a field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is less than y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is less than y"}}}},
     "cases": [
       {
         "description": "passes when the order holds",
@@ -2230,7 +2288,7 @@
   },
   {
     "description": "is at least a field holding strings",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least y"}}}},
     "cases": [
       {
         "description": "fails as unusable on two strings, so numbers held as strings aren't ordered as text",
@@ -2253,7 +2311,7 @@
   },
   {
     "description": "is between two numbers",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 1 and 5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 1 and 5"}}}},
     "cases": [
       {
         "description": "passes inside the range",
@@ -2324,7 +2382,7 @@
   },
   {
     "description": "is between two decimals",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 0.5 and 1.5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 0.5 and 1.5"}}}},
     "cases": [
       {
         "description": "passes on 1",
@@ -2347,7 +2405,7 @@
   },
   {
     "description": "is between the same number twice",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 2 and 2"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 2 and 2"}}}},
     "cases": [
       {
         "description": "passes on that number",
@@ -2370,7 +2428,7 @@
   },
   {
     "description": "a time is before another",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before closed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before closed"}}}},
     "cases": [
       {
         "description": "passes when the order holds",
@@ -2447,7 +2505,7 @@
   },
   {
     "description": "a time is after another",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is after closed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is after closed"}}}},
     "cases": [
       {
         "description": "passes when the order holds",
@@ -2524,7 +2582,7 @@
   },
   {
     "description": "a time is on or after another",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is on or after closed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is on or after closed"}}}},
     "cases": [
       {
         "description": "passes when the order holds",
@@ -2601,7 +2659,7 @@
   },
   {
     "description": "a time is on or before another",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is on or before closed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is on or before closed"}}}},
     "cases": [
       {
         "description": "passes when the order holds",
@@ -2678,7 +2736,7 @@
   },
   {
     "description": "two numbers are compared as times",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before closed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before closed"}}}},
     "cases": [
       {
         "description": "passes when both are numbers in order",
@@ -2701,7 +2759,7 @@
   },
   {
     "description": "a quoted key with a dot in it",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "metadata.\"app.kubernetes.io/name\" is \"web\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "metadata.\"app.kubernetes.io/name\" is \"web\""}}}},
     "cases": [
       {
         "description": "reads the key as one key",
@@ -2724,7 +2782,7 @@
   },
   {
     "description": "a bare key with a dash",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "pull-request.state is \"OPEN\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "pull-request.state is \"OPEN\""}}}},
     "cases": [
       {
         "description": "reads the key with the dash",
@@ -2739,7 +2797,7 @@
   },
   {
     "description": "a quoted first key",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "\"$schema\" is \"v1\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "\"$schema\" is \"v1\""}}}},
     "cases": [
       {
         "description": "reads the key $schema, named as syntax.md names it",
@@ -2762,7 +2820,7 @@
   },
   {
     "description": "a path that starts at the input",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$input.flag is true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$input.flag is true"}}}},
     "cases": [
       {
         "description": "reads the input",
@@ -2777,7 +2835,7 @@
   },
   {
     "description": "a path that starts at the input and is missing",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$input.flag is true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$input.flag is true"}}}},
     "cases": [
       {
         "description": "fails as absent when the input has no such key",
@@ -2791,7 +2849,7 @@
   },
   {
     "description": "a path that starts at the params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.k is \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.k is \"a\""}}}},
     "params": {"k": "a"},
     "cases": [
       {
@@ -2807,7 +2865,7 @@
   },
   {
     "description": "a key chosen by a param",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k is 1"}}}},
     "params": {"k": "b"},
     "cases": [
       {
@@ -2842,7 +2900,7 @@
   },
   {
     "description": "a key chosen by a param, then more keys",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k.v is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k.v is 1"}}}},
     "params": {"k": "b"},
     "cases": [
       {
@@ -2859,7 +2917,7 @@
   },
   {
     "description": "a key chosen by a param that is missing",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k is 1"}}}},
     "params": {},
     "cases": [
       {
@@ -2875,7 +2933,7 @@
   },
   {
     "description": "a key chosen by a param that isn't a key",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj named by $params.k is 1"}}}},
     "params": {"k": ["b"]},
     "cases": [
       {
@@ -2891,7 +2949,7 @@
   },
   {
     "description": "a key chosen by a param in brackets",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj[$params.k] is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "obj[$params.k] is 1"}}}},
     "params": {"k": "b"},
     "cases": [
       {
@@ -2908,7 +2966,7 @@
   },
   {
     "description": "the second item of a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "item 2 of xs is \"b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "item 2 of xs is \"b\""}}}},
     "cases": [
       {
         "description": "counts from 1",
@@ -2947,7 +3005,7 @@
   },
   {
     "description": "the first item of a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "first of xs is \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "first of xs is \"a\""}}}},
     "cases": [
       {
         "description": "reads the item at position 0",
@@ -2970,7 +3028,7 @@
   },
   {
     "description": "an item of a list in brackets",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "xs[1] is \"b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "xs[1] is \"b\""}}}},
     "cases": [
       {
         "description": "counts from 0 and prints the word form",
@@ -2993,7 +3051,7 @@
   },
   {
     "description": "a field of an item in brackets",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "xs[1].k is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "xs[1].k is 1"}}}},
     "cases": [
       {
         "description": "keeps the brackets when a key follows",
@@ -3008,7 +3066,7 @@
   },
   {
     "description": "a field on the right with a dot in front",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is .empty"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is .empty"}}}},
     "cases": [
       {
         "description": "compares with the field called empty and prints equals",
@@ -3039,7 +3097,7 @@
   },
   {
     "description": "a field called true on the right",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is .true"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is .true"}}}},
     "cases": [
       {
         "description": "compares with the field, not with the value true",
@@ -3062,7 +3120,7 @@
   },
   {
     "description": "a quoted string on the right is text",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"y\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"y\""}}}},
     "cases": [
       {
         "description": "compares with the text, not with a field called y",
@@ -3077,7 +3135,7 @@
   },
   {
     "description": "a quoted key on the right with a dot in front",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is .\"$schema\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is .\"$schema\""}}}},
     "cases": [
       {
         "description": "compares with the field $schema",
@@ -3092,7 +3150,7 @@
   },
   {
     "description": "a field on the right without a dot",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals total"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals total"}}}},
     "cases": [
       {
         "description": "compares with the field",
@@ -3107,7 +3165,7 @@
   },
   {
     "description": "a field with a dot in front that doesn't need it",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals .total"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals .total"}}}},
     "cases": [
       {
         "description": "prints without the dot",
@@ -3122,7 +3180,7 @@
   },
   {
     "description": "a field called empty on the left with a dot in front",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".empty is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".empty is 1"}}}},
     "cases": [
       {
         "description": "reads the field called empty",
@@ -3137,7 +3195,7 @@
   },
   {
     "description": "a grammar word after the first key",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "review.count is 2"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "review.count is 2"}}}},
     "cases": [
       {
         "description": "needs no dot",
@@ -3152,7 +3210,7 @@
   },
   {
     "description": "is equal to prints as is",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is equal to \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is equal to \"a\""}}}},
     "cases": [
       {
         "description": "prints as x is \"a\"",
@@ -3167,7 +3225,7 @@
   },
   {
     "description": "is equal to a field prints as equals",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is equal to y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is equal to y"}}}},
     "cases": [
       {
         "description": "prints as x equals y",
@@ -3182,7 +3240,7 @@
   },
   {
     "description": "equals with a value prints as is",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals \"a\""}}}},
     "cases": [
       {
         "description": "prints as x is \"a\"",
@@ -3197,7 +3255,7 @@
   },
   {
     "description": "two spaces between words print as one",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x  is   \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x  is   \"a\""}}}},
     "cases": [
       {
         "description": "prints as x is \"a\"",
@@ -3212,7 +3270,7 @@
   },
   {
     "description": "single quotes without a backslash print as double quotes",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 'prod'"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 'prod'"}}}},
     "cases": [
       {
         "description": "prints as x is \"prod\"",
@@ -3227,7 +3285,7 @@
   },
   {
     "description": "a quote inside single quotes prints with a JSON escape",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 'a\"b'"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 'a\"b'"}}}},
     "cases": [
       {
         "description": "prints as x is \"a\\\"b\"",
@@ -3242,7 +3300,7 @@
   },
   {
     "description": "is in values prints as is one of",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in \"a\", \"b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in \"a\", \"b\""}}}},
     "cases": [
       {
         "description": "prints as x is one of \"a\", \"b\"",
@@ -3257,7 +3315,7 @@
   },
   {
     "description": "values with no space after the comma print with one",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\",\"b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\",\"b\""}}}},
     "cases": [
       {
         "description": "prints as x is one of \"a\", \"b\"",
@@ -3272,7 +3330,7 @@
   },
   {
     "description": "is one of a path prints as is in",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.k"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.k"}}}},
     "params": {"k": ["a"]},
     "cases": [
       {
@@ -3289,7 +3347,7 @@
   },
   {
     "description": "is before a field prints as equals",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is y"}}}},
     "cases": [
       {
         "description": "prints as x equals y",
@@ -3304,7 +3362,7 @@
   },
   {
     "description": "does not equal a value prints as is not",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not equal \"a\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not equal \"a\""}}}},
     "cases": [
       {
         "description": "prints as x is not \"a\"",
@@ -3319,7 +3377,7 @@
   },
   {
     "description": "is not a field prints as does not equal",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not y"}}}},
     "cases": [
       {
         "description": "prints as x does not equal y",
@@ -3334,7 +3392,7 @@
   },
   {
     "description": "a pattern with a backslash prints in single quotes",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches '^\\d+$'"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches '^\\d+$'"}}}},
     "cases": [
       {
         "description": "prints as x matches '^\\d+$'",
@@ -3349,7 +3407,7 @@
   },
   {
     "description": "a pattern with a backslash written in double quotes prints in single quotes",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^\\\\d+$\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^\\\\d+$\""}}}},
     "cases": [
       {
         "description": "prints as x matches '^\\d+$'",
@@ -3364,7 +3422,7 @@
   },
   {
     "description": "a pattern with two backslashes in a row prints in double quotes",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"a\\\\\\\\b\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"a\\\\\\\\b\""}}}},
     "cases": [
       {
         "description": "prints as x matches \"a\\\\\\\\b\"",
@@ -3379,7 +3437,7 @@
   },
   {
     "description": "a pattern with a single quote prints in double quotes",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches 'it\\'s'"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches 'it\\'s'"}}}},
     "cases": [
       {
         "description": "prints as x matches \"it's\"",
@@ -3394,7 +3452,7 @@
   },
   {
     "description": "a number with a trailing zero prints in its plain form",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1.50"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1.50"}}}},
     "cases": [
       {
         "description": "prints as x is 1.5",
@@ -3409,7 +3467,7 @@
   },
   {
     "description": "a number with an exponent prints in its plain form",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1e2"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1e2"}}}},
     "cases": [
       {
         "description": "prints as x is 100",
@@ -3424,7 +3482,7 @@
   },
   {
     "description": "a field on the right with a dot in front prints without it when it isn't needed",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least .y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least .y"}}}},
     "cases": [
       {
         "description": "prints as x is at least y",
@@ -3439,7 +3497,7 @@
   },
   {
     "description": "a path with a dot in a key prints with quotes",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "meta.\"b.c\" exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "meta.\"b.c\" exists"}}}},
     "cases": [
       {
         "description": "prints as meta.\"b.c\" exists",
@@ -3454,7 +3512,7 @@
   },
   {
     "description": "a time sentence prints as written",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is on or after closed"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is on or after closed"}}}},
     "cases": [
       {
         "description": "prints as opened is on or after closed",
@@ -3476,7 +3534,7 @@
   },
   {
     "description": "equals with within prints as written",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.5"}}}},
     "cases": [
       {
         "description": "prints as x equals y within 0.5",
@@ -3491,7 +3549,7 @@
   },
   {
     "description": "is within a value prints as written",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 5 within 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 5 within 1"}}}},
     "cases": [
       {
         "description": "prints as x is 5 within 1",
@@ -3506,7 +3564,7 @@
   },
   {
     "description": "a sentence with an unclosed quote",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3527,7 +3585,7 @@
   },
   {
     "description": "a sentence with an unclosed quote after a longer path",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "environment is \"prod"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "environment is \"prod"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3548,7 +3606,7 @@
   },
   {
     "description": "a sentence with nothing after the path",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3569,7 +3627,7 @@
   },
   {
     "description": "a number out of range",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least 1e400"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least 1e400"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3590,7 +3648,7 @@
   },
   {
     "description": "a position too big to be held exactly",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "items[9007199254740992] does not exist"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "items[9007199254740992] does not exist"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3611,7 +3669,7 @@
   },
   {
     "description": "a bare grammar word as the first key",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "empty is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "empty is 1"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3632,7 +3690,7 @@
   },
   {
     "description": "a name that starts with a dollar sign",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$foo.x exists"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$foo.x exists"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3653,7 +3711,7 @@
   },
   {
     "description": "bounds in the wrong order",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 5 and 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is between 5 and 1"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3674,7 +3732,7 @@
   },
   {
     "description": "is not null",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not null"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not null"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3695,7 +3753,7 @@
   },
   {
     "description": "a path compared with itself",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least x"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is at least x"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3709,7 +3767,7 @@
   },
   {
     "description": "every ending in the field it's compared with",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every conditions.type equals type"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every conditions.type equals type"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says the bare name is the item's, and the requirement gets no other row",
@@ -3723,7 +3781,7 @@
   },
   {
     "description": "a whose that compares a field with itself",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some conditions whose type equals type as condition", "assert": "condition.status is \"OK\""}}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some conditions whose type equals type as condition", "assert": "condition.status is \"OK\""}}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says the bare name is the item's, and the requirement gets no other row",
@@ -3737,7 +3795,7 @@
   },
   {
     "description": "an item compared with the subject under assert",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some conditions as condition", "assert": ["condition.type equals type", "condition.status is \"OK\""]}}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some conditions as condition", "assert": ["condition.type equals type", "condition.status is \"OK\""]}}}}},
     "cases": [
       {
         "description": "reads type from the subject, so no condition matches and the check fails with value",
@@ -3751,7 +3809,7 @@
   },
   {
     "description": "a for alias inside an item's scope",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"alias_right": {"for": "some approvals.approver as approver", "assert": "every commits.author does not equal approver"}, "dot_right": {"for": "some approvals.approver as approver", "assert": "every commits.author does not equal .approver"}, "dot_subject": {"for": "some approvals.approver as approver", "assert": ".approver equals approver"}, "whose_left": {"for": "every environments as env, some deployments whose env is \"prod\" as deployment", "assert": "deployment.ok is true"}, "whose_right": {"for": "every environments as env, some deployments whose environment equals env.name as deployment", "assert": "deployment.ok is true"}}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"alias_right": {"for": "some approvals.approver as approver", "assert": "every commits.author does not equal approver"}, "dot_right": {"for": "some approvals.approver as approver", "assert": "every commits.author does not equal .approver"}, "dot_subject": {"for": "some approvals.approver as approver", "assert": ".approver equals approver"}, "whose_left": {"for": "every environments as env, some deployments whose env is \"prod\" as deployment", "assert": "deployment.ok is true"}, "whose_right": {"for": "every environments as env, some deployments whose environment equals env.name as deployment", "assert": "deployment.ok is true"}}}}},
     "cases": [
       {
         "description": "an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters",
@@ -3769,8 +3827,59 @@
     ]
   },
   {
+    "description": "a for alias on the right of a whose, with items that have a field of the same name",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": {"for": "every groups as g", "assert": "every rows.v whose n is count of g is 1"}, "some_whose": {"for": "every groups as g", "assert": "some rows.v whose n is count of g is 9"}, "count_whose": {"for": "every groups as g", "assert": "count of rows whose n is count of g is 2"}, "sum_whose": {"for": "every groups as g", "assert": "sum of rows.v whose n is count of g is 2"}, "every_sum": {"for": "every groups as g", "assert": "every rows.v whose n is at most sum of g is 1"}, "dot_right": {"for": "every groups as g", "assert": "every rows.v whose n is count of .g is 1"}, "left": {"for": "every groups as g", "assert": "count of rows whose count of g is 5 is 3"}}}}},
+    "cases": [
+      {
+        "description": "reads the alias on the right, in every, some, count of and sum of, and the item's field on the left and after a dot",
+        "rules": ["sentence.for.scope", "sentence.for.alias", "sentence.path.start"],
+        "input": {"things": [{"id": "a", "groups": [[1, 1]], "rows": [{"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 5, "v": 9, "g": [5, 5, 5, 5, 5]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "count_whose", "failed_items": [], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [[1, 1]]}, {"locations": ["/things/0/rows/0", "/things/0/rows/1", "/things/0/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "dot_right", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "every rows.v whose n equals count of .g is 1", "cause": "value", "inputs": [{"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/0/groups/0"], "path": "item 1 of groups", "value": [1, 1]}], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [[1, 1]]}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "every_sum", "failed_items": [], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [[1, 1]]}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "every_whose", "failed_items": [], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [[1, 1]]}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "left", "failed_items": [], "inputs": [{"locations": ["/things/0/rows/0", "/things/0/rows/1", "/things/0/rows/2"], "name": "count of rows whose count of g is 5", "value": 3}, {"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [[1, 1]]}, {"locations": ["/things/0/rows/0", "/things/0/rows/1", "/things/0/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "some_whose", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "some rows.v whose n equals count of g is 9", "cause": "value", "inputs": [{"locations": ["/things/0/groups/0"], "name": "g", "value": [1, 1]}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/0/groups/0"], "path": "item 1 of groups", "value": [1, 1]}], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [[1, 1]]}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "sum_whose", "failed_items": [], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [[1, 1]]}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}}
+        ],
+        "expressions": {"r": {"every_whose": "for every groups as g: every rows.v whose n equals count of g is 1", "some_whose": "for every groups as g: some rows.v whose n equals count of g is 9", "count_whose": "for every groups as g: count of rows whose n equals count of g is 2", "sum_whose": "for every groups as g: sum of rows.v whose n equals count of g is 2", "every_sum": "for every groups as g: every rows.v whose n is at most sum of g is 1", "dot_right": "for every groups as g: every rows.v whose n equals count of .g is 1", "left": "for every groups as g: count of rows whose count of g is 5 is 3"}}
+      }
+    ]
+  },
+  {
+    "description": "a for alias on the right of a whose, with an alias that is null, text or an object",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": {"for": "every groups as g", "assert": "every rows.v whose n is count of g is 1"}, "count_whose": {"for": "every groups as g", "assert": "count of rows whose n is count of g is 2"}, "sum_whose": {"for": "every groups as g", "assert": "sum of rows.v whose n is count of g is 2"}, "every_sum": {"for": "every groups as g", "assert": "every rows.v whose n is at most sum of g is 1"}}}}},
+    "cases": [
+      {
+        "description": "fails closed for each thing, and never reads the items' own field instead",
+        "rules": ["sentence.for.scope", "sentence.for.alias", "sentence.path.start"],
+        "input": {"things": [{"id": "null", "groups": [null], "rows": [{"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 5, "v": 9, "g": [5, 5, 5, 5, 5]}]}, {"id": "text", "groups": ["abc"], "rows": [{"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 5, "v": 9, "g": [5, 5, 5, 5, 5]}]}, {"id": "object", "groups": [{"k": 1}], "rows": [{"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 5, "v": 9, "g": [5, 5, 5, 5, 5]}]}, {"id": "list_of_text", "groups": [["a"]], "rows": [{"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 2, "v": 1, "g": [5, 5, 5, 5, 5]}, {"n": 5, "v": 9, "g": [5, 5, 5, 5, 5]}]}]},
+        "results": [
+          {"cause": "null", "check": "count_whose", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "count of rows whose n equals count of g is 2", "cause": "null", "inputs": [{"locations": ["/things/0/rows/0", "/things/0/rows/1", "/things/0/rows/2"], "name": "count of rows whose n equals count of g", "value": null}, {"locations": ["/things/0/rows/0", "/things/0/rows/1", "/things/0/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}, {"locations": ["/things/0/groups/0"], "name": "g", "value": null}]}], "item": "item 1 of groups", "locations": ["/things/0/groups/0"], "path": "item 1 of groups", "value": null}], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [null]}, {"locations": ["/things/0/rows/0", "/things/0/rows/1", "/things/0/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "null", "check": "every_sum", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "every rows.v whose n is at most sum of g is 1", "cause": "null", "inputs": [{"locations": ["/things/0/groups/0"], "name": "g", "value": null}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/0/groups/0"], "path": "item 1 of groups", "value": null}], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [null]}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "null", "check": "every_whose", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "every rows.v whose n equals count of g is 1", "cause": "null", "inputs": [{"locations": ["/things/0/groups/0"], "name": "g", "value": null}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/0/groups/0"], "path": "item 1 of groups", "value": null}], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [null]}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "null", "check": "sum_whose", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "sum of rows.v whose n equals count of g is 2", "cause": "null", "inputs": [{"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "sum of rows.v whose n equals count of g", "value": null}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}, {"locations": ["/things/0/groups/0"], "name": "g", "value": null}]}], "item": "item 1 of groups", "locations": ["/things/0/groups/0"], "path": "item 1 of groups", "value": null}], "inputs": [{"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [null]}, {"locations": ["/things/0/rows/0/v", "/things/0/rows/1/v", "/things/0/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "unusable", "check": "count_whose", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of rows whose n equals count of g is 2", "cause": "unusable", "inputs": [{"locations": ["/things/1/rows/0", "/things/1/rows/1", "/things/1/rows/2"], "name": "count of rows whose n equals count of g", "value": null}, {"locations": ["/things/1/rows/0", "/things/1/rows/1", "/things/1/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}, {"locations": ["/things/1/groups/0"], "name": "g", "value": "abc"}]}], "item": "item 1 of groups", "locations": ["/things/1/groups/0"], "path": "item 1 of groups", "value": "abc"}], "inputs": [{"locations": ["/things/1/groups/0"], "name": "groups[]", "value": ["abc"]}, {"locations": ["/things/1/rows/0", "/things/1/rows/1", "/things/1/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every rows.v whose n is at most sum of g is 1", "cause": "unusable", "inputs": [{"locations": ["/things/1/groups/0"], "name": "g", "value": "abc"}, {"locations": ["/things/1/rows/0/v", "/things/1/rows/1/v", "/things/1/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/1/groups/0"], "path": "item 1 of groups", "value": "abc"}], "inputs": [{"locations": ["/things/1/groups/0"], "name": "groups[]", "value": ["abc"]}, {"locations": ["/things/1/rows/0/v", "/things/1/rows/1/v", "/things/1/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every rows.v whose n equals count of g is 1", "cause": "unusable", "inputs": [{"locations": ["/things/1/groups/0"], "name": "g", "value": "abc"}, {"locations": ["/things/1/rows/0/v", "/things/1/rows/1/v", "/things/1/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/1/groups/0"], "path": "item 1 of groups", "value": "abc"}], "inputs": [{"locations": ["/things/1/groups/0"], "name": "groups[]", "value": ["abc"]}, {"locations": ["/things/1/rows/0/v", "/things/1/rows/1/v", "/things/1/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "sum_whose", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "sum of rows.v whose n equals count of g is 2", "cause": "unusable", "inputs": [{"locations": ["/things/1/rows/0/v", "/things/1/rows/1/v", "/things/1/rows/2/v"], "name": "sum of rows.v whose n equals count of g", "value": null}, {"locations": ["/things/1/rows/0/v", "/things/1/rows/1/v", "/things/1/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}, {"locations": ["/things/1/groups/0"], "name": "g", "value": "abc"}]}], "item": "item 1 of groups", "locations": ["/things/1/groups/0"], "path": "item 1 of groups", "value": "abc"}], "inputs": [{"locations": ["/things/1/groups/0"], "name": "groups[]", "value": ["abc"]}, {"locations": ["/things/1/rows/0/v", "/things/1/rows/1/v", "/things/1/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "count_whose", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of rows whose n equals count of g is 2", "cause": "unusable", "inputs": [{"locations": ["/things/2/rows/0", "/things/2/rows/1", "/things/2/rows/2"], "name": "count of rows whose n equals count of g", "value": null}, {"locations": ["/things/2/rows/0", "/things/2/rows/1", "/things/2/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}, {"locations": ["/things/2/groups/0"], "name": "g", "value": {"k": 1}}]}], "item": "item 1 of groups", "locations": ["/things/2/groups/0"], "path": "item 1 of groups", "value": {"k": 1}}], "inputs": [{"locations": ["/things/2/groups/0"], "name": "groups[]", "value": [{"k": 1}]}, {"locations": ["/things/2/rows/0", "/things/2/rows/1", "/things/2/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every rows.v whose n is at most sum of g is 1", "cause": "unusable", "inputs": [{"locations": ["/things/2/groups/0"], "name": "g", "value": {"k": 1}}, {"locations": ["/things/2/rows/0/v", "/things/2/rows/1/v", "/things/2/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/2/groups/0"], "path": "item 1 of groups", "value": {"k": 1}}], "inputs": [{"locations": ["/things/2/groups/0"], "name": "groups[]", "value": [{"k": 1}]}, {"locations": ["/things/2/rows/0/v", "/things/2/rows/1/v", "/things/2/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every rows.v whose n equals count of g is 1", "cause": "unusable", "inputs": [{"locations": ["/things/2/groups/0"], "name": "g", "value": {"k": 1}}, {"locations": ["/things/2/rows/0/v", "/things/2/rows/1/v", "/things/2/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/2/groups/0"], "path": "item 1 of groups", "value": {"k": 1}}], "inputs": [{"locations": ["/things/2/groups/0"], "name": "groups[]", "value": [{"k": 1}]}, {"locations": ["/things/2/rows/0/v", "/things/2/rows/1/v", "/things/2/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "unusable", "check": "sum_whose", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "sum of rows.v whose n equals count of g is 2", "cause": "unusable", "inputs": [{"locations": ["/things/2/rows/0/v", "/things/2/rows/1/v", "/things/2/rows/2/v"], "name": "sum of rows.v whose n equals count of g", "value": null}, {"locations": ["/things/2/rows/0/v", "/things/2/rows/1/v", "/things/2/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}, {"locations": ["/things/2/groups/0"], "name": "g", "value": {"k": 1}}]}], "item": "item 1 of groups", "locations": ["/things/2/groups/0"], "path": "item 1 of groups", "value": {"k": 1}}], "inputs": [{"locations": ["/things/2/groups/0"], "name": "groups[]", "value": [{"k": 1}]}, {"locations": ["/things/2/rows/0/v", "/things/2/rows/1/v", "/things/2/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "value", "check": "count_whose", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of rows whose n equals count of g is 2", "cause": "value", "inputs": [{"locations": ["/things/3/rows/0", "/things/3/rows/1", "/things/3/rows/2"], "name": "count of rows whose n equals count of g", "value": 0}, {"locations": ["/things/3/rows/0", "/things/3/rows/1", "/things/3/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}, {"locations": ["/things/3/groups/0"], "name": "g", "value": ["a"]}]}], "item": "item 1 of groups", "locations": ["/things/3/groups/0"], "path": "item 1 of groups", "value": ["a"]}], "inputs": [{"locations": ["/things/3/groups/0"], "name": "groups[]", "value": [["a"]]}, {"locations": ["/things/3/rows/0", "/things/3/rows/1", "/things/3/rows/2"], "name": "rows[]", "value": [{"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 2, "v": 1}, {"g": [5, 5, 5, 5, 5], "n": 5, "v": 9}]}], "passed": false, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
+          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every rows.v whose n is at most sum of g is 1", "cause": "unusable", "inputs": [{"locations": ["/things/3/groups/0"], "name": "g", "value": ["a"]}, {"locations": ["/things/3/rows/0/v", "/things/3/rows/1/v", "/things/3/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/3/groups/0"], "path": "item 1 of groups", "value": ["a"]}], "inputs": [{"locations": ["/things/3/groups/0"], "name": "groups[]", "value": [["a"]]}, {"locations": ["/things/3/rows/0/v", "/things/3/rows/1/v", "/things/3/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
+          {"cause": "value", "check": "every_whose", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "every rows.v whose n equals count of g is 1", "cause": "value", "inputs": [{"locations": ["/things/3/groups/0"], "name": "g", "value": ["a"]}, {"locations": ["/things/3/rows/0/v", "/things/3/rows/1/v", "/things/3/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}]}], "item": "item 1 of groups", "locations": ["/things/3/groups/0"], "path": "item 1 of groups", "value": ["a"]}], "inputs": [{"locations": ["/things/3/groups/0"], "name": "groups[]", "value": [["a"]]}, {"locations": ["/things/3/rows/0/v", "/things/3/rows/1/v", "/things/3/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
+          {"cause": "value", "check": "sum_whose", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "sum of rows.v whose n equals count of g is 2", "cause": "value", "inputs": [{"locations": ["/things/3/rows/0/v", "/things/3/rows/1/v", "/things/3/rows/2/v"], "name": "sum of rows.v whose n equals count of g", "value": 0}, {"locations": ["/things/3/rows/0/v", "/things/3/rows/1/v", "/things/3/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}, {"locations": ["/things/3/groups/0"], "name": "g", "value": ["a"]}]}], "item": "item 1 of groups", "locations": ["/things/3/groups/0"], "path": "item 1 of groups", "value": ["a"]}], "inputs": [{"locations": ["/things/3/groups/0"], "name": "groups[]", "value": [["a"]]}, {"locations": ["/things/3/rows/0/v", "/things/3/rows/1/v", "/things/3/rows/2/v"], "name": "rows[].v", "value": [1, 1, 9]}], "passed": false, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}}
+        ],
+        "expressions": {"r": {"every_whose": "for every groups as g: every rows.v whose n equals count of g is 1", "count_whose": "for every groups as g: count of rows whose n equals count of g is 2", "sum_whose": "for every groups as g: sum of rows.v whose n equals count of g is 2", "every_sum": "for every groups as g: every rows.v whose n is at most sum of g is 1"}}
+      }
+    ]
+  },
+  {
     "description": "a regular expression that isn't valid",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"(\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"(\""}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3791,7 +3900,7 @@
   },
   {
     "description": "a regular expression that isn't valid in a list of several",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\", \"(\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^a\", \"(\""}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3812,7 +3921,7 @@
   },
   {
     "description": "a phrase with a missing number after within",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1 within"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1 within"}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3833,7 +3942,7 @@
   },
   {
     "description": "a regular expression that uses a lookahead",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"a(?=b)\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"a(?=b)\""}}}},
     "cases": [
       {
         "description": "fails $well_formed, which says why, and the requirement gets no other row",
@@ -3854,7 +3963,7 @@
   },
   {
     "description": "is empty",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is empty"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is empty"}}}},
     "cases": [
       {
         "description": "passes on an empty list",
@@ -3933,7 +4042,7 @@
   },
   {
     "description": "is not empty",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not empty"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not empty"}}}},
     "cases": [
       {
         "description": "passes on a list with an item",
@@ -4004,7 +4113,7 @@
   },
   {
     "description": "is not one of values",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not one of \"prod\", \"staging\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not one of \"prod\", \"staging\""}}}},
     "cases": [
       {
         "description": "passes on a value that isn't listed",
@@ -4051,7 +4160,7 @@
   },
   {
     "description": "is not in a list from the params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
     "params": {"blocked": ["prod"]},
     "cases": [
       {
@@ -4075,7 +4184,7 @@
   },
   {
     "description": "is not in a list from the params that isn't a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
     "params": {"blocked": "prod"},
     "cases": [
       {
@@ -4090,7 +4199,7 @@
   },
   {
     "description": "is not in an empty list from the params",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
     "params": {"blocked": []},
     "cases": [
       {
@@ -4105,7 +4214,7 @@
   },
   {
     "description": "is not in a param that's missing",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
     "params": {"other": 1},
     "cases": [
       {
@@ -4120,7 +4229,7 @@
   },
   {
     "description": "is not in a param that's null",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
     "params": {"blocked": null},
     "cases": [
       {
@@ -4135,7 +4244,7 @@
   },
   {
     "description": "is not in a list of strings, on a field that's a list or an object",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not in $params.blocked"}}}},
     "params": {"blocked": ["prod"]},
     "cases": [
       {
@@ -4158,7 +4267,7 @@
   },
   {
     "description": "is a <type>",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"b": "x is a boolean", "l": "x is a list", "n": "x is a number", "o": "x is an object", "s": "x is a string"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"b": "x is a boolean", "l": "x is a list", "n": "x is a number", "o": "x is an object", "s": "x is a string"}}}},
     "cases": [
       {
         "description": "passes only the type check for a list",
@@ -4249,7 +4358,7 @@
   },
   {
     "description": "is a <type> on empty values, an article written wrong, and a parent that can't hold the field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is a object", "l": "x is a list", "p": "s.y is a string"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is a object", "l": "x is a list", "p": "s.y is a string"}}}},
     "cases": [
       {
         "description": "an empty object is an object, and is a object prints as is an object",
@@ -4276,7 +4385,7 @@
   },
   {
     "description": "starts with and ends with",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"e": "x ends with \".2\"", "f": "x starts with p", "v": "x starts with \"release/\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"e": "x ends with \".2\"", "f": "x starts with p", "v": "x starts with \"release/\""}}}},
     "cases": [
       {
         "description": "passes when the field starts or ends with the value or the field",
@@ -4333,7 +4442,7 @@
   },
   {
     "description": "starts with a field on the right",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"f": "x starts with p"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"f": "x starts with p"}}}},
     "cases": [
       {
         "description": "fails as null when the field on the right is null",
@@ -4371,7 +4480,7 @@
   },
   {
     "description": "starts with a written value that isn't text",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x starts with null"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x starts with null"}}}},
     "cases": [
       {
         "description": "is written wrong, because it could only fail",
@@ -4385,7 +4494,7 @@
   },
   {
     "description": "assertions joined with and, and listed under assert",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"s": {"subject": "pr", "checks": {"line": "username does not equal author and ts is after last_commit", "list": {"description": "A peer approved after the last commit", "assert": ["username does not equal author", "ts is after last_commit"]}}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"s": {"subject": "pr", "checks": {"line": "username does not equal author and ts is after last_commit", "list": {"description": "A peer approved after the last commit", "assert": ["username does not equal author", "ts is after last_commit"]}}}}},
     "cases": [
       {
         "description": "passes when every assertion passes, with no failed assertions, and prints both forms the same way",
@@ -4423,7 +4532,7 @@
   },
   {
     "description": "an assert list written wrong",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"empty": {"assert": []}, "line2": {"assert": ["x exists", "y is \"a"]}}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"empty": {"assert": []}, "line2": {"assert": ["x exists", "y is \"a"]}}}}},
     "cases": [
       {
         "description": "says which line is written wrong, and that an empty list is",
@@ -4437,7 +4546,7 @@
   },
   {
     "description": "a field after a phrase that takes a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in y", "not_in": "x is not in y", "has": "l contains w", "lacks": "l does not contain w", "all": "l contains all of y", "none": "l contains none of y", "match": "x matches p", "no_match": "x does not match p"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in y", "not_in": "x is not in y", "has": "l contains w", "lacks": "l does not contain w", "all": "l contains all of y", "none": "l contains none of y", "match": "x matches p", "no_match": "x does not match p"}}}},
     "cases": [
       {
         "description": "passes or fails as the same phrase with the list written, and lists both fields in inputs",
@@ -4604,7 +4713,7 @@
   },
   {
     "description": "a field after a phrase that takes a list, read through a path that can't hold it",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in y.z", "has": "l contains y.z"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in y.z", "has": "l contains y.z"}}}},
     "cases": [
       {
         "description": "fails as unusable on the right when the path reads into something that can't hold the field",
@@ -4622,7 +4731,7 @@
   },
   {
     "description": "an empty list after is in and is not in",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in y", "not_in": "x is not in y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in y", "not_in": "x is not in y"}}}},
     "cases": [
       {
         "description": "treats an empty list as one that holds nothing after is in and is not in",
@@ -4638,7 +4747,7 @@
   },
   {
     "description": "a field after a phrase that takes a list, in a for line, a one-line every or some, and the input",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"for": {"for": "every approvers as ap", "assert": "ap.username is not one of excluded"}, "every": "every commits.sha whose author is \"x\" is in ok", "some": "some commits.sha whose author is \"x\" is in ok", "files": "files contains all of gap_files", "dev": "$input.dev does not contain tested_by"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"for": {"for": "every approvers as ap", "assert": "ap.username is not one of excluded"}, "every": "every commits.sha whose author is \"x\" is in ok", "some": "some commits.sha whose author is \"x\" is in ok", "files": "files contains all of gap_files", "dev": "$input.dev does not contain tested_by"}}}},
     "cases": [
       {
         "description": "reads the field from the subject, from the item or from the input, and lists what it read",
@@ -4662,7 +4771,7 @@
   },
   {
     "description": "named by a field",
-    "policy": {"ergo_spec": "v0.2", "requirements": {"s": {"checks": {"item": "every items.n is at least $params.min named by kind", "limit": "age is less than $params.max_days named by severity", "named": {"assert": "$params.need named by k exists", "for": "every kinds as k"}, "own": "m named by k is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "v0.3-dev", "requirements": {"s": {"checks": {"item": "every items.n is at least $params.min named by kind", "limit": "age is less than $params.max_days named by severity", "named": {"assert": "$params.need named by k exists", "for": "every kinds as k"}, "own": "m named by k is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
     "params": {"max_days": {"critical": 1, "high": 5}, "min": {"a": 2, "b": 2}, "need": {"b": 1}},
     "cases": [
       {
@@ -4692,7 +4801,7 @@
   },
   {
     "description": "is one of values of mixed types",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is one of \"a\", 1", "not_in": "x is not one of \"a\", 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is one of \"a\", 1", "not_in": "x is not one of \"a\", 1"}}}},
     "cases": [
       {
         "description": "is written wrong, and says why",
@@ -4706,7 +4815,7 @@
   },
   {
     "description": "is one of a field holding values of mixed types",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is one of y", "not_in": "x is not one of y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is one of y", "not_in": "x is not one of y"}}}},
     "cases": [
       {
         "description": "fails as unusable, even when the field is one of them",
@@ -4721,7 +4830,7 @@
   },
   {
     "description": "an any_of whose options hold sentences written wrong",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"permitted": {"any_of": {"a": ["x exists", "x exists"], "b": ["x is one of 1, \"a\"", "x exists"], "c": "x exists and x is one of 1, \"a\""}}}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"permitted": {"any_of": {"a": ["x exists", "x exists"], "b": ["x is one of 1, \"a\"", "x exists"], "c": "x exists and x is one of 1, \"a\""}}}}}},
     "cases": [
       {
         "description": "lists each problem under the check, named by its option and, when the option has more than one, its line",
@@ -4735,7 +4844,7 @@
   },
   {
     "description": "contains all of values of mixed types",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"all": "x contains all of \"a\", 1", "none": "x contains none of \"a\", 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"all": "x contains all of \"a\", 1", "none": "x contains none of \"a\", 1"}}}},
     "cases": [
       {
         "description": "is written wrong, and says why",
@@ -4749,7 +4858,7 @@
   },
   {
     "description": "contains a field of another type than the list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"has": "x contains w", "lacks": "x does not contain w", "all": "x contains all of y", "none": "x contains none of y"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"has": "x contains w", "lacks": "x does not contain w", "all": "x contains all of y", "none": "x contains none of y"}}}},
     "cases": [
       {
         "description": "fails as unusable, and so does a list on the right whose values have more than one type",
@@ -4771,7 +4880,7 @@
   {
     "description": "a time is before a written time",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -4962,7 +5071,7 @@
   {
     "description": "a time is after a written number",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -5087,7 +5196,7 @@
   },
   {
     "description": "a time phrase with a written value that isn't a time",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before \"yesterday\""}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before \"yesterday\""}}}},
     "cases": [
       {
         "description": "is written wrong, because it could only fail",
@@ -5102,7 +5211,7 @@
   {
     "description": "a time is on or before a written time",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -5195,7 +5304,7 @@
   {
     "description": "is in a list read with named by",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -5300,7 +5409,7 @@
   {
     "description": "is in a list read with named by a key that has no list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -5367,7 +5476,7 @@
   {
     "description": "matches patterns read with named by",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -5472,7 +5581,7 @@
   {
     "description": "an any_of of sentences",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "component": {
           "from": "components",
@@ -5686,7 +5795,7 @@
   {
     "description": "an any_of of sentences with a param that isn't a list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "component": {
           "from": "components",
@@ -5774,7 +5883,7 @@
   {
     "description": "an any_of of sentences that walk, count and ask whether a field exists",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -6059,7 +6168,7 @@
   {
     "description": "an any_of of sentences written wrong",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -6214,7 +6323,7 @@
   {
     "description": "an any_of of sentences with a name that starts like another",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -6280,7 +6389,7 @@
   {
     "description": "an any_of of sentences that read a part",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -6515,7 +6624,7 @@
   {
     "description": "an any_of of sentences that read a parent subject",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "pr": {
           "from": "prs",
@@ -6699,7 +6808,7 @@
   {
     "description": "a count on the left of a whose",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6858,6 +6967,932 @@
                 "b": "b1"
               },
               "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent subject's name on the right of a whose, with items that have a field of the same name",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"plain": "every items.v whose n is b.n is 1", "every_whose": "every items.v whose n is count of b.ks is 1", "some_whose": "some items.v whose n is count of b.ks is 5", "every_sum": "every items.v whose n is at most sum of b.ks is 1", "count_plain": "count of items whose n is b.n is 2", "sum_plain": "sum of items.v whose n is b.n is 2", "dot_right": "count of items whose n is .b.n is 0", "left": "count of items whose count of b.ks is 3 is 3"}}}},
+    "cases": [
+      {
+        "description": "reads the parent on the right, in every, some and count of, and the item's field on the left and after a dot",
+        "rules": ["sentence.path.start", "sentence.subject.chain"],
+        "input": {"bs": [{"id": "b1", "n": 1, "ks": [1], "kids": [{"id": "k1", "items": [{"n": 1, "v": 1, "b": {"n": 9, "ks": [1, 1, 1]}}, {"n": 1, "v": 1, "b": {"n": 9, "ks": [1, 1, 1]}}, {"n": 3, "v": 5, "b": {"n": 9, "ks": [1, 1, 1]}}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "count_plain", "inputs": [{"locations": ["/bs/0/kids/0/items/0", "/bs/0/kids/0/items/1", "/bs/0/kids/0/items/2"], "name": "count of items whose n equals b.n", "value": 2}, {"locations": ["/bs/0/kids/0/items/0", "/bs/0/kids/0/items/1", "/bs/0/kids/0/items/2"], "name": "items[]", "value": [{"b": {"ks": [1, 1, 1], "n": 9}, "n": 1, "v": 1}, {"b": {"ks": [1, 1, 1], "n": 9}, "n": 1, "v": 1}, {"b": {"ks": [1, 1, 1], "n": 9}, "n": 3, "v": 5}]}, {"locations": ["/bs/0/n"], "name": "b.n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "satisfied", "check": "dot_right", "inputs": [{"locations": ["/bs/0/kids/0/items/0", "/bs/0/kids/0/items/1", "/bs/0/kids/0/items/2"], "name": "count of items whose n equals .b.n", "value": 0}, {"locations": ["/bs/0/kids/0/items/0", "/bs/0/kids/0/items/1", "/bs/0/kids/0/items/2"], "name": "items[]", "value": [{"b": {"ks": [1, 1, 1], "n": 9}, "n": 1, "v": 1}, {"b": {"ks": [1, 1, 1], "n": 9}, "n": 1, "v": 1}, {"b": {"ks": [1, 1, 1], "n": 9}, "n": 3, "v": 5}]}], "passed": true, "requirement": "r", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "satisfied", "check": "every_sum", "failed_items": [], "inputs": [{"locations": ["/bs/0/ks"], "name": "b.ks", "value": [1]}, {"locations": ["/bs/0/kids/0/items/0/v", "/bs/0/kids/0/items/1/v", "/bs/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 1, 5]}], "passed": true, "requirement": "r", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "satisfied", "check": "every_whose", "failed_items": [], "inputs": [{"locations": ["/bs/0/ks"], "name": "b.ks", "value": [1]}, {"locations": ["/bs/0/kids/0/items/0/v", "/bs/0/kids/0/items/1/v", "/bs/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 1, 5]}], "passed": true, "requirement": "r", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "satisfied", "check": "left", "inputs": [{"locations": ["/bs/0/kids/0/items/0", "/bs/0/kids/0/items/1", "/bs/0/kids/0/items/2"], "name": "count of items whose count of b.ks is 3", "value": 3}, {"locations": ["/bs/0/kids/0/items/0", "/bs/0/kids/0/items/1", "/bs/0/kids/0/items/2"], "name": "items[]", "value": [{"b": {"ks": [1, 1, 1], "n": 9}, "n": 1, "v": 1}, {"b": {"ks": [1, 1, 1], "n": 9}, "n": 1, "v": 1}, {"b": {"ks": [1, 1, 1], "n": 9}, "n": 3, "v": 5}]}], "passed": true, "requirement": "r", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "satisfied", "check": "plain", "failed_items": [], "inputs": [{"locations": ["/bs/0/n"], "name": "b.n", "value": 1}, {"locations": ["/bs/0/kids/0/items/0/v", "/bs/0/kids/0/items/1/v", "/bs/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 1, 5]}], "passed": true, "requirement": "r", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "value", "check": "some_whose", "failed_items": [{"cause": "value", "item": "item 1 of items", "locations": ["/bs/0/kids/0/items/0/v"], "path": "items[0].v", "value": 1}, {"cause": "value", "item": "item 2 of items", "locations": ["/bs/0/kids/0/items/1/v"], "path": "items[1].v", "value": 1}], "inputs": [{"locations": ["/bs/0/ks"], "name": "b.ks", "value": [1]}, {"locations": ["/bs/0/kids/0/items/0/v", "/bs/0/kids/0/items/1/v", "/bs/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}},
+          {"cause": "satisfied", "check": "sum_plain", "inputs": [{"locations": ["/bs/0/kids/0/items/0/v", "/bs/0/kids/0/items/1/v", "/bs/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals b.n", "value": 2}, {"locations": ["/bs/0/kids/0/items/0/v", "/bs/0/kids/0/items/1/v", "/bs/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 1, 5]}, {"locations": ["/bs/0/n"], "name": "b.n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}}
+        ],
+        "expressions": {"r": {"plain": "every items.v whose n equals b.n is 1", "every_whose": "every items.v whose n equals count of b.ks is 1", "some_whose": "some items.v whose n equals count of b.ks is 5", "every_sum": "every items.v whose n is at most sum of b.ks is 1", "count_plain": "count of items whose n equals b.n is 2", "sum_plain": "sum of items.v whose n equals b.n is 2", "dot_right": "count of items whose n equals .b.n is 0", "left": "count of items whose count of b.ks is 3 is 3"}}
+      }
+    ]
+  },
+  {
+    "description": "a tab and a newline at either end of a check",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "plain": "\tx is 1\n",
+            "block": {
+              "description": "X is 1",
+              "assert": "x is 1\n"
+            },
+            "list": {
+              "assert": [
+                "\n\tx is 1",
+                "y exists\t\n"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "are dropped, so a YAML block ending in a newline reads as written, and the report prints the sentence without them",
+        "rules": [
+          "sentence.ends",
+          "sentence.check",
+          "sentence.assert.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1,
+              "y": 2
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "block",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "list",
+            "failed_assertions": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/things/0/y"
+                ],
+                "name": "y",
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "plain",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "block": "x is 1",
+            "list": "x is 1 and y exists",
+            "plain": "x is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a tab and a newline at either end of a for line",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "\tevery xs as x\n",
+              "assert": "x.ok is true"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "are dropped, and the for line reads as written",
+        "rules": [
+          "sentence.ends",
+          "sentence.for.line"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "xs": [
+                {
+                  "ok": true
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "ok": true
+                  }
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every xs as x: x.ok is true"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a tab and a newline at either end of a from line",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "\n\tevery things whose y is 1\t\n",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "are dropped, before a leading every too, and the from line reads as written",
+        "rules": [
+          "sentence.ends",
+          "sentence.subject.from",
+          "sentence.subject.every"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1,
+              "y": 1
+            },
+            {
+              "id": "t2",
+              "x": 2,
+              "y": 2
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "value",
+            "check": "$applies",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1/y"
+                ],
+                "name": "y",
+                "value": 2
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "x is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "other whitespace at either end of a check",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "nel": "\u0085x is 1\u2028",
+            "nbsp": "\u00a0x is 1\u3000",
+            "cr": "\r\u000bx is 1\f\r"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is dropped too: every character with Unicode's White_Space property",
+        "rules": [
+          "sentence.ends"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "cr",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "nbsp",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "nel",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "cr": "x is 1",
+            "nbsp": "x is 1",
+            "nel": "x is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a byte order mark at the start of a check",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "\ufeffx is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "isn't whitespace, so the check doesn't read",
+        "rules": [
+          "sentence.ends",
+          "sentence.written_wrong.slot"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "doesn't parse"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "\ufeffx is 1"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "whitespace at either end of an identified_by and of a part's path",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "\tid\n",
+          "has": {
+            "p": "\u3000k\n",
+            "q": {
+              "from": "\tm\n",
+              "identified_by": "\nmid\t"
+            }
+          }
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "p.z is 1",
+            "d": "q.w is 2"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is dropped, so the subject and the part are read and named as if it weren't there",
+        "rules": [
+          "sentence.ends",
+          "subjects.id",
+          "parts.path"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "k": {
+                "z": 1
+              },
+              "m": {
+                "mid": "m1",
+                "w": 2
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/k/z"
+                ],
+                "name": "p.z",
+                "part": {
+                  "id": null,
+                  "name": "p"
+                },
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/m/w"
+                ],
+                "name": "q.w",
+                "part": {
+                  "id": "m1",
+                  "name": "q"
+                },
+                "value": 2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ],
+        "report": {
+          "subjects": {
+            "thing": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {
+                "p": {
+                  "from": "k",
+                  "identified_by": null
+                },
+                "q": {
+                  "from": "m",
+                  "identified_by": "mid"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "numbers in a sentence",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is 1e-7", "b": "x is -0", "c": "x is 0.10e1", "d": "x is -1.2500E+2", "e": "x is one of 1e1, -0.0, 2.50", "f": "x is 9007199254740993", "g": "x is 1e21"}}}},
+    "cases": [
+      {
+        "description": "print as their exact value in decimal, with no exponent, no zero at the end of a fraction and no minus on zero",
+        "rules": ["sentence.print.numbers", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "e", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "f", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "g", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+        ],
+        "expressions": {"s": {"a": "x is 0.0000001", "b": "x is 0", "c": "x is 1", "d": "x is -125", "e": "x is one of 10, 0, 2.5", "f": "x is 9007199254740993", "g": "x is 1000000000000000000000"}}
+      }
+    ]
+  },
+  {
+    "description": "a check sentence with an unknown name and a syntax error",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is $foo foo bar"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says it doesn't parse, and not unknown name",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "doesn't parse"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check sentence that compares a path with itself and has an unknown name",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is x and y is $foo"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the unknown name and the comparison with itself",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "unknown name $foo",
+                  "x is compared with itself"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check sentence with a bare $params after named by and a within with no number",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x named by $params is 1 within"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says the within has no number, as it does without the $params",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "\"within\" needs a number after it"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check sentence with two quantifiers and a bare $params after named by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "every a every b named by $params exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says to put the quantifiers on a for line",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "two quantifiers in one sentence: put them on a for line"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
             }
           }
         ]

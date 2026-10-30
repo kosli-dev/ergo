@@ -11,10 +11,11 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `README.md` walks a new user through a first policy.
 - `REFERENCE.md` describes every field, operator, cause and report entry.
 - `CONTRIBUTING.md` tells people how to report bugs and send changes, and points them here for the rules.
-- `CHANGELOG.md` says what each release of `ergo.rego` changed. The spec has its own in `spec/CHANGELOG.md`.
+- `CHANGELOG.md` says what each release of `ergo.rego` changed. The spec has its own in `spec/CHANGELOG.md`, and the Rust engine in `ports/rust/CHANGELOG.md`. A change in what a check means goes in `spec/CHANGELOG.md`, and an engine's own fixes go in that engine's file.
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.
+- `ports/rust/` is a second engine, in Rust. It's experimental and in progress. It's a Cargo workspace with five crates: `ergo-sentences` reads sentences and nothing else, `ergo-engine` builds the report, `ergo-cli` is the `ergo` command that prints a report or the violations from JSON or YAML files, and `ergo-wasm` and `ergo-sentences-wasm` wrap them for a browser. Its tests run every case in `spec/cases`, and `ports/rust/known-failures.txt` lists the ones it still fails.
 - `packages/` holds Node tools that build on Ergo, in one pnpm workspace. Someone who only copies `ergo.rego` never needs them.
 - `packages/markdown/` compiles a policy written in Markdown into a policy object. It's an experiment, not published.
 - `packages/editor/` builds a web page for writing those Markdown policies: the source beside what the compiler read, the policy, the document, the YAML and a report from `ergo.rego` run in the page.
@@ -24,20 +25,21 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 Run these before saying a change is done:
 
 ```sh
-opa check --strict . --ignore .github --ignore packages
+opa check --strict . --ignore .github --ignore packages --ignore ports
 opa check --strict --schema .github/closed-input-schema.json ergo.rego
 opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > /tmp/ergo-deterministic.json && opa check --strict --capabilities /tmp/ergo-deterministic.json ergo.rego
 opa fmt --list .
-opa test . --ignore .github --ignore packages --timeout 120s
-opa eval --strict-builtin-errors --ignore .github --ignore packages -d . --format raw 'count(data) > 0'
+opa test . --ignore .github --ignore packages --ignore ports --timeout 120s
+opa eval --strict-builtin-errors --ignore .github --ignore packages --ignore ports -d . --format raw 'count(data) > 0'
 regal lint --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
 python3 spec/check_rules.py
 python3 spec/sentences_corpus.py --check
 python3 -m venv /tmp/ergo-venv && /tmp/ergo-venv/bin/pip install --quiet jsonschema==4.26.0 abnf==2.9.0 && /tmp/ergo-venv/bin/python .github/spec-schemas.py
 /tmp/ergo-venv/bin/python spec/check_grammar.py
+/tmp/ergo-venv/bin/python spec/check_grammar.py --rust 'docker run --rm -i -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust cargo run --locked -q --release -p ergo-sentences --example read'
 ```
 
-Run them from the repo root. The last two lines use a virtual environment that holds `jsonschema` and `abnf`; it's outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
+Run them from the repo root. The last three lines use a virtual environment that holds `jsonschema` and `abnf`, and the last one the Docker image that [`ports/rust/README.md`](ports/rust/README.md) builds; it's outside the repo, because some Pythons, like Homebrew's, refuse `pip install` outside one.
 
 `opa fmt --list .` should print nothing. If it prints file names, run `opa fmt -w .`.
 
@@ -49,7 +51,7 @@ The `opa eval` command runs every test again with `--strict-builtin-errors`, whi
 
 The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml` because OPA would load that file as data.
 
-OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, and so do the workspace's files under `packages`, so the checks ignore both folders.
+OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, and so do the workspace's files under `packages`, and the Rust port's test data under `ports` isn't Rego's, so the checks ignore all three folders.
 
 When you change anything under `packages/`, run these too, one at a time:
 
@@ -63,24 +65,32 @@ pnpm -r bundle
 
 `pnpm test` fails when a line under `packages/markdown/src` isn't reached by a test. Its tests also run `ergo.report` with opa on every case in `packages/markdown/cases` that has an input. The editor's tests build the page, which compiles `ergo.rego` to Wasm with the `opa` on your PATH, and check that each sample gives the report its case expects.
 
+When you change `ports/rust/`, run its checks too. There's no need for Rust on your machine: `ports/rust/README.md` has the Docker command, which runs `cargo fmt --check`, Clippy with warnings as errors, the tests, and a Wasm build of `ergo-sentences`. Use `-j 4` and run one at a time, because a full build takes every core otherwise. The Rust version is pinned in `ports/rust/rust-toolchain.toml` and the `Dockerfile` next to it; change both together. CI runs the same checks in the `tests-rust` job.
+
+A change that only adds or changes spec cases can break those checks too, so run the whole `cargo test` for it. Rust runs every case, and the sentence oracle in `ports/rust/sentences/tests/oracle` needs a row for every sentence in the cases. `python3 ports/rust/sentences/tests/oracle/validate.py` checks the rows against `ergo.rego` with the `opa` on your PATH, or the OPA command you give it, and prints the ones that are missing. It fails only when a row differs, so read its output for missing ones. A case Rust fails goes in `known-failures.txt`.
+
 CI runs these checks on pull requests and on pushes to `main` (`.github/workflows/test.yml`), using the OPA version the README names and Regal 0.43.0. That's OPA 1.20.2, the version the Kosli CLI embeds. When you change the OPA version, change it in the README, in `CONTRIBUTING.md`, in every job of the workflow, in the Docker command below and in `opaVersion` in `site/hugo.toml`.
 
-CI also runs every test compiled to Wasm, with `.github/wasm-tests.sh`, because Wasm walks objects and sets in a different order from `opa eval`, so anything that ends up in the report has to be sorted. The script runs `opa test --target wasm` on 150 tests at a time, because OPA keeps the memory of every test until the run ends, and all of them at once take more than the 16 GB a GitHub runner has. It takes the list of tests from a plain `opa test` run, checks that every one of them ran, and fails when two tests share a name, since it picks tests by name. That needs the Linux build of OPA. The macOS one says `engine not found`, so on a Mac give the script the Docker command to run OPA with:
+CI also runs every test compiled to Wasm, with `.github/wasm-tests.sh`, because Wasm walks objects and sets in a different order from `opa eval`, so anything that ends up in the report has to be sorted. The script runs `opa test --target wasm` on 100 tests at a time, because OPA keeps the memory of every test until the run ends, and all of them at once take more than the 16 GB a GitHub runner has. Some batches of 150 already came close to it. It takes the list of tests from a plain `opa test` run, checks that every one of them ran, and fails when two tests share a name, since it picks tests by name. That needs the Linux build of OPA. The macOS one says `engine not found`, so on a Mac give the script the Docker command to run OPA with:
 
 ```sh
 .github/wasm-tests.sh docker run --rm -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.20.2
 ```
 
-CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if Ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because Ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first. Last, it builds three reports on 100 deployments, one with a check on every test, one with three checks on each deployment and one with the tests of each deployment as subjects, and fails if they use more than 24 MB, 17 MB and 40 MB of Wasm memory. Wasm doesn't cache function calls and frees nothing until the report is done, so something worked out again for every row shows up there long before it slows down `opa eval`.
+CI also runs every test with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm` (`.github/wasm-js.cjs`), because that runtime brings its own versions of some built-ins, like a `sprintf` that formats lists and objects differently, and lacks others. The script compiles each test as a Wasm entrypoint, fails if Ergo uses a built-in the runtime doesn't have (apart from `time.parse_rfc3339_ns`, which it passes in, as `REFERENCE.md` tells Wasm users to), and then runs every test. It also fails if `ergo.report` or `ergo.violations` needs any built-in that OPA's Wasm build runs outside the module. OPA reads the arguments of those built-ins back as Rego, so a string holding a byte-order mark fails the whole evaluation. `time.parse_rfc3339_ns` is allowed because Ergo only passes it strings that already match the RFC 3339 pattern. If you add a function for users to call, add it to the entrypoint the script writes, so the check covers it. `sprintf` is one of them, so build text with `concat` instead. `concat` takes only strings, so write anything else with `_text` first. Last, it builds three reports on 100 deployments, one with a check on every test, one with three checks on each deployment and one with the tests of each deployment as subjects, and fails if they use more than 24 MB, 17 MB and 40 MB of Wasm memory. Wasm doesn't cache function calls and frees nothing until the report is done, so something worked out again for every row shows up there long before it slows down `opa eval`. The reports on `main` sit close to those limits, so before adding something that costs memory on every report, measure them on `main` and on your branch. The script prints all three at the end, after running every test. Run it from the repo root, with `opa` on your PATH:
 
-A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, when Ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`, or when a `$well_formed` row fails without naming what's wrong. `python3 spec/sentences_corpus.py --check` fails when `spec/sentences-corpus.json` no longer holds every line of `spec/sentences-corpus.md`. `spec/check_grammar.py` reads sentences with `ergo.rego` and with a parser built from `spec/sentences.abnf`, and fails when one reads a sentence and the other rejects it as a matter of syntax. The sentences are the corpus, the cases, and a few thousand generated from the grammar and changed a little, with a fixed seed. A sentence `ergo.rego` rejects for another reason, like an unknown name, isn't a disagreement. The known ones are listed in `spec/OPEN.md`, and the script fails on a new one and when a listed one no longer disagrees. If `ergo.rego` gives a message that isn't about syntax, add it to `NON_SYNTAX` in the script.
+```sh
+npm install --silent --no-save --prefix /tmp/ergo-wasm-js @open-policy-agent/opa-wasm@1.10.0 && node .github/wasm-js.cjs /tmp/ergo-wasm-js
+```
+
+A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when a rule has no case and isn't listed under "Rules without cases" in `spec/OPEN.md`. `.github/spec-schemas.py` builds the report for every case and fails when a report doesn't match `spec/report/schema.json`, when Ergo reads a policy as written correctly but it doesn't match `spec/policy/schema.json`, or when a `$well_formed` row fails without naming what's wrong. `python3 spec/sentences_corpus.py --check` fails when `spec/sentences-corpus.json` no longer holds every line of `spec/sentences-corpus.md`. `spec/check_grammar.py` reads sentences with `ergo.rego` and with a parser built from `spec/sentences.abnf`, and fails when one reads a sentence and the other rejects it as a matter of syntax. With `--rust <command>` it also runs `ports/rust`'s sentence reader (`ergo-sentences`, the `read` example) and fails when Rust and the ABNF disagree, with no list of known ones; CI does this, and the second command above does it locally through Docker. It also fails when Rust and `ergo.rego` give different problems for a sentence, so a change to one of `ergo.rego`'s messages has to change Rust's in the same pull request. It leaves out only a Rust problem that ends in `is compared with itself`. The sentences are the corpus, the cases, and a few thousand generated from the grammar and changed a little, with a fixed seed. A sentence `ergo.rego` rejects for another reason, like an unknown name, isn't a disagreement. The known ones are listed in `spec/OPEN.md`, and the script fails on a new one and when a listed one no longer disagrees. If `ergo.rego` gives a message that isn't about syntax, add it to `NON_SYNTAX` in the script.
 
 `main` always carries a `-dev` version, like `0.1.0-dev`, and a test fails without one. The `checks` job shows a warning when that version equals the latest `rego-v*` tag, and fails when it's below it. The spec has its own version, `_spec` in `ergo.rego`. `.github/spec-version.sh` fails when `_spec` and the `$id` of both schemas disagree, when a file that defines the spec (`spec/syntax.md`, `spec/semantics.md`, both schemas, `spec/sentences.abnf` and `spec/cases/`) differs from the latest `spec-v*` tag and `_spec` still equals that tag, and when `_spec` is not the tag's version or one minor above it (with `-dev`, or without it for a release being prepared), or is above it without a heading in `spec/CHANGELOG.md`. So the first change to the spec moves `_spec`, both `$id`s and every `ergo_spec` to `vX.(Y+1)-dev`, except in `README.md`, which goes with the latest release and is moved by hand in the pull request that releases the spec. The site needs no change: it follows the latest published release on its own. `release.sh` and the release workflow refuse a `rego-v*` or `spec-v*` tag on a commit whose `_spec` says `-dev`. A release is a tag, which `.github/release.sh` checks and pushes, and `.github/workflows/release.yml` does the rest, with the steps in `CONTRIBUTING.md`. The site build runs `site/prepare.sh` before Hugo, which takes the schemas of every published `spec-v*` release, so nothing is committed.
 
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
 ```sh
-opa test . --ignore .github --ignore packages --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
+opa test . --ignore .github --ignore packages --ignore ports --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
 ```
 
 ## Tests
@@ -92,6 +102,8 @@ Every change needs tests: new behaviour, bug fixes and changes to existing behav
 There are no comments in the code or the tests, and it should stay that way.
 
 There are two exceptions, both above `package ergo` in `ergo.rego`. The first is the license header. Users copy that file on its own, so the header keeps the license with it. The second is the `METADATA` annotation that declares `input["ergo/names"]` as an object. While Ergo checks, `input` holds Ergo's names, and a host that type-checks `input` against a closed JSON Schema, like Kosli does when a policy is published, would otherwise refuse every read of them. OPA only reads a schema from an annotation, and annotations are comments.
+
+There's one more exception, for code meant for others to call: API doc comments on public items, `///` (and `//!` for a crate) in the Rust crates under `ports/rust`, and JSDoc `/** */` on exported functions and types in `packages/`. They say what the item is, what it takes and what it returns, with an example where it helps, and never why the code is written the way it is. Every other comment stays out, and the Rego files get none.
 
 CI fails on any other comment in a `.rego` file. It asks `opa parse` for each file's comments, so a `#` inside a string doesn't count. To list them yourself:
 
@@ -137,7 +149,8 @@ When talking to people:
 
 The first line names the part of the repo that changed, then says what the change does, in the imperative and in lowercase:
 
-- `core:` the library and its tests
+- `rego:` `ergo.rego` and its tests
+- `rust:` the Rust port in `ports/rust/`
 - `docs:` `README.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
@@ -145,11 +158,11 @@ The first line names the part of the repo that changed, then says what the chang
 - `spec:` the spec in `spec/`, its cases and `spec_test.rego`
 - `markdown:` the Markdown compiler in `packages/markdown`, the editor in `packages/editor` and the pnpm workspace around them
 
-For example, `core: fail compare when either side is missing`.
+For example, `rego: fail compare when either side is missing`. Commits from before the Rust port say `core:` for `rego:`.
 
-One area per commit. A `core:` change that updates `REFERENCE.md` or `spec/` with it stays `core:`.
+One area per commit. A `rego:` or `rust:` change that updates `REFERENCE.md` or `spec/` with it keeps its area. A `rego:` change that alters behaviour adds the cases Rust now fails to `ports/rust/known-failures.txt`, and keeps its area. The `rust:` change that ports it deletes those lines.
 
-When a `core:` change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
+When a `rego:` or `rust:` change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
 
 Add a body when the reason isn't obvious from the first line. PR titles follow the same rules, because they become the commit on `main`. Issue titles do too, so an issue reads like the change that will fix it.
 

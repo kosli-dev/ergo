@@ -7,7 +7,7 @@ export const parseTime = (v) => {
 export const straighten = (text) => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
 
 export const buildPolicy = (sentence) => ({
-  ergo_spec: "v0.2",
+  ergo_spec: "v0.3-dev",
   subjects: { batch: { from: "$input" } },
   requirements: { tutorial: { subject: "batch", checks: { sentence } } },
 });
@@ -915,7 +915,7 @@ export const nameCoach = (name) => {
 };
 
 export const tutorialPolicy = ({ name = defaultNames.name, heading = defaultNames.heading, from = null, id = null } = {}) => ({
-  ergo_spec: "v0.2",
+  ergo_spec: "v0.3-dev",
   subjects: { batch: from === null ? { from: "$input" } : { from, identified_by: id } },
   requirements: {
     [slug(heading)]: {

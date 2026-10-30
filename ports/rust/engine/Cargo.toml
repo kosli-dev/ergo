@@ -1,0 +1,13 @@
+[package]
+name = "ergo-engine"
+description = "Experimental: builds Ergo reports"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ergo-sentences = { path = "../sentences" }
+regex = "1"
+serde_json = { version = "1", features = ["arbitrary_precision"] }

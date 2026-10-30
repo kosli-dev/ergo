@@ -1,10 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ergo.kosli.com/spec/0.2/report.schema.json",
+  "$id": "https://ergo.kosli.com/spec/0.3-dev/report.schema.json",
   "title": "Ergo report",
   "type": "object",
   "properties": {
-    "ergo": {"const": "v0.2", "description": "The version of the spec the report follows"},
+    "ergo": {"const": "v0.3-dev", "description": "The version of the spec the report follows"},
     "engine": {
       "type": "object",
       "description": "What made the report. A report's hash leaves it out.",

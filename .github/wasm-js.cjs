@@ -14,7 +14,7 @@ const tests = execFileSync("git", ["ls-files", "*_test.rego"], { encoding: "utf8
 });
 
 const bundle = path.join(runtimeDir, "suite.tar.gz");
-execFileSync("opa", ["build", "-t", "wasm", "--ignore", ".github", "--ignore", "packages", ...tests.flatMap((t) => ["-e", t]), "-o", bundle, "."]);
+execFileSync("opa", ["build", "-t", "wasm", "--ignore", ".github", "--ignore", "packages", "--ignore", "ports", ...tests.flatMap((t) => ["-e", t]), "-o", bundle, "."]);
 execFileSync("tar", ["-xzf", bundle, "-C", runtimeDir, "/policy.wasm", "/data.json"]);
 
 const ergoDir = path.join(runtimeDir, "ergo");
@@ -65,7 +65,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
 
   const document = { deployments: Array.from({ length: 100 }, (_, i) => ({ id: `d-${i}`, environment: i % 3 ? "prod" : "staging", ...(i % 2 ? { approved_by: "a" } : {}), tests: [{ ok: i % 5 > 0 }, { ok: true }] })) };
   const budgetPolicy = {
-    ergo_spec: "v0.2",
+    ergo_spec: "v0.3-dev",
     subjects: { deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" } },
     requirements: {
       approved: { subject: "deployment", checks: { approved: "approved_by is a non-empty string" } },
@@ -73,7 +73,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     },
   };
   const sentencePolicy = {
-    ergo_spec: "v0.2",
+    ergo_spec: "v0.3-dev",
     subjects: budgetPolicy.subjects,
     requirements: {
       approved: {
@@ -87,7 +87,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     },
   };
   const chainPolicy = {
-    ergo_spec: "v0.2",
+    ergo_spec: "v0.3-dev",
     subjects: {
       deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" },
       test: { from: "deployment.tests" },

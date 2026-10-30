@@ -2,7 +2,7 @@
   {
     "description": "count of a list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -404,7 +404,7 @@
   {
     "description": "count of an empty list is 0",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -520,7 +520,7 @@
   {
     "description": "count of a list with whose",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -967,7 +967,7 @@
   {
     "description": "count of a list whose a field exists",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -1057,7 +1057,7 @@
   {
     "description": "count of two lists",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -1571,7 +1571,7 @@
   {
     "description": "sum of a field",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2213,7 +2213,7 @@
   {
     "description": "sum over no items is 0",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2339,7 +2339,7 @@
   {
     "description": "sum of decimals",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2417,9 +2417,922 @@
     ]
   },
   {
+    "description": "a plus that needs more than 15 digits at a common scale",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "x plus y is at least 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "adds 0.1 and 0.2 up to 0.3",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 0.1,
+              "y": 0.2,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": 0.3
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.1
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 0.2
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "adds a number with trailing zeros exactly",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1.50,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": 2.5
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 1.5
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "adds a number with many trailing zeros exactly",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1.500000000000000000,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": 2.5
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 1.5
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "fails as unusable when 15 decimal places and 3 whole digits are needed",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 0.123456789012345,
+              "y": 100,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.123456789012345
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 100
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when a term is 1e20 and the other is 1",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1e20,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 100000000000000000000
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when a term has 15 decimal places and the other is 1",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 0.000000000000001,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.000000000000001
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when a term has 16 decimal places",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1e-16,
+              "y": 0,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.0000000000000001
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when the result reaches 10^15",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 999999999999999,
+              "y": 1,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 999999999999999
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable when a term has 19 decimal places",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 0.0000000000000000001,
+              "y": 0.2,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 0.0000000000000000001
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 0.2
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "fails as unusable for two round numbers too large to scale",
+        "rules": [
+          "sentence.derived.plus",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "x": 1e20,
+              "y": 1e20,
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/x",
+                  "/releases/0/y"
+                ],
+                "name": "x plus y",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/x"
+                ],
+                "name": "x",
+                "value": 100000000000000000000
+              },
+              {
+                "locations": [
+                  "/releases/0/y"
+                ],
+                "name": "y",
+                "value": 100000000000000000000
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "a sum that needs more than 15 digits at a common scale",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "sum of xs is at least 0"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when a single value reaches 10^15",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [
+                1e15
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/xs/0"
+                ],
+                "name": "sum of xs",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  1000000000000000
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "adds a single value of 15 decimal places as it is",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [
+                0.123456789012345
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/xs/0"
+                ],
+                "name": "sum of xs",
+                "value": 0.123456789012345
+              },
+              {
+                "locations": [
+                  "/releases/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  0.123456789012345
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "adds 0.1, 0.2 and 100 up to 100.3",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [
+                0.1,
+                0.2,
+                100
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/xs/0",
+                  "/releases/0/xs/1",
+                  "/releases/0/xs/2"
+                ],
+                "name": "sum of xs",
+                "value": 100.3
+              },
+              {
+                "locations": [
+                  "/releases/0/xs/0",
+                  "/releases/0/xs/1",
+                  "/releases/0/xs/2"
+                ],
+                "name": "xs[]",
+                "value": [
+                  0.1,
+                  0.2,
+                  100
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      },
+      {
+        "description": "fails as unusable when the values need 15 decimal places and 3 whole digits",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [
+                0.123456789012345,
+                100
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/xs/0",
+                  "/releases/0/xs/1"
+                ],
+                "name": "sum of xs",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/xs/0",
+                  "/releases/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  0.123456789012345,
+                  100
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false
+      },
+      {
+        "description": "is 0 over no values",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.fail",
+          "tally.inputs",
+          "sentence.phrase.order"
+        ],
+        "input": {
+          "releases": [
+            {
+              "xs": [],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "sum of xs",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ],
+        "status": {
+          "s": "met"
+        },
+        "compliant": true
+      }
+    ]
+  },
+  {
     "description": "sum of a field with whose",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2747,7 +3660,7 @@
   {
     "description": "sum with whose over no items is 0",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2823,7 +3736,7 @@
   {
     "description": "sum within a distance",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3136,7 +4049,7 @@
   {
     "description": "sum within a distance of a field",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3419,7 +4332,7 @@
   {
     "description": "a path plus a number on the left",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3670,7 +4583,7 @@
   {
     "description": "a number plus a path on the left",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3738,7 +4651,7 @@
   {
     "description": "two paths on the left",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3924,7 +4837,7 @@
   {
     "description": "decimals added from paths",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4001,7 +4914,7 @@
   {
     "description": "a path plus a count on the left",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4229,7 +5142,7 @@
   {
     "description": "a count plus a path on the left",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4332,7 +5245,7 @@
   {
     "description": "a count plus a number on the left",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4426,7 +5339,7 @@
   {
     "description": "a path plus a sum on the left",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4518,7 +5431,7 @@
   {
     "description": "a number plus a count with whose",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4622,7 +5535,7 @@
   {
     "description": "a path on the left and a path plus a number on the right",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4806,7 +5719,7 @@
   {
     "description": "a path and a count plus a path on the right",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4917,7 +5830,7 @@
   {
     "description": "a path on the left and a path plus a count on the right",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5028,7 +5941,7 @@
   {
     "description": "a count on the left and a count plus a number on the right",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5161,7 +6074,7 @@
   {
     "description": "a count on the left and a field on the right",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5380,7 +6293,7 @@
   {
     "description": "a count does not equal a field",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5545,7 +6458,7 @@
   {
     "description": "count of findings is not 2",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5697,7 +6610,7 @@
   {
     "description": "count of findings is at least 2",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5833,7 +6746,7 @@
   {
     "description": "count of findings is at most 2",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5985,7 +6898,7 @@
   {
     "description": "count of findings is more than 2",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6137,7 +7050,7 @@
   {
     "description": "count of findings is less than 2",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6273,7 +7186,7 @@
   {
     "description": "a sum is at least a number",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6467,7 +7380,7 @@
   {
     "description": "a count in the whose of an every",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6924,7 +7837,7 @@
   {
     "description": "a count under a for line reading the line's name",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7563,7 +8476,7 @@
   {
     "description": "count of a params list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7648,7 +8561,7 @@
   {
     "description": "count of a params list with too few items",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7724,7 +8637,7 @@
   {
     "description": "count of an empty params list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7796,7 +8709,7 @@
   {
     "description": "count of a params list that is missing",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7868,7 +8781,7 @@
   {
     "description": "count of a params list that is null",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7942,7 +8855,7 @@
   {
     "description": "count of a params value that is not a list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8016,7 +8929,7 @@
   {
     "description": "sum of a params list",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8099,7 +9012,7 @@
   {
     "description": "a count of a list in the subject against a params number",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8196,7 +9109,7 @@
   {
     "description": "a count with is empty",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8272,7 +9185,7 @@
   {
     "description": "a count with is between",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8721,7 +9634,7 @@
   {
     "description": "a sum with is between",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8974,7 +9887,7 @@
   {
     "description": "a plus with is between",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9140,7 +10053,7 @@
   {
     "description": "a sum with is empty",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9216,7 +10129,7 @@
   {
     "description": "a count with whose on the right",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9292,7 +10205,7 @@
   {
     "description": "count of on subjects and items that aren't objects",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -9471,7 +10384,7 @@
   {
     "description": "a count whose whose reads a param that's missing",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -9546,7 +10459,7 @@
   {
     "description": "a count of zero whose whose reads a param that's missing",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -9650,7 +10563,7 @@
   {
     "description": "seconds elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -9790,7 +10703,7 @@
   {
     "description": "minutes elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -9930,7 +10843,7 @@
   {
     "description": "hours elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10070,7 +10983,7 @@
   {
     "description": "days elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10210,7 +11123,7 @@
   {
     "description": "weeks elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10350,7 +11263,7 @@
   {
     "description": "days elapsed against a limit by severity",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10602,7 +11515,7 @@
   {
     "description": "days elapsed between two numbers",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10741,7 +11654,7 @@
   {
     "description": "days elapsed between equal times",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10880,7 +11793,7 @@
   {
     "description": "days elapsed with the end before the start",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11020,7 +11933,7 @@
   {
     "description": "days elapsed that cannot be read",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12014,7 +12927,7 @@
   {
     "description": "days elapsed under a for line reading the line's name",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12326,7 +13239,7 @@
   {
     "description": "days elapsed in a list of assertions",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12421,7 +13334,7 @@
   {
     "description": "a field called days",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12502,7 +13415,7 @@
   {
     "description": "a field called days with a dot",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12565,7 +13478,7 @@
   {
     "description": "a field called to",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12646,7 +13559,7 @@
   {
     "description": "days elapsed added to another term",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -12926,7 +13839,7 @@
   {
     "description": "days elapsed added to another term, first",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13080,7 +13993,7 @@
   {
     "description": "days elapsed on the right side of a phrase",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13297,7 +14210,7 @@
   {
     "description": "days elapsed in a plus on the right side",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13468,7 +14381,7 @@
   {
     "description": "days elapsed in the whose of an every",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13719,7 +14632,7 @@
   {
     "description": "days elapsed in the whose of a count",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -14043,7 +14956,7 @@
   {
     "description": "a count in the whose of a count",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -14212,7 +15125,7 @@
   {
     "description": "a count in the whose of a sum",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -14306,7 +15219,7 @@
   {
     "description": "days elapsed with is between",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -14609,7 +15522,7 @@
   {
     "description": "days elapsed with a phrase that takes no number",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -14692,7 +15605,7 @@
   {
     "description": "days elapsed with a unit that has no fixed length",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -14774,7 +15687,7 @@
   {
     "description": "days elapsed between two dates",
     "policy": {
-      "ergo_spec": "v0.2",
+      "ergo_spec": "v0.3-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -14960,7 +15873,7 @@
   },
   {
     "description": "count of a list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is 2"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is 2"}}}},
     "cases": [
       {
         "description": "gives the count the locations of the items it counted",
@@ -14982,7 +15895,7 @@
   },
   {
     "description": "count of a list with whose",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is 1"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is 1"}}}},
     "cases": [
       {
         "description": "gives the count the locations of every item read, kept or not",
@@ -14996,7 +15909,7 @@
   },
   {
     "description": "count of lists inside lists",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of pull_requests.commits is 3"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of pull_requests.commits is 3"}}}},
     "cases": [
       {
         "description": "gives the count one location per item of every inner list",
@@ -15010,7 +15923,7 @@
   },
   {
     "description": "sum of a field",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is 30"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is 30"}}}},
     "cases": [
       {
         "description": "gives the sum the locations of the values it added",
@@ -15024,7 +15937,7 @@
   },
   {
     "description": "a path plus a count",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "base plus count of findings is 5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "base plus count of findings is 5"}}}},
     "cases": [
       {
         "description": "gives the plus the locations of the entries after it, once each, in their order",
@@ -15038,7 +15951,7 @@
   },
   {
     "description": "a path plus a sum",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "fee plus sum of items.usd is 40"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "fee plus sum of items.usd is 40"}}}},
     "cases": [
       {
         "description": "gives the plus the location of the path and then of every value summed",
@@ -15052,7 +15965,7 @@
   },
   {
     "description": "days elapsed between two numbers",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"vuln": {"from": "vulns", "identified_by": "id"}}, "requirements": {"s": {"subject": "vuln", "checks": {"c": "days elapsed from started to ended is 1.5"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"vuln": {"from": "vulns", "identified_by": "id"}}, "requirements": {"s": {"subject": "vuln", "checks": {"c": "days elapsed from started to ended is 1.5"}}}},
     "cases": [
       {
         "description": "gives the elapsed time the locations of both ends",
@@ -15074,7 +15987,7 @@
   },
   {
     "description": "a plus that reads the same list twice",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"deployment": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "deployment", "checks": {"c": "count of approvals plus count of approvals is 4"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"deployment": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "deployment", "checks": {"c": "count of approvals plus count of approvals is 4"}}}},
     "cases": [
       {
         "description": "shows the number and the list once each",
@@ -15088,7 +16001,7 @@
   },
   {
     "description": "a count compared with a count of the same list",
-    "policy": {"ergo_spec": "v0.2", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is at most count of findings"}}}},
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is at most count of findings"}}}},
     "cases": [
       {
         "description": "shows the list once, after the left side's number, and the right side's number",
@@ -15096,6 +16009,1092 @@
         "input": {"releases": [{"id": "r1", "findings": [{"severity": "high"}, {"severity": "low"}]}]},
         "results": [
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "count of findings whose severity is \"high\"", "value": 1}, {"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "findings[]", "value": [{"severity": "high"}, {"severity": "low"}]}, {"locations": ["/releases/0/findings/0", "/releases/0/findings/1"], "name": "count of findings", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a field over a null item",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "count of xs.n is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a null item fails as not_an_object",
+        "rules": [
+          "tally.walk"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "count of xs.n",
+                "value": null,
+                "locations": [
+                  "/things/0/xs/0"
+                ]
+              },
+              {
+                "name": "xs[].n",
+                "value": [
+                  null
+                ],
+                "locations": [
+                  "/things/0/xs/0"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a field over a null item",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": "sum of xs.n is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a null item fails as not_an_object",
+        "rules": [
+          "tally.walk"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                null
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "inputs": [
+              {
+                "name": "sum of xs.n",
+                "value": null,
+                "locations": [
+                  "/things/0/xs/0"
+                ]
+              },
+              {
+                "name": "xs[].n",
+                "value": [
+                  null
+                ],
+                "locations": [
+                  "/things/0/xs/0"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a field with whose, over items it cannot decide",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "sum of items.x whose k is \"a\" is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null, without reading the field, when an item has a null k",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab",
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent, without reading the field, when an item has no k",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.absent"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab"
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when k is a number where the condition compares text",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "compare.fail"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab",
+                  "k": 5
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the item whose condition cannot be decided has a number to add",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": 1,
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the field is missing and an item has a null k",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0"
+                ],
+                "name": "items[].x",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails with the worst cause, as tally.fail says, when an item the whose cannot decide comes before a kept item with a bad field",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.absent"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab"
+                },
+                {
+                  "x": null,
+                  "k": "a"
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab",
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "adds the kept items and leaves out the others, bad fields included",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": 1,
+                  "k": "a"
+                },
+                {
+                  "x": "ab",
+                  "k": "b"
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ],
+                "name": "sum of items.x whose k is \"a\"",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  1,
+                  "ab"
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when a kept item comes before an item with a null k and a field that isn't a number",
+        "rules": [
+          "tally.whose"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "t",
+              "items": [
+                {
+                  "k": "a",
+                  "x": 1
+                },
+                {
+                  "k": null,
+                  "x": "s"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ]
+              },
+              {
+                "name": "items[].x",
+                "value": [
+                  1,
+                  "s"
+                ],
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1/x"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails as null when a kept item comes before an item with a null k and no field",
+        "rules": [
+          "tally.whose"
+        ],
+        "input": {
+          "releases": [
+            {
+              "id": "t",
+              "items": [
+                {
+                  "k": "a",
+                  "x": 1
+                },
+                {
+                  "k": null
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "s",
+            "subject": {
+              "type": "release",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "sum of items.x whose k is \"a\"",
+                "value": null,
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1"
+                ]
+              },
+              {
+                "name": "items[].x",
+                "value": [
+                  1,
+                  null
+                ],
+                "locations": [
+                  "/releases/0/items/0/x",
+                  "/releases/0/items/1"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "sum of a path that goes on, with whose, over items it cannot decide",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "sum of items.x.y whose k is \"a\" is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null, without reading the path, when an item has a null k",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab",
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "sum of items.x.y whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x.y",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the path would have read a number",
+        "rules": [
+          "sentence.derived.sum",
+          "tally.walk",
+          "tally.sum",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": {
+                    "y": 1
+                  },
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x/y"
+                ],
+                "name": "sum of items.x.y whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x/y"
+                ],
+                "name": "items[].x.y",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a path with whose, over items it cannot decide",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "count of items.x whose k is \"a\" is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null when an item has a null k",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab",
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "count of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when an item has no k",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.absent"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "ab"
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "count of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x",
+                "value": [
+                  "ab"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the field is missing and an item has a null k",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0"
+                ],
+                "name": "count of items.x whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0"
+                ],
+                "name": "items[].x",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a path that goes on, with whose, over items it cannot decide",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "release": {
+          "from": "releases",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "release",
+          "checks": {
+            "c": "count of items.x.y whose k is \"a\" is 1"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as null, without reading the path, when an item has a null k",
+        "rules": [
+          "sentence.derived.count",
+          "tally.walk",
+          "tally.count",
+          "tally.inputs",
+          "tally.whose",
+          "tally.fail",
+          "sentence.derived.fail",
+          "sentence.phrase.is",
+          "path.null"
+        ],
+        "input": {
+          "releases": [
+            {
+              "items": [
+                {
+                  "x": "s",
+                  "k": null
+                }
+              ],
+              "id": "r1"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "count of items.x.y whose k is \"a\"",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/releases/0/items/0/x"
+                ],
+                "name": "items[].x.y",
+                "value": [
+                  null
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "type": "release"
+            }
+          }
         ]
       }
     ]

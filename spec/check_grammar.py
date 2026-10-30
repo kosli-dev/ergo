@@ -33,6 +33,11 @@ NON_SYNTAX = [
     ]
 ]
 
+LATER = re.compile(r" is compared with itself")
+WHITE_SPACE = "\t\n\x0b\x0c\r \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000"
+NOT_WHITE_SPACE = ["\ufeff", "\u200b", "\x1c"]
+EDGED_EVERY = 5
+
 VOCABULARY = ["x", "y", "items", "status", "a_b", "k-1", "_id", "Count", "env", "sha", "pr", "commits", "owner"]
 GRAMMAR_WORDS = re.findall(
     r"`([a-z]+)`",
@@ -43,6 +48,14 @@ OTHER_POOL = [0xE9, 0x65E5, 0x1F600, 0xFEFF, 0x2028, 0xA0]
 
 EXTRA = [
     ("check", " x is 1"),
+    ("check", "\tx is 1\n"),
+    ("check", "\n\tx is 1 \r\n"),
+    ("check", "\u3000x is 1\u2028"),
+    ("check", "\ufeffx is 1"),
+    ("check", "x is 1\u200b"),
+    ("for-line", "\tevery xs as x\n"),
+    ("from-line", "\n\tevery xs whose y is 1\t\n"),
+    ("from-line", "\x85xs whose y is 1\xa0"),
     ("check", "x is 1 "),
     ("check", "x  is 1"),
     ("check", "x is  1"),
@@ -53,6 +66,10 @@ EXTRA = [
     ("check", "x\tis 1"),
     ("check", "x is\t1"),
     ("for-line", "every xs whose days elapsed from p to q is 1 as x"),
+    ("for-line", "t[0] as i"),
+    ("for-line", "t.u[1] as i"),
+    ("for-line", "every t as x, t[0] as i"),
+    ("for-line", "every t as x, t.u[1] as i"),
     ("check", "x is 1 plus days elapsed from p to q"),
     ("check", "every xs whose days elapsed from p to q is 1 is not empty"),
     ("check", 'x is "\\ud800"'),
@@ -151,7 +168,7 @@ def has_surrogate_escape(text):
 
 def mutate(rng, text):
     words = text.split()
-    kind = rng.choice(["drop_quote", "swap_words", "cut_end", "delete_char", "duplicate_word", "insert_punctuation", "replace_word", "uppercase_word"])
+    kind = rng.choice(["drop_quote", "swap_words", "cut_end", "delete_char", "duplicate_word", "insert_punctuation", "replace_word", "uppercase_word", "bracket_pick"])
     if kind == "drop_quote":
         spots = [i for i, c in enumerate(text) if c in "\"'"]
         if not spots:
@@ -177,6 +194,16 @@ def mutate(rng, text):
     if kind == "insert_punctuation":
         i = rng.randrange(len(text) + 1)
         return text[:i] + rng.choice(",.[]'\"$-") + text[i:]
+    if kind == "bracket_pick":
+        options = []
+        for m in re.finditer(r"\bitem +([1-9][0-9]*) +of +([^\s,]+)", text):
+            options.append(text[: m.start()] + m.group(2) + "[" + str(int(m.group(1)) - 1) + "]" + text[m.end() :])
+        for m in re.finditer(r"\bfirst +of +([^\s,]+)", text):
+            options.append(text[: m.start()] + m.group(1) + "[0]" + text[m.end() :])
+        dropped = [text[: m.start(1)] + m.group(2) + "[0]" + text[m.end() :] for m in re.finditer(r"(?:^|, +)(every|some) +([^\s,]+)", text)]
+        if not options and not dropped:
+            return None
+        return rng.choice(dropped or options)
     if kind == "replace_word":
         i = rng.randrange(len(words))
         words[i] = rng.choice(GRAMMAR_WORDS + VOCABULARY)
@@ -229,7 +256,7 @@ def bare_word_keys(node):
 def abnf_accepts(grammar, rules, text):
     for rule in rules:
         try:
-            tree = grammar(rule).parse_all(text.strip(" "))
+            tree = grammar(rule).parse_all(text.strip(WHITE_SPACE))
         except ParseError:
             continue
         if not any(bare_word_keys(tree)):
@@ -276,7 +303,36 @@ def ergo_reads(samples):
     return result
 
 
+def rust_reads(command, samples):
+    rows = [{"kinds": kinds, "text": text} for _, text, kinds in samples]
+    out = subprocess.run(command, shell=True, input=json.dumps({"rows": rows}), capture_output=True, text=True)
+    if out.returncode != 0:
+        sys.exit(out.stdout + out.stderr)
+    try:
+        result = json.loads(out.stdout)
+    except ValueError as error:
+        sys.exit(f"the Rust command did not print JSON: {error}")
+    if not isinstance(result, list) or len(result) != len(rows):
+        sys.exit(f"the Rust command answered {len(result) if isinstance(result, list) else 'something that is not a list'} rows for {len(rows)}")
+    for row, answers in zip(rows, result):
+        kinds = [a.get("kind") if isinstance(a, dict) else None for a in answers] if isinstance(answers, list) else None
+        if kinds != row["kinds"]:
+            sys.exit(f"the Rust command answered {json.dumps(kinds)} for {json.dumps(row['text'])}, which asked for {json.dumps(row['kinds'])}")
+    return result
+
+
+def rust_command(argv):
+    if not argv:
+        return None
+    if len(argv) != 2 or argv[0] != "--rust":
+        sys.exit("usage: check_grammar.py [--rust <command>]")
+    if not argv[1].strip():
+        sys.exit("--rust needs a command to run")
+    return argv[1]
+
+
 def main():
+    command = rust_command(sys.argv[1:])
     started = time.time()
     grammar = load_grammar()
     generator = Generator(grammar, SEED)
@@ -328,6 +384,19 @@ def main():
             add("mutated", kind, changed, [kind])
             mutated += 1
 
+    edged = 0
+    for n, (kind, text) in enumerate(generated):
+        if n % EDGED_EVERY:
+            continue
+        pool = list(WHITE_SPACE) + NOT_WHITE_SPACE
+        left = "".join(rng.choice(pool) for _ in range(rng.randint(0, 2)))
+        right = "".join(rng.choice(pool) for _ in range(rng.randint(0, 2)))
+        changed = left + text + right
+        if changed == text or (kind, changed) in seen:
+            continue
+        add("edges", kind, changed, [kind])
+        edged += 1
+
     flat = [(o, t, k) for o, t, k, _ in samples]
     results = ergo_reads(flat)
 
@@ -346,6 +415,22 @@ def main():
         elif not theirs and accepted:
             disagreements.append((kind, text, origin, "ergo.rego accepts and the ABNF rejects", problems))
 
+    rust_disagreements = []
+    if command is not None:
+        for (origin, text, kinds, kind), per_kind, ergo in zip(samples, rust_reads(command, flat), results):
+            theirs = abnf_accepts(grammar, kinds, text)
+            accepted = any(not r["syntax"] for r in per_kind)
+            problems = sorted({p for r in per_kind for p in r["syntax"]})
+            if theirs and not accepted:
+                rust_disagreements.append((kind, text, origin, "the ABNF accepts and Rust rejects", problems))
+            elif not theirs and accepted:
+                rust_disagreements.append((kind, text, origin, "Rust accepts and the ABNF rejects", problems))
+            for rust_kind, ergo_kind in zip(per_kind, ergo):
+                mine = sorted(p for p in rust_kind["problems"] if not LATER.search(p))
+                if mine != sorted(ergo_kind["problems"]):
+                    said = mine, sorted(ergo_kind["problems"])
+                    rust_disagreements.append((rust_kind["kind"], text, origin, "Rust and ergo.rego give different problems", [f"Rust {said[0]}", f"ergo.rego {said[1]}"]))
+
     section = open("spec/OPEN.md").read().split("\n## Sentences the ABNF and ergo.rego read differently\n", 1)[1].split("\n## ", 1)[0]
     listed = set()
     for kind, raw in re.findall(r"^- (\w[\w-]*) `(.+?)`", section, re.M):
@@ -360,8 +445,13 @@ def main():
     for kind, text in sorted(listed - found):
         problems.append(f"spec/OPEN.md lists {kind} {json.dumps(text)}, but the two read it alike now")
 
-    origins = {o: sum(1 for s in samples if s[0] == o) for o in ["corpus", "case", "extra", "generated", "mutated"]}
-    print(f"read {len(samples)} sentences ({origins}) in {time.time() - started:.1f}s; {len(disagreements)} disagreements, {len(listed)} listed; ergo.rego rejected {semantic} for reasons that aren't syntax; {bad_generated} generated sentences the ABNF parser itself refused")
+    for kind, text, origin, side, why in sorted(rust_disagreements, key=lambda d: (d[0], d[1])):
+        said = f": {'; '.join(why)}" if why else ""
+        problems.append(f"{kind} {json.dumps(text)} ({origin}): {side}{said}")
+
+    rust_summary = f", {len(rust_disagreements)} Rust disagreements" if command is not None else ""
+    origins = {o: sum(1 for s in samples if s[0] == o) for o in ["corpus", "case", "extra", "generated", "mutated", "edges"]}
+    print(f"read {len(samples)} sentences ({origins}) in {time.time() - started:.1f}s; {len(disagreements)} disagreements, {len(listed)} listed{rust_summary}; ergo.rego rejected {semantic} for reasons that aren't syntax; {bad_generated} generated sentences the ABNF parser itself refused")
     for line in problems:
         print(line)
     sys.exit(1 if problems else 0)
