@@ -16,18 +16,21 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md` are the forms GitHub shows for new issues and pull requests.
 - `examples/` holds worked examples. Each one has an input, the same policy in plain Rego and with Ergo, and tests that pin what both versions report.
 - `ports/rust/` is a second engine, in Rust. It's experimental and in progress. It's a Cargo workspace with five crates: `ergo-sentences` reads sentences and nothing else, `ergo-engine` builds the report, `ergo-cli` is the `ergo` command that prints a report or the violations from JSON or YAML files, and `ergo-wasm` and `ergo-sentences-wasm` wrap them for a browser. Its tests run every case in `spec/cases`, and `ports/rust/known-failures.txt` lists the ones it still fails.
+- `packages/` holds Node tools that build on Ergo, in one pnpm workspace. Someone who only copies `ergo.rego` never needs them.
+- `packages/markdown/` compiles a policy written in Markdown into a policy object. It's an experiment, not published.
+- `packages/editor/` builds a web page for writing those Markdown policies: the source beside what the compiler read, the policy, the document, the YAML and a report from the Rego engine (`ergo.rego`) or the Rust engine, run in the page. It also reads each sentence with the Rust sentence parser, `ergo-sentences-wasm`, to underline what's written wrong, colour the words, say how a sentence reads and suggest what to type next.
 
 ## Checks
 
 Run these before saying a change is done:
 
 ```sh
-opa check --strict . --ignore .github --ignore ports
+opa check --strict . --ignore .github --ignore packages --ignore ports
 opa check --strict --schema .github/closed-input-schema.json ergo.rego
 opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > /tmp/ergo-deterministic.json && opa check --strict --capabilities /tmp/ergo-deterministic.json ergo.rego
 opa fmt --list .
-opa test . --ignore .github --ignore ports --timeout 120s
-opa eval --strict-builtin-errors --ignore .github --ignore ports -d . --format raw 'count(data) > 0'
+opa test . --ignore .github --ignore packages --ignore ports --timeout 120s
+opa eval --strict-builtin-errors --ignore .github --ignore packages --ignore ports -d . --format raw 'count(data) > 0'
 regal lint --disable-all --enable-category bugs --disable redundant-existence-check --ignore-files '.github/**' .
 python3 spec/check_rules.py
 python3 spec/sentences_corpus.py --check
@@ -48,7 +51,19 @@ The `opa eval` command runs every test again with `--strict-builtin-errors`, whi
 
 The `regal lint` command runs [Regal](https://www.openpolicyagent.org/projects/regal)'s rules for likely bugs, and should say `No violations found`. One of them, `leaked-internal-reference`, fails when a file outside `package ergo` calls a rule whose name starts with `_`. Test files are allowed to. `redundant-existence-check` is off because it flags `_verdict_cause(passed) := "satisfied" if passed`, where `if passed` is what stops a `false` from counting as satisfied. The flags are on the command line and not in `.regal/config.yaml` because OPA would load that file as data.
 
-OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, and the Rust port's test data under `ports` isn't Rego's, so the checks ignore both folders.
+OPA loads every JSON and YAML file it finds as data. The workflow files under `.github` clash with each other, and so do the workspace's files under `packages`, and the Rust port's test data under `ports` isn't Rego's, so the checks ignore all three folders.
+
+When you change anything under `packages/`, run these too, one at a time:
+
+```sh
+cd packages
+pnpm install --frozen-lockfile
+pnpm check
+pnpm test
+pnpm -r bundle
+```
+
+`pnpm test` fails when a line under `packages/markdown/src` isn't reached by a test. Its tests also run `ergo.report` with opa on every case in `packages/markdown/cases` that has an input. The editor's tests build the page, which compiles `ergo.rego` to Wasm with the `opa` on your PATH, and check that each sample gives the report its case expects. They also need the Rust engine built to Wasm in `ports/rust/wasm/pkg` and the sentence parser in `ports/rust/sentences-wasm/pkg`: see "Building for a browser" in `ports/rust/README.md`.
 
 When you change `ports/rust/`, run its checks too. There's no need for Rust on your machine: `ports/rust/README.md` has the Docker command, which runs `cargo fmt --check`, Clippy with warnings as errors, the tests, and a Wasm build of `ergo-sentences`. Use `-j 4` and run one at a time, because a full build takes every core otherwise. The Rust version is pinned in `ports/rust/rust-toolchain.toml` and the `Dockerfile` next to it; change both together. CI runs the same checks in the `tests-rust` job.
 
@@ -75,7 +90,7 @@ A `spec` job checks the spec. `python3 spec/check_rules.py` fails when a case ci
 CI also fails when a line of Rego isn't reached by any test. To list those lines yourself:
 
 ```sh
-opa test . --ignore .github --ignore ports --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
+opa test . --ignore .github --ignore packages --ignore ports --timeout 120s --coverage | jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | "\($f):\(.start.row)"' | sort -u
 ```
 
 ## Tests
@@ -141,6 +156,7 @@ The first line names the part of the repo that changed, then says what the chang
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`
 - `spec:` the spec in `spec/`, its cases and `spec_test.rego`
+- `markdown:` the Markdown compiler in `packages/markdown`, the editor in `packages/editor` and the pnpm workspace around them
 
 For example, `rego: fail compare when either side is missing`. Commits from before the Rust port say `core:` for `rego:`.
 

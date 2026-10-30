@@ -471,6 +471,7 @@ impl For {
             part: path::part_tag(&item.path, &outer).map(|(name, id)| Part { name, id }),
         };
         let mut dead: Vec<Dead> = walked.failures.iter().map(Dead::of_failure).collect();
+        let from_list = walked.failures.len();
         let mut live = Vec::new();
         let mut kept = 0;
         let mut at = outer.clone();
@@ -529,7 +530,6 @@ impl For {
             let first = &self.items[0].alias;
             let depends = reads_path(&item.path, first);
             let whose_reads = item.whose.iter().any(|check| reads_alias(check, first));
-            let from_list = walked.failures.len();
             for (at, entry) in dead.iter_mut().enumerate() {
                 entry.shared = !depends && (at < from_list || !whose_reads);
             }
@@ -571,7 +571,7 @@ impl For {
                 let first = &self.items[0].alias;
                 let shared = !reads_path(&item.path, first)
                     && !item.whose.iter().any(|check| reads_alias(check, first));
-                for entry in cands.dead.iter_mut() {
+                for entry in cands.dead.iter_mut().skip(from_list) {
                     entry.shared = shared;
                 }
             }

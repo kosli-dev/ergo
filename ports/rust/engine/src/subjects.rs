@@ -885,10 +885,10 @@ pub fn find_subjects(
         params: params.as_object().map(|_| params),
         unreadable: unreadable_params(params),
     };
-    let empty = Value::Object(Map::new());
+    let empty = &path::ABSENT;
     let chain = chain_of(reading, subject);
     let mut anc = Vec::new();
-    let evaluations = descend(&env, &chain, &mut anc, &empty);
+    let evaluations = descend(&env, &chain, &mut anc, empty);
     if evaluations.is_empty() {
         return none_found(&env);
     }
@@ -1397,6 +1397,53 @@ mod tests {
                 .map(|row| row["cause"].clone())
                 .collect();
             assert_eq!(causes, vec![json!("absent")], "{from}");
+        }
+    }
+
+    #[test]
+    fn a_key_the_object_lacks_reads_as_missing_in_every_check() {
+        let cases = [
+            ("it exists", false, "value"),
+            ("it does not exist", true, "satisfied"),
+            ("it is an object", false, "absent"),
+            ("it is empty", false, "absent"),
+            ("x exists", false, "value"),
+            ("x does not exist", true, "satisfied"),
+        ];
+        for (check, passed, cause) in cases {
+            let p = json!({
+                "ergo_spec": "v0.3-dev",
+                "subjects": {"s": {"from": "things named by each of $params.k"}},
+                "requirements": {"r": {"subject": "s", "checks": {"c": check}}}
+            });
+            let r = report(
+                &json!({"things": {"b": {"x": 1}}}),
+                &p,
+                &json!({"k": ["a"]}),
+            );
+            let row = &rows(&r, "c")[0];
+            assert_eq!(row["passed"], json!(passed), "{check}");
+            assert_eq!(row["cause"], json!(cause), "{check}");
+            assert_eq!(row["inputs"][0]["value"], Value::Null, "{check}");
+            assert_eq!(row["inputs"][0]["locations"], json!(["/things"]), "{check}");
+        }
+    }
+
+    #[test]
+    fn a_missing_key_fails_its_check_when_the_input_is_not_an_object() {
+        let p = json!({
+            "ergo_spec": "v0.3-dev",
+            "subjects": {"s": {"from": "$input named by each of $params.k"}},
+            "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}
+        });
+        for input in [json!([{"id": 1}]), json!("text")] {
+            let r = report(&input, &p, &json!({"k": ["a"]}));
+            let min = &rows(&r, "$min_subjects")[0];
+            assert_eq!(min["cause"], json!("unusable"), "{input}");
+            assert_eq!(input_of(min, 0)["value"], json!(1), "{input}");
+            let row = &rows(&r, "c")[0];
+            assert_eq!(row["passed"], json!(false), "{input}");
+            assert_eq!(row["subject"]["id"], json!("a"), "{input}");
         }
     }
 

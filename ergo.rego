@@ -502,7 +502,6 @@ _array_read(doc, req) if {
 
 _array_read(doc, req) if {
 	is_array(doc)
-	not _keys_step(req)
 	_index_step(_from_keys(req)[0])
 }
 
@@ -699,6 +698,7 @@ _raw_entries(doc, req) := [{"key": k, "subject": object.get(_keyed(doc, req), [k
 	"keys" in object.keys(_each_step(req))
 	_listed_keys(_each_step(req))
 	not _from_unreadable(req)
+	_target_state(doc, req) != "not_an_object"
 }
 
 _raw_entries(_, req) := [] if {
@@ -714,12 +714,22 @@ _raw_entries(_, req) := [] if {
 	_from_unreadable(req)
 }
 
+_raw_entries(doc, req) := [] if {
+	_from_well_formed(req)
+	"keys" in object.keys(_each_step(req))
+	_listed_keys(_each_step(req))
+	not _from_unreadable(req)
+	_target_state(doc, req) == "not_an_object"
+}
+
 _keyed(doc, req) := coll if {
 	coll := _target(doc, req)
 	is_object(coll)
 }
 
-_keyed(doc, req) := {} if not is_object(_target(doc, req))
+_keyed(doc, req) := {} if not _target_is_object(doc, req)
+
+_target_is_object(doc, req) if is_object(_target(doc, req))
 
 _scope_of(req, subj) := {"ergo/names": object.union(object.union(object.union(names, _parent_names), _subject_name(req, subj)), {"$at": {"names": _name_ats(req), "subject": _subject_at}})} if names := _each_names(req, subj)
 

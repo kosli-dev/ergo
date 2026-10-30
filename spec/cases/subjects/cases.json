@@ -6428,6 +6428,487 @@
     ]
   },
   {
+    "description": "a from line with named by each of that starts at the input, when the input isn't an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "s": {
+          "from": "$input named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "c": "it exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable when the input is a list, and still makes a subject of the key, which fails its check",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": [
+          {
+            "id": 1
+          }
+        ],
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "in-scope s count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "fails min_subjects as unusable when the input is a string, and still makes a subject of the key, which fails its check",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": "text",
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "in-scope s count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "locations": [
+                  ""
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of, when the object doesn't have the key",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "c": "it exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "a check of it exists fails as if the key were missing, with the object as its location",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {
+          "things": {
+            "b": {
+              "x": 1
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "in-scope s count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of, when the object doesn't have the key, checked with it does not exist",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "c": "it does not exist"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "a check of it does not exist passes for the missing key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {
+          "things": {
+            "b": {
+              "x": 1
+            }
+          }
+        },
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "in-scope s count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of, when the object doesn't have the key, checked with it is an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "s",
+          "checks": {
+            "c": "it is an object"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "a check of it is an object fails as absent for the missing key",
+        "rules": [
+          "subjects.sentence",
+          "subjects.from"
+        ],
+        "input": {
+          "things": {
+            "b": {
+              "x": 1
+            }
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "in-scope s count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject with named by each of under a parent key the object doesn't have",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "k": {
+          "from": "things named by each of $params.k"
+        },
+        "c": {
+          "from": "k named by each of $params.j"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "c1": "it exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a"
+      ],
+      "j": [
+        "z"
+      ]
+    },
+    "cases": [
+      {
+        "description": "the child key z fails its check as a value, because the parent key a is missing and nothing is read below it",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "things": {
+            "b": {}
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "k": "a"
+              },
+              "type": "c"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "in-scope c count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "z",
+              "in": {
+                "k": "a"
+              },
+              "type": "c"
+            },
+            "check": "c1",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a child subject of a from line with named by each of whose object can't be read",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -22528,6 +23009,306 @@
               },
               "type": "k"
             }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with a position on the parent, named by each of, when the parent is a list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "ps"
+        },
+        "k": {
+          "from": "p[0] named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "it exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads p[0] as the object, so min_subjects passes, and the key it lacks is a subject whose check fails",
+        "rules": [
+          "subjects.chain",
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "ps": [
+            [
+              {
+                "id": 1
+              }
+            ]
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": [
+                  {
+                    "id": 1
+                  }
+                ]
+              },
+              "type": "k"
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "in": {
+                "p": [
+                  {
+                    "id": 1
+                  }
+                ]
+              },
+              "type": "k"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/0"
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with a position on the parent, named by each of, checked with it is an object",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "ps"
+        },
+        "k": {
+          "from": "p[0] named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "it is an object"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "reads p[0] as the object, and the key it lacks fails as absent",
+        "rules": [
+          "subjects.chain",
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "ps": [
+            [
+              {
+                "id": 1
+              }
+            ]
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": [
+                  {
+                    "id": 1
+                  }
+                ]
+              },
+              "type": "k"
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "in": {
+                "p": [
+                  {
+                    "id": 1
+                  }
+                ]
+              },
+              "type": "k"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0/0"
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with a position on the parent, named by each of, when the parent is a string",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "p": {
+          "from": "ps"
+        },
+        "k": {
+          "from": "p[0] named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "it is a string"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable, and the key is still a subject that fails its check",
+        "rules": [
+          "subjects.chain",
+          "subjects.chain.not_an_object",
+          "subjects.sentence"
+        ],
+        "input": {
+          "ps": [
+            "text"
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "p": "text"
+              },
+              "type": "k"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0"
+                ],
+                "name": "in-scope k count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "in": {
+                "p": "text"
+              },
+              "type": "k"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [
+                  "/ps/0"
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
           }
         ]
       }

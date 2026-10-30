@@ -2543,6 +2543,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("input is 1", "input is 1", &[], &[]),
     ("it contains y", "it contains y", &[], &[]),
     ("it does not equal y", "it does not equal y", &[], &[]),
+    ("it does not exist", "it does not exist", &[], &[]),
     ("it equals x1", "it equals x1", &[], &[]),
     ("it equals y", "it equals y", &[], &[]),
     ("it exists", "it exists", &[], &[]),
@@ -6928,6 +6929,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs named by x as x",
         "every xs named by x as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, first of ys whose k is p.k sorted by n as q",
+        "every xs as p, first of ys whose k equals p.k sorted by n as q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, first of p.ys sorted by n as q",
+        "every xs as p, first of p.ys sorted by n as q",
         &[],
         &[],
     ),

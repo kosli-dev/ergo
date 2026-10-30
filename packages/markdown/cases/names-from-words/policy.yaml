@@ -1,0 +1,15 @@
+ergo_spec: v0.3-dev
+subjects:
+  pull request:
+    from: pull_requests
+    identified_by: number
+requirements:
+  "crème brûlée — the \"recipe\" check!":
+    subject: pull request
+    checks:
+      "approved by 2+ people":
+        assert: count of approvers is at least 2
+      "(optional) review":
+        assert: reviewed is true
+      ci__green:
+        assert: ci.status is "green"

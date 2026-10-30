@@ -16988,6 +16988,255 @@
     ]
   },
   {
+    "description": "a second for item picking with sorted by after the first alias, whose list can't be walked, lists that list once",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of ys whose k is p.k sorted by n as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "a missing second list is listed once, not under each first item",
+        "rules": ["for.shared_failures", "for.failed_items", "sentence.for.pick"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1
+                },
+                {
+                  "k": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "ys",
+                "locations": [
+                  "/things/0"
+                ],
+                "path": "ys",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              },
+              {
+                "locations": [],
+                "name": "ys",
+                "value": []
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second for item picking from a list read through the first alias, which ties for one first item and is missing for another",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of p.ys sorted by n as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "one first item fails as ambiguous and the other as absent, each with its own second list failure",
+        "rules": ["for.pick", "for.failed_items", "sentence.for.pick"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "xs": [
+                {
+                  "k": 1,
+                  "ys": [
+                    {
+                      "n": 1
+                    },
+                    {
+                      "n": 1
+                    }
+                  ]
+                },
+                {
+                  "k": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of p.ys",
+                    "locations": [
+                      "/things/0/xs/0/ys/0/n"
+                    ],
+                    "path": "item 1 of p.ys",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of p.ys",
+                    "locations": [
+                      "/things/0/xs/0/ys/1/n"
+                    ],
+                    "path": "item 2 of p.ys",
+                    "value": 1
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/things/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": 1,
+                  "ys": [
+                    {
+                      "n": 1
+                    },
+                    {
+                      "n": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "absent",
+                    "item": "p.ys",
+                    "locations": [
+                      "/things/0/xs/1"
+                    ],
+                    "path": "p.ys",
+                    "value": null
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/things/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "p.ys[]",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": 1,
+                    "ys": [
+                      {
+                        "n": 1
+                      },
+                      {
+                        "n": 1
+                      }
+                    ]
+                  },
+                  {
+                    "k": 2
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a for line with an unknown name and a syntax error",
     "policy": {
       "ergo_spec": "v0.3-dev",

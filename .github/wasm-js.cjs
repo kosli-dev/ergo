@@ -14,7 +14,7 @@ const tests = execFileSync("git", ["ls-files", "*_test.rego"], { encoding: "utf8
 });
 
 const bundle = path.join(runtimeDir, "suite.tar.gz");
-execFileSync("opa", ["build", "-t", "wasm", "--ignore", ".github", "--ignore", "ports", ...tests.flatMap((t) => ["-e", t]), "-o", bundle, "."]);
+execFileSync("opa", ["build", "-t", "wasm", "--ignore", ".github", "--ignore", "packages", "--ignore", "ports", ...tests.flatMap((t) => ["-e", t]), "-o", bundle, "."]);
 execFileSync("tar", ["-xzf", bundle, "-C", runtimeDir, "/policy.wasm", "/data.json"]);
 
 const ergoDir = path.join(runtimeDir, "ergo");

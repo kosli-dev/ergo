@@ -1,0 +1,306 @@
+{
+  "compliant": false,
+  "description": "",
+  "engine": {
+    "name": "ergo.rego",
+    "version": "0.3.0-dev"
+  },
+  "ergo": "v0.3-dev",
+  "meta": {},
+  "requirements": {
+    "release": {
+      "causes": [
+        {
+          "cause": "absent",
+          "rows": 1
+        },
+        {
+          "cause": "value",
+          "rows": 1
+        }
+      ],
+      "checks": {
+        "$min_subjects": {
+          "description": "The in-scope release count is at least 1",
+          "expression": "count(matching(releases)) >= 1",
+          "meta": {}
+        },
+        "$unique_ids": {
+          "description": "Every release id is unique",
+          "expression": "count(repeated(ids(releases))) == 0",
+          "meta": {}
+        },
+        "$well_formed": {
+          "description": "The requirement is written correctly",
+          "expression": "count(problems) == 0",
+          "meta": {}
+        },
+        "peer approved": {
+          "description": "Someone other than the author approved every pull request",
+          "expression": "for every pull_requests as pr, some pr.approvers as approver: approver.state is \"APPROVED\" and approver.username does not equal pr.author",
+          "meta": {}
+        },
+        "signed": {
+          "description": "Every commit is signed",
+          "expression": "every pull_requests.commits.signed is true",
+          "meta": {}
+        }
+      },
+      "description": "",
+      "meta": {},
+      "require": "every",
+      "status": "not_met",
+      "subject": "release",
+      "subjects": {
+        "matching": 1,
+        "total": 1
+      }
+    }
+  },
+  "results": [
+    {
+      "cause": "satisfied",
+      "check": "$well_formed",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "count(checks)",
+          "value": 2
+        },
+        {
+          "locations": [],
+          "name": "require",
+          "value": "every"
+        }
+      ],
+      "passed": true,
+      "requirement": "release",
+      "subject": {
+        "id": null,
+        "type": "release"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$min_subjects",
+      "inputs": [
+        {
+          "locations": [
+            "/releases/0"
+          ],
+          "name": "in-scope release count",
+          "value": 1
+        }
+      ],
+      "passed": true,
+      "requirement": "release",
+      "subject": {
+        "id": null,
+        "type": "release"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$unique_ids",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "repeated release ids",
+          "value": []
+        }
+      ],
+      "passed": true,
+      "requirement": "release",
+      "subject": {
+        "id": null,
+        "type": "release"
+      }
+    },
+    {
+      "cause": "value",
+      "check": "peer approved",
+      "failed_items": [
+        {
+          "cause": "value",
+          "failed_assertions": [
+            {
+              "assertion": "approver.state is \"APPROVED\"",
+              "cause": "value",
+              "items": [
+                {
+                  "cause": "value",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/releases/0/pull_requests/1/approvers/0/state"
+                      ],
+                      "name": "approver.state",
+                      "value": "COMMENTED"
+                    }
+                  ],
+                  "item": "item 1 of pr.approvers"
+                }
+              ]
+            },
+            {
+              "assertion": "approver.username does not equal pr.author",
+              "cause": "value",
+              "items": [
+                {
+                  "cause": "value",
+                  "inputs": [
+                    {
+                      "locations": [
+                        "/releases/0/pull_requests/1/approvers/0/username"
+                      ],
+                      "name": "approver.username",
+                      "value": "bob"
+                    },
+                    {
+                      "locations": [
+                        "/releases/0/pull_requests/1/author"
+                      ],
+                      "name": "pr.author",
+                      "value": "bob"
+                    }
+                  ],
+                  "item": "item 1 of pr.approvers"
+                }
+              ]
+            }
+          ],
+          "item": "item 2 of pull_requests",
+          "locations": [
+            "/releases/0/pull_requests/1"
+          ],
+          "path": "item 2 of pull_requests",
+          "value": {
+            "approvers": [
+              {
+                "state": "COMMENTED",
+                "username": "bob"
+              }
+            ],
+            "author": "bob",
+            "number": 8
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/releases/0/pull_requests/0/approvers/0",
+            "/releases/0/pull_requests/1/approvers/0"
+          ],
+          "name": "pr.approvers[]",
+          "value": [
+            {
+              "state": "APPROVED",
+              "username": "bob"
+            },
+            {
+              "state": "COMMENTED",
+              "username": "bob"
+            }
+          ]
+        },
+        {
+          "locations": [
+            "/releases/0/pull_requests/0",
+            "/releases/0/pull_requests/1"
+          ],
+          "name": "pull_requests[]",
+          "value": [
+            {
+              "approvers": [
+                {
+                  "state": "APPROVED",
+                  "username": "bob"
+                }
+              ],
+              "author": "ann",
+              "commits": [
+                {
+                  "sha": "a1",
+                  "signed": true
+                },
+                {
+                  "sha": "a2",
+                  "signed": false
+                }
+              ],
+              "number": 7
+            },
+            {
+              "approvers": [
+                {
+                  "state": "COMMENTED",
+                  "username": "bob"
+                }
+              ],
+              "author": "bob",
+              "number": 8
+            }
+          ]
+        }
+      ],
+      "passed": false,
+      "requirement": "release",
+      "subject": {
+        "id": "r-1",
+        "type": "release"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "signed",
+      "failed_items": [
+        {
+          "cause": "value",
+          "item": "item 2 of pull_requests[0].commits",
+          "locations": [
+            "/releases/0/pull_requests/0/commits/1/signed"
+          ],
+          "path": "pull_requests[0].commits[1].signed",
+          "value": false
+        },
+        {
+          "cause": "absent",
+          "item": "pull_requests[1].commits",
+          "locations": [
+            "/releases/0/pull_requests/1"
+          ],
+          "path": "pull_requests[1].commits",
+          "value": null
+        }
+      ],
+      "inputs": [
+        {
+          "locations": [
+            "/releases/0/pull_requests/0/commits/0/signed",
+            "/releases/0/pull_requests/0/commits/1/signed"
+          ],
+          "name": "pull_requests[].commits[].signed",
+          "value": [
+            true,
+            false
+          ]
+        }
+      ],
+      "passed": false,
+      "requirement": "release",
+      "subject": {
+        "id": "r-1",
+        "type": "release"
+      }
+    }
+  ],
+  "subjects": {
+    "release": {
+      "description": "",
+      "from": "releases",
+      "identified_by": "id",
+      "parts": {}
+    }
+  }
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "line": 12,
+    "message": "a subject's fields are from and identified by, not \"owner\""
+  },
+  {
+    "line": 19,
+    "message": "a requirement's fields are subject, require and min subjects, not \"severity\""
+  }
+]

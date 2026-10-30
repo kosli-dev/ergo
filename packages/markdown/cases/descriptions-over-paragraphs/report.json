@@ -1,0 +1,212 @@
+{
+  "compliant": false,
+  "description": "Every batch that leaves the bakery is safe to eat.\n\nThe bakery's allergy promise covers nuts. Other allergens have their own policy.",
+  "engine": {
+    "name": "ergo.rego",
+    "version": "0.3.0-dev"
+  },
+  "ergo": "v0.3-dev",
+  "meta": {},
+  "requirements": {
+    "cake batch": {
+      "causes": [
+        {
+          "cause": "unusable",
+          "rows": 1
+        },
+        {
+          "cause": "absent",
+          "rows": 1
+        },
+        {
+          "cause": "value",
+          "rows": 1
+        }
+      ],
+      "checks": {
+        "$min_subjects": {
+          "description": "The in-scope batch count is at least 1",
+          "expression": "count(matching(batches)) >= 1",
+          "meta": {}
+        },
+        "$unique_ids": {
+          "description": "Every batch id is unique",
+          "expression": "count(repeated(ids(batches))) == 0",
+          "meta": {}
+        },
+        "$well_formed": {
+          "description": "The requirement is written correctly",
+          "expression": "count(problems) == 0",
+          "meta": {}
+        },
+        "nut free": {
+          "description": "Must not contain nut allergens.",
+          "expression": "allergens does not contain \"nuts\"",
+          "meta": {}
+        }
+      },
+      "description": "Cakes are safe to eat.\n\nA customer with a nut allergy relies on this. A batch that can't show its allergens fails.",
+      "meta": {},
+      "require": "every",
+      "status": "not_met",
+      "subject": "batch",
+      "subjects": {
+        "matching": 4,
+        "total": 4
+      }
+    }
+  },
+  "results": [
+    {
+      "cause": "satisfied",
+      "check": "$well_formed",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "count(checks)",
+          "value": 1
+        },
+        {
+          "locations": [],
+          "name": "require",
+          "value": "every"
+        }
+      ],
+      "passed": true,
+      "requirement": "cake batch",
+      "subject": {
+        "id": null,
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$min_subjects",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/0",
+            "/batches/1",
+            "/batches/2",
+            "/batches/3"
+          ],
+          "name": "in-scope batch count",
+          "value": 4
+        }
+      ],
+      "passed": true,
+      "requirement": "cake batch",
+      "subject": {
+        "id": null,
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "$unique_ids",
+      "inputs": [
+        {
+          "locations": [],
+          "name": "repeated batch ids",
+          "value": []
+        }
+      ],
+      "passed": true,
+      "requirement": "cake batch",
+      "subject": {
+        "id": null,
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "satisfied",
+      "check": "nut free",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/0/allergens"
+          ],
+          "name": "allergens",
+          "value": [
+            "milk",
+            "eggs"
+          ]
+        }
+      ],
+      "passed": true,
+      "requirement": "cake batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-001",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "value",
+      "check": "nut free",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/1/allergens"
+          ],
+          "name": "allergens",
+          "value": [
+            "nuts",
+            "milk"
+          ]
+        }
+      ],
+      "passed": false,
+      "requirement": "cake batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-002",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "unusable",
+      "check": "nut free",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/2/allergens"
+          ],
+          "name": "allergens",
+          "value": "nuts"
+        }
+      ],
+      "passed": false,
+      "requirement": "cake batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-003",
+        "type": "batch"
+      }
+    },
+    {
+      "cause": "absent",
+      "check": "nut free",
+      "inputs": [
+        {
+          "locations": [
+            "/batches/3"
+          ],
+          "name": "allergens",
+          "value": null
+        }
+      ],
+      "passed": false,
+      "requirement": "cake batch",
+      "subject": {
+        "id": "cake-batch-2026-03-18-004",
+        "type": "batch"
+      }
+    }
+  ],
+  "subjects": {
+    "batch": {
+      "description": "A batch of cakes baked today.\n\nOne batch is one tray, as the oven logs it.",
+      "from": "batches",
+      "identified_by": "id",
+      "parts": {}
+    }
+  }
+}
