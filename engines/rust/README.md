@@ -93,7 +93,18 @@ docker run --rm -v "$REPO":/src -v "$PWD":/work -v ergo-rust-target:/target -v e
 ]
 ```
 
-`--params <file>` gives the policy its params. The file holds the params themselves, like `limit: 9`, without a `params:` key around them, and without `--params` they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. The command exits 0 whenever it printed a report, even when `compliant` is `false`. It exits 1 when a file can't be read or parsed and 2 when the command line is wrong, and says why on one line of stderr. `ergo --version` prints the version.
+`--params <file>` gives the policy its params. The file holds the params themselves, like `limit: 9`, without a `params:` key around them, and without `--params` they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. `ergo --version` prints the version.
+
+Without `--fail`, the command exits 0 whenever it printed the output, even when `compliant` is `false`. With `--fail` it still prints all of it, then exits with a code that says how the policy did, so a CI job can stop on it:
+
+| Code | When                                                                                                                                      |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | The output was printed, and the policy is met or `--fail` isn't given.                                                                    |
+| 1    | With `--fail`: a check failed. Input Ergo can't read, like a missing field, counts as a failed check.                                     |
+| 2    | The command line is wrong, a file can't be read or parsed, or the output couldn't be written, so it may be cut short.                     |
+| 3    | With `--fail`: the policy is written wrong, so a `$well_formed` row failed, or it has no requirements, so no check ran. This wins over 1. |
+
+When the command line or a file is wrong, the command says why on one line of stderr.
 
 YAML is read the way OPA reads it: `yes`, `no`, `on` and `off` are booleans, `010` is 8, `0x10` is 16, dates stay strings, `<<` merges, and only the first document counts. `ergo` also refuses most files OPA refuses, like one with a control character, a tag that doesn't fit its value like `!!int 1.5`, more than 10,000 levels of nesting, or too many aliases.
 

@@ -7,20 +7,20 @@ fn main() -> ExitCode {
         eprint!("{}", ergo_policy_cli::USAGE);
         return ExitCode::from(2);
     }
-    match ergo_policy_cli::run(&arguments) {
-        Ok(ergo_policy_cli::Outcome::Print(text)) => {
-            let mut stdout = std::io::stdout().lock();
-            match stdout
-                .write_all(text.as_bytes())
-                .and_then(|()| stdout.flush())
-            {
-                Ok(()) => ExitCode::SUCCESS,
-                Err(_) => ExitCode::from(1),
-            }
-        }
+    let (text, code) = match ergo_policy_cli::run(&arguments) {
+        Ok(ergo_policy_cli::Outcome::Print(text)) => (text, 0),
+        Ok(ergo_policy_cli::Outcome::PrintAndFail(text, code)) => (text, code),
         Err(failure) => {
             eprintln!("ergo: {}", failure.message());
-            ExitCode::from(failure.code() as u8)
+            return ExitCode::from(failure.code() as u8);
         }
+    };
+    let mut stdout = std::io::stdout().lock();
+    match stdout
+        .write_all(text.as_bytes())
+        .and_then(|()| stdout.flush())
+    {
+        Ok(()) => ExitCode::from(code),
+        Err(_) => ExitCode::from(2),
     }
 }

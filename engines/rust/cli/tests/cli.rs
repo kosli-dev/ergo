@@ -130,6 +130,203 @@ fn a_report_that_is_not_compliant_still_exits_zero() {
     assert!(out(&output).contains("\"compliant\": false"));
 }
 
+const COMMANDS: [&str; 2] = ["report", "violations"];
+
+fn exits(command: &str, policy: &str, input: &str, fail: bool) -> Output {
+    let mut args = vec![command, "--policy", policy, "--input", input];
+    if fail {
+        args.push("--fail");
+    }
+    ergo(&args)
+}
+
+fn approved_input(name: &str) -> String {
+    write(
+        &dir(name),
+        "approved.json",
+        r#"{"deployments": [{"id": "d-1", "environment": "prod", "approved_by": "alice"}]}"#,
+    )
+}
+
+fn written_wrong_policy(name: &str) -> String {
+    write(
+        &dir(name),
+        "wrong.yaml",
+        &POLICY_YAML.replace("ergo_spec: v0.3", "ergo_spec: v0.1"),
+    )
+}
+
+fn one_requirement_written_wrong_policy(name: &str) -> String {
+    write(
+        &dir(name),
+        "half-wrong.yaml",
+        &format!(
+            "{POLICY_YAML}  named:\n    subject: deployment\n    checks:\n      named:\n        assert: name sparkles brightly\n"
+        ),
+    )
+}
+
+#[test]
+fn without_fail_every_report_exits_zero_whatever_it_says() {
+    let (policy, input) = readme("no-fail");
+    let wrong = written_wrong_policy("no-fail");
+    for command in COMMANDS {
+        for policy in [&policy, &wrong] {
+            assert_eq!(
+                exits(command, policy, &input, false).status.code(),
+                Some(0),
+                "{command} {policy}"
+            );
+        }
+    }
+}
+
+#[test]
+fn fail_exits_zero_when_the_policy_is_met() {
+    let (policy, _) = readme("fail-met");
+    let input = approved_input("fail-met");
+    for command in COMMANDS {
+        let output = exits(command, &policy, &input, true);
+        assert_eq!(output.status.code(), Some(0), "{command}");
+        assert_eq!(out(&output), out(&exits(command, &policy, &input, false)));
+    }
+}
+
+#[test]
+fn fail_exits_one_when_a_check_failed_and_still_prints_everything() {
+    let (policy, input) = readme("fail-check");
+    for command in COMMANDS {
+        let output = exits(command, &policy, &input, true);
+        assert_eq!(output.status.code(), Some(1), "{command}");
+        assert!(err(&output).is_empty());
+        assert_eq!(out(&output), out(&exits(command, &policy, &input, false)));
+    }
+}
+
+#[test]
+fn fail_exits_one_when_the_input_cannot_be_read_because_that_is_a_check_failing() {
+    let (policy, _) = readme("fail-null-input");
+    let dir = dir("fail-null-input");
+    for (file, text) in [
+        ("null.json", "null"),
+        ("list.json", "[1]"),
+        ("prod.json", r#"{"deployments": 7}"#),
+    ] {
+        let input = write(&dir, file, text);
+        for command in COMMANDS {
+            assert_eq!(
+                exits(command, &policy, &input, true).status.code(),
+                Some(1),
+                "{command} {file}"
+            );
+        }
+    }
+}
+
+#[test]
+fn fail_exits_two_when_a_file_cannot_be_read() {
+    let (policy, _) = readme("fail-file");
+    let bad = write(&dir("fail-file"), "bad.json", "{not json");
+    for command in COMMANDS {
+        for input in [bad.as_str(), "/nonexistent/in.json"] {
+            let output = exits(command, &policy, input, true);
+            assert_eq!(output.status.code(), Some(2), "{command} {input}");
+            assert!(out(&output).is_empty());
+        }
+    }
+}
+
+#[test]
+fn fail_exits_two_when_the_command_line_is_wrong() {
+    let (policy, input) = readme("fail-usage");
+    for command in COMMANDS {
+        for args in [
+            vec![command, "--policy", &policy, "--fail"],
+            vec![
+                command,
+                "--policy",
+                &policy,
+                "--input",
+                &input,
+                "--fail=yes",
+            ],
+        ] {
+            let output = ergo(&args);
+            assert_eq!(output.status.code(), Some(2), "{args:?}");
+            assert!(out(&output).is_empty());
+        }
+    }
+}
+
+#[test]
+fn fail_exits_three_when_the_policy_is_written_wrong() {
+    let (_, input) = readme("fail-wrong");
+    let policy = written_wrong_policy("fail-wrong");
+    for command in COMMANDS {
+        let output = exits(command, &policy, &input, true);
+        assert_eq!(output.status.code(), Some(3), "{command}");
+        assert_eq!(out(&output), out(&exits(command, &policy, &input, false)));
+    }
+}
+
+#[test]
+fn fail_exits_three_when_the_policy_has_no_requirements_because_no_check_ran() {
+    let (_, input) = readme("fail-empty");
+    let dir = dir("fail-empty");
+    for (file, text) in [
+        ("empty.json", "{}"),
+        ("future.json", r#"{"ergo_spec": "v9.9"}"#),
+        ("none.json", r#"{"ergo_spec": "v0.3"}"#),
+        ("null.yaml", "null\n"),
+        ("list.yaml", "- 1\n"),
+    ] {
+        let policy = write(&dir, file, text);
+        for command in COMMANDS {
+            assert_eq!(
+                exits(command, &policy, &input, true).status.code(),
+                Some(3),
+                "{command} {file}"
+            );
+        }
+    }
+}
+
+#[test]
+fn fail_exits_three_rather_than_one_when_a_check_failed_and_a_requirement_is_written_wrong() {
+    let (_, input) = readme("fail-both");
+    let policy = one_requirement_written_wrong_policy("fail-both");
+    let report: Value =
+        serde_json::from_str(&out(&exits("report", &policy, &input, false))).unwrap();
+    let failed: Vec<_> = rows(&report)
+        .into_iter()
+        .filter(|(_, _, passed, _)| !passed)
+        .map(|(_, check, _, _)| check)
+        .collect();
+    assert!(failed.contains(&"$well_formed".to_string()), "{failed:?}");
+    assert!(failed.contains(&"approved".to_string()), "{failed:?}");
+    for command in COMMANDS {
+        assert_eq!(
+            exits(command, &policy, &input, true).status.code(),
+            Some(3),
+            "{command}"
+        );
+    }
+}
+
+#[test]
+fn help_lists_fail_and_every_exit_code() {
+    let usage = out(&ergo(&["--help"]));
+    assert!(usage.starts_with("Usage: ergo <command> --policy <file> --input <file> [--params <file>] [--compact] [--fail]\n"));
+    assert!(usage.ends_with(
+        "Exit codes:
+  0  the output was printed: the policy is met, or --fail isn't given
+  1  with --fail, a check failed
+  2  the command line is wrong, a file can't be read, or the output couldn't be written
+  3  with --fail, the policy is written wrong or has no requirements
+"
+    ));
+}
+
 #[test]
 fn output_is_pretty_with_two_spaces_sorted_keys_and_a_trailing_newline() {
     let (policy, input) = readme("pretty");
@@ -222,7 +419,7 @@ fn params_are_read_from_the_params_file() {
 
 fn fails(args: &[&str], needle: &str) {
     let output = ergo(args);
-    assert!(!output.status.success(), "{args:?} should fail");
+    assert_eq!(output.status.code(), Some(2), "{args:?}");
     assert!(out(&output).is_empty(), "stdout: {}", out(&output));
     let message = err(&output);
     assert!(message.contains(needle), "{message:?} lacks {needle:?}");
@@ -341,7 +538,7 @@ fn yaml_that_json_cannot_hold_is_called_valid_yaml() {
     ] {
         let input = write(&dir, file, text);
         let output = ergo(&["report", "--policy", &policy, "--input", &input]);
-        assert_eq!(output.status.code(), Some(1));
+        assert_eq!(output.status.code(), Some(2));
         let message = err(&output);
         assert!(
             message.contains("is valid YAML that JSON can't hold") && message.contains(needle),
@@ -369,7 +566,7 @@ fn deep_nesting_and_an_alias_bomb_fail_without_crashing() {
     ] {
         let input = write(&dir, file, &text);
         let output = ergo(&["report", "--policy", &policy, "--input", &input]);
-        assert_eq!(output.status.code(), Some(1), "{file}");
+        assert_eq!(output.status.code(), Some(2), "{file}");
         assert!(err(&output).contains(needle), "{}", err(&output));
     }
 }
