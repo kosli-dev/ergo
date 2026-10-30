@@ -3,6 +3,9 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("kid whose n is 1", "kid whose n is 1"),
+    ("mid whose n is 1", "mid whose n is 1"),
+    ("pp whose n is 1", "pp whose n is 1"),
     ("commit.files", "commit.files"),
     ("every parent.items", "every parent.items"),
     (
@@ -2506,6 +2509,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("y", "y"),
     ("n", "n"),
     ("\tid\n", "id"),
     ("\nmid\t", "mid"),
