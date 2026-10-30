@@ -54,6 +54,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("k.items", "k.items"),
     ("artifact named by $params.k", "artifact named by $params.k"),
+    ("every x named by $params.k", "every x named by $params.k"),
+    (
+        "m named by each of $params.ks",
+        "m named by each of $params.ks",
+    ),
     (
         "artifact.scans named by each of $params.k",
         "artifact.scans named by each of $params.k",
@@ -1479,6 +1484,15 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "zz[k].q whose .empty.y is .it plus item 3 of $input.i[$params.k]",
         "zz named by k.q whose .empty.y equals .it plus item 3 of $input.i named by $params.k",
     ),
+    ("$input[0].y", "$input[0].y"),
+    ("every $input[0]", "every item 1 of $input"),
+    ("every $input[0].y", "every $input[0].y"),
+    ("first of p", "first of p"),
+    ("item 2 of $input", "item 2 of $input"),
+    ("item 2 of p", "item 2 of p"),
+    ("last of p", "last of p"),
+    ("p[0]", "item 1 of p"),
+    ("p[1]", "item 2 of p"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
