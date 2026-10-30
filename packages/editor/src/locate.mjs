@@ -17,6 +17,12 @@ const codeNodes = (node, out = []) => {
   return out;
 };
 
+/** The kind of the innermost check, option or from block at a line, or `null`. `check` and `option` are sentence blocks and `field` is a `from` field. */
+export const blockKindAt = (blocks, line) => {
+  const b = innermost(blocks, line, (x) => INNER[x.kind] || (x.kind === "field" && x.name === "from"));
+  return b ? (b.kind === "field" ? "from" : b.kind) : null;
+};
+
 const trimmed = (text) => {
   const lead = text.length - text.trimStart().length;
   return { text: text.trim(), lead };

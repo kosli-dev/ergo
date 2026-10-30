@@ -6,7 +6,8 @@ import { ENGINES, ENGINE_LABELS, readEngine, engineNote, engineMessage, makeRust
 import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
 import { makeParser } from "./sentences.mjs";
-import { markdownSentences, yamlSentences } from "./locate.mjs";
+import { markdownSentences, yamlSentences, blockKindAt } from "./locate.mjs";
+import { completionAt } from "./complete.mjs";
 import { makeAnalyser, decorateLines, entryAt, hoverOf, sentenceProblems } from "./analyse.mjs";
 import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
 import { savedEdit, saveEdit, forgetEdit } from "./saved.mjs";
@@ -75,6 +76,8 @@ const markdownAnalyser = makeAnalyser(sentenceParser, "code");
 const yamlAnalyser = makeAnalyser(sentenceParser, "plain");
 let markdownEntries = null;
 let yamlEntries = null;
+let markdownSubjects = [];
+let yamlSubjects = [];
 
 const paint = (into, lines) => {
   const frag = document.createDocumentFragment();
@@ -95,7 +98,9 @@ const follow = () => {
 
 const drawSource = () => {
   const blocks = last?.blocks ?? [];
-  markdownEntries = markdownAnalyser(markdownSentences(src.value, blocks));
+  const located = markdownSentences(src.value, blocks);
+  markdownSubjects = located.subjects;
+  markdownEntries = markdownAnalyser(located);
   paint(hl, decorateLines(highlightMarkdown(src.value, blocks), src.value, markdownEntries));
   hl.append("\n");
   follow();
@@ -128,7 +133,9 @@ yamlSentenceNotes.hidden = true;
 yamlPane.append(yamlSentenceNotes);
 
 const drawYaml = () => {
-  yamlEntries = yamlAnalyser(yamlSentences(yamlBox.value));
+  const located = yamlSentences(yamlBox.value);
+  yamlSubjects = located.subjects;
+  yamlEntries = yamlAnalyser(located);
   paint(yamlHl, decorateLines(highlightYaml(yamlBox.value), yamlBox.value, yamlEntries));
   const found = sentenceProblems(yamlEntries);
   yamlSentenceNotes.hidden = found.length === 0;
@@ -739,14 +746,18 @@ const hideTip = () => {
   tip.hidden = true;
 };
 let charWidth = 0;
-const cellAt = (box, e) => {
-  const rect = box.getBoundingClientRect();
-  const style = getComputedStyle(box);
+const widthOf = (style) => {
   if (!charWidth) {
     const ctx = document.createElement("canvas").getContext("2d");
     ctx.font = `${style.fontSize} ${style.fontFamily}`;
     charWidth = ctx.measureText("M").width || 8;
   }
+  return charWidth;
+};
+const cellAt = (box, e) => {
+  const rect = box.getBoundingClientRect();
+  const style = getComputedStyle(box);
+  const charWidth = widthOf(style);
   return {
     line: Math.floor((e.clientY - rect.top - parseFloat(style.paddingTop) + box.scrollTop) / LH) + 1,
     col: Math.floor((e.clientX - rect.left - parseFloat(style.paddingLeft) + box.scrollLeft) / charWidth),
@@ -768,6 +779,95 @@ for (const [box, entries] of [
 ]) {
   box.addEventListener("mousemove", (e) => showTip(e, box, entries()));
   for (const ev of ["mouseleave", "input", "scroll", "keydown", "blur"]) box.addEventListener(ev, hideTip);
+}
+
+const popup = el("div", "complete");
+popup.hidden = true;
+popup.setAttribute("role", "listbox");
+document.body.append(popup);
+let choices = null;
+let accepting = false;
+const closeComplete = () => {
+  choices = null;
+  popup.hidden = true;
+};
+const drawChoices = () => {
+  popup.replaceChildren(
+    ...choices.items.map((item, i) => {
+      const row = el("div");
+      row.setAttribute("role", "option");
+      row.setAttribute("aria-selected", String(i === choices.index));
+      row.append(el("span", null, item.text), el("small", null, item.kind));
+      row.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        choices.index = i;
+        acceptChoice();
+      });
+      return row;
+    }),
+  );
+  popup.children[choices.index]?.scrollIntoView({ block: "nearest" });
+};
+const inputJson = () => {
+  try {
+    return JSON.parse(reportInput);
+  } catch {
+    return null;
+  }
+};
+const openComplete = (box, forced) => {
+  const before = box.value.slice(0, box.selectionStart);
+  if (box.selectionStart !== box.selectionEnd || !sentenceParser) return closeComplete();
+  const rows = before.split("\n");
+  const line = rows.length;
+  const col = rows[line - 1].length;
+  const isMarkdown = box === src;
+  const found = completionAt(isMarkdown ? "markdown" : "yaml", isMarkdown ? markdownEntries : yamlEntries, box.value.split("\n")[line - 1], line, col, {
+    parser: sentenceParser,
+    subjects: isMarkdown ? markdownSubjects : yamlSubjects,
+    input: inputJson(),
+    blockKind: isMarkdown ? blockKindAt(last?.blocks ?? [], line) : null,
+  });
+  if (!found || found.items.length === 0) return closeComplete();
+  const typedText = box.value.slice(before.length - (col - found.from), before.length);
+  if (!forced && typedText === "" && !before.endsWith(".")) return closeComplete();
+  if (found.items.length === 1 && found.items[0].text === typedText) return closeComplete();
+  choices = { box, start: before.length - col, from: found.from, to: found.to, items: found.items, index: 0 };
+  popup.hidden = false;
+  drawChoices();
+  const rect = box.getBoundingClientRect();
+  const style = getComputedStyle(box);
+  popup.style.left = Math.min(rect.left + parseFloat(style.paddingLeft) + found.from * widthOf(style) - box.scrollLeft, window.innerWidth - popup.offsetWidth - 8) + "px";
+  popup.style.top = Math.min(rect.top + parseFloat(style.paddingTop) + line * LH - box.scrollTop, window.innerHeight - popup.offsetHeight - 8) + "px";
+};
+const acceptChoice = () => {
+  const { box, start, from, to, items, index } = choices;
+  closeComplete();
+  accepting = true;
+  box.setRangeText(items[index].text, start + from, start + to, "end");
+  box.dispatchEvent(new Event("input"));
+  accepting = false;
+};
+for (const box of [src, yamlBox]) {
+  box.addEventListener("input", () => {
+    if (!accepting) openComplete(box, false);
+  });
+  box.addEventListener("keydown", (e) => {
+    if (e.key === " " && e.ctrlKey) {
+      e.preventDefault();
+      openComplete(box, true);
+    } else if (choices && choices.box === box) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        choices.index = (choices.index + (e.key === "ArrowDown" ? 1 : choices.items.length - 1)) % choices.items.length;
+        drawChoices();
+      } else if (e.key === "Tab" || (e.key === "Enter" && !e.ctrlKey && !e.metaKey)) {
+        e.preventDefault();
+        acceptChoice();
+      } else if (e.key === "Escape") closeComplete();
+    }
+  });
+  for (const ev of ["blur", "scroll", "click"]) box.addEventListener(ev, closeComplete);
 }
 
 const buttons = {};
