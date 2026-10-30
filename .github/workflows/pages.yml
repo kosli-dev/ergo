@@ -18,6 +18,7 @@ jobs:
     permissions:
       contents: read
       pages: read
+      actions: read
     env:
       HUGO_VERSION: 0.157.0
     steps:
@@ -36,6 +37,41 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
+      - name: Find the test run that built the Wasm
+        id: tests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        shell: bash
+        run: |
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow test.yml --commit "$SHA" --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          fi
+          if [ -z "$RUN_ID" ]; then
+            echo "::error::No successful test run for $SHA, so there is no Wasm for the editor. Run this workflow on a commit of main whose tests passed."
+            exit 1
+          fi
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v8
+        with:
+          name: ergo-wasm-pkg
+          path: ports/rust/wasm/pkg
+          run-id: ${{ steps.tests.outputs.run_id }}
+          github-token: ${{ github.token }}
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: packages/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: packages/.nvmrc
+          cache: pnpm
+          cache-dependency-path: packages/pnpm-lock.yaml
+      - name: Build the editor
+        working-directory: packages
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter @kosli/ergo-editor build
       - name: Write what the site needs from the latest release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -48,6 +84,7 @@ jobs:
         shell: bash
         run: |
           hugo --source site --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
+          site/editor.sh packages/editor/dist/editor.html site/public
           python3 site/check_build.py site/public
       - uses: actions/upload-pages-artifact@v5
         with:

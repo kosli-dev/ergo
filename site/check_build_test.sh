@@ -105,4 +105,35 @@ mkdir -p "$dir/site/prepared/content"
 printf -- '---\ntitle: ""\n---\n' > "$dir/site/prepared/content/tutorial.md"
 fails "the tutorial page's title isn't \"\""
 
+build
+mkdir -p "$dir/public/editor"
+echo '<html><head><meta name="robots" content="noindex"></head><body><a href="/">Home</a></body></html>' > "$dir/public/editor/index.html"
+echo '<a href="/docs/">Docs</a>' > "$dir/public/docs.html"
+fits "the editor page is there with noindex and nothing links to it"
+
+build
+mkdir -p "$dir/public/editor"
+echo '<html><head></head></html>' > "$dir/public/editor/index.html"
+fails "the editor page has no noindex meta"
+
+for link in /editor/ /editor https://ergo.kosli.com/editor/ ../editor/ editor/index.html '/editor/?x=1#top'; do
+  build
+  echo "<a href=\"$link\">Editor</a>" >> "$dir/public/index.html"
+  mkdir -p "$dir/public/docs"
+  echo "<a href=\"$link\">Editor</a>" > "$dir/public/docs/index.html"
+  fails "docs/index.html links to the editor"
+done
+
+build
+echo "<script src='/editor/'></script>" >> "$dir/public/index.html"
+fails "index.html links to the editor with \"/editor/\""
+
+build
+echo '<a href="/editorial/">Words</a>' >> "$dir/public/index.html"
+fits "a link to a page that only starts with editor"
+
+build
+echo '<urlset><url><loc>https://ergo.kosli.com/editor/</loc></url></urlset>' > "$dir/public/sitemap.xml"
+fails "sitemap.xml lists the editor"
+
 echo "check_build.py fails when the built site doesn't show what was prepared"
