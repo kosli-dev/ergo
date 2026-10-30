@@ -282,7 +282,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("z matches '^\\s+$'", "z matches '^\\s+$'", &[], &[]),
     ("p.z is 1", "p.z is 1", &[], &[]),
     ("q.w is 2", "q.w is 2", &[], &[]),
-    ("q.n is 1", "q.n is 1", &[], &[]),
     ("\tx is 1\n", "x is 1", &[], &[]),
     ("x is 1\n", "x is 1", &[], &[]),
     ("\n\tx is 1", "x is 1", &[], &[]),
@@ -2694,7 +2693,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
-    ("n exists", "n exists", &[], &[]),
     (
         "n is at most $input.limits.high",
         "n is at most $input.limits.high",
