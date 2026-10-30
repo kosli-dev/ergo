@@ -105,12 +105,12 @@ The tree is not part of the spec and carries no promise of staying the same yet.
 
 Run the checks in [`ports/rust/README.md`](../README.md) from the root of the repo. They use `--all-features`, so the `serde` tests run too.
 
-`tests/oracle/mod.rs` holds what `ergo.rego` printed or said for a few hundred lines, taken by running it. To make it again, run `data.ergo._from_line` and `data.ergo._s_from_line_text` on the lines with `opa eval`.
+`tests/oracle/mod.rs` holds what `ergo.rego` printed or said for a few hundred `from` lines and paths, taken by running it.
 
-`tests/oracle/checks.rs` holds the same for checks and `for` lines. `tests/oracle/validate.py` runs `ergo.rego` with the queries in `tests/oracle/oracle_test.rego` on every line there and on every check and `for` line in `spec/cases`. It fails when a row no longer matches what `ergo.rego` gives, and prints a row for each line of the cases that `checks.rs` doesn't have yet. Run it from the root of the repo, with OPA 1.20.2, the version CI uses:
+`tests/oracle/checks.rs` holds the same for checks and `for` lines. `tests/oracle/validate.py` runs `ergo.rego` with the queries in `tests/oracle/oracle_test.rego` on every line in both files, and on every check, `for` line, `from` line and path in `spec/cases`. It fails when a row no longer matches what `ergo.rego` gives, and prints a row for each line of the cases that the oracle doesn't have yet. Run it from the root of the repo, with OPA 1.20.2, the version CI uses:
 
 ```sh
 python3 ports/rust/sentences/tests/oracle/validate.py docker run --rm -i -v "$PWD":/src:ro -w /src openpolicyagent/opa:1.20.2
 ```
 
-Without arguments it runs `opa`. Paste each printed row at the top of the table it names. A line `ergo.rego` rejects goes in `CHECK_ERRORS` or `FOR_ERRORS` when this crate fails to parse it, and in `CHECK_WRITTEN_WRONG` or `FOR_WRITTEN_WRONG` when it parses and its problems come from `check_problems` or `for_problems`. Then run `cargo fmt`. The file's name ends in `_test.rego` because it calls rules of `ergo.rego` whose names start with `_`, which Regal only allows in test files.
+Without arguments it runs `opa`. Paste each printed row at the top of the table it names. A line `ergo.rego` rejects goes in `CHECK_ERRORS` or `FOR_ERRORS` when this crate fails to parse it, and in `CHECK_WRITTEN_WRONG` or `FOR_WRITTEN_WRONG` when it parses and its problems come from `check_problems` or `for_problems`. A `from` line it rejects goes in `FROM_ERRORS` when this crate fails to parse it, in `FROM_WRITTEN_WRONG` when it parses and its problems come from `from_problems`, and in `FROM_PARTIAL` when this crate's messages are only some of `ergo.rego`'s. A path goes in `PATH_OK` or `PATH_ERRORS`. A path counts as read when `ergo.rego` reads it as a `from` line that is only a path, whatever names it uses. Then run `cargo fmt`. The file's name ends in `_test.rego` because it calls rules of `ergo.rego` whose names start with `_`, which Regal only allows in test files.

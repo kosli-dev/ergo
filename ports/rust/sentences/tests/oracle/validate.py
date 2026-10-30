@@ -53,8 +53,13 @@ def strings(text):
 
 def table(src, name):
     start = src.index(f"pub const {name}:")
-    end = src.find("pub const", start + 1)
-    return src[start : end if end > 0 else len(src)]
+    return src[start : src.index("\n];", start) + 3]
+
+
+def add(rows, kind, line, row):
+    if line in rows[kind]:
+        sys.exit(f"{line!r} is in the oracle twice")
+    rows[kind][line] = row
 
 
 def oracle():
@@ -64,15 +69,27 @@ def oracle():
     rejected = r"\(\s*" + STRING + r",\s*&\[(.*?)\],?\s*\)"
     for kind, prefix in [("checks", "CHECK"), ("fors", "FOR")]:
         for m in re.finditer(ok, table(src, prefix + "_OK"), re.S):
-            rows[kind][unrust(m.group(1))] = {
+            add(rows, kind, unrust(m.group(1)), {
                 "kind": "ok",
                 "printed": unrust(m.group(2)),
                 "plain": strings(m.group(3)),
                 "aliases": strings(m.group(4)),
-            }
+            })
         for suffix in ["_ERRORS", "_WRITTEN_WRONG"]:
             for m in re.finditer(rejected, table(src, prefix + suffix), re.S):
-                rows[kind][unrust(m.group(1))] = {"kind": "rejected", "problems": strings(m.group(2))}
+                add(rows, kind, unrust(m.group(1)), {"kind": "rejected", "problems": strings(m.group(2))})
+    src = open(os.path.join(HERE, "mod.rs")).read()
+    rows["froms"], rows["paths"] = {}, {}
+    pair = r"\(\s*" + STRING + r",\s*" + STRING + r",?\s*\)"
+    for m in re.finditer(pair, table(src, "FROM_OK"), re.S):
+        add(rows, "froms", unrust(m.group(1)), {"kind": "ok", "printed": unrust(m.group(2))})
+    for name in ["FROM_ERRORS", "FROM_WRITTEN_WRONG", "FROM_PARTIAL"]:
+        for m in re.finditer(rejected, table(src, name), re.S):
+            add(rows, "froms", unrust(m.group(1)), {"kind": "rejected", "problems": strings(m.group(2))})
+    for m in re.finditer(pair, table(src, "PATH_OK"), re.S):
+        add(rows, "paths", unrust(m.group(1)), {"kind": "ok", "printed": unrust(m.group(2))})
+    for line in strings(table(src, "PATH_ERRORS").split("= &[", 1)[1]):
+        add(rows, "paths", line, {"kind": "rejected"})
     return rows
 
 
@@ -100,12 +117,37 @@ def collect(value, lines):
             collect(item, lines)
 
 
+def string_of(value):
+    return [value] if isinstance(value, str) else []
+
+
+def subject_lines(subjects, lines):
+    for subject in subjects.values():
+        if not isinstance(subject, dict):
+            continue
+        lines["froms"].extend(string_of(subject.get("from")))
+        lines["paths"].extend(string_of(subject.get("identified_by")))
+        parts = subject.get("has")
+        if not isinstance(parts, dict):
+            continue
+        for part in parts.values():
+            lines["froms"].extend(string_of(part))
+            lines["paths"].extend(string_of(part))
+            if isinstance(part, dict):
+                lines["froms"].extend(string_of(part.get("from")))
+                lines["paths"].extend(string_of(part.get("from")))
+                lines["paths"].extend(string_of(part.get("identified_by")))
+
+
 def case_lines():
-    lines = {"checks": [], "fors": []}
+    lines = {"checks": [], "fors": [], "froms": [], "paths": []}
     folder = os.path.join(ROOT, "spec/cases")
     for topic in sorted(os.listdir(folder)):
         for group in json.load(open(os.path.join(folder, topic, "cases.json"))):
             collect(group["policy"], lines)
+            subjects = group["policy"].get("subjects")
+            if isinstance(subjects, dict):
+                subject_lines(subjects, lines)
     return lines
 
 
@@ -133,7 +175,10 @@ def main():
             if mine != row:
                 differ += 1
                 print(f"differs: {line!r}\n  oracle:   {row}\n  ergo.rego: {mine}")
-    print(f"{len(want['checks'])} checks and {len(want['fors'])} for lines in the oracle, {differ} differ from ergo.rego")
+    print(
+        f"{len(want['checks'])} checks, {len(want['fors'])} for lines, {len(want['froms'])} from lines"
+        f" and {len(want['paths'])} paths in the oracle, {differ} differ from ergo.rego"
+    )
     for kind, prefix in [("checks", "CHECK"), ("fors", "FOR")]:
         for line in sorted(set(cases[kind]) - set(want[kind])):
             row = got[kind][line]
@@ -141,6 +186,18 @@ def main():
                 print(f"{prefix}_OK: ({rust(line)}, {rust(row['printed'])}, {rust_list(row['plain'])}, {rust_list(row['aliases'])}),")
             else:
                 print(f"{prefix}_ERRORS or {prefix}_WRITTEN_WRONG: ({rust(line)}, {rust_list(row['problems'])}),")
+    for line in sorted(set(cases["froms"]) - set(want["froms"])):
+        row = got["froms"][line]
+        if row["kind"] == "ok":
+            print(f"FROM_OK: ({rust(line)}, {rust(row['printed'])}),")
+        else:
+            print(f"FROM_ERRORS, FROM_WRITTEN_WRONG or FROM_PARTIAL: ({rust(line)}, {rust_list(row['problems'])}),")
+    for line in sorted(set(cases["paths"]) - set(want["paths"])):
+        row = got["paths"][line]
+        if row["kind"] == "ok":
+            print(f"PATH_OK: ({rust(line)}, {rust(row['printed'])}),")
+        else:
+            print(f"PATH_ERRORS: {rust(line)},")
     sys.exit(1 if differ else 0)
 
 
