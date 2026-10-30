@@ -342,8 +342,14 @@ jobs:
         include:
           - runner: ubuntu-22.04
             name: linux-x86_64
+          - runner: ubuntu-22.04-arm
+            name: linux-arm64
           - runner: macos-latest
             name: macos-arm64
+          - runner: windows-latest
+            name: windows-x86_64
+            exe: .exe
+            archive: zip
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -358,9 +364,17 @@ jobs:
         working-directory: engines/rust
         run: cargo build --locked --release -p ergo-policy-cli
       - name: Pack ergo
+        shell: bash
         run: |
-          mkdir "$RUNNER_TEMP/pack"
-          tar -czf "$RUNNER_TEMP/pack/ergo-${TAG#rust-v}-${{ matrix.name }}.tar.gz" -C engines/rust/target/release ergo -C "$GITHUB_WORKSPACE" LICENSE
+          mkdir "$RUNNER_TEMP/pack" "$RUNNER_TEMP/stage"
+          cp "engines/rust/target/release/ergo${{ matrix.exe }}" LICENSE "$RUNNER_TEMP/stage/"
+          name="ergo-${TAG#rust-v}-${{ matrix.name }}"
+          cd "$RUNNER_TEMP/stage"
+          if [ "${{ matrix.archive }}" = zip ]; then
+            7z a -tzip "$RUNNER_TEMP/pack/$name.zip" "ergo${{ matrix.exe }}" LICENSE
+          else
+            tar -czf "$RUNNER_TEMP/pack/$name.tar.gz" ergo LICENSE
+          fi
       - uses: actions/upload-artifact@v7
         with:
           name: ergo-${{ matrix.name }}
@@ -433,8 +447,8 @@ jobs:
           fi
           git show "$GITHUB_SHA:.github/release-notes.sh" > "$RUNNER_TEMP/release-notes.sh"
           sh "$RUNNER_TEMP/release-notes.sh" engines/rust/CHANGELOG.md "$VERSION" "https://github.com/$GITHUB_REPOSITORY/blob/$TAG/engines/rust/" > "$RUNNER_TEMP/notes.md"
-          (cd "$RUNNER_TEMP/binaries" && sha256sum ergo-*.tar.gz > SHA256SUMS)
-          gh release create "$TAG" "$RUNNER_TEMP"/binaries/*.tar.gz "$RUNNER_TEMP/binaries/SHA256SUMS" \
+          (cd "$RUNNER_TEMP/binaries" && sha256sum ergo-*.tar.gz ergo-*.zip > SHA256SUMS)
+          gh release create "$TAG" "$RUNNER_TEMP"/binaries/ergo-*.tar.gz "$RUNNER_TEMP"/binaries/ergo-*.zip "$RUNNER_TEMP/binaries/SHA256SUMS" \
             --title "Ergo Rust engine $VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md" \
             --latest=false \
