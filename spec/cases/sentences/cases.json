@@ -7486,5 +7486,75 @@
         "expressions": {"s": {"a": "x is 0.0000001", "b": "x is 0", "c": "x is 1", "d": "x is -125", "e": "x is one of 10, 0, 2.5", "f": "x is 9007199254740993", "g": "x is 1000000000000000000000"}}
       }
     ]
+  },
+  {
+    "description": "a check sentence with an unknown name and a syntax error",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x is $foo foo bar"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says it doesn't parse, and not unknown name",
+        "rules": ["sentence.path.start", "well_formed", "written_wrong.row"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "x": 1
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "doesn't parse"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
