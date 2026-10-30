@@ -12486,31 +12486,6 @@
     ]
   },
   {
-    "description": "a child subject whose from has a name that isn't known",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "parent": {"from": "things", "identified_by": "id"},
-        "kid": {"from": "parent.items whose zz is $foo", "identified_by": "n"}
-      },
-      "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}}
-    },
-    "cases": [
-      {
-        "description": "lists the subject the from starts at, and kid is <invalid from>",
-        "rules": ["report.subjects", "written_wrong.row", "subjects.chain"],
-        "input": {"things": [{"id": "a", "n": 1, "items": [{"n": 1}]}]},
-        "report": {
-          "subjects": {
-            "kid": {"description": "", "from": "<invalid from>", "identified_by": "n", "parts": {}},
-            "parent": {"description": "", "from": "things", "identified_by": "id", "parts": {}}
-          }
-        },
-        "results": []
-      }
-    ]
-  },
-  {
     "description": "a child subject whose from doesn't parse",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -12643,7 +12618,7 @@
         "input": {"things": [{"id": "a", "n": 1, "items": [{"n": 1}]}]},
         "report": {
           "subjects": {
-            "kid": {"description": "", "from": "<invalid from>", "identified_by": "n", "parts": {}},
+            "kid": {"description": "", "from": "<invalid from>", "identified_by": "id", "parts": {}},
             "parent": {"description": "", "from": "things", "identified_by": "id", "parts": {}}
           }
         },
@@ -12665,28 +12640,6 @@
             ]
           }
         ]
-      }
-    ]
-  },
-  {
-    "description": "a subject that narrows another, with a from that has a name that isn't known",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {"parent": {"from": "things", "identified_by": "id"}, "kid": {"from": "parent whose n is $foo"}},
-      "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}}
-    },
-    "cases": [
-      {
-        "description": "lists the subject it narrows and keeps its id, because the line still says which subject it narrows",
-        "rules": ["report.subjects", "subjects.narrow.id", "written_wrong.row"],
-        "input": {"things": [{"id": "a", "n": 1}]},
-        "report": {
-          "subjects": {
-            "kid": {"description": "", "from": "<invalid from>", "identified_by": "id", "parts": {}},
-            "parent": {"description": "", "from": "things", "identified_by": "id", "parts": {}}
-          }
-        },
-        "results": []
       }
     ]
   },

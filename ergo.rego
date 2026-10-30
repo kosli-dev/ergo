@@ -4088,15 +4088,15 @@ _subject_text(name, def) := _path_name([name]) if {
 	object.keys(def) & {"of", "applies_to"} == set()
 }
 
-_subject_id_text(name) := _id_text(data.ergo_resolved[name].def.identified_by) if {
-	"identified_by" in object.keys(data.ergo_resolved[name].def)
-} else := _id_text(data.ergo_resolved[owners[0]].def.identified_by) if {
+_subject_id_text(name) := _id_text(data.ergo_resolved[owners[0]].def.identified_by) if {
 	owners := sort([m |
 		some m in graph.reachable({n: object.get(object.get(data.ergo_subject_sentences, "narrowing", {}), n, []) | some n, _ in data.ergo_resolved}, [name])
 		m != name
 		"identified_by" in object.keys(data.ergo_resolved[m].def)
 	])
 	count(owners) > 0
+} else := _id_text(data.ergo_resolved[name].def.identified_by) if {
+	"identified_by" in object.keys(data.ergo_resolved[name].def)
 } else := null
 
 _id_text(p) := _path_name(p) if {
@@ -6224,42 +6224,15 @@ _s_id_field(read) := {"identified_by": read.identified_by.path} if "path" in obj
 
 else := {}
 
-_s_subject_sentences(subjects, reads, parts) := {"from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "listed": {name: _s_listed_parent(name, subjects, r) | some name, r in reads; _s_listed_parent(name, subjects, r) != null}, "narrowing": {name: [parent] | some name, r in reads; parent := _s_narrowed_parent(name, subjects, r); is_string(parent); trim_space(parent) != ""}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
+_s_subject_sentences(subjects, reads, parts) := {"from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "listed": {name: _s_listed_parent(r) | some name, r in reads; _s_listed_parent(r) != null}, "narrowing": {name: [parent] | some name, r in reads; parent := _s_narrowed_parent(r); is_string(parent); trim_space(parent) != ""}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
 
-_s_listed_parent(name, subjects, r) := object.get(r, "parent", null) if object.get(r, "parent", null) != null
+_s_listed_parent(r) := object.get(r, "parent", null) if object.get(r, "parent", null) != null
 
-else := _s_narrowed_parent(name, subjects, r) if _s_narrowed_parent(name, subjects, r) != null
-
-else := fl.path.steps[0] if {
-	fl := _s_unread_start(name, subjects, r)
-	_s_descends(name, fl, subjects)
-}
+else := _s_narrowed_parent(r) if _s_narrowed_parent(r) != null
 
 else := null
 
-_s_narrowed_parent(name, subjects, r) := object.get(object.get(r, "fields", {}), "of", null) if object.get(object.get(r, "fields", {}), "of", null) != null
-
-else := fl.path.steps[0] if {
-	fl := _s_unread_start(name, subjects, r)
-	_s_narrows(name, fl, subjects)
-}
-
-else := null
-
-_s_unread_start(name, subjects, r) := _s_from_of(_s_before_whose(trim_space(subjects[name].from)), _s_patterns) if {
-	not "path" in object.keys(r)
-	problems := object.get(r, "problems", [])
-	count(problems) > 0
-	every p in problems {
-		startswith(p, "unknown name ")
-	}
-	is_object(subjects[name])
-	is_string(subjects[name].from)
-}
-
-_s_before_whose(text) := m[1] if {
-	m := regex.find_all_string_submatch_n(`^(.*?) +whose +`, text, 1)[0]
-} else := text
+_s_narrowed_parent(r) := object.get(object.get(r, "fields", {}), "of", null)
 
 _s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "listed": {}, "narrowing": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}} if not is_object(subjects)
 

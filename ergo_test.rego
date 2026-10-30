@@ -10261,14 +10261,14 @@ test_a_for_alias_named_like_a_part_of_a_subject_with_a_space_in_its_name_quotes_
 	[i.value | some r in rep.results; r.check == "$well_formed"; some i in r.inputs; i.name == "checks.c"] == [["pull can't be an alias: it's a part of \"pull request\""]]
 }
 
-test_subjects_that_narrow_each_other_with_unknown_names_are_listed_without_looping if {
+test_subjects_that_narrow_each_other_with_unknown_names_list_no_other_subject if {
 	policy := {
 		"ergo_spec": "v0.3-dev",
 		"subjects": {"a": {"from": "b whose x is $foo"}, "b": {"from": "a whose x is $foo"}},
 		"requirements": {"r": {"subject": "a", "checks": {"c": "n exists"}}},
 	}
 	report := ergo.report({}, policy, {})
-	object.keys(report.subjects) == {"a", "b"}
+	object.keys(report.subjects) == {"a"}
 	report.subjects.a.from == "<invalid from>"
 	report.subjects.a.identified_by == null
 }

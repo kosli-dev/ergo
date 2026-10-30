@@ -1601,7 +1601,7 @@ Each entry has:
 
   A part that is written wrong is listed as best it can be, with `<invalid from>` for a path that can't be read and `<invalid identified_by>` for an id that can't.
 
-A subject that is written wrong still has its entry, so nothing disappears from the report. A subject whose `from` starts at another subject lists that subject even when the line is written wrong, like `every parent.items` or `parent.items whose zz is $foo`. A `from` that doesn't parse, or isn't a string, lists no other subject. With this policy and the same input, where `deployment` writes its `from` and `identified_by` as lists:
+A subject that is written wrong still has its entry, so nothing disappears from the report. A subject whose `from` starts at another subject lists that subject even when the line is written wrong, like `every parent.items`, and a subject that narrows another has that subject's id then. A `from` that doesn't parse, or isn't a string, lists no other subject. In `ergo.rego`, a `from` with an unknown name, like `parent.items whose zz is $foo`, doesn't parse either, so it lists no other subject. With this policy and the same input, where `deployment` writes its `from` and `identified_by` as lists:
 
 ```yaml
 ergo_spec: v0.3-dev
