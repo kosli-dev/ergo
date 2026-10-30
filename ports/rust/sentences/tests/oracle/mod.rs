@@ -3,6 +3,7 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    (".artifact.p[0]", "item 1 of artifact.p"),
     (
         ".artifact named by each of $params.k",
         "artifact named by each of $params.k",

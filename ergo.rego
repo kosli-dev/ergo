@@ -3308,16 +3308,17 @@ _tail_after_part(req, alias) := concat("", [_step_name(i + 2, rest[i]) | some i 
 
 _matching_count_name(req) := concat("", ["count(matching(", _from_text(req), "))"])
 
-_from_text(req) := concat("", [_every_word(req), _from_dot(req), _from_name(_from_path(req))]) if {
+_from_text(req) := concat("", [_every_word(req), _with_from_dot(req, _from_name(_from_path(req)))]) if {
 	_from_well_formed(req)
 	_from_path(req) != []
 	not _chained(req)
 	not _chain_part(req)
 }
 
-_from_dot(req) := "." if object.get(object.get(data.ergo_subject_sentences, "dotted", {}), req.subject, false) == true
-
-else := ""
+_with_from_dot(req, name) := concat("", [at, ".", substring(name, count(at), -1)]) if {
+	object.get(object.get(data.ergo_subject_sentences, "dotted", {}), req.subject, false) == true
+	at := regex.find_all_string_submatch_n(`^(?:(?:item [1-9][0-9]*(?: from last)?|first|last) of )?`, name, 1)[0][0]
+} else := name
 
 _every_word(req) := "every " if _every_from(req)
 

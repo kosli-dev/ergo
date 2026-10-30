@@ -16060,5 +16060,119 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line with a position that starts with a dot and another subject's name",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "p": {
+          "from": ".artifact.p[0]"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "p",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the top-level field and prints the dot after the position",
+        "rules": [
+          "sentence.path.start",
+          "sentence.print.canonical",
+          "report.subjects"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a",
+              "p": [
+                {
+                  "x": 2
+                }
+              ]
+            }
+          ],
+          "artifact": {
+            "p": [
+              {
+                "x": 1
+              }
+            ]
+          }
+        },
+        "status": {
+          "r": "met"
+        },
+        "compliant": true,
+        "expressions": {
+          "r": {
+            "$min_subjects": "count(matching(item 1 of .artifact.p)) >= 1",
+            "$unique_ids": "count(repeated(ids(item 1 of .artifact.p))) == 0"
+          }
+        },
+        "report": {
+          "subjects": {
+            "p": {
+              "description": "",
+              "from": "item 1 of .artifact.p",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "p",
+              "id": null
+            },
+            "check": "$min_subjects",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "in-scope p count",
+                "value": 1,
+                "locations": [
+                  "/artifact/p/0"
+                ]
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "p",
+              "id": {
+                "x": 1
+              }
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "name": "x",
+                "value": 1,
+                "locations": [
+                  "/artifact/p/0/x"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
