@@ -14527,7 +14527,8 @@
         "rules": [
           "subjects.from",
           "sentence.path.start",
-          "sentence.subject.chain"
+          "sentence.subject.chain",
+          "sentence.print.canonical"
         ],
         "input": {
           "artifacts": [
@@ -14548,6 +14549,22 @@
           "r": "not_met"
         },
         "compliant": false,
+        "expressions": {
+          "r": {
+            "$min_subjects": "count(matching(.artifact.p)) >= 1",
+            "$unique_ids": "count(repeated(ids(.artifact.p))) == 0"
+          }
+        },
+        "report": {
+          "subjects": {
+            "k": {
+              "description": "",
+              "from": ".artifact.p",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
         "results": [
           {
             "cause": "satisfied",
@@ -14642,7 +14659,8 @@
         "rules": [
           "subjects.sentence",
           "sentence.path.start",
-          "sentence.subject.chain"
+          "sentence.subject.chain",
+          "sentence.print.canonical"
         ],
         "input": {
           "artifacts": [
@@ -14660,6 +14678,22 @@
           "r": "met"
         },
         "compliant": true,
+        "expressions": {
+          "r": {
+            "$min_subjects": "count(matching(.artifact)) >= 1",
+            "$unique_ids": "count(repeated(ids(.artifact))) == 0"
+          }
+        },
+        "report": {
+          "subjects": {
+            "k": {
+              "description": "",
+              "from": ".artifact named by each of $params.k",
+              "identified_by": null,
+              "parts": {}
+            }
+          }
+        },
         "results": [
           {
             "cause": "satisfied",

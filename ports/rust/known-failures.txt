@@ -13,3 +13,5 @@ subjects / a child subject of a from line with named by each of and params.k a l
 subjects / a child subject of a from line with named by each of and params.k a string / fails min_subjects of each parent on its own, with its in, and gives no subject
 subjects / a child subject of a from line with named by each of and params.k missing / fails min_subjects of each parent on its own, with its in, and gives no subject
 subjects / a child subject of a from line with named by each of and params.k null / fails min_subjects of each parent on its own, with its in, and gives no subject
+subjects / a from line that starts with a dot and goes on with named by each of reads the input field and not the parent / reads the key x inside the top-level field artifact, with no in
+subjects / a from line that starts with a dot reads the input field and not the parent, even with a path / reads the top-level field artifact.p, so it finds no subject of the parent's

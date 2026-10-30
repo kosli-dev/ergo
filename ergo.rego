@@ -3308,12 +3308,16 @@ _tail_after_part(req, alias) := concat("", [_step_name(i + 2, rest[i]) | some i 
 
 _matching_count_name(req) := concat("", ["count(matching(", _from_text(req), "))"])
 
-_from_text(req) := concat("", [_every_word(req), _from_name(_from_path(req))]) if {
+_from_text(req) := concat("", [_every_word(req), _from_dot(req), _from_name(_from_path(req))]) if {
 	_from_well_formed(req)
 	_from_path(req) != []
 	not _chained(req)
 	not _chain_part(req)
 }
+
+_from_dot(req) := "." if object.get(object.get(data.ergo_subject_sentences, "dotted", {}), req.subject, false) == true
+
+else := ""
 
 _every_word(req) := "every " if _every_from(req)
 
@@ -4081,7 +4085,7 @@ _subject_from_unreadable(name, def) if not _subject_readable(name, def)
 
 _subject_readable(name, def) if _subject_text(name, def)
 
-_subject_text(name, def) := _s_from_line_text(data.ergo_subject_sentences.lines[name]) if {
+_subject_text(name, def) := _s_from_line_text(_s_dotted_line(name, data.ergo_subject_sentences.lines[name])) if {
 	is_string(object.get(def, "from", null))
 	object.keys(def) & {"of", "applies_to"} == set()
 }
@@ -5766,6 +5770,8 @@ _s_start_dot(p, side) := "." if {
 	object.get(p, "own", false) != true
 }
 
+else := "." if object.get(p, "kept_dot", false) == true
+
 else := "" if object.get(p, "it", false) == true
 
 else := _s_dot(p.steps[0], side)
@@ -6243,9 +6249,23 @@ _s_id_field(read) := {"identified_by": read.identified_by.path} if "path" in obj
 
 else := {}
 
-_s_subject_sentences(subjects, reads, parts) := {"from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
+_s_dotted_line(name, line) := object.union(line, {"path": object.union(line.path, {"kept_dot": true})}) if object.get(data.ergo_subject_sentences, "dotted", {})[name] == true
 
-_s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}} if not is_object(subjects)
+else := line
+
+_s_dotted(subjects, lines) := {name: true |
+	some name, l in lines
+	is_object(object.get(l, "path", null))
+	l.path.dot == true
+	not "start" in object.keys(l.path)
+	is_string(l.path.steps[0])
+	l.path.steps[0] != name
+	l.path.steps[0] in object.keys(subjects)
+}
+
+_s_subject_sentences(subjects, reads, parts) := {"dotted": _s_dotted(subjects, parts.lines), "from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
+
+_s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}, "dotted": {}} if not is_object(subjects)
 
 _s_subject_problems(name, def, reads) := {f: ps | some f in ["applies_to", "from", "identified_by", "of"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
 
