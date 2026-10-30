@@ -546,9 +546,15 @@ _keys_step(req) if "keys" in object.keys(_each_step(req))
 _target_state(doc, req) := "not_an_object" if {
 	is_object(data.ergo_parent)
 	not is_object(doc)
-	count(_from_keys(req)) > 0
-	not _index_step(_from_keys(req)[0])
+	_reads_inside_parent(req)
+	not _starts_at_position(req)
 } else := _from_state(doc, req)
+
+_starts_at_position(req) if _index_step(_from_keys(req)[0])
+
+_reads_inside_parent(req) if count(_from_keys(req)) > 0
+
+_reads_inside_parent(req) if _keys_step(req)
 
 default _from_state(_, _) := "absent"
 
@@ -2119,7 +2125,7 @@ _compared(check, l, r) if {
 	is_number(l)
 	is_number(r)
 	not "max" in object.keys(check)
-	abs(l - r) <= check.within
+	_within_gap(l, r, check.within)
 }
 
 _leaf_op_passed("compare_time", check, subj) if {
@@ -2307,7 +2313,7 @@ _unusable(leaf, x) if {
 	"within" in object.keys(leaf)
 	l := _simple_found(x, leaf.left)
 	r := _simple_found(x, leaf.right)
-	not _numbers(l, r)
+	not _within_usable(leaf, l, r)
 }
 
 _numbers(l, r) if {
@@ -3302,12 +3308,17 @@ _tail_after_part(req, alias) := concat("", [_step_name(i + 2, rest[i]) | some i 
 
 _matching_count_name(req) := concat("", ["count(matching(", _from_text(req), "))"])
 
-_from_text(req) := concat("", [_every_word(req), _from_name(_from_path(req))]) if {
+_from_text(req) := concat("", [_every_word(req), _with_from_dot(req, _from_name(_from_path(req)))]) if {
 	_from_well_formed(req)
 	_from_path(req) != []
 	not _chained(req)
 	not _chain_part(req)
 }
+
+_with_from_dot(req, name) := concat("", [at, ".", substring(name, count(at), -1)]) if {
+	object.get(object.get(data.ergo_subject_sentences, "dotted", {}), req.subject, false) == true
+	at := regex.find_all_string_submatch_n(`^(?:(?:item [1-9][0-9]*(?: from last)?|first|last) of )?`, name, 1)[0][0]
+} else := name
 
 _every_word(req) := "every " if _every_from(req)
 
@@ -3328,6 +3339,7 @@ _from_text(req) := _path_name(array.concat([_subject_step(data.ergo_subject_sent
 _from_text(req) := "$input" if {
 	_from_well_formed(req)
 	_from_path(req) == []
+	not _chained(req)
 }
 
 _from_text(req) := "<invalid from>" if not _from_well_formed(req)
@@ -4078,7 +4090,7 @@ _subject_from_unreadable(name, def) if not _subject_readable(name, def)
 
 _subject_readable(name, def) if _subject_text(name, def)
 
-_subject_text(name, def) := _s_from_line_text(data.ergo_subject_sentences.lines[name]) if {
+_subject_text(name, def) := _s_from_line_text(_s_dotted_line(name, data.ergo_subject_sentences.lines[name])) if {
 	is_string(object.get(def, "from", null))
 	object.keys(def) & {"of", "applies_to"} == set()
 }
@@ -4596,7 +4608,110 @@ _usable_sides(check, l, r) if {
 
 _usable_sides(check, l, r) if {
 	"within" in object.keys(check)
+	_within_usable(check, l, r)
+}
+
+_within_usable(check, l, r) if {
 	_numbers(l, r)
+	is_number(check.within)
+	_within_spread([json.marshal(l), json.marshal(r), json.marshal(check.within)]) <= 4096
+}
+
+_within_gap(l, r, w) if {
+	texts := [json.marshal(l), json.marshal(r), json.marshal(w)]
+	_within_spread(texts) <= 4096
+	_within_texts(texts)
+}
+
+_within_texts(texts) := _at_most(gap, round(to_number(texts[2]) * scale)) if {
+	scale := _text_scale(texts)
+	gap := abs(round(to_number(texts[0]) * scale) - round(to_number(texts[1]) * scale))
+	gap < 1e15
+} else := _within_exact(texts)
+
+_at_most(a, b) := a <= b
+
+_text_scale(texts) := scale if {
+	every t in texts {
+		count(_decimal_parts(t).digits) + _decimal_parts(t).exponent <= 15
+	}
+	places := max([_text_places(t) | some t in texts])
+	places <= 15
+	scale := product([10 | some i in numbers.range(1, 15); i <= places])
+	every t in texts {
+		round(abs(to_number(t)) * scale) < 1e15
+	}
+}
+
+_text_places(text) := max([0, count(trim_right(digits, "0")) - point]) if {
+	m := _number_match(text)
+	digits := concat("", [m[1], m[2]])
+	point := count(m[1]) + _exponent(m[3])
+}
+
+_within_spread(texts) := max(exponents) - min(exponents) if exponents := [_decimal_parts(t).exponent | some t in texts]
+
+_decimal_parts(text) := {"negative": false, "digits": "0", "exponent": 0} if trim_left(_number_digits(text), "0") == ""
+
+_decimal_parts(text) := {"negative": startswith(text, "-"), "digits": trimmed, "exponent": ((_exponent(m[3]) - count(m[2])) + count(stripped)) - count(trimmed)} if {
+	m := _number_match(text)
+	stripped := trim_left(_number_digits(text), "0")
+	stripped != ""
+	trimmed := trim_right(stripped, "0")
+}
+
+_number_match(text) := regex.find_all_string_submatch_n(`^-?([0-9]+)(?:\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?$`, text, 1)[0]
+
+_number_digits(text) := concat("", [m[1], m[2]]) if m := _number_match(text)
+
+_within_exact(texts) if {
+	parts := [_decimal_parts(t) | some t in texts]
+	low := min([p.exponent | some p in parts])
+	mags := [concat("", [p.digits, _zeros(p.exponent - low)]) | some p in parts]
+	width := 7 * ceil((max([count(m) | some m in mags]) + 1) / 7)
+	chunks := [_chunks(m, width) | some m in mags]
+	_within_chunks(parts[0].negative == parts[1].negative, chunks)
+}
+
+_within_chunks(true, chunks) if {
+	chunks[0] <= _sum_chunks(chunks[1], chunks[2])
+	chunks[1] <= _sum_chunks(chunks[0], chunks[2])
+}
+
+_within_chunks(false, chunks) if _sum_chunks(chunks[0], chunks[1]) <= chunks[2]
+
+_chunks(mag, width) := [_chunk(substring(padded, start, 7)) | some i in numbers.range(0, (width / 7) - 1); start := i * 7] if padded := concat("", [_zeros(width - count(mag)), mag])
+
+_chunk(text) := 0 if trim_left(text, "0") == ""
+
+_chunk(text) := to_number(trim_left(text, "0")) if trim_left(text, "0") != ""
+
+_sum_chunks(x, y) := [_normalized(sums, i) | some i, _ in sums] if {
+	sums := [total | some i, v in x; total := v + y[i]]
+}
+
+_normalized(sums, i) := total - 10000000 if {
+	total := sums[i] + _carry(sums, i)
+	total >= 10000000
+}
+
+_normalized(sums, i) := total if {
+	total := sums[i] + _carry(sums, i)
+	total < 10000000
+}
+
+_carry(sums, i) := _carry_from(sums, [j | some j, s in sums; j > i; s != 9999999])
+
+_carry_from(_, []) := 0
+
+_carry_from(sums, later) := 1 if {
+	later != []
+	sums[min(later)] >= 10000000
+}
+
+_carry_from(sums, later) := 0 if {
+	later != []
+	sums[min(later)] < 10000000
 }
 
 _basic_inputs(subj, side) := [_path_input(subj, side)] if _basic_form(side) == "path"
@@ -4648,13 +4763,16 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	flaws := [_cond_flaw(c) | some c in side.whose]
 	judged := [_tally_judge(side, e, flaws) | some e in w.items]
 	kept := [e.v | some i, e in w.items; judged[i].kept]
-	states := ((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, kept)) | {fl | some fl in flaws; fl != ""}
+	read := [e.v | some i, e in w.items; judged[i].read]
+	states := ((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, read)) | {fl | some fl in flaws; fl != ""}
 	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, kept, states))
 }
 
-_tally_judge(side, e, flaws) := {"kept": kept, "states": ({c | some c in causes; not c in {"satisfied", "value", "missing"}} | _tally_mark(kept, e))} if {
+_tally_judge(side, e, flaws) := {"kept": kept, "read": read, "states": (undecided | _tally_mark(read, e))} if {
 	causes := [_tally_cond_cause(c, e.iv, flaws[i]) | some i, c in side.whose]
-	kept := count([c | some c in causes; not c in {"satisfied"}]) == 0
+	undecided := {c | some c in causes; not c in {"satisfied", "value", "missing"}}
+	kept := count([c | some c in causes; c in {"value", "missing"}]) == 0
+	read := count([c | some c in causes; c != "satisfied"]) == 0
 }
 
 _tally_cond_cause(c, item, "") := _eval_cause(passed, _ref_cause(c), states) if {
@@ -4732,13 +4850,17 @@ _sum_state(null) := "null"
 
 _sum_state(n) := "unusable" if n != null
 
-_decimal_sum(nums) := total / scale if {
+_decimal_scale(nums) := scale if {
 	places := max(array.concat([0], [_value_places(n) | some n in nums]))
 	places <= 15
 	scale := product([10 | some i in numbers.range(1, 15); i <= places])
 	every n in nums {
 		round(abs(n) * scale) < 1e15
 	}
+}
+
+_decimal_sum(nums) := total / scale if {
+	scale := _decimal_scale(nums)
 	total := sum([round(n * scale) | some n in nums])
 	abs(total) < 1e15
 }
@@ -5763,6 +5885,8 @@ _s_start_dot(p, side) := "." if {
 	object.get(p, "own", false) != true
 }
 
+else := "." if object.get(p, "kept_dot", false) == true
+
 else := "" if object.get(p, "it", false) == true
 
 else := _s_dot(p.steps[0], side)
@@ -6111,7 +6235,7 @@ _s_from_dot(p, names, keep) := object.union(p, {"field": true, "own": false}) if
 
 _p_from_part(name, fl, subjects, eff) := {"part": rest[0]} if {
 	_s_descends(name, fl, subjects)
-	rest := array.slice(_s_model_path(fl.path), 1, count(fl.path.steps))
+	rest := array.slice(_s_model_path(fl.path), 1, count(_s_model_path(fl.path)))
 	count(rest) > 0
 	is_string(rest[0])
 	rest[0] in object.keys(_p_steps_of(object.get(eff, fl.path.steps[0], {})))
@@ -6119,7 +6243,7 @@ _p_from_part(name, fl, subjects, eff) := {"part": rest[0]} if {
 
 _s_source(name, fl, subjects, eff) := {"of": fl.path.steps[0]} if {
 	_s_narrows(name, fl, subjects)
-} else := {"from": array.concat(_s_from_steps(_p_descend_steps(array.slice(_s_model_path(fl.path), 1, count(fl.path.steps)), object.get(eff, fl.path.steps[0], {}))), _s_each_step(fl))} if {
+} else := {"from": array.concat(_s_from_steps(_p_descend_steps(array.slice(_s_model_path(fl.path), 1, count(_s_model_path(fl.path))), object.get(eff, fl.path.steps[0], {}))), _s_each_step(fl))} if {
 	_s_descends(name, fl, subjects)
 } else := {"from": array.concat(_s_from_steps(_s_model_path(fl.path)), _s_each_step(fl))}
 
@@ -6129,10 +6253,21 @@ else := null
 
 _s_descends(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
 	count(fl.path.steps) > 1
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
 	fl.path.steps[0] in object.keys(subjects)
+}
+
+_s_descends(name, fl, subjects) if {
+	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
+	fl.path.steps == [fl.path.steps[0]]
+	is_string(fl.path.steps[0])
+	fl.path.steps[0] != name
+	fl.path.steps[0] in object.keys(subjects)
+	"named_by_each_of" in object.keys(fl)
 }
 
 _s_narrows(name, fl, subjects) if {
@@ -6229,9 +6364,23 @@ _s_id_field(read) := {"identified_by": read.identified_by.path} if "path" in obj
 
 else := {}
 
-_s_subject_sentences(subjects, reads, parts) := {"from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
+_s_dotted_line(name, line) := object.union(line, {"path": object.union(line.path, {"kept_dot": true})}) if object.get(data.ergo_subject_sentences, "dotted", {})[name] == true
 
-_s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}} if not is_object(subjects)
+else := line
+
+_s_dotted(subjects, lines) := {name: true |
+	some name, l in lines
+	is_object(object.get(l, "path", null))
+	l.path.dot == true
+	not "start" in object.keys(l.path)
+	is_string(l.path.steps[0])
+	l.path.steps[0] != name
+	l.path.steps[0] in object.keys(subjects)
+}
+
+_s_subject_sentences(subjects, reads, parts) := {"dotted": _s_dotted(subjects, parts.lines), "from_parts": {name: r.part | some name, r in reads; _s_from_used(subjects[name], r)}, "lines": parts.lines, "parts": parts.effective, "has_problems": parts.problems, "chains": {name: p | some name, r in reads; _s_from_used(subjects[name], r); p := object.get(r, "parent", null); p != null}, "every": {name | some name, r in reads; _s_from_used(subjects[name], r); object.get(r, "every", false) == true}, "narrowed": {name | some name, r in reads; _s_from_used(subjects[name], r); "of" in object.keys(r.fields)}, "filters": {[name, n] | some name, r in reads; _s_from_used(subjects[name], r); some n, _ in object.get(r.fields, "applies_to", {})}, "problems": {name: probs | some name, def in subjects; probs := _s_subject_problems(name, def, reads); probs != {}}, "follows": {name: r.follows | some name, r in reads; "follows" in object.keys(r)}} if is_object(subjects)
+
+_s_subject_sentences(subjects, _, _) := {"from_parts": {}, "lines": {}, "parts": {}, "has_problems": {}, "chains": {}, "every": set(), "narrowed": set(), "filters": set(), "problems": {}, "follows": {}, "dotted": {}} if not is_object(subjects)
 
 _s_subject_problems(name, def, reads) := {f: ps | some f in ["applies_to", "from", "identified_by", "of"]; ps := _s_field_problems(name, def, f, reads); ps != []} if is_object(def)
 

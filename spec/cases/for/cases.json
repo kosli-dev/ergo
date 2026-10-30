@@ -9551,6 +9551,489 @@
     ]
   },
   {
+    "description": "a second item with a position lists its failed list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of ys as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": 2
+                }
+              ],
+              "ys": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 2
+                  }
+                ],
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ]
+              },
+              {
+                "name": "ys",
+                "value": [],
+                "locations": []
+              }
+            ],
+            "failed_items": [
+              {
+                "item": "ys",
+                "path": "ys",
+                "cause": "unusable",
+                "value": "s",
+                "failed_assertions": [],
+                "locations": [
+                  "/things/0/ys"
+                ]
+              }
+            ]
+          }
+        ],
+        "description": "lists a list that isn't a list once",
+        "rules": [
+          "for.shared_failures",
+          "for.pick",
+          "for.walk"
+        ]
+      },
+      {
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 2
+                  }
+                ],
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ]
+              },
+              {
+                "name": "ys",
+                "value": [],
+                "locations": []
+              }
+            ],
+            "failed_items": [
+              {
+                "item": "ys",
+                "path": "ys",
+                "cause": "absent",
+                "value": null,
+                "failed_assertions": [],
+                "locations": [
+                  "/things/0"
+                ]
+              }
+            ]
+          }
+        ],
+        "description": "lists a missing list once",
+        "rules": [
+          "for.shared_failures",
+          "for.pick",
+          "for.walk"
+        ]
+      },
+      {
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": 2
+                }
+              ],
+              "ys": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 2
+                  }
+                ],
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ]
+              },
+              {
+                "name": "ys",
+                "value": [],
+                "locations": []
+              }
+            ],
+            "failed_items": [
+              {
+                "item": "ys",
+                "path": "ys",
+                "cause": "null",
+                "value": null,
+                "failed_assertions": [],
+                "locations": [
+                  "/things/0/ys"
+                ]
+              }
+            ]
+          }
+        ],
+        "description": "lists a null list once",
+        "rules": [
+          "for.shared_failures",
+          "for.pick",
+          "for.walk"
+        ]
+      },
+      {
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": 2
+                }
+              ],
+              "ys": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 2
+                  }
+                ],
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ]
+              },
+              {
+                "name": "ys[]",
+                "value": [],
+                "locations": []
+              }
+            ],
+            "failed_items": []
+          }
+        ],
+        "description": "lists no entry for an empty list, which a position allows",
+        "rules": [
+          "for.shared_failures",
+          "for.pick",
+          "for.walk"
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second item with a some first item lists its failed list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "some xs as p, first of ys as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": 2
+                }
+              ],
+              "ys": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 2
+                  }
+                ],
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ]
+              },
+              {
+                "name": "ys",
+                "value": [],
+                "locations": []
+              }
+            ],
+            "failed_items": [
+              {
+                "item": "ys",
+                "path": "ys",
+                "cause": "unusable",
+                "value": "s",
+                "failed_assertions": [],
+                "locations": [
+                  "/things/0/ys"
+                ]
+              }
+            ]
+          }
+        ],
+        "description": "lists a list that isn't a list once",
+        "rules": [
+          "for.shared_failures",
+          "for.pick",
+          "for.walk"
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second item picking the last of a sorted list lists its failed list",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every xs as p, last of ys sorted by n as q",
+              "assert": "q.n is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "xs": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": 2
+                }
+              ],
+              "ys": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "thing",
+              "id": "t"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 2
+                  }
+                ],
+                "locations": [
+                  "/things/0/xs/0",
+                  "/things/0/xs/1"
+                ]
+              },
+              {
+                "name": "ys",
+                "value": [],
+                "locations": []
+              }
+            ],
+            "failed_items": [
+              {
+                "item": "ys",
+                "path": "ys",
+                "cause": "unusable",
+                "value": "s",
+                "failed_assertions": [],
+                "locations": [
+                  "/things/0/ys"
+                ]
+              }
+            ]
+          }
+        ],
+        "description": "lists a list that isn't a list once",
+        "rules": [
+          "for.shared_failures",
+          "for.pick",
+          "for.walk"
+        ]
+      }
+    ]
+  },
+  {
     "description": "a list that can't be read",
     "policy": {"ergo_spec": "v0.3-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests as pr, every pr.commits as commit", "assert": "commit.signed is true"}}}}},
     "cases": [
@@ -12640,489 +13123,6 @@
               "type": "thing"
             }
           }
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a second item with a position lists its failed list",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "thing": {
-          "from": "things",
-          "identified_by": "id"
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "thing",
-          "checks": {
-            "c": {
-              "for": "every xs as p, first of ys as q",
-              "assert": "q.n is 1"
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "input": {
-          "things": [
-            {
-              "id": "t",
-              "xs": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ],
-              "ys": "s"
-            }
-          ]
-        },
-        "results": [
-          {
-            "requirement": "r",
-            "subject": {
-              "type": "thing",
-              "id": "t"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "unusable",
-            "inputs": [
-              {
-                "name": "xs[]",
-                "value": [
-                  {
-                    "v": 1
-                  },
-                  {
-                    "v": 2
-                  }
-                ],
-                "locations": [
-                  "/things/0/xs/0",
-                  "/things/0/xs/1"
-                ]
-              },
-              {
-                "name": "ys",
-                "value": [],
-                "locations": []
-              }
-            ],
-            "failed_items": [
-              {
-                "item": "ys",
-                "path": "ys",
-                "cause": "unusable",
-                "value": "s",
-                "failed_assertions": [],
-                "locations": [
-                  "/things/0/ys"
-                ]
-              }
-            ]
-          }
-        ],
-        "description": "lists a list that isn't a list once",
-        "rules": [
-          "for.shared_failures",
-          "for.pick",
-          "for.walk"
-        ]
-      },
-      {
-        "input": {
-          "things": [
-            {
-              "id": "t",
-              "xs": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ]
-            }
-          ]
-        },
-        "results": [
-          {
-            "requirement": "r",
-            "subject": {
-              "type": "thing",
-              "id": "t"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "absent",
-            "inputs": [
-              {
-                "name": "xs[]",
-                "value": [
-                  {
-                    "v": 1
-                  },
-                  {
-                    "v": 2
-                  }
-                ],
-                "locations": [
-                  "/things/0/xs/0",
-                  "/things/0/xs/1"
-                ]
-              },
-              {
-                "name": "ys",
-                "value": [],
-                "locations": []
-              }
-            ],
-            "failed_items": [
-              {
-                "item": "ys",
-                "path": "ys",
-                "cause": "absent",
-                "value": null,
-                "failed_assertions": [],
-                "locations": [
-                  "/things/0"
-                ]
-              }
-            ]
-          }
-        ],
-        "description": "lists a missing list once",
-        "rules": [
-          "for.shared_failures",
-          "for.pick",
-          "for.walk"
-        ]
-      },
-      {
-        "input": {
-          "things": [
-            {
-              "id": "t",
-              "xs": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ],
-              "ys": null
-            }
-          ]
-        },
-        "results": [
-          {
-            "requirement": "r",
-            "subject": {
-              "type": "thing",
-              "id": "t"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "null",
-            "inputs": [
-              {
-                "name": "xs[]",
-                "value": [
-                  {
-                    "v": 1
-                  },
-                  {
-                    "v": 2
-                  }
-                ],
-                "locations": [
-                  "/things/0/xs/0",
-                  "/things/0/xs/1"
-                ]
-              },
-              {
-                "name": "ys",
-                "value": [],
-                "locations": []
-              }
-            ],
-            "failed_items": [
-              {
-                "item": "ys",
-                "path": "ys",
-                "cause": "null",
-                "value": null,
-                "failed_assertions": [],
-                "locations": [
-                  "/things/0/ys"
-                ]
-              }
-            ]
-          }
-        ],
-        "description": "lists a null list once",
-        "rules": [
-          "for.shared_failures",
-          "for.pick",
-          "for.walk"
-        ]
-      },
-      {
-        "input": {
-          "things": [
-            {
-              "id": "t",
-              "xs": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ],
-              "ys": []
-            }
-          ]
-        },
-        "results": [
-          {
-            "requirement": "r",
-            "subject": {
-              "type": "thing",
-              "id": "t"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "absent",
-            "inputs": [
-              {
-                "name": "xs[]",
-                "value": [
-                  {
-                    "v": 1
-                  },
-                  {
-                    "v": 2
-                  }
-                ],
-                "locations": [
-                  "/things/0/xs/0",
-                  "/things/0/xs/1"
-                ]
-              },
-              {
-                "name": "ys[]",
-                "value": [],
-                "locations": []
-              }
-            ],
-            "failed_items": []
-          }
-        ],
-        "description": "lists no entry for an empty list, which a position allows",
-        "rules": [
-          "for.shared_failures",
-          "for.pick",
-          "for.walk"
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a second item with a some first item lists its failed list",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "thing": {
-          "from": "things",
-          "identified_by": "id"
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "thing",
-          "checks": {
-            "c": {
-              "for": "some xs as p, first of ys as q",
-              "assert": "q.n is 1"
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "input": {
-          "things": [
-            {
-              "id": "t",
-              "xs": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ],
-              "ys": "s"
-            }
-          ]
-        },
-        "results": [
-          {
-            "requirement": "r",
-            "subject": {
-              "type": "thing",
-              "id": "t"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "unusable",
-            "inputs": [
-              {
-                "name": "xs[]",
-                "value": [
-                  {
-                    "v": 1
-                  },
-                  {
-                    "v": 2
-                  }
-                ],
-                "locations": [
-                  "/things/0/xs/0",
-                  "/things/0/xs/1"
-                ]
-              },
-              {
-                "name": "ys",
-                "value": [],
-                "locations": []
-              }
-            ],
-            "failed_items": [
-              {
-                "item": "ys",
-                "path": "ys",
-                "cause": "unusable",
-                "value": "s",
-                "failed_assertions": [],
-                "locations": [
-                  "/things/0/ys"
-                ]
-              }
-            ]
-          }
-        ],
-        "description": "lists a list that isn't a list once",
-        "rules": [
-          "for.shared_failures",
-          "for.pick",
-          "for.walk"
-        ]
-      }
-    ]
-  },
-  {
-    "description": "a second item picking the last of a sorted list lists its failed list",
-    "policy": {
-      "ergo_spec": "v0.3-dev",
-      "subjects": {
-        "thing": {
-          "from": "things",
-          "identified_by": "id"
-        }
-      },
-      "requirements": {
-        "r": {
-          "subject": "thing",
-          "checks": {
-            "c": {
-              "for": "every xs as p, last of ys sorted by n as q",
-              "assert": "q.n is 1"
-            }
-          }
-        }
-      }
-    },
-    "cases": [
-      {
-        "input": {
-          "things": [
-            {
-              "id": "t",
-              "xs": [
-                {
-                  "v": 1
-                },
-                {
-                  "v": 2
-                }
-              ],
-              "ys": "s"
-            }
-          ]
-        },
-        "results": [
-          {
-            "requirement": "r",
-            "subject": {
-              "type": "thing",
-              "id": "t"
-            },
-            "check": "c",
-            "passed": false,
-            "cause": "unusable",
-            "inputs": [
-              {
-                "name": "xs[]",
-                "value": [
-                  {
-                    "v": 1
-                  },
-                  {
-                    "v": 2
-                  }
-                ],
-                "locations": [
-                  "/things/0/xs/0",
-                  "/things/0/xs/1"
-                ]
-              },
-              {
-                "name": "ys",
-                "value": [],
-                "locations": []
-              }
-            ],
-            "failed_items": [
-              {
-                "item": "ys",
-                "path": "ys",
-                "cause": "unusable",
-                "value": "s",
-                "failed_assertions": [],
-                "locations": [
-                  "/things/0/ys"
-                ]
-              }
-            ]
-          }
-        ],
-        "description": "lists a list that isn't a list once",
-        "rules": [
-          "for.shared_failures",
-          "for.pick",
-          "for.walk"
         ]
       }
     ]
