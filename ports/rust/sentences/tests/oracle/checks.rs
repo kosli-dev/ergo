@@ -6488,6 +6488,10 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs as x, every x.ys as y",
         "every xs as x, every x.ys as y",
+        &[],
+        &[],
+    ),
+    (
         "every lists named by q as p, every qs as q",
         "every lists named by q as p, every qs as q",
         &[],
