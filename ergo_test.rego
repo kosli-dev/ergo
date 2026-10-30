@@ -1934,7 +1934,7 @@ test_every_badly_written_check_fails_well_formed_and_says_what_is_wrong if {
 }
 
 test_a_bare_word_after_named_by_that_no_for_line_gives_is_an_unknown_alias if {
-	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown alias x"]
+	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["for: unknown alias x"]
 }
 
 test_a_dollar_word_in_a_sentence_is_not_an_alias_so_it_stays_an_unknown_name if {
@@ -4583,7 +4583,7 @@ test_a_position_and_a_sum_after_plus_on_the_right_and_a_count_in_a_picked_items_
 	_reads("n is count of xs plus sum of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10")
 	_sentence_problems(concat("", ["n is count of xs plus sum of ", _eleven])) == _too_long
 	_reads({"for": "first of xs whose n is count of k1.k2.k3.k4.k5.k6.k7.k8.k9.k10 as x", "assert": "x.n is 1"})
-	_sentence_problems({"for": concat("", ["first of xs whose n is count of ", _eleven, " as x"]), "assert": "x.n is 1"}) == _too_long
+	_sentence_problems({"for": concat("", ["first of xs whose n is count of ", _eleven, " as x"]), "assert": "x.n is 1"}) == [concat("", ["for: ", p]) | some p in _too_long]
 }
 
 test_params_is_not_a_step_of_a_walk if {
@@ -4888,7 +4888,7 @@ test_forms_ergo_does_not_run_yet_are_written_wrong_on_a_for_line_too if {
 		["every xs whose last of ys is 1 as x", "last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""],
 		["every b.c.d.e.f.g.h.i.j.k.l.m as x", "every and some over more than ten steps aren't supported yet"],
 	] {
-		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [pair[1]]
+		_sentence_problems({"assert": "x is 1", "for": pair[0]}) == [concat("", ["for: ", pair[1]])]
 	}
 }
 
@@ -6193,9 +6193,9 @@ test_named_by_a_for_name_in_the_second_items_path_reads_the_first_items_key if {
 }
 
 test_named_by_a_for_name_before_it_is_given_is_an_unknown_name if {
-	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["unknown alias x"]
-	_sentence_problems({"for": "every lists named by q as p, every qs as q", "assert": "p is 1"}) == ["unknown alias q"]
-	_sentence_problems({"for": "every objs whose v named by o is 1 as o", "assert": "o exists"}) == ["unknown alias o"]
+	_sentence_problems({"for": "every xs named by x as x", "assert": "x is 1"}) == ["for: unknown alias x"]
+	_sentence_problems({"for": "every lists named by q as p, every qs as q", "assert": "p is 1"}) == ["for: unknown alias q"]
+	_sentence_problems({"for": "every objs whose v named by o is 1 as o", "assert": "o exists"}) == ["for: unknown alias o"]
 }
 
 test_named_by_a_for_name_that_holds_no_text_fails_with_its_cause if {

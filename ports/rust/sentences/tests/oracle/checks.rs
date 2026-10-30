@@ -5566,6 +5566,12 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
+        "every xs whose name starts with count of ys as x",
+        "every xs whose name starts with count of ys as x",
+        &[],
+        &[],
+    ),
+    (
         "every xs whose v is one of 1, 'a' as x",
         "every xs whose v is one of 1, \"a\" as x",
         &[],

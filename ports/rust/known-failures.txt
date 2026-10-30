@@ -1,2 +1,3 @@
 requirements / a check with values of mixed types and a field compared with itself / lists both problems, on one line, in a list, in an any_of option and under a for line
+requirements / a for line with a form its whose can't take / is listed with for: in front of the problem, like every problem of the for line
 requirements / a for line with values of mixed types in its whose / is printed as written and named by its check, with for: in front of the problem

@@ -7566,7 +7566,7 @@ _s_for_problems(lines, ftext) := _s_lines_problems(lines) if not is_string(ftext
 
 _s_for_line_unsupported(lines, ftext) := _s_lines_problems(lines) if not "items" in object.keys(_for_line(ftext))
 
-_s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, []) | _s_lines_problems(lines) if {
+_s_for_line_unsupported(lines, ftext) := {concat("", ["for: ", u]) | some u in _s_for_unsupported(fl, [])} | _s_lines_problems(lines) if {
 	fl := _for_line(ftext)
 	"items" in object.keys(fl)
 }
