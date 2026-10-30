@@ -12320,7 +12320,7 @@
     ]
   },
   {
-    "description": "a chain of three subjects",
+    "description": "report.subjects for a chain of three subjects",
     "policy": {
       "ergo_spec": "v0.3-dev",
       "subjects": {
@@ -12347,7 +12347,7 @@
     ]
   },
   {
-    "description": "a chain of four subjects",
+    "description": "report.subjects for a chain of four subjects",
     "policy": {
       "ergo_spec": "v0.3-dev",
       "subjects": {
