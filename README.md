@@ -66,15 +66,22 @@ Each release has a version, like `0.2.0`, and the file says which one it is. To 
 
 #### The Rust engine (experimental)
 
-Nothing of the Rust engine is published yet, so you build it from this repo. Install Rust with [rustup](https://rustup.rs/), then clone the repo and build the `ergo` command once:
+Install the `ergo` command from crates.io. You need Rust, which [rustup](https://rustup.rs/) installs:
 
 ```sh
-git clone https://github.com/kosli-dev/ergo.git
-cd ergo/engines/rust
-cargo install --locked --path cli
+cargo install --locked ergo-policy-cli
 ```
 
-To build it with Docker instead, without Rust, see [`engines/rust/README.md`](engines/rust/README.md#running-from-the-command-line).
+Or download it, without Rust, for Linux (x86_64) or macOS (arm64) from the [latest Rust engine release](https://github.com/kosli-dev/ergo/releases?q=rust&expanded=true), unpack it and put `ergo` on your `PATH`:
+
+```sh
+curl -L https://github.com/kosli-dev/ergo/releases/download/rust-v0.1.0/ergo-0.1.0-macos-arm64.tar.gz | tar xz
+./ergo --version
+```
+
+On Linux, the file is `ergo-0.1.0-linux-x86_64.tar.gz`.
+
+To build it from this repo with Docker instead, see [`engines/rust/README.md`](engines/rust/README.md#running-from-the-command-line).
 
 ### 2. Write a policy
 
@@ -278,7 +285,7 @@ The [reference](REFERENCE.md) covers every field, operator and cause, including 
 
 ### Updating
 
-With `ergo.rego`, download the new file over the old one and run your policy's tests. [`CHANGELOG.md`](CHANGELOG.md) says what each release changed, and which spec version it follows.
+With the Rust engine, run `cargo install --locked ergo-policy-cli` again, or download the binary from the newest Rust engine release.
 
 With the Rust engine, pull the repo and run `cargo install --locked --path cli` again from `engines/rust`.
 
