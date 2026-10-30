@@ -2551,7 +2551,7 @@ _required_fields := {
 	"not_in": {"path", "values"},
 	"has_type": {"path", "type"},
 	"all_of": {"checks", "assertions"},
-	"sentence_any_of": {"checks", "assertions", "option_of", "places"},
+	"sentence_any_of": {"checks", "assertions", "option_of"},
 	"every": {"path", "check", "whose", "if_any"},
 	"for": {"items", "checks", "assertions"},
 	"some": {"path", "check", "whose", "if_any"},
@@ -3426,7 +3426,7 @@ _check_problem_inputs(req) := [{"name": name, "value": sort({p[1] | some p in pr
 	problems := (_own_check_problems(req) | _reserved_name_problems(req)) | {p | some a in _ancestors_of(req); some p in _own_check_problems({"subject": a, "checks": {}})}
 }
 
-_own_check_problems(req) := {_placed_problem(req, f, n, check, p) |
+_own_check_problems(req) := {[_field_path_name(_problem_at(req, f, n, p[0])), p[1]] |
 	some f in ["applies_to", "checks"]
 	some n, check in _req_checks(req, f)
 	here := _s_written_here(req, f, n)
@@ -3445,13 +3445,6 @@ _req_checks(req, "checks") := _checks_of(req)
 _problem_at(req, "applies_to", n, _) := ["subjects", _resolution_of(req).filter_owners[n], "from"]
 
 _problem_at(_, "checks", n, at) := array.concat(["checks", n], at)
-
-_placed_problem(req, f, n, check, p) := [_field_path_name(["checks", n]), concat("", [check.places[p[0][1]], ": ", p[1]])] if {
-	f == "checks"
-	check.op == "sentence_any_of"
-	count(p[0]) > 1
-	p[0][0] == "checks"
-} else := [_field_path_name(_problem_at(req, f, n, p[0])), p[1]]
 
 _from_names(req, here) := ({n |
 	_from_well_formed(req)
@@ -6719,15 +6712,15 @@ _s_named_model_leaf(m, names) := _s_named(m, names) if not m.op in {"every", "so
 
 _s_written_check(check) := _p_written(check, set(), set(), _p_context({}, {}, _p_no_parts))
 
-_p_written(check, aliases, parents, pc) := _s_check([check], {}, _p_named_by_problems([check], "", aliases) | _p_part_walk_problems([check], "", pc), aliases | parents) if is_string(check)
+_p_written(check, aliases, parents, pc) := _s_check_mixed([check], {}, (_p_named_by_problems([check], "", aliases) | _p_part_walk_problems([check], "", pc)), aliases | parents) if is_string(check)
 
-_p_written(check, aliases, parents, pc) := _s_check(_s_lines(check.assert), object.filter(check, {"description", "meta"}), ((_s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases)) | _p_part_walk_problems(_s_lines(check.assert), "", pc)), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_mixed(_s_lines(check.assert), object.filter(check, {"description", "meta"}), ((_s_form_problems(check) | _p_named_by_problems(_s_lines(check.assert), "", aliases)) | _p_part_walk_problems(_s_lines(check.assert), "", pc)), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	not "for" in object.keys(check)
 }
 
-_p_written(check, aliases, parents, pc) := _s_check_for(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), (((_s_form_problems(check) | _p_for_clash(check, pc)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases)) | _p_part_walk_problems(_s_lines(check.assert), check.for, pc)), aliases | parents) if {
+_p_written(check, aliases, parents, pc) := _s_check_for_mixed(_s_lines(check.assert), check.for, object.filter(check, {"description", "meta"}), (((_s_form_problems(check) | _p_for_clash(check, pc)) | _p_named_by_problems(_s_lines(check.assert), object.get(check, "for", ""), aliases)) | _p_part_walk_problems(_s_lines(check.assert), check.for, pc)), aliases | parents) if {
 	_s_assert_form(check)
 	"assert" in object.keys(check)
 	"for" in object.keys(check)
@@ -6763,11 +6756,10 @@ _s_any_of(check, aliases, names, pc) := object.union(object.filter(check, {"desc
 	"checks": [object.remove(p[0], ["expression"]) | some p in pairs],
 	"assertions": [p[1] | some p in pairs],
 	"option_of": [p[2] | some p in pairs],
-	"places": [place | some nm in _names(options); some place in _s_option_places(nm, _s_lines(check.any_of[nm]))],
 	"expression": _one_of([[_text(nm), _option_text(nm, texts, texts)] | some nm in _names(options); texts := [p[1] | some p in pairs; p[2] == nm]]),
 }) if {
 	count(_s_any_of_problems(check)) == 0
-	options := {nm: _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc), names) | some nm, o in check.any_of}
+	options := {nm: _s_check_mixed(_s_lines(o), {}, (_p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc)), names) | some nm, o in check.any_of}
 	every m in options {
 		not "$sentence" in object.keys(m)
 	}
@@ -6780,12 +6772,6 @@ _s_any_of(check, aliases, names, pc) := object.union(object.filter(check, {"desc
 _s_option_lines(m, nm) := [[c, m.assertions[i], nm] | some i, c in m.checks] if m.op == "all_of"
 
 _s_option_lines(m, nm) := [[m, m.expression, nm]] if m.op != "all_of"
-
-_s_option_places(nm, lines) := [_s_option_place(nm, i, count(lines)) | some i, line in lines; some _ in _sentence(line).assertions]
-
-_s_option_place(nm, _, 1) := concat("", ["option ", _text(nm)])
-
-_s_option_place(nm, i, n) := concat("", ["option ", _text(nm), ": line ", _literal_text(i + 1)]) if n > 1
 
 _s_any_of_problems(check) := {concat("", ["unknown field ", _text(f)]) | some f in object.keys(check); not f in {"any_of", "description", "meta"}} | _s_options_shape(check.any_of)
 
@@ -6817,7 +6803,7 @@ _s_options_problems(options, aliases, names, pc) := {concat("", ["option ", _tex
 	some nm, o in options
 	_s_option_written(o)
 	o != []
-	m := _s_check(_s_lines(o), {}, _p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc), names)
+	m := _s_check_mixed(_s_lines(o), {}, (_p_named_by_problems(_s_lines(o), "", aliases) | _p_part_walk_problems(_s_lines(o), "", pc)), names)
 	some p in object.get(m, "$sentence", [])
 } if is_object(options)
 
@@ -6883,6 +6869,23 @@ _s_check(lines, wording, problems, parts) := object.union(wording, object.union(
 	model := _s_model_of(marked)
 } else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable(((problems | _s_lines_problems(lines)) | _s_lines_self(lines, _s_names(set(), parts)))))})
 
+_s_check_mixed(lines, wording, problems, parts) := m if {
+	m := _s_check(lines, wording, problems, parts)
+	not "$sentence" in object.keys(m)
+	not _s_has_mixed([m])
+} else := _s_check(lines, wording, problems | _s_mixed_lines(lines, _s_names(set(), parts)), parts)
+
+_s_check_for_mixed(lines, ftext, wording, problems, parts) := m if {
+	m := _s_check_for(lines, ftext, wording, problems, parts)
+	not "$sentence" in object.keys(m)
+	not _s_has_mixed(array.concat(object.get(m, "checks", []), [c | some item in object.get(m, "items", []); some c in item.whose]))
+} else := _s_check_for(lines, ftext, wording, problems | _s_mixed_for(lines, ftext, parts), parts)
+
+_s_has_mixed(models) if {
+	some node in _walk_nodes([[m, [], [], set()] | some m in models])
+	"values of mixed types" in _values_problem(node[0])
+}
+
 _s_lines_self([line], names) := _s_line_self(line, names)
 
 _s_lines_self(lines, names) := {concat("", ["line ", _literal_text(i + 1), ": ", p]) | some i, line in lines; some p in _s_line_self(line, names)} if count(lines) > 1
@@ -6902,6 +6905,33 @@ _s_model_of(assertions) := {"op": "all_of", "checks": models, "assertions": [_s_
 	models := [_s_model(a) | some a in assertions]
 	count(models) == count(assertions)
 }
+
+_s_mixed_lines([line], names) := _s_line_mixed(line, names)
+
+_s_mixed_lines(lines, names) := {concat("", ["line ", _literal_text(i + 1), ": ", p]) | some i, line in lines; some p in _s_line_mixed(line, names)} if count(lines) > 1
+
+_s_mixed_lines([], _) := set()
+
+_s_line_mixed(line, names) := {"values of mixed types" |
+	some a in parsed.assertions
+	some node in _walk_nodes([[_s_model(_s_aliased(a, names)), [], [], set()]])
+	"values of mixed types" in _values_problem(node[0])
+} if {
+	is_string(line)
+	parsed := _sentence(line)
+	"assertions" in object.keys(parsed)
+} else := set()
+
+_s_mixed_for(lines, ftext, parts) := _s_mixed_lines(lines, _s_names({item.as | some item in fl.items}, parts)) | {"for: values of mixed types" |
+	some i, item in _s_marked_items(fl, parts)
+	some c in _s_for_item_model(item, {earlier.as | some earlier in array.slice(fl.items, 0, i)}).whose
+	some node in _walk_nodes([[c, [], [], set()]])
+	"values of mixed types" in _values_problem(node[0])
+} if {
+	is_string(ftext)
+	fl := _for_line(ftext)
+	"items" in object.keys(fl)
+} else := _s_mixed_lines(lines, _s_names(set(), parts))
 
 _s_lines_problems([line]) := _s_unread_problems(line)
 
@@ -7554,15 +7584,56 @@ _walk_passed([], true, leaf, v) if _op_passed(leaf, v)
 
 _walk_failure(w, e, [], true, leaf, false) := {"path": e.c, "item": e.i, "cause": _row_cause(leaf, e.iv, ""), "value": _walk_shown(e.v), "at": _walk_at(w, e)}
 
-_walk_failure(w, e, undecided, _, _, _) := {"path": array.concat(e.i, _walk_first_path(undecided[0][0])), "item": e.i, "cause": undecided[0][1], "value": _walk_first_value(undecided[0][0], e.iv), "at": _item_read_at(w, e, _walk_first_path(undecided[0][0]))} if undecided != []
+_walk_failure(w, e, undecided, _, _, _) := {"path": _walk_named_path(e, p), "item": e.i, "cause": undecided[0][1], "value": _value_at(e.iv, p), "at": _walk_named_at(w, e, p)} if {
+	undecided != []
+	p := _walk_first_path(undecided[0][0], e.iv)
+}
+
+_walk_named_path(_, p) := _as_subject_part(p) if _walk_outside(p)
+
+_walk_named_path(e, p) := array.concat(e.i, p) if not _walk_outside(p)
+
+_walk_named_at(_, _, p) := _ref_at(p) if _walk_outside(p)
+
+_walk_named_at(w, e, p) := _item_read_at(w, e, p) if not _walk_outside(p)
+
+_walk_outside(p) if _read_off_item(p)
+
+_walk_outside(p) if _builtin(p)
 
 _walk_failure(_, _, [], false, _, _) := null
 
 _walk_failure(_, _, [], true, _, true) := null
 
-_walk_first_path(c) := _condition_paths(c)[0]
+_walk_first_path(c, v) := array.concat([e[0] | some e in _walk_sides_paths(c); not _walk_side_read(v, e)], [e[0] | some e in _walk_sides_paths(c)])[0]
 
-_walk_first_value(c, v) := _value_at(v, _condition_paths(c)[0])
+_walk_side_read(v, e) if {
+	_read_state(v, e[0]) == "value"
+	_walk_list_read(e[1], _value_at(v, e[0]))
+}
+
+_walk_list_read("value", _)
+
+_walk_list_read("list", x) if is_array(x)
+
+_walk_sides_paths(c) := [e | some f in ["left", "right"]; some e in _walk_side_paths(c, c[f])] if _two_sided(c)
+
+_walk_sides_paths(c) := [[p, "value"] | some p in _condition_paths(c)] if not _two_sided(c)
+
+_walk_side_paths(_, side) := [[side, "value"]] if is_array(side)
+
+_walk_side_paths(c, side) := [[p, _walk_side_needs(operand)] | some operand in _walk_operands(side); some p in _basic_paths(operand)] if {
+	c.op == "compare"
+	_derived(side)
+}
+
+_walk_operands(side) := side.add if _side_form(side) == "add"
+
+else := [side]
+
+_walk_side_needs(side) := "list" if _basic_form(side) in {"count_of", "sum_of"}
+
+else := "value"
 
 _condition_paths(c) := array.concat(_leaf_paths(c), [p | some side in _derived_sides(c); some p in _side_paths(side)])
 
@@ -7731,7 +7802,7 @@ _s_for_problems(lines, ftext) := _s_lines_problems(lines) if not is_string(ftext
 
 _s_for_line_unsupported(lines, ftext) := _s_lines_problems(lines) if not "items" in object.keys(_for_line(ftext))
 
-_s_for_line_unsupported(lines, ftext) := _s_for_unsupported(fl, []) | _s_lines_problems(lines) if {
+_s_for_line_unsupported(lines, ftext) := {concat("", ["for: ", u]) | some u in _s_for_unsupported(fl, [])} | _s_lines_problems(lines) if {
 	fl := _for_line(ftext)
 	"items" in object.keys(fl)
 }
