@@ -8,7 +8,7 @@ import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
 import { parse as parseYaml } from "yaml";
 import { layoutRows, policySheet, makeRunner, parseTime, reportTables, yamlText, reportDocument } from "../src/lib.mjs";
-import { sampleCases, readSample, opaVersionNote } from "../build.mjs";
+import { sampleCases, readSample, opaVersionNote, sentencesGlue } from "../build.mjs";
 import { VIEWS, LABELS } from "../src/layout.mjs";
 import { makeRustRunner } from "../src/engines.mjs";
 
@@ -34,7 +34,7 @@ test("the page has no script tag that ends early", () => {
 });
 
 test("every placeholder was filled and the page asks nothing from the network", () => {
-  for (const p of ["__BUNDLE__", "__SAMPLES__", "__WASM__", "__RUST_WASM__"]) assert.ok(!html.includes(p), p);
+  for (const p of ["__BUNDLE__", "__SAMPLES__", "__WASM__", "__RUST_WASM__", "__SENTENCES_WASM__"]) assert.ok(!html.includes(p), p);
   assert.ok(!/<link /.test(html));
   assert.ok(!/<script[^>]* src=/.test(html));
 });
@@ -104,6 +104,20 @@ test("the Rust Wasm inside the page throws a plain message for input that isn't 
   const glue = await import("../../../ports/rust/wasm/pkg/ergo_wasm.js");
   await runRust({}, {}, {});
   assert.throws(() => glue.report("{", "{}", "{}"), /^Error: the input isn't valid JSON: /);
+});
+
+test("the page holds the sentences Wasm and it reads a sentence", async () => {
+  const bytes = Buffer.from(/sentencesWasm: "([^"]+)"/.exec(html)[1], "base64");
+  const pkgDir = join(here, "..", "..", "..", "ports", "rust", "sentences-wasm", "pkg");
+  assert.deepEqual(bytes, readFileSync(join(pkgDir, "ergo_sentences_wasm_bg.wasm")));
+  const glue = await import("../../../ports/rust/sentences-wasm/pkg/ergo_sentences_wasm.js");
+  glue.initSync({ module: bytes });
+  assert.equal(JSON.parse(glue.parse_check("approvals is at least 2")).tree.assertions.length, 1);
+});
+
+test("the build says when the sentences Wasm is not built and where to build it", () => {
+  assert.throws(() => sentencesGlue(join(here, "no-such-folder")), /The sentences Wasm isn't built: .*no-such-folder has no ergo_sentences_wasm\.js.*"Building for a browser" in ports\/rust\/README\.md/);
+  assert.equal(sentencesGlue().bytes.length > 1000, true);
 });
 
 test("the Wasm inside the page takes input and params that aren't objects, as Ergo does", async () => {

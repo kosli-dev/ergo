@@ -1,14 +1,19 @@
 import { compile, parse } from "@kosli/ergo-markdown";
 import opa from "@open-policy-agent/opa-wasm";
 import { initSync, report as rustReport } from "ergo-wasm";
+import { initSync as initSentences, parse_check, parse_for, parse_from, check_problems, for_problems, from_problems } from "ergo-sentences-wasm";
 import { ENGINES, ENGINE_LABELS, readEngine, engineNote, engineMessage, makeRustRunner, stopOnPanic } from "./engines.mjs";
 import { highlightMarkdown, highlightYaml } from "./highlight.mjs";
 import { editFromYaml, markdownFromPaste } from "./twoway.mjs";
+import { makeParser } from "./sentences.mjs";
+import { markdownSentences, yamlSentences } from "./locate.mjs";
+import { makeAnalyser, decorateLines, entryAt, hoverOf, sentenceProblems } from "./analyse.mjs";
 import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
 import { savedEdit, saveEdit, forgetEdit } from "./saved.mjs";
 import { layoutRows, policySheet, yamlText, markOf, kindAt, docGroups, parseJson, makeRunner, parseTime, reportTables, plural, reportDocument, unroundable } from "./lib.mjs";
 
-const { samples, wasm, rustWasm } = window.EDITOR;
+const { samples, wasm, rustWasm, sentencesWasm } = window.EDITOR;
+const decode = (text) => Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
 const LH = 22;
 const PAD = 12;
 const $ = (id) => document.getElementById(id);
@@ -58,11 +63,27 @@ const el = (tag, cls, text) => {
   return n;
 };
 
+const sentenceParser = (() => {
+  try {
+    initSentences({ module: decode(sentencesWasm) });
+    return makeParser({ parse_check, parse_for, parse_from, check_problems, for_problems, from_problems });
+  } catch {
+    return null;
+  }
+})();
+const markdownAnalyser = makeAnalyser(sentenceParser, "code");
+const yamlAnalyser = makeAnalyser(sentenceParser, "plain");
+let markdownEntries = null;
+let yamlEntries = null;
+
 const paint = (into, lines) => {
   const frag = document.createDocumentFragment();
   lines.forEach((tokens, i) => {
     if (i) frag.append("\n");
-    for (const t of tokens) frag.append(t.kind === "plain" ? document.createTextNode(t.text) : el("span", "h-" + t.kind, t.text));
+    for (const t of tokens) {
+      if (t.kind === "plain" && !t.problem) frag.append(document.createTextNode(t.text));
+      else frag.append(el("span", `h-${t.kind}${t.problem ? " h-problem" : ""}`, t.text));
+    }
   });
   into.replaceChildren(frag);
 };
@@ -73,7 +94,9 @@ const follow = () => {
 };
 
 const drawSource = () => {
-  paint(hl, highlightMarkdown(src.value, last?.blocks ?? []));
+  const blocks = last?.blocks ?? [];
+  markdownEntries = markdownAnalyser(markdownSentences(src.value, blocks));
+  paint(hl, decorateLines(highlightMarkdown(src.value, blocks), src.value, markdownEntries));
   hl.append("\n");
   follow();
 };
@@ -100,8 +123,22 @@ let noteTimer = 0;
 let flashing = false;
 const yamlUndo = [];
 
+const yamlSentenceNotes = el("div", "diags");
+yamlSentenceNotes.hidden = true;
+yamlPane.append(yamlSentenceNotes);
+
 const drawYaml = () => {
-  paint(yamlHl, highlightYaml(yamlBox.value));
+  yamlEntries = yamlAnalyser(yamlSentences(yamlBox.value));
+  paint(yamlHl, decorateLines(highlightYaml(yamlBox.value), yamlBox.value, yamlEntries));
+  const found = sentenceProblems(yamlEntries);
+  yamlSentenceNotes.hidden = found.length === 0;
+  yamlSentenceNotes.replaceChildren(
+    ...found.map((p) => {
+      const row = el("div", "diag");
+      row.append(el("span", "where", "line " + p.line), el("span", null, p.message));
+      return row;
+    }),
+  );
   yamlHl.append("\n");
   yamlHl.style.transform = `translate(${-yamlBox.scrollLeft}px, ${-yamlBox.scrollTop}px)`;
 };
@@ -573,12 +610,15 @@ const choose = (side, view) => {
 
 const render = (result) => {
   last = result;
+  drawSource();
   const lines = src.value.split("\n");
   const kinds = new Array(lines.length).fill("");
   for (const b of result.blocks) {
     for (let i = b.startLine; i <= b.endLine && i <= lines.length; i++) kinds[i - 1] = kindClass(b.kind);
   }
-  const badLines = new Set(result.problems.map((p) => p.line));
+  const written = sentenceProblems(markdownEntries);
+  const problems = [...result.problems, ...written].sort((a, b) => a.line - b.line);
+  const badLines = new Set(problems.map((p) => p.line));
   gutter.replaceChildren(
     ...lines.map((_, i) => el("div", "gline" + (kinds[i] ? " k-" + kinds[i] : "") + (badLines.has(i + 1) ? " bad" : ""), String(i + 1))),
   );
@@ -592,16 +632,14 @@ const render = (result) => {
         return band;
       }),
   );
-  drawSource();
-
   $("n-req").textContent = plural(result.blocks.filter((b) => b.kind === "requirement").length, "requirement");
   $("n-chk").textContent = plural(result.blocks.filter((b) => b.kind === "check").length, "check");
-  $("n-diag-wrap").textContent = plural(result.problems.length, "problem");
-  $("n-diag-wrap").classList.toggle("bad", result.problems.length > 0);
+  $("n-diag-wrap").textContent = plural(problems.length, "problem");
+  $("n-diag-wrap").classList.toggle("bad", problems.length > 0);
 
-  diags.hidden = result.problems.length === 0;
+  diags.hidden = problems.length === 0;
   diags.replaceChildren(
-    ...result.problems.map((p) => {
+    ...problems.map((p) => {
       const b = el("button", "diag");
       b.append(el("span", "where", "line " + p.line), el("span", null, p.message));
       b.addEventListener("click", () => goto(p.line));
@@ -694,6 +732,44 @@ for (const ev of ["keyup", "click"]) {
   });
 }
 
+const tip = el("div", "tip");
+tip.hidden = true;
+document.body.append(tip);
+const hideTip = () => {
+  tip.hidden = true;
+};
+let charWidth = 0;
+const cellAt = (box, e) => {
+  const rect = box.getBoundingClientRect();
+  const style = getComputedStyle(box);
+  if (!charWidth) {
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.font = `${style.fontSize} ${style.fontFamily}`;
+    charWidth = ctx.measureText("M").width || 8;
+  }
+  return {
+    line: Math.floor((e.clientY - rect.top - parseFloat(style.paddingTop) + box.scrollTop) / LH) + 1,
+    col: Math.floor((e.clientX - rect.left - parseFloat(style.paddingLeft) + box.scrollLeft) / charWidth),
+  };
+};
+const showTip = (e, box, entries) => {
+  const { line, col } = cellAt(box, e);
+  const entry = entryAt(entries, line, col);
+  const found = entry && hoverOf(entry);
+  if (!found || (found.problems.length === 0 && found.lines.length === 0)) return hideTip();
+  tip.replaceChildren(...found.problems.map((m) => el("p", "bad", m)), ...found.lines.map((l, i) => el("p", i === 0 || found.problems.length === 0 ? null : "quiet", l)));
+  tip.hidden = false;
+  tip.style.left = Math.max(8, Math.min(e.clientX + 12, window.innerWidth - tip.offsetWidth - 8)) + "px";
+  tip.style.top = Math.min(e.clientY + 18, window.innerHeight - tip.offsetHeight - 8) + "px";
+};
+for (const [box, entries] of [
+  [src, () => markdownEntries],
+  [yamlBox, () => yamlEntries],
+]) {
+  box.addEventListener("mousemove", (e) => showTip(e, box, entries()));
+  for (const ev of ["mouseleave", "input", "scroll", "keydown", "blur"]) box.addEventListener(ev, hideTip);
+}
+
 const buttons = {};
 const load = (which) => {
   current = which;
@@ -732,7 +808,6 @@ copy.addEventListener("click", async () => {
   }, 1400);
 });
 
-const decode = (text) => Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
 const loaded = (name, run) => {
   runners[name] = run;
   if (shows("report") && last) render(last);
