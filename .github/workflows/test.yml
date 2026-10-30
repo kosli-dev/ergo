@@ -207,6 +207,10 @@ jobs:
           wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_wasm_bg.wasm -o wasm/pkg/ergo_wasm_bg.wasm
       - name: Load ergo-wasm in Node and build a report
         run: node wasm/check-node.mjs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ergo-wasm-pkg
+          path: ports/rust/wasm/pkg
       - name: Build ergo-sentences-wasm, wrap it for a browser and shrink it
         run: |
           cargo build --locked --profile wasm -p ergo-sentences-wasm --target wasm32-unknown-unknown
@@ -216,6 +220,7 @@ jobs:
         run: node sentences-wasm/check-node.mjs
 
   markdown:
+    needs: tests-rust
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -233,6 +238,10 @@ jobs:
           node-version-file: packages/.nvmrc
           cache: pnpm
           cache-dependency-path: packages/pnpm-lock.yaml
+      - uses: actions/download-artifact@v8
+        with:
+          name: ergo-wasm-pkg
+          path: ports/rust/wasm/pkg
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm test
