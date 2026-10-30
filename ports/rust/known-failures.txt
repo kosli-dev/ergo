@@ -6,3 +6,10 @@ subjects / a child subject of a from line with named by each of, which starts at
 subjects / a child subject of a from line with named by each of, which starts at its parent / reads every parent in turn, so a parent without the key fails its own subject
 subjects / a child subject of a from line with named by each of, with a parent that isn't an object / fails min_subjects as not_an_object, even with min_subjects 0, and gives no subject
 subjects / a grandchild subject of a child subject read with named by each of / reads the items inside the key of each parent, with both ancestors under in
+subjects / a child subject of a from line with a position on a path inside the parent and named by each of / reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check
+subjects / a child subject of a from line with a position on the parent and named by each of / reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check
+subjects / a child subject of a from line with first of the parent and named by each of / reads the parent as a list, so $min_subjects fails as unusable, and the key is still a subject that fails its check
+subjects / a child subject of a from line with named by each of and params.k a list with a number / fails min_subjects of each parent on its own, with its in, and gives no subject
+subjects / a child subject of a from line with named by each of and params.k a string / fails min_subjects of each parent on its own, with its in, and gives no subject
+subjects / a child subject of a from line with named by each of and params.k missing / fails min_subjects of each parent on its own, with its in, and gives no subject
+subjects / a child subject of a from line with named by each of and params.k null / fails min_subjects of each parent on its own, with its in, and gives no subject
