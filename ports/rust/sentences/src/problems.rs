@@ -2,7 +2,6 @@ use crate::error::SyntaxError;
 use crate::parse::{self, Parser};
 use crate::rules;
 use crate::tree::*;
-use std::collections::BTreeSet;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Kind {
@@ -47,10 +46,6 @@ fn messages(text: &str, kind: Kind) -> Vec<String> {
     }
     if !lenient.is_empty() {
         return lenient;
-    }
-    let names = unknown_names(&c);
-    if !names.is_empty() {
-        return names;
     }
     if kind == Kind::Path {
         return vec!["doesn't parse".to_string()];
@@ -126,47 +121,6 @@ fn invalid_strings(c: &[char]) -> Vec<String> {
         }
     }
     out
-}
-
-fn unknown_names(c: &[char]) -> Vec<String> {
-    let mut names = BTreeSet::new();
-    let mut i = 0;
-    while i < c.len() {
-        if let Some(Some(end)) = string_end(c, i) {
-            i = end;
-            continue;
-        }
-        let at = if i == 0 && c[0] == '$' {
-            Some(0)
-        } else if matches!(c[i], ' ' | ',' | '[') && c.get(i + 1) == Some(&'$') {
-            Some(i + 1)
-        } else {
-            None
-        };
-        let Some(at) = at else {
-            i += 1;
-            continue;
-        };
-        let mut j = at + 1;
-        if c.get(j)
-            .is_some_and(|ch| ch.is_ascii_alphabetic() || *ch == '_')
-        {
-            while c
-                .get(j)
-                .is_some_and(|ch| ch.is_ascii_alphanumeric() || *ch == '_')
-            {
-                j += 1;
-            }
-            let name: String = c[at..j].iter().collect();
-            if name != "$params" && name != "$input" {
-                names.insert(format!("unknown name {name}"));
-            }
-            i = j;
-        } else {
-            i += 1;
-        }
-    }
-    names.into_iter().collect()
 }
 
 fn spaces(c: &[char], i: usize) -> Option<usize> {

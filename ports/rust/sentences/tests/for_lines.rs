@@ -171,8 +171,8 @@ fn a_for_line_otherwise_fails_as_a_check_does() {
         "unclosed quote at column 24"
     );
     assert_eq!(
-        for_failure("every items whose k is $z as i"),
-        vec!["unknown name $z"]
+        for_failure("every items whose k is $z j as i"),
+        vec!["doesn't parse"]
     );
     assert_eq!(
         for_failure("every items whose empty is 1 as i"),
@@ -270,4 +270,10 @@ fn a_long_for_line_does_not_make_the_reader_slow() {
         for_failure(&format!("{line}, ")),
         vec!["an item ends with \"as\" and a name, like \"every pull_requests as pr\""]
     );
+}
+
+#[test]
+fn a_for_line_with_an_unknown_name_reads_and_is_written_wrong() {
+    let line = for_line("every items whose k is $z as i");
+    assert_eq!(for_problems(&line, &[]), vec!["unknown name $z"]);
 }
