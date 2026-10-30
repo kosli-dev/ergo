@@ -167,7 +167,13 @@ fn lower_whose(whose: &[s::Condition], scope: &Scope, problems: &mut Vec<String>
     for condition in whose {
         match lower::lower_condition(condition, scope) {
             Ok(check) => checks.push(check),
-            Err(found) => problems.extend(found),
+            Err(found) => problems.extend(found.into_iter().map(|p| {
+                if p == "values of mixed types" {
+                    format!("for: {p}")
+                } else {
+                    p
+                }
+            })),
         }
     }
     checks

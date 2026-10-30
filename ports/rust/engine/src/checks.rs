@@ -57,14 +57,18 @@ fn read_lines(
         match s::parse_check(line) {
             Ok(tree) => {
                 let found = s::check_problems(&tree, aliases);
-                if found.is_empty() {
-                    trees.push(tree);
-                    places.push(place);
-                    continue;
+                let only_self = found
+                    .iter()
+                    .all(|problem| problem.ends_with(" is compared with itself"));
+                if !found.is_empty() {
+                    ok = false;
                 }
-                ok = false;
                 for problem in found {
                     problems.insert(format!("{place}{problem}"));
+                }
+                if only_self {
+                    trees.push(tree);
+                    places.push(place);
                 }
             }
             Err(errors) => {
@@ -524,6 +528,42 @@ mod tests {
         let read = one(json!({"c": "x equals x"}));
         assert_eq!(problems(&read), ["x is compared with itself"]);
         assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn values_of_mixed_types_are_listed_beside_a_field_compared_with_itself() {
+        let sentence = "x is one of 1, 'a' and y is at least y";
+        let both = ["values of mixed types", "y is compared with itself"];
+        let read = one(json!({"c": sentence}));
+        assert_eq!(problems(&read), both);
+        let read = one(json!({"c": {"assert": ["x exists", sentence]}}));
+        assert_eq!(
+            problems(&read),
+            [
+                "line 2: values of mixed types",
+                "line 2: y is compared with itself"
+            ]
+        );
+        let read = one(json!({"c": {"any_of": {"p": sentence}}}));
+        assert_eq!(
+            problems(&read),
+            [
+                "option p: values of mixed types",
+                "option p: y is compared with itself"
+            ]
+        );
+        let read = one(
+            json!({"c": {"for": "every xs as i", "assert": "i is one of 1, 'a' and y is at least y"}}),
+        );
+        assert_eq!(problems(&read), both);
+    }
+
+    #[test]
+    fn values_of_mixed_types_in_a_whose_of_the_for_line_start_with_for() {
+        let read = one(
+            json!({"c": {"for": "every xs whose v is one of 1, 'a' as x", "assert": "x exists"}}),
+        );
+        assert_eq!(problems(&read), ["for: values of mixed types"]);
     }
 
     #[test]
