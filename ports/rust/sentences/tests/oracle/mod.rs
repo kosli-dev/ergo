@@ -53,6 +53,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "artifact named by each of $params.k",
     ),
     (
+        "k named by each of $params.j",
+        "k named by each of $params.j",
+    ),
+    (
         "artifact.x named by each of $params.k",
         "artifact.x named by each of $params.k",
     ),

@@ -6814,6 +6814,101 @@
     ]
   },
   {
+    "description": "a child subject with named by each of under a parent key the object doesn't have",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "k": {
+          "from": "things named by each of $params.k"
+        },
+        "c": {
+          "from": "k named by each of $params.j"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "c",
+          "checks": {
+            "c1": "it exists"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "a"
+      ],
+      "j": [
+        "z"
+      ]
+    },
+    "cases": [
+      {
+        "description": "the child key z fails its check as a value, because the parent key a is missing and nothing is read below it",
+        "rules": [
+          "subjects.sentence",
+          "subjects.chain",
+          "subjects.chain.count"
+        ],
+        "input": {
+          "things": {
+            "b": {}
+          }
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "k": "a"
+              },
+              "type": "c"
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "in-scope c count",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "z",
+              "in": {
+                "k": "a"
+              },
+              "type": "c"
+            },
+            "check": "c1",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "locations": [
+                  "/things"
+                ],
+                "name": "it",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a child subject of a from line with named by each of whose object can't be read",
     "policy": {
       "ergo_spec": "v0.3-dev",
