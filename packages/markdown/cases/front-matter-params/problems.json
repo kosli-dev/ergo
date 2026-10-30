@@ -1,0 +1,6 @@
+[
+  {
+    "line": 3,
+    "message": "the front matter holds only ergo_spec, not params: pass params to ergo.report"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "line": 11,
+    "message": "a field is written as key: `value`"
+  },
+  {
+    "line": 19,
+    "message": "a field is written as key: `value`"
+  }
+]

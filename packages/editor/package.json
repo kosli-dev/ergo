@@ -1,0 +1,17 @@
+{
+  "name": "@kosli/ergo-editor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@kosli/ergo-markdown": "workspace:*",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@open-policy-agent/opa-wasm": "1.10.0",
+    "esbuild": "0.28.2"
+  }
+}

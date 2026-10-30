@@ -70,7 +70,7 @@ jobs:
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.20.2
-      - run: opa check --strict . --ignore .github
+      - run: opa check --strict . --ignore .github --ignore packages --ignore ports
       - name: Check the test workflow passed on this commit
         shell: bash
         run: |

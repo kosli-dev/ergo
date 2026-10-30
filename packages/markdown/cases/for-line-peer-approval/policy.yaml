@@ -1,0 +1,18 @@
+ergo_spec: v0.3-dev
+subjects:
+  release:
+    from: releases
+    identified_by: id
+requirements:
+  release:
+    subject: release
+    checks:
+      signed:
+        description: Every commit is signed
+        assert: every pull_requests.commits.signed is true
+      peer approved:
+        description: Someone other than the author approved every pull request
+        for: every pull_requests as pr, some pr.approvers as approver
+        assert:
+          - approver.state is "APPROVED"
+          - approver.username does not equal pr.author

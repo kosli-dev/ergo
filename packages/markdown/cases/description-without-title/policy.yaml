@@ -1,0 +1,14 @@
+ergo_spec: v0.3-dev
+description: |-
+  Every batch that leaves the bakery is safe to eat.
+
+  We check every batch baked today.
+subjects:
+  batch:
+    from: batches
+requirements:
+  nut free:
+    subject: batch
+    checks:
+      no nuts:
+        assert: allergens does not contain "nuts"

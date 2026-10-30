@@ -1,0 +1,13 @@
+{
+  "name": "ergo-packages",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.19.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "check": "pnpm -r check",
+    "test": "pnpm -r test"
+  }
+}

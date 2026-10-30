@@ -43,7 +43,7 @@ jobs:
           fi
       - name: Check the spec version moved when the spec changed
         run: .github/spec-version.sh
-      - run: opa check --strict . --ignore .github --ignore ports
+      - run: opa check --strict . --ignore .github --ignore packages --ignore ports
       - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json ergo.rego
       - name: Check Ergo compiles without built-ins whose answer depends on the machine
@@ -71,7 +71,7 @@ jobs:
             exit 1
           fi
       - name: Check the tests give the same results with --strict-builtin-errors
-        run: opa eval --strict-builtin-errors --ignore .github --ignore ports -d . --format raw 'count(data) > 0'
+        run: opa eval --strict-builtin-errors --ignore .github --ignore packages --ignore ports -d . --format raw 'count(data) > 0'
 
   tests-rego:
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
       - name: Run this part of the tests with coverage
         shell: bash
         run: |
-          if ! opa test . --ignore .github --ignore ports --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
+          if ! opa test . --ignore .github --ignore packages --ignore ports --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
             cat "$RUNNER_TEMP/coverage.json"
             exit 1
           fi
@@ -207,6 +207,10 @@ jobs:
           wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue wasm/pkg/ergo_wasm_bg.wasm -o wasm/pkg/ergo_wasm_bg.wasm
       - name: Load ergo-wasm in Node and build a report
         run: node wasm/check-node.mjs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ergo-wasm-pkg
+          path: ports/rust/wasm/pkg
       - name: Build ergo-sentences-wasm, wrap it for a browser and shrink it
         run: |
           cargo build --locked --profile wasm -p ergo-sentences-wasm --target wasm32-unknown-unknown
@@ -214,6 +218,34 @@ jobs:
           wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm -o sentences-wasm/pkg/ergo_sentences_wasm_bg.wasm
       - name: Load ergo-sentences-wasm in Node and read a sentence
         run: node sentences-wasm/check-node.mjs
+
+  markdown:
+    needs: tests-rust
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages
+    steps:
+      - uses: actions/checkout@v7
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: 1.20.2
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: packages/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: packages/.nvmrc
+          cache: pnpm
+          cache-dependency-path: packages/pnpm-lock.yaml
+      - uses: actions/download-artifact@v8
+        with:
+          name: ergo-wasm-pkg
+          path: ports/rust/wasm/pkg
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test
+      - run: pnpm -r bundle
 
   spec:
     runs-on: ubuntu-latest

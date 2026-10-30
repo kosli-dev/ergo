@@ -1,0 +1,13 @@
+ergo_spec: v0.3-dev
+subjects:
+  deployment:
+    from: deployments whose environment is "prod"
+    identified_by: id
+requirements:
+  prod_deploy:
+    description: Every production deployment is approved
+    subject: deployment
+    checks:
+      approved:
+        description: Someone approved the deployment
+        assert: approved_by is a non-empty string

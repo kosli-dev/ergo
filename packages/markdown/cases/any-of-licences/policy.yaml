@@ -1,0 +1,20 @@
+ergo_spec: v0.3-dev
+description: |-
+  Every component we ship has a licence we allow.
+
+  It reads two params: allowed_licenses, the licences we allow, and known_package_licenses, the licence of each package whose SBOM doesn't declare one, by package name.
+subjects:
+  component:
+    from: components
+    identified_by: name
+requirements:
+  licences:
+    subject: component
+    checks:
+      licence allowed:
+        description: The licence is allowed
+        any_of:
+          declared: some licenses.license.id is in $params.allowed_licenses
+          known:
+            - licenses does not exist
+            - $params.known_package_licenses named by name is in $params.allowed_licenses
