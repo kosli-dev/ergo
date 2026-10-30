@@ -6268,6 +6268,7 @@ _s_descends(name, fl, subjects) if {
 
 _s_narrows(name, fl, subjects) if {
 	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
 	fl.path.steps == [fl.path.steps[0]]
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
@@ -6317,6 +6318,7 @@ _s_every_unsupported(_, fl, _) := set() if object.get(fl, "every", false) != tru
 
 _s_every_unsupported(name, fl, subjects) := ({"every can't go with a from line that starts at another subject yet" |
 	not "start" in object.keys(fl.path)
+	object.get(fl.path, "dot", false) != true
 	is_string(fl.path.steps[0])
 	fl.path.steps[0] != name
 	fl.path.steps[0] in object.keys(subjects)
