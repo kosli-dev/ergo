@@ -3572,6 +3572,111 @@
     ]
   },
   {
+    "description": "a subject with of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "deployment": {
+          "from": "deployments",
+          "identified_by": "id",
+          "of": "other"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "deployment",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is <invalid from> with of, because the field said how the subject was found",
+        "rules": [
+          "report.subjects",
+          "written_wrong.row"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "deployment": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a subject with applies_to or of",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "deployment": {
+          "from": "deployments",
+          "identified_by": "id",
+          "applies_to": {
+            "f": {
+              "op": "present",
+              "path": [
+                "x"
+              ]
+            }
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "deployment",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is <invalid from> with applies_to, because the field said how the subject was found",
+        "rules": [
+          "report.subjects",
+          "written_wrong.row"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "deployment": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
     "description": "a condition with some in a from line with every",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -4007,6 +4112,163 @@
             }
           }
         ]
+      }
+    ]
+  },
+  {
+    "description": "a subject that narrows another, with a from that is written wrong",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "parent whose n is one of 1, \"a\""
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the subject it narrows and keeps its id, because the line still says which subject it narrows",
+        "rules": [
+          "report.subjects",
+          "subjects.narrow.id",
+          "written_wrong.row"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a subject that narrows another, with a from that is written right",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "parent whose n is 1"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists both subjects, and kid has the id of the subject it narrows",
+        "rules": [
+          "report.subjects",
+          "subjects.narrow.id"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "parent whose n is 1",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a subject with another unknown field",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "deployment": {
+          "from": "deployments",
+          "identified_by": "id",
+          "foo": 1
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "deployment",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps its from line, because only applies_to and of say how a subject is found",
+        "rules": [
+          "report.subjects",
+          "written_wrong.row"
+        ],
+        "input": {
+          "deployments": [
+            {
+              "id": "d1",
+              "x": 1
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "deployment": {
+              "description": "",
+              "from": "deployments",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
       }
     ]
   },
@@ -5268,6 +5530,128 @@
             ]
           }
         ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from has values of mixed types",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "parent.items whose n is one of 1, \"a\"",
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the subject the from starts at, and kid is <invalid from>",
+        "rules": [
+          "report.subjects",
+          "written_wrong.row",
+          "subjects.chain"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "n",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from doesn't parse",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "parent.items whose",
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists no other subject, and kid is <invalid from>",
+        "rules": [
+          "report.subjects",
+          "written_wrong.row",
+          "subjects.chain"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "n",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
       }
     ]
   },
@@ -8962,6 +9346,161 @@
     ]
   },
   {
+    "description": "report.subjects for a chain of three subjects",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        },
+        "commit": {
+          "from": "pr.commits",
+          "identified_by": "sha"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "commit",
+          "checks": {
+            "c": "size exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists every subject in the chain, each with its own from line",
+        "rules": [
+          "report.subjects",
+          "subjects.chain"
+        ],
+        "input": {},
+        "report": {
+          "subjects": {
+            "artifact": {
+              "description": "",
+              "from": "artifacts",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "commit": {
+              "description": "",
+              "from": "pr.commits",
+              "identified_by": "sha",
+              "parts": {}
+            },
+            "pr": {
+              "description": "",
+              "from": "artifact.prs",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "report.subjects for a chain of four subjects",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "pr": {
+          "from": "artifact.prs",
+          "identified_by": "id"
+        },
+        "commit": {
+          "from": "pr.commits",
+          "identified_by": "sha"
+        },
+        "file": {
+          "from": "commit.files",
+          "identified_by": "name"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "file",
+          "checks": {
+            "c": "size exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists every subject up the chain, and the last one has <invalid from>, because a chain of more than three is written wrong",
+        "rules": [
+          "report.subjects",
+          "subjects.chain",
+          "written_wrong.row"
+        ],
+        "input": {
+          "artifacts": [
+            {
+              "id": "a1",
+              "prs": [
+                {
+                  "id": "p1",
+                  "commits": [
+                    {
+                      "sha": "c1",
+                      "files": [
+                        {
+                          "name": "f1",
+                          "size": 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "artifact": {
+              "description": "",
+              "from": "artifacts",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "commit": {
+              "description": "",
+              "from": "pr.commits",
+              "identified_by": "sha",
+              "parts": {}
+            },
+            "file": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "name",
+              "parts": {}
+            },
+            "pr": {
+              "description": "",
+              "from": "artifact.prs",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
     "description": "a chain of four subjects",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -9784,6 +10323,161 @@
     ]
   },
   {
+    "description": "a subject that narrows another, with a from that starts with every",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "every parent"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the subject it narrows and keeps its id, because the line still says which subject it narrows",
+        "rules": [
+          "report.subjects",
+          "subjects.narrow.id",
+          "written_wrong.row"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a subject that narrows a subject that narrows another with every",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "mid": {
+          "from": "every parent",
+          "identified_by": "x"
+        },
+        "kid": {
+          "from": "mid whose n is 1"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "has the id of the subject at the top of its chain, not mid's own",
+        "rules": [
+          "report.subjects",
+          "subjects.narrow.id"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "mid whose n is 1",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "mid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.mid.from",
+                "value": [
+                  "every can't go with a from line that starts at another subject yet"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a from line with every and named by each of",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -10469,6 +11163,775 @@
     ]
   },
   {
+    "description": "two subjects that narrow each other, each with an identified_by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "pp": {
+          "from": "kid whose n is 1",
+          "identified_by": "x"
+        },
+        "kid": {
+          "from": "pp whose n is 1",
+          "identified_by": "y"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "have no id, because no subject is at the top of the loop",
+        "rules": [
+          "report.subjects",
+          "subjects.narrow.id",
+          "subjects.chain"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "<invalid identified_by>",
+              "parts": {}
+            },
+            "pp": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "<invalid identified_by>",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.kid.from",
+                "value": [
+                  "leads to a loop"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with an unknown name in a whose",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "parent.items whose zz is $foo",
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the subject it starts at, and kid is <invalid from>",
+        "rules": ["report.subjects", "sentence.path.start", "written_wrong.row", "well_formed", "subjects.chain"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1,
+                  "zz": 1
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "n",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.kid.from",
+                "value": [
+                  "unknown name $foo"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with an unknown name after named by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "parent.items named by $foo",
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the subject it starts at, and kid is <invalid from>",
+        "rules": ["report.subjects", "sentence.path.start", "written_wrong.row", "well_formed", "subjects.chain"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1,
+                  "zz": 1
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "n",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.kid.from",
+                "value": [
+                  "unknown name $foo"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with an unknown name in brackets",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "parent[$foo] whose n is 1",
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the subject it starts at, and kid is <invalid from>",
+        "rules": ["report.subjects", "sentence.path.start", "written_wrong.row", "well_formed", "subjects.chain"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1,
+                  "zz": 1
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "n",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.kid.from",
+                "value": [
+                  "unknown name $foo"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that narrows a subject, with an unknown name",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "parent whose n is $foo"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the subject it narrows and keeps its id, because the line still says which subject it narrows",
+        "rules": ["report.subjects", "sentence.path.start", "written_wrong.row", "well_formed", "subjects.narrow.id"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1,
+                  "zz": 1
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.kid.from",
+                "value": [
+                  "unknown name $foo"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that starts at a subject with ' whose ' in its name, with an unknown name",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "par whose ent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "\"par whose ent\".items whose zz is $foo",
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the subject it starts at, and kid is <invalid from>",
+        "rules": ["report.subjects", "sentence.path.start", "written_wrong.row", "well_formed", "subjects.chain"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1,
+                  "zz": 1
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "n",
+              "parts": {}
+            },
+            "par whose ent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.kid.from",
+                "value": [
+                  "unknown name $foo"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with an unknown name and a syntax error",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "parent.items whose zz is $foo foo bar",
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "says it doesn't parse and lists no other subject, because the syntax error comes first",
+        "rules": ["report.subjects", "sentence.path.start", "written_wrong.row", "well_formed", "subjects.chain"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1,
+                  "zz": 1
+                }
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "n",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.kid.from",
+                "value": [
+                  "doesn't parse"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that narrows a subject with parts, with an unknown name",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id",
+          "has": {
+            "owner": "owner.name"
+          }
+        },
+        "kid": {
+          "from": "parent whose n is $foo"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the parts of the subject it narrows, because the line still says which subject it narrows",
+        "rules": ["report.subjects", "parts.narrow", "sentence.path.start", "written_wrong.row", "well_formed"],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1,
+                  "zz": 1
+                }
+              ],
+              "owner": {
+                "name": "x"
+              }
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {
+                "owner": {
+                  "from": "owner.name",
+                  "identified_by": null
+                }
+              }
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {
+                "owner": {
+                  "from": "owner.name",
+                  "identified_by": null
+                }
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "subjects.kid.from",
+                "value": [
+                  "unknown name $foo"
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "description": "a subject that narrows another and has its own identified_by",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -10797,6 +12260,56 @@
             }
           }
         ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads but has a problem",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "thing": {
+          "from": "things whose x is one of 1, \"a\" and y exists",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is <invalid from>, not the line, when the line is written wrong",
+        "rules": [
+          "report.subjects",
+          "written_wrong.row",
+          "in.values"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "x": 1,
+              "y": 2
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "thing": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
       }
     ]
   },
@@ -12988,6 +14501,224 @@
     ]
   },
   {
+    "description": "a child subject whose from is every, with an identified_by",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "every parent",
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "gives one problem, under from, and none under identified_by",
+        "rules": [
+          "written_wrong.row",
+          "sentence.subject.every",
+          "report.subjects"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "id",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "kid"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.kid.from",
+                "value": [
+                  "every can't go with a from line that starts at another subject yet"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from isn't a string",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": [
+            "parent.items"
+          ],
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists no other subject, and kid is <invalid from>",
+        "rules": [
+          "report.subjects",
+          "written_wrong.row",
+          "subjects.chain"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "n",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from starts with every",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "parent": {
+          "from": "things",
+          "identified_by": "id"
+        },
+        "kid": {
+          "from": "every parent.items",
+          "identified_by": "n"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "kid",
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the subject the from starts at, and kid is <invalid from>",
+        "rules": [
+          "report.subjects",
+          "written_wrong.row",
+          "subjects.chain"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "n": 1,
+              "items": [
+                {
+                  "n": 1
+                }
+              ]
+            }
+          ]
+        },
+        "report": {
+          "subjects": {
+            "kid": {
+              "description": "",
+              "from": "<invalid from>",
+              "identified_by": "n",
+              "parts": {}
+            },
+            "parent": {
+              "description": "",
+              "from": "things",
+              "identified_by": "id",
+              "parts": {}
+            }
+          }
+        },
+        "results": []
+      }
+    ]
+  },
+  {
     "description": "a grandchild subject whose parent isn't an object",
     "policy": {
       "ergo_spec": "v0.3-dev",
@@ -13914,6 +15645,207 @@
               },
               "type": "k"
             }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of, under a parent that isn't an object, with params.k missing",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as absent when params.k is missing, because the params cause comes before not_an_object",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence",
+          "value.ref"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "absent",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of, under a parent that isn't an object, with params.k a string",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": "x"
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable when params.k is a string",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence",
+          "value.ref"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "unusable",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject of a from line with named by each of, under a parent that isn't an object, with params.k null",
+    "policy": {
+      "ergo_spec": "v0.3-dev",
+      "subjects": {
+        "artifact": {
+          "from": "artifacts",
+          "identified_by": "id"
+        },
+        "k": {
+          "from": "artifact named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "min_subjects": 0,
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": null
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as null when params.k is null",
+        "rules": [
+          "subjects.chain.not_an_object",
+          "subjects.sentence",
+          "value.ref"
+        ],
+        "input": {
+          "artifacts": [
+            "x"
+          ]
+        },
+        "status": {
+          "r": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "type": "k",
+              "id": null,
+              "in": {
+                "artifact": "x"
+              }
+            },
+            "check": "$min_subjects",
+            "passed": false,
+            "cause": "null",
+            "inputs": [
+              {
+                "name": "in-scope k count",
+                "value": 0,
+                "locations": []
+              }
+            ]
           }
         ]
       }

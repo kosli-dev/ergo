@@ -41,7 +41,7 @@
             "expression": "count(matching(t)) >= 1",
             "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}],
             "requirement": "s",
-            "subject": {"id": null, "type": "subject"}
+            "subject": {"type": "subject", "id": null}
           }
         ]
       },
@@ -230,6 +230,16 @@
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
         ]
+      },
+      {
+        "description": "names a list that breaks from $input",
+        "rules": ["subjects.every.broken"],
+        "input": [{"commits": [{"x": 1}]}, {"commits": 5}],
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "unusable", "value": 5, "locations": ["/1/commits"]}], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0/commits/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
+        ]
       }
     ]
   },
@@ -243,6 +253,16 @@
         "input": [{"commits": [{"x": 1}]}],
         "results": [
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "failed_items": [], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0/commits/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
+        ]
+      },
+      {
+        "description": "names a list that breaks from $input",
+        "rules": ["subjects.every.broken"],
+        "input": [{"commits": [{"x": 1}]}, {"commits": 5}],
+        "results": [
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "unusable", "value": 5, "locations": ["/1/commits"]}], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0/commits/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
         ]

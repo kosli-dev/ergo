@@ -237,26 +237,33 @@ fn naming_a_key_with_a_word_is_reported() {
     );
 }
 
+fn names_of(line: &str) -> Vec<String> {
+    from_problems(&from(line))
+}
+
 #[test]
-fn a_dollar_name_that_is_not_params_or_input_is_unknown() {
-    assert_eq!(failure("x whose y equals $z"), vec!["unknown name $z"]);
-    assert_eq!(failure("$z"), vec!["unknown name $z"]);
-    assert_eq!(failure("x[$z]"), vec!["unknown name $z"]);
+fn a_dollar_name_that_is_not_params_or_input_is_read_and_unknown() {
+    assert_eq!(names_of("x whose y equals $z"), vec!["unknown name $z"]);
+    assert_eq!(names_of("$z"), vec!["unknown name $z"]);
+    assert_eq!(names_of("x[$z]"), vec!["unknown name $z"]);
+    assert_eq!(names_of("x named by $z"), vec!["unknown name $z"]);
+    assert_eq!(names_of("x named by $z.k"), vec!["unknown name $z"]);
+    assert_eq!(names_of("x named by each of $z"), vec!["unknown name $z"]);
 }
 
 #[test]
 fn unknown_names_are_sorted_and_listed_once() {
     assert_eq!(
-        failure("x whose y equals $b and z equals $a and w equals $b"),
+        names_of("x whose y equals $b and z equals $a and w equals $b"),
         vec!["unknown name $a", "unknown name $b"]
     );
 }
 
 #[test]
 fn a_dollar_name_inside_a_string_is_not_a_name() {
-    assert!(parse_from("x whose y is \"$z\"").is_ok());
+    assert!(names_of("x whose y is \"$z\"").is_empty());
     assert_eq!(
-        failure("x whose y is \"$z\" and w is $v"),
+        names_of("x whose y is \"$z\" and w is $v"),
         vec!["unknown name $v"]
     );
 }
@@ -268,11 +275,54 @@ fn a_dollar_name_glued_to_a_word_is_not_looked_at() {
 
 #[test]
 fn a_name_that_starts_with_params_is_unknown() {
-    assert_eq!(failure("$paramsx"), vec!["unknown name $paramsx"]);
+    assert_eq!(names_of("$paramsx"), vec!["unknown name $paramsx"]);
     assert_eq!(
-        failure("x whose y equals $inputs.z"),
+        names_of("x whose y equals $inputs.z"),
         vec!["unknown name $inputs"]
     );
+}
+
+#[test]
+fn a_bare_params_or_input_reference_does_not_parse() {
+    for line in [
+        "x named by $params",
+        "x[$params]",
+        "x named by $input",
+        "x[$input]",
+    ] {
+        assert_eq!(failure(line), vec!["doesn't parse"], "{line:?}");
+    }
+}
+
+#[test]
+fn a_line_with_an_unknown_name_and_a_syntax_error_says_it_does_not_parse() {
+    assert_eq!(failure("x whose y is $z foo bar"), vec!["doesn't parse"]);
+    assert_eq!(failure("x whose $z"), vec!["doesn't parse"]);
+    assert_eq!(failure("x whose y is $z and"), vec!["doesn't parse"]);
+}
+
+#[test]
+fn an_unknown_name_is_listed_next_to_the_other_problems_of_a_line() {
+    assert_eq!(
+        failure("x whose empty is $z"),
+        vec![
+            "empty is a word of the grammar: write .empty".to_string(),
+            "unknown name $z".to_string()
+        ]
+    );
+    let check = check("x is not null and w is $v");
+    assert_eq!(
+        check_problems(&check, &[]),
+        vec![
+            "\"is not null\" is written \"exists\"".to_string(),
+            "unknown name $v".to_string()
+        ]
+    );
+}
+
+#[test]
+fn a_path_with_an_unknown_name_does_not_read_as_a_path() {
+    assert_eq!(parse_path("$z").unwrap_err(), one("unknown name $z", None));
 }
 
 #[test]

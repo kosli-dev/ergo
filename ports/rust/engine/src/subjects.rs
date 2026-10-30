@@ -143,6 +143,12 @@ fn each_of_entries<'a>(
     }
     names.sort();
     names.dedup();
+    let alias_is_not_an_object = path.steps.is_empty()
+        && matches!(path.start, Start::Alias(_))
+        && object.value.is_some_and(|value| !value.is_object());
+    if object.outcome == Outcome::NotAnObject || alias_is_not_an_object {
+        return Read::Failed(Cause::NotAnObject);
+    }
     let unread = match (object.outcome, object.value) {
         (Outcome::Found, Some(Value::Object(_))) => None,
         (Outcome::Found, _) => Some(Cause::Unusable),
@@ -269,8 +275,9 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
 fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
     let ctx = context(env, input_root(env), anc);
     let (path, each_of) = match source {
-        Source::Root { path, each_of, .. } => (path, each_of.as_ref()),
-        Source::Child { path, .. } => (path, None),
+        Source::Root { path, each_of, .. } | Source::Child { path, each_of } => {
+            (path, each_of.as_ref())
+        }
     };
     let mut causes: Vec<Cause> = path::step_refs(path)
         .iter()
@@ -310,6 +317,10 @@ fn read_entries<'a>(
             path,
             each_of: Some(each_of),
             ..
+        } => each_of_entries(env, empty, path, each_of, anc),
+        Source::Child {
+            path,
+            each_of: Some(each_of),
         } => each_of_entries(env, empty, path, each_of, anc),
         Source::Root { path, .. } | Source::Child { path, .. } => {
             let ctx = context(env, input_root(env), anc);
@@ -755,7 +766,14 @@ fn descend<'a>(
         Read::Entries { entries, broken } => (entries, broken),
         Read::Failed(cause) => return vec![failed_level(env, anc, cause, anc.is_empty())],
     };
-    if let Some(cause) = Cause::worst(broken.iter().map(|b| b.cause)) {
+    let keyed_child = matches!(
+        &lowered.source,
+        Source::Child {
+            each_of: Some(_),
+            ..
+        }
+    );
+    if !keyed_child && let Some(cause) = Cause::worst(broken.iter().map(|b| b.cause)) {
         return vec![failed_level(env, anc, cause, anc.is_empty())];
     }
     let mut out = Vec::new();
