@@ -1172,6 +1172,15 @@ mod tests {
     }
 
     #[test]
+    fn a_path_through_a_part_of_a_dollar_subject_quotes_the_subject_name() {
+        let (_, r) = reading(json!({
+            "$x": {"from": "things", "has": {"pa": "meta"}},
+            "kid": {"from": "\"$x\".pa.items"}
+        }));
+        assert_eq!(r.lowered("kid").unwrap().from_text, "\"$x\".pa.items");
+    }
+
+    #[test]
     fn a_subject_name_with_named_by_each_of_is_a_child_that_keeps_its_keys_inside_its_parent() {
         let (_, r) = reading(json!({
             "art": {"from": "arts"},
