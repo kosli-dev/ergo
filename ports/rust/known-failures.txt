@@ -1,2 +1,0 @@
-subjects / a child subject listed by named by each of that has identified_by / is written wrong, and $well_formed names identified_by on the child
-subjects / a subject listed by named by each of that has identified_by / is written wrong, because the key is the id, and $well_formed is the requirement's only row

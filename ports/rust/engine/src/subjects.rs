@@ -1138,7 +1138,7 @@ mod tests {
     #[test]
     fn named_by_each_of_makes_each_sorted_key_a_subject_and_a_missing_key_points_at_the_object() {
         let p = policy(
-            json!({"thing": {"from": "scans named by each of $params.l", "identified_by": "name"}}),
+            json!({"thing": {"from": "scans named by each of $params.l"}}),
             json!(1),
         );
         let input = json!({"scans": {"sast": {"name": "other"}, "sca": {}}});
