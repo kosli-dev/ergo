@@ -573,6 +573,64 @@
     ]
   },
   {
+    "description": "equals a field within 0.2 exactly",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.2"}}}},
+    "cases": [
+      {
+        "description": "passes when the gap is exactly the number",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.3, "y": 0.1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0.3, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.1, "locations": ["/things/0/y"]}]}
+        ]
+      },
+      {
+        "description": "passes when the left is the smaller",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.1, "y": 0.3}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 0.1, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.3, "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a field within 0.19999 exactly",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.19999"}}}},
+    "cases": [
+      {
+        "description": "fails as value when the gap is a little more than the number",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.3, "y": 0.1}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0.3, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.1, "locations": ["/things/0/y"]}]}
+        ]
+      },
+      {
+        "description": "fails as value when the left is the smaller",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.1, "y": 0.3}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 0.1, "locations": ["/things/0/x"]}, {"name": "y", "value": 0.3, "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "equals a field within 0.000001 exactly",
+    "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x equals y within 0.000001"}}}},
+    "cases": [
+      {
+        "description": "passes on big equal numbers",
+        "rules": ["sentence.phrase.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1000000000, "y": 1000000000}]},
+        "results": [
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1000000000, "locations": ["/things/0/x"]}, {"name": "y", "value": 1000000000, "locations": ["/things/0/y"]}]}
+        ]
+      }
+    ]
+  },
+  {
     "description": "is within 0",
     "policy": {"ergo_spec": "v0.3-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 5 within 0"}}}},
     "cases": [
