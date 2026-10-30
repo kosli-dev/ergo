@@ -536,7 +536,7 @@ Each check's definition in the report has an `expression` that says what it chec
 
 ## Checks Ergo adds
 
-**[added.text]** The checks Ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps. When the input is a list and `from` starts with a position on it, `<from>` starts at `$input`, like `item 1 of $input` for `$input[0]` or `every $input[1].commits`. For a subject that goes on into another subject, `<from>` is its `from` as written, starting with that subject's name: `artifact.pull_requests`, or, read from a part of it, `artifact.pr_attestation.pull_requests`.
+**[added.text]** The checks Ergo adds have these descriptions and expressions, where `<type>` is the name of the requirement's subject, and `<from>` is the name of the subject's `from`, or `$input` when it has no steps. When `from` starts with a position on the input, `<from>` starts at `$input`, like `item 1 of $input` for `$input[0]` or `every $input[1].commits`. For a subject that goes on into another subject, `<from>` is its `from` as written, starting with that subject's name: `artifact.pull_requests`, or, read from a part of it, `artifact.pr_attestation.pull_requests`.
 
 | Check           | Description                                                                                           | Expression                                                          |
 | --------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
