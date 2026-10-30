@@ -559,7 +559,16 @@ fn source_text(source: &Source) -> String {
     match source {
         Source::Root { path, every, .. } => {
             let words = if *every { "every " } else { "" };
-            format!("{words}{}", plain_text(&path.steps))
+            let from_input = matches!(path.steps.first(), Some(Step::Index(_)));
+            let text = if from_input {
+                name::name(&path::Path {
+                    start: Start::Input,
+                    steps: path.steps.clone(),
+                })
+            } else {
+                plain_text(&path.steps)
+            };
+            format!("{words}{text}")
         }
         Source::Child { path, .. } => name::name(path),
     }
