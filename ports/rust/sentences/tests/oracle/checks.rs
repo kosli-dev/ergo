@@ -3394,6 +3394,42 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
     ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
     ("i exists", "i exists", &[], &[]),
+    (
+        "every rows.n whose $input.q is at least z is at least x.v",
+        "every rows.n whose $input.q is at least z is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least $input.q is at least x.v",
+        "every rows.n whose z is at least $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least t.x is at least r.v",
+        "every rows.n whose z is at least t.x is at least r.v",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.n whose z is at least x.w is at least $input.k",
+        "every rows.n whose z is at least x.w is at least $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "every y.w whose zz is at least $input.q is at least x.v",
+        "every y.w whose zz is at least $input.q is at least x.v",
+        &[],
+        &[],
+    ),
+    (
+        "some rows.n whose z is at most $input.q is at least x.v",
+        "some rows.n whose z is at most $input.q is at least x.v",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6304,6 +6340,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every t[0].u as i", "every t[0].u as i", &[], &[]),
     ("first of t as i", "first of t as i", &[], &[]),
+    (
+        "every xs as x, every x.ys as y",
+        "every xs as x, every x.ys as y",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
