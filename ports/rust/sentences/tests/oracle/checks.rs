@@ -2530,6 +2530,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("input is 1", "input is 1", &[], &[]),
     ("it contains y", "it contains y", &[], &[]),
     ("it does not equal y", "it does not equal y", &[], &[]),
+    ("it does not exist", "it does not exist", &[], &[]),
     ("it equals x1", "it equals x1", &[], &[]),
     ("it equals y", "it equals y", &[], &[]),
     ("it exists", "it exists", &[], &[]),
