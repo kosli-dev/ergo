@@ -37,8 +37,15 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
+      - name: Write what the site needs from the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: site/prepare.sh
+      - name: Test the released tutorial and home page examples before publishing them
+        run: site/check.sh
       - name: Find the test run that built the Wasm
         id: tests
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.event.workflow_run.id }}
@@ -54,37 +61,39 @@ jobs:
           fi
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@v8
+        continue-on-error: true
         with:
           name: ergo-wasm-pkg
           path: ports/rust/wasm/pkg
           run-id: ${{ steps.tests.outputs.run_id }}
           github-token: ${{ github.token }}
       - uses: pnpm/action-setup@v6
+        continue-on-error: true
         with:
           package_json_file: packages/package.json
       - uses: actions/setup-node@v7
+        continue-on-error: true
         with:
           node-version-file: packages/.nvmrc
           cache: pnpm
           cache-dependency-path: packages/pnpm-lock.yaml
       - name: Build the editor
+        continue-on-error: true
         working-directory: packages
         run: |
           pnpm install --frozen-lockfile
           pnpm --filter @kosli/ergo-editor build
-      - name: Write what the site needs from the latest release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: site/prepare.sh
-      - name: Test the released tutorial and home page examples before publishing them
-        run: site/check.sh
       - id: pages
         uses: actions/configure-pages@v6
       - name: Build
         shell: bash
         run: |
           hugo --source site --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
-          site/editor.sh packages/editor/dist/editor.html site/public
+          if [ -f packages/editor/dist/editor.html ]; then
+            site/editor.sh packages/editor/dist/editor.html site/public
+          else
+            echo "::warning::The editor wasn't built, so the site is deployed without /editor/."
+          fi
           python3 site/check_build.py site/public
       - uses: actions/upload-pages-artifact@v5
         with:

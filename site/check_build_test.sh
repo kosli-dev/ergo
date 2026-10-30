@@ -116,12 +116,12 @@ mkdir -p "$dir/public/editor"
 echo '<html><head></head></html>' > "$dir/public/editor/index.html"
 fails "the editor page has no noindex meta"
 
-for link in /editor/ /editor https://ergo.kosli.com/editor/ ../editor/ editor/index.html '/editor/?x=1#top'; do
+for link in /editor/ /editor ../editor/ editor/index.html '/editor/?x=1#top'; do
   build
   echo "<a href=\"$link\">Editor</a>" >> "$dir/public/index.html"
   mkdir -p "$dir/public/docs"
   echo "<a href=\"$link\">Editor</a>" > "$dir/public/docs/index.html"
-  fails "docs/index.html links to the editor"
+  fails "index.html links to the editor"
 done
 
 build
@@ -133,7 +133,48 @@ echo '<a href="/editorial/">Words</a>' >> "$dir/public/index.html"
 fits "a link to a page that only starts with editor"
 
 build
-echo '<urlset><url><loc>https://ergo.kosli.com/editor/</loc></url></urlset>' > "$dir/public/sitemap.xml"
+echo '<urlset><url><loc>https://ergo.kosli.com/</loc></url><url><loc>https://ergo.kosli.com/editor/</loc></url></urlset>' > "$dir/public/sitemap.xml"
 fails "sitemap.xml lists the editor"
+
+build
+echo '<a href="https://other.example/editor/">Elsewhere</a>' >> "$dir/public/index.html"
+fits "a link to the editor of another site"
+
+build
+echo '<a href="https://ergo.kosli.com/editor/">Editor</a>' >> "$dir/public/index.html"
+fits "an absolute link to the editor when the build doesn't say what its address is"
+
+build
+echo '<urlset><url><loc>https://ergo.kosli.com/</loc></url></urlset>' > "$dir/public/sitemap.xml"
+echo '<a href="https://ergo.kosli.com/editor/">Editor</a>' >> "$dir/public/index.html"
+fails "index.html links to the editor with \"https://ergo.kosli.com/editor/\""
+
+build
+echo '<urlset><url><loc>https://ergo.kosli.com/</loc></url></urlset>' > "$dir/public/sitemap.xml"
+echo '<a href="https://other.example/editor/">Elsewhere</a>' >> "$dir/public/index.html"
+fits "a link to the editor of another host when the sitemap names the site's"
+
+build
+echo '<urlset><url><loc>https://ergo.kosli.com/ergo/</loc></url><url><loc>https://ergo.kosli.com/ergo/docs/</loc></url></urlset>' > "$dir/public/sitemap.xml"
+echo '<a href="https://ergo.kosli.com/ergo/editor/">Editor</a>' >> "$dir/public/index.html"
+fails "index.html links to the editor with \"https://ergo.kosli.com/ergo/editor/\""
+
+build
+echo '<urlset><url><loc>https://ergo.kosli.com/ergo/</loc></url><url><loc>https://ergo.kosli.com/ergo/docs/</loc></url></urlset>' > "$dir/public/sitemap.xml"
+echo '<a href="/ergo/docs/editor/">Docs</a><a href="/editor/">Other</a>' >> "$dir/public/index.html"
+fits "links to other pages called editor under the site's base path"
+
+build
+echo '<img srcset="/a.png 1x, /editor/ 2x">' >> "$dir/public/index.html"
+fails "index.html links to the editor with \"/editor/\""
+
+build
+echo '<img srcset="/a.png 300w, /b.png 600w">' >> "$dir/public/index.html"
+fits "a srcset that doesn't point at the editor"
+
+build
+mkdir -p "$dir/public/docs"
+echo '<a href="/docs/">Docs</a>' > "$dir/public/docs/index.html"
+fits "the editor page is missing"
 
 echo "check_build.py fails when the built site doesn't show what was prepared"
