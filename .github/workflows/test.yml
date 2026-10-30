@@ -298,6 +298,7 @@ jobs:
           site/check_fit_test.sh
           site/check_examples_test.sh
           site/check_build_test.sh
+          site/editor_test.sh
       - name: Write what the site needs from this commit
         run: site/prepare.sh --working-tree
       - name: Test this commit's tutorial and home page examples against its ergo.rego
