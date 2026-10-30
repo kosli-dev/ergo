@@ -567,6 +567,36 @@ mod tests {
     }
 
     #[test]
+    fn every_problem_found_while_lowering_the_for_line_starts_with_for() {
+        let read = one(
+            json!({"c": {"for": "every xs whose k is one of 1, 'a' as x", "assert": "x exists"}}),
+        );
+        assert_eq!(problems(&read), ["for: values of mixed types"]);
+        let read = one(
+            json!({"c": {"for": "every xs whose k.a.b.c.d.e.f.g.h.i.j.l is 1 as x", "assert": "x exists"}}),
+        );
+        assert!(
+            problems(&read).iter().all(|p| p.starts_with("for: ")),
+            "{:?}",
+            problems(&read)
+        );
+        let read =
+            one(json!({"c": {"for": "every xs.a.b.c.d.e.f.g.h.i.j.k as x", "assert": "x exists"}}));
+        assert_eq!(
+            problems(&read),
+            ["for: every and some over more than ten steps aren't supported yet"]
+        );
+        let read = one(
+            json!({"c": {"for": "every xs as x", "assert": "x starts with count of ys plus 1"}}),
+        );
+        assert!(
+            problems(&read).iter().all(|p| !p.starts_with("for: ")),
+            "{:?}",
+            problems(&read)
+        );
+    }
+
+    #[test]
     fn a_phrase_that_cannot_take_a_count_or_a_plus_is_written_wrong() {
         let read = one(json!({"c": "x ends with y plus z"}));
         assert_eq!(
@@ -653,7 +683,7 @@ mod tests {
         }}));
         assert_eq!(
             problems(&read),
-            ["\"starts with\" can't take a count of, a sum of or a plus"]
+            ["for: \"starts with\" can't take a count of, a sum of or a plus"]
         );
         assert!(read.plan.is_none());
         assert_eq!(
