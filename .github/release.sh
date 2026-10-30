@@ -51,7 +51,7 @@ check_rust() {
   says=$(awk '/^\[workspace\.package\]$/ { on = 1; next } /^\[/ { on = 0 } on && /^version = / { print }' "$files/engines/rust/Cargo.toml")
   [ "$says" = "version = \"$version\"" ] || fail "engines/rust/Cargo.toml on main must say version = \"$version\" under [workspace.package], and says ${says:-no version}"
   for dep in engine/Cargo.toml cli/Cargo.toml sentences-wasm/Cargo.toml; do
-    if grep 'path = "[^"]*"' "$files/engines/rust/$dep" | grep -qv "version = \"$version\""; then
+    if grep '{.*path = "[^"]*"' "$files/engines/rust/$dep" | grep -qv "version = \"$version\""; then
       fail "engines/rust/$dep has a path dependency that doesn't say version = \"$version\""
     fi
   done

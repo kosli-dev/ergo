@@ -311,7 +311,7 @@ jobs:
             exit 1
           fi
           for dep in engine cli sentences-wasm; do
-            if grep 'path = "[^"]*"' "engines/rust/$dep/Cargo.toml" | grep -qv "version = \"$VERSION\""; then
+            if grep '{.*path = "[^"]*"' "engines/rust/$dep/Cargo.toml" | grep -qv "version = \"$VERSION\""; then
               echo "engines/rust/$dep/Cargo.toml has a path dependency that doesn't say version = \"$VERSION\""
               exit 1
             fi

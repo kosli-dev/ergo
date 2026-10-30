@@ -23,7 +23,7 @@ setup() {
   : > spec/report/schema.json
   printf '%s\n' '[workspace]' 'members = ["engine"]' '' '[workspace.package]' 'version = "'"$1"'"' 'edition = "2024"' '' '[profile.wasm]' 'version = "9.9.9"' > engines/rust/Cargo.toml
   printf '%s\n' '[dependencies]' 'ergo-policy-sentences = { path = "../sentences", version = "'"$1"'" }' 'regex = "1"' > engines/rust/engine/Cargo.toml
-  printf '%s\n' '[dependencies]' 'ergo-policy-engine = { path = "../engine", version = "'"$1"'" }' > engines/rust/cli/Cargo.toml
+  printf '%s\n' '[[bin]]' 'name = "ergo"' 'path = "src/main.rs"' '' '[dependencies]' 'ergo-policy-engine = { path = "../engine", version = "'"$1"'" }' > engines/rust/cli/Cargo.toml
   printf '%s\n' '[dependencies]' 'ergo-policy-sentences = { path = "../sentences", version = "'"$1"'", features = ["serde"] }' > engines/rust/sentences-wasm/Cargo.toml
   printf '%s\n' '# Changes' '' '## '"$2" 'Something changed.' > engines/rust/CHANGELOG.md
   git add -A
