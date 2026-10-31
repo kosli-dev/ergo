@@ -34,6 +34,10 @@ heading=${heading% (not released yet)}
 tags=$(git tag --list "$tagprefix*" | grep -E "^${tagprefix}[0-9]+\.[0-9]+\.[0-9]+\$" | sed "s/^$tagprefix//" || true)
 
 if printf '%s\n' "$tags" | grep -qxF "$heading"; then
+  if [ "$version" = "$heading" ]; then
+    echo "::warning::$changelog and the version both say $heading, but $tagprefix$heading is already released. Merge the pull request that moves main to the next patch version."
+    exit 0
+  fi
   expected="${heading%.*}.$((10#${heading##*.} + 1))"
   [ "$version" = "$expected" ] || fail "$changelog has no heading above $heading, which is released as $tagprefix$heading, so nothing has changed since and the version must be $expected, and it is $version. Change the version in $files to $expected. The first change after a release adds its heading and moves the version to match."
   exit 0

@@ -60,7 +60,13 @@ setup 0.2.0 0.1.0
 fails "the version must be 0.1.1, and it is 0.2.0"
 
 setup 0.1.0 0.1.0
-fails "the version must be 0.1.1, and it is 0.1.0"
+for kind in rego rust; do
+  out=$(bash "$script" $kind 2>&1) || { echo "changelog-version.sh $kind should only warn when the released version is still on main, and said: $out" >&2; exit 1; }
+  case $out in
+    "::warning::"*"Merge the pull request that moves main to the next patch version."*) ;;
+    *) echo "changelog-version.sh $kind should warn when the released version is still on main, and said: $out" >&2; exit 1 ;;
+  esac
+done
 
 setup 0.1.1 0.1.1
 passes "a patch with a new heading"
