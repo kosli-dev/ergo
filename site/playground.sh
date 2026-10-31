@@ -20,7 +20,6 @@ cat > "$2/editor/index.html" <<'HTML'
 <meta charset="utf-8">
 <meta name="robots" content="noindex">
 <meta http-equiv="refresh" content="0; url=../playground/">
-<link rel="canonical" href="../playground/">
 <title>Ergo playground</title>
 </head>
 <body>

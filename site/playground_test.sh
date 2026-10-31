@@ -21,7 +21,7 @@ old="$dir/public/editor/index.html"
   echo "playground.sh should write the page at /editor/ that sends visitors on" >&2
   exit 1
 }
-for want in '<!doctype html>' '<meta charset="utf-8">' '<meta name="robots" content="noindex">' '<meta http-equiv="refresh" content="0; url=../playground/">' '<link rel="canonical" href="../playground/">' '<a href="../playground/">The playground has moved to /playground/</a>'; do
+for want in '<!doctype html>' '<meta charset="utf-8">' '<meta name="robots" content="noindex">' '<meta http-equiv="refresh" content="0; url=../playground/">' '<a href="../playground/">The playground has moved to /playground/</a>'; do
   grep -qF "$want" "$old" || {
     echo "the /editor/ page should contain $want" >&2
     exit 1
