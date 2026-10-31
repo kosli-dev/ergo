@@ -8,7 +8,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - The report's `engine` name is `ergo-rust`, where it was `ergo-policy-engine`, so it matches the Rego engine's `ergo-rego` and the `rust-v*` tag. Every report changes in that field only, and the hash leaves `engine` out, so hashes stay the same. The version is the same.
 - The engine follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released.
-- An input that reads the item's own field named like a parent subject keeps its dot, like `.art.k`, as spec 0.4 says. A `from` that is only a `named by` step is written as it is in the `$min_subjects` and `$unique_ids` expressions, so `every $input named by $params.k` is no longer `count(matching(every [$params.k]))`. Reports change for such policies.
+- An input that reads the item's own field named like a parent subject keeps its dot, like `.art.k`, as spec 0.4 says. A `from` that starts at the input with a `named by` step is written as it is in the `$min_subjects` and `$unique_ids` expressions, so `every $input named by $params.k` is no longer `count(matching(every [$params.k]))`. Reports change for such policies.
 
 ## 0.1.0
 

@@ -10814,3 +10814,35 @@ test_the_childs_own_field_named_like_its_parent_keeps_its_dot_in_the_input_name 
 	[i.name | some i in rows_for(rep, "r", "c")[0].inputs] == [".art.k"]
 	[i.name | some i in rows_for(rep, "r", "d")[0].inputs] == ["art.k"]
 }
+
+test_a_position_on_the_childs_own_field_named_like_its_parent_puts_the_dot_after_the_position_words if {
+	subjects := {"art": {"from": "arts", "identified_by": "id"}, "item": {"from": "art.items", "identified_by": "id"}}
+	checks := {"a": ".art.xs[0] is 5", "b": "item 1 of .art.xs is 5", "c": "first of .art.xs is 5"}
+	rep := ergo.report({"arts": [{"id": "a1", "items": [{"id": "i1", "art": {"xs": [5]}}]}]}, {"ergo_spec": "v0.4-dev", "subjects": subjects, "requirements": {"r": {"subject": "item", "checks": checks}}}, {})
+	every c in ["a", "b", "c"] {
+		[i.name | some i in rows_for(rep, "r", c)[0].inputs] == ["item 1 of .art.xs"]
+	}
+}
+
+test_a_for_line_names_the_childs_own_field_named_like_its_parent_with_the_dot if {
+	subjects := {"art": {"from": "arts", "identified_by": "id"}, "item": {"from": "art.items", "identified_by": "id"}}
+	checks := {"f": {"for": "every .art.xs as x", "assert": "x is at least .art.k"}}
+	rep := ergo.report({"arts": [{"id": "a1", "items": [{"id": "i1", "art": {"k": 1, "xs": [5]}}]}]}, {"ergo_spec": "v0.4-dev", "subjects": subjects, "requirements": {"r": {"subject": "item", "checks": checks}}}, {})
+	".art.k" in [i.name | some i in rows_for(rep, "r", "f")[0].inputs]
+}
+
+test_a_from_that_is_several_named_by_steps_or_a_named_by_with_a_position_is_written_as_it_was if {
+	subjects := {"s": {"from": "every $input named by $params.k named by $params.j"}}
+	rep := ergo.report({"a": {"b": [{"id": 1}]}}, {"ergo_spec": "v0.4-dev", "subjects": subjects, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}}, {"k": "a", "j": "b"})
+	rep.requirements.r.checks["$min_subjects"].expression == "count(matching(every $input named by $params.k named by $params.j)) >= 1"
+	rep2 := ergo.report({"a": [{"id": 1}]}, {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "$input named by $params.k[0]"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}}, {"k": ["a"]})
+	rep2.requirements.r.checks["$min_subjects"].expression == "count(matching(item 1 of $input named by $params.k)) >= 1"
+	rep3 := ergo.report({"a": [{"id": 1}]}, {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "every $input named by $params.k.x"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}}, {"k": {"x": "a"}})
+	rep3.requirements.r.checks["$min_subjects"].expression == "count(matching(every $input named by $params.k.x)) >= 1"
+}
+
+test_a_from_whose_condition_keeps_the_dot_of_the_childs_own_field_named_like_its_parent_in_the_subjects_from if {
+	subjects := {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose v equals .art.k", "identified_by": "id"}}
+	rep := ergo.report({"arts": [{"id": "a1", "k": 5, "items": [{"id": "i1", "art": {"k": 1}, "v": 5}]}]}, {"ergo_spec": "v0.4-dev", "subjects": subjects, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}}, {})
+	rep.subjects.thing.from == "art.items whose v equals .art.k"
+}

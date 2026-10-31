@@ -1533,6 +1533,26 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("every artifacts.releases", "every artifacts.releases"),
     ("k whose n is 2", "k whose n is 2"),
+    (
+        "$input named by $params.k[0]",
+        "item 1 of $input named by $params.k",
+    ),
+    (
+        "art.items whose every .art.xs is 5",
+        "art.items whose every art.xs is 5",
+    ),
+    (
+        "art.items whose v equals .art.k",
+        "art.items whose v equals art.k",
+    ),
+    (
+        "every $input named by $params.k named by $params.j",
+        "every $input named by $params.k named by $params.j",
+    ),
+    (
+        "every $input named by $params.k.x",
+        "every $input named by $params.k.x",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
