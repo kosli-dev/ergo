@@ -3,7 +3,7 @@ title: "Ergo - An open language for explainable policies."
 
 hero:
   title: An open language for explainable policies.
-  lede: ==ergo== is an open source language for writing policies that explain themselves. Instead of a yes or no, every decision returns an audit report of what was checked, and why it passed or failed. Run your policies on Open Policy Agent with `ergo.rego`, or with the `ergo` command.
+  lede: ==ergo== is an open source language for writing policies that explain themselves. Instead of a yes or no, every decision returns an audit report of what was checked, and why it passed or failed. Run your policies on Open Policy Agent with `ergo.rego`, or with the `ergo` CLI.
   primary: Get started
   secondary: GitHub
   verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
@@ -89,7 +89,7 @@ manifesto:
 architecture:
   title: One language.
   muted: Two engines.
-  lede: Two engines can run your policies, and both follow the same spec. `ergo.rego` runs on Open Policy Agent, so anywhere OPA runs. The Rust engine runs in the `ergo` CLI and in the editor in your browser, and is still experimental. Both pass every case in the spec, so the same policy and input give the same report, apart from the engine's name.
+  lede: Two engines can run your policies, and both follow the same spec. `ergo.rego` runs on Open Policy Agent, so it runs wherever OPA does. The Rust engine runs in the `ergo` CLI and in the editor in your browser, and is still experimental. Both pass every case in the spec.
   engines:
     - name: ergo.rego
       runs: runs on OPA
@@ -114,7 +114,7 @@ start:
       body: Either one runs the same policy.
       options:
         - engine: OPA with ergo.rego
-          body: Copy it next to the policy, with a few lines of Rego that load it. [Get started](/docs/getting-started/) shows them.
+          body: Copy it next to the policy, with a few lines of Rego that hand the policy to it. [Get started](/docs/getting-started/) shows them.
           code: |-
             policy/
               policy.yaml

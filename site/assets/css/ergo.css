@@ -308,7 +308,7 @@ p code, li code, dd code, td code {
 }
 .js .flow[data-sequence] .flow__card:not(.is-resolved) * { visibility: hidden; }
 .js .flow[data-sequence] > li:not(.is-arrow)::after { visibility: hidden; }
-/* What ergo itself contributes is named in lime and bold: the library and the report. */
+/* What ergo itself contributes is named in lime and bold: the engines and the report. */
 .flow__v--ergo { color: var(--lime); font-weight: 700; }
 .flow__or { margin: -4px 0; text-align: center; font-size: 12px; font-weight: 700; color: var(--lime); }
 .js .flow[data-sequence] .flow__group:not(.is-in) .flow__or { visibility: hidden; }
