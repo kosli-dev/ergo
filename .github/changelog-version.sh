@@ -62,10 +62,10 @@ section=$(awk '/^## / { n++ } n == 1' "$changelog")
 if printf '%s\n' "$section" | grep -qE '^### (Changed|Removed)$'; then
   if [ "$pmajor" = 0 ]; then
     [ "$version" != "$patch" ] && exit 0
-    needed=$minor
+    needed="$minor or $major"
   else
     [ "$version" = "$major" ] && exit 0
     needed=$major
   fi
-  fail "$changelog lists a change under ### Changed or ### Removed for $heading, which can break a policy or a report, so the version must go above $previous, to $needed or higher. Change the heading and the version in $files."
+  fail "$changelog lists a change under ### Changed or ### Removed for $heading, which can break a policy or a report, so after $previous the version must be $needed. Change the heading and the version in $files."
 fi

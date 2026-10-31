@@ -84,10 +84,10 @@ setup 0.1.1 0.1.2
 fails "which isn't released yet, but the version is 0.1.1"
 
 setup 0.1.1 0.1.1 '### Changed'
-fails "the version must go above 0.1.0, to 0.2.0 or higher"
+fails "after 0.1.0 the version must be 0.2.0 or 1.0.0"
 
 setup 0.1.1 0.1.1 '### Removed'
-fails "the version must go above 0.1.0, to 0.2.0 or higher"
+fails "after 0.1.0 the version must be 0.2.0 or 1.0.0"
 
 setup 0.2.0 0.2.0 '### Changed'
 passes "a minor with Changed"
@@ -103,7 +103,7 @@ setup 0.2.1 0.2.0
 passes "the patch after a second release"
 
 setup 0.2.1 0.2.1 '### Changed'
-fails "the version must go above 0.2.0, to 0.3.0 or higher"
+fails "after 0.2.0 the version must be 0.3.0 or 1.0.0"
 
 setup 0.1.5 0.1.5
 fails "the next version must be 0.2.1, 0.3.0 or 1.0.0"
@@ -125,7 +125,7 @@ passes "the next major"
 
 tag 1.0.0
 setup 1.1.0 1.1.0 '### Changed'
-fails "the version must go above 1.0.0, to 2.0.0 or higher"
+fails "after 1.0.0 the version must be 2.0.0"
 
 setup 2.0.0 2.0.0 '### Changed'
 passes "a major from 1.0 with Changed"
