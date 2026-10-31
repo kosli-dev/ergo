@@ -35,7 +35,7 @@ Ergo reads no clock and nothing random, and sorts everything it writes. The same
 Two engines build Ergo reports, and you choose one:
 
 - `ergo.rego` runs on [Open Policy Agent](https://www.openpolicyagent.org/). It is one file with no dependencies. Run it with `opa eval`, or compile it to Wasm and run it with OPA's JavaScript runtime, as [REFERENCE.md](REFERENCE.md#compiling-to-wasm) shows.
-- The Rust engine is experimental. It runs as the `ergo` command, or in a browser through Wasm, and its sentence reader works alone, for editors and linters. See [`engines/rust/README.md`](engines/rust/README.md).
+- The `ergo` CLI runs the Rust engine, which is experimental. The Rust engine also runs in a browser through Wasm, and its sentence reader works alone, for editors and linters. See [`engines/rust/README.md`](engines/rust/README.md).
 
 Both run every case in [`spec/cases`](spec/cases) and give the same report, apart from `engine`, which says which one made it.
 
@@ -64,15 +64,15 @@ policy/
 
 Each release has a version, like `0.2.0`, and the file says which one it is. To stay on one, download it from that release instead of the latest, like `https://github.com/kosli-dev/ergo/releases/download/rego-v0.2.0/ergo.rego`.
 
-#### The Rust engine (experimental)
+#### The `ergo` CLI (experimental)
 
-Install the `ergo` command from crates.io. You need Rust, which [rustup](https://rustup.rs/) installs:
+Install the `ergo` CLI from crates.io. You need Rust, which [rustup](https://rustup.rs/) installs:
 
 ```sh
 cargo install --locked ergo-policy-cli
 ```
 
-Or download it, without Rust, for Linux (x86_64) or macOS (arm64) from the [latest Rust engine release](https://github.com/kosli-dev/ergo/releases?q=rust&expanded=true), unpack it and put `ergo` on your `PATH`:
+Or download it, without Rust, for Linux (x86_64) or macOS (arm64) from the [latest release of the CLI](https://github.com/kosli-dev/ergo/releases?q=rust&expanded=true), unpack it and put `ergo` on your `PATH`:
 
 ```sh
 curl -L https://github.com/kosli-dev/ergo/releases/download/rust-v0.1.0/ergo-0.1.0-macos-arm64.tar.gz | tar xz
@@ -172,7 +172,7 @@ Ask for the report. With `ergo.rego`:
 opa eval -d policy -i deployments.json --format=pretty 'data.deploy.report'
 ```
 
-With the Rust engine:
+With the `ergo` CLI:
 
 ```sh
 ergo report --policy policy/policy.yaml --input deployments.json
@@ -196,7 +196,7 @@ The report records every check Ergo ran, including the ones that passed. It come
 }
 ```
 
-That is the report from `ergo.rego`. The Rust engine gives the same report, except that `engine` is `{"name": "ergo-policy-engine", "version": "0.2.0-dev"}`.
+That is the report from `ergo.rego`. The `ergo` CLI gives the same report, except that `engine` names the Rust engine: `{"name": "ergo-policy-engine", "version": "0.2.0-dev"}`.
 
 - `compliant` is the overall answer. When you need a plain yes or no to allow or block something, this is the one to use: `allow := report.compliant`.
 - `requirements` has an entry for each requirement. It repeats the requirement's `description`, and its `status` is `met`, `not_met`, or `not_applicable` when no subject was left to check. When it's `not_met`, `causes` says why, worst first, with how many rows each: here `[{"cause": "absent", "rows": 1}]`. It also says how many subjects were found and kept, and lists every check with a readable `expression`, which is the sentence as you wrote it.
@@ -244,7 +244,7 @@ The report holds every row, passed or failed. To tell someone only what went wro
 opa eval -d policy -i deployments.json --format=pretty 'data.deploy.violations'
 ```
 
-With the Rust engine:
+With the `ergo` CLI:
 
 ```sh
 ergo violations --policy policy/policy.yaml --input deployments.json
@@ -281,13 +281,13 @@ Both print:
 
 ### Going further
 
-The [reference](REFERENCE.md) covers every field, operator and cause, including the ones this example doesn't use. For the Rust engine, read [`engines/rust/README.md`](engines/rust/README.md).
+The [reference](REFERENCE.md) covers every field, operator and cause, including the ones this example doesn't use. For the `ergo` CLI and the Rust engine, read [`engines/rust/README.md`](engines/rust/README.md).
 
 ### Updating
 
-With the Rust engine, run `cargo install --locked ergo-policy-cli` again, or download the binary from the newest Rust engine release.
+With `ergo.rego`, download the new file over the old one and run your policy's tests. [`CHANGELOG.md`](CHANGELOG.md) says what each release changed, and which spec version it follows.
 
-With the Rust engine, pull the repo and run `cargo install --locked --path cli` again from `engines/rust`.
+With the `ergo` CLI, run `cargo install --locked ergo-policy-cli` again, or download it from the newest release of the CLI.
 
 ## Contributing
 
