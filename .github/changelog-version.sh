@@ -13,14 +13,14 @@ case $kind in
   rego)
     tagprefix=rego-v
     changelog=CHANGELOG.md
-    files='engines/rego/ergo.rego, README.md and REFERENCE.md'
+    files='engines/rego/ergo.rego and REFERENCE.md'
     version=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' engines/rego/ergo.rego)
     [ -n "$version" ] || fail 'ergo.rego must say version := "X.Y.Z-dev" on main'
     ;;
   rust)
     tagprefix=rust-v
     changelog=engines/rust/CHANGELOG.md
-    files='the Cargo.toml files of engines/rust and README.md'
+    files='the Cargo.toml files of engines/rust'
     version=$(sed -n 's/^version = "\([0-9]*\.[0-9]*\.[0-9]*\)\(-dev\)\{0,1\}"$/\1/p' engines/rust/Cargo.toml | head -n 1)
     [ -n "$version" ] || fail 'engines/rust/Cargo.toml must say version = "X.Y.Z" or "X.Y.Z-dev" under [workspace.package]'
     ;;
