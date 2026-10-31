@@ -95,11 +95,12 @@ jobs:
         shell: bash
         run: |
           hugo --source site --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
-          if [ -f packages/editor/dist/editor.html ]; then
-            site/editor.sh packages/editor/dist/editor.html site/public
-          else
-            echo "::warning::The editor wasn't built, so the site is deployed without /editor/."
+          if [ ! -f packages/editor/dist/editor.html ]; then
+            echo "::error::The editor wasn't built, and every page links to /editor/."
+            exit 1
           fi
+          site/editor.sh packages/editor/dist/editor.html site/public
+          test -f site/public/editor/index.html
           python3 site/check_build.py site/public
       - uses: actions/upload-pages-artifact@v5
         with:

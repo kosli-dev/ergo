@@ -1,4 +1,5 @@
 {{- $marks := .marks | default dict -}}
+{{- $wrap := .wrap -}}
 {{- $out := slice -}}
 {{- range split .text "\n" -}}
   {{- with findRESubmatch `^(\s*)([^:]+):\s*(.*)$` . 1 -}}
@@ -16,9 +17,16 @@
     {{- else if $value -}}
       {{- $line = printf `%s <span class="s">%s</span>` $line (htmlEscape $value) -}}
     {{- end -}}
+    {{- if $wrap -}}
+      {{- $line = printf `<span class="ln" style="--hang: %dch">%s</span>` (add (len (index $m 1)) 2) $line -}}
+    {{- end -}}
     {{- $out = $out | append $line -}}
   {{- else -}}
-    {{- $out = $out | append (htmlEscape .) -}}
+    {{- if $wrap -}}
+      {{- $out = $out | append (printf `<span class="ln">%s</span>` (htmlEscape .)) -}}
+    {{- else -}}
+      {{- $out = $out | append (htmlEscape .) -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
-{{- return (delimit $out "\n") -}}
+{{- return (delimit $out (cond $wrap "" "\n")) -}}

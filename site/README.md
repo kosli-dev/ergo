@@ -42,17 +42,17 @@ Then open http://localhost:1313. Hugo picks up edits to the working tree's tutor
 `site/prepare.sh` writes what Hugo needs into folders git ignores, and Hugo stops with a message naming the script when they're missing:
 
 - `site/prepared/` holds what comes from the release, laid out like `site/`, and where a file is in both, Hugo uses the one in `site/prepared/`. It always holds `README.md` and `REFERENCE.md` for the docs and `examples/` for the bakery page, from the release or the working tree, so run the script again after you edit those. The example files end in `.txt`, and the released `ergo.rego` is `ergo.rego.txt`, because OPA loads every `.rego`, `.json` and `.yaml` file under the folder it's given, and they'd clash with the repo's own.
-- `site/prepared/data/release.json` holds the versions the home page shows: the release, the newest published `spec-vX.Y` release, and the spec that `ergo.rego` reads.
+- `site/prepared/data/release.json` holds the versions the home page shows: the release, the newest published `rust-vX.Y.Z` release (empty when there is none, and then the home page leaves it out), the newest published `spec-vX.Y` release, and the spec that `ergo.rego` reads.
 - `site/assets/tutorial/` holds `ergo.rego` compiled to Wasm, and OPA's Wasm runtime.
 - `site/static/spec/` holds the schemas of every published spec release, from `site/spec-schemas.sh`.
 
-The script picks the newest `rego-vX.Y.Z` and `spec-vX.Y` releases by version, and ignores drafts, pre-releases and tags of any other shape. It fails when there's no such release, or when a release's tag isn't fetched. With `--working-tree`, it takes the spec from the `spec-vX.Y` tags instead, so it needs no GitHub CLI.
+The script picks the newest `rego-vX.Y.Z`, `rust-vX.Y.Z` and `spec-vX.Y` releases by version, and ignores drafts, pre-releases and tags of any other shape. It fails when there's no such release, or when a release's tag isn't fetched. With `--working-tree`, it takes the spec and the Rust release from the `spec-vX.Y` and `rust-vX.Y.Z` tags instead, so it needs no GitHub CLI.
 
 `site/check.sh` tests what `site/prepare.sh` wrote. From the working tree, it runs the tutorial's tests and checks the home page's examples against the working tree's `ergo.rego`. From the release, it runs the released tutorial's tests, checks the home page's examples against the released `ergo.rego`, and checks that the released tutorial still has what it needs from `main`: the CSS variables and classes it took from `ergo.css`, the partials its layout calls, and the files its scripts import.
 
 After `hugo` builds the site, `site/check_build.py <folder>` checks that the built tutorial writes the spec of the Ergo it runs, that its script has the strings of the tutorial `site/prepare.sh` chose and none that only the other one has, that its page has that tutorial's layout and title, that its CSS has that `tutorial.css`'s classes, properties, colours and lengths, and that the home page shows the examples `site/check.sh` checked. That catches a mount in `hugo.toml` that lets `main`'s file win over the release's.
 
-The deploy also builds `packages/editor` and `site/editor.sh` puts it at `/editor/` with a `noindex` meta tag. Nothing links to it, and `check_build.py` fails when a page does, when `sitemap.xml` lists it or when the tag is missing. The deploy reuses the Wasm the `test` run built, so it needs a successful `test` run for the commit.
+The deploy also builds `packages/editor` and `site/editor.sh` puts it at `/editor/` with a `noindex` meta tag. The top navigation of every page links to it, and so does the home page's start section. `check_build.py` fails when the home page has no link to it, when `sitemap.xml` lists it or when the tag is missing. The deploy reuses the Wasm the `test` run built, so it needs a successful `test` run for the commit.
 
 CI does all of this from the working tree and from the release on every pull request, and the deploy runs the release checks before it publishes.
 

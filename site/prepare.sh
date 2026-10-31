@@ -30,13 +30,17 @@ if [ "$mode" = release ]; then
     fail "Listing Ergo's releases needs the GitHub CLI, logged in. To build from this working tree instead, run: site/prepare.sh --working-tree"
   fi
   specs=$releases
+  rusts=$releases
   where="$repo has no published spec-vX.Y release"
 else
   specs=$(git tag --list 'spec-v*')
+  rusts=$(git tag --list 'rust-v*')
   where="There's no spec-vX.Y tag here. Fetch the tags with: git fetch --tags"
 fi
 spec_tag=$(printf '%s\n' "$specs" | site/latest-release.sh spec)
 [ -n "$spec_tag" ] || fail "$where"
+rust_tag=$(printf '%s\n' "$rusts" | site/latest-release.sh rust)
+[ -z "$rust_tag" ] || has_tag "$rust_tag"
 spec_tags=$(printf '%s\n' "$specs" | grep -E '^spec-v[0-9]+\.[0-9]+$')
 for spec in $spec_tags; do
   has_tag "$spec"
@@ -108,7 +112,7 @@ if [ "$mode" = release ]; then
       ;;
   esac
 fi
-printf '{"source": "%s", "rego": "%s", "spec": "%s", "ergo_spec": "%s"}\n' "$source" "$version" "${spec_tag#spec-v}" "$ergo_spec" > "$prepared/data/release.json"
+printf '{"source": "%s", "rego": "%s", "rust": "%s", "spec": "%s", "ergo_spec": "%s"}\n' "$source" "$version" "${rust_tag#rust-v}" "${spec_tag#spec-v}" "$ergo_spec" > "$prepared/data/release.json"
 
 out=site/assets/tutorial
 rm -rf "$out"

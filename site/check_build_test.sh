@@ -7,13 +7,14 @@ trap 'rm -rf "$dir"' EXIT
 build() {
   rm -rf "$dir/public" "$dir/site"
   mkdir -p "$dir/public/js/tutorial" "$dir/site/prepared/data" "$dir/site/data"
-  echo '{"source": "rego-v0.1.0", "rego": "0.1.0", "spec": "0.1", "ergo_spec": "v0.1"}' > "$dir/site/prepared/data/release.json"
+  echo '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "0.1.0", "spec": "0.1", "ergo_spec": "v0.1"}' > "$dir/site/prepared/data/release.json"
   printf 'demo:\n  input: |-\n    {"a": 1}\n  policy: |-\n    subjects: {}\n' > "$dir/site/data/examples.yaml"
   mkdir -p "$dir/site/assets/js/tutorial"
   echo 'export const step = { title: "Name the check", spec: "v0.1" };' > "$dir/site/assets/js/tutorial/lib.mjs"
   echo 'import { step } from "./lib.mjs";' > "$dir/site/assets/js/tutorial/main.mjs"
   echo 'const p={ergo_spec:"v0.1"},s={title:"Name the check",spec:"v0.1"};' > "$dir/public/js/tutorial/main.abc.js"
   printf '%s\n' '<pre class="code"><code>{<span class="k">"a"</span>: 1}</code></pre>' '<pre class="code"><code><span class="k">ergo_spec</span>: v0.1' 'subjects: {}</code></pre>' > "$dir/public/index.html"
+  echo '<a href="/editor/">Editor</a>' >> "$dir/public/index.html"
   mkdir -p "$dir/site/layouts" "$dir/site/content" "$dir/site/assets/css" "$dir/public/tutorial" "$dir/public/css"
   echo '<div class="tut" data-wasm="{{ . }}" data-step></div>' > "$dir/site/layouts/tutorial.html"
   printf -- '---\ntitle: "Learn Ergo"\n---\n' > "$dir/site/content/tutorial.md"
@@ -109,68 +110,36 @@ build
 mkdir -p "$dir/public/editor"
 echo '<html><head><meta name="robots" content="noindex"></head><body><a href="/">Home</a></body></html>' > "$dir/public/editor/index.html"
 echo '<a href="/docs/">Docs</a>' > "$dir/public/docs.html"
-fits "the editor page is there with noindex and nothing links to it"
+fits "the editor page is there with noindex and the home page links to it"
 
 build
 mkdir -p "$dir/public/editor"
 echo '<html><head></head></html>' > "$dir/public/editor/index.html"
 fails "the editor page has no noindex meta"
 
-for link in /editor/ /editor ../editor/ editor/index.html '/editor/?x=1#top'; do
-  build
-  echo "<a href=\"$link\">Editor</a>" >> "$dir/public/index.html"
-  mkdir -p "$dir/public/docs"
-  echo "<a href=\"$link\">Editor</a>" > "$dir/public/docs/index.html"
-  fails "index.html links to the editor"
-done
+build
+sed -i.bak 's|<a href="/editor/">Editor</a>||' "$dir/public/index.html"
+rm "$dir/public/index.html.bak"
+fails "the home page doesn't link to the editor"
 
 build
-echo "<script src='/editor/'></script>" >> "$dir/public/index.html"
-fails "index.html links to the editor with \"/editor/\""
+sed -i.bak 's|<a href="/editor/">Editor</a>|<a href="/editorial/">Editor</a>|' "$dir/public/index.html"
+rm "$dir/public/index.html.bak"
+fails "the home page doesn't link to the editor"
 
 build
-echo '<a href="/editorial/">Words</a>' >> "$dir/public/index.html"
-fits "a link to a page that only starts with editor"
+sed -i.bak 's|<a href="/editor/">Editor</a>|<a href=/editor/>Editor</a>|' "$dir/public/index.html"
+rm "$dir/public/index.html.bak"
+fits "a minified link to the editor without quotes"
+
+build
+sed -i.bak 's|href="/editor/"|href="/ergo/editor"|' "$dir/public/index.html"
+rm "$dir/public/index.html.bak"
+fits "a link to the editor under a base path"
 
 build
 echo '<urlset><url><loc>https://ergo.kosli.com/</loc></url><url><loc>https://ergo.kosli.com/editor/</loc></url></urlset>' > "$dir/public/sitemap.xml"
 fails "sitemap.xml lists the editor"
-
-build
-echo '<a href="https://other.example/editor/">Elsewhere</a>' >> "$dir/public/index.html"
-fits "a link to the editor of another site"
-
-build
-echo '<a href="https://ergo.kosli.com/editor/">Editor</a>' >> "$dir/public/index.html"
-fits "an absolute link to the editor when the build doesn't say what its address is"
-
-build
-echo '<urlset><url><loc>https://ergo.kosli.com/</loc></url></urlset>' > "$dir/public/sitemap.xml"
-echo '<a href="https://ergo.kosli.com/editor/">Editor</a>' >> "$dir/public/index.html"
-fails "index.html links to the editor with \"https://ergo.kosli.com/editor/\""
-
-build
-echo '<urlset><url><loc>https://ergo.kosli.com/</loc></url></urlset>' > "$dir/public/sitemap.xml"
-echo '<a href="https://other.example/editor/">Elsewhere</a>' >> "$dir/public/index.html"
-fits "a link to the editor of another host when the sitemap names the site's"
-
-build
-echo '<urlset><url><loc>https://ergo.kosli.com/ergo/</loc></url><url><loc>https://ergo.kosli.com/ergo/docs/</loc></url></urlset>' > "$dir/public/sitemap.xml"
-echo '<a href="https://ergo.kosli.com/ergo/editor/">Editor</a>' >> "$dir/public/index.html"
-fails "index.html links to the editor with \"https://ergo.kosli.com/ergo/editor/\""
-
-build
-echo '<urlset><url><loc>https://ergo.kosli.com/ergo/</loc></url><url><loc>https://ergo.kosli.com/ergo/docs/</loc></url></urlset>' > "$dir/public/sitemap.xml"
-echo '<a href="/ergo/docs/editor/">Docs</a><a href="/editor/">Other</a>' >> "$dir/public/index.html"
-fits "links to other pages called editor under the site's base path"
-
-build
-echo '<img srcset="/a.png 1x, /editor/ 2x">' >> "$dir/public/index.html"
-fails "index.html links to the editor with \"/editor/\""
-
-build
-echo '<img srcset="/a.png 300w, /b.png 600w">' >> "$dir/public/index.html"
-fits "a srcset that doesn't point at the editor"
 
 build
 mkdir -p "$dir/public/docs"

@@ -1,9 +1,9 @@
 ---
-title: "Ergo - Explainable policies that run on Open Policy Agent and Rego."
+title: "Ergo - An open language for explainable policies."
 
 hero:
-  title: Explainable policies that run on Open Policy Agent and Rego.
-  lede: ==ergo== is an open source language for writing explainable policies. Instead of a binary result, every decision returns an audit report of what was checked, and why it passed or failed.
+  title: An open language for explainable policies.
+  lede: ==ergo== is an open source language for writing policies that explain themselves. Instead of a yes or no, every decision returns an audit report of what was checked, and why it passed or failed. Run your policies on Open Policy Agent with `ergo.rego`, or with the `ergo` CLI.
   primary: Get started
   secondary: GitHub
   verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
@@ -87,9 +87,16 @@ manifesto:
     - Everything has a reason.
 
 architecture:
-  title: OPA is the engine.
-  muted: ==ergo== is a rego library.
-  lede: ==ergo== doesn't replace OPA. Copy a single rego file into your policies. The policy is expressed as YAML, JSON or rego and ==ergo== provides a single evaluation and reporting model.
+  title: One language.
+  muted: Two engines.
+  lede: Two engines can run your policies, and both follow the same spec. `ergo.rego` runs on Open Policy Agent, so it runs wherever OPA does. The Rust engine runs in the `ergo` CLI and in the playground in your browser, and is still experimental. Both pass every case in the spec.
+  engines:
+    - name: ergo.rego
+      runs: runs on OPA
+      opa: true
+    - name: Rust engine
+      note: (experimental)
+      runs: runs in the ergo CLI and the playground
 
 vocabulary:
   title: Auditor says why
@@ -98,26 +105,41 @@ vocabulary:
   link: The bakery example
 
 start:
-  title: One file. No lock-in.
+  title: No lock-in.
   steps:
-    - title: Copy the library
-      body: Copy `ergo.rego` next to your policies. That's the install.
-      code: |-
-        policy/
-          ergo.rego
     - title: Write a policy
-      body: Say what you're judging, what's in scope and what must hold.
-      code: |-
-        report := ergo.report(input, {
-          "ergo_spec": data.ergo_spec,
-          "subjects": data.subjects,
-          "requirements": data.requirements,
-        }, {})
+      body: Say what you're judging, what's in scope and what must hold, in `policy.yaml`.
+      policy: true
+    - title: Pick an engine
+      body: Either one runs the same policy.
+      options:
+        - engine: OPA with ergo.rego
+          body: Copy it next to the policy, with a few lines of Rego that hand the policy to it. [Get started](/docs/getting-started/) shows them.
+          code: |-
+            policy/
+              policy.yaml
+              ergo.rego
+              deploy.rego
+        - engine: ergo CLI
+          body: Build it with Cargo, or download it for Linux (x86_64) or macOS (arm64) from the [latest release of the CLI](https://github.com/kosli-dev/ergo/releases?q=rust-v).
+          code: cargo install --locked ergo-policy-cli
     - title: Read the report
-      body: Ask OPA for the report, or just the violations.
-      code: |-
-        opa eval -d policy -i deployments.json \
-          'data.deploy.report'
+      body: Every check, with what it read and why it passed or failed.
+      options:
+        - engine: OPA with ergo.rego
+          body: Ask OPA for the report, or for `data.deploy.violations` to see only what failed.
+          code: |-
+            opa eval -d policy -i deployments.json \
+              'data.deploy.report'
+        - engine: ergo CLI
+          body: Run `ergo report`, or `ergo violations` to see only what failed.
+          code: |-
+            ergo report --policy policy/policy.yaml \
+              --input deployments.json
+  editor:
+    lead: "Or try it in the browser, with nothing to install:"
+    link: the playground
+    note: (experimental)
   primary: Read the walkthrough
   secondary: GitHub
 

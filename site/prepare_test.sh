@@ -129,7 +129,7 @@ case $out in
     ;;
 esac
 says site/prepared/source rego-v0.1.0
-says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "spec": "0.1", "ergo_spec": "v0.1"}'
+says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1"}'
 says site/prepared/repo/README.md '# Readme
 "version": "0.1.0"
 10.1.0-dev
@@ -170,7 +170,11 @@ has site/prepared/data/examples.yaml
 
 FAKE_RELEASES="rego-v0.1.0 spec-v0.1" FAKE_PRE_RELEASES="rego-v0.10.0 spec-v0.9" FAKE_DRAFTS="rego-v0.10.0 spec-v0.9" site/prepare.sh > /dev/null
 says site/prepared/source rego-v0.1.0
-says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "spec": "0.1", "ergo_spec": "v0.1"}'
+says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1"}'
+
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rust-v0.2.0
+FAKE_RELEASES="rego-v0.1.0 spec-v0.1 rust-v0.1.0 rust-v0.2.0 rust-v0.10.0-rc1" site/prepare.sh > /dev/null
+says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "0.2.0", "spec": "0.1", "ergo_spec": "v0.1"}'
 
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag spec-v0.2
 FAKE_RELEASES="rego-v0.10.0 spec-v0.1" FAKE_ASSET_VERSION=0.10.0 site/prepare.sh > /dev/null
@@ -179,21 +183,28 @@ lacks site/static/spec/0.2
 (FAKE_RELEASES="rego-v0.10.0"; FAKE_ASSET_VERSION=0.10.0; expected="kosli-dev/ergo has no published spec-vX.Y release"; fails)
 (FAKE_RELEASES="rego-v0.10.0 spec-v0.1 spec-v0.3"; FAKE_ASSET_VERSION=0.10.0; expected="There's no spec-v0.3 tag here. Fetch the tags with: git fetch --tags"; fails)
 (FAKE_RELEASES="rego-v0.10.0 spec-v0.1"; FAKE_ASSET_VERSION=0.10.0; export FAKE_ASSET_SPEC=v0.2; expected="The ergo.rego of rego-v0.10.0 reads spec v0.2, and spec-v0.2 isn't published, so the site would link to schemas it doesn't have"; fails)
-git tag --delete spec-v0.2 > /dev/null
+(FAKE_RELEASES="rego-v0.10.0 spec-v0.1 rust-v0.3.0"; FAKE_ASSET_VERSION=0.10.0; expected="There's no rust-v0.3.0 tag here. Fetch the tags with: git fetch --tags"; fails)
+git tag --delete spec-v0.2 rust-v0.2.0 > /dev/null
 
 echo "# Working" > README.md
 site/prepare.sh --working-tree > /dev/null
 says site/prepared/source "working tree"
 says site/prepared/repo/README.md "# Working"
-says site/prepared/data/release.json '{"source": "working tree", "rego": "", "spec": "0.1", "ergo_spec": "v0.2-dev"}'
+says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "", "spec": "0.1", "ergo_spec": "v0.2-dev"}'
 has site/prepared/repo/README.md
 has site/prepared/examples/demo/demo.rego.txt
 lacks site/prepared/assets
 has site/assets/tutorial/ergo.wasm
 
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rust-v0.4.1
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rust-v0.4.0
+site/prepare.sh --working-tree > /dev/null
+says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "0.4.1", "spec": "0.1", "ergo_spec": "v0.2-dev"}'
+git tag --delete rust-v0.4.1 rust-v0.4.0 > /dev/null
+
 printf 'package ergo\n\nversion := "0.3.0-dev"\n\n_spec := "v0.3"\n' > engines/rego/ergo.rego
 site/prepare.sh --working-tree > /dev/null
-says site/prepared/data/release.json '{"source": "working tree", "rego": "", "spec": "0.1", "ergo_spec": "v0.3"}'
+says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "", "spec": "0.1", "ergo_spec": "v0.3"}'
 printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > engines/rego/ergo.rego
 
 (expected="usage: site/prepare.sh [--working-tree]"; fails --release)
