@@ -13907,6 +13907,53 @@
     ]
   },
   {
+    "description": "a from line whose left side is written with a dot on the parent's name, with a position",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose art.k is 1 and .art.xs[0] is 5", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "prints the dot the policy wrote, after the position words",
+        "rules": ["name.dot", "sentence.subject.condition"],
+        "input": {"arts": [{"id": "a1", "k": 1, "xs": [5], "items": [{"id": "i1", "art": {"k": 1, "xs": [5]}, "v": 1, "cov": {"k": 1}, "leaves": [{"id": "l1", "v": 1, "art": {"k": 1}}]}]}]},
+        "report": {"subjects": {"art": {"description": "", "from": "arts", "identified_by": "id", "parts": {}}, "thing": {"description": "", "from": "art.items whose art.k is 1 and item 1 of .art.xs is 5", "identified_by": "id", "parts": {}}}},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "failed_assertions": [], "inputs": [{"locations": ["/arts/0/items/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/art/xs/0"], "name": "item 1 of .art.xs", "value": 5}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/arts/0/items/0/id"], "name": "id", "value": "i1"}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose left side is written with a dot on a grandparent's name",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items", "identified_by": "id"}, "leaf": {"from": "thing.leaves whose .art.k is 1 and thing.v is 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "leaf", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "prints the dot the policy wrote",
+        "rules": ["name.dot", "sentence.subject.condition"],
+        "input": {"arts": [{"id": "a1", "k": 1, "xs": [5], "items": [{"id": "i1", "art": {"k": 1, "xs": [5]}, "v": 1, "cov": {"k": 1}, "leaves": [{"id": "l1", "v": 1, "art": {"k": 1}}]}]}]},
+        "report": {"subjects": {"art": {"description": "", "from": "arts", "identified_by": "id", "parts": {}}, "leaf": {"description": "", "from": "thing.leaves whose .art.k is 1 and thing.v is 1", "identified_by": "id", "parts": {}}, "thing": {"description": "", "from": "art.items", "identified_by": "id", "parts": {}}}},
+        "results": [
+          {"cause": "absent", "check": "$applies", "failed_assertions": [{"assertion": ".thing.v is 1", "cause": "absent"}], "inputs": [{"locations": ["/arts/0/items/0/leaves/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/leaves/0"], "name": ".thing.v", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "l1", "in": {"art": "a1", "thing": "i1"}, "type": "leaf"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose left side is a count of a path written with a dot on the parent's name",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose count of .art.xs is 1 and .art.k is at most 2", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "prints the dot the policy wrote",
+        "rules": ["name.dot", "sentence.subject.condition"],
+        "input": {"arts": [{"id": "a1", "k": 1, "xs": [5], "items": [{"id": "i1", "art": {"k": 1, "xs": [5]}, "v": 1, "cov": {"k": 1}, "leaves": [{"id": "l1", "v": 1, "art": {"k": 1}}]}]}]},
+        "report": {"subjects": {"art": {"description": "", "from": "arts", "identified_by": "id", "parts": {}}, "thing": {"description": "", "from": "art.items whose count of .art.xs is 1 and .art.k is at most 2", "identified_by": "id", "parts": {}}}},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "failed_assertions": [], "inputs": [{"locations": ["/arts/0/items/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/art/xs/0"], "name": "art.xs[]", "value": [5]}, {"locations": ["/arts/0/items/0/art/xs/0"], "name": "count of .art.xs", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/arts/0/items/0/id"], "name": "id", "value": "i1"}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a subject named $input, with a child that starts at it and the check \"$input\".k is 2",
     "policy": {
       "ergo_spec": "v0.4-dev",

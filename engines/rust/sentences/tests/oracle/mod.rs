@@ -1553,6 +1553,20 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every $input named by $params.k.x",
         "every $input named by $params.k.x",
     ),
+    ("art.items whose .cov.k is 1", "art.items whose cov.k is 1"),
+    (
+        "art.items whose art.k is 1 and .art.xs[0] is 5",
+        "art.items whose art.k is 1 and item 1 of art.xs is 5",
+    ),
+    (
+        "art.items whose count of .art.xs is 1 and .art.k is at most 2",
+        "art.items whose count of art.xs is 1 and art.k is at most 2",
+    ),
+    ("cov", "cov"),
+    (
+        "thing.leaves whose .art.k is 1 and thing.v is 1",
+        "thing.leaves whose art.k is 1 and thing.v is 1",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2722,6 +2736,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("x[3]", "item 4 of x"),
     ("xs", "xs"),
     ("ys", "ys"),
+    ("cov", "cov"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[

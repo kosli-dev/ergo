@@ -93,8 +93,8 @@ fn from_condition_text(
                 Left::Derived(derived) if dot_derived => {
                     print_left_term(&Term::Derived(derived.clone()), aliases, parents)
                 }
-                Left::Derived(derived) => derived_text(derived, aliases, true),
-                Left::Elapsed(elapsed) => elapsed_text(elapsed, aliases, true),
+                Left::Derived(derived) => derived_text(derived, aliases, own),
+                Left::Elapsed(elapsed) => elapsed_text(elapsed, aliases, own),
             };
             format!("{left} {}", phrase_text(&condition.phrase, aliases))
         }
@@ -143,7 +143,7 @@ pub fn print_from(line: &FromLine, aliases: &[&str], parents: &[&str]) -> String
         let parts: Vec<String> = line
             .whose
             .iter()
-            .map(|c| from_condition_text(c, aliases, parents, false, true))
+            .map(|c| from_condition_text(c, aliases, parents, false, false))
             .collect();
         out.push_str(&parts.join(" and "));
     }

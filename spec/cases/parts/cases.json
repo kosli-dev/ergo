@@ -5582,6 +5582,7 @@
             }
           }
         },
+        "report": {"subjects": {"kid": {"description": "", "from": "kids whose .att.id is 1", "identified_by": "id", "parts": {"att": {"from": "atts.pr", "identified_by": "id"}}}}},
         "results": [
           {
             "cause": "satisfied",
@@ -5704,6 +5705,22 @@
               "type": "kid"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part written with a dot on the left of a whose in a child's from line",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose .cov.k is 1", "identified_by": "id", "has": {"cov": "cov"}}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "prints the dot the policy wrote",
+        "rules": ["name.dot", "parts.where"],
+        "input": {"arts": [{"id": "a1", "k": 1, "xs": [5], "items": [{"id": "i1", "art": {"k": 1, "xs": [5]}, "v": 1, "cov": {"k": 1}, "leaves": [{"id": "l1", "v": 1, "art": {"k": 1}}]}]}]},
+        "report": {"subjects": {"art": {"description": "", "from": "arts", "identified_by": "id", "parts": {}}, "thing": {"description": "", "from": "art.items whose .cov.k is 1", "identified_by": "id", "parts": {"cov": {"from": "cov", "identified_by": null}}}}},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/arts/0/items/0/cov/k"], "name": "cov.k", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/arts/0/items/0/id"], "name": "id", "value": "i1"}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}}
         ]
       }
     ]
