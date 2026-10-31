@@ -25,7 +25,6 @@ jobs:
         run: |
           .github/changelog-version.sh rego
           .github/changelog-version.sh rust
-          .github/changelog-version_test.sh
       - name: Check the spec version moved when the spec changed
         run: .github/spec-version.sh
       - run: opa check --strict engines/rego spec:spec examples:examples
@@ -46,6 +45,7 @@ jobs:
           .github/release-latest_test.sh
           .github/release-notes_test.sh
           .github/release_test.sh
+          .github/changelog-version_test.sh
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check engines/rego examples engines/rust/sentences/tests/oracle
       - name: Check there are no comments

@@ -105,6 +105,24 @@ passes "the patch after a second release"
 setup 0.2.1 0.2.1 '### Changed'
 fails "the version must go above 0.2.0, to 0.3.0 or higher"
 
+setup 0.1.5 0.1.5
+fails "the next version must be 0.2.1, 0.3.0 or 1.0.0"
+
+setup 0.2.2 0.2.2
+fails "the next version must be 0.2.1, 0.3.0 or 1.0.0"
+
+setup 0.4.0 0.4.0
+fails "the next version must be 0.2.1, 0.3.0 or 1.0.0"
+
+setup 0.2.1 0.2.1
+passes "the next patch"
+
+setup 0.3.0 0.3.0
+passes "the next minor"
+
+setup 1.0.0 1.0.0
+passes "the next major"
+
 tag 1.0.0
 setup 1.1.0 1.1.0 '### Changed'
 fails "the version must go above 1.0.0, to 2.0.0 or higher"

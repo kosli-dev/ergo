@@ -489,6 +489,11 @@ jobs:
             echo "main already says $next"
             exit 0
           fi
+          says=$(sed -n 's/^version = "\([0-9]*\.[0-9]*\.[0-9]*\)\(-dev\)\{0,1\}"$/\1/p' engines/rust/Cargo.toml | head -n 1)
+          if [ -n "$says" ] && [ "$says" != "$VERSION" ] && [ "$(printf '%s\n%s\n' "$VERSION" "$says" | sort -V | tail -n 1)" != "$VERSION" ]; then
+            echo "main already says $says, which is above $VERSION"
+            exit 0
+          fi
           if ! grep -qxF "version = \"$VERSION\"" engines/rust/Cargo.toml; then
             echo "engines/rust/Cargo.toml says $(grep -m 1 '^version = ' engines/rust/Cargo.toml || true) and this job expected $VERSION. Move main to the next patch version by hand."
             exit 1
@@ -518,7 +523,7 @@ jobs:
           if ! out=$(gh pr create --base main --head "$branch" --title "$title" \
             --body "The Rust crates $VERSION were released, so \`main\` moves to $next.
 
-          GitHub holds the checks of a pull request opened by GitHub Actions until someone approves them, so click \"Approve and run\" on this one, or close and reopen it, then merge it once they pass." 2>&1); then
+          GitHub holds the checks of a pull request opened by GitHub Actions until someone approves them, so click \"Approve and run\" on this one, or close and reopen it, then merge it once they pass. Until it's merged, the \`checks\` job shows a warning on every pull request that \`main\` is still at $VERSION." 2>&1); then
             echo "$out"
             case $out in
               *"not permitted"*) echo "Turn on \"Allow GitHub Actions to create and approve pull requests\" in the repository's Actions settings, or open the PR by hand from $branch." ;;

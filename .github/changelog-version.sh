@@ -45,25 +45,27 @@ fi
 
 [ "$version" = "$heading" ] || fail "$changelog starts with ## $heading, which isn't released yet, but the version is $version. They must be the same. Change the heading, or the version in $files."
 
-previous=$(printf '%s\n' "$tags" | sort -V | while read -r t; do
-  if [ -n "$t" ] && [ "$(printf '%s\n%s\n' "$t" "$heading" | sort -V | head -n 1)" = "$t" ]; then echo "$t"; fi
-done | tail -n 1)
+previous=$(printf '%s\n' "$tags" | sort -V | tail -n 1)
 [ -n "$previous" ] || exit 0
+
+pmajor=${previous%%.*}
+rest=${previous#*.}
+pminor=${rest%%.*}
+patch="$pmajor.$pminor.$((10#${previous##*.} + 1))"
+minor="$pmajor.$((10#$pminor + 1)).0"
+major="$((10#$pmajor + 1)).0.0"
+if [ "$version" != "$patch" ] && [ "$version" != "$minor" ] && [ "$version" != "$major" ]; then
+  fail "$changelog starts with ## $heading, but the latest release is $tagprefix$previous, so the next version must be $patch, $minor or $major. Change the heading and the version in $files."
+fi
 
 section=$(awk '/^## / { n++ } n == 1' "$changelog")
 if printf '%s\n' "$section" | grep -qE '^### (Changed|Removed)$'; then
-  pmajor=${previous%%.*}
-  rest=${previous#*.}
-  pminor=${rest%%.*}
-  major=${version%%.*}
-  rest=${version#*.}
-  minor=${rest%%.*}
   if [ "$pmajor" = 0 ]; then
-    if [ "$major" -gt "$pmajor" ] || [ "$minor" -gt "$pminor" ]; then exit 0; fi
-    needed="0.$((pminor + 1)).0"
+    [ "$version" != "$patch" ] && exit 0
+    needed=$minor
   else
-    if [ "$major" -gt "$pmajor" ]; then exit 0; fi
-    needed="$((pmajor + 1)).0.0"
+    [ "$version" = "$major" ] && exit 0
+    needed=$major
   fi
   fail "$changelog lists a change under ### Changed or ### Removed for $heading, which can break a policy or a report, so the version must go above $previous, to $needed or higher. Change the heading and the version in $files."
 fi
