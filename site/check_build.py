@@ -86,14 +86,20 @@ for name in sorted(examples):
         if text.strip() not in shown:
             problems.append(f"the home page doesn't show the {what} of {name} from {examples_file}")
 
-editor_page = public / "editor/index.html"
+playground_page = public / "playground/index.html"
+old_editor_page = public / "editor/index.html"
 sitemap = public / "sitemap.xml"
-if not re.search(r"""<a\s[^>]*href=["']?[^"'\s>]*/editor/?(?=["'\s>])""", page):
-    problems.append("the home page doesn't link to the editor")
-if sitemap.exists() and "/editor" in sitemap.read_text():
-    problems.append("sitemap.xml lists the editor")
-if editor_page.exists() and not re.search(r"""<meta\s+name=["']robots["']\s+content=["']noindex["']""", editor_page.read_text(errors="replace"), re.I):
-    problems.append("the editor page has no noindex meta")
+if not re.search(r"""<a\s[^>]*href=["']?[^"'\s>]*/playground/?(?=["'\s>])""", page):
+    problems.append("the home page doesn't link to the playground")
+if sitemap.exists():
+    listed = sitemap.read_text()
+    if "/playground" in listed:
+        problems.append("sitemap.xml lists the playground")
+    if "/editor" in listed:
+        problems.append("sitemap.xml lists the old editor page")
+for name, found in (("playground", playground_page), ("old editor", old_editor_page)):
+    if found.exists() and not re.search(r"""<meta\s+name=["']robots["']\s+content=["']noindex["']""", found.read_text(errors="replace"), re.I):
+        problems.append(f"the {name} page has no noindex meta")
 
 if problems:
     print("\n".join(problems))

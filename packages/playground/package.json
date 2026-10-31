@@ -1,5 +1,5 @@
 {
-  "name": "@kosli/ergo-editor",
+  "name": "@kosli/ergo-playground",
   "private": true,
   "type": "module",
   "scripts": {

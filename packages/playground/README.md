@@ -1,12 +1,12 @@
 # Ergo playground
 
-A web page for trying Ergo in the browser, called the playground on the website: a policy as YAML beside its report, with Markdown as an experimental way to write the policy. It's an experiment. It's on the website at `/editor/`, and it asks search engines not to index it.
+A web page for trying Ergo in the browser, called the playground on the website: a policy as YAML beside its report, with Markdown as an experimental way to write the policy. It's an experiment. It's on the website at `/playground/`, and it asks search engines not to index it.
 
 ```sh
 cd packages
 pnpm install
-pnpm --filter @kosli/ergo-editor build
-open editor/dist/editor.html
+pnpm --filter @kosli/ergo-playground build
+open playground/dist/playground.html
 ```
 
 The build needs `opa` on your PATH, because it compiles `ergo.rego` to Wasm for the Report view. It also needs the Rust engine built to Wasm in `engines/rust/wasm/pkg`, which the Report view can run instead, and the Rust sentence parser built to Wasm in `engines/rust/sentences-wasm/pkg`: see "Building for a browser" in `engines/rust/README.md` for both. It prints the OPA version it used, and warns when that isn't the one the README tests with.

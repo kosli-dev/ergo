@@ -52,7 +52,7 @@ The script picks the newest `rego-vX.Y.Z`, `rust-vX.Y.Z` and `spec-vX.Y` release
 
 After `hugo` builds the site, `site/check_build.py <folder>` checks that the built tutorial writes the spec of the Ergo it runs, that its script has the strings of the tutorial `site/prepare.sh` chose and none that only the other one has, that its page has that tutorial's layout and title, that its CSS has that `tutorial.css`'s classes, properties, colours and lengths, and that the home page shows the examples `site/check.sh` checked. That catches a mount in `hugo.toml` that lets `main`'s file win over the release's.
 
-The deploy also builds `packages/editor` and `site/editor.sh` puts it at `/editor/` with a `noindex` meta tag. The top navigation of every page links to it, and so does the home page's start section. `check_build.py` fails when the home page has no link to it, when `sitemap.xml` lists it or when the tag is missing. The deploy reuses the Wasm the `test` run built, so it needs a successful `test` run for the commit.
+The deploy also builds `packages/playground` and `site/playground.sh` puts it at `/playground/` with a `noindex` meta tag, and also writes a small page at `/editor/` that sends old links on to it. The top navigation of every page links to it, and so does the home page's start section. `check_build.py` fails when the home page has no link to it, when `sitemap.xml` lists either page, or when either page has no `noindex` tag. The deploy reuses the Wasm the `test` run built, so it needs a successful `test` run for the commit.
 
 CI does all of this from the working tree and from the release on every pull request, and the deploy runs the release checks before it publishes.
 

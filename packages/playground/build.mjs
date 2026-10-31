@@ -83,7 +83,7 @@ export const sentencesGlue = (dir = sentencesPkg) => {
   return { glue, bytes: readFileSync(bytes).toString("base64") };
 };
 
-export const buildEditor = async (out = join(here, "dist", "editor.html")) => {
+export const buildPlayground = async (out = join(here, "dist", "playground.html")) => {
   const opaWasm = join(dirname(require.resolve("@open-policy-agent/opa-wasm")), "..", "dist", "opa-wasm-browser.esm.js");
   const rust = rustGlue();
   const sentences = sentencesGlue();
@@ -113,6 +113,6 @@ export const buildEditor = async (out = join(here, "dist", "editor.html")) => {
 };
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const { out, bytes } = await buildEditor();
+  const { out, bytes } = await buildPlayground();
   console.log(`${out} ${(bytes / 1024).toFixed(0)} KB`);
 }

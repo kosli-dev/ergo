@@ -18,7 +18,7 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `engines/rust/` is a second engine, in Rust. It's experimental and in progress. It's a Cargo workspace with five crates: `ergo-policy-sentences` reads sentences and nothing else, `ergo-policy-engine` builds the report, `ergo-policy-cli` is the `ergo` command that prints a report or the violations from JSON or YAML files, and `ergo-policy-wasm` and `ergo-policy-sentences-wasm` wrap them for a browser. Its tests run every case in `spec/cases`, and `engines/rust/known-failures.txt` lists the ones it still fails.
 - `packages/` holds Node tools that build on Ergo, in one pnpm workspace. Someone who only copies `ergo.rego` never needs them.
 - `packages/markdown/` compiles a policy written in Markdown into a policy object. It's an experiment, not published.
-- `packages/editor/` builds the playground, the web page the site links to as "Try Ergo". It opens on a policy in YAML beside its report, from the Rego engine (`ergo.rego`) or the Rust engine, run in the page. Other tabs show the policy, and let you write it in Markdown, with what the compiler read and the document as a reader sees it. It also reads each sentence with the Rust sentence parser, `ergo-policy-sentences-wasm`, to underline what's written wrong, colour the words, say how a sentence reads and suggest what to type next.
+- `packages/playground/` builds the playground, the web page the site links to as "Try Ergo". It opens on a policy in YAML beside its report, from the Rego engine (`ergo.rego`) or the Rust engine, run in the page. Other tabs show the policy, and let you write it in Markdown, with what the compiler read and the document as a reader sees it. It also reads each sentence with the Rust sentence parser, `ergo-policy-sentences-wasm`, to underline what's written wrong, colour the words, say how a sentence reads and suggest what to type next.
 
 ## Checks
 
@@ -158,7 +158,7 @@ The first line names the part of the repo that changed, then says what the chang
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`
 - `spec:` the spec in `spec/`, its cases and `engines/rego/spec_test.rego`
-- `playground:` the playground in `packages/editor`, the Markdown compiler in `packages/markdown` and the pnpm workspace around them
+- `playground:` the playground in `packages/playground`, the Markdown compiler in `packages/markdown` and the pnpm workspace around them
 
 For example, `rego: fail compare when either side is missing`. Commits from before the Rust engine say `core:` for `rego:`, and commits from before the playground say `markdown:` for `playground:`.
 
