@@ -3238,6 +3238,38 @@
     ]
   },
   {
+    "description": "a subject whose name starts with a dollar sign and that has no from",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"$x": {"identified_by": "id"}}, "requirements": {"r": {"subject": "$x", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "lists the subject's from quoted, as name.keys says, next to the problem",
+        "rules": ["names.dollar", "name.keys", "report.subjects"],
+        "input": {"$x": [{"id": "a"}]},
+        "status": {"r": "not_met"},
+        "report": {"subjects": {"$x": {"description": "", "from": "\"$x\"", "identified_by": "id", "parts": {}}}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.$x", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "$x"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose name starts with a dollar sign and that is null",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"$x": null}, "requirements": {"r": {"subject": "$x", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "lists the subject's from quoted, as name.keys says, next to the problem",
+        "rules": ["names.dollar", "name.keys", "report.subjects"],
+        "input": {"$x": [{"id": "a"}]},
+        "status": {"r": "not_met"},
+        "report": {"subjects": {"$x": {"description": "", "from": "\"$x\"", "identified_by": null, "parts": {}}}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.$x", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "$x"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a requirement whose name starts with a dollar sign",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"$r": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [

@@ -4248,7 +4248,9 @@ _part_id_text(read) := "<invalid identified_by>" if {
 
 _subject_from_text(name, null, _) := _path_name([_subject_step(name)])
 
-_subject_step(name) := name
+_subject_step(name) := {"literal": name} if startswith(name, "$")
+
+_subject_step(name) := name if not startswith(name, "$")
 
 _parent_step(name) := {"parent": name}
 
