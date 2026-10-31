@@ -7,7 +7,7 @@
   "properties": {
     "ergo_spec": {
       "const": "v0.4-dev",
-      "description": "The version of the spec the policy is written for. YAML reads v0.4-dev as text, but 0.3 as a number."
+      "description": "The version of the spec the policy is written for. YAML reads v0.4-dev as text, but 0.4 as a number."
     },
     "subjects": {
       "type": "object",
