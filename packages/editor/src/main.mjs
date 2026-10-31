@@ -904,7 +904,7 @@ copy.addEventListener("click", async () => {
     b.textContent = "Blocked";
   }
   setTimeout(() => {
-    b.textContent = "Copy YAML";
+    b.textContent = "Copy";
   }, 1400);
 });
 

@@ -59,7 +59,7 @@ button { font:inherit; color:inherit; cursor:pointer; }
 .cursor { text-transform:none; letter-spacing:0; font-weight:400; font-family:var(--mono); white-space:nowrap; }
 .body { flex:1; display:flex; flex-direction:column; min-height:0; min-width:0; }
 .tab { background:none; border:0; padding:.15rem .1rem; font:inherit; font-size:.66rem; font-weight:600;
-  letter-spacing:.11em; text-transform:uppercase; color:var(--faint); border-bottom:2px solid transparent; }
+  letter-spacing:.11em; text-transform:uppercase; color:var(--faint); border-bottom:2px solid transparent; white-space:nowrap; }
 .tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--check); }
 .ghost { background:none; border:1px solid var(--hairline); border-radius:3px; padding:.2rem .55rem;
   font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; font-weight:600; color:var(--muted); white-space:nowrap; }
@@ -266,7 +266,7 @@ textarea:focus { outline:none; }
     </div>
   </div>
   <span id="cursor" class="cursor"></span>
-  <button class="ghost" id="copy">Copy YAML</button>
+  <button class="ghost" id="copy" title="Copy the YAML">Copy</button>
 </div>
 
 <div class="foot">

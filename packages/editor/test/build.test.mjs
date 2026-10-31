@@ -45,8 +45,13 @@ test("the page holds only ASCII in its samples", () => {
   assert.ok(!/[^\x00-\x7f]/.test(html.slice(start, end)));
 });
 
-test("the page says the editor, the Markdown format and the Rust engine are experimental", () => {
+test("the page says the playground, the Markdown format and the Rust engine are experimental", () => {
   assert.match(html, /<p class="notice" id="notice" role="note"><b>Experimental\.<\/b> This playground, the Markdown format and the Rust engine may change or go away\. The Rust engine can give a different report from ergo\.rego\.<\/p>/);
+});
+
+test("the tab labels and the copy button stay on one line, so the tabs fit next to the button", () => {
+  assert.match(html, /\.tab \{[^}]*white-space:nowrap;[^}]*\}/);
+  assert.match(html, /<button class="ghost" id="copy" title="Copy the YAML">Copy<\/button>/);
 });
 
 test("the page has a tab label for every view", () => {
