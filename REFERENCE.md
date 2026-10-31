@@ -113,7 +113,7 @@ the report starts with:
   "description": "Production changes are reviewed and approved",
   "engine": {
     "name": "ergo.rego",
-    "version": "0.3.1-dev"
+    "version": "0.3.2-dev"
   },
   "ergo": "v0.3",
   "meta": {
@@ -1407,7 +1407,7 @@ Reading the subject from the right side of a phrase, like `x equals it`, is left
   "description": "",
   "engine": {
     "name": "ergo.rego",
-    "version": "0.3.1-dev"
+    "version": "0.3.2-dev"
   },
   "ergo": "v0.3",
   "meta": {},
@@ -1866,7 +1866,7 @@ const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": pars
 Treat a compiled policy like a compiler's object file. Make it in the build that uses it, don't commit it, and make it again whenever the policy or your copy of `ergo.rego` changes. Its shape is Ergo's own and changes between versions. A compiled policy holds the `engine` that compiled it, the same name and version a report gives. When it's missing or isn't the one running, `ergo.report` reads the policy the compiled one came from and fails every requirement's `$well_formed` row with an input like:
 
 ```json
-{"name": "ergo/compiled engine", "value": ["compiled by another engine, expected ergo.rego 0.3.1-dev"], "locations": []}
+{"name": "ergo/compiled engine", "value": ["compiled by another engine, expected ergo.rego 0.3.2-dev"], "locations": []}
 ```
 
 or `["missing"]` when the compiled policy has no `engine`. That only tells released versions apart: every copy of `ergo.rego` between two releases has the same `-dev` version, so a compiled policy from an older copy of the same version still runs and can give a wrong report. Ergo doesn't check that nobody edited it either, so don't edit it. One with a field missing or of the wrong type fails like a policy Ergo can't read, and compiling a compiled policy gives it back unchanged, even one from another engine.
