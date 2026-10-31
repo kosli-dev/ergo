@@ -14,7 +14,7 @@
       </div>
       {{- with hugo.Data.release.rego }}
       <p class="hero__release">Latest release: <a href="{{ site.Params.repo }}/releases/tag/rego-v{{ . }}">ergo.rego {{ . }}</a>
-        {{- with hugo.Data.release.rust }}, <a href="{{ site.Params.repo }}/releases/tag/rust-v{{ . }}">ergo command {{ . }}</a>{{ end }}
+        {{- with hugo.Data.release.rust }}, <a href="{{ site.Params.repo }}/releases/tag/rust-v{{ . }}">ergo CLI {{ . }}</a>{{ end }}
         {{- with hugo.Data.release.spec }}, <a href="{{ site.Params.repo }}/blob/spec-v{{ . }}/spec/README.md">spec {{ . }}</a>{{ end }}</p>
       {{- end }}
     </div>
@@ -129,10 +129,13 @@
       </li>
       <li class="flow__group flow__group--live">
         <svg class="flow__ants" aria-hidden="true" focusable="false"><rect></rect></svg>
-        <span class="flow__label mono">engines, following the Ergo spec</span>
+        <span class="flow__label mono">one engine, following the Ergo spec</span>
         <ul>
-          {{- range $c.architecture.engines }}
-          <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v"><span><span class="flow__v--ergo">{{ .name }}</span> {{ .on }}{{ if .opa }} {{ site.Params.opaVersion }}{{ end }}</span></span></li>
+          {{- range $i, $e := $c.architecture.engines }}
+          {{- if $i }}
+          <li class="flow__or mono">or</li>
+          {{- end }}
+          <li class="flow__card"><span class="flow__k mono">engine</span><span class="flow__v"><span><span class="flow__v--ergo">{{ $e.name }}</span>{{ with $e.note }} {{ . }}{{ end }}</span></span><span class="flow__runs">{{ $e.runs }}{{ if $e.opa }} {{ site.Params.opaVersion }}{{ end }}</span></li>
           {{- end }}
         </ul>
       </li>
@@ -160,23 +163,34 @@
 <section class="section section--panel" id="start">
   <div class="wrap">
     <h2 class="display-m">{{ partial "copy.html" $c.start.title }}</h2>
-    {{- range $c.start.ways }}
-    <h3 class="steps__way">{{ .title }}</h3>
     <ol class="steps">
-      {{- range $i, $st := .steps }}
+      {{- range $i, $st := $c.start.steps }}
       <li>
         <span class="steps__n mono">{{ printf "%02d" (add $i 1) }}</span>
         <h3>{{ $st.title }}</h3>
         <p>{{ partial "copy.html" $st.body }}</p>
         {{- if $st.policy }}
-        <pre class="code"><code>{{ partial "code/yaml.html" (dict "text" (printf "ergo_spec: %s\n%s" hugo.Data.release.ergo_spec (index hugo.Data.examples "deploy").policy) "marks" (dict)) | safeHTML }}</code></pre>
-        {{- else }}
-        <pre class="code"><code>{{ $st.code }}</code></pre>
+        <pre class="code code--wrap"><code>{{ partial "code/yaml.html" (dict "text" (printf "ergo_spec: %s\n%s" hugo.Data.release.ergo_spec (index hugo.Data.examples "deploy").policy) "marks" (dict) "wrap" true) | safeHTML }}</code></pre>
+        {{- end }}
+        {{- with $st.options }}
+        <div class="steps__options">
+          {{- range $j, $o := . }}
+          {{- if $j }}
+          <p class="steps__or mono">or</p>
+          {{- end }}
+          <div class="steps__option">
+            <h4 class="steps__engine mono">{{ $o.engine }}</h4>
+            {{- with $o.body }}
+            <p>{{ partial "copy.html" . }}</p>
+            {{- end }}
+            <pre class="code"><code>{{ $o.code }}</code></pre>
+          </div>
+          {{- end }}
+        </div>
         {{- end }}
       </li>
       {{- end }}
     </ol>
-    {{- end }}
     <p class="start__editor">{{ $c.start.editor.lead }} <a class="link" href="{{ "editor/" | relURL }}">{{ $c.start.editor.link }}</a> {{ $c.start.editor.note }}</p>
     <div class="actions">
       <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.start.primary }} <span aria-hidden="true">→</span></a>

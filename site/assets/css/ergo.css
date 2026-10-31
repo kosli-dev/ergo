@@ -231,6 +231,9 @@ p code, li code, dd code, td code {
   font: 400 13.5px/1.65 var(--mono); tab-size: 2; color: var(--paper);
 }
 .code--lg { font-size: 14px; padding: 24px 26px; }
+.code code { font-size: inherit; padding: 0; border-radius: 0; background: none; }
+.code--wrap { overflow-x: visible; }
+.code--wrap .ln { display: block; white-space: pre-wrap; padding-left: var(--hang, 0); text-indent: calc(-1 * var(--hang, 0)); }
 .code .k { color: var(--violet-text); }
 .code .s { color: var(--paper); }
 .code .n { color: var(--muted); }
@@ -294,6 +297,7 @@ p code, li code, dd code, td code {
 .flow__group .flow__card { padding: 14px 16px; }
 .flow__k { display: block; font-size: 12px; color: var(--faint); margin-bottom: 6px; }
 .flow__v { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.flow__runs { display: block; margin-top: 6px; font-size: 14px; color: var(--muted); }
 /* On scroll the diagram plays zone by zone: a zone's outline, its cards resolving one at a time, then the arrow on. */
 .js .flow[data-sequence] .flow__group:not(.is-in) { border-color: transparent; }
 .js .flow[data-sequence] .flow__group:not(.is-in) .flow__label { visibility: hidden; }
@@ -306,20 +310,25 @@ p code, li code, dd code, td code {
 .js .flow[data-sequence] > li:not(.is-arrow)::after { visibility: hidden; }
 /* What ergo itself contributes is named in lime and bold: the library and the report. */
 .flow__v--ergo { color: var(--lime); font-weight: 700; }
+.flow__or { margin: -4px 0; text-align: center; font-size: 12px; font-weight: 700; color: var(--lime); }
+.js .flow[data-sequence] .flow__group:not(.is-in) .flow__or { visibility: hidden; }
 .flow__card .mark { height: 26px; width: auto; }
 
 /* ——— Ops ——— */
 
 /* ——— Steps ——— */
-.steps__way { margin: 48px 0 0; font: 500 14px/1.25 var(--mono); color: var(--muted); }
-.steps__way + .steps { margin-top: 16px; }
 .start__editor { margin: 32px 0 0; color: var(--muted); }
 .steps { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .steps li { padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-3); display: flex; flex-direction: column; }
 .steps__n { color: var(--lime); font-size: 13px; }
 .steps h3 { margin: 12px 0 8px; font: 500 22px/1.25 var(--sans); letter-spacing: -.01em; }
 .steps p { margin: 0 0 18px; color: var(--muted); font-size: 16px; }
-.steps .code { margin-top: auto; font-size: 12.5px; }
+.steps .code { font-size: 12.5px; }
+.steps__options { margin-top: 4px; display: flex; flex-direction: column; gap: 10px; }
+.steps__options .code { margin-top: 0; }
+.steps__engine { margin: 0 0 8px; font-size: 13px; font-weight: 700; color: var(--lime); }
+.steps__option p { margin: 0 0 12px; font-size: 15px; }
+.steps .steps__or { margin: 0; text-align: center; font-size: 12px; font-weight: 700; color: var(--lime); }
 
 /* ——— Name ——— */
 .name__grid { display: grid; grid-template-columns: auto 1fr; gap: clamp(32px, 6vw, 96px); align-items: center; }
@@ -427,6 +436,7 @@ p code, li code, dd code, td code {
 .annotated .notes li { margin: 0; }
 
 /* ——— Responsive ——— */
+@media (max-width: 1200px) { .steps { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 1080px) {
   .fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .fields li:nth-child(4) { border-left: 0; }
@@ -438,7 +448,6 @@ p code, li code, dd code, td code {
 @media (max-width: 920px) {
   .hero__grid, .split, .declare, .docs, .side, .annotated { grid-template-columns: minmax(0, 1fr); }
   .split--text-right .split__col, .split--text-right .compare { grid-column: auto; grid-row: auto; }
-  .steps { grid-template-columns: minmax(0, 1fr); }
   .docs__side { position: static; max-height: none; overflow: visible; padding: 0; }
   .docs__toc:not([open]) { margin-bottom: 0; }
   .docs__label { cursor: pointer; }
