@@ -1,6 +1,6 @@
-# Ergo policy editor
+# Ergo playground
 
-A web page for writing an Ergo policy in Markdown. It's an experiment. It's on the website at `/editor/`, unlisted: no page links to it and it asks search engines not to index it.
+A web page for writing an Ergo policy in Markdown, called the playground on the website. It's an experiment. It's on the website at `/editor/`, and it asks search engines not to index it.
 
 ```sh
 cd packages
