@@ -65,14 +65,16 @@ test("with no pane to edit the note is about the right pane", () => {
   assert.equal(noteView({ left: "report", right: "doc" }), "doc");
 });
 
-test("the legend shows when a pane shows a view that uses its colours", () => {
-  for (const view of ["markdown", "blocks", "doc", "policy"]) {
+test("the legend shows when a pane shows a view that colours lines the way it says", () => {
+  for (const view of ["markdown", "blocks"]) {
     assert.equal(showsLegend({ left: "yaml", right: view }), true, view);
     assert.equal(showsLegend({ left: view, right: "report" }), true, view);
   }
 });
 
-test("the legend hides when no pane shows a view that uses its colours", () => {
+test("the legend hides when no pane colours lines the way it says, as the policy and the document use the colours for other things", () => {
   assert.equal(showsLegend(DEFAULT_LAYOUT), false);
   assert.equal(showsLegend({ left: "report", right: "yaml" }), false);
+  assert.equal(showsLegend({ left: "policy", right: "doc" }), false);
+  assert.equal(showsLegend({ left: "yaml", right: "policy" }), false);
 });

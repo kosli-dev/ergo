@@ -32,5 +32,5 @@ export const layoutText = (layout) => JSON.stringify({ left: layout.left, right:
 /** Gives the view the note under the page is about: the pane you edit (`"yaml"` or `"markdown"`, the left one when both), else the right pane. */
 export const noteView = (layout) => [layout.left, layout.right].find((v) => v === "yaml" || v === "markdown") ?? layout.right;
 
-/** Says whether the colour legend is worth showing: some open pane shows Markdown, Blocks, Document or Policy, the views that use its colours. */
-export const showsLegend = (layout) => [layout.left, layout.right].some((v) => v === "markdown" || v === "blocks" || v === "doc" || v === "policy");
+/** Says whether the colour legend is worth showing: some open pane shows Markdown or Blocks, the views that colour lines the way it says. */
+export const showsLegend = (layout) => [layout.left, layout.right].some((v) => v === "markdown" || v === "blocks");
