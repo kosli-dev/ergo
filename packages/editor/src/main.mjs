@@ -9,7 +9,7 @@ import { makeParser } from "./sentences.mjs";
 import { markdownSentences, yamlSentences, blockKindAt } from "./locate.mjs";
 import { completionAt } from "./complete.mjs";
 import { makeAnalyser, decorateLines, entryAt, hoverOf, sentenceProblems } from "./analyse.mjs";
-import { VIEWS, LABELS, pick, readLayout, layoutText } from "./layout.mjs";
+import { VIEWS, LABELS, noteView, pick, readLayout, layoutText } from "./layout.mjs";
 import { savedEdit, saveEdit, forgetEdit } from "./saved.mjs";
 import { layoutRows, policySheet, yamlText, markOf, kindAt, docGroups, parseJson, makeRunner, parseTime, reportTables, plural, reportDocument, unroundable } from "./lib.mjs";
 
@@ -251,7 +251,7 @@ const sentenceLines = (sentences, into) => {
 const viewPolicy = (result, into) => {
   const sheet = policySheet(result.policy);
   if (!sheet) {
-    into.replaceChildren(el("p", "empty", "The policy has problems, so there is nothing to show yet. The problems are listed below the editor."));
+    into.replaceChildren(el("p", "empty", "The policy has problems, so there is nothing to show yet. The problems are listed at the bottom of the page."));
     return;
   }
   const spec = el("div", "spec");
@@ -412,7 +412,7 @@ const viewYaml = (result) => {
     yamlProblems = [];
     clearTimeout(noteTimer);
     const undoable = yamlUndo.length && yamlUndo[yamlUndo.length - 1].after === src.value;
-    if (!undoable) showYamlNotes(result.policy ? [] : [{ path: "Markdown", message: "The Markdown has problems, so there is no YAML for it yet." }], []);
+    if (!undoable) showYamlNotes(result.policy ? [] : [{ path: "Policy", message: "The policy has problems, so there is no YAML for it yet. They're listed at the bottom of the page." }], []);
   }
 };
 
@@ -467,7 +467,7 @@ const showReport = (out, result) => {
   out.replaceChildren();
   if (runnerErrors[engine]) return out.append(el("p", "notice", runnerErrors[engine]));
   if (!runners[engine]) return out.append(el("p", "notice info", engineMessage(engine, "loading")));
-  if (!result.policy) return out.append(el("p", "notice", "The policy has problems, so it can't run yet. The problems are listed below the editor."));
+  if (!result.policy) return out.append(el("p", "notice", "The policy has problems, so it can't run yet. The problems are listed at the bottom of the page."));
   const input = parseJson(reportInput, "input");
   if (!input.ok) return out.append(el("p", "notice", input.message));
   const params = parseJson(reportParams, "params");
@@ -549,11 +549,12 @@ const NOTES = {
   report: "Runs the policy on the input in your browser.",
 };
 
-const noteText = () => NOTES[layout.right === "markdown" ? layout.left : layout.right];
+const noteText = () => NOTES[noteView(layout)];
 
 const mdView = $("mdview");
 const cursor = $("cursor");
 const copy = $("copy");
+const copyLabel = copy.textContent;
 const panes = Object.fromEntries(
   ["left", "right"].map((side) => {
     const root = $("pane-" + side);
@@ -904,7 +905,7 @@ copy.addEventListener("click", async () => {
     b.textContent = "Blocked";
   }
   setTimeout(() => {
-    b.textContent = "Copy";
+    b.textContent = copyLabel;
   }, 1400);
 });
 
