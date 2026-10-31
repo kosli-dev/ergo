@@ -502,7 +502,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           pattern=${VERSION//./\\.}
           sed -i "s/\bversion = \"$pattern\"/version = \"$next\"/" engines/rust/Cargo.toml engines/rust/engine/Cargo.toml engines/rust/cli/Cargo.toml engines/rust/sentences-wasm/Cargo.toml engines/rust/wasm/Cargo.toml
-          sed -i "s/\"name\": \"ergo-policy-engine\", \"version\": \"$pattern\"/\"name\": \"ergo-policy-engine\", \"version\": \"$next\"/" README.md
+          sed -i "s/\"name\": \"ergo-rust\", \"version\": \"$pattern\"/\"name\": \"ergo-rust\", \"version\": \"$next\"/" README.md
           (cd engines/rust && cargo update --workspace)
           awk -v h="## ${next%-dev} (not released yet)" '!done && /^## / { print h; print ""; done = 1 } { print }' engines/rust/CHANGELOG.md > "$RUNNER_TEMP/CHANGELOG.md"
           mv "$RUNNER_TEMP/CHANGELOG.md" engines/rust/CHANGELOG.md
