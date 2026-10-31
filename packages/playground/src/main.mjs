@@ -9,7 +9,7 @@ import { makeParser } from "./sentences.mjs";
 import { markdownSentences, yamlSentences, blockKindAt } from "./locate.mjs";
 import { completionAt } from "./complete.mjs";
 import { makeAnalyser, decorateLines, entryAt, hoverOf, sentenceProblems } from "./analyse.mjs";
-import { VIEWS, LABELS, noteView, pick, readLayout, layoutText } from "./layout.mjs";
+import { VIEWS, LABELS, noteView, showsLegend, pick, readLayout, layoutText } from "./layout.mjs";
 import { savedEdit, saveEdit, forgetEdit } from "./saved.mjs";
 import { layoutRows, policySheet, yamlText, markOf, kindAt, docGroups, parseJson, makeRunner, parseTime, reportTables, plural, reportDocument, unroundable } from "./lib.mjs";
 
@@ -656,6 +656,7 @@ const render = (result) => {
   );
 
   if (!flashing) $("note").textContent = noteText();
+  $("legend").classList.toggle("bare", !showsLegend(layout));
   drawPane("left", result);
   drawPane("right", result);
 };

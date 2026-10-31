@@ -201,6 +201,7 @@ textarea:focus { outline:none; }
 .empty { padding:1.5rem .9rem; color:var(--faint); font-size:.85rem; font-family:var(--serif); font-style:italic; }
 .legend { display:flex; flex-wrap:wrap; align-items:baseline; gap:.3rem 1.1rem; padding:.45rem .9rem;
   border-top:1px solid var(--hairline); background:var(--sunk); font-size:.68rem; color:var(--muted); }
+.legend.bare span:not(.note) { display:none; }
 .legend span { display:inline-flex; align-items:center; gap:.4rem; }
 .legend i { width:.55rem; height:.55rem; border-radius:1px; }
 .legend .note { margin-left:auto; font-family:var(--serif); font-style:italic; color:var(--faint); font-size:.72rem; }
@@ -271,7 +272,7 @@ textarea:focus { outline:none; }
 
 <div class="foot">
   <div class="diags" id="diags" hidden></div>
-  <div class="legend">
+  <div class="legend bare" id="legend">
     <span><i style="background:var(--check)"></i>a check Ergo will run</span>
     <span><i style="background:var(--declare)"></i>a subject, requirement or field</span>
     <span><i style="background:var(--other)"></i>a title or description</span>
