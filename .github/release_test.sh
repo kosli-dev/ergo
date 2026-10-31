@@ -15,7 +15,12 @@ printf '%s\n' '#!/bin/sh' 'echo 1' > bin/gh
 chmod +x bin/gh
 export PATH="$dir/work/bin:$PATH"
 
+readme() {
+  printf '%s\n' '```json' '  "engine": {' '    "name": "'"$1"'",' '    "version": "'"$2"'"' '  },' '```' '' 'The CLI gives {"name": "'"$3"'", "version": "'"$4"'"}.' > README.md
+}
+
 setup() {
+  readme ergo-rego 0.1.0 ergo-rust 0.1.0
   printf '%s\n' 'version := "0.1.0-dev"' '_spec := "v0.1"' > engines/rego/ergo.rego
   printf '%s\n' '## 0.1.0' 'First.' > CHANGELOG.md
   printf '%s\n' '## 0.1' 'First.' > spec/CHANGELOG.md
@@ -73,4 +78,31 @@ git commit --quiet -am "empty notes"
 git push --quiet origin HEAD:main 2> /dev/null
 refuses "has nothing under \"## 0.1.0\"" rust-v0.1.0
 
-echo "release.sh refuses a rust tag with -dev, with a version that isn't the workspace's, and without notes"
+setup 0.1.0 0.1.0
+refuses "Nothing pushed." rego-v0.1.0
+sed -i.bak 's/"version": "0.1.0"$/"version": "0.2.0"/' README.md
+git commit --quiet -am "stale rego version"
+git push --quiet origin HEAD:main 2> /dev/null
+refuses "README.md on main must show the report's engine as \"name\": \"ergo-rego\" with \"version\": \"0.1.0\"" rego-v0.1.0
+refuses "Nothing pushed." rust-v0.1.0
+
+setup 0.1.0 0.1.0
+readme ergo.rego 0.1.0 ergo-rust 0.1.0
+git commit --quiet -am "old rego name"
+git push --quiet origin HEAD:main 2> /dev/null
+refuses "README.md on main must show the report's engine" rego-v0.1.0
+
+setup 0.1.0 0.1.0
+readme ergo-rego 0.1.0 ergo-rust 0.2.0
+git commit --quiet -am "stale rust version"
+git push --quiet origin HEAD:main 2> /dev/null
+refuses "README.md on main must show the CLI's engine as {\"name\": \"ergo-rust\", \"version\": \"0.1.0\"}" rust-v0.1.0
+refuses "Nothing pushed." rego-v0.1.0
+
+setup 0.1.0 0.1.0
+readme ergo-rego 0.1.0 ergo-policy-engine 0.1.0
+git commit --quiet -am "old rust name"
+git push --quiet origin HEAD:main 2> /dev/null
+refuses "README.md on main must show the CLI's engine" rust-v0.1.0
+
+echo "release.sh refuses a rust tag with -dev, with a version that isn't the workspace's, without notes, and until README.md shows the engine"
