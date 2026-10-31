@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ergo policy editor</title>
+<title>Ergo playground</title>
 <style>
 :root {
   --paper:#EFF1F4; --surface:#FFFFFF; --sunk:#E7EAEF; --ink:#141922; --muted:#5A6472;
@@ -59,7 +59,7 @@ button { font:inherit; color:inherit; cursor:pointer; }
 .cursor { text-transform:none; letter-spacing:0; font-weight:400; font-family:var(--mono); white-space:nowrap; }
 .body { flex:1; display:flex; flex-direction:column; min-height:0; min-width:0; }
 .tab { background:none; border:0; padding:.15rem .1rem; font:inherit; font-size:.66rem; font-weight:600;
-  letter-spacing:.11em; text-transform:uppercase; color:var(--faint); border-bottom:2px solid transparent; }
+  letter-spacing:.11em; text-transform:uppercase; color:var(--faint); border-bottom:2px solid transparent; white-space:nowrap; }
 .tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--check); }
 .ghost { background:none; border:1px solid var(--hairline); border-radius:3px; padding:.2rem .55rem;
   font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; font-weight:600; color:var(--muted); white-space:nowrap; }
@@ -231,9 +231,9 @@ textarea:focus { outline:none; }
 </style>
 </head>
 <body>
-<p class="notice" id="notice" role="note"><b>Experimental.</b> This editor, the Markdown format and the Rust engine may change or go away. The Rust engine can give a different report from ergo.rego.</p>
+<p class="notice" id="notice" role="note"><b>Experimental.</b> This playground, the Markdown format and the Rust engine may change or go away. The Rust engine can give a different report from ergo.rego.</p>
 <div class="bar">
-  <div class="brand"><h1>Ergo policy editor</h1><span>write a policy as a document</span></div>
+  <div class="brand"><h1>Ergo playground</h1><span>write a policy and see its report</span></div>
   <div class="samples" role="group" aria-label="Sample policy" id="samples">
     <button id="s-reset" title="Throw away your edits and load the sample again">reset</button>
   </div>
@@ -266,7 +266,7 @@ textarea:focus { outline:none; }
     </div>
   </div>
   <span id="cursor" class="cursor"></span>
-  <button class="ghost" id="copy">Copy YAML</button>
+  <button class="ghost" id="copy" title="Copy the YAML">Copy</button>
 </div>
 
 <div class="foot">

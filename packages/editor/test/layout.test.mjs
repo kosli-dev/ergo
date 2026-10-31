@@ -2,13 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { DEFAULT_LAYOUT, LABELS, VIEWS, pick, readLayout, layoutText } from "../src/layout.mjs";
 
-test("the page starts with the Markdown on the left and the blocks on the right", () => {
-  assert.deepEqual(DEFAULT_LAYOUT, { left: "markdown", right: "blocks" });
+test("the page starts with the YAML on the left and the report on the right", () => {
+  assert.deepEqual(DEFAULT_LAYOUT, { left: "yaml", right: "report" });
 });
 
 test("picking a view the other pane doesn't show puts it in this pane", () => {
-  assert.deepEqual(pick(DEFAULT_LAYOUT, "right", "yaml"), { left: "markdown", right: "yaml" });
-  assert.deepEqual(pick(DEFAULT_LAYOUT, "left", "report"), { left: "report", right: "blocks" });
+  assert.deepEqual(pick(DEFAULT_LAYOUT, "right", "policy"), { left: "yaml", right: "policy" });
+  assert.deepEqual(pick(DEFAULT_LAYOUT, "left", "markdown"), { left: "markdown", right: "report" });
 });
 
 test("picking the view the other pane shows swaps the two panes", () => {
@@ -38,7 +38,7 @@ test("no pick ever shows a view in both panes", () => {
 
 test("every view has a tab label", () => {
   assert.deepEqual(Object.keys(LABELS).sort(), [...VIEWS].sort());
-  assert.deepEqual(VIEWS.map((v) => LABELS[v]), ["Markdown", "Blocks", "Policy", "Document", "YAML", "Report"]);
+  assert.deepEqual(VIEWS.map((v) => LABELS[v]), ["YAML", "Report", "Policy", "Markdown (experimental)", "Blocks", "Document"]);
 });
 
 test("a saved layout comes back as it was saved", () => {
