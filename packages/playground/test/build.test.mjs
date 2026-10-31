@@ -13,7 +13,7 @@ import { VIEWS, LABELS } from "../src/layout.mjs";
 import { makeRustRunner } from "../src/engines.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const dist = join(here, "..", "dist", "editor.html");
+const dist = join(here, "..", "dist", "playground.html");
 let html = "";
 
 before(() => {
@@ -21,7 +21,7 @@ before(() => {
   html = readFileSync(dist, "utf8");
 });
 
-test("the build writes dist/editor.html", () => {
+test("the build writes dist/playground.html", () => {
   assert.ok(existsSync(dist));
   assert.ok(html.length > 100000);
 });

@@ -14,7 +14,7 @@ build() {
   echo 'import { step } from "./lib.mjs";' > "$dir/site/assets/js/tutorial/main.mjs"
   echo 'const p={ergo_spec:"v0.1"},s={title:"Name the check",spec:"v0.1"};' > "$dir/public/js/tutorial/main.abc.js"
   printf '%s\n' '<pre class="code"><code>{<span class="k">"a"</span>: 1}</code></pre>' '<pre class="code"><code><span class="k">ergo_spec</span>: v0.1' 'subjects: {}</code></pre>' > "$dir/public/index.html"
-  echo '<a href="/editor/">Editor</a>' >> "$dir/public/index.html"
+  echo '<a href="/playground/">Playground</a>' >> "$dir/public/index.html"
   mkdir -p "$dir/site/layouts" "$dir/site/content" "$dir/site/assets/css" "$dir/public/tutorial" "$dir/public/css"
   echo '<div class="tut" data-wasm="{{ . }}" data-step></div>' > "$dir/site/layouts/tutorial.html"
   printf -- '---\ntitle: "Learn Ergo"\n---\n' > "$dir/site/content/tutorial.md"
@@ -107,43 +107,52 @@ printf -- '---\ntitle: ""\n---\n' > "$dir/site/prepared/content/tutorial.md"
 fails "the tutorial page's title isn't \"\""
 
 build
-mkdir -p "$dir/public/editor"
-echo '<html><head><meta name="robots" content="noindex"></head><body><a href="/">Home</a></body></html>' > "$dir/public/editor/index.html"
+mkdir -p "$dir/public/playground"
+echo '<html><head><meta name="robots" content="noindex"></head><body><a href="/">Home</a></body></html>' > "$dir/public/playground/index.html"
 echo '<a href="/docs/">Docs</a>' > "$dir/public/docs.html"
-fits "the editor page is there with noindex and the home page links to it"
+fits "the playground page is there with noindex and the home page links to it"
+
+build
+mkdir -p "$dir/public/playground"
+echo '<html><head></head></html>' > "$dir/public/playground/index.html"
+fails "the playground page has no noindex meta"
+
+build
+sed -i.bak 's|<a href="/playground/">Playground</a>||' "$dir/public/index.html"
+rm "$dir/public/index.html.bak"
+fails "the home page doesn't link to the playground"
+
+build
+sed -i.bak 's|<a href="/playground/">Playground</a>|<a href="/playgroundial/">Playground</a>|' "$dir/public/index.html"
+rm "$dir/public/index.html.bak"
+fails "the home page doesn't link to the playground"
+
+build
+sed -i.bak 's|<a href="/playground/">Playground</a>|<a href=/playground/>Playground</a>|' "$dir/public/index.html"
+rm "$dir/public/index.html.bak"
+fits "a minified link to the playground without quotes"
+
+build
+sed -i.bak 's|href="/playground/"|href="/ergo/playground"|' "$dir/public/index.html"
+rm "$dir/public/index.html.bak"
+fits "a link to the playground under a base path"
+
+build
+echo '<urlset><url><loc>https://ergo.kosli.com/</loc></url><url><loc>https://ergo.kosli.com/playground/</loc></url></urlset>' > "$dir/public/sitemap.xml"
+fails "sitemap.xml lists the playground"
+
+build
+echo '<urlset><url><loc>https://ergo.kosli.com/</loc></url><url><loc>https://ergo.kosli.com/editor/</loc></url></urlset>' > "$dir/public/sitemap.xml"
+fails "sitemap.xml lists the old editor page"
 
 build
 mkdir -p "$dir/public/editor"
 echo '<html><head></head></html>' > "$dir/public/editor/index.html"
-fails "the editor page has no noindex meta"
-
-build
-sed -i.bak 's|<a href="/editor/">Editor</a>||' "$dir/public/index.html"
-rm "$dir/public/index.html.bak"
-fails "the home page doesn't link to the editor"
-
-build
-sed -i.bak 's|<a href="/editor/">Editor</a>|<a href="/editorial/">Editor</a>|' "$dir/public/index.html"
-rm "$dir/public/index.html.bak"
-fails "the home page doesn't link to the editor"
-
-build
-sed -i.bak 's|<a href="/editor/">Editor</a>|<a href=/editor/>Editor</a>|' "$dir/public/index.html"
-rm "$dir/public/index.html.bak"
-fits "a minified link to the editor without quotes"
-
-build
-sed -i.bak 's|href="/editor/"|href="/ergo/editor"|' "$dir/public/index.html"
-rm "$dir/public/index.html.bak"
-fits "a link to the editor under a base path"
-
-build
-echo '<urlset><url><loc>https://ergo.kosli.com/</loc></url><url><loc>https://ergo.kosli.com/editor/</loc></url></urlset>' > "$dir/public/sitemap.xml"
-fails "sitemap.xml lists the editor"
+fails "the old editor page has no noindex meta"
 
 build
 mkdir -p "$dir/public/docs"
 echo '<a href="/docs/">Docs</a>' > "$dir/public/docs/index.html"
-fits "the editor page is missing"
+fits "the playground page is missing"
 
 echo "check_build.py fails when the built site doesn't show what was prepared"

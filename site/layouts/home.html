@@ -191,7 +191,7 @@
       </li>
       {{- end }}
     </ol>
-    <p class="start__editor">{{ $c.start.editor.lead }} <a class="link" href="{{ "editor/" | relURL }}" target="_blank" rel="noopener">{{ $c.start.editor.link }} <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a> {{ $c.start.editor.note }}</p>
+    <p class="start__editor">{{ $c.start.editor.lead }} <a class="link" href="{{ "playground/" | relURL }}" target="_blank" rel="noopener">{{ $c.start.editor.link }} <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a> {{ $c.start.editor.note }}</p>
     <div class="actions">
       <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.start.primary }} <span aria-hidden="true">→</span></a>
       <a class="btn btn--outline" href="{{ site.Params.repo }}">{{ partial "github-icon.html" . }}{{ $c.start.secondary }}</a>

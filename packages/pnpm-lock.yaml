@@ -8,22 +8,6 @@ importers:
 
   .: {}
 
-  editor:
-    dependencies:
-      '@kosli/ergo-markdown':
-        specifier: workspace:*
-        version: link:../markdown
-      yaml:
-        specifier: 2.9.1
-        version: 2.9.1
-    devDependencies:
-      '@open-policy-agent/opa-wasm':
-        specifier: 1.10.0
-        version: 1.10.0
-      esbuild:
-        specifier: 0.28.2
-        version: 0.28.2
-
   markdown:
     dependencies:
       mdast-util-from-markdown:
@@ -60,6 +44,22 @@ importers:
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
+
+  playground:
+    dependencies:
+      '@kosli/ergo-markdown':
+        specifier: workspace:*
+        version: link:../markdown
+      yaml:
+        specifier: 2.9.1
+        version: 2.9.1
+    devDependencies:
+      '@open-policy-agent/opa-wasm':
+        specifier: 1.10.0
+        version: 1.10.0
+      esbuild:
+        specifier: 0.28.2
+        version: 0.28.2
 
 packages:
 

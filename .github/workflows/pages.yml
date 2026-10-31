@@ -55,7 +55,7 @@ jobs:
             RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow test.yml --commit "$SHA" --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
           fi
           if [ -z "$RUN_ID" ]; then
-            echo "::error::No successful test run for $SHA, so there is no Wasm for the editor. Run this workflow on a commit of main whose tests passed."
+            echo "::error::No successful test run for $SHA, so there is no Wasm for the playground. Run this workflow on a commit of main whose tests passed."
             exit 1
           fi
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
@@ -83,24 +83,24 @@ jobs:
           node-version-file: packages/.nvmrc
           cache: pnpm
           cache-dependency-path: packages/pnpm-lock.yaml
-      - name: Build the editor
+      - name: Build the playground
         continue-on-error: true
         working-directory: packages
         run: |
           pnpm install --frozen-lockfile
-          pnpm --filter @kosli/ergo-editor build
+          pnpm --filter @kosli/ergo-playground build
       - id: pages
         uses: actions/configure-pages@v6
       - name: Build
         shell: bash
         run: |
           hugo --source site --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
-          if [ ! -f packages/editor/dist/editor.html ]; then
-            echo "::error::The editor wasn't built, and every page links to /editor/."
+          if [ ! -f packages/playground/dist/playground.html ]; then
+            echo "::error::The playground wasn't built, and every page links to /playground/."
             exit 1
           fi
-          site/editor.sh packages/editor/dist/editor.html site/public
-          test -f site/public/editor/index.html
+          site/playground.sh packages/playground/dist/playground.html site/public
+          test -f site/public/playground/index.html
           python3 site/check_build.py site/public
       - uses: actions/upload-pages-artifact@v5
         with:
