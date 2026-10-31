@@ -46,7 +46,7 @@ test("the page holds only ASCII in its samples", () => {
 });
 
 test("the page says the editor, the Markdown format and the Rust engine are experimental", () => {
-  assert.match(html, /<p class="notice" id="notice" role="note"><b>Experimental\.<\/b> This editor, the Markdown format and the Rust engine may change or go away\. The Rust engine can give a different report from ergo\.rego\.<\/p>/);
+  assert.match(html, /<p class="notice" id="notice" role="note"><b>Experimental\.<\/b> This playground, the Markdown format and the Rust engine may change or go away\. The Rust engine can give a different report from ergo\.rego\.<\/p>/);
 });
 
 test("the page has a tab label for every view", () => {
