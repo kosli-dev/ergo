@@ -1522,6 +1522,17 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("last of p", "last of p"),
     ("p[0]", "item 1 of p"),
     ("p[1]", "item 2 of p"),
+    ("$input named by $params.k", "$input named by $params.k"),
+    ("art", "art"),
+    ("art whose n is 1", "art whose n is 1"),
+    ("art whose n is at least 1", "art whose n is at least 1"),
+    ("art.items", "art.items"),
+    (
+        "every $input named by $params.k",
+        "every $input named by $params.k",
+    ),
+    ("every artifacts.releases", "every artifacts.releases"),
+    ("k whose n is 2", "k whose n is 2"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

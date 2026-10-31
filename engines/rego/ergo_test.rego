@@ -6090,8 +6090,8 @@ test_a_whose_in_a_childs_from_line_reads_the_parent_by_its_name if {
 test_the_parents_name_on_the_left_of_a_whose_in_a_childs_from_line_is_the_childs_own_field if {
 	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 2}, "v": 2}, {"id": "k2", "v": 1}]}]}, {"ergo_spec": "v0.4-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose b.x equals v", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
 	_applies_of(rep) == [
-		["k1", "satisfied", [{"name": "b.x", "value": 2, "locations": ["/bs/0/kids/0/b/x"]}, {"name": "v", "value": 2, "locations": ["/bs/0/kids/0/v"]}]],
-		["k2", "absent", [{"name": "b.x", "value": null, "locations": ["/bs/0/kids/1"]}, {"name": "v", "value": 1, "locations": ["/bs/0/kids/1/v"]}]],
+		["k1", "satisfied", [{"name": ".b.x", "value": 2, "locations": ["/bs/0/kids/0/b/x"]}, {"name": "v", "value": 2, "locations": ["/bs/0/kids/0/v"]}]],
+		["k2", "absent", [{"name": ".b.x", "value": null, "locations": ["/bs/0/kids/1"]}, {"name": "v", "value": 1, "locations": ["/bs/0/kids/1/v"]}]],
 	]
 	rep.requirements.r.checks["$applies"].expression == ".b.x equals v"
 }
@@ -6099,8 +6099,8 @@ test_the_parents_name_on_the_left_of_a_whose_in_a_childs_from_line_is_the_childs
 test_a_dot_before_the_parents_name_in_a_childs_from_line_reads_the_childs_own_field if {
 	rep := ergo.report({"bs": [{"id": "b1", "kids": [{"id": "k1", "b": 1}, {"id": "k2", "b": 5}]}]}, {"ergo_spec": "v0.4-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids whose .b equals 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "b exists"}}}}, {})
 	_applies_of(rep) == [
-		["k1", "satisfied", [{"name": "b", "value": 1, "locations": ["/bs/0/kids/0/b"]}]],
-		["k2", "value", [{"name": "b", "value": 5, "locations": ["/bs/0/kids/1/b"]}]],
+		["k1", "satisfied", [{"name": ".b", "value": 1, "locations": ["/bs/0/kids/0/b"]}]],
+		["k2", "value", [{"name": ".b", "value": 5, "locations": ["/bs/0/kids/1/b"]}]],
 	]
 	rep.requirements.r.checks["$applies"].expression == ".b is 1"
 }
@@ -9285,10 +9285,10 @@ test_a_failed_line_lists_a_value_it_reads_twice_once_for_each_pair_of_items if {
 	]
 }
 
-test_a_failed_line_orders_two_reads_of_one_name_by_where_they_were_read_as_a_row_does if {
+test_a_failed_line_lists_a_parents_field_and_the_childs_own_field_of_the_same_name_in_the_order_they_were_read if {
 	policy := {"ergo_spec": "v0.4-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": {"for": "every cs as c", "assert": "c.ts is at least b.x plus .b.x"}}}}}
 	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 1}, "cs": [{"ts": 1}]}]}]}, policy, {})
-	[i.locations | some r in rep.results; r.check == "c"; some i in r.failed_items[0].failed_assertions[0].inputs; i.name == "b.x"] == [["/bs/0/kids/0/b/x"], ["/bs/0/x"]]
+	[i.locations | some r in rep.results; r.check == "c"; some i in r.failed_items[0].failed_assertions[0].inputs; i.name in {"b.x", ".b.x"}] == [["/bs/0/x"], ["/bs/0/kids/0/b/x"]]
 }
 
 test_a_failed_line_names_the_items_of_the_second_list_it_failed_on if {
@@ -9969,7 +9969,7 @@ test_reads_with_the_same_name_and_value_merge_only_when_their_locations_match if
 	policy := {"ergo_spec": "v0.4-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "b.x is 1 and .b.x is 1", "d": "b.x is 1 and b.x is 1"}}}}
 	rep := ergo.report({"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 1}}]}]}, policy, {})
 	rows_for(rep, "s", "c")[0].inputs == [
-		{"name": "b.x", "value": 1, "locations": ["/bs/0/kids/0/b/x"]},
+		{"name": ".b.x", "value": 1, "locations": ["/bs/0/kids/0/b/x"]},
 		{"name": "b.x", "value": 1, "locations": ["/bs/0/x"]},
 	]
 	rows_for(rep, "s", "d")[0].inputs == [{"name": "b.x", "value": 1, "locations": ["/bs/0/x"]}]
@@ -10792,4 +10792,25 @@ test_a_from_that_reads_names_with_an_unknown_name_lists_the_subject_it_starts_at
 		"requirements": {"r": {"subject": "k", "checks": {"c": "n exists"}}},
 	}
 	object.keys(ergo.report({}, policy, {}).subjects) == {"k", "p"}
+}
+
+test_a_from_that_is_only_a_named_by_step_is_written_as_is_in_the_added_expressions if {
+	policy := {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "every $input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}}
+	rep := ergo.report({"a": [{"id": 1}]}, policy, {"k": "a"})
+	rep.requirements.r.checks["$min_subjects"].expression == "count(matching(every $input named by $params.k)) >= 1"
+	rep.requirements.r.checks["$unique_ids"].expression == "count(repeated(ids(every $input named by $params.k))) == 0"
+}
+
+test_a_subject_that_narrows_a_parent_read_with_every_filters_the_parents_flat_list if {
+	subjects := {"art": {"from": "every artifacts.releases", "identified_by": "id"}, "k": {"from": "art whose n is 1"}}
+	rep := ergo.report({"artifacts": [{"releases": [{"id": "r1", "n": 1}, {"id": "r2", "n": 2}]}]}, {"ergo_spec": "v0.4-dev", "subjects": subjects, "requirements": {"r": {"subject": "k", "checks": {"c": "id exists"}}}}, {})
+	rep.requirements.r.subjects == {"matching": 1, "total": 2}
+	rep.requirements.r.checks["$min_subjects"].expression == "count(matching(every artifacts.releases)) >= 1"
+}
+
+test_the_childs_own_field_named_like_its_parent_keeps_its_dot_in_the_input_name if {
+	subjects := {"art": {"from": "arts", "identified_by": "id"}, "item": {"from": "art.items", "identified_by": "id"}}
+	rep := ergo.report({"arts": [{"id": "a1", "k": 2, "items": [{"id": "i1", "art": {"k": 1}}]}]}, {"ergo_spec": "v0.4-dev", "subjects": subjects, "requirements": {"r": {"subject": "item", "checks": {"c": ".art.k is 1", "d": "art.k is 1"}}}}, {})
+	[i.name | some i in rows_for(rep, "r", "c")[0].inputs] == [".art.k"]
+	[i.name | some i in rows_for(rep, "r", "d")[0].inputs] == ["art.k"]
 }

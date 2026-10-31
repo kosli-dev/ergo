@@ -79,6 +79,17 @@ pub fn name(path: &Path) -> String {
     render(path, None)
 }
 
+pub fn plain_name(path: &Path) -> String {
+    if path.start == Start::Own {
+        name(&Path {
+            start: Start::Subject,
+            steps: path.steps.clone(),
+        })
+    } else {
+        name(path)
+    }
+}
+
 pub fn marked_name(path: &Path, marks: &BTreeSet<usize>) -> String {
     render(path, Some(marks))
 }
@@ -93,7 +104,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
         }
     };
     let mut out = match &path.start {
-        Start::Subject => String::new(),
+        Start::Subject | Start::Own => String::new(),
         Start::Input => "$input".to_string(),
         Start::Params => "$params".to_string(),
         Start::Alias(alias) => parent_key_text(alias),
@@ -105,7 +116,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
         match step {
             Step::Key(key) => {
                 if out.is_empty() {
-                    if is_word(key) {
+                    if is_word(key) || (at == 0 && marks.is_none() && path.start == Start::Own) {
                         out.push('.');
                     }
                 } else {
@@ -128,7 +139,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
                 let ref_name = name(reference);
                 let one_key = (matches!(
                     reference.start,
-                    Start::Input | Start::Params | Start::Subject
+                    Start::Input | Start::Params | Start::Subject | Start::Own
                 ) && matches!(reference.steps.as_slice(), [Step::Key(_)]))
                     || (matches!(reference.start, Start::Alias(_)) && reference.steps.is_empty());
                 if one_key && !out.is_empty() {
@@ -228,6 +239,17 @@ mod tests {
         assert_eq!(name(&subject(vec![k("empty")])), ".empty");
         assert_eq!(name(&subject(vec![k("a"), k("x")])), ".a.x");
         assert_eq!(name(&subject(vec![k("it")])), ".it");
+    }
+
+    #[test]
+    fn an_own_field_named_like_a_parent_keeps_its_dot() {
+        let own = |steps| Path {
+            start: Start::Own,
+            steps,
+        };
+        assert_eq!(name(&own(vec![k("art"), k("k")])), ".art.k");
+        assert_eq!(name(&own(vec![k("$x"), k("k")])), ".\"$x\".k");
+        assert_eq!(plain_name(&own(vec![k("art"), k("k")])), "art.k");
     }
 
     #[test]

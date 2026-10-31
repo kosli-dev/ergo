@@ -3907,6 +3907,8 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &["y is compared with itself"],
         &["y is compared with itself"],
     ),
+    (".art.k is 1", "art.k is 1", &[], &[]),
+    ("art.k is 1", "art.k is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

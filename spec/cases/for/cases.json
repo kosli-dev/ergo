@@ -12285,7 +12285,7 @@
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": {"for": "every cs as c", "assert": "c.ts is at least b.x plus .b.x"}}}}},
     "cases": [
       {
-        "description": "orders the entries of the same name by where they were read, as a row does",
+        "description": "lists the parent's field and the child's own field of the same name in the order they were read",
         "rules": ["for.failure_inputs", "row.inputs_once", "location.merged"],
         "input": {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "b": {"x": 1}, "cs": [{"ts": 1}]}]}]},
         "results": [
@@ -12317,16 +12317,16 @@
                       },
                       {
                         "locations": [
-                          "/bs/0/kids/0/b/x"
+                          "/bs/0/x"
                         ],
                         "name": "b.x",
                         "value": 1
                       },
                       {
                         "locations": [
-                          "/bs/0/x"
+                          "/bs/0/kids/0/b/x"
                         ],
-                        "name": "b.x",
+                        "name": ".b.x",
                         "value": 1
                       }
                     ]
@@ -12347,7 +12347,7 @@
                 "locations": [
                   "/bs/0/kids/0/b/x"
                 ],
-                "name": "b.x",
+                "name": ".b.x",
                 "value": 1
               },
               {

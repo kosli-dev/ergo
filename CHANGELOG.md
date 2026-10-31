@@ -8,6 +8,7 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 - This version follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released, and the report's `ergo` follows. One that says `v0.3` is written wrong, with `unsupported version v0.3, expected v0.4-dev`.
 - The report's `engine` name is `ergo-rego`, where it was `ergo.rego`. Every report changes in that field only, and the hash leaves `engine` out, so hashes stay the same. A compiled policy made by an older copy says `ergo.rego`, so `ergo.report` reads it as one from another engine, and the message says `expected ergo-rego`. Compile the policy again.
+- A `from` that is only a `named by` step is written as it is in the `$min_subjects` and `$unique_ids` expressions, so `every $input named by $params.k` is no longer `count(matching(every ))`. A subject that narrows a subject read with `every` takes its flat list of subjects and filters it, where `ergo.rego` dropped the `every` and found none. An input that reads the item's own field named like a parent subject keeps its dot, like `.art.k`. Reports change for such policies.
 
 ## 0.3.1
 

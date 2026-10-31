@@ -352,6 +352,10 @@ impl Scope {
                 return (Start::Alias(key.to_string()), steps);
             }
         }
+        if (dot || !parents) && self.parents.contains_key(key) {
+            steps.insert(0, Step::Key(key.to_string()));
+            return (Start::Own, steps);
+        }
         steps.insert(0, Step::Key(key.to_string()));
         (Start::Subject, steps)
     }
@@ -659,7 +663,7 @@ pub const MOST_WALK_STEPS: usize = 10;
 
 pub fn walk_steps(path: &path::Path) -> usize {
     let start = match &path.start {
-        Start::Subject | Start::Input | Start::Params => 0,
+        Start::Subject | Start::Own | Start::Input | Start::Params => 0,
         Start::Alias(_) => 1,
         Start::Part(part) => part.steps.len(),
     };
@@ -827,7 +831,8 @@ mod tests {
         assert_eq!(p.start, Start::Subject);
         assert_eq!(p.steps, [key("cov"), key("x")]);
         let p = lowered(&scope(), ".artifact.x");
-        assert_eq!(p.start, Start::Subject);
+        assert_eq!(p.start, Start::Own);
+        assert_eq!(p.steps, [key("artifact"), key("x")]);
         let p = lowered(&scope(), ".pr.x");
         assert_eq!(p.start, Start::Subject);
         let p = lowered(&Scope::new(), ".empty");
@@ -877,7 +882,7 @@ mod tests {
         let left = |text: &str| scope().left_path(&path(text)).unwrap();
         assert!(matches!(left("cov.x").start, Start::Part(_)));
         let p = left("artifact.owner");
-        assert_eq!(p.start, Start::Subject);
+        assert_eq!(p.start, Start::Own);
         assert_eq!(p.steps, [key("artifact"), key("owner")]);
         assert_eq!(left("pr.author").start, Start::Subject);
         assert!(matches!(left(".cov.x").start, Start::Subject));
@@ -1078,7 +1083,7 @@ mod tests {
         else {
             panic!("not present");
         };
-        assert_eq!(found.path.start, Start::Subject);
+        assert_eq!(found.path.start, Start::Own);
         assert_eq!(found.path.steps, [key("artifact"), key("x")]);
     }
 
@@ -1115,7 +1120,7 @@ mod tests {
             panic!("not a tally");
         };
         let paths = found.paths();
-        assert_eq!(paths[0].start, Start::Subject);
+        assert_eq!(paths[0].start, Start::Own);
         assert_eq!(paths[0].steps, [key("artifact"), key("xs")]);
     }
 

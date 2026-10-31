@@ -556,7 +556,8 @@ default _every_from(_) := false
 _every_from(req) if {
 	is_object(req)
 	is_string(object.get(req, "subject", null))
-	req.subject in object.get(data.ergo_subject_sentences, "every", set())
+	some m in graph.reachable({n: object.get(object.get(data.ergo_subject_sentences, "narrowing", {}), n, []) | some n, _ in data.ergo_resolved}, [req.subject])
+	m in object.get(data.ergo_subject_sentences, "every", set())
 }
 
 _every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e)} | some e in w.items; _every_kept(e, last)], "fails": array.concat(array.concat(w.fails, _walk_stop(w)), [object.union(_every_end_fail(e), {"at": _walk_at(w, e)}) | some e in w.items; not _every_kept(e, last)])} if {
@@ -1439,9 +1440,20 @@ _at(subj, path) := _joined(_subject_at, keys) if {
 	start := _start_of(subj, path)
 }
 
-_path_input(subj, path) := {"name": _item_path_name(path), "value": _value_at(subj, path), "locations": [at]} if at := _at(subj, path)
+_path_input(subj, path) := {"name": _dotted_name(path), "value": _value_at(subj, path), "locations": [at]} if at := _at(subj, path)
 
-else := {"name": _item_path_name(path), "value": _value_at(subj, path), "locations": []}
+else := {"name": _dotted_name(path), "value": _value_at(subj, path), "locations": []}
+
+_dotted_name(path) := concat("", [".", name]) if {
+	name := _item_path_name(path)
+	_dot_kept(path)
+	not startswith(name, ".")
+} else := _item_path_name(path)
+
+_dot_kept(path) if {
+	_string_literal(path[0])
+	path[0].literal in object.keys(_parent_names)
+}
 
 _merged_inputs(inputs) := [object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations] | some i in inputs})]
 
@@ -3425,7 +3437,14 @@ _from_text(req) := concat("", [_every_word(req), "$input"]) if {
 
 _from_text(req) := "<invalid from>" if not _from_well_formed(req)
 
-_from_name(p) := _input_path_name(_from_steps(p))
+_from_name(p) := concat("", ["$input", _step_name(1, p[0])]) if _ref_start(p)
+
+_from_name(p) := _input_path_name(_from_steps(p)) if not _ref_start(p)
+
+_ref_start(p) if {
+	count(p) == 1
+	_is_ref(p[0])
+}
 
 _from_steps(p) := array.concat([{"literal": p[0]}], array.slice(p, 1, count(p))) if _starts_with_dollar_key(p)
 
