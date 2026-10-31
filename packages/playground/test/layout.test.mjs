@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT_LAYOUT, LABELS, VIEWS, pick, readLayout, layoutText } from "../src/layout.mjs";
+import { DEFAULT_LAYOUT, LABELS, VIEWS, noteView, pick, readLayout, layoutText } from "../src/layout.mjs";
 
 test("the page starts with the YAML on the left and the report on the right", () => {
   assert.deepEqual(DEFAULT_LAYOUT, { left: "yaml", right: "report" });
@@ -50,4 +50,17 @@ test("a missing, broken or impossible saved layout gives the default one", () =>
   for (const text of [null, "", "{", "[]", "null", '{"left":"yaml","right":"yaml"}', '{"left":"yaml","right":"nothing"}', '{"left":"yaml"}']) {
     assert.deepEqual(readLayout(text), DEFAULT_LAYOUT, String(text));
   }
+});
+
+test("the note under the page is about the pane you edit, YAML or Markdown, on either side", () => {
+  assert.equal(noteView({ left: "yaml", right: "report" }), "yaml");
+  assert.equal(noteView({ left: "report", right: "yaml" }), "yaml");
+  assert.equal(noteView({ left: "markdown", right: "blocks" }), "markdown");
+  assert.equal(noteView({ left: "blocks", right: "markdown" }), "markdown");
+  assert.equal(noteView({ left: "yaml", right: "markdown" }), "yaml");
+});
+
+test("with no pane to edit the note is about the right pane", () => {
+  assert.equal(noteView({ left: "policy", right: "report" }), "report");
+  assert.equal(noteView({ left: "report", right: "doc" }), "doc");
 });
