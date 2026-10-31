@@ -235,6 +235,8 @@ def case_sentences():
     for path in sorted(glob.glob("spec/cases/*/cases.json")):
         for group in json.load(open(path)):
             policy = group.get("policy", {})
+            if not isinstance(policy, dict):
+                continue
             walk(policy)
             requirements = policy.get("requirements")
             for requirement in requirements.values() if isinstance(requirements, dict) else []:

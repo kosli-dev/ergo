@@ -3014,23 +3014,29 @@ test_the_report_never_reads_data_params if {
 	[r.cause | some r in rows_for(unset, "s", "c")] == ["absent"]
 }
 
-empty_report := {"compliant": false, "description": "", "engine": {"name": "ergo-rego", "version": ergo.version}, "ergo": "v0.4-dev", "meta": {}, "requirements": {}, "results": [], "subjects": {}}
+empty_report := {"compliant": false, "description": "", "engine": {"name": "ergo-rego", "version": ergo.version}, "ergo": "v0.4-dev", "meta": {}, "subjects": {}}
+
+has_only_the_policy_row(rep) if {
+	object.remove(rep, ["requirements", "results"]) == empty_report
+	object.keys(rep.requirements) == {"$policy"}
+	count(rep.results) == 1
+}
 
 test_a_policy_without_requirements_is_not_compliant if {
-	ergo.report({"items": [{"id": 1}]}, {}, {}) == empty_report
-	ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.4-dev", "requirements": {}}, {}) == empty_report
-	ergo.report({"items": [{"id": 1}]}, {"requirments": params_req("id exists")}, {}) == empty_report
+	has_only_the_policy_row(ergo.report({"items": [{"id": 1}]}, {}, {}))
+	has_only_the_policy_row(ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.4-dev", "requirements": {}}, {}))
+	has_only_the_policy_row(ergo.report({"items": [{"id": 1}]}, {"requirments": params_req("id exists")}, {}))
 }
 
 test_a_policy_that_is_not_an_object_is_not_compliant if {
 	every policy in [null, true, 1, "requirements", [], [params_req("id exists")]] {
-		ergo.report({"items": [{"id": 1}]}, policy, {}) == empty_report
+		has_only_the_policy_row(ergo.report({"items": [{"id": 1}]}, policy, {}))
 	}
 }
 
 test_requirements_that_are_not_an_object_are_not_compliant if {
 	every reqs in [null, true, 1, "", "s", []] {
-		ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.4-dev", "requirements": reqs}, {}) == empty_report
+		has_only_the_policy_row(ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.4-dev", "requirements": reqs}, {}))
 	}
 	ergo.report({"items": [{"id": 1}]}, {"ergo_spec": "v0.4-dev", "requirements": [params_req("id exists").s]}, {}).compliant == false
 }
@@ -3562,7 +3568,7 @@ test_min_subjects_lists_only_the_count_when_the_input_and_params_are_json if {
 }
 
 test_a_requirement_name_that_is_not_a_string_fails_the_requirement_and_the_policy if {
-	every policy in [{1: json_only_req.s}, [json_only_req.s]] {
+	every policy in [{1: json_only_req.s}] {
 		rep := report({"items": [{"id": "a", "x": 1}]}, policy)
 		rep.compliant == false
 		some name, r in rep.requirements
@@ -10845,4 +10851,56 @@ test_a_from_whose_condition_keeps_the_dot_of_the_childs_own_field_named_like_its
 	subjects := {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose v equals .art.k", "identified_by": "id"}}
 	rep := ergo.report({"arts": [{"id": "a1", "k": 5, "items": [{"id": "i1", "art": {"k": 1}, "v": 5}]}]}, {"ergo_spec": "v0.4-dev", "subjects": subjects, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}}, {})
 	rep.subjects.thing.from == "art.items whose v equals .art.k"
+}
+
+test_a_policy_with_no_requirements_has_a_violation_for_the_row_that_says_so if {
+	rep := ergo.report({}, {"ergo_spec": "v0.4-dev"}, {})
+	rep.compliant == false
+	ergo.violations(rep) == [{
+		"requirement": "$policy",
+		"subject": {"type": "$policy", "id": "$policy"},
+		"check": "$well_formed",
+		"description": "The policy is written correctly",
+		"expression": "count(problems) == 0",
+		"inputs": [{"name": "requirements", "value": ["missing"], "locations": []}],
+		"cause": "value",
+	}]
+}
+
+test_a_policy_with_a_requirement_gets_no_policy_requirement_of_its_own if {
+	policy := {"ergo_spec": "v9.9", "subjects": {"s": {"from": "xs"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}}
+	rep := ergo.report({}, policy, {})
+	object.keys(rep.requirements) == {"r"}
+	every row in rep.results {
+		row.requirement == "r"
+	}
+}
+
+test_a_requirement_called_policy_is_written_wrong_and_leaves_no_policy_requirement_of_its_own if {
+	policy := {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs"}}, "requirements": {"$policy": {"subject": "s", "checks": {"c": "x exists"}}}}
+	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+	object.keys(rep.requirements) == {"$policy"}
+	rep.requirements["$policy"].subject == "s"
+	[i.value | some i in rows_for(rep, "$policy", "$well_formed")[0].inputs; i.name == "requirement name"] == [["name reserved"]]
+}
+
+test_a_requirements_list_with_items_is_read_as_no_requirements if {
+	rep := ergo.report({"xs": [{"x": 1}]}, {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs"}}, "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]}, {})
+	object.keys(rep.requirements) == {"$policy"}
+	[i.value | some i in rows_for(rep, "$policy", "$well_formed")[0].inputs; i.name == "requirements"] == [["not an object"]]
+	count(rep.results) == 1
+}
+
+test_a_policy_that_is_not_an_object_says_so_in_place_of_requirements if {
+	rep := ergo.report({}, ["x"], {})
+	rows_for(rep, "$policy", "$well_formed")[0].inputs == [{"name": "policy", "value": ["not an object"], "locations": []}]
+}
+
+test_a_set_of_requirements_reads_as_none if {
+	policy := {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs"}}, "requirements": {{"subject": "s", "checks": {"c": "x exists"}}}}
+	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+	rep.compliant == false
+	object.keys(rep.requirements) == {"$policy"}
+	[i.value | some i in rows_for(rep, "$policy", "$well_formed")[0].inputs; i.name == "requirements"] == [["not an object"]]
+	[v.requirement | some v in ergo.violations(rep)] == ["$policy"]
 }

@@ -58,7 +58,31 @@ Give each argument a default like this when it comes from `data`. Rego doesn't c
 
 Because each name is an object key, two requirements can't share a name, and every row in the report points back to exactly one requirement.
 
-A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. Ergo leaves out any other section of the policy, so it changes nothing in the report.
+A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. Its report then has a requirement of Ergo's own, `$policy`, with one `$well_formed` row that fails and says what is wrong, so `ergo.violations` doesn't come back empty. For the policy `{"ergo_spec": "v0.4-dev"}` and the input `{}`, the row is:
+
+```json
+{
+  "cause": "value",
+  "check": "$well_formed",
+  "inputs": [
+    {
+      "locations": [],
+      "name": "requirements",
+      "value": [
+        "missing"
+      ]
+    }
+  ],
+  "passed": false,
+  "requirement": "$policy",
+  "subject": {
+    "id": "$policy",
+    "type": "$policy"
+  }
+}
+```
+
+`requirements` says `missing`, `not an object` or `empty`, and a wrong `ergo_spec`, `description` or `meta` is listed next to it, as `policy ergo_spec`. A requirement can't be called `$policy`: it is written wrong, with `requirement name` holding `name reserved` in its `$well_formed` row. Ergo leaves out any other section of the policy, so it changes nothing in the report.
 
 From your own policies, call only `ergo.report` and `ergo.violations`. Rules whose names start with `_`, like `ergo._row_cause`, are Ergo's own and can change or disappear in any release. If you lint with [Regal](https://www.openpolicyagent.org/projects/regal), its `leaked-internal-reference` rule flags a call to one.
 

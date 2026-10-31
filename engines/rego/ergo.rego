@@ -3526,10 +3526,16 @@ default _well_formed_named(_, _) := false
 
 _well_formed_named(req, name) if {
 	is_string(name)
+	name != "$policy"
 	_well_formed(req)
 }
 
-_name_problem_inputs(name) := [] if is_string(name)
+_name_problem_inputs(name) := [] if {
+	is_string(name)
+	name != "$policy"
+}
+
+_name_problem_inputs("$policy") := [{"name": "requirement name", "value": ["name reserved"], "locations": []}]
 
 _name_problem_inputs(name) := [{"name": "requirement name", "value": ["not a string"], "locations": []}] if not is_string(name)
 
@@ -3976,8 +3982,6 @@ _names(x) := sort(object.keys(x)) if is_object(x)
 
 _names(x) := [i | some i, _ in x] if is_array(x)
 
-_names(x) := sort(x) if is_set(x)
-
 report(doc, policy, params) := _run(doc, c.policy, _from_compiled(c), params) if {
 	c := _compiled(policy)
 } else := _run(doc, c.policy, _stale_read(c), params) if {
@@ -3999,7 +4003,7 @@ _read(policy) := {"subjects": subjects, "subject_sentences": subject_sentences, 
 	reads := _s_from_reads(written_subjects, parts)
 	subjects := _s_subjects(_s_new_subjects(written_subjects), reads, parts)
 	subject_sentences := _s_subject_sentences(written_subjects, reads, parts)
-	reqs := _p_requirements(raw, subject_sentences.chains, parts)
+	reqs := _p_requirements(_object_or_empty(raw), subject_sentences.chains, parts)
 	sentences := _s_sentences(raw, reqs)
 	resolved := _resolved_subjects with data.ergo_subjects as subjects with data.ergo_subject_sentences as subject_sentences
 }
@@ -4113,7 +4117,62 @@ _run(doc, policy, rd, params) := r if {
 	unreadable := _unreadable_inputs(doc, params)
 	written := object.union(_report_of(doc, reqs, object.get(rd.ahead, "requirements", {})), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _listed_of(policy, rd)}) with data.ergo_reading as false with data.ergo_policy_problems as _policy_problems_of(policy, rd) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, rd.subjects, rd.resolved)
-	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": _engine})
+	r := _with_policy_row(object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": _engine}), policy)
+}
+
+_with_policy_row(report, _) := report if count(report.requirements) > 0
+
+_with_policy_row(report, policy) := object.union(report, {
+	"requirements": {"$policy": _policy_requirement},
+	"results": array.concat(report.results, [_policy_row(policy)]),
+}) if count(report.requirements) == 0
+
+_policy_requirement := {
+	"description": "",
+	"meta": {},
+	"require": "every",
+	"subject": "$policy",
+	"status": "not_met",
+	"subjects": {"matching": 0, "total": 0},
+	"checks": {"$well_formed": {
+		"description": "The policy is written correctly",
+		"expression": "count(problems) == 0",
+		"meta": {},
+	}},
+	"causes": [{"cause": "value", "rows": 1}],
+}
+
+_policy_row(policy) := {
+	"requirement": "$policy",
+	"subject": {"type": "$policy", "id": "$policy"},
+	"check": "$well_formed",
+	"passed": false,
+	"cause": "value",
+	"inputs": [i | some i in sort(array.concat(_policy_problem_inputs(policy), _requirements_input(policy)))],
+}
+
+_requirements_input(policy) := [{"name": "policy", "value": ["not an object"], "locations": []}] if not is_object(policy)
+
+_requirements_input(policy) := [{"name": "requirements", "value": [_requirements_problem(policy)], "locations": []}] if is_object(policy)
+
+_requirements_problem(policy) := "missing" if not _has_requirements(policy)
+
+_requirements_problem(policy) := "not an object" if {
+	_has_requirements(policy)
+	not is_object(policy.requirements)
+}
+
+_requirements_problem(policy) := "empty" if {
+	_has_requirements(policy)
+	is_object(policy.requirements)
+	count(policy.requirements) == 0
+}
+
+default _has_requirements(_) := false
+
+_has_requirements(policy) if {
+	is_object(policy)
+	policy.requirements != null
 }
 
 version := "0.4.0-dev"

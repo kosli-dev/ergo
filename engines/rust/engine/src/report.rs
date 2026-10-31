@@ -423,7 +423,12 @@ pub fn well_formed_row(
     extra: Option<&Problems>,
 ) -> Row {
     let problems = requirement_problems(requirement, extra);
-    let mut inputs = vec![input("count(checks)", json!(requirement.checks_count), &[])];
+    let reserved = requirement_name == POLICY;
+    let mut inputs = Vec::new();
+    if reserved {
+        inputs.push(input("requirement name", json!(["name reserved"]), &[]));
+    }
+    inputs.push(input("count(checks)", json!(requirement.checks_count), &[]));
     let require_wrong = problems.contains_key("require");
     inputs.push(if require_wrong {
         input("require", json!(["neither every nor some"]), &[])
@@ -444,8 +449,10 @@ pub fn well_formed_row(
     for (name, texts) in &policy.problems {
         inputs.push(input(name, json!(texts), &[]));
     }
-    let failed =
-        !problems.is_empty() || !policy.problems.is_empty() || requirement.not_an_object.is_some();
+    let failed = reserved
+        || !problems.is_empty()
+        || !policy.problems.is_empty()
+        || requirement.not_an_object.is_some();
     let cause = if failed {
         Cause::Value
     } else {
@@ -640,6 +647,10 @@ pub fn assemble_with(
         applies_rows.extend(evaluation.applies);
         check_rows.extend(evaluation.subject_rows.into_iter().flatten());
     }
+    if policy.requirements.is_empty() {
+        requirements.insert("$policy".to_string(), policy_requirement());
+        well_formed_rows.push(policy_row(policy));
+    }
     let results: Vec<Value> = well_formed_rows
         .iter()
         .chain(&min_rows)
@@ -658,6 +669,54 @@ pub fn assemble_with(
         "results": results,
         "subjects": subjects,
     })
+}
+
+pub const POLICY: &str = "$policy";
+
+fn policy_requirement() -> Value {
+    json!({
+        "description": "",
+        "meta": {},
+        "require": "every",
+        "subject": POLICY,
+        "status": "not_met",
+        "causes": [{"cause": "value", "rows": 1}],
+        "subjects": {"total": 0, "matching": 0},
+        "checks": {"$well_formed": {
+            "description": "The policy is written correctly",
+            "expression": "count(problems) == 0",
+            "meta": {},
+        }},
+    })
+}
+
+fn policy_row(policy: &Policy) -> Row {
+    let mut named: Vec<(String, Value)> = policy
+        .problems
+        .iter()
+        .map(|(name, texts)| (name.clone(), json!(texts)))
+        .collect();
+    if !policy.requirements_problem.is_empty() {
+        named.push((
+            "requirements".to_string(),
+            json!([policy.requirements_problem]),
+        ));
+    }
+    named.sort_by(|a, b| a.0.cmp(&b.0));
+    Row {
+        requirement: POLICY.to_string(),
+        subject_type: json!(POLICY),
+        subject_id: json!(POLICY),
+        subject_in: None,
+        check: "$well_formed".to_string(),
+        cause: Cause::Value,
+        inputs: named
+            .into_iter()
+            .map(|(name, value)| input(&name, value, &[]))
+            .collect(),
+        failed_items: None,
+        failed_assertions: None,
+    }
 }
 
 fn is_holding(report: &Value, requirement: &Value) -> bool {
@@ -1192,10 +1251,73 @@ mod tests {
             Value::Null,
         );
         assert_eq!(report["compliant"], json!(false));
-        assert_eq!(report["results"], json!([]));
-        assert_eq!(report["requirements"], json!({}));
+        assert_eq!(report["results"].as_array().unwrap().len(), 1);
         let report = report_of(json!(null), Value::Null);
         assert_eq!(report["compliant"], json!(false));
+    }
+
+    #[test]
+    fn a_policy_with_no_requirements_has_a_requirement_of_its_own_that_says_what_is_wrong() {
+        let report = report_of(json!({"ergo_spec": "v9.9"}), Value::Null);
+        let entry = &report["requirements"]["$policy"];
+        assert_eq!(entry["subject"], json!("$policy"));
+        assert_eq!(entry["status"], json!("not_met"));
+        assert_eq!(entry["subjects"], json!({"total": 0, "matching": 0}));
+        assert_eq!(report["subjects"], json!({}));
+        let row = row_of_check(&report, "$policy", "$well_formed");
+        assert_eq!(row["subject"], json!({"type": "$policy", "id": "$policy"}));
+        assert_eq!(
+            row["inputs"],
+            json!([
+                {"name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.4-dev"], "locations": []},
+                {"name": "requirements", "value": ["missing"], "locations": []},
+            ])
+        );
+        let listed = crate::violations(&report);
+        assert_eq!(listed.as_array().unwrap().len(), 1);
+        for (written, wanted) in [
+            (json!({"requirements": {}}), "empty"),
+            (json!({"requirements": []}), "not an object"),
+            (json!({"requirements": null}), "missing"),
+        ] {
+            let report = report_of(written, Value::Null);
+            let row = row_of_check(&report, "$policy", "$well_formed");
+            let last = row["inputs"].as_array().unwrap().last().unwrap().clone();
+            assert_eq!(last["value"], json!([wanted]));
+        }
+    }
+
+    #[test]
+    fn a_policy_that_is_not_an_object_says_so_in_place_of_requirements() {
+        let report = report_of(json!("x"), Value::Null);
+        let row = row_of_check(&report, "$policy", "$well_formed");
+        assert_eq!(
+            row["inputs"],
+            json!([{"name": "policy", "value": ["not an object"], "locations": []}])
+        );
+        let report = report_of(
+            json!({"ergo_spec": "v0.4-dev", "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]}),
+            Value::Null,
+        );
+        assert_eq!(report["requirements"].as_object().unwrap().len(), 1);
+        assert!(report["requirements"].get("$policy").is_some());
+    }
+
+    #[test]
+    fn a_policy_with_a_requirement_gets_no_requirement_of_its_own() {
+        let report = report_of(policy(json!({"s": good()})), Value::Null);
+        assert!(report["requirements"].get("$policy").is_none());
+    }
+
+    #[test]
+    fn a_requirement_called_policy_is_written_wrong() {
+        let report = report_of(policy(json!({"$policy": good()})), Value::Null);
+        let row = row_of_check(&report, "$policy", "$well_formed");
+        assert_eq!(row["passed"], json!(false));
+        assert_eq!(
+            row["inputs"][0],
+            json!({"name": "requirement name", "value": ["name reserved"], "locations": []})
+        );
     }
 
     #[test]

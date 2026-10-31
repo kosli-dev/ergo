@@ -404,7 +404,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 - `not_applicable` when it would otherwise be met but no subject is in scope, which only happens with `min_subjects: 0`
 - `met` otherwise
 
-**[compliant]** The report is `compliant` when it has at least one requirement and none is `not_met`. A policy with no requirements is never compliant, because it doesn't check anything.
+**[compliant]** The report is `compliant` when it has at least one requirement and none is `not_met`. A policy with no requirements is never compliant, because it doesn't check anything, and its report has Ergo's own requirement `$policy`, which is never met ([policy.no_requirements](syntax.md#policy)).
 
 **[report.requirements]** The report has an entry for each requirement, with its `description` and `meta`, or `""` and `{}` when it has none, its `require`, `subject`, the name of the subject it checks, or `null` when it names none or one that isn't in the policy's subjects, its `status`, `subjects` with `total`, the number found by `from`, and `matching`, the number in scope, `checks`, each check as written with its `description`, `meta` and `expression`, plus the checks Ergo adds, and `causes`. All the filters share one `$applies` entry.
 
