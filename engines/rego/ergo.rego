@@ -1440,19 +1440,24 @@ _at(subj, path) := _joined(_subject_at, keys) if {
 	start := _start_of(subj, path)
 }
 
-_path_input(subj, path) := {"name": _dotted_name(path), "value": _value_at(subj, path), "locations": [at]} if at := _at(subj, path)
+_path_input(subj, path) := {"name": _input_name(path), "value": _value_at(subj, path), "locations": [at]} if at := _at(subj, path)
 
-else := {"name": _dotted_name(path), "value": _value_at(subj, path), "locations": []}
+else := {"name": _input_name(path), "value": _value_at(subj, path), "locations": []}
 
-_dotted_name(path) := concat("", [".", name]) if {
-	name := _item_path_name(path)
-	_dot_kept(path)
-	not startswith(name, ".")
-} else := _item_path_name(path)
+_input_name(path) := _item_path_name(path) if not _dot_kept(path)
+
+_input_name(path) := _dotted(_item_path_name(path)) if _dot_kept(path)
+
+_dotted(name) := name if startswith(name, ".")
+
+_dotted(name) := concat("", [".", name]) if not startswith(name, ".")
+
+default _dot_kept(_) := false
 
 _dot_kept(path) if {
+	is_object(path[0])
 	_string_literal(path[0])
-	path[0].literal in object.keys(_parent_names)
+	_ := _parent_names[path[0].literal]
 }
 
 _merged_inputs(inputs) := [object.union(_with_part({"name": t[0], "value": t[1]}, t[2]), {"locations": t[3]}) | some t in sort({[i.name, i.value, object.get(i, "part", null), i.locations] | some i in inputs})]
