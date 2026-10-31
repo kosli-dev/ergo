@@ -1444,13 +1444,17 @@ _path_input(subj, path) := {"name": _input_name(path), "value": _value_at(subj, 
 
 else := {"name": _input_name(path), "value": _value_at(subj, path), "locations": []}
 
-_input_name(path) := _item_path_name(path) if not _dot_kept(path)
+_input_name(path) := _path_name(path) if not _has_parents
 
-_input_name(path) := _dotted(_item_path_name(path)) if _dot_kept(path)
+_input_name(path) := _with_dot(_path_name(path), _dot_kept(path)) if _has_parents
 
-_dotted(name) := name if startswith(name, ".")
+default _has_parents := false
 
-_dotted(name) := concat("", [".", name]) if not startswith(name, ".")
+_has_parents if count(_parent_names) > 0
+
+_with_dot(name, false) := name
+
+_with_dot(name, true) := concat("", [".", trim_prefix(name, ".")])
 
 default _dot_kept(_) := false
 
@@ -1784,8 +1788,6 @@ _named_by(p) if {
 	count(p.ref) == 2
 	is_string(p.ref[1])
 }
-
-_item_path_name(path) := _path_name(path)
 
 _segment_name(p) := _key_name(p) if not is_object(p)
 
