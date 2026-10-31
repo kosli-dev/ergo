@@ -2,6 +2,10 @@
 
 This file is about `ergo.rego` only. The Rust engine's changes are in [engines/rust/CHANGELOG.md](engines/rust/CHANGELOG.md), and the spec's in [spec/CHANGELOG.md](spec/CHANGELOG.md). Each release names the version of the spec it follows.
 
+## 0.3.1
+
+`ergo.rego` is the same as in 0.3.0 apart from its version, and follows spec 0.3. This release brings the docs up to date with the first release of the Rust engine: [README.md](README.md#the-ergo-cli-experimental) says how to install the `ergo` CLI from crates.io or download it, and calls it the `ergo` CLI where it meant the command. It also says again how to update `ergo.rego`.
+
 ## 0.3.0
 
 ### Changed

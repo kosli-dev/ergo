@@ -186,7 +186,7 @@ The report records every check Ergo ran, including the ones that passed. It come
   "description": "",
   "engine": {
     "name": "ergo.rego",
-    "version": "0.4.0-dev"
+    "version": "0.3.1-dev"
   },
   "ergo": "v0.3",
   "meta": {},
