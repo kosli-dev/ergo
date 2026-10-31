@@ -1,4 +1,4 @@
-/** The views the editor can show, in the order the pickers list them. */
+/** The views the playground can show, in the order the pickers list them. */
 export const VIEWS = ["yaml", "report", "policy", "markdown", "blocks", "doc"];
 
 /** The name each view shows. */
@@ -28,3 +28,6 @@ export const readLayout = (text) => {
 
 /** Writes a layout as JSON text, for storing. */
 export const layoutText = (layout) => JSON.stringify({ left: layout.left, right: layout.right });
+
+/** Gives the view the note under the page is about: the pane you edit (`"yaml"` or `"markdown"`, the left one when both), else the right pane. */
+export const noteView = (layout) => [layout.left, layout.right].find((v) => v === "yaml" || v === "markdown") ?? layout.right;
