@@ -35,7 +35,7 @@ Ergo reads no clock and nothing random, and sorts everything it writes. The same
 Two engines build Ergo reports, and you choose one:
 
 - `ergo.rego` runs on [Open Policy Agent](https://www.openpolicyagent.org/). It is one file with no dependencies. Run it with `opa eval`, or compile it to Wasm and run it with OPA's JavaScript runtime, as [REFERENCE.md](REFERENCE.md#compiling-to-wasm) shows.
-- The `ergo` CLI runs the Rust engine, which is experimental. The Rust engine also runs in a browser through Wasm, and its sentence reader works alone, for editors and linters. See [`engines/rust/README.md`](engines/rust/README.md).
+- The Rust engine is experimental. It runs as the `ergo` CLI, or in a browser through Wasm, and its sentence reader works alone, for editors and linters. See [`engines/rust/README.md`](engines/rust/README.md).
 
 Both run every case in [`spec/cases`](spec/cases) and give the same report, apart from `engine`, which says which one made it.
 

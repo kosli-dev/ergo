@@ -851,7 +851,7 @@ requirements:
 {"rows": [{"id": "a", "l": 1234567890.1209567890, "r": 0.5}, {"id": "b", "l": 1234567890.1209567990, "r": 0.5}]}
 ```
 
-`most` passes on `b`, even though its `l` is bigger than the limit. OPA also remembers the result of a comparison and reuses it for any number it treats as the same, so the answer can depend on the other rows: `within` fails on `b` when `b` is the only row, but passes on `b` when `a` is also in the input. The Rust engine, which the `ergo` CLI runs, compares every digit and fails both checks on `b`. So keep the decimals you compare to at most 15 significant digits, or use the `ergo` CLI. [#426](https://github.com/kosli-dev/ergo/issues/426) is about fixing `ergo.rego`.
+`most` passes on `b`, even though its `l` is bigger than the limit. OPA also remembers the result of a comparison and reuses it for any number it treats as the same, so the answer can depend on the other rows: `within` fails on `b` when `b` is the only row, but passes on `b` when `a` is also in the input. The Rust engine, which the `ergo` CLI runs, compares every digit and fails both checks on `b`. So keep the decimals you compare to at most 15 significant digits, or use the Rust engine, for example with the `ergo` CLI. [#426](https://github.com/kosli-dev/ergo/issues/426) is about fixing `ergo.rego`.
 
 After `is in`, `is not in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match`, the thing on the right can be a field too, read like the field after `is at least`: from the subject, from the name of a `for` line or from the item of a one-line `every` or `some` and a `whose`. With this policy and this input:
 
