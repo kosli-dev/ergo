@@ -49,6 +49,10 @@ test("the page says the playground, the Markdown format and the Rust engine are 
   assert.match(html, /<p class="notice" id="notice" role="note"><b>Experimental\.<\/b> This playground, the Markdown format and the Rust engine may change or go away\. The Rust engine can give a different report from ergo\.rego\.<\/p>/);
 });
 
+test("the playground says what it's for, not that a policy is a document", () => {
+  assert.match(html, /<h1>Ergo playground<\/h1><span>write a policy and see its report<\/span>/);
+});
+
 test("the tab labels and the copy button stay on one line, so the tabs fit next to the button", () => {
   assert.match(html, /\.tab \{[^}]*white-space:nowrap;[^}]*\}/);
   assert.match(html, /<button class="ghost" id="copy" title="Copy the YAML">Copy<\/button>/);
