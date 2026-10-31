@@ -170,7 +170,10 @@ fn read_part(
 ) -> PartRead {
     let at = field_name(&["subjects", subject, "has", alias]);
     let mut bad = false;
-    if bad_alias(alias) {
+    if alias.starts_with('$') {
+        add_problem(problems, at.clone(), crate::policy::DOLLAR_NAME);
+        bad = true;
+    } else if bad_alias(alias) {
         add_problem(problems, at.clone(), "invalid alias");
         bad = true;
     }
@@ -1578,7 +1581,7 @@ mod tests {
         assert!(problems["subjects.r.has.blank"].contains("from: doesn't parse"));
         assert!(problems["subjects.r.has.every"].contains("invalid alias"));
         assert!(problems["subjects.r.has.\"with space\""].contains("invalid alias"));
-        assert!(problems["subjects.r.has.$dollar"].contains("invalid alias"));
+        assert!(problems["subjects.r.has.$dollar"].contains("a name can't start with $"));
         assert!(problems["subjects.r.has.bare_by"].contains("from: unknown alias foo"));
     }
 

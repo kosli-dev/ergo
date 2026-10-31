@@ -1567,6 +1567,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "thing.leaves whose .art.k is 1 and thing.v is 1",
         "thing.leaves whose art.k is 1 and thing.v is 1",
     ),
+    ("\"x y\".items", "\"x y\".items"),
+    ("\"x y\".pa.items", "\"x y\".pa.items"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

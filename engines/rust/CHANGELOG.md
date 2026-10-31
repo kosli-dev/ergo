@@ -10,6 +10,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - The engine follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released.
 - An input that reads the item's own field named like a parent subject keeps its dot, like `.art.k`, as spec 0.4 says. A `from` that starts at the input with a `named by` step is written as it is in the `$min_subjects` and `$unique_ids` expressions, so `every $input named by $params.k` is no longer `count(matching(every [$params.k]))`. Reports change for such policies. The `from` a subject gets in `subjects` keeps every dot the policy wrote on the left of a `whose`, like `.art.k`, `.art.xs[0]` or a part's `.att.id`, where it dropped them.
 - A policy with no requirement, because `requirements` is missing, `null`, not an object or empty, gets Ergo's own requirement `$policy` with a failing `$well_formed` row that says what is wrong, as spec 0.4 says, where the report had no row and `violations` was empty while `compliant` was `false`. A requirement called `$policy` is written wrong. Reports change for such policies.
+- A name that starts with `$` is written wrong, whether it names a subject, a requirement, a check, an `any_of` option or a part, with `a name can't start with $`, as spec 0.4 says, in place of `name reserved`, `a subject can't be named $input` and `invalid alias` for a part called `$dollar`. A check with such a name has no entry in `requirements`. Reports change for such policies.
 
 ## 0.1.0
 

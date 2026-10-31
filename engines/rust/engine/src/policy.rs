@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 pub const SPEC: &str = "v0.4-dev";
 
-pub const RESERVED_CHECKS: [&str; 4] = ["$applies", "$min_subjects", "$unique_ids", "$well_formed"];
+pub const DOLLAR_NAME: &str = "a name can't start with $";
 
 pub type Problems = BTreeMap<String, BTreeSet<String>>;
 
@@ -339,12 +339,8 @@ fn read_subject(name: &str, value: &Value) -> Subject {
             "it is a word of the grammar, so a subject can't be called it",
         );
     }
-    if name == "$input" || name == "$params" {
-        add_problem(
-            &mut problems,
-            field_name(&["subjects", name]),
-            format!("a subject can't be named {name}"),
-        );
+    if name.starts_with('$') {
+        add_problem(&mut problems, field_name(&["subjects", name]), DOLLAR_NAME);
     }
     Subject { def, problems }
 }
@@ -399,6 +395,9 @@ fn read_any_of(
                 .map(|(name, option)| {
                     let read = read_option(option);
                     match &read {
+                        _ if name.starts_with('$') => {
+                            problems.insert(format!("option {name}: {DOLLAR_NAME}"));
+                        }
                         OptionLines::Lines(lines) if lines.is_empty() => {
                             problems.insert(format!("empty option {name}"));
                         }
@@ -663,12 +662,8 @@ fn read_requirement(value: &Value, subjects: &Subjects) -> Requirement {
                 problem.clone(),
             );
         }
-        if RESERVED_CHECKS.contains(&name.as_str()) {
-            add_problem(
-                &mut problems,
-                field_name(&["checks", name]),
-                "name reserved",
-            );
+        if name.starts_with('$') {
+            add_problem(&mut problems, field_name(&["checks", name]), DOLLAR_NAME);
         }
     }
     Requirement {
@@ -1323,10 +1318,11 @@ mod tests {
         assert_eq!(
             requirement_problems(policy, "s"),
             [
-                problem("checks.$applies", &["name reserved"]),
-                problem("checks.$min_subjects", &["name reserved"]),
-                problem("checks.$unique_ids", &["name reserved"]),
-                problem("checks.$well_formed", &["name reserved"]),
+                problem("checks.$applies", &["a name can't start with $"]),
+                problem("checks.$min_subjects", &["a name can't start with $"]),
+                problem("checks.$other", &["a name can't start with $"]),
+                problem("checks.$unique_ids", &["a name can't start with $"]),
+                problem("checks.$well_formed", &["a name can't start with $"]),
             ]
         );
     }
@@ -1338,7 +1334,11 @@ mod tests {
             requirement_problems(policy, "s"),
             [problem(
                 "checks.$unique_ids",
-                &["missing assert", "name reserved", "unknown field op"]
+                &[
+                    "a name can't start with $",
+                    "missing assert",
+                    "unknown field op"
+                ]
             )]
         );
     }

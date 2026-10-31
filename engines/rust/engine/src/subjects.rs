@@ -704,7 +704,7 @@ fn check_rows(env: &Env, judged: &Judged, anc: &[Anc]) -> Vec<Row> {
     let ctx = context(env, judged.entry.at.clone(), anc);
     env.checks
         .iter()
-        .filter(|(name, _)| !crate::policy::RESERVED_CHECKS.contains(&name.as_str()))
+        .filter(|(name, _)| !name.starts_with('$'))
         .filter_map(|(name, read)| {
             read.plan
                 .as_ref()

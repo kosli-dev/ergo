@@ -276,9 +276,9 @@ _member_problems(members) := union({
 		some m in members
 		m == "it"
 	},
-	{[["subjects", m], concat("", ["a subject can't be named ", m])] |
+	{[["subjects", m], _dollar_name_problem] |
 		some m in members
-		m in {"$input", "$params"}
+		_dollar_name(m)
 	},
 	{[["subjects", m, f], p] |
 		some m in members
@@ -362,9 +362,14 @@ _unknown_problems(req) := {[f, "unknown field"] | some f in _unknown_req_fields(
 
 _checks_problems(req) := {["checks", "missing"] | is_object(req); not "checks" in object.keys(req)} | {["checks", "empty"] | req.checks == {}}
 
-_reserved_name_problems(req) := {[_field_path_name(["checks", name]), "name reserved"] | some name, _ in _checks_of(req); name in _reserved_checks}
+_reserved_name_problems(req) := {[_field_path_name(["checks", name]), _dollar_name_problem] | some name, _ in _checks_of(req); _dollar_name(name)}
 
-_reserved_checks := {"$applies", "$min_subjects", "$unique_ids", "$well_formed"}
+_dollar_name_problem := "a name can't start with $"
+
+_dollar_name(name) if {
+	is_string(name)
+	startswith(name, "$")
+}
 
 _require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
 
@@ -3526,16 +3531,19 @@ default _well_formed_named(_, _) := false
 
 _well_formed_named(req, name) if {
 	is_string(name)
-	name != "$policy"
+	not startswith(name, "$")
 	_well_formed(req)
 }
 
 _name_problem_inputs(name) := [] if {
 	is_string(name)
-	name != "$policy"
+	not startswith(name, "$")
 }
 
-_name_problem_inputs("$policy") := [{"name": "requirement name", "value": ["name reserved"], "locations": []}]
+_name_problem_inputs(name) := [{"name": "requirement name", "value": [_dollar_name_problem], "locations": []}] if {
+	is_string(name)
+	startswith(name, "$")
+}
 
 _name_problem_inputs(name) := [{"name": "requirement name", "value": ["not a string"], "locations": []}] if not is_string(name)
 
@@ -3622,7 +3630,7 @@ _requirement_checks_written_or_added(req) := object.union(
 	object.union(
 		{name: def |
 			some name, check in _checks_of(req)
-			not name in _reserved_checks
+			not _dollar_name(name)
 			def := _check_def(check, _s_written_here(req, "checks", name))
 		},
 		object.union(_min_subjects_def(req), _unique_ids_def(req)),
@@ -4240,9 +4248,7 @@ _part_id_text(read) := "<invalid identified_by>" if {
 
 _subject_from_text(name, null, _) := _path_name([_subject_step(name)])
 
-_subject_step(name) := {"literal": name} if startswith(name, "$")
-
-_subject_step(name) := name if not startswith(name, "$")
+_subject_step(name) := name
 
 _parent_step(name) := {"parent": name}
 
@@ -6318,7 +6324,17 @@ _p_part_read(alias, entry) := {"from": from, "identified_by": id, "problems": so
 	problems := ((_p_alias_problems(alias) | _p_shape_problems(entry)) | _p_prefixed("from", from)) | _p_prefixed("identified_by", id)
 }
 
-_p_alias_problems(alias) := {"invalid alias" | not _p_alias_ok(alias)}
+_p_alias_problems(alias) := {_dollar_name_problem} if {
+	is_string(alias)
+	startswith(alias, "$")
+}
+
+_p_alias_problems(alias) := {"invalid alias" | not _p_alias_ok(alias)} if not _dollar_alias(alias)
+
+_dollar_alias(alias) if {
+	is_string(alias)
+	startswith(alias, "$")
+}
 
 _p_shape_problems(entry) := {"not a string or an object"} if {
 	not is_string(entry)
@@ -7104,11 +7120,24 @@ _s_options_shape(options) := {_s_option_shape(nm, o) | some nm, o in options; _s
 	options != {}
 }
 
-_s_option_shape(nm, o) := concat("", ["empty option ", _text(nm)]) if o == []
+_s_option_shape(nm, _) := concat("", ["option ", _text(nm), ": ", _dollar_name_problem]) if _dollar_name(nm)
 
-else := concat("", ["invalid option ", _text(nm)]) if not _s_option_written(o)
+_s_option_shape(nm, o) := concat("", ["empty option ", _text(nm)]) if {
+	not _dollar_name(nm)
+	o == []
+}
 
-else := ""
+_s_option_shape(nm, o) := concat("", ["invalid option ", _text(nm)]) if {
+	not _dollar_name(nm)
+	o != []
+	not _s_option_written(o)
+}
+
+_s_option_shape(nm, o) := "" if {
+	not _dollar_name(nm)
+	o != []
+	_s_option_written(o)
+}
 
 _s_option_written(o) if is_string(o)
 

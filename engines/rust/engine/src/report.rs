@@ -322,6 +322,7 @@ pub fn check_defs(
     let mut defs: BTreeMap<String, CheckDef> = requirement
         .checks
         .iter()
+        .filter(|(name, _)| !name.starts_with('$'))
         .map(|(name, check)| {
             (
                 name.clone(),
@@ -423,10 +424,14 @@ pub fn well_formed_row(
     extra: Option<&Problems>,
 ) -> Row {
     let problems = requirement_problems(requirement, extra);
-    let reserved = requirement_name == POLICY;
+    let reserved = requirement_name.starts_with('$');
     let mut inputs = Vec::new();
     if reserved {
-        inputs.push(input("requirement name", json!(["name reserved"]), &[]));
+        inputs.push(input(
+            "requirement name",
+            json!([crate::policy::DOLLAR_NAME]),
+            &[],
+        ));
     }
     inputs.push(input("count(checks)", json!(requirement.checks_count), &[]));
     let require_wrong = problems.contains_key("require");
@@ -1310,13 +1315,67 @@ mod tests {
     }
 
     #[test]
+    fn a_name_that_starts_with_a_dollar_sign_is_written_wrong_wherever_it_stands() {
+        let wrong = json!(["a name can't start with $"]);
+        let policy = json!({
+            "ergo_spec": "v0.4-dev",
+            "subjects": {"$s": {"from": "xs"}, "t": {"from": "xs", "has": {"$p": "ys"}}},
+            "requirements": {
+                "$r": {"subject": "t", "checks": {"c": "x exists"}},
+                "q": {"subject": "$s", "checks": {"c": "x exists"}},
+                "o": {"subject": "t", "checks": {"c": {"any_of": {"$o": "x exists", "p": "x is 1"}}}},
+                "k": {"subject": "t", "checks": {"$k": "x exists"}},
+                "ok": {"subject": "t", "checks": {"a$b": "x exists"}},
+            }
+        });
+        let report = report_of(policy, Value::Null);
+        let inputs = |requirement: &str| -> Vec<Value> {
+            row_of_check(&report, requirement, "$well_formed")["inputs"]
+                .as_array()
+                .unwrap()
+                .clone()
+        };
+        assert!(
+            inputs("$r")
+                .iter()
+                .any(|i| i["name"] == "requirement name" && i["value"] == wrong)
+        );
+        assert!(
+            inputs("q")
+                .iter()
+                .any(|i| i["name"] == "subjects.$s" && i["value"] == wrong)
+        );
+        assert!(inputs("o").iter().any(|i| i["name"] == "checks.c"
+            && i["value"] == json!(["option $o: a name can't start with $"])));
+        assert!(
+            inputs("k")
+                .iter()
+                .any(|i| i["name"] == "checks.$k" && i["value"] == wrong)
+        );
+        assert!(
+            inputs("k")
+                .iter()
+                .any(|i| i["name"] == "subjects.t.has.$p" && i["value"] == wrong)
+        );
+        assert_eq!(
+            row_of_check(&report, "ok", "$well_formed")["inputs"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|i| i["name"].as_str().is_some_and(|n| n.starts_with("checks.")))
+                .count(),
+            0
+        );
+    }
+
+    #[test]
     fn a_requirement_called_policy_is_written_wrong() {
         let report = report_of(policy(json!({"$policy": good()})), Value::Null);
         let row = row_of_check(&report, "$policy", "$well_formed");
         assert_eq!(row["passed"], json!(false));
         assert_eq!(
             row["inputs"][0],
-            json!({"name": "requirement name", "value": ["name reserved"], "locations": []})
+            json!({"name": "requirement name", "value": ["a name can't start with $"], "locations": []})
         );
     }
 

@@ -11113,9 +11113,9 @@
     }
   },
   {
-    "description": "a subject named $x with no from reads the field \"$x\" and shows it quoted, as name.keys says, where ergo.rego shows it bare",
+    "description": "a subject with a space in its name and no from reads the field \"x y\" and shows it quoted, as name.keys says, where ergo.rego shows it bare",
     "input": {
-      "$x": [
+      "x y": [
         {
           "x": 1
         }
@@ -11135,11 +11135,11 @@
             "c": "x is 1"
           },
           "min_subjects": 1,
-          "subject": "$x"
+          "subject": "x y"
         }
       },
       "subjects": {
-        "$x": null
+        "x y": null
       }
     },
     "report": {
@@ -11152,13 +11152,13 @@
           "causes": [],
           "checks": {
             "$min_subjects": {
-              "description": "The in-scope $x count is at least 1",
-              "expression": "count(matching(\"$x\")) >= 1",
+              "description": "The in-scope x y count is at least 1",
+              "expression": "count(matching(\"x y\")) >= 1",
               "meta": {}
             },
             "$unique_ids": {
-              "description": "Every $x id is unique",
-              "expression": "count(repeated(ids(\"$x\"))) == 0",
+              "description": "Every x y id is unique",
+              "expression": "count(repeated(ids(\"x y\"))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -11176,7 +11176,7 @@
           "meta": {},
           "require": "every",
           "status": "met",
-          "subject": "$x",
+          "subject": "x y",
           "subjects": {
             "matching": 1,
             "total": 1
@@ -11203,7 +11203,7 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "$x"
+            "type": "x y"
           }
         },
         {
@@ -11212,9 +11212,9 @@
           "inputs": [
             {
               "locations": [
-                "/$x/0"
+                "/x y/0"
               ],
-              "name": "in-scope $x count",
+              "name": "in-scope x y count",
               "value": 1
             }
           ],
@@ -11222,7 +11222,7 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "$x"
+            "type": "x y"
           }
         },
         {
@@ -11231,7 +11231,7 @@
           "inputs": [
             {
               "locations": [],
-              "name": "repeated $x ids",
+              "name": "repeated x y ids",
               "value": []
             }
           ],
@@ -11239,7 +11239,7 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "$x"
+            "type": "x y"
           }
         },
         {
@@ -11248,7 +11248,7 @@
           "inputs": [
             {
               "locations": [
-                "/$x/0/x"
+                "/x y/0/x"
               ],
               "name": "x",
               "value": 1
@@ -11260,14 +11260,14 @@
             "id": {
               "x": 1
             },
-            "type": "$x"
+            "type": "x y"
           }
         }
       ],
       "subjects": {
-        "$x": {
+        "x y": {
           "description": "",
-          "from": "\"$x\"",
+          "from": "\"x y\"",
           "identified_by": null,
           "parts": {}
         }

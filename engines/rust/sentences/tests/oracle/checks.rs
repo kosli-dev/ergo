@@ -3913,6 +3913,9 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("first of .art.xs is 5", "first of art.xs is 5", &[], &[]),
     ("item 1 of .art.xs is 5", "item 1 of art.xs is 5", &[], &[]),
     ("x is at least .art.k", "x is at least art.k", &[], &[]),
+    ("\"x y\".k is 2", "\"x y\".k is 2", &[], &[]),
+    ("\"x y\".pa.k is 1", "\"x y\".pa.k is 1", &[], &[]),
+    (".\"x y\".k is 3", "\"x y\".k is 3", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -7405,6 +7408,7 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
         "t[0] as i",
         &["an item starts with \"every\", \"some\" or a position, like \"last of\""],
     ),
+    ("every ys as $y", &["doesn't parse"]),
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
