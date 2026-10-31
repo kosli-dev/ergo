@@ -1,7 +1,7 @@
 [
   {
     "description": "includes a value",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains \"a\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains \"a\""}}}},
     "cases": [
       {
         "description": "passes when the list contains it",
@@ -64,7 +64,7 @@
   },
   {
     "description": "includes a number",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains 1"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains 1"}}}},
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
@@ -95,7 +95,7 @@
   },
   {
     "description": "includes values",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of \"b\", \"a\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of \"b\", \"a\""}}}},
     "cases": [
       {
         "description": "passes when the list contains every one",
@@ -118,7 +118,7 @@
   },
   {
     "description": "excludes a value",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain \"a\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain \"a\""}}}},
     "cases": [
       {
         "description": "passes when the list doesn't contain it",
@@ -173,7 +173,7 @@
   },
   {
     "description": "excludes values",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of \"nuts\", \"garlic\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of \"nuts\", \"garlic\""}}}},
     "cases": [
       {
         "description": "passes when the list contains none of them",
@@ -196,7 +196,7 @@
   },
   {
     "description": "excludes a value read through a ref",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain $params.banned"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain $params.banned"}}}},
     "params": {},
     "cases": [
       {
@@ -212,7 +212,7 @@
   },
   {
     "description": "excludes values read through a ref to an empty list",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
     "params": {"banned": []},
     "cases": [
       {
@@ -228,7 +228,7 @@
   },
   {
     "description": "excludes values read through a ref that isn't a list",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
     "params": {"banned": "a"},
     "cases": [
       {
@@ -243,7 +243,7 @@
   },
   {
     "description": "excludes values read through a ref that holds values of mixed types",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
     "params": {"banned": ["a", 1]},
     "cases": [
       {

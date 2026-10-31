@@ -1,7 +1,7 @@
 [
   {
     "description": "present on a field of the subject",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "passes on a string",
@@ -88,7 +88,7 @@
   },
   {
     "description": "present on a nested field",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y exists"}}}},
     "cases": [
       {
         "description": "fails as value when the parent is missing",
@@ -126,7 +126,7 @@
   },
   {
     "description": "present on a list item",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "item 2 of x exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "item 2 of x exists"}}}},
     "cases": [
       {
         "description": "passes when the item is there",
@@ -165,7 +165,7 @@
   {
     "description": "present on the input and with a ref step",
     "policy": {
-      "ergo_spec": "v0.3",
+      "ergo_spec": "v0.4-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -203,7 +203,7 @@
   },
   {
     "description": "present with a ref step that can't be read",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x named by $params.key exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x named by $params.key exists"}}}},
     "params": {"key": ["a"]},
     "cases": [
       {
@@ -218,7 +218,7 @@
   },
   {
     "description": "present with a ref step whose param is missing",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x named by $params.key exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x named by $params.key exists"}}}},
     "params": {},
     "cases": [
       {
@@ -234,7 +234,7 @@
   {
     "description": "present as a filter",
     "policy": {
-      "ergo_spec": "v0.3",
+      "ergo_spec": "v0.4-dev",
       "subjects": {
         "thing": {
           "from": "things whose status is \"COMPLETE\" and status exists",
@@ -286,7 +286,7 @@
   {
     "description": "present as a filter on a parent that can't hold the field",
     "policy": {
-      "ergo_spec": "v0.3",
+      "ergo_spec": "v0.4-dev",
       "subjects": {
         "thing": {
           "from": "things whose build.fingerprint exists",
@@ -316,7 +316,7 @@
   },
   {
     "description": "present on a param when the params are null",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.flag exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.flag exists"}}}},
     "params": null,
     "cases": [
       {
@@ -331,7 +331,7 @@
   },
   {
     "description": "present on a param the params don't have",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.flag exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "$params.flag exists"}}}},
     "params": {},
     "cases": [
       {
@@ -346,7 +346,7 @@
   },
   {
     "description": "an input is read from a subject in a list",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "shows where each value was read, counting list positions from 0, and for a field that isn't there the subject it isn't in",
@@ -362,7 +362,7 @@
   },
   {
     "description": "a path that can't go on",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y exists"}}}},
     "cases": [
       {
         "description": "points at the field that held a string, which couldn't hold a key",
@@ -400,7 +400,7 @@
   },
   {
     "description": "a subject that isn't an object",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "points at the subject",
@@ -415,7 +415,7 @@
   },
   {
     "description": "exists with a ref step after a field, and the param is missing",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y named by $params.i exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y named by $params.i exists"}}}},
     "cases": [
       {
         "description": "fails with the ref's cause when the parent field is missing",
@@ -461,7 +461,7 @@
   },
   {
     "description": "exists with a ref step after a field, and the param is null",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y named by $params.i exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y named by $params.i exists"}}}},
     "params": {"i": null},
     "cases": [
       {
@@ -508,7 +508,7 @@
   },
   {
     "description": "exists with a ref step after a field, and the param is a list",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y named by $params.i exists"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x.y named by $params.i exists"}}}},
     "params": {"i": [1]},
     "cases": [
       {

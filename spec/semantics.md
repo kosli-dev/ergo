@@ -410,9 +410,9 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[report.keys]** Every object in the report, `meta` and values copied from the input included, has its keys sorted by code point, whatever order the policy or the input wrote them in.
 
-**[report.version]** The report has `ergo` at its top, the version of the spec it follows, like `"ergo": "v0.3"`. That's the version the implementation follows, even when the policy names another or none.
+**[report.version]** The report has `ergo` at its top, the version of the spec it follows, like `"ergo": "v0.4-dev"`. That's the version the implementation follows, even when the policy names another or none.
 
-**[report.engine]** The report has `engine` at its top, saying which implementation made it: its `name` and `version`, both strings, like `{"name": "ergo.rego", "version": "0.1.0"}`, and nothing else. Apart from `engine`, a report depends only on the policy, the input and the params, so it says nothing about the machine that made it, like the version of OPA, and an implementation reads nothing from that machine: no clock, randomness, network or environment variables.
+**[report.engine]** The report has `engine` at its top, saying which implementation made it: its `name` and `version`, both strings, like `{"name": "ergo-rego", "version": "0.1.0"}`, and nothing else. A name is `ergo-` and the engine, like `ergo-rego` or `ergo-rust`, so the name and version match the engine's release tag, like `rego-v0.3.0` or `rust-v0.1.0`. Apart from `engine`, a report depends only on the policy, the input and the params, so it says nothing about the machine that made it, like the version of OPA, and an implementation reads nothing from that machine: no clock, randomness, network or environment variables.
 
 **[report.hash]** The hash of a report is the SHA-256, in lowercase hex, of the report without `engine`, written as [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) says. So the same policy, input, params and spec version give the same hash whichever engine made the report, apart from numbers that a 64-bit float doesn't keep (see [OPEN.md](OPEN.md#numbers-in-a-reports-hash)). An implementation doesn't have to compute it.
 

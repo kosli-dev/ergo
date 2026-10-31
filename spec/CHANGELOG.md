@@ -2,6 +2,12 @@
 
 Each version says whether reports changed, so that anyone who only stores reports knows when to look.
 
+## 0.4
+
+### Changed
+
+- A report's `engine` name is `ergo-` and the engine, like `ergo-rego` or `ergo-rust`, so a name and version match a release tag like `rego-v0.3.0` ([report.engine](semantics.md#the-report)). The Rego engine said `ergo.rego` and the Rust engine `ergo-policy-engine`. A policy says `ergo_spec: v0.4-dev`, and the report's `ergo` changes to match. The schemas are under `https://ergo.kosli.com/spec/0.4-dev/` until the release. Reports change in `engine` only, and a report's hash leaves `engine` out, so hashes stay the same.
+
 ## 0.3
 
 ### Changed
