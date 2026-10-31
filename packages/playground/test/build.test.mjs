@@ -53,6 +53,12 @@ test("the playground says what it's for, not that a policy is a document", () =>
   assert.match(html, /<h1>Ergo playground<\/h1><span>write a policy and see its report<\/span>/);
 });
 
+test("the page hides the colour swatches but keeps the note until a view that uses its colours is open", () => {
+  assert.match(html, /<div class="legend bare" id="legend">/);
+  assert.match(html, /\.legend\.bare span:not\(\.note\) \{ display:none; \}/);
+  assert.match(html, /\("legend"\)\.classList\.toggle\("bare",!/);
+});
+
 test("the tab labels and the copy button stay on one line, so the tabs fit next to the button", () => {
   assert.match(html, /\.tab \{[^}]*white-space:nowrap;[^}]*\}/);
   assert.match(html, /<button class="ghost" id="copy" title="Copy the YAML">Copy<\/button>/);
