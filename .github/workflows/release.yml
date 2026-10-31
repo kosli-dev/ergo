@@ -457,7 +457,7 @@ jobs:
           sh "$RUNNER_TEMP/release-notes.sh" engines/rust/CHANGELOG.md "$VERSION" "https://github.com/$GITHUB_REPOSITORY/blob/$TAG/engines/rust/" > "$RUNNER_TEMP/notes.md"
           (cd "$RUNNER_TEMP/binaries" && sha256sum ergo-*.tar.gz ergo-*.zip > SHA256SUMS)
           gh release create "$TAG" "$RUNNER_TEMP"/binaries/ergo-*.tar.gz "$RUNNER_TEMP"/binaries/ergo-*.zip "$RUNNER_TEMP/binaries/SHA256SUMS" \
-            --title "Ergo Rust engine $VERSION" \
+            --title "Ergo CLI and Rust engine $VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md" \
             --latest=false \
             --verify-tag
