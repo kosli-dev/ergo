@@ -3526,10 +3526,16 @@ default _well_formed_named(_, _) := false
 
 _well_formed_named(req, name) if {
 	is_string(name)
+	name != "$policy"
 	_well_formed(req)
 }
 
-_name_problem_inputs(name) := [] if is_string(name)
+_name_problem_inputs(name) := [] if {
+	is_string(name)
+	name != "$policy"
+}
+
+_name_problem_inputs("$policy") := [{"name": "requirement name", "value": ["name reserved"], "locations": []}]
 
 _name_problem_inputs(name) := [{"name": "requirement name", "value": ["not a string"], "locations": []}] if not is_string(name)
 
@@ -4113,7 +4119,58 @@ _run(doc, policy, rd, params) := r if {
 	unreadable := _unreadable_inputs(doc, params)
 	written := object.union(_report_of(doc, reqs, object.get(rd.ahead, "requirements", {})), {"description": _reported_description(policy), "meta": _reported_meta(policy), "subjects": _listed_of(policy, rd)}) with data.ergo_reading as false with data.ergo_policy_problems as _policy_problems_of(policy, rd) with data.ergo_document as doc with data.ergo_params as params with data.ergo_subjects as rd.subjects with data.ergo_resolved as rd.resolved with data.ergo_unreadable as unreadable with data.ergo_sentences as rd.sentences with data.ergo_subject_sentences as rd.subject_sentences with input as {"ergo/names": {}}
 	used := _used_subjects(reqs, rd.subjects, rd.resolved)
-	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": _engine})
+	r := _with_policy_row(object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": _engine}), policy)
+}
+
+_with_policy_row(report, _) := report if count(report.requirements) > 0
+
+_with_policy_row(report, policy) := object.union(report, {
+	"requirements": {"$policy": _policy_requirement},
+	"results": array.concat(report.results, [_policy_row(policy)]),
+}) if count(report.requirements) == 0
+
+_policy_requirement := {
+	"description": "",
+	"meta": {},
+	"require": "every",
+	"subject": "$policy",
+	"status": "not_met",
+	"subjects": {"matching": 0, "total": 0},
+	"checks": {"$well_formed": {
+		"description": "The policy is written correctly",
+		"expression": "count(problems) == 0",
+		"meta": {},
+	}},
+	"causes": [{"cause": "value", "rows": 1}],
+}
+
+_policy_row(policy) := {
+	"requirement": "$policy",
+	"subject": {"type": "$policy", "id": "$policy"},
+	"check": "$well_formed",
+	"passed": false,
+	"cause": "value",
+	"inputs": [i | some i in sort(array.concat(_policy_problem_inputs(policy), [{"name": "requirements", "value": [_requirements_problem(policy)], "locations": []}]))],
+}
+
+_requirements_problem(policy) := "missing" if not _has_requirements(policy)
+
+_requirements_problem(policy) := "not an object" if {
+	_has_requirements(policy)
+	not is_object(policy.requirements)
+}
+
+_requirements_problem(policy) := "empty" if {
+	_has_requirements(policy)
+	is_object(policy.requirements)
+	count(policy.requirements) == 0
+}
+
+default _has_requirements(_) := false
+
+_has_requirements(policy) if {
+	is_object(policy)
+	policy.requirements != null
 }
 
 version := "0.4.0-dev"

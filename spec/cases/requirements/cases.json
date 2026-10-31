@@ -440,6 +440,174 @@
     ]
   },
   {
+    "description": "a policy with no requirements section",
+    "policy": {"ergo_spec": "v0.4-dev"},
+    "cases": [
+      {
+        "description": "reports Ergo's own requirement, with requirements missing",
+        "rules": ["policy.no_requirements"],
+        "input": {},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy with an empty requirements section",
+    "policy": {"ergo_spec": "v0.4-dev", "requirements": {}},
+    "cases": [
+      {
+        "description": "reports Ergo's own requirement, with requirements empty",
+        "rules": ["policy.no_requirements"],
+        "input": {},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["empty"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["empty"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy whose requirements is null",
+    "policy": {"ergo_spec": "v0.4-dev", "requirements": null},
+    "cases": [
+      {
+        "description": "reports Ergo's own requirement, with requirements missing",
+        "rules": ["policy.no_requirements"],
+        "input": {},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy whose requirements is a list",
+    "policy": {"ergo_spec": "v0.4-dev", "requirements": []},
+    "cases": [
+      {
+        "description": "reports Ergo's own requirement, with requirements not an object",
+        "rules": ["policy.no_requirements"],
+        "input": {},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy whose requirements is text",
+    "policy": {"ergo_spec": "v0.4-dev", "requirements": "x"},
+    "cases": [
+      {
+        "description": "reports Ergo's own requirement, with requirements not an object",
+        "rules": ["policy.no_requirements"],
+        "input": {},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy with nothing but an unsupported version",
+    "policy": {"ergo_spec": "v9.9"},
+    "cases": [
+      {
+        "description": "lists the version problem and requirements, sorted by name",
+        "rules": ["policy.no_requirements", "policy.version"],
+        "input": {},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.4-dev"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.4-dev"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy with nothing in it",
+    "policy": {},
+    "cases": [
+      {
+        "description": "lists the missing version and the missing requirements",
+        "rules": ["policy.no_requirements", "policy.version"],
+        "input": {},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["missing"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["missing"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy with an empty requirements section and a wrong description and meta",
+    "policy": {"ergo_spec": "v0.4-dev", "requirements": {}, "description": 5, "meta": 3},
+    "cases": [
+      {
+        "description": "lists every policy problem next to requirements, sorted by name",
+        "rules": ["policy.no_requirements", "policy.version"],
+        "input": {},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "policy description", "value": ["not a string"]}, {"locations": [], "name": "policy meta", "value": ["not an object"]}, {"locations": [], "name": "requirements", "value": ["empty"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy description", "value": ["not a string"]}, {"locations": [], "name": "policy meta", "value": ["not an object"]}, {"locations": [], "name": "requirements", "value": ["empty"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a policy that is not an object",
+    "policy": ["x"],
+    "cases": [
+      {
+        "description": "reports Ergo's own requirement, with requirements missing",
+        "rules": ["policy.no_requirements"],
+        "input": {},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a requirement called $policy",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs"}}, "requirements": {"$policy": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, so its $well_formed row fails with the name reserved",
+        "rules": ["policy.reserved"],
+        "input": {"xs": [{"x": 1}]},
+        "status": {"$policy": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["name reserved"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "$policy", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "first of the whole input when it is a list",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"subject": {"from": "first of $input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
@@ -1063,7 +1231,18 @@
     "description": "a policy with no requirements",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {}, "requirements": {}},
     "cases": [
-      {"description": "is never compliant", "rules": ["compliant"], "input": {"t": []}, "compliant": false, "results": [], "violations": []}
+      {
+        "description": "is never compliant, and its report has Ergo's own requirement",
+        "rules": ["compliant", "policy.no_requirements"],
+        "input": {"t": []},
+        "status": {"$policy": "not_met"},
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["empty"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
+        "compliant": false,
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["empty"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+        ]
+      }
     ]
   },
   {

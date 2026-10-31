@@ -88,7 +88,7 @@
         "meta": {"type": "object"},
         "require": {"description": "The require the requirement was written with, or every by default."},
         "status": {"enum": ["met", "not_met", "not_applicable"]},
-        "subject": {"type": ["string", "null"], "description": "The name of the subject the requirement checks, or null when it names none or one that isn't in the policy's subjects."},
+        "subject": {"type": ["string", "null"], "description": "The name of the subject the requirement checks, or null when it names none or one that isn't in the policy's subjects. Ergo's own `$policy` requirement names `$policy`."},
         "subjects": {
           "type": "object",
           "properties": {
@@ -131,8 +131,8 @@
         "subject": {
           "type": "object",
           "properties": {
-            "type": {"description": "The name of the requirement's subject."},
-            "id": {"description": "The subject's id, or null for the rows of the checks Ergo adds to a requirement."},
+            "type": {"description": "The name of the requirement's subject, or `$policy` for the row of Ergo's own `$policy` requirement."},
+            "id": {"description": "The subject's id, null for the rows of the checks Ergo adds to a requirement, or `$policy` for the row of Ergo's own `$policy` requirement."},
             "in": {"type": "object", "description": "Only for a child subject: the name and id of each subject it was read from, its parent and, three subjects deep, its grandparent.", "maxProperties": 2}
           },
           "required": ["type", "id"],

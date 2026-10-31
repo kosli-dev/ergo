@@ -145,6 +145,7 @@ pub struct Policy {
     pub problems: Problems,
     pub subjects: Subjects,
     pub requirements: BTreeMap<String, Requirement>,
+    pub requirements_problem: &'static str,
 }
 
 fn empty_meta() -> Value {
@@ -695,6 +696,7 @@ impl Policy {
                     problems: Problems::new(),
                     subjects: Subjects::Map(BTreeMap::new()),
                     requirements: BTreeMap::new(),
+                    requirements_problem: "missing",
                 };
             }
         };
@@ -706,12 +708,19 @@ impl Policy {
                 .collect(),
             _ => BTreeMap::new(),
         };
+        let requirements_problem = match map.get("requirements") {
+            None | Some(Value::Null) => "missing",
+            Some(Value::Object(found)) if found.is_empty() => "empty",
+            Some(Value::Object(_)) => "",
+            Some(_) => "not an object",
+        };
         Policy {
             description: reported_description(map),
             meta: reported_meta(map),
             problems: policy_problems(map),
             subjects,
             requirements,
+            requirements_problem,
         }
     }
 
