@@ -10895,3 +10895,12 @@ test_a_policy_that_is_not_an_object_says_so_in_place_of_requirements if {
 	rep := ergo.report({}, ["x"], {})
 	rows_for(rep, "$policy", "$well_formed")[0].inputs == [{"name": "policy", "value": ["not an object"], "locations": []}]
 }
+
+test_a_set_of_requirements_reads_as_none if {
+	policy := {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs"}}, "requirements": {{"subject": "s", "checks": {"c": "x exists"}}}}
+	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+	rep.compliant == false
+	object.keys(rep.requirements) == {"$policy"}
+	[i.value | some i in rows_for(rep, "$policy", "$well_formed")[0].inputs; i.name == "requirements"] == [["not an object"]]
+	[v.requirement | some v in ergo.violations(rep)] == ["$policy"]
+}
