@@ -3982,8 +3982,6 @@ _names(x) := sort(object.keys(x)) if is_object(x)
 
 _names(x) := [i | some i, _ in x] if is_array(x)
 
-_names(x) := sort(x) if is_set(x)
-
 report(doc, policy, params) := _run(doc, c.policy, _from_compiled(c), params) if {
 	c := _compiled(policy)
 } else := _run(doc, c.policy, _stale_read(c), params) if {
