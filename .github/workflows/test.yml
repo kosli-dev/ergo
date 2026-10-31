@@ -228,7 +228,7 @@ jobs:
           name: ergo-policy-sentences-wasm-pkg
           path: engines/rust/sentences-wasm/pkg
 
-  markdown:
+  playground:
     needs: tests-rust
     runs-on: ubuntu-latest
     defaults:
