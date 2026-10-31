@@ -2,7 +2,7 @@ use ergo_policy_wasm::report_text;
 use serde_json::Value;
 
 const POLICY: &str = r#"{
-  "ergo_spec": "v0.3",
+  "ergo_spec": "v0.4-dev",
   "subjects": {"item": {"from": "items", "identified_by": "id"}},
   "requirements": {"r": {"subject": "item", "checks": {"exact": "n is 9007199254740993"}}}
 }"#;
@@ -11,7 +11,7 @@ const POLICY: &str = r#"{
 fn a_report_comes_back_as_json_text_from_the_engine() {
     let text = report_text(r#"{"items": [{"id": "a", "n": 1}]}"#, POLICY, "{}").unwrap();
     let report: Value = serde_json::from_str(&text).unwrap();
-    assert_eq!(report["engine"]["name"], "ergo-policy-engine");
+    assert_eq!(report["engine"]["name"], "ergo-rust");
     assert_eq!(report["compliant"], false);
 }
 
@@ -57,7 +57,7 @@ fn params_that_are_not_json_are_named_in_the_message() {
 #[test]
 fn a_number_that_cannot_be_read_comes_back_with_its_digits() {
     let big = format!("1e1{}", "0".repeat(36));
-    let policy = r#"{"ergo_spec": "v0.3", "subjects": {"item": {"from": "items"}}, "requirements": {"r": {"subject": "item", "checks": {"c": "size is at least 5"}}}}"#;
+    let policy = r#"{"ergo_spec": "v0.4-dev", "subjects": {"item": {"from": "items"}}, "requirements": {"r": {"subject": "item", "checks": {"c": "size is at least 5"}}}}"#;
     let text = report_text(
         &format!(r#"{{"items": [{{"size": {big}}}]}}"#),
         policy,

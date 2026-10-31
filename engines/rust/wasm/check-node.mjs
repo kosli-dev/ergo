@@ -12,7 +12,7 @@ const policy = {
   requirements: { r: { subject: "item", checks: { ok: "n is 1" } } },
 };
 const built = JSON.parse(report(JSON.stringify({ items: [{ id: "a", n: 1 }] }), JSON.stringify(policy), "{}"));
-if (built.engine?.name !== "ergo-policy-engine") {
+if (built.engine?.name !== "ergo-rust") {
   throw new Error(`unexpected engine: ${JSON.stringify(built.engine)}`);
 }
 if (built.compliant !== true) {

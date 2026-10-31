@@ -4,6 +4,11 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ## 0.2.0 (not released yet)
 
+### Changed
+
+- The report's `engine` name is `ergo-rust`, where it was `ergo-policy-engine`, so it matches the Rego engine's `ergo-rego` and the `rust-v*` tag. Every report changes in that field only, and the hash leaves `engine` out, so hashes stay the same. The version is the same.
+- The engine follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released.
+
 ## 0.1.0
 
 ### New
