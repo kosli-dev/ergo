@@ -24,7 +24,7 @@ const report = (policy: unknown, params: unknown, input: string): string => {
   }
 };
 
-const engine = '"name": "ergo.rego",\n    "version": "ergo.rego\'s version"';
+const engine = '"name": "ergo-rego",\n    "version": "ergo.rego\'s version"';
 const version = /^version := "(.+)"$/m.exec(readFileSync(ergo, "utf8"))?.[1] ?? "no version in ergo.rego";
 
 const expected = (dir: string): string => {

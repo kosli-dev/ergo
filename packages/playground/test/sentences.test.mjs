@@ -13,7 +13,7 @@ const parser = makeParser(pkg);
 const corpus = JSON.parse(readFileSync(new URL("../../../spec/sentences-corpus.json", import.meta.url), "utf8")).sentence_corpus;
 
 const policy = (checks, forLine = "") => `---
-ergo_spec: v0.3
+ergo_spec: v0.4-dev
 ---
 
 # Items

@@ -205,7 +205,7 @@ for (const [name, dir] of Object.entries(sampleCases)) {
 
   test(`the Rust Wasm inside the page gives the ${name} sample the report its case expects`, async () => {
     const report = await runRust(sample.input, result.policy, sample.params);
-    assert.equal(report.engine.name, "ergo-policy-engine");
+    assert.equal(report.engine.name, "ergo-rust");
     assert.deepEqual({ ...report, engine: null }, { ...expected(dir, "report.json"), engine: null });
   });
 
