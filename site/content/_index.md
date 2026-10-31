@@ -138,7 +138,7 @@ start:
               --input deployments.json
   editor:
     lead: "Or try it in the browser, with nothing to install:"
-    link: the editor
+    link: the playground
     note: (experimental)
   primary: Read the walkthrough
   secondary: GitHub
