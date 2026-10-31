@@ -186,11 +186,11 @@ fn a_bare_name_that_is_an_alias_prints_without_a_dot() {
 }
 
 #[test]
-fn the_left_of_a_condition_never_gets_an_alias_dot() {
+fn the_left_of_a_condition_keeps_the_dot_it_was_written_with_when_the_name_is_an_alias() {
     let read = from("x whose .pr is 1 and count of .pr is 2 and days elapsed from .pr to .pr is 1");
     assert_eq!(
         print_from(&read, &["pr"], &[]),
-        "x whose pr is 1 and count of pr is 2 and days elapsed from pr to pr is 1"
+        "x whose .pr is 1 and count of .pr is 2 and days elapsed from .pr to .pr is 1"
     );
 }
 
@@ -489,5 +489,18 @@ fn a_parent_name_on_the_left_of_a_from_condition_prints_with_a_dot() {
     assert_eq!(
         print_from_condition(&line.whose[0], &["b"], &[]),
         "b.x equals v"
+    );
+}
+
+#[test]
+fn a_dot_written_on_the_left_of_a_from_condition_stays_when_the_name_is_an_alias() {
+    let read = from("art.items whose art.k is 1 and .art.xs[0] is 5 and count of .art.xs is 1");
+    assert_eq!(
+        print_from(&read, &["art"], &[]),
+        "art.items whose art.k is 1 and item 1 of .art.xs is 5 and count of .art.xs is 1"
+    );
+    assert_eq!(
+        print_from(&read, &[], &[]),
+        "art.items whose art.k is 1 and item 1 of art.xs is 5 and count of art.xs is 1"
     );
 }

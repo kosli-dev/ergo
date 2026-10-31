@@ -3907,6 +3907,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &["y is compared with itself"],
         &["y is compared with itself"],
     ),
+    (".art.k is 1", "art.k is 1", &[], &[]),
+    ("art.k is 1", "art.k is 1", &[], &[]),
+    (".art.xs[0] is 5", "item 1 of art.xs is 5", &[], &[]),
+    ("first of .art.xs is 5", "first of art.xs is 5", &[], &[]),
+    ("item 1 of .art.xs is 5", "item 1 of art.xs is 5", &[], &[]),
+    ("x is at least .art.k", "x is at least art.k", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6968,6 +6974,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every .art.xs as x", "every art.xs as x", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

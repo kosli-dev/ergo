@@ -523,7 +523,7 @@ pub(super) fn path_needs_an_object_subject(path: &Path, ctx: &Ctx) -> bool {
         return false;
     }
     match &path.start {
-        Start::Subject => !matches!(path.steps.first(), None | Some(Step::Index(_))),
+        Start::Subject | Start::Own => !matches!(path.steps.first(), None | Some(Step::Index(_))),
         Start::Part(part) => part.base == Start::Subject,
         _ => false,
     }

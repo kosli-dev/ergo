@@ -245,6 +245,99 @@
     ]
   },
   {
+    "description": "a from line that is only named by a param, with every",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "every $input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}},
+    "params": {"k": "a"},
+    "cases": [
+      {
+        "description": "names the line as written in both expressions",
+        "rules": ["added.text", "subjects.from"],
+        "input": {"a": [{"id": 1}]},
+        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k)) >= 1", "$unique_ids": "count(repeated(ids(every $input named by $params.k))) == 0"}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/a/0"], "name": "in-scope s count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/a/0"], "name": "it", "value": {"id": 1}}], "passed": true, "requirement": "r", "subject": {"id": {"id": 1}, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that is only named by a param",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "$input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}},
+    "params": {"k": "a"},
+    "cases": [
+      {
+        "description": "names the line as written in both expressions",
+        "rules": ["added.text", "subjects.from"],
+        "input": {"a": [{"id": 1}]},
+        "expressions": {"r": {"$min_subjects": "count(matching($input named by $params.k)) >= 1", "$unique_ids": "count(repeated(ids($input named by $params.k))) == 0"}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/a/0"], "name": "in-scope s count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/a/0"], "name": "it", "value": {"id": 1}}], "passed": true, "requirement": "r", "subject": {"id": {"id": 1}, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that is named by a param twice",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "every $input named by $params.k named by $params.j"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}},
+    "params": {"k": "a", "j": "b"},
+    "cases": [
+      {
+        "description": "names the whole line in both expressions",
+        "rules": ["added.text", "subjects.from"],
+        "input": {"a": {"b": [{"id": 1}]}},
+        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k named by $params.j)) >= 1", "$unique_ids": "count(repeated(ids(every $input named by $params.k named by $params.j))) == 0"}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/a/b/0"], "name": "in-scope s count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/a/b/0"], "name": "it", "value": {"id": 1}}], "passed": true, "requirement": "r", "subject": {"id": {"id": 1}, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that is named by a key of a param",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "every $input named by $params.k.x"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}},
+    "params": {"k": {"x": "a"}},
+    "cases": [
+      {
+        "description": "names the whole line in both expressions",
+        "rules": ["added.text", "subjects.from"],
+        "input": {"a": [{"id": 1}]},
+        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k.x)) >= 1", "$unique_ids": "count(repeated(ids(every $input named by $params.k.x))) == 0"}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope s count", "value": 0}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that is named by a param and then picks a position",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "$input named by $params.k[0]"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}},
+    "params": {"k": ["a"]},
+    "cases": [
+      {
+        "description": "names the whole line in both expressions",
+        "rules": ["added.text", "subjects.from"],
+        "input": {"a": [{"id": 1}]},
+        "expressions": {"r": {"$min_subjects": "count(matching(item 1 of $input named by $params.k)) >= 1", "$unique_ids": "count(repeated(ids(item 1 of $input named by $params.k))) == 0"}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope s count", "value": 0}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a walk that starts at an input that is a list",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"subject": {"from": "every $input.commits"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [

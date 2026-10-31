@@ -6,6 +6,7 @@ use std::collections::BTreeMap;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Start {
     Subject,
+    Own,
     Input,
     Params,
     Alias(String),
@@ -207,7 +208,7 @@ fn found_or_absent<'a>(at: &Located<'a>) -> Result<(&'a Value, Location, bool), 
 
 pub fn start_of<'a>(start: &Start, ctx: &Ctx<'a>) -> Result<(&'a Value, Location, bool), Read<'a>> {
     match start {
-        Start::Subject => found_or_absent(&ctx.subject),
+        Start::Subject | Start::Own => found_or_absent(&ctx.subject),
         Start::Input => Ok((ctx.input, Location::input_root(), false)),
         Start::Params => match ctx.params {
             Some(params) => Ok((params, Location::params_root(), false)),

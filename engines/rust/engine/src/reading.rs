@@ -571,7 +571,7 @@ fn source_text(source: &Source) -> String {
     match source {
         Source::Root { path, every, .. } => {
             let words = if *every { "every " } else { "" };
-            let from_input = matches!(path.steps.first(), Some(Step::Index(_)));
+            let from_input = matches!(path.steps.first(), Some(Step::Index(_) | Step::Ref(_)));
             let text = if from_input {
                 name::name(&path::Path {
                     start: Start::Input,
@@ -1189,6 +1189,20 @@ mod tests {
     fn a_from_that_is_the_input_alone_reads_the_whole_input() {
         let (_, r) = reading(json!({"art": {"from": "$input"}}));
         assert_eq!(r.lowered("art").unwrap().from_text, "$input");
+    }
+
+    #[test]
+    fn a_from_that_is_only_a_named_by_step_is_written_as_it_was() {
+        let (_, r) = reading(json!({"s": {"from": "every $input named by $params.k"}}));
+        assert_eq!(
+            r.lowered("s").unwrap().from_text,
+            "every $input named by $params.k"
+        );
+        let (_, r) = reading(json!({"s": {"from": "$input named by $params.k"}}));
+        assert_eq!(
+            r.lowered("s").unwrap().from_text,
+            "$input named by $params.k"
+        );
     }
 
     #[test]

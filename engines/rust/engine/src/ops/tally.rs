@@ -468,7 +468,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
     if walk::path_needs_an_object_subject(&counted.path, ctx) {
         let result = Err(Cause::NotAnObject);
         let list = Input {
-            name: name::name(&counted.path),
+            name: name::plain_name(&counted.path),
             value: Value::Array(Vec::new()),
             locations: Vec::new(),
             part: None,
@@ -2027,7 +2027,7 @@ mod tests {
             panic!("not a tally");
         };
         let path = check.paths()[0];
-        assert_eq!(path.start, Start::Subject);
+        assert_eq!(path.start, Start::Own);
         assert_eq!(
             path.steps,
             [Step::Key("b".into()), Step::Key("kids".into())]

@@ -131,7 +131,7 @@ fn walked_paths(check: &Check) -> Vec<(&Path, bool)> {
 fn item_paths(check: &Check) -> Vec<&Path> {
     all_paths(check)
         .into_iter()
-        .filter(|path| !matches!(path.start, Start::Subject))
+        .filter(|path| !matches!(path.start, Start::Subject | Start::Own))
         .collect()
 }
 

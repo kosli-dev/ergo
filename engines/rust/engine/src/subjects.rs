@@ -1706,7 +1706,7 @@ mod tests {
         );
         assert_eq!(
             r["subjects"]["kid"]["from"],
-            json!("kids whose att.id is 1")
+            json!("kids whose .att.id is 1")
         );
     }
 
