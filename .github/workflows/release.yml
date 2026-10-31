@@ -126,13 +126,10 @@ jobs:
         shell: bash
         run: |
           echo "VERSION=${TAG#rego-v}" >> "$GITHUB_ENV"
-      - name: Open the pull request that moves main to the next version
+      - name: Open the pull request that moves main to the next patch version
         shell: bash
         run: |
-          major=${VERSION%%.*}
-          minor=${VERSION#*.}
-          minor=${minor%%.*}
-          next="$major.$((10#$minor + 1)).0-dev"
+          next="${VERSION%.*}.$((10#${VERSION##*.} + 1))-dev"
           branch="core/version-$next"
           title="rego: move main to $next"
           if grep -qxF "version := \"$next\"" engines/rego/ergo.rego; then
@@ -145,7 +142,7 @@ jobs:
               echo "main already says $says-dev, which is above $VERSION"
               exit 0
             fi
-            echo "main says $(grep -m 1 '^version := ' engines/rego/ergo.rego || true) and this job expected $VERSION-dev. Move main to the next version by hand."
+            echo "main says $(grep -m 1 '^version := ' engines/rego/ergo.rego || true) and this job expected $VERSION-dev. Move main to the next patch version by hand."
             exit 1
           fi
           git config user.name "github-actions[bot]"
@@ -157,7 +154,7 @@ jobs:
             echo "origin/$branch already exists, so there is nothing to commit or push"
           else
             git switch --create "$branch"
-            git commit --all --message "$title" --message "Ergo $VERSION was released, so main moves to its next version."
+            git commit --all --message "$title" --message "Ergo $VERSION was released, so main moves to the next patch version. A pull request that needs a minor or major version picks it when it adds its changelog heading."
             git push origin "$branch"
           fi
           existing=$(gh pr list --head "$branch" --base main --state open --json url --jq '.[0].url')
@@ -482,13 +479,10 @@ jobs:
       - name: Install the Rust version in rust-toolchain.toml
         working-directory: engines/rust
         run: rustup toolchain install
-      - name: Open the pull request that moves main to the next version
+      - name: Open the pull request that moves main to the next patch version
         shell: bash
         run: |
-          major=${VERSION%%.*}
-          minor=${VERSION#*.}
-          minor=${minor%%.*}
-          next="$major.$((10#$minor + 1)).0-dev"
+          next="${VERSION%.*}.$((10#${VERSION##*.} + 1))-dev"
           branch="rust/version-$next"
           title="rust: move main to $next"
           if grep -qxF "version = \"$next\"" engines/rust/Cargo.toml; then
@@ -496,7 +490,7 @@ jobs:
             exit 0
           fi
           if ! grep -qxF "version = \"$VERSION\"" engines/rust/Cargo.toml; then
-            echo "engines/rust/Cargo.toml says $(grep -m 1 '^version = ' engines/rust/Cargo.toml || true) and this job expected $VERSION. Move main to the next version by hand."
+            echo "engines/rust/Cargo.toml says $(grep -m 1 '^version = ' engines/rust/Cargo.toml || true) and this job expected $VERSION. Move main to the next patch version by hand."
             exit 1
           fi
           git config user.name "github-actions[bot]"
@@ -513,7 +507,7 @@ jobs:
             echo "origin/$branch already exists, so there is nothing to commit or push"
           else
             git switch --create "$branch"
-            git commit --all --message "$title" --message "The Rust crates $VERSION were released, so main moves to their next version."
+            git commit --all --message "$title" --message "The Rust crates $VERSION were released, so main moves to the next patch version. A pull request that needs a minor or major version picks it when it adds its changelog heading."
             git push origin "$branch"
           fi
           existing=$(gh pr list --head "$branch" --base main --state open --json url --jq '.[0].url')

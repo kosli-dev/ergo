@@ -21,26 +21,11 @@ jobs:
       - uses: open-policy-agent/setup-regal@v2.0.0
         with:
           version: 0.43.0
-      - name: Check the version isn't below the latest release
-        shell: bash
+      - name: Check the versions follow the releases and the changelogs
         run: |
-          version=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' engines/rego/ergo.rego)
-          if [ -z "$version" ]; then
-            echo 'ergo.rego must say version := "X.Y.Z-dev" on main'
-            exit 1
-          fi
-          latest=$(git tag --list 'rego-v*' | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^rego-v//' | sort -V | tail -n 1 || true)
-          if [ -n "$latest" ]; then
-            if [ "$latest" = "$version" ]; then
-              echo "::warning::ergo.rego says $version-dev, but rego-v$latest is already released. Merge the pull request that moves main to the next version."
-              exit 0
-            fi
-            highest=$(printf '%s\n%s\n' "$latest" "$version" | sort -V | tail -n 1)
-            if [ "$highest" != "$version" ]; then
-              echo "ergo.rego says $version-dev, but rego-v$latest is already released. Change it to a version above $latest, like the next minor."
-              exit 1
-            fi
-          fi
+          .github/changelog-version.sh rego
+          .github/changelog-version.sh rust
+          .github/changelog-version_test.sh
       - name: Check the spec version moved when the spec changed
         run: .github/spec-version.sh
       - run: opa check --strict engines/rego spec:spec examples:examples
