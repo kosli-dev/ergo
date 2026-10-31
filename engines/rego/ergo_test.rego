@@ -3568,7 +3568,7 @@ test_min_subjects_lists_only_the_count_when_the_input_and_params_are_json if {
 }
 
 test_a_requirement_name_that_is_not_a_string_fails_the_requirement_and_the_policy if {
-	every policy in [{1: json_only_req.s}, [json_only_req.s]] {
+	every policy in [{1: json_only_req.s}] {
 		rep := report({"items": [{"id": "a", "x": 1}]}, policy)
 		rep.compliant == false
 		some name, r in rep.requirements
@@ -10882,4 +10882,16 @@ test_a_requirement_called_policy_is_written_wrong_and_leaves_no_policy_requireme
 	object.keys(rep.requirements) == {"$policy"}
 	rep.requirements["$policy"].subject == "s"
 	[i.value | some i in rows_for(rep, "$policy", "$well_formed")[0].inputs; i.name == "requirement name"] == [["name reserved"]]
+}
+
+test_a_requirements_list_with_items_is_read_as_no_requirements if {
+	rep := ergo.report({"xs": [{"x": 1}]}, {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs"}}, "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]}, {})
+	object.keys(rep.requirements) == {"$policy"}
+	[i.value | some i in rows_for(rep, "$policy", "$well_formed")[0].inputs; i.name == "requirements"] == [["not an object"]]
+	count(rep.results) == 1
+}
+
+test_a_policy_that_is_not_an_object_says_so_in_place_of_requirements if {
+	rep := ergo.report({}, ["x"], {})
+	rows_for(rep, "$policy", "$well_formed")[0].inputs == [{"name": "policy", "value": ["not an object"], "locations": []}]
 }

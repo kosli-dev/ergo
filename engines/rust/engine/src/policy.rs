@@ -690,13 +690,18 @@ impl Policy {
         let map = match policy {
             Value::Object(map) => map,
             _ => {
+                let mut problems = Problems::new();
+                problems.insert(
+                    "policy".to_string(),
+                    BTreeSet::from(["not an object".to_string()]),
+                );
                 return Policy {
                     description: String::new(),
                     meta: empty_meta(),
-                    problems: Problems::new(),
+                    problems,
                     subjects: Subjects::Map(BTreeMap::new()),
                     requirements: BTreeMap::new(),
-                    requirements_problem: "missing",
+                    requirements_problem: "",
                 };
             }
         };

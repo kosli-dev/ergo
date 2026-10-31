@@ -4005,7 +4005,7 @@ _read(policy) := {"subjects": subjects, "subject_sentences": subject_sentences, 
 	reads := _s_from_reads(written_subjects, parts)
 	subjects := _s_subjects(_s_new_subjects(written_subjects), reads, parts)
 	subject_sentences := _s_subject_sentences(written_subjects, reads, parts)
-	reqs := _p_requirements(raw, subject_sentences.chains, parts)
+	reqs := _p_requirements(_object_or_empty(raw), subject_sentences.chains, parts)
 	sentences := _s_sentences(raw, reqs)
 	resolved := _resolved_subjects with data.ergo_subjects as subjects with data.ergo_subject_sentences as subject_sentences
 }
@@ -4150,8 +4150,12 @@ _policy_row(policy) := {
 	"check": "$well_formed",
 	"passed": false,
 	"cause": "value",
-	"inputs": [i | some i in sort(array.concat(_policy_problem_inputs(policy), [{"name": "requirements", "value": [_requirements_problem(policy)], "locations": []}]))],
+	"inputs": [i | some i in sort(array.concat(_policy_problem_inputs(policy), _requirements_input(policy)))],
 }
+
+_requirements_input(policy) := [{"name": "policy", "value": ["not an object"], "locations": []}] if not is_object(policy)
+
+_requirements_input(policy) := [{"name": "requirements", "value": [_requirements_problem(policy)], "locations": []}] if is_object(policy)
 
 _requirements_problem(policy) := "missing" if not _has_requirements(policy)
 

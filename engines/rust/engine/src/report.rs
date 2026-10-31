@@ -696,10 +696,12 @@ fn policy_row(policy: &Policy) -> Row {
         .iter()
         .map(|(name, texts)| (name.clone(), json!(texts)))
         .collect();
-    named.push((
-        "requirements".to_string(),
-        json!([policy.requirements_problem]),
-    ));
+    if !policy.requirements_problem.is_empty() {
+        named.push((
+            "requirements".to_string(),
+            json!([policy.requirements_problem]),
+        ));
+    }
     named.sort_by(|a, b| a.0.cmp(&b.0));
     Row {
         requirement: POLICY.to_string(),
@@ -1277,13 +1279,28 @@ mod tests {
             (json!({"requirements": {}}), "empty"),
             (json!({"requirements": []}), "not an object"),
             (json!({"requirements": null}), "missing"),
-            (json!("x"), "missing"),
         ] {
             let report = report_of(written, Value::Null);
             let row = row_of_check(&report, "$policy", "$well_formed");
             let last = row["inputs"].as_array().unwrap().last().unwrap().clone();
             assert_eq!(last["value"], json!([wanted]));
         }
+    }
+
+    #[test]
+    fn a_policy_that_is_not_an_object_says_so_in_place_of_requirements() {
+        let report = report_of(json!("x"), Value::Null);
+        let row = row_of_check(&report, "$policy", "$well_formed");
+        assert_eq!(
+            row["inputs"],
+            json!([{"name": "policy", "value": ["not an object"], "locations": []}])
+        );
+        let report = report_of(
+            json!({"ergo_spec": "v0.4-dev", "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]}),
+            Value::Null,
+        );
+        assert_eq!(report["requirements"].as_object().unwrap().len(), 1);
+        assert!(report["requirements"].get("$policy").is_some());
     }
 
     #[test]
