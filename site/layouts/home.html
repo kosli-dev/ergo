@@ -130,7 +130,7 @@
       <li class="flow__group flow__group--live">
         <svg class="flow__ants" aria-hidden="true" focusable="false"><rect></rect></svg>
         <span class="flow__label mono">one engine, following the Ergo spec</span>
-        <ul>
+        <ul class="flow__engines">
           {{- range $i, $e := $c.architecture.engines }}
           {{- if $i }}
           <li class="flow__or mono">or</li>

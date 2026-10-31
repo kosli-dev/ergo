@@ -443,6 +443,8 @@ p code, li code, dd code, td code {
   .fields li:nth-child(n+4) { border-top: 1px solid var(--line); }
   .flow { grid-template-columns: minmax(0, 1fr); }
   .flow__group ul { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .flow__group .flow__engines { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
+  .flow__engines .flow__or { margin: 0 4px; }
   .flow > li:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -30px; transform: translateX(-50%); }
 }
 @media (max-width: 920px) {
@@ -479,6 +481,8 @@ p code, li code, dd code, td code {
   .fields li:first-child { border-top: 0; }
   .flow { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .flow__group ul { grid-auto-flow: row; }
+  .flow__group .flow__engines { grid-template-columns: minmax(0, 1fr); }
+  .flow__engines .flow__or { margin: -4px 0; }
   .flow > li:not(:last-child)::after { bottom: -26px; }
   .name__grid { grid-template-columns: minmax(0, 1fr); }
   .name__glyph ergo-mark { width: 120px; }

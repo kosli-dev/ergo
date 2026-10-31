@@ -89,14 +89,14 @@ manifesto:
 architecture:
   title: One language.
   muted: Two engines.
-  lede: Two engines can run your policies, and both follow the same spec. `ergo.rego` runs on Open Policy Agent, so it runs wherever OPA does. The Rust engine runs in the `ergo` CLI and in the editor in your browser, and is still experimental. Both pass every case in the spec.
+  lede: Two engines can run your policies, and both follow the same spec. `ergo.rego` runs on Open Policy Agent, so it runs wherever OPA does. The Rust engine runs in the `ergo` CLI and in the playground in your browser, and is still experimental. Both pass every case in the spec.
   engines:
     - name: ergo.rego
       runs: runs on OPA
       opa: true
     - name: Rust engine
       note: (experimental)
-      runs: runs in the ergo CLI and the editor
+      runs: runs in the ergo CLI and the playground
 
 vocabulary:
   title: Auditor says why
