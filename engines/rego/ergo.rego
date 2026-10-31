@@ -4069,9 +4069,9 @@ _run(doc, policy, rd, params) := r if {
 	r := object.union(_reported(written, unreadable, [raw, used]), {"ergo": _spec, "engine": _engine})
 }
 
-version := "0.3.2-dev"
+version := "0.4.0-dev"
 
-_engine := {"name": "ergo.rego", "version": version}
+_engine := {"name": "ergo-rego", "version": version}
 
 _used_subjects(reqs, subjects, resolved) := {name: subjects[name] |
 	some req in reqs
@@ -4232,7 +4232,7 @@ else := {concat("", ["unsupported version ", v, ", expected ", _spec])} if v != 
 
 else := set()
 
-_spec := "v0.3"
+_spec := "v0.4-dev"
 
 _is_version(v) if regex.match(`^v[0-9]+\.[0-9]+(-dev)?$`, v)
 

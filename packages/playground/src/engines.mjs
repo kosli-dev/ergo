@@ -4,7 +4,7 @@ export const ENGINES = ["opa", "rust"];
 /** The name each engine shows. */
 export const ENGINE_LABELS = { opa: "Rego engine", rust: "Rust engine (experimental)" };
 
-const RUST_ENGINE_NAME = "ergo-policy-engine";
+const RUST_ENGINE_NAME = "ergo-rust";
 
 /** The engine used when nothing else was chosen. */
 export const DEFAULT_ENGINE = "opa";
@@ -25,7 +25,7 @@ export const engineNote = (report, ms) => {
   const made = typeof engine.version === "string" ? `${engine.name} ${engine.version}` : engine.name;
   const took = typeof ms === "number" ? ` in ${formatMs(ms)}` : "";
   if (engine.name === RUST_ENGINE_NAME) return `Report made by the Rust engine (${made})${took}.`;
-  if (engine.name === "ergo.rego") return `Report made by the Rego engine (${made})${took}.`;
+  if (engine.name === "ergo-rego") return `Report made by the Rego engine (${made})${took}.`;
   return `Report made by ${made}${took}.`;
 };
 

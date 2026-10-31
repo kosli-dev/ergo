@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
-const POLICY_YAML: &str = r#"ergo_spec: v0.3
+const POLICY_YAML: &str = r#"ergo_spec: v0.4-dev
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -152,7 +152,7 @@ fn written_wrong_policy(name: &str) -> String {
     write(
         &dir(name),
         "wrong.yaml",
-        &POLICY_YAML.replace("ergo_spec: v0.3", "ergo_spec: v0.1"),
+        &POLICY_YAML.replace("ergo_spec: v0.4-dev", "ergo_spec: v0.1"),
     )
 }
 
@@ -276,7 +276,7 @@ fn fail_exits_three_when_the_policy_has_no_requirements_because_no_check_ran() {
     for (file, text) in [
         ("empty.json", "{}"),
         ("future.json", r#"{"ergo_spec": "v9.9"}"#),
-        ("none.json", r#"{"ergo_spec": "v0.3"}"#),
+        ("none.json", r#"{"ergo_spec": "v0.4-dev"}"#),
         ("null.yaml", "null\n"),
         ("list.yaml", "- 1\n"),
     ] {
@@ -385,7 +385,7 @@ fn pretty_output_escapes_like_opa() {
     let policy = write(
         &dir,
         "policy.json",
-        r#"{"ergo_spec":"v0.3","meta":{"k":"a<b>&c\u2028é"}}"#,
+        r#"{"ergo_spec":"v0.4-dev","meta":{"k":"a<b>&c\u2028é"}}"#,
     );
     let input = write(&dir, "input.json", "{}");
     let text = out(&ergo(&["report", "--policy", &policy, "--input", &input]));
@@ -401,7 +401,7 @@ fn params_are_read_from_the_params_file() {
     let policy = write(
         &dir,
         "policy.yaml",
-        "ergo_spec: v0.3\nsubjects:\n  item:\n    from: items\n    identified_by: id\nrequirements:\n  r:\n    subject: item\n    checks:\n      small: n is at most $params.limit\n",
+        "ergo_spec: v0.4-dev\nsubjects:\n  item:\n    from: items\n    identified_by: id\nrequirements:\n  r:\n    subject: item\n    checks:\n      small: n is at most $params.limit\n",
     );
     let input = write(&dir, "input.json", r#"{"items":[{"id":"a","n":5}]}"#);
     let low = write(&dir, "low.yaml", "limit: 3\n");

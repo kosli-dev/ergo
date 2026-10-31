@@ -2,6 +2,13 @@
 
 This file is about `ergo.rego` only. The Rust engine's changes are in [engines/rust/CHANGELOG.md](engines/rust/CHANGELOG.md), and the spec's in [spec/CHANGELOG.md](spec/CHANGELOG.md). Each release names the version of the spec it follows.
 
+## 0.4.0
+
+### Changed
+
+- This version follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released, and the report's `ergo` follows. One that says `v0.3` is written wrong, with `unsupported version v0.3, expected v0.4-dev`.
+- The report's `engine` name is `ergo-rego`, where it was `ergo.rego`. Every report changes in that field only, and the hash leaves `engine` out, so hashes stay the same. A compiled policy made by an older copy says `ergo.rego`, so `ergo.report` reads it as one from another engine, and the message says `expected ergo-rego`. Compile the policy again.
+
 ## 0.3.1
 
 `ergo.rego` is the same as in 0.3.0 apart from its version, and follows spec 0.3. This release brings the docs up to date with the first release of the Rust engine: [README.md](README.md#the-ergo-cli-experimental) says how to install the `ergo` CLI from crates.io or download it, and calls it the `ergo` CLI where it meant the command. It also says again how to update `ergo.rego`.

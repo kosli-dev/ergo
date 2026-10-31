@@ -165,9 +165,9 @@ test("a new description with no title goes at the top, after the front matter", 
 });
 
 test("ergo_spec is rewritten, removed or added in the front matter", () => {
-  const rewrote = edited((p) => (p.ergo_spec = "v0.3"));
+  const rewrote = edited((p) => (p.ergo_spec = "v0.4-dev"));
   assert.deepEqual(rewrote.changes, ["rewrote ergo_spec"]);
-  assert.equal(rewrote.markdown, DOC.replace("ergo_spec: v0.2", "ergo_spec: v0.3"));
+  assert.equal(rewrote.markdown, DOC.replace("ergo_spec: v0.2", "ergo_spec: v0.4-dev"));
   const removed = edited((p) => delete p.ergo_spec);
   assert.deepEqual(removed.changes, ["removed ergo_spec"]);
   assert.equal(removed.markdown, DOC.replace("---\nergo_spec: v0.2\n---\n\n", ""));

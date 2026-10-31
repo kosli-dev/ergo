@@ -2134,7 +2134,7 @@ mod tests {
 
     fn row_names(checks: Value) -> Vec<String> {
         let policy = json!({
-            "ergo_spec": "v0.3",
+            "ergo_spec": "v0.4-dev",
             "subjects": {"t": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "t", "checks": {"c": checks}}}
         });

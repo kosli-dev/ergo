@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ergo.kosli.com/spec/0.3/policy.schema.json",
+  "$id": "https://ergo.kosli.com/spec/0.4-dev/policy.schema.json",
   "title": "Ergo policy",
   "description": "A policy that passes this schema can still be written wrong in ways a schema can't express, like a sentence that doesn't parse or a from line that names a subject that isn't there. Ergo reports those in $well_formed. A policy that fails this schema still gets a report, which says what's wrong.",
   "type": "object",
   "properties": {
     "ergo_spec": {
-      "const": "v0.3",
-      "description": "The version of the spec the policy is written for. YAML reads v0.3 as text, but 0.3 as a number."
+      "const": "v0.4-dev",
+      "description": "The version of the spec the policy is written for. YAML reads v0.4-dev as text, but 0.4 as a number."
     },
     "subjects": {
       "type": "object",

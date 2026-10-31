@@ -1,7 +1,7 @@
 [
   {
     "description": "matches_any",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"z\", \"^b\", \"svc_\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"z\", \"^b\", \"svc_\""}}}},
     "cases": [
       {
         "description": "passes when one pattern matches anywhere in the string",
@@ -40,7 +40,7 @@
   },
   {
     "description": "not_matches_any",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^b\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not match \"^b\""}}}},
     "cases": [
       {
         "description": "passes when no pattern matches",
@@ -79,7 +79,7 @@
   },
   {
     "description": "a pattern with a dot",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^a.b$\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^a.b$\""}}}},
     "cases": [
       {
         "description": "doesn't match a newline",
@@ -93,7 +93,7 @@
   },
   {
     "description": "a pattern ending with a dollar",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"a$\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"a$\""}}}},
     "cases": [
       {
         "description": "doesn't match before a final newline",
@@ -107,7 +107,7 @@
   },
   {
     "description": "a case-insensitive pattern",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"(?i)^A\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"(?i)^A\""}}}},
     "cases": [
       {
         "description": "matches the other case",
@@ -121,7 +121,7 @@
   },
   {
     "description": "a pattern with a Unicode class",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^\\\\p{L}+$\""}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches \"^\\\\p{L}+$\""}}}},
     "cases": [
       {
         "description": "matches letters outside ASCII",
@@ -135,7 +135,7 @@
   },
   {
     "description": "patterns read through a ref to a list",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.ps"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.ps"}}}},
     "params": {"ps": ["c"]},
     "cases": [
       {
@@ -151,7 +151,7 @@
   },
   {
     "description": "patterns read through a ref that isn't a list",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.ps"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x matches $params.ps"}}}},
     "params": {"ps": "c"},
     "cases": [
       {
@@ -166,7 +166,7 @@
   },
   {
     "description": "the classes \\d, \\w, \\s and \\b",
-    "policy": {"ergo_spec": "v0.3", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"d": "x matches '^\\d$'", "w": "y matches '^\\w$'", "s": "z matches '^\\s+$'", "b": "v matches '^a\\b'"}}}},
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"d": "x matches '^\\d$'", "w": "y matches '^\\w$'", "s": "z matches '^\\s+$'", "b": "v matches '^a\\b'"}}}},
     "cases": [
       {
         "description": "only know ASCII, as in RE2, so a digit or a letter outside ASCII doesn't match and a letter outside ASCII ends a word",

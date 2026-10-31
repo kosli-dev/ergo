@@ -1327,7 +1327,7 @@ mod tests {
 
     fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.3",
+            "ergo_spec": "v0.4-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertions}}}}
         });
@@ -1357,7 +1357,7 @@ mod tests {
 
     fn problems(for_line: &str) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.3",
+            "ergo_spec": "v0.4-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": "x exists"}}}}
         });
@@ -1520,7 +1520,7 @@ mod tests {
     #[test]
     fn a_subject_that_is_not_an_object_fails_as_not_an_object_with_nothing_listed() {
         let policy = json!({
-            "ergo_spec": "v0.3",
+            "ergo_spec": "v0.4-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": "x is 1"}}}}
         });
@@ -1647,7 +1647,7 @@ mod tests {
     #[test]
     fn a_failed_count_whose_whose_reads_a_part_lists_the_parts_value_with_its_location() {
         let policy = json!({
-            "ergo_spec": "v0.3",
+            "ergo_spec": "v0.4-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {
                 "for": "every groups as g",

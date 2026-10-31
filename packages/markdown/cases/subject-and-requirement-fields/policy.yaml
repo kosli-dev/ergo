@@ -1,4 +1,4 @@
-ergo_spec: v0.3
+ergo_spec: v0.4-dev
 description: Every deployment to production was approved, and at least one test run passed before it.
 subjects:
   deployment:

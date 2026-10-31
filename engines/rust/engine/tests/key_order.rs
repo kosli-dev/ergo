@@ -5,7 +5,7 @@ fn read(text: &str) -> Value {
 }
 
 const POLICY: &str = r#"{
-    "ergo_spec": "v0.3",
+    "ergo_spec": "v0.4-dev",
     "description": "keys in one order",
     "meta": {"owner": "ops", "area": "release"},
     "subjects": {
@@ -47,7 +47,7 @@ const POLICY_REORDERED: &str = r#"{
     },
     "meta": {"area": "release", "owner": "ops"},
     "description": "keys in one order",
-    "ergo_spec": "v0.3"
+    "ergo_spec": "v0.4-dev"
 }"#;
 
 const INPUT: &str = r#"{
