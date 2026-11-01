@@ -146,6 +146,29 @@ mod tests {
     }
 
     #[test]
+    fn the_fields_of_a_requirement_come_before_the_fields_of_its_subject() {
+        let policy = json!({
+            "ergo_spec": "v0.4-dev",
+            "subjects": {"s": {"from": "xs", "zq": 1}},
+            "requirements": {"r": {"subject": "s", "zz": 1, "checks": {"c": "x exists"}}}
+        });
+        let report = report(&json!({"xs": [{"x": 1}]}), &policy, &json!({}));
+        let row = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == "$well_formed")
+            .unwrap();
+        let names: Vec<&str> = row["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|input| input["name"].as_str())
+            .collect();
+        assert_eq!(names, ["count(checks)", "require", "zz", "subjects.s.zq"]);
+    }
+
+    #[test]
     fn report_and_violations_work_from_json_alone() {
         let policy = json!({
             "ergo_spec": "v0.4-dev",
