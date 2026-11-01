@@ -9921,5 +9921,43 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line over items that aren't objects, with a named by field",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": {"for": "every rows as row", "assert": "row.w named by p is \"xy\""}}}}},
+    "cases": [
+      {
+        "description": "fails as not_an_object on the item, whether the field it reads is good, null, missing or a number",
+        "rules": ["path.field_step", "for.inputs"],
+        "input": {"things": [{"id": "t1", "p": "k", "rows": [5]}, {"id": "t2", "p": null, "rows": [5]}, {"id": "t3", "rows": [5]}, {"id": "t4", "p": 3, "rows": [5]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "a", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "row.w named by p is \"xy\"", "cause": "not_an_object", "inputs": [{"locations": ["/things/0/rows/0"], "name": "row.w named by p", "value": null}, {"locations": ["/things/0/p"], "name": "p", "value": "k"}]}], "item": "item 1 of rows", "locations": ["/things/0/rows/0"], "path": "item 1 of rows", "value": 5}], "inputs": [{"locations": ["/things/0/p"], "name": "p", "value": "k"}, {"locations": ["/things/0/rows/0"], "name": "rows[]", "value": [5]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "not_an_object", "check": "a", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "row.w named by p is \"xy\"", "cause": "not_an_object", "inputs": [{"locations": ["/things/1/rows/0"], "name": "row.w named by p", "value": null}, {"locations": ["/things/1/p"], "name": "p", "value": null}]}], "item": "item 1 of rows", "locations": ["/things/1/rows/0"], "path": "item 1 of rows", "value": 5}], "inputs": [{"locations": ["/things/1/p"], "name": "p", "value": null}, {"locations": ["/things/1/rows/0"], "name": "rows[]", "value": [5]}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "not_an_object", "check": "a", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "row.w named by p is \"xy\"", "cause": "not_an_object", "inputs": [{"locations": ["/things/2/rows/0"], "name": "row.w named by p", "value": null}, {"locations": ["/things/2"], "name": "p", "value": null}]}], "item": "item 1 of rows", "locations": ["/things/2/rows/0"], "path": "item 1 of rows", "value": 5}], "inputs": [{"locations": ["/things/2"], "name": "p", "value": null}, {"locations": ["/things/2/rows/0"], "name": "rows[]", "value": [5]}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "not_an_object", "check": "a", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "row.w named by p is \"xy\"", "cause": "not_an_object", "inputs": [{"locations": ["/things/3/rows/0"], "name": "row.w named by p", "value": null}, {"locations": ["/things/3/p"], "name": "p", "value": 3}]}], "item": "item 1 of rows", "locations": ["/things/3/rows/0"], "path": "item 1 of rows", "value": 5}], "inputs": [{"locations": ["/things/3/p"], "name": "p", "value": 3}, {"locations": ["/things/3/rows/0"], "name": "rows[]", "value": [5]}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line that walks a path with a named by field",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": {"for": "every rows.w named by p as w", "assert": "w is \"xy\""}, "b": {"for": "every rows as r, every r.xs named by p as x", "assert": "x is 1"}}}}},
+    "cases": [
+      {
+        "description": "fails as the field says when it's missing, null or not a string, and lists the field",
+        "rules": ["path.field_step", "for.inputs"],
+        "input": {"things": [{"id": "t1", "p": "k", "rows": [{"w": {"k": "xy"}, "xs": {"k": [1]}}]}, {"id": "t2", "p": null, "rows": [{"w": {"k": "xy"}, "xs": {"k": [1]}}]}, {"id": "t3", "rows": [{"w": {"k": "xy"}, "xs": {"k": [1]}}]}, {"id": "t4", "p": 3, "rows": [{"w": {"k": "xy"}, "xs": {"k": [1]}}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "failed_items": [], "inputs": [{"locations": ["/things/0/p"], "name": "p", "value": "k"}, {"locations": ["/things/0/rows/0/w/k"], "name": "rows[].w named by p", "value": ["xy"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "failed_items": [], "inputs": [{"locations": ["/things/0/p"], "name": "p", "value": "k"}, {"locations": ["/things/0/rows/0/xs/k/0"], "name": "r.xs named by p[]", "value": [1]}, {"locations": ["/things/0/rows/0"], "name": "rows[]", "value": [{"w": {"k": "xy"}, "xs": {"k": [1]}}]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "failed_items": [], "inputs": [{"locations": ["/things/1/p"], "name": "p", "value": null}, {"locations": [], "name": "rows.w named by p", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "null", "check": "b", "failed_items": [{"cause": "null", "failed_assertions": [], "failed_items": [{"cause": "null", "item": "r.xs named by p", "locations": ["/things/1/rows/0/xs"], "path": "r.xs named by p", "value": null}], "item": "item 1 of rows", "locations": ["/things/1/rows/0"], "path": "item 1 of rows", "value": {"w": {"k": "xy"}, "xs": {"k": [1]}}}], "inputs": [{"locations": ["/things/1/p"], "name": "p", "value": null}, {"locations": [], "name": "r.xs named by p", "value": []}, {"locations": ["/things/1/rows/0"], "name": "rows[]", "value": [{"w": {"k": "xy"}, "xs": {"k": [1]}}]}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "absent", "check": "a", "failed_items": [], "inputs": [{"locations": ["/things/2"], "name": "p", "value": null}, {"locations": [], "name": "rows.w named by p", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "absent", "check": "b", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "r.xs named by p", "locations": ["/things/2/rows/0/xs"], "path": "r.xs named by p", "value": null}], "item": "item 1 of rows", "locations": ["/things/2/rows/0"], "path": "item 1 of rows", "value": {"w": {"k": "xy"}, "xs": {"k": [1]}}}], "inputs": [{"locations": ["/things/2"], "name": "p", "value": null}, {"locations": [], "name": "r.xs named by p", "value": []}, {"locations": ["/things/2/rows/0"], "name": "rows[]", "value": [{"w": {"k": "xy"}, "xs": {"k": [1]}}]}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "failed_items": [], "inputs": [{"locations": ["/things/3/p"], "name": "p", "value": 3}, {"locations": [], "name": "rows.w named by p", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [{"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "r.xs named by p", "locations": ["/things/3/rows/0/xs"], "path": "r.xs named by p", "value": null}], "item": "item 1 of rows", "locations": ["/things/3/rows/0"], "path": "item 1 of rows", "value": {"w": {"k": "xy"}, "xs": {"k": [1]}}}], "inputs": [{"locations": ["/things/3/p"], "name": "p", "value": 3}, {"locations": [], "name": "r.xs named by p", "value": []}, {"locations": ["/things/3/rows/0"], "name": "rows[]", "value": [{"w": {"k": "xy"}, "xs": {"k": [1]}}]}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

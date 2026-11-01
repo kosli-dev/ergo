@@ -19,6 +19,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("q.n is 9", "q.n is 9", &[], &[]),
     ("some .cov.xs is 9", "some cov.xs is 9", &[], &[]),
     ("w is at least 2", "w is at least 2", &[], &[]),
+    ("w is \"xy\"", "w is \"xy\"", &[], &[]),
     ("z is at least 2", "z is at least 2", &[], &[]),
     ("z is at least 9", "z is at least 9", &[], &[]),
     ("z.y is 0", "z.y is 0", &[], &[]),
@@ -7739,6 +7740,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every rows as row", "every rows as row", &[], &[]),
+    (
+        "every rows as r, every r.xs named by p as x",
+        "every rows as r, every r.xs named by p as x",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.w named by p as w",
+        "every rows.w named by p as w",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
