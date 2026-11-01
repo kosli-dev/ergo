@@ -4,6 +4,10 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ## 0.4
 
+### New
+
+- Every phrase that lacked an opposite has one: `does not start with` and `does not end with` ([sentence.phrase.starts](syntax.md#phrases)), `is not a <type>` and `is not a non-empty string` ([sentence.phrase.type](syntax.md#phrases)), `is not between` ([sentence.phrase.between](syntax.md#phrases)), `is not <value> within <number>` and `does not equal <field> within <number>` ([sentence.phrase.within](syntax.md#phrases)), and `contains some of` and `does not contain all of` ([sentence.phrase.contains_all](syntax.md#phrases)). `is alphabetically on or before` and `is alphabetically on or after` join the alphabetical phrases ([sentence.phrase.alphabetical](syntax.md#phrases)). Each one fails as the phrase it is the opposite of does when a field is missing, `null` or of the wrong type, so it never passes by reading nothing. They read into `lacks_type`, `not_non_empty_string`, `outside_range`, `includes_some` and `not_includes_all`, and into the new `not_starts_with`, `not_ends_with`, `alphabetically_lte` and `alphabetically_gte` comparisons, and `compare` with `ne` takes a `within` ([compare.within](semantics.md#compare)). A sentence that was written wrong before, like `x is not 3 within 1`, now reads. No report for a policy that was readable changes.
+
 ### Changed
 
 - A report's `engine` name is `ergo-` and the engine, like `ergo-rego` or `ergo-rust`, so a name and version match a release tag like `rego-v0.3.0` ([report.engine](semantics.md#the-report)). The Rego engine said `ergo.rego` and the Rust engine `ergo-policy-engine`. A policy says `ergo_spec: v0.4-dev`, and the report's `ergo` changes to match. The schemas are under `https://ergo.kosli.com/spec/0.4-dev/` until the release. Reports change in `engine` only, and a report's hash leaves `engine` out, so hashes stay the same.

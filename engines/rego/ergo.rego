@@ -2073,6 +2073,46 @@ _leaf_op_passed("range", check, subj) if {
 	v <= hi
 }
 
+_leaf_op_passed("outside_range", check, subj) if {
+	v := _value_at(subj, check.path)
+	is_number(v)
+	lo := _arg(check.min)
+	hi := _arg(check.max)
+	is_number(lo)
+	is_number(hi)
+	not v >= lo
+}
+
+_leaf_op_passed("outside_range", check, subj) if {
+	v := _value_at(subj, check.path)
+	is_number(v)
+	lo := _arg(check.min)
+	hi := _arg(check.max)
+	is_number(lo)
+	is_number(hi)
+	v > hi
+}
+
+_leaf_op_passed("includes_some", check, subj) if {
+	v := _value_at(subj, check.path)
+	is_array(v)
+	wants := _wants(check.values)
+	_wanted(wants)
+	_items_fit(v, wants)
+	some want in wants
+	want in v
+}
+
+_leaf_op_passed("not_includes_all", check, subj) if {
+	v := _value_at(subj, check.path)
+	is_array(v)
+	wants := _wants(check.values)
+	_wanted(wants)
+	_items_fit(v, wants)
+	some want in wants
+	not want in v
+}
+
 _leaf_op_passed("excludes", check, subj) if {
 	v := _value_at(subj, check.path)
 	is_array(v)
@@ -2127,6 +2167,12 @@ _leaf_op_passed("has_type", check, subj) if {
 	type_name(v) == _json_types[check.type]
 }
 
+_leaf_op_passed("lacks_type", check, subj) if {
+	v := _value_at(subj, check.path)
+	v != null
+	type_name(v) != _json_types[check.type]
+}
+
 _json_types := {"list": "array", "string": "string", "number": "number", "boolean": "boolean", "object": "object"}
 
 _leaf_op_passed("not_in", check, subj) if {
@@ -2150,6 +2196,17 @@ _leaf_op_passed("present", check, subj) if {
 
 _leaf_op_passed("non_empty_string", check, subj) if {
 	v := _value_at(subj, check.path)
+	is_string(v)
+	v != ""
+}
+
+_leaf_op_passed("not_non_empty_string", check, subj) if {
+	v := _value_at(subj, check.path)
+	v != null
+	not _non_empty_text(v)
+}
+
+_non_empty_text(v) if {
 	is_string(v)
 	v != ""
 }
@@ -2244,6 +2301,7 @@ _leaf_op_passed("compare", check, subj) if {
 _compared(check, l, r) if {
 	not "within" in object.keys(check)
 	not check.cmp in _list_cmps
+	check.cmp != "outside"
 	_comparable(l, r)
 	_orderable(check.cmp, l)
 	_cmp(check.cmp, l, r)
@@ -2269,10 +2327,37 @@ _compared(check, l, r) if {
 
 _compared(check, l, r) if {
 	"within" in object.keys(check)
+	check.cmp == "eq"
 	is_number(l)
 	is_number(r)
 	not "max" in object.keys(check)
 	_within_gap(l, r, check.within)
+}
+
+_compared(check, l, r) if {
+	"within" in object.keys(check)
+	check.cmp == "ne"
+	_within_usable(check, l, r)
+	not "max" in object.keys(check)
+	not _within_gap(l, r, check.within)
+}
+
+_compared(check, l, r) if {
+	not "within" in object.keys(check)
+	check.cmp == "outside"
+	_comparable(l, r)
+	_orderable(check.cmp, l)
+	is_number(check.max)
+	l < r
+}
+
+_compared(check, l, r) if {
+	not "within" in object.keys(check)
+	check.cmp == "outside"
+	_comparable(l, r)
+	_orderable(check.cmp, l)
+	is_number(check.max)
+	l > check.max
 }
 
 _leaf_op_passed("compare_time", check, subj) if {
@@ -2337,7 +2422,7 @@ _orderable(c, v) if {
 _unusable_states(leaf, x) := {"unusable" | _unusable(leaf, x)}
 
 _unusable(leaf, x) if {
-	leaf.op == "range"
+	leaf.op in {"range", "outside_range"}
 	v := _found(x, leaf.path)
 	not is_number(v)
 }
@@ -2349,17 +2434,19 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
-	leaf.op in {"includes", "excludes"}
+	leaf.op in _contain_ops
 	v := _found(x, leaf.path)
 	not is_array(v)
 }
 
 _unusable(leaf, x) if {
-	leaf.op in {"includes", "excludes"}
+	leaf.op in _contain_ops
 	v := _found(x, leaf.path)
 	is_array(v)
 	not _items_fit(v, _leaf_wants(leaf))
 }
+
+_contain_ops := {"includes", "excludes", "includes_some", "not_includes_all"}
 
 _leaf_wants(leaf) := [_arg(leaf.value)] if "value" in object.keys(leaf)
 
@@ -2431,7 +2518,7 @@ _unusable(leaf, x) if {
 
 _unusable(leaf, x) if {
 	_list_cmp(leaf)
-	leaf.cmp in {"includes", "excludes", "includes_all", "excludes_all"}
+	leaf.cmp in ({"includes", "excludes"} | _all_cmps)
 	v := _found(x, leaf.left)
 	not is_array(v)
 }
@@ -2447,7 +2534,7 @@ _unusable(leaf, x) if {
 
 _unusable(leaf, x) if {
 	_list_cmp(leaf)
-	leaf.cmp in {"includes_all", "excludes_all"}
+	leaf.cmp in _all_cmps
 	l := _found(x, leaf.left)
 	r := _found(x, leaf.right)
 	is_array(l)
@@ -2568,6 +2655,30 @@ _cmp("ends_with", l, r) if {
 	endswith(l, r)
 }
 
+_cmp("not_starts_with", l, r) if {
+	is_string(l)
+	is_string(r)
+	not startswith(l, r)
+}
+
+_cmp("not_ends_with", l, r) if {
+	is_string(l)
+	is_string(r)
+	not endswith(l, r)
+}
+
+_cmp("alphabetically_lte", l, r) if {
+	is_string(l)
+	is_string(r)
+	l <= r
+}
+
+_cmp("alphabetically_gte", l, r) if {
+	is_string(l)
+	is_string(r)
+	l >= r
+}
+
 _cmp("alphabetically_before", l, r) if {
 	is_string(l)
 	is_string(r)
@@ -2626,6 +2737,22 @@ _cmp("excludes_all", l, r) if {
 	}
 }
 
+_cmp("includes_some", l, r) if {
+	is_array(l)
+	_wanted(r)
+	_items_fit(l, r)
+	some want in r
+	want in l
+}
+
+_cmp("not_includes_all", l, r) if {
+	is_array(l)
+	_wanted(r)
+	_items_fit(l, r)
+	some want in r
+	not want in l
+}
+
 _cmp("matches_any", l, r) if {
 	is_string(l)
 	_valid_patterns(r)
@@ -2641,7 +2768,9 @@ _cmp("not_matches_any", l, r) if {
 	}
 }
 
-_list_cmps := {"in", "not_in", "includes", "excludes", "includes_all", "excludes_all", "matches_any", "not_matches_any"}
+_all_cmps := {"includes_all", "excludes_all", "includes_some", "not_includes_all"}
+
+_list_cmps := {"in", "not_in", "includes", "excludes", "matches_any", "not_matches_any"} | _all_cmps
 
 _list_cmp(leaf) if {
 	leaf.op == "compare"
@@ -2673,7 +2802,7 @@ _list_right_usable(cmp, r) if {
 _list_right_usable(cmp, _) if cmp in {"includes", "excludes"}
 
 _list_right_usable(cmp, r) if {
-	cmp in {"includes_all", "excludes_all"}
+	cmp in _all_cmps
 	_wanted(r)
 	not _mixed_types(r)
 }
@@ -2687,6 +2816,11 @@ _leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "missi
 
 _required_fields := {
 	"range": {"path", "min", "max"},
+	"outside_range": {"path", "min", "max"},
+	"includes_some": {"path"},
+	"not_includes_all": {"path"},
+	"lacks_type": {"path", "type"},
+	"not_non_empty_string": {"path"},
 	"excludes": {"path"},
 	"includes": {"path"},
 	"in": {"path", "values"},
@@ -2786,10 +2920,10 @@ _missing_fields_problem(node) := {concat("", ["missing ", f]) |
 }
 
 _value_or_values_problem(node) := {"missing value or values" |
-	node.op in {"includes", "excludes"}
+	node.op in _contain_ops
 	count({"value", "values"} & object.keys(node)) == 0
 } | {"both value and values" |
-	node.op in {"includes", "excludes"}
+	node.op in _contain_ops
 	count({"value", "values"} & object.keys(node)) == 2
 }
 
@@ -2813,7 +2947,7 @@ _compare_max_problem(node) := ({"invalid max" |
 } | {"max needs cmp gte" |
 	node.op == "compare"
 	"max" in object.keys(node)
-	object.get(node, "cmp", null) != "gte"
+	not object.get(node, "cmp", null) in {"gte", "outside"}
 }) | {"max can't go with within" |
 	node.op == "compare"
 	"max" in object.keys(node)
@@ -2836,6 +2970,8 @@ _op_fields := object.union(_required_fields, {
 	"compare": {"left", "right", "cmp", "within"},
 	"excludes": {"path", "value", "values"},
 	"includes": {"path", "value", "values"},
+	"includes_some": {"path", "values"},
+	"not_includes_all": {"path", "values"},
 	"all": {"path", "check", "each", "as"},
 	"any": {"path", "check", "each", "as"},
 })
@@ -2858,18 +2994,18 @@ _range_order_problem(node) := {"min above max" |
 }
 
 _values_problem(node) := ({"invalid values" |
-	node.op in {"in", "not_in", "includes", "excludes"}
+	node.op in ({"in", "not_in"} | _contain_ops)
 	"values" in object.keys(node)
 	not _value_list(_written(node.values))
 	not is_set(_written(node.values))
 	not _is_ref(node.values)
 } | {"values of mixed types" |
-	node.op in {"in", "not_in", "includes", "excludes"}
+	node.op in ({"in", "not_in"} | _contain_ops)
 	vals := _written(node.values)
 	_value_list(vals)
 	_mixed_types([_written(w) | some w in vals; not _is_ref(w)])
 }) | {"empty values" |
-	node.op in {"includes", "excludes"}
+	node.op in _contain_ops
 	_value_list(_written(node.values))
 	count(_written(node.values)) == 0
 }
@@ -2926,11 +3062,11 @@ _cmp_problem(node, here) := {"invalid cmp" |
 	not _sentence_cmp(node, here)
 }
 
-_text_cmps := {"starts_with", "ends_with", "alphabetically_before", "alphabetically_after"}
+_text_cmps := {"starts_with", "ends_with", "not_starts_with", "not_ends_with", "alphabetically_before", "alphabetically_after", "alphabetically_lte", "alphabetically_gte"}
 
 _sentence_cmp(node, here) if {
 	node.op == "compare"
-	node.cmp in (_text_cmps | _list_cmps)
+	node.cmp in ((_text_cmps | _list_cmps) | {"outside"})
 	_s_read(node, here)
 }
 
@@ -3022,14 +3158,14 @@ _node_param_broken(node) if {
 }
 
 _node_param_broken(node) if {
-	node.op in {"in", "not_in", "includes", "excludes"}
+	node.op in ({"in", "not_in"} | _contain_ops)
 	vals := _wants(node.values)
 	_value_list(vals)
 	_mixed_types(vals)
 }
 
 _node_param_broken(node) if {
-	node.op in {"includes", "excludes"}
+	node.op in _contain_ops
 	_is_ref(node.values)
 	v := _arg(node.values)
 	not _wanted(v)
@@ -5209,10 +5345,10 @@ _within_problem(node) := {"invalid within" |
 	node.op == "compare"
 	"within" in object.keys(node)
 	not _non_negative(node.within)
-} | {"within needs cmp eq" |
+} | {"within needs cmp eq or ne" |
 	node.op == "compare"
 	"within" in object.keys(node)
-	object.get(node, "cmp", null) != "eq"
+	not object.get(node, "cmp", null) in {"eq", "ne"}
 }
 
 _non_negative(n) if {
@@ -5296,32 +5432,41 @@ _s_patterns := {
 	phrases := [
 		["is not one of", `is +not +(?:one +of|in) +`, list, "list"],
 		["is one of", `is +(?:one +of|in) +`, list, "list"],
+		["is not a non-empty string", `is +not +a +non-empty +string`, ``, "none"],
 		["is a non-empty string", `is +a +non-empty +string`, ``, "none"],
+		["is not a", `is +not +an? +`, type, "type"],
 		["is a", `is +an? +`, type, "type"],
 		["is not empty", `is +not +empty`, ``, "none"],
 		["is empty", `is +empty`, ``, "none"],
 		["does not exist", `does +not +exist`, ``, "none"],
 		["exists", `exists`, ``, "none"],
+		["does not contain all of", `does +not +contain +all +of +`, list, "list"],
+		["contains some of", `contains +some +of +`, list, "list"],
 		["contains all of", `contains +all +of +`, list, "list"],
 		["contains none of", `contains +none +of +`, list, "list"],
 		["does not contain", `does +not +contain +`, operand, "operand"],
 		["contains", `contains +`, operand, "operand"],
 		["does not match", `does +not +match +`, list, "list"],
 		["matches", `matches +`, list, "list"],
+		["does not start with", `does +not +start +with +`, operand, "operand"],
+		["does not end with", `does +not +end +with +`, operand, "operand"],
 		["starts with", `starts +with +`, operand, "operand"],
 		["ends with", `ends +with +`, operand, "operand"],
+		["is alphabetically on or before", `is +alphabetically +on +or +before +`, operand, "operand"],
+		["is alphabetically on or after", `is +alphabetically +on +or +after +`, operand, "operand"],
 		["is alphabetically before", `is +alphabetically +before +`, operand, "operand"],
 		["is alphabetically after", `is +alphabetically +after +`, operand, "operand"],
 		["is at least", `is +at +least +`, operand, "operand"],
 		["is at most", `is +at +most +`, operand, "operand"],
 		["is more than", `is +more +than +`, operand, "operand"],
 		["is less than", `is +less +than +`, operand, "operand"],
+		["is not between", `is +not +between +`, concat("", [num, ` +and +`, num]), "range"],
 		["is between", `is +between +`, concat("", [num, ` +and +`, num]), "range"],
 		["is on or after", `is +on +or +after +`, operand, "operand"],
 		["is on or before", `is +on +or +before +`, operand, "operand"],
 		["is before", `is +before +`, operand, "operand"],
 		["is after", `is +after +`, operand, "operand"],
-		["is not", `(?:is +not|does +not +equal) +`, operand, "operand"],
+		["is not", `(?:is +not|does +not +equal) +`, concat("", [operand, `(?: +within +`, num, `)?`]), "operand_within"],
 		["is", `(?:is +equal +to|equals|is) +`, concat("", [operand, `(?: +within +`, num, `)?`]), "operand_within"],
 	]
 	kinds := [
@@ -5860,7 +6005,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"terms" in object.keys(node)
-	not node.phrase.op in {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is between"}
+	not node.phrase.op in {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is between", "is not between"}
 }) | {"a number can't start a sentence" |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -5869,7 +6014,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 }) | {"min above max" |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	node.op == "is between"
+	node.op in {"is between", "is not between"}
 	is_number(node.min)
 	is_number(node.max)
 	node.min > node.max
@@ -5897,7 +6042,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 }) | {concat("", [`"`, node.op, `" takes text`]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	node.op in {"starts with", "ends with", "is alphabetically before", "is alphabetically after"}
+	node.op in _s_text_ops
 	"value" in object.keys(node)
 	not is_string(node.value)
 }) | {concat("", [`"`, node.op, `" takes `, _s_takes[node.op]]) |
@@ -5910,7 +6055,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 	some node in _s_nodes(parsed)
 	is_object(node)
 	object.keys(node) & {"every", "some"} != set()
-	node.phrase.op in {"contains", "does not contain", "contains all of", "contains none of"}
+	node.phrase.op in {"contains", "does not contain", "contains all of", "contains none of", "contains some of", "does not contain all of"}
 }) | {`"within" only compares numbers` |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -5940,7 +6085,9 @@ _s_bad_name(name) if name in {"params", "input"}
 
 _s_nodes(x) := {y | walk(x, [_, y])}
 
-_s_self_ops := {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is before", "is after", "is on or after", "is on or before", "starts with", "ends with", "is alphabetically before", "is alphabetically after"}
+_s_text_ops := {"starts with", "ends with", "does not start with", "does not end with", "is alphabetically before", "is alphabetically after", "is alphabetically on or before", "is alphabetically on or after"}
+
+_s_self_ops := {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is before", "is after", "is on or after", "is on or before"} | _s_text_ops
 
 _s_self_term(node) := node.phrase.terms[0] if {
 	node.phrase.op in _s_self_ops
@@ -6294,16 +6441,26 @@ _s_phrase_words(ph) := "is a" if {
 	ph.type != "object"
 }
 
-_s_phrase_words(ph) := ph.op if not ph.op in {"is", "is not", "is one of", "is not one of", "is a"}
+_s_phrase_words(ph) := "is not an" if {
+	ph.op == "is not a"
+	ph.type == "object"
+}
 
-_s_args_text(ph) := ph.type if ph.op == "is a"
+_s_phrase_words(ph) := "is not a" if {
+	ph.op == "is not a"
+	ph.type != "object"
+}
 
-_s_args_text(ph) := concat(" and ", [_json_text(ph.min), _json_text(ph.max)]) if ph.op == "is between"
+_s_phrase_words(ph) := ph.op if not ph.op in {"is", "is not", "is one of", "is not one of", "is a", "is not a"}
+
+_s_args_text(ph) := ph.type if ph.op in {"is a", "is not a"}
+
+_s_args_text(ph) := concat(" and ", [_json_text(ph.min), _json_text(ph.max)]) if ph.op in {"is between", "is not between"}
 
 _s_args_text(ph) := concat(" within ", [_s_operand_text(ph), _json_text(ph.within)]) if "within" in object.keys(ph)
 
 _s_args_text(ph) := _s_operand_text(ph) if {
-	not ph.op in {"is a", "is between"}
+	not ph.op in {"is a", "is not a", "is between", "is not between"}
 	not "within" in object.keys(ph)
 }
 
@@ -7484,7 +7641,7 @@ _s_one_path(terms) if {
 	"steps" in object.keys(terms[0])
 }
 
-_s_list_ops := {"is one of", "is not one of", "contains", "does not contain", "contains all of", "contains none of", "matches", "does not match"}
+_s_list_ops := {"is one of", "is not one of", "contains", "does not contain", "contains all of", "contains none of", "contains some of", "does not contain all of", "matches", "does not match"}
 
 _s_list_path(ph) := ph.path if "path" in object.keys(ph)
 
@@ -7528,7 +7685,7 @@ _s_cond_model(c) := _s_plain_model(c) if not "terms" in object.keys(c)
 
 _s_cond_model(c) := object.union({"op": "compare", "left": _s_bare_side(c.terms), "cmp": _s_derived_cmps[c.phrase.op], "right": _s_side(c.phrase)}, object.filter(c.phrase, {"within", "max"})) if "terms" in object.keys(c)
 
-_s_derived_cmps := {"is between": "gte", "is": "eq", "is not": "ne", "is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
+_s_derived_cmps := {"is between": "gte", "is not between": "outside", "is": "eq", "is not": "ne", "is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
 
 _s_plain_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.phrase.value} if {
 	a.phrase.op == "is"
@@ -7541,7 +7698,7 @@ _s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path
 	_s_side_given(a.phrase)
 }
 
-_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)} if a.phrase.op == "is not"
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if a.phrase.op == "is not"
 
 _s_plain_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
 
@@ -7551,6 +7708,10 @@ _s_plain_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_li
 }
 
 _s_plain_model(a) := {"op": "has_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is a"
+
+_s_plain_model(a) := {"op": "lacks_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is not a"
+
+_s_plain_model(a) := {"op": "not_non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is not a non-empty string"
 
 _s_plain_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
 	a.phrase.op == "is not one of"
@@ -7573,7 +7734,7 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 }
 
 _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
-	a.phrase.op in {"contains all of", "contains none of"}
+	a.phrase.op in {"contains all of", "contains none of", "contains some of", "does not contain all of"}
 	not _s_field_arg(a.phrase)
 }
 
@@ -7612,15 +7773,19 @@ _s_list_cmps := {
 	"does not contain": "excludes",
 	"contains all of": "includes_all",
 	"contains none of": "excludes_all",
+	"contains some of": "includes_some",
+	"does not contain all of": "not_includes_all",
 	"matches": "matches_any",
 	"does not match": "not_matches_any",
 }
 
 _s_plain_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is between"
 
+_s_plain_model(a) := {"op": "outside_range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is not between"
+
 _s_compare_ops := object.union(
 	object.union({op: ["compare", cmp] | some op, cmp in _s_order_cmps}, {op: ["compare_time", cmp] | some op, cmp in _s_time_cmps}),
-	{"starts with": ["compare", "starts_with"], "ends with": ["compare", "ends_with"], "is alphabetically before": ["compare", "alphabetically_before"], "is alphabetically after": ["compare", "alphabetically_after"]},
+	{"starts with": ["compare", "starts_with"], "ends with": ["compare", "ends_with"], "does not start with": ["compare", "not_starts_with"], "does not end with": ["compare", "not_ends_with"], "is alphabetically before": ["compare", "alphabetically_before"], "is alphabetically after": ["compare", "alphabetically_after"], "is alphabetically on or before": ["compare", "alphabetically_lte"], "is alphabetically on or after": ["compare", "alphabetically_gte"]},
 )
 
 _s_contains_ops := {
@@ -7628,6 +7793,8 @@ _s_contains_ops := {
 	"does not contain": "excludes",
 	"contains all of": "includes",
 	"contains none of": "excludes",
+	"contains some of": "includes_some",
+	"does not contain all of": "not_includes_all",
 	"matches": "matches_any",
 	"does not match": "not_matches_any",
 }
@@ -7638,7 +7805,7 @@ _s_side_given(ph) if "within" in object.keys(ph)
 
 _s_side(ph) := {"literal": ph.value} if "value" in object.keys(ph)
 
-_s_side(ph) := {"literal": ph.min} if ph.op == "is between"
+_s_side(ph) := {"literal": ph.min} if ph.op in {"is between", "is not between"}
 
 _s_side(ph) := _s_bare_side(ph.terms) if "terms" in object.keys(ph)
 

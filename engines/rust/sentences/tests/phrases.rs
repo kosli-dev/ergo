@@ -155,6 +155,7 @@ fn alphabetical_and_time_phrases_take_an_operand() {
         phrase("is alphabetically before \"b\""),
         Phrase::Alphabetically {
             after: false,
+            or_equal: false,
             operand: value(text("b"))
         }
     );
@@ -162,6 +163,7 @@ fn alphabetical_and_time_phrases_take_an_operand() {
         phrase("is alphabetically after k"),
         Phrase::Alphabetically {
             after: true,
+            or_equal: false,
             operand: field("k")
         }
     );
@@ -204,6 +206,7 @@ fn between_keeps_both_numbers_as_written() {
     assert_eq!(
         phrase("is between -1.50 and 2E3"),
         Phrase::Between {
+            not: false,
             min: "-1.50".into(),
             max: "2E3".into()
         }
@@ -257,9 +260,102 @@ fn within_goes_after_the_operand_of_is_and_keeps_its_digits() {
 }
 
 #[test]
-fn within_is_not_read_after_is_not() {
-    assert!(parse_from("x whose y is not 1 within 2").is_err());
-    assert!(parse_from("x whose y does not equal k within 2").is_err());
+fn within_goes_after_the_operand_of_is_not_and_does_not_equal() {
+    assert_eq!(
+        phrase("is not 1 within 0.50"),
+        Phrase::Is {
+            not: true,
+            operand: value(number("1")),
+            within: Some("0.50".into())
+        }
+    );
+    assert_eq!(
+        phrase("does not equal k within 2"),
+        Phrase::Is {
+            not: true,
+            operand: field("k"),
+            within: Some("2".into())
+        }
+    );
+    assert!(parse_from("x whose y is not 1 within").is_err());
+    assert!(parse_from("x whose y does not equal k within k").is_err());
+}
+
+#[test]
+fn is_not_between_keeps_both_numbers_as_written() {
+    assert_eq!(
+        phrase("is not between 1 and 2.50"),
+        Phrase::Between {
+            not: true,
+            min: "1".into(),
+            max: "2.50".into()
+        }
+    );
+    assert!(parse_from("x whose y is not between 1").is_err());
+    assert!(parse_from("x whose y is not between k and 2").is_err());
+    let line = from("x whose y is not between 1 and 2 and z is 3");
+    assert_eq!(line.whose.len(), 2);
+}
+
+#[test]
+fn is_not_a_type_reads_either_article() {
+    assert_eq!(phrase("is not a list"), Phrase::NotType(Type::List));
+    assert_eq!(phrase("is not a string"), Phrase::NotType(Type::String));
+    assert_eq!(phrase("is not a number"), Phrase::NotType(Type::Number));
+    assert_eq!(phrase("is not a boolean"), Phrase::NotType(Type::Boolean));
+    assert_eq!(phrase("is not an object"), Phrase::NotType(Type::Object));
+    assert_eq!(phrase("is not a object"), Phrase::NotType(Type::Object));
+    assert_eq!(phrase("is not an list"), Phrase::NotType(Type::List));
+    assert_eq!(
+        phrase("is not a non-empty string"),
+        Phrase::NotNonEmptyString
+    );
+    assert!(parse_from("x whose y is not a thing").is_err());
+}
+
+#[test]
+fn does_not_start_with_and_does_not_end_with_take_an_operand() {
+    assert_eq!(
+        phrase("does not start with 'a'"),
+        Phrase::NotStartsWith(value(text("a")))
+    );
+    assert_eq!(
+        phrase("does not end with k"),
+        Phrase::NotEndsWith(field("k"))
+    );
+}
+
+#[test]
+fn contains_some_of_and_does_not_contain_all_of_take_a_list() {
+    assert_eq!(
+        phrase("contains some of 1, 2"),
+        Phrase::ContainsSome(vals(vec![number("1"), number("2")]))
+    );
+    assert_eq!(
+        phrase("does not contain all of l"),
+        Phrase::NotContainsAll(List::Path(key("l")))
+    );
+    assert!(parse_from("x whose y contains some of").is_err());
+}
+
+#[test]
+fn alphabetically_on_or_before_and_on_or_after_take_an_operand() {
+    assert_eq!(
+        phrase("is alphabetically on or before \"b\""),
+        Phrase::Alphabetically {
+            after: false,
+            or_equal: true,
+            operand: value(text("b"))
+        }
+    );
+    assert_eq!(
+        phrase("is alphabetically on or after k"),
+        Phrase::Alphabetically {
+            after: true,
+            or_equal: true,
+            operand: field("k")
+        }
+    );
 }
 
 #[test]

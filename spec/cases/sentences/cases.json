@@ -7898,5 +7898,994 @@
         ]
       }
     ]
+  },
+  {
+    "description": "does not start with and does not end with",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x does not start with \"release/\"", "b": "x does not end with \".2\"", "c": "x does not start with p", "d": "x does not end with q"}}}},
+    "cases": [
+      {
+        "description": "pass when the field doesn't start or end with the value or the field",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "x": "main", "p": "release/", "q": ".2"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "main"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "main"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "main"}, {"locations": ["/things/0/p"], "name": "p", "value": "release/"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "main"}, {"locations": ["/things/0/q"], "name": "q", "value": ".2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not start with \"release/\"", "c": "x does not start with p"}}
+      },
+      {
+        "description": "fail as value when it does",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": "release/1.2", "p": "release/", "q": ".2"}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "release/1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "release/1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "release/1.2"}, {"locations": ["/things/0/p"], "name": "p", "value": "release/"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "release/1.2"}, {"locations": ["/things/0/q"], "name": "q", "value": ".2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not start with \"release/\"", "c": "x does not start with p"}}
+      },
+      {
+        "description": "fail as unusable on numbers, even two of them",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": 15, "p": 1, "q": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 15}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 15}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 15}, {"locations": ["/things/0/p"], "name": "p", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 15}, {"locations": ["/things/0/q"], "name": "q", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not start with \"release/\"", "c": "x does not start with p"}}
+      },
+      {
+        "description": "fail as unusable when the field on the right is a number",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": "ab", "p": 1, "q": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}, {"locations": ["/things/0/p"], "name": "p", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}, {"locations": ["/things/0/q"], "name": "q", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not start with \"release/\"", "c": "x does not start with p"}}
+      },
+      {
+        "description": "fail as null when the field is null",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "p": "r", "q": "r"}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}, {"locations": ["/things/0/p"], "name": "p", "value": "r"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}, {"locations": ["/things/0/q"], "name": "q", "value": "r"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not start with \"release/\"", "c": "x does not start with p"}}
+      },
+      {
+        "description": "fail as null when the field on the right is null",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": "ab", "p": null, "q": null}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}, {"locations": ["/things/0/p"], "name": "p", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}, {"locations": ["/things/0/q"], "name": "q", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not start with \"release/\"", "c": "x does not start with p"}}
+      },
+      {
+        "description": "fail as absent when the field is missing",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail", "path.absent"],
+        "input": {"things": [{"id": "t1", "p": "r", "q": "r"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}, {"locations": ["/things/0/p"], "name": "p", "value": "r"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}, {"locations": ["/things/0/q"], "name": "q", "value": "r"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not start with \"release/\"", "c": "x does not start with p"}}
+      },
+      {
+        "description": "fail as absent when the field on the right is missing",
+        "rules": ["sentence.phrase.starts", "compare.text", "compare.fail", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": "ab"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}, {"locations": ["/things/0"], "name": "p", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}, {"locations": ["/things/0"], "name": "q", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not start with \"release/\"", "c": "x does not start with p"}}
+      }
+    ]
+  },
+  {
+    "description": "does not start with and does not end with an empty string",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x does not start with \"\"", "b": "x does not end with \"\""}}}},
+    "cases": [
+      {
+        "description": "fail as value on any string, because every string starts and ends with it",
+        "rules": ["sentence.phrase.starts", "compare.text"],
+        "input": {"things": [{"id": "t1", "x": "ab"}, {"id": "t1", "x": ""}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "ab"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/x"], "name": "x", "value": ""}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/1/x"], "name": "x", "value": ""}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "alphabetically on or before and on or after",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is alphabetically on or before y", "b": "x is alphabetically on or after y", "c": "x is alphabetically on or before \"m\"", "d": "x is alphabetically on or after \"m\""}}}},
+    "cases": [
+      {
+        "description": "pass both on equal strings",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "x": "m", "y": "m"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "m"}, {"locations": ["/things/0/y"], "name": "y", "value": "m"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "m"}, {"locations": ["/things/0/y"], "name": "y", "value": "m"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "m"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "m"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is alphabetically on or before y", "b": "x is alphabetically on or after y"}}
+      },
+      {
+        "description": "pass on or before and fail on or after when before",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1", "x": "adam", "y": "bob"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "adam"}, {"locations": ["/things/0/y"], "name": "y", "value": "bob"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "adam"}, {"locations": ["/things/0/y"], "name": "y", "value": "bob"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "adam"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "adam"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is alphabetically on or before y", "b": "x is alphabetically on or after y"}}
+      },
+      {
+        "description": "pass on or after and fail on or before when after",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1", "x": "zoe", "y": "bob"}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "zoe"}, {"locations": ["/things/0/y"], "name": "y", "value": "bob"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "zoe"}, {"locations": ["/things/0/y"], "name": "y", "value": "bob"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "zoe"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "zoe"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is alphabetically on or before y", "b": "x is alphabetically on or after y"}}
+      },
+      {
+        "description": "compare code point by code point, so an uppercase letter is before a lowercase one",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1", "x": "Zoe", "y": "adam"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "Zoe"}, {"locations": ["/things/0/y"], "name": "y", "value": "adam"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "Zoe"}, {"locations": ["/things/0/y"], "name": "y", "value": "adam"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "Zoe"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "Zoe"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is alphabetically on or before y", "b": "x is alphabetically on or after y"}}
+      },
+      {
+        "description": "fail as unusable on numbers, even two of them",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 2}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0/y"], "name": "y", "value": 2}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0/y"], "name": "y", "value": 2}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is alphabetically on or before y", "b": "x is alphabetically on or after y"}}
+      },
+      {
+        "description": "fail as null when the field is null",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical", "compare.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": "a"}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}, {"locations": ["/things/0/y"], "name": "y", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}, {"locations": ["/things/0/y"], "name": "y", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is alphabetically on or before y", "b": "x is alphabetically on or after y"}}
+      },
+      {
+        "description": "fail as absent when the field is missing",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical", "compare.fail", "path.absent"],
+        "input": {"things": [{"id": "t1", "y": "a"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}, {"locations": ["/things/0/y"], "name": "y", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}, {"locations": ["/things/0/y"], "name": "y", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is alphabetically on or before y", "b": "x is alphabetically on or after y"}}
+      },
+      {
+        "description": "fail as absent when the right is missing",
+        "rules": ["sentence.phrase.alphabetical", "compare.alphabetical", "compare.fail", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}, {"locations": ["/things/0"], "name": "y", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}, {"locations": ["/things/0"], "name": "y", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is alphabetically on or before y", "b": "x is alphabetically on or after y"}}
+      }
+    ]
+  },
+  {
+    "description": "text phrases written with a value that isn't text",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x does not start with null", "b": "x does not end with 1", "c": "x is alphabetically on or before true", "d": "x is alphabetically on or after 2"}}}},
+    "cases": [
+      {
+        "description": "are written wrong, because they could only fail",
+        "rules": ["sentence.phrase.starts", "sentence.phrase.alphabetical", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": "ab"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["\"does not start with\" takes text"]}, {"locations": [], "name": "checks.b", "value": ["\"does not end with\" takes text"]}, {"locations": [], "name": "checks.c", "value": ["\"is alphabetically on or before\" takes text"]}, {"locations": [], "name": "checks.d", "value": ["\"is alphabetically on or after\" takes text"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not a <type>",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is not a list", "b": "x is not a string", "c": "x is not a number", "d": "x is not a boolean", "e": "x is not an object", "f": "x is not a non-empty string"}}}},
+    "cases": [
+      {
+        "description": "fails only the type check for a list",
+        "rules": ["sentence.phrase.type", "lacks_type.pass", "lacks_type.fail"],
+        "input": {"things": [{"id": "t1", "x": ["a"]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ["a"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ["a"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ["a"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ["a"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ["a"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ["a"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"e": "x is not an object", "b": "x is not a string", "f": "x is not a non-empty string"}}
+      },
+      {
+        "description": "fails only the type check for a string",
+        "rules": ["sentence.phrase.type", "lacks_type.pass", "lacks_type.fail", "not_non_empty_string.pass", "not_non_empty_string.fail"],
+        "input": {"things": [{"id": "t1", "x": "a"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "f", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"e": "x is not an object", "b": "x is not a string", "f": "x is not a non-empty string"}}
+      },
+      {
+        "description": "fails only the type check for a number",
+        "rules": ["sentence.phrase.type", "lacks_type.pass", "lacks_type.fail"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"e": "x is not an object", "b": "x is not a string", "f": "x is not a non-empty string"}}
+      },
+      {
+        "description": "fails only the type check for a boolean",
+        "rules": ["sentence.phrase.type", "lacks_type.pass", "lacks_type.fail"],
+        "input": {"things": [{"id": "t1", "x": false}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": false}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": false}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": false}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": false}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": false}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": false}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"e": "x is not an object", "b": "x is not a string", "f": "x is not a non-empty string"}}
+      },
+      {
+        "description": "passes every check but the one for its own type, for an object",
+        "rules": ["sentence.phrase.type", "lacks_type.pass", "lacks_type.fail"],
+        "input": {"things": [{"id": "t1", "x": {"k": 1}}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": {"k": 1}}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": {"k": 1}}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": {"k": 1}}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": {"k": 1}}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "e", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": {"k": 1}}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": {"k": 1}}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"e": "x is not an object", "b": "x is not a string", "f": "x is not a non-empty string"}}
+      },
+      {
+        "description": "passes is not a non-empty string on an empty string",
+        "rules": ["sentence.phrase.type", "not_non_empty_string.pass"],
+        "input": {"things": [{"id": "t1", "x": ""}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ""}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ""}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ""}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ""}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ""}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": ""}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"e": "x is not an object", "b": "x is not a string", "f": "x is not a non-empty string"}}
+      },
+      {
+        "description": "fails every check as null when the field is null",
+        "rules": ["sentence.phrase.type", "lacks_type.fail", "not_non_empty_string.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "e", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "f", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"e": "x is not an object", "b": "x is not a string", "f": "x is not a non-empty string"}}
+      },
+      {
+        "description": "fails every check as absent when the field is missing",
+        "rules": ["sentence.phrase.type", "lacks_type.fail", "not_non_empty_string.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "e", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "f", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"e": "x is not an object", "b": "x is not a string", "f": "x is not a non-empty string"}}
+      }
+    ]
+  },
+  {
+    "description": "is not a <type> with an article written the other way",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is not an list", "b": "x is not a object"}}}},
+    "cases": [
+      {
+        "description": "prints as is not a list and is not an object",
+        "rules": ["sentence.phrase.type", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not a list", "b": "x is not an object"}}
+      }
+    ]
+  },
+  {
+    "description": "is not between two numbers",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is not between 1 and 5"}}}},
+    "cases": [
+      {
+        "description": "passes below the range",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "outside_range.pass", "path.inputs"],
+        "input": {"things": [{"id": "t1", "x": 0}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 0}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not between 1 and 5"}}
+      },
+      {
+        "description": "passes above the range",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "outside_range.pass"],
+        "input": {"things": [{"id": "t1", "x": 5.5}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 5.5}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not between 1 and 5"}}
+      },
+      {
+        "description": "fails as value inside the range",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "outside_range.pass", "outside_range.fail"],
+        "input": {"things": [{"id": "t1", "x": 3}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 3}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not between 1 and 5"}}
+      },
+      {
+        "description": "fails as value on the lower bound",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "outside_range.fail"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not between 1 and 5"}}
+      },
+      {
+        "description": "fails as value on the upper bound",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "outside_range.fail"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not between 1 and 5"}}
+      },
+      {
+        "description": "fails as unusable on a string",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "outside_range.fail"],
+        "input": {"things": [{"id": "t1", "x": "9"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "9"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not between 1 and 5"}}
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "outside_range.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not between 1 and 5"}}
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "outside_range.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not between 1 and 5"}}
+      }
+    ]
+  },
+  {
+    "description": "is not between with the bounds the wrong way round",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is not between 5 and 1"}}}},
+    "cases": [
+      {
+        "description": "is written wrong",
+        "rules": ["sentence.phrase.between", "sentence.value.scalar", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 3}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["min above max"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of is not between two numbers",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "count of l is not between 2 and 3"}}}},
+    "cases": [
+      {
+        "description": "passes below the range",
+        "rules": ["sentence.phrase.between", "tally.not_between"],
+        "input": {"things": [{"id": "t1", "l": [1]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l/0"], "name": "count of l", "value": 1}, {"locations": ["/things/0/l/0"], "name": "l[]", "value": [1]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "count of l is not between 2 and 3"}}
+      },
+      {
+        "description": "passes above the range",
+        "rules": ["sentence.phrase.between", "tally.not_between"],
+        "input": {"things": [{"id": "t1", "l": [1, 2, 3, 4]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l/0", "/things/0/l/1", "/things/0/l/2", "/things/0/l/3"], "name": "count of l", "value": 4}, {"locations": ["/things/0/l/0", "/things/0/l/1", "/things/0/l/2", "/things/0/l/3"], "name": "l[]", "value": [1, 2, 3, 4]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "count of l is not between 2 and 3"}}
+      },
+      {
+        "description": "fails as value inside the range",
+        "rules": ["sentence.phrase.between", "tally.not_between"],
+        "input": {"things": [{"id": "t1", "l": [1, 2]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/l/0", "/things/0/l/1"], "name": "count of l", "value": 2}, {"locations": ["/things/0/l/0", "/things/0/l/1"], "name": "l[]", "value": [1, 2]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "count of l is not between 2 and 3"}}
+      },
+      {
+        "description": "fails as value on the upper bound",
+        "rules": ["sentence.phrase.between", "tally.not_between"],
+        "input": {"things": [{"id": "t1", "l": [1, 2, 3]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/l/0", "/things/0/l/1", "/things/0/l/2"], "name": "count of l", "value": 3}, {"locations": ["/things/0/l/0", "/things/0/l/1", "/things/0/l/2"], "name": "l[]", "value": [1, 2, 3]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "count of l is not between 2 and 3"}}
+      },
+      {
+        "description": "fails as absent when the list is missing",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "count of l is not between 2 and 3"}}
+      },
+      {
+        "description": "fails as null when the list is null",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "l": null}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "count of l is not between 2 and 3"}}
+      }
+    ]
+  },
+  {
+    "description": "is not a value within a number",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is not 3 within 0.5"}}}},
+    "cases": [
+      {
+        "description": "fails as value on the same number",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 3}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 3}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not 3 within 0.5"}}
+      },
+      {
+        "description": "fails as value when exactly that far apart",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 3.5}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 3.5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not 3 within 0.5"}}
+      },
+      {
+        "description": "passes when further apart",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": 3.6}, {"id": "t1", "x": 2}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 3.6}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/1/x"], "name": "x", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not 3 within 0.5"}}
+      },
+      {
+        "description": "fails as unusable on a string",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "x": "3"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "3"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not 3 within 0.5"}}
+      },
+      {
+        "description": "fails as absent when the field is missing",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.scalar", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not 3 within 0.5"}}
+      },
+      {
+        "description": "fails as null when the field is null",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.scalar", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x is not 3 within 0.5"}}
+      }
+    ]
+  },
+  {
+    "description": "does not equal a field within a number",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x does not equal y within 1"}}}},
+    "cases": [
+      {
+        "description": "passes when the numbers are far apart",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 5}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0/y"], "name": "y", "value": 5}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not equal y within 1"}}
+      },
+      {
+        "description": "fails as value when they are close",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1.5}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0/y"], "name": "y", "value": 1.5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not equal y within 1"}}
+      },
+      {
+        "description": "fails as unusable when the right is a string",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": "1"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0/y"], "name": "y", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not equal y within 1"}}
+      },
+      {
+        "description": "fails as absent when the right is missing",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.path", "path.absent"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0"], "name": "y", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not equal y within 1"}}
+      },
+      {
+        "description": "fails as null when the left is null",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.path", "path.null"],
+        "input": {"things": [{"id": "t1", "x": null, "y": 1}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": null}, {"locations": ["/things/0/y"], "name": "y", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x does not equal y within 1"}}
+      }
+    ]
+  },
+  {
+    "description": "does not equal a field within 0.2 exactly",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x does not equal y within 0.2"}}}},
+    "cases": [
+      {
+        "description": "fails as value when the gap is exactly the number",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.3, "y": 0.1}, {"id": "t1", "x": 0.1, "y": 0.3}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 0.3}, {"locations": ["/things/0/y"], "name": "y", "value": 0.1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/x"], "name": "x", "value": 0.1}, {"locations": ["/things/1/y"], "name": "y", "value": 0.3}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "passes when the gap is a little more than the number",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.value.path"],
+        "input": {"things": [{"id": "t1", "x": 0.30001, "y": 0.1}, {"id": "t1", "x": 0.1, "y": 0.30001}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 0.30001}, {"locations": ["/things/0/y"], "name": "y", "value": 0.1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/1/x"], "name": "x", "value": 0.1}, {"locations": ["/things/1/y"], "name": "y", "value": 0.30001}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not within 0",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is not 5 within 0"}}}},
+    "cases": [
+      {
+        "description": "fails as value on the same number",
+        "rules": ["sentence.phrase.within", "compare.within"],
+        "input": {"things": [{"id": "t1", "x": 5}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "passes on another number",
+        "rules": ["sentence.phrase.within", "compare.within"],
+        "input": {"things": [{"id": "t1", "x": 5.001}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 5.001}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of is not a value within a number",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "count of l is not 3 within 1"}}}},
+    "cases": [
+      {
+        "description": "passes when further apart",
+        "rules": ["sentence.phrase.within", "compare.within"],
+        "input": {"things": [{"id": "t1", "l": []}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": 0}, {"locations": [], "name": "l[]", "value": []}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as value when close",
+        "rules": ["sentence.phrase.within", "compare.within"],
+        "input": {"things": [{"id": "t1", "l": [1, 2]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/l/0", "/things/0/l/1"], "name": "count of l", "value": 2}, {"locations": ["/things/0/l/0", "/things/0/l/1"], "name": "l[]", "value": [1, 2]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "is not with a value that isn't a number within a number",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is not \"a\" within 1", "b": "x is not 1 within -1", "c": "x is not 1 within"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and says why",
+        "rules": ["sentence.phrase.within", "compare.within", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "x": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 3}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["\"within\" only compares numbers"]}, {"locations": [], "name": "checks.b", "value": ["\"within\" needs a number of 0 or more"]}, {"locations": [], "name": "checks.c", "value": ["\"within\" needs a number after it"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains some of and does not contain all of values",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "l contains some of \"a\", \"b\"", "b": "l does not contain all of \"a\", \"b\""}}}},
+    "cases": [
+      {
+        "description": "pass contains some of when the list has one, and does not contain all of when it lacks one",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains_some.pass", "path.inputs"],
+        "input": {"things": [{"id": "t1", "l": ["a", "c"]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of \"a\", \"b\"", "b": "l does not contain all of \"a\", \"b\""}}
+      },
+      {
+        "description": "pass contains some of and fail does not contain all of when the list has every value",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains_some.pass"],
+        "input": {"things": [{"id": "t1", "l": ["b", "a", "c"]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["b", "a", "c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["b", "a", "c"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of \"a\", \"b\"", "b": "l does not contain all of \"a\", \"b\""}}
+      },
+      {
+        "description": "fail contains some of as value and pass does not contain all of when the list has none",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains_some.pass"],
+        "input": {"things": [{"id": "t1", "l": ["c"]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["c"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of \"a\", \"b\"", "b": "l does not contain all of \"a\", \"b\""}}
+      },
+      {
+        "description": "fail contains some of as value and pass does not contain all of on an empty list",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains_some.pass"],
+        "input": {"things": [{"id": "t1", "l": []}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": []}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of \"a\", \"b\"", "b": "l does not contain all of \"a\", \"b\""}}
+      },
+      {
+        "description": "fail as unusable when the field is a string",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains_some.fail"],
+        "input": {"things": [{"id": "t1", "l": "a"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of \"a\", \"b\"", "b": "l does not contain all of \"a\", \"b\""}}
+      },
+      {
+        "description": "fail as unusable when the items and the values have more than one type",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains_some.fail"],
+        "input": {"things": [{"id": "t1", "l": ["a", 1]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", 1]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", 1]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of \"a\", \"b\"", "b": "l does not contain all of \"a\", \"b\""}}
+      },
+      {
+        "description": "fail as absent when the field is missing",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains_some.fail", "path.absent"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0"], "name": "l", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/0"], "name": "l", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of \"a\", \"b\"", "b": "l does not contain all of \"a\", \"b\""}}
+      },
+      {
+        "description": "fail as null when the field is null",
+        "rules": ["sentence.phrase.contains_all", "sentence.value.list", "contains_some.fail", "path.null"],
+        "input": {"things": [{"id": "t1", "l": null}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of \"a\", \"b\"", "b": "l does not contain all of \"a\", \"b\""}}
+      }
+    ]
+  },
+  {
+    "description": "contains some of and does not contain all of a field",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "l contains some of m", "b": "l does not contain all of m"}}}},
+    "cases": [
+      {
+        "description": "pass when the lists overlap but the field lacks a value",
+        "rules": ["sentence.phrase.field", "compare.list"],
+        "input": {"things": [{"id": "t1", "l": ["a", "c"], "m": ["a", "b"]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}, {"locations": ["/things/0/m"], "name": "m", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}, {"locations": ["/things/0/m"], "name": "m", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      },
+      {
+        "description": "pass contains some of and fail does not contain all of when the field holds every value",
+        "rules": ["sentence.phrase.field", "compare.list"],
+        "input": {"things": [{"id": "t1", "l": ["a", "b"], "m": ["a", "b"]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "b"]}, {"locations": ["/things/0/m"], "name": "m", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "b"]}, {"locations": ["/things/0/m"], "name": "m", "value": ["a", "b"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      },
+      {
+        "description": "fail contains some of as value when no value is in the field",
+        "rules": ["sentence.phrase.field", "compare.list"],
+        "input": {"things": [{"id": "t1", "l": ["c"], "m": ["a", "b"]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["c"]}, {"locations": ["/things/0/m"], "name": "m", "value": ["a", "b"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["c"]}, {"locations": ["/things/0/m"], "name": "m", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      },
+      {
+        "description": "fail as unusable whatever the left side is when the right is empty",
+        "rules": ["sentence.phrase.field", "compare.list", "contains_some.values"],
+        "input": {"things": [{"id": "t1", "l": ["a"], "m": []}, {"id": "t1", "l": "a", "m": []}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/m"], "name": "m", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/m"], "name": "m", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": "a"}, {"locations": ["/things/1/m"], "name": "m", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": "a"}, {"locations": ["/things/1/m"], "name": "m", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      },
+      {
+        "description": "fail as unusable whatever the left side is when the right isn't a list",
+        "rules": ["sentence.phrase.field", "compare.list", "contains_some.values"],
+        "input": {"things": [{"id": "t1", "l": ["a"], "m": "a"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/m"], "name": "m", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/m"], "name": "m", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      },
+      {
+        "description": "fail as unusable when the right's values have more than one type",
+        "rules": ["sentence.phrase.field", "compare.list", "contains_some.values"],
+        "input": {"things": [{"id": "t1", "l": ["a"], "m": ["a", 1]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/m"], "name": "m", "value": ["a", 1]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/m"], "name": "m", "value": ["a", 1]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      },
+      {
+        "description": "fail as absent when the right is missing, whatever the left side is",
+        "rules": ["sentence.phrase.field", "compare.list", "path.absent"],
+        "input": {"things": [{"id": "t1", "l": ["a"]}, {"id": "t1", "l": 1}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0"], "name": "m", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0"], "name": "m", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1}, {"locations": ["/things/1"], "name": "m", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": 1}, {"locations": ["/things/1"], "name": "m", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      },
+      {
+        "description": "fail as null when the field on the right is null",
+        "rules": ["sentence.phrase.field", "compare.list", "path.null"],
+        "input": {"things": [{"id": "t1", "l": ["a"], "m": null}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/m"], "name": "m", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/m"], "name": "m", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      },
+      {
+        "description": "fail as unusable when the left isn't a list",
+        "rules": ["sentence.phrase.field", "compare.list"],
+        "input": {"things": [{"id": "t1", "l": "a", "m": ["a"]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": "a"}, {"locations": ["/things/0/m"], "name": "m", "value": ["a"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": "a"}, {"locations": ["/things/0/m"], "name": "m", "value": ["a"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      },
+      {
+        "description": "fail as absent when the left is missing",
+        "rules": ["sentence.phrase.field", "compare.list", "path.absent"],
+        "input": {"things": [{"id": "t1", "m": ["a"]}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0"], "name": "l", "value": null}, {"locations": ["/things/0/m"], "name": "m", "value": ["a"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/0"], "name": "l", "value": null}, {"locations": ["/things/0/m"], "name": "m", "value": ["a"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "l contains some of m", "b": "l does not contain all of m"}}
+      }
+    ]
+  },
+  {
+    "description": "contains some of a list of params",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "l contains some of $params.p", "b": "l does not contain all of $params.p"}}}},
+    "params": {"p": ["a", "b"]},
+    "cases": [
+      {
+        "description": "pass and fail as the same sentence with the values written",
+        "rules": ["sentence.phrase.contains_all", "value.ref", "value.refs"],
+        "input": {"things": [{"id": "t1", "l": ["a", "c"]}, {"id": "t1", "l": ["c"]}, {"id": "t1", "l": ["a", "b"]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a", "c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": ["c"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": ["c"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/2/l"], "name": "l", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/2/l"], "name": "l", "value": ["a", "b"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains some of an empty list of params",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "l contains some of $params.p", "b": "l does not contain all of $params.p"}}}},
+    "params": {"p": []},
+    "cases": [
+      {
+        "description": "fail as unusable, because an empty list would pass or fail every field",
+        "rules": ["sentence.phrase.contains_all", "contains_some.values", "value.refs"],
+        "input": {"things": [{"id": "t1", "l": ["a"]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains some of values of mixed types",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "l contains some of \"a\", 1", "b": "l does not contain all of 1, \"a\""}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and says why",
+        "rules": ["written_wrong", "written_wrong.row", "sentence.phrase.contains_all"],
+        "input": {"things": [{"id": "t1", "l": ["a"]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["values of mixed types"]}, {"locations": [], "name": "checks.b", "value": ["values of mixed types"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains some of after every",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "every l contains some of \"a\"", "b": "some l does not contain all of \"a\""}}}},
+    "cases": [
+      {
+        "description": "is written wrong, with the walk to put on a for line",
+        "rules": ["sentence.every.walk", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "l": ["a"]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["\"contains some of\" after every or some would check each item of the last list, not the list: put the walk on a for line"]}, {"locations": [], "name": "checks.b", "value": ["\"does not contain all of\" after every or some would check each item of the last list, not the list: put the walk on a for line"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains some of with nothing after it",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "l contains some of", "b": "l does not contain all of"}}}},
+    "cases": [
+      {
+        "description": "doesn't parse",
+        "rules": ["sentence.phrase.contains_all", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "l": ["a"]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["doesn't parse"]}, {"locations": [], "name": "checks.b", "value": ["doesn't parse"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

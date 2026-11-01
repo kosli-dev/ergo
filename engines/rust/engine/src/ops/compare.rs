@@ -26,8 +26,12 @@ pub enum Cmp {
     Lte,
     StartsWith,
     EndsWith,
+    NotStartsWith,
+    NotEndsWith,
     AlphabeticallyBefore,
     AlphabeticallyAfter,
+    AlphabeticallyOnOrBefore,
+    AlphabeticallyOnOrAfter,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -109,9 +113,10 @@ pub fn run(check: &Compare, ctx: &Ctx) -> Verdict {
 fn compared(check: &Compare, l: &Value, r: &Value) -> Cause {
     if let Some(distance) = &check.within {
         return match (l, r) {
-            (Value::Number(a), Value::Number(b)) => {
-                within(a, b, distance).map_or(Cause::Unusable, verdict)
-            }
+            (Value::Number(a), Value::Number(b)) => within(a, b, distance)
+                .map_or(Cause::Unusable, |inside| {
+                    verdict(inside != (check.cmp == Cmp::Ne))
+                }),
             _ => Cause::Unusable,
         };
     }
@@ -124,17 +129,26 @@ fn compared(check: &Compare, l: &Value, r: &Value) -> Cause {
                 .map_or(Cause::Unusable, |order| verdict(ordered(check.cmp, order))),
             _ => Cause::Unusable,
         },
-        Cmp::StartsWith | Cmp::EndsWith | Cmp::AlphabeticallyBefore | Cmp::AlphabeticallyAfter => {
-            match (l, r) {
-                (Value::String(a), Value::String(b)) => verdict(match check.cmp {
-                    Cmp::StartsWith => a.starts_with(b.as_str()),
-                    Cmp::EndsWith => a.ends_with(b.as_str()),
-                    Cmp::AlphabeticallyBefore => a < b,
-                    _ => a > b,
-                }),
-                _ => Cause::Unusable,
-            }
-        }
+        Cmp::StartsWith
+        | Cmp::EndsWith
+        | Cmp::NotStartsWith
+        | Cmp::NotEndsWith
+        | Cmp::AlphabeticallyBefore
+        | Cmp::AlphabeticallyAfter
+        | Cmp::AlphabeticallyOnOrBefore
+        | Cmp::AlphabeticallyOnOrAfter => match (l, r) {
+            (Value::String(a), Value::String(b)) => verdict(match check.cmp {
+                Cmp::StartsWith => a.starts_with(b.as_str()),
+                Cmp::EndsWith => a.ends_with(b.as_str()),
+                Cmp::NotStartsWith => !a.starts_with(b.as_str()),
+                Cmp::NotEndsWith => !a.ends_with(b.as_str()),
+                Cmp::AlphabeticallyBefore => a < b,
+                Cmp::AlphabeticallyAfter => a > b,
+                Cmp::AlphabeticallyOnOrBefore => a <= b,
+                _ => a >= b,
+            }),
+            _ => Cause::Unusable,
+        },
     }
 }
 
@@ -333,21 +347,35 @@ pub fn lower_phrase(
         ),
         tree::Phrase::StartsWith(operand) => compare(operand, Cmp::StartsWith, None),
         tree::Phrase::EndsWith(operand) => compare(operand, Cmp::EndsWith, None),
-        tree::Phrase::Alphabetically { after, operand } => compare(
+        tree::Phrase::NotStartsWith(operand) => compare(operand, Cmp::NotStartsWith, None),
+        tree::Phrase::NotEndsWith(operand) => compare(operand, Cmp::NotEndsWith, None),
+        tree::Phrase::Alphabetically {
+            after,
+            or_equal,
             operand,
-            if *after {
-                Cmp::AlphabeticallyAfter
-            } else {
-                Cmp::AlphabeticallyBefore
+        } => compare(
+            operand,
+            match (*after, *or_equal) {
+                (false, false) => Cmp::AlphabeticallyBefore,
+                (true, false) => Cmp::AlphabeticallyAfter,
+                (false, true) => Cmp::AlphabeticallyOnOrBefore,
+                (true, true) => Cmp::AlphabeticallyOnOrAfter,
             },
             None,
         ),
-        tree::Phrase::Between { min, max } => Some(
+        tree::Phrase::Between { not, min, max } => Some(
             joined(
                 scope.left_path(path),
                 joined(number(min, scope), number(max, scope)),
             )
-            .map(|(path, (min, max))| Check::Range(Range { path, min, max })),
+            .map(|(path, (min, max))| {
+                Check::Range(Range {
+                    path,
+                    min,
+                    max,
+                    outside: *not,
+                })
+            }),
         ),
         tree::Phrase::Time { time, operand } => {
             let right = operand_side(operand, scope)?;
@@ -556,6 +584,81 @@ mod tests {
     }
 
     #[test]
+    fn does_not_start_with_and_does_not_end_with_pass_only_on_two_strings() {
+        let starts = check(Cmp::NotStartsWith, field("b"));
+        let ends = check(Cmp::NotEndsWith, field("b"));
+        assert_eq!(
+            cause(json!({"a": "main", "b": "release/"}), &starts),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(json!({"a": "release/1", "b": "release/"}), &starts),
+            Cause::Value
+        );
+        assert_eq!(
+            cause(json!({"a": "a.txt", "b": ".md"}), &ends),
+            Cause::Satisfied
+        );
+        assert_eq!(cause(json!({"a": "a.md", "b": ".md"}), &ends), Cause::Value);
+        assert_eq!(cause(json!({"a": 12, "b": 1}), &starts), Cause::Unusable);
+        assert_eq!(cause(json!({"a": "1", "b": 1}), &ends), Cause::Unusable);
+        assert_eq!(cause(json!({"b": "r"}), &starts), Cause::Absent);
+        assert_eq!(cause(json!({"a": null, "b": "r"}), &ends), Cause::Null);
+        assert_eq!(cause(json!({"a": "x"}), &ends), Cause::Absent);
+    }
+
+    #[test]
+    fn alphabetical_on_or_before_and_on_or_after_include_equal_strings() {
+        let before = check(Cmp::AlphabeticallyOnOrBefore, field("b"));
+        let after = check(Cmp::AlphabeticallyOnOrAfter, field("b"));
+        assert_eq!(
+            cause(json!({"a": "m", "b": "m"}), &before),
+            Cause::Satisfied
+        );
+        assert_eq!(cause(json!({"a": "m", "b": "m"}), &after), Cause::Satisfied);
+        assert_eq!(
+            cause(json!({"a": "a", "b": "b"}), &before),
+            Cause::Satisfied
+        );
+        assert_eq!(cause(json!({"a": "a", "b": "b"}), &after), Cause::Value);
+        assert_eq!(
+            cause(json!({"a": "Z", "b": "a"}), &before),
+            Cause::Satisfied
+        );
+        assert_eq!(cause(json!({"a": "b", "b": "a"}), &before), Cause::Value);
+        assert_eq!(cause(json!({"a": 1, "b": 2}), &after), Cause::Unusable);
+        assert_eq!(cause(json!({"b": "a"}), &before), Cause::Absent);
+        assert_eq!(cause(json!({"a": null, "b": "a"}), &after), Cause::Null);
+    }
+
+    #[test]
+    fn ne_with_within_passes_only_on_numbers_further_apart() {
+        let far = Compare {
+            left: field("a"),
+            right: field("b"),
+            cmp: Cmp::Ne,
+            within: Some(number("1")),
+        };
+        assert_eq!(cause(json!({"a": 1, "b": 5}), &far), Cause::Satisfied);
+        assert_eq!(cause(json!({"a": 1, "b": 2}), &far), Cause::Value);
+        assert_eq!(cause(json!({"a": 1, "b": 1.5}), &far), Cause::Value);
+        assert_eq!(
+            cause(
+                json!({"a": 0.3, "b": 0.1}),
+                &Compare {
+                    within: Some(number("0.2")),
+                    ..far.clone()
+                }
+            ),
+            Cause::Value
+        );
+        assert_eq!(cause(json!({"a": 1, "b": "1"}), &far), Cause::Unusable);
+        assert_eq!(cause(json!({"a": "1", "b": "9"}), &far), Cause::Unusable);
+        assert_eq!(cause(json!({"a": 1}), &far), Cause::Absent);
+        assert_eq!(cause(json!({"a": null, "b": 1}), &far), Cause::Null);
+    }
+
+    #[test]
     fn alphabetical_order_is_by_code_point() {
         let before = check(Cmp::AlphabeticallyBefore, field("b"));
         let after = check(Cmp::AlphabeticallyAfter, field("b"));
@@ -676,6 +779,17 @@ mod tests {
     }
 
     #[test]
+    fn is_not_with_within_reads_into_compare_ne_with_the_distance() {
+        match lowered_check("x is not 5 within 0.5") {
+            Check::Compare(c) => {
+                assert_eq!(c.cmp, Cmp::Ne);
+                assert_eq!(c.within.map(|n| n.to_string()), Some("0.5".to_string()));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
     fn a_field_on_the_right_reads_into_compare_with_two_paths() {
         assert!(matches!(
             lowered_check("x equals y"),
@@ -704,6 +818,16 @@ mod tests {
             ("x is less than 1", Cmp::Lt),
             ("x starts with \"a\"", Cmp::StartsWith),
             ("x ends with \"a\"", Cmp::EndsWith),
+            ("x does not start with \"a\"", Cmp::NotStartsWith),
+            ("x does not end with \"a\"", Cmp::NotEndsWith),
+            (
+                "x is alphabetically on or before \"a\"",
+                Cmp::AlphabeticallyOnOrBefore,
+            ),
+            (
+                "x is alphabetically on or after \"a\"",
+                Cmp::AlphabeticallyOnOrAfter,
+            ),
             (
                 "x is alphabetically before \"a\"",
                 Cmp::AlphabeticallyBefore,

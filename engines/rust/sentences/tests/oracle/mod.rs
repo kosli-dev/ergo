@@ -1569,6 +1569,19 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("\"x y\".items", "\"x y\".items"),
     ("\"x y\".pa.items", "\"x y\".pa.items"),
+    (
+        "$params.p named by k whose .empty.z is not count of \"$s\" within 2",
+        "$params.p named by k whose .empty.z does not equal count of \"$s\" within 2",
+    ),
+    (
+        "every item 3 of zz whose item 2 from last of \"$s\" is between 2.5 and 3 and sum of k1 is not 1e2 within 2",
+        "every item 3 of zz whose item 2 from last of \"$s\" is between 2.5 and 3 and sum of k1 is not 100 within 2",
+    ),
+    (
+        "x whose aa is not 1 within 2",
+        "x whose aa is not 1 within 2",
+    ),
+    ("x whose aa is not a list", "x whose aa is not a list"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -1603,10 +1616,6 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "$input.i whose every $input.i equals \"s\" and some y, if any, equals count of item of $params.p.\"\" plus 5 and \"q r\" equals 1 plus \"$s\"",
-        &["doesn't parse"],
-    ),
-    (
-        "$params.p named by k whose .empty.z is not count of \"$s\" within 2",
         &["doesn't parse"],
     ),
     (
@@ -1743,10 +1752,6 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "every item 0 of .empty named by $params.k whose count of .empty.z equals null",
-        &["doesn't parse"],
-    ),
-    (
-        "every item 3 of zz whose item 2 from last of \"$s\" is between 2.5 and 3 and sum of k1 is not 1e2 within 2",
         &["doesn't parse"],
     ),
     (
@@ -2105,8 +2110,6 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         "x whose aa is not",
         &["not is a word of the grammar: write .not"],
     ),
-    ("x whose aa is not 1 within 2", &["doesn't parse"]),
-    ("x whose aa is not a list", &["doesn't parse"]),
     (
         "x whose aa is not in not",
         &["not is a word of the grammar: write .not"],

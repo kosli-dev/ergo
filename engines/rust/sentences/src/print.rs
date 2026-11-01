@@ -472,9 +472,12 @@ fn phrase_text(phrase: &Phrase, aliases: &[&str]) -> String {
             };
             operand(words, o)
         }
-        Phrase::Between { min, max } => {
-            format!("is between {} and {}", number_text(min), number_text(max))
-        }
+        Phrase::Between { not, min, max } => format!(
+            "{} {} and {}",
+            if *not { "is not between" } else { "is between" },
+            number_text(min),
+            number_text(max)
+        ),
         Phrase::OneOf { not, list: l } => {
             let path = matches!(l, List::Path(_));
             let words = match (*not, path) {
@@ -488,6 +491,15 @@ fn phrase_text(phrase: &Phrase, aliases: &[&str]) -> String {
         Phrase::Exists { not } => if *not { "does not exist" } else { "exists" }.to_string(),
         Phrase::Empty { not } => if *not { "is not empty" } else { "is empty" }.to_string(),
         Phrase::NonEmptyString => "is a non-empty string".to_string(),
+        Phrase::NotNonEmptyString => "is not a non-empty string".to_string(),
+        Phrase::NotType(kind) => match kind {
+            Type::List => "is not a list",
+            Type::String => "is not a string",
+            Type::Number => "is not a number",
+            Type::Boolean => "is not a boolean",
+            Type::Object => "is not an object",
+        }
+        .to_string(),
         Phrase::Type(kind) => match kind {
             Type::List => "is a list",
             Type::String => "is a string",
@@ -501,16 +513,25 @@ fn phrase_text(phrase: &Phrase, aliases: &[&str]) -> String {
         }
         Phrase::ContainsAll(l) => list("contains all of", l),
         Phrase::ContainsNone(l) => list("contains none of", l),
+        Phrase::ContainsSome(l) => list("contains some of", l),
+        Phrase::NotContainsAll(l) => list("does not contain all of", l),
         Phrase::Matches { not, list: l } => {
             list(if *not { "does not match" } else { "matches" }, l)
         }
         Phrase::StartsWith(o) => operand("starts with", o),
         Phrase::EndsWith(o) => operand("ends with", o),
-        Phrase::Alphabetically { after, operand: o } => operand(
-            if *after {
-                "is alphabetically after"
-            } else {
-                "is alphabetically before"
+        Phrase::NotStartsWith(o) => operand("does not start with", o),
+        Phrase::NotEndsWith(o) => operand("does not end with", o),
+        Phrase::Alphabetically {
+            after,
+            or_equal,
+            operand: o,
+        } => operand(
+            match (*after, *or_equal) {
+                (false, false) => "is alphabetically before",
+                (true, false) => "is alphabetically after",
+                (false, true) => "is alphabetically on or before",
+                (true, true) => "is alphabetically on or after",
             },
             o,
         ),

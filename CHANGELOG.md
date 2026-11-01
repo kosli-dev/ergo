@@ -4,6 +4,10 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 ## 0.4.0
 
+### New
+
+- Every phrase that lacked an opposite has one, as spec 0.4 says: `does not start with`, `does not end with`, `is not a <type>`, `is not a non-empty string`, `is not between`, `is not <value> within <number>`, `does not equal <field> within <number>`, `contains some of` and `does not contain all of`, plus `is alphabetically on or before` and `is alphabetically on or after`. Each fails as its opposite does when a field is missing, `null` or of the wrong type. A sentence like `x is not 3 within 1` was written wrong before and reads now, and a `compare` with `ne` can have a `within`, so the message `within needs cmp eq` is now `within needs cmp eq or ne`.
+
 ### Changed
 
 - This version follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released, and the report's `ergo` follows. One that says `v0.3` is written wrong, with `unsupported version v0.3, expected v0.4-dev`.

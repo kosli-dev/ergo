@@ -3917,6 +3917,155 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("\"x y\".pa.k is 1", "\"x y\".pa.k is 1", &[], &[]),
     (".\"x y\".k is 3", "\"x y\".k is 3", &[], &[]),
     ("\" y\" is 1", "\" y\" is 1", &[], &[]),
+    (
+        "count of l is not 3 within 1",
+        "count of l is not 3 within 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of l is not between 2 and 3",
+        "count of l is not between 2 and 3",
+        &[],
+        &[],
+    ),
+    (
+        "l contains some of \"a\", \"b\"",
+        "l contains some of \"a\", \"b\"",
+        &[],
+        &[],
+    ),
+    (
+        "l contains some of \"a\", 1",
+        "l contains some of \"a\", 1",
+        &[],
+        &[],
+    ),
+    (
+        "l contains some of $params.p",
+        "l contains some of $params.p",
+        &[],
+        &[],
+    ),
+    ("l contains some of m", "l contains some of m", &[], &[]),
+    (
+        "l does not contain all of \"a\", \"b\"",
+        "l does not contain all of \"a\", \"b\"",
+        &[],
+        &[],
+    ),
+    (
+        "l does not contain all of $params.p",
+        "l does not contain all of $params.p",
+        &[],
+        &[],
+    ),
+    (
+        "l does not contain all of 1, \"a\"",
+        "l does not contain all of 1, \"a\"",
+        &[],
+        &[],
+    ),
+    (
+        "l does not contain all of m",
+        "l does not contain all of m",
+        &[],
+        &[],
+    ),
+    (
+        "x does not end with \"\"",
+        "x does not end with \"\"",
+        &[],
+        &[],
+    ),
+    (
+        "x does not end with \".2\"",
+        "x does not end with \".2\"",
+        &[],
+        &[],
+    ),
+    ("x does not end with q", "x does not end with q", &[], &[]),
+    (
+        "x does not equal y within 0.2",
+        "x does not equal y within 0.2",
+        &[],
+        &[],
+    ),
+    (
+        "x does not equal y within 1",
+        "x does not equal y within 1",
+        &[],
+        &[],
+    ),
+    (
+        "x does not start with \"\"",
+        "x does not start with \"\"",
+        &[],
+        &[],
+    ),
+    (
+        "x does not start with \"release/\"",
+        "x does not start with \"release/\"",
+        &[],
+        &[],
+    ),
+    (
+        "x does not start with p",
+        "x does not start with p",
+        &[],
+        &[],
+    ),
+    (
+        "x is alphabetically on or after \"m\"",
+        "x is alphabetically on or after \"m\"",
+        &[],
+        &[],
+    ),
+    (
+        "x is alphabetically on or after y",
+        "x is alphabetically on or after y",
+        &[],
+        &[],
+    ),
+    (
+        "x is alphabetically on or before \"m\"",
+        "x is alphabetically on or before \"m\"",
+        &[],
+        &[],
+    ),
+    (
+        "x is alphabetically on or before y",
+        "x is alphabetically on or before y",
+        &[],
+        &[],
+    ),
+    ("x is not 3 within 0.5", "x is not 3 within 0.5", &[], &[]),
+    ("x is not 5 within 0", "x is not 5 within 0", &[], &[]),
+    ("x is not a boolean", "x is not a boolean", &[], &[]),
+    ("x is not a list", "x is not a list", &[], &[]),
+    (
+        "x is not a non-empty string",
+        "x is not a non-empty string",
+        &[],
+        &[],
+    ),
+    ("x is not a number", "x is not a number", &[], &[]),
+    ("x is not a object", "x is not an object", &[], &[]),
+    ("x is not a string", "x is not a string", &[], &[]),
+    ("x is not an list", "x is not a list", &[], &[]),
+    ("x is not an object", "x is not an object", &[], &[]),
+    (
+        "x is not between 1 and 5",
+        "x is not between 1 and 5",
+        &[],
+        &[],
+    ),
+    (
+        "sum of \"q r\"._k named by $params.k whose count of y does not equal y plus count of x plus first of .\"a.b\" within 2 is \"a\\u00e9\"",
+        "sum of \"q r\"._k named by $params.k whose count of y does not equal y plus count of x plus first of .\"a.b\" within 2 is \"aé\"",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -4809,19 +4958,11 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         &["doesn't parse"],
     ),
     (
-        "some .true, if any, does not equal 'b\\c' within 2",
-        &["doesn't parse"],
-    ),
-    (
         "some item 0 of zz whose some $params.p is k1 and sum of .empty is 5 plus .empty plus .empty.\"\" and $input.i is \"q r\" exists",
         &["doesn't parse"],
     ),
     (
         "some item 2 from last of .it is equal to of \"q r\".\"\"[\"s t\"] plus k1 plus $input.i named by k",
-        &["doesn't parse"],
-    ),
-    (
-        "some last of $params.p[3].\"é\" does not equal true within 2",
         &["doesn't parse"],
     ),
     (
@@ -4854,10 +4995,6 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "sum of \"q r\"._k is item 0 of .\"a.b\" plus $input.i",
-        &["doesn't parse"],
-    ),
-    (
-        "sum of \"q r\"._k named by $params.k whose count of y does not equal y plus count of x plus first of .\"a.b\" within 2 is \"a\\u00e9\"",
         &["doesn't parse"],
     ),
     (
@@ -5041,6 +5178,9 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         "zz.\"é\" is equal to -2.50 and count of item 0 of x \"q r\" whose count of \"q r\" is \"s\" does not match \"a\\u00e9\", 0.10",
         &["doesn't parse"],
     ),
+    ("l contains some of", &["doesn't parse"]),
+    ("l does not contain all of", &["doesn't parse"]),
+    ("x is not 1 within", &["\"within\" needs a number after it"]),
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
@@ -6079,6 +6219,54 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     (
         "zz[3] contains sum of .empty and every x is equal to x plus days elapsed from x.\"w v\" to item 2 from last of .empty.q._k and last of $input.i does not match 1, 'b\\c'",
         &["invalid pattern \"b\\\\c\"", "invalid pattern 1"],
+    ),
+    (
+        "every l contains some of \"a\"",
+        &[
+            "\"contains some of\" after every or some would check each item of the last list, not the list: put the walk on a for line",
+        ],
+    ),
+    (
+        "some l does not contain all of \"a\"",
+        &[
+            "\"does not contain all of\" after every or some would check each item of the last list, not the list: put the walk on a for line",
+        ],
+    ),
+    (
+        "x does not end with 1",
+        &["\"does not end with\" takes text"],
+    ),
+    (
+        "x does not start with null",
+        &["\"does not start with\" takes text"],
+    ),
+    (
+        "x is alphabetically on or after 2",
+        &["\"is alphabetically on or after\" takes text"],
+    ),
+    (
+        "x is alphabetically on or before true",
+        &["\"is alphabetically on or before\" takes text"],
+    ),
+    (
+        "x is not \"a\" within 1",
+        &["\"within\" only compares numbers"],
+    ),
+    (
+        "x is not 1 within -1",
+        &["\"within\" needs a number of 0 or more"],
+    ),
+    ("x is not between 5 and 1", &["min above max"]),
+    (
+        "some .true, if any, does not equal 'b\\c' within 2",
+        &[
+            "\"within\" only compares numbers",
+            "if any can't go with some",
+        ],
+    ),
+    (
+        "some last of $params.p[3].\"é\" does not equal true within 2",
+        &["\"within\" only compares numbers"],
     ),
 ];
 

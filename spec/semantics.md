@@ -150,6 +150,14 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[has_type.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`. A value of any other type fails with `value`, because checking the type is what it's for.
 
+## `lacks_type`
+
+`lacks_type` takes a path and a `type`, like `has_type`, and asks whether the field has another JSON type. It's what the sentence `is not a <type>` reads into, see [sentence.phrase.type](syntax.md#phrases).
+
+**[lacks_type.pass]** It passes when its path ends `found` and the value doesn't have the type.
+
+**[lacks_type.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, so a missing or `null` field fails it, as it fails `has_type`. A value of the type fails with `value`.
+
 ## `not_in`
 
 `not_in` takes a path and a list of values, written like the values of [`in`](#in), and asks whether the field is none of them. It's what the sentences `is not one of` and `is not in` read into, see [sentence.phrase.one_of](syntax.md#phrases).
@@ -166,6 +174,14 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[non_empty_string.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`. When the field was read, it fails with `value`, whatever its type, because checking the type is what it's for.
 
+## `not_non_empty_string`
+
+`not_non_empty_string` takes a path and asks whether the field is anything but a string with something in it. It's what the sentence `is not a non-empty string` reads into.
+
+**[not_non_empty_string.pass]** It passes when its path ends `found` and the value isn't a string with a character in it, so `""` passes, and so does a number, a list or an object.
+
+**[not_non_empty_string.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`. A string other than `""` fails with `value`.
+
 ## `empty_string_or_list` and `not_empty_string_or_list`
 
 `empty_string_or_list` takes a path and asks whether the field is `""` or `[]`. `not_empty_string_or_list` asks whether it's a string or a list with something in it. They're what the sentences `is empty` and `is not empty` read into, see [sentence.phrase.empty](syntax.md#phrases).
@@ -181,6 +197,14 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 **[range.pass]** It passes when its path ends `found`, the value is a number, and `min <= value <= max`, compared by value.
 
 **[range.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, and with `unusable` when the value isn't a number. A number outside the range fails with `value`.
+
+## `outside_range`
+
+`outside_range` takes a path, a `min` and a `max`, like `range`, and asks whether the field is a number below `min` or above `max`. It's what the sentence `is not between` reads into.
+
+**[outside_range.pass]** It passes when its path ends `found`, the value is a number, and `value < min` or `value > max`, compared by value.
+
+**[outside_range.fail]** It fails with the path's outcome as its cause when the path ends anything but `found`, and with `unusable` when the value isn't a number, as `range` does. A number from `min` to `max` fails with `value`.
 
 ## `matches_any` and `not_matches_any`
 
@@ -204,6 +228,16 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[contains.fail]** Both fail with the path's outcome as their cause when the path ends anything but `found`, and with `unusable` when the value isn't a list, a string or an object included, or when its items and the values have more than one type, leaving `null` aside. Otherwise they fail with `value`. An empty list holds no type, so it fails `includes` with `value`.
 
+## `includes_some` and `not_includes_all`
+
+`includes_some` takes a path and a list of values, and asks whether the field is a list that contains at least one of them. `not_includes_all` asks whether it's a list that lacks at least one of them. They're what the sentences `contains some of` and `does not contain all of` read into.
+
+**[contains_some.values]** The values are as [contains.value](#includes-and-excludes) says for a list of values: at least one item, all of one type, and read through a ref when it's a ref.
+
+**[contains_some.pass]** `includes_some` passes when its path ends `found`, the value is a list, and some item [equals](#values) one of the values. `not_includes_all` passes when its path ends `found`, the value is a list, and one of the values equals no item. So an empty list fails `includes_some` and passes `not_includes_all`.
+
+**[contains_some.fail]** Both fail as [contains.fail](#includes-and-excludes) says for `includes` and `excludes`: with the path's outcome as their cause when the path ends anything but `found`, with `unusable` when the value isn't a list or its items and the values have more than one type, leaving `null` aside, and with `value` otherwise.
+
 ## `compare`
 
 `compare` takes two sides, `left` and `right`, and a comparison: `eq`, `ne`, `gt`, `gte`, `lt` or `lte`. A side is a path, so it compares two fields of the same subject. [Counts and sums in sentences](#counts-and-sums-in-sentences) says what else a side can be.
@@ -212,13 +246,15 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[compare.fail]** It fails with the worse of the two paths' outcomes when either ends anything but `found`, so two `null` fields fail as `null`, even with `eq`. When both were read, it fails with `unusable` when their types differ, even with `ne`, and when `gt`, `gte`, `lt` or `lte` is used on anything but two numbers, two strings included. Otherwise it fails with `value`.
 
+**[compare.within]** A `compare` with `ne` can have a `within`, a number of 0 or more. `eq` passes when the two values are numbers and no further apart than `within`, and `ne` when they are numbers and further apart than that, with the gap worked out exactly, as [sentence.phrase.within](syntax.md#phrases) says. `ne` with `within` fails as `eq` with `within` does when a side is missing, `null` or not a number, and as `unusable` when the gap can't be worked out exactly. Otherwise it fails with `value`.
+
 **[compare.inputs]** Its row has two entries in `inputs`, `left` then `right`.
 
-**[compare.text]** Two more comparisons, `starts_with` and `ends_with`, are what the sentences `starts with` and `ends with` read into, see [sentence.phrase.starts](syntax.md#phrases). They pass when both values are strings and the left one starts, or ends, with the right one, code point by code point. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
+**[compare.text]** Four more comparisons, `starts_with`, `ends_with`, `not_starts_with` and `not_ends_with`, are what the sentences `starts with`, `ends with`, `does not start with` and `does not end with` read into, see [sentence.phrase.starts](syntax.md#phrases). They pass when both values are strings and the left one starts, or ends, with the right one, code point by code point, and for the last two when it doesn't. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
 
-**[compare.alphabetical]** Two more comparisons, `alphabetically_before` and `alphabetically_after`, are what the sentences `is alphabetically before` and `is alphabetically after` read into, see [sentence.phrase.alphabetical](syntax.md#phrases). They pass when both values are strings and the left one comes before, or after, the right one, compared code point by code point, so `"Z"` comes before `"a"` and `"！"` (U+FF01) before `"😀"` (U+1F600). Equal strings fail both. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
+**[compare.alphabetical]** Four more comparisons, `alphabetically_before`, `alphabetically_after`, `alphabetically_lte` and `alphabetically_gte`, are what the sentences `is alphabetically before`, `is alphabetically after`, `is alphabetically on or before` and `is alphabetically on or after` read into, see [sentence.phrase.alphabetical](syntax.md#phrases). They pass when both values are strings and the left one comes before, or after, the right one, or for the last two is the same or comes before, or after, compared code point by code point, so `"Z"` comes before `"a"` and `"！"` (U+FF01) before `"😀"` (U+1F600). Equal strings fail the first two and pass the last two. Anything but two strings, two numbers included, fails with `unusable`, and the rest is as [compare.fail](#compare) says.
 
-**[compare.list]** Eight more comparisons, `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `matches_any` and `not_matches_any`, are what the sentences `is one of`, `is not one of`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match` read into when what follows is a field, see [sentence.phrase.field](syntax.md#phrases). Each means what [`in`](#in), [`not_in`](#not_in), [`includes` and `excludes`](#includes-and-excludes) and [`matches_any` and `not_matches_any`](#matches_any-and-not_matches_any) say, with the right side's value as their value, values or patterns, and the check as a whole passes and fails as they say, so `compare.pass` and `compare.fail` don't apply to them. The right side decides first. When it ends anything but `found`, the row fails with that outcome, whatever the left side is. When it was read but can't be used, it fails with `unusable`, again whatever the left side is: a value that isn't a list after `in`, `not_in`, `includes_all`, `excludes_all`, `matches_any` or `not_matches_any`, a list whose values have more than one type after `in`, `not_in`, `includes_all` or `excludes_all`, an empty list after `includes_all` or `excludes_all`, and patterns that aren't all valid regular expressions. Anything that was read is usable after `includes` and `excludes`. Only then are the left side's outcome and type looked at, as the rules named above say. The row has the two entries of [compare.inputs](#compare).
+**[compare.list]** Ten more comparisons, `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `includes_some`, `not_includes_all`, `matches_any` and `not_matches_any`, are what the sentences `is one of`, `is not one of`, `contains`, `does not contain`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match` read into when what follows is a field, see [sentence.phrase.field](syntax.md#phrases). Each means what [`in`](#in), [`not_in`](#not_in), [`includes` and `excludes`](#includes-and-excludes), [`includes_some` and `not_includes_all`](#includes_some-and-not_includes_all) and [`matches_any` and `not_matches_any`](#matches_any-and-not_matches_any) say, with the right side's value as their value, values or patterns, and the check as a whole passes and fails as they say, so `compare.pass` and `compare.fail` don't apply to them. The right side decides first. When it ends anything but `found`, the row fails with that outcome, whatever the left side is. When it was read but can't be used, it fails with `unusable`, again whatever the left side is: a value that isn't a list after `in`, `not_in`, `includes_all`, `excludes_all`, `includes_some`, `not_includes_all`, `matches_any` or `not_matches_any`, a list whose values have more than one type after `in`, `not_in`, `includes_all`, `excludes_all`, `includes_some` or `not_includes_all`, an empty list after `includes_all`, `excludes_all`, `includes_some` or `not_includes_all`, and patterns that aren't all valid regular expressions. Anything that was read is usable after `includes` and `excludes`. Only then are the left side's outcome and type looked at, as the rules named above say. The row has the two entries of [compare.inputs](#compare).
 
 ## Counts and sums in sentences
 
@@ -235,6 +271,8 @@ A side of `compare` can also be `count_of` or `sum_of`, each with a path, `whose
 **[tally.elapsed]** An `elapsed` side has `unit`, which is `seconds`, `minutes`, `hours`, `days` or `weeks`, two paths, `elapsed_from` and `elapsed_to`, and `text`. It's the time from the first path to the second, in that unit: the nanoseconds between them divided by 1, 60, 3600, 86400 or 604800 times 10^9, rounded down to 6 decimal places. Working in whole nanoseconds and rounding down keeps the number the same in every runtime. Both paths must end `found` as [time.format](#compare_time) says, both RFC 3339 strings, compared as the instants they name, both dates, read as midnight UTC on that day so that the time between them is whole days, or both numbers from -9000000000 to 9000000000, read as seconds and rounded to the nearest microsecond. Two times in different formats fail the side as `unusable`, as [time.fail](#compare_time) says, and so does anything else. A path that ends anything but `found` fails the side as [tally.fail](#counts-and-sums-in-sentences) says. When `elapsed_to` is before `elapsed_from` the side has no number and the check fails as `value`. Its row shows the entry named after `text`, then one for each path, `elapsed_from` first, each filled as a path in `compare` is. An `elapsed` side can be a side of `compare`, among the sides of an `add`, or in the `whose` checks of a `count_of`, a `sum_of` or an `every`, where an item it fails for with `value` is left out.
 
 **[tally.between]** `is between` after a `count_of`, `sum_of`, `add` or `elapsed` side reads the number the side works out, and passes when `min <= number <= max`, compared by value, as [range.pass](#range) says for a field. Outside the range it fails with `value`, and the bounds are as [range.bounds](#range) says. A side that fails gives the check its cause, as [tally.fail](#counts-and-sums-in-sentences) says, and the row shows what [tally.inputs](#counts-and-sums-in-sentences) says.
+
+**[tally.not_between]** `is not between` after a `count_of`, `sum_of`, `add` or `elapsed` side passes when the number the side works out is below `min` or above `max`, compared by value, and fails with `value` from `min` to `max`. A side that fails gives the check its cause, as [tally.fail](#counts-and-sums-in-sentences) says.
 
 **[tally.fail]** A side that fails gives the check its cause, as a path that ends anything but `found` does in [compare.fail](#compare), and the worst one when both sides fail. An `add` fails as its worst operand does.
 

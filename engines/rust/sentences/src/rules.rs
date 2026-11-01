@@ -141,25 +141,50 @@ fn op_name(phrase: &Phrase) -> &'static str {
             Order::MoreThan => "is more than",
             Order::LessThan => "is less than",
         },
-        Phrase::Between { .. } => "is between",
+        Phrase::Between { not: false, .. } => "is between",
+        Phrase::Between { not: true, .. } => "is not between",
         Phrase::OneOf { not: true, .. } => "is not one of",
         Phrase::OneOf { not: false, .. } => "is one of",
         Phrase::NonEmptyString => "is a non-empty string",
+        Phrase::NotNonEmptyString => "is not a non-empty string",
         Phrase::Type(_) => "is a",
+        Phrase::NotType(_) => "is not a",
         Phrase::Empty { not: true } => "is not empty",
         Phrase::Empty { not: false } => "is empty",
         Phrase::Exists { not: true } => "does not exist",
         Phrase::Exists { not: false } => "exists",
         Phrase::ContainsAll(_) => "contains all of",
         Phrase::ContainsNone(_) => "contains none of",
+        Phrase::ContainsSome(_) => "contains some of",
+        Phrase::NotContainsAll(_) => "does not contain all of",
         Phrase::Contains { not: true, .. } => "does not contain",
         Phrase::Contains { not: false, .. } => "contains",
         Phrase::Matches { not: true, .. } => "does not match",
         Phrase::Matches { not: false, .. } => "matches",
         Phrase::StartsWith(_) => "starts with",
         Phrase::EndsWith(_) => "ends with",
-        Phrase::Alphabetically { after: false, .. } => "is alphabetically before",
-        Phrase::Alphabetically { after: true, .. } => "is alphabetically after",
+        Phrase::NotStartsWith(_) => "does not start with",
+        Phrase::NotEndsWith(_) => "does not end with",
+        Phrase::Alphabetically {
+            after: false,
+            or_equal: false,
+            ..
+        } => "is alphabetically before",
+        Phrase::Alphabetically {
+            after: true,
+            or_equal: false,
+            ..
+        } => "is alphabetically after",
+        Phrase::Alphabetically {
+            after: false,
+            or_equal: true,
+            ..
+        } => "is alphabetically on or before",
+        Phrase::Alphabetically {
+            after: true,
+            or_equal: true,
+            ..
+        } => "is alphabetically on or after",
         Phrase::Time { time, .. } => match time {
             TimeOrder::Before => "is before",
             TimeOrder::After => "is after",
@@ -319,7 +344,11 @@ impl Walk {
         if quantified
             && matches!(
                 phrase,
-                Phrase::Contains { .. } | Phrase::ContainsAll(_) | Phrase::ContainsNone(_)
+                Phrase::Contains { .. }
+                    | Phrase::ContainsAll(_)
+                    | Phrase::ContainsNone(_)
+                    | Phrase::ContainsSome(_)
+                    | Phrase::NotContainsAll(_)
             )
         {
             self.out.insert(format!(
@@ -378,6 +407,8 @@ impl Walk {
             }
             Phrase::StartsWith(operand)
             | Phrase::EndsWith(operand)
+            | Phrase::NotStartsWith(operand)
+            | Phrase::NotEndsWith(operand)
             | Phrase::Alphabetically { operand, .. } => {
                 if let Operand::Value(value) = operand
                     && !matches!(value, Value::String(_))
@@ -387,7 +418,7 @@ impl Walk {
                 self.operand(operand);
             }
             Phrase::Contains { operand, .. } => self.operand(operand),
-            Phrase::Between { min, max } => {
+            Phrase::Between { min, max, .. } => {
                 self.number(min);
                 self.number(max);
                 if let (Some(low), Some(high)) = (Decimal::read(min), Decimal::read(max))
@@ -398,7 +429,11 @@ impl Walk {
                     self.out.insert("min above max".to_string());
                 }
             }
-            Phrase::OneOf { list, .. } | Phrase::ContainsAll(list) | Phrase::ContainsNone(list) => {
+            Phrase::OneOf { list, .. }
+            | Phrase::ContainsAll(list)
+            | Phrase::ContainsNone(list)
+            | Phrase::ContainsSome(list)
+            | Phrase::NotContainsAll(list) => {
                 self.list(list);
             }
             Phrase::Matches { list, .. } => {
@@ -421,7 +456,9 @@ impl Walk {
             Phrase::Exists { .. }
             | Phrase::Empty { .. }
             | Phrase::NonEmptyString
-            | Phrase::Type(_) => {}
+            | Phrase::NotNonEmptyString
+            | Phrase::Type(_)
+            | Phrase::NotType(_) => {}
         }
     }
 
@@ -640,6 +677,8 @@ fn self_term(phrase: &Phrase) -> Option<&Path> {
         | Phrase::Time { operand, .. }
         | Phrase::StartsWith(operand)
         | Phrase::EndsWith(operand)
+        | Phrase::NotStartsWith(operand)
+        | Phrase::NotEndsWith(operand)
         | Phrase::Alphabetically { operand, .. } => operand,
         _ => return None,
     };

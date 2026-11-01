@@ -9,6 +9,7 @@ pub struct Range {
     pub path: Path,
     pub min: Number,
     pub max: Number,
+    pub outside: bool,
 }
 
 impl Range {
@@ -20,9 +21,8 @@ impl Range {
 pub fn run(check: &Range, ctx: &Ctx) -> Verdict {
     let read = read_path(&check.path, ctx);
     let cause = match (read.outcome, &read.value) {
-        (Outcome::Found, Some(Value::Number(n))) => {
-            value::between(&check.min, n, &check.max).map_or(Cause::Unusable, verdict)
-        }
+        (Outcome::Found, Some(Value::Number(n))) => value::between(&check.min, n, &check.max)
+            .map_or(Cause::Unusable, |inside| verdict(inside != check.outside)),
         (Outcome::Found, _) => Cause::Unusable,
         (other, _) => other.cause().unwrap_or(Cause::Unusable),
     };
@@ -47,6 +47,14 @@ mod tests {
     }
 
     fn cause(subject: &str, min: &str, max: &str) -> Cause {
+        outcome(subject, min, max, false)
+    }
+
+    fn outside(subject: &str, min: &str, max: &str) -> Cause {
+        outcome(subject, min, max, true)
+    }
+
+    fn outcome(subject: &str, min: &str, max: &str, outside: bool) -> Cause {
         let input = json!({"things": [serde_json::from_str::<Value>(subject).unwrap()]});
         let ctx = Ctx {
             subject: Located {
@@ -64,6 +72,7 @@ mod tests {
             },
             min: number(min),
             max: number(max),
+            outside,
         };
         run(&check, &ctx).cause
     }
@@ -88,6 +97,24 @@ mod tests {
         assert_eq!(cause(r#"{"x": "2"}"#, "1", "3"), Cause::Unusable);
         assert_eq!(cause(r#"{"x": true}"#, "1", "3"), Cause::Unusable);
         assert_eq!(cause(r#"{"x": [2]}"#, "1", "3"), Cause::Unusable);
+    }
+
+    #[test]
+    fn outside_passes_below_and_above_and_fails_from_min_to_max_as_value() {
+        assert_eq!(outside(r#"{"x": 0.5}"#, "1", "3"), Cause::Satisfied);
+        assert_eq!(outside(r#"{"x": 3.5}"#, "1", "3"), Cause::Satisfied);
+        assert_eq!(outside(r#"{"x": 1}"#, "1", "3"), Cause::Value);
+        assert_eq!(outside(r#"{"x": 3.0}"#, "1", "3"), Cause::Value);
+        assert_eq!(outside(r#"{"x": 2}"#, "1", "3"), Cause::Value);
+    }
+
+    #[test]
+    fn outside_never_passes_on_a_value_that_is_not_a_number_or_not_read() {
+        assert_eq!(outside(r#"{"x": "9"}"#, "1", "3"), Cause::Unusable);
+        assert_eq!(outside(r#"{"x": [9]}"#, "1", "3"), Cause::Unusable);
+        assert_eq!(outside(r#"{}"#, "1", "3"), Cause::Absent);
+        assert_eq!(outside(r#"{"x": null}"#, "1", "3"), Cause::Null);
+        assert_eq!(outside(r#""s""#, "1", "3"), Cause::NotAnObject);
     }
 
     #[test]

@@ -821,79 +821,83 @@ impl Parser {
     }
 
     fn type_phrases(&self, out: &mut Reads<Phrase>, i: usize) {
-        for spelling in ["is an", "is a"] {
-            let Some(j) = self.lead(i, spelling) else {
-                continue;
-            };
-            for (word, kind) in [
-                ("list", Type::List),
-                ("string", Type::String),
-                ("number", Type::Number),
-                ("boolean", Type::Boolean),
-                ("object", Type::Object),
-            ] {
-                if let Some(end) = self.lit(j, word) {
-                    out.push((Phrase::Type(kind), end));
+        for (spellings, not) in [
+            (["is an", "is a"], false),
+            (["is not an", "is not a"], true),
+        ] {
+            for spelling in spellings {
+                let Some(j) = self.lead(i, spelling) else {
+                    continue;
+                };
+                for (word, kind) in [
+                    ("list", Type::List),
+                    ("string", Type::String),
+                    ("number", Type::Number),
+                    ("boolean", Type::Boolean),
+                    ("object", Type::Object),
+                ] {
+                    if let Some(end) = self.lit(j, word) {
+                        out.push((
+                            if not {
+                                Phrase::NotType(kind)
+                            } else {
+                                Phrase::Type(kind)
+                            },
+                            end,
+                        ));
+                    }
                 }
             }
         }
     }
 
     fn between_phrases(&self, out: &mut Reads<Phrase>, i: usize) {
-        let Some(j) = self.lead(i, "is between") else {
-            return;
-        };
-        let Some((min, k)) = self.number(j) else {
-            return;
-        };
-        let Some(m) = self.ws(k).and_then(|m| self.lead(m, "and")) else {
-            return;
-        };
-        if let Some((max, end)) = self.number(m) {
-            out.push((Phrase::Between { min, max }, end));
+        for (spelling, not) in [("is between", false), ("is not between", true)] {
+            let Some(j) = self.lead(i, spelling) else {
+                continue;
+            };
+            let Some((min, k)) = self.number(j) else {
+                continue;
+            };
+            let Some(m) = self.ws(k).and_then(|m| self.lead(m, "and")) else {
+                continue;
+            };
+            if let Some((max, end)) = self.number(m) {
+                out.push((Phrase::Between { not, min, max }, end));
+            }
         }
     }
 
     fn is_phrases(&self, out: &mut Reads<Phrase>, i: usize) {
-        for spelling in ["is not", "does not equal"] {
-            if let Some(j) = self.lead(i, spelling) {
+        let negative: &[&str] = &["is not", "does not equal"];
+        let positive: &[&str] = &["is equal to", "equals", "is"];
+        for (spellings, not) in [(negative, true), (positive, false)] {
+            for spelling in spellings {
+                let Some(j) = self.lead(i, spelling) else {
+                    continue;
+                };
                 for (operand, end) in self.operand(j) {
+                    if let Some(k) = self.ws(end).and_then(|m| self.lead(m, "within"))
+                        && let Some((within, stop)) = self.number(k)
+                    {
+                        out.push((
+                            Phrase::Is {
+                                not,
+                                operand: operand.clone(),
+                                within: Some(within),
+                            },
+                            stop,
+                        ));
+                    }
                     out.push((
                         Phrase::Is {
-                            not: true,
+                            not,
                             operand,
                             within: None,
                         },
                         end,
                     ));
                 }
-            }
-        }
-        for spelling in ["is equal to", "equals", "is"] {
-            let Some(j) = self.lead(i, spelling) else {
-                continue;
-            };
-            for (operand, end) in self.operand(j) {
-                if let Some(k) = self.ws(end).and_then(|m| self.lead(m, "within"))
-                    && let Some((within, stop)) = self.number(k)
-                {
-                    out.push((
-                        Phrase::Is {
-                            not: false,
-                            operand: operand.clone(),
-                            within: Some(within),
-                        },
-                        stop,
-                    ));
-                }
-                out.push((
-                    Phrase::Is {
-                        not: false,
-                        operand,
-                        within: None,
-                    },
-                    end,
-                ));
             }
         }
     }
@@ -908,6 +912,12 @@ impl Parser {
                 not: false,
                 list,
             });
+            self.bare_phrases(
+                &mut out,
+                i,
+                "is not a non-empty string",
+                Phrase::NotNonEmptyString,
+            );
             self.bare_phrases(&mut out, i, "is a non-empty string", Phrase::NonEmptyString);
             self.type_phrases(&mut out, i);
             self.bare_phrases(&mut out, i, "is not empty", Phrase::Empty { not: true });
@@ -916,6 +926,13 @@ impl Parser {
             self.bare_phrases(&mut out, i, "exists", Phrase::Exists { not: false });
             self.list_phrases(&mut out, i, &["contains all of"], Phrase::ContainsAll);
             self.list_phrases(&mut out, i, &["contains none of"], Phrase::ContainsNone);
+            self.list_phrases(&mut out, i, &["contains some of"], Phrase::ContainsSome);
+            self.list_phrases(
+                &mut out,
+                i,
+                &["does not contain all of"],
+                Phrase::NotContainsAll,
+            );
             self.operand_phrases(&mut out, i, &["does not contain"], |operand| {
                 Phrase::Contains { not: true, operand }
             });
@@ -933,18 +950,20 @@ impl Parser {
             });
             self.operand_phrases(&mut out, i, &["starts with"], Phrase::StartsWith);
             self.operand_phrases(&mut out, i, &["ends with"], Phrase::EndsWith);
-            self.operand_phrases(&mut out, i, &["is alphabetically before"], |operand| {
-                Phrase::Alphabetically {
-                    after: false,
+            self.operand_phrases(&mut out, i, &["does not start with"], Phrase::NotStartsWith);
+            self.operand_phrases(&mut out, i, &["does not end with"], Phrase::NotEndsWith);
+            for (spelling, after, or_equal) in [
+                ("is alphabetically before", false, false),
+                ("is alphabetically after", true, false),
+                ("is alphabetically on or before", false, true),
+                ("is alphabetically on or after", true, true),
+            ] {
+                self.operand_phrases(&mut out, i, &[spelling], |operand| Phrase::Alphabetically {
+                    after,
+                    or_equal,
                     operand,
-                }
-            });
-            self.operand_phrases(&mut out, i, &["is alphabetically after"], |operand| {
-                Phrase::Alphabetically {
-                    after: true,
-                    operand,
-                }
-            });
+                });
+            }
         }
         for (spelling, order) in [
             ("is at least", Order::AtLeast),

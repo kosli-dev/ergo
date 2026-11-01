@@ -248,7 +248,7 @@ within_limit: days elapsed from first_seen_ts to now_ts is less than $params.max
 
 It's a number like a `count of`, so it goes where one does: at the start of an assertion, on its own line of a list under `assert` or after the `for` line, as a term of `plus`, as the right side of a phrase, in the `whose` of a `count of`, a `sum of` or an `every`, and before `is between`. In a `whose`, an item whose end is before its start has no number, so it's left out, as any item whose condition fails with `value` is. After `every` or `some` and in a `from` line, the spec doesn't say yet, see [OPEN.md](OPEN.md#sentences-the-spec-doesnt-say-enough-about-yet). Months and years have no fixed length, so `months elapsed from` and `years elapsed from` don't read as this phrase.
 
-**[sentence.derived.compare]** A derived value only goes with `is`, `equals`, `is not`, `does not equal`, `is ... within`, `equals ... within`, `is at least`, `is at most`, `is more than`, `is less than` and `is between`. `count of approvers is empty` is written wrong, and so is `days elapsed from a to b is empty`.
+**[sentence.derived.compare]** A derived value only goes with `is`, `equals`, `is not`, `does not equal`, `is ... within`, `equals ... within`, `is not ... within`, `does not equal ... within`, `is at least`, `is at most`, `is more than`, `is less than`, `is between` and `is not between`. `count of approvers is empty` is written wrong, and so is `days elapsed from a to b is empty`.
 
 ## The `for` line
 
@@ -341,9 +341,11 @@ The field equals, or doesn't equal, what's on the right, as [value.equal](semant
 ```
 <path> is <value> within <number>
 <path> equals <field> within <number>
+<path> is not <value> within <number>
+<path> does not equal <field> within <number>
 ```
 
-Two numbers at most that far apart. The gap is worked out exactly on the decimals, so `0.3` and `0.1` are within `0.2`. That holds for the numbers [Values](semantics.md#values) covers, with at most 15 significant digits, and the spec doesn't say how longer ones compare. An implementation that can't compare the numbers exactly fails the check as `unusable`, as [Values](semantics.md#values) says. `ergo.rego` and the Rust engine do when the exponents of the two sides and the number after `within` are more than 4096 apart, counted on the value, so `1e5000` and `1` within `1` fails as `unusable`. The number is 0 or more. A value before `within` that isn't a number is written wrong, with `"within" only compares numbers`, because the check could only fail. Missing: `absent`. `null`: `null`. Wrong type: `unusable`.
+Two numbers at most that far apart, or, with `is not` and `does not equal`, more than that far apart. The gap is worked out exactly on the decimals, so `0.3` and `0.1` are within `0.2`. That holds for the numbers [Values](semantics.md#values) covers, with at most 15 significant digits, and the spec doesn't say how longer ones compare. An implementation that can't compare the numbers exactly fails the check as `unusable`, as [Values](semantics.md#values) says. `ergo.rego` and the Rust engine do when the exponents of the two sides and the number after `within` are more than 4096 apart, counted on the value, so `1e5000` and `1` within `1` fails as `unusable`. The number is 0 or more. A value before `within` that isn't a number is written wrong, with `"within" only compares numbers`, because the check could only fail. Missing: `absent`. `null`: `null`. Wrong type: `unusable`, for both forms, so `is not 3 within 1` never passes on a string or on a field that isn't there.
 
 **[sentence.phrase.one_of]**
 ```
@@ -376,9 +378,12 @@ These are [`present`](semantics.md#present) and [`missing`](semantics.md#missing
 <path> is a <type>
 <path> is an <type>
 <path> is a non-empty string
+<path> is not a <type>
+<path> is not an <type>
+<path> is not a non-empty string
 ```
 
-The field has that JSON type. Either article is accepted, and the report prints `an` before `object` and `a` before the rest. `is a non-empty string` reads into [`non_empty_string`](semantics.md#non_empty_string): a string with at least one character. Missing: `absent`. `null`: `null`. Wrong type: `value`, because checking the type is the phrase's job.
+The field has that JSON type, or, after `is not`, has another one. Either article is accepted, and the report prints `an` before `object` and `a` before the rest. `is a non-empty string` reads into [`non_empty_string`](semantics.md#non_empty_string): a string with at least one character. `is not a <type>` reads into [`lacks_type`](semantics.md#lacks_type) and `is not a non-empty string` into [`not_non_empty_string`](semantics.md#not_non_empty_string), which passes on `""` and on any other value that isn't a string with a character in it. Missing: `absent`. `null`: `null`, for both forms, so `x is not a string` doesn't pass on a field that isn't there or is `null`. Wrong type: `value`, because checking the type is the phrase's job.
 
 **[sentence.phrase.contains]**
 ```
@@ -392,9 +397,11 @@ The field is a list that holds the value, or doesn't. Missing: `absent`. `null`:
 ```
 <path> contains all of <list>
 <path> contains none of <list>
+<path> contains some of <list>
+<path> does not contain all of <list>
 ```
 
-The field is a list that holds every value, or none of them. Missing, `null`, not a list and wrong type as `contains`. Values of more than one type are written wrong, with `values of mixed types`, and a list read from a path whose values have more than one type fails as `unusable`. An empty list written in the sentence can't be written, and one read from a path fails as `unusable`, because it would pass every list. `contains "a", "b"` on its own is written wrong, because it could mean all of them or any of them, so a list always takes `all of` or `none of`.
+The field is a list that holds every value, or none of them, or at least one of them, or lacks at least one of them. `contains some of` is the opposite of `contains none of`, and `does not contain all of` of `contains all of`, but each fails as the others do, so a missing, `null` or wrong-typed field never passes one by being the opposite of another. Missing, `null`, not a list and wrong type as `contains`. Values of more than one type are written wrong, with `values of mixed types`, and a list read from a path whose values have more than one type fails as `unusable`. An empty list written in the sentence can't be written, and one read from a path fails as `unusable`, because it would pass every list. `contains "a", "b"` on its own is written wrong, because it could mean all of them or any of them, so a list always takes `all of`, `none of` or `some of`.
 
 **[sentence.phrase.matches]**
 ```
@@ -404,15 +411,17 @@ The field is a list that holds every value, or none of them. Missing, `null`, no
 
 The field is a string that matches at least one of the regular expressions, or none of them. They aren't anchored. Missing: `absent`. `null`: `null`. Not a string: `unusable`. A pattern that isn't a valid regular expression is written wrong when it's in the sentence, with `invalid pattern <pattern>`, and fails as `unusable` when it's read from a path.
 
-**[sentence.phrase.field]** The thing after `is one of`, `is in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match` can be a field as well as written values or a `$params` or `$input` path: `files contains all of gap_files`, `tested_by is in reviewers`, `$input.artifact.developers does not contain tested_by`. A field here is read like any field on the right of `is at least`: from the subject, from a name of a `for` line, or from the item in a one-line `every` or `some` and in a `whose`. The row's `passed` and `cause` are what the same sentence gives with the list read from `$params` holding the same value, whatever that value and the field are, and [compare.list](semantics.md#compare) says how. The field is read for each row, so it's in the row's `inputs` after the left side, as the right side of a `compare` is, and not in `$refs`.
+**[sentence.phrase.field]** The thing after `is one of`, `is in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match` can be a field as well as written values or a `$params` or `$input` path: `files contains all of gap_files`, `tested_by is in reviewers`, `$input.artifact.developers does not contain tested_by`. A field here is read like any field on the right of `is at least`: from the subject, from a name of a `for` line, or from the item in a one-line `every` or `some` and in a `whose`. The row's `passed` and `cause` are what the same sentence gives with the list read from `$params` holding the same value, whatever that value and the field are, and [compare.list](semantics.md#compare) says how. The field is read for each row, so it's in the row's `inputs` after the left side, as the right side of a `compare` is, and not in `$refs`.
 
 **[sentence.phrase.starts]**
 ```
 <path> starts with <value or field>
 <path> ends with <value or field>
+<path> does not start with <value or field>
+<path> does not end with <value or field>
 ```
 
-New, and unused in the corpus. Both sides are strings, and a written value that isn't one is written wrong, with `"starts with" takes text`, because the check could only fail. Missing: `absent`. `null`: `null`. Not a string: `unusable`.
+New, and unused in the corpus. Both sides are strings, and a written value that isn't one is written wrong, with `"starts with" takes text`, because the check could only fail. Missing: `absent`. `null`: `null`. Not a string: `unusable`. The negative forms fail the same way, so `x does not start with "a"` doesn't pass on a number or on a field that isn't there, and fails with `value` only when `x` is a string that starts with it.
 
 **[sentence.phrase.order]**
 ```
@@ -428,16 +437,19 @@ Both sides are numbers. Two strings fail as `unusable`, even when they hold numb
 ```
 <path> is alphabetically before <value or field>
 <path> is alphabetically after <value or field>
+<path> is alphabetically on or before <value or field>
+<path> is alphabetically on or after <value or field>
 ```
 
-New, and unused in the corpus. Both sides are strings, compared code point by code point, so every uppercase letter comes before every lowercase one: `"Zoe"` is alphabetically before `"adam"`. A string isn't alphabetically before or after itself. A written value that isn't a string is written wrong, with `"is alphabetically before" takes text`. Missing: `absent`. `null`: `null`. Not a string: `unusable`. A locale's order, where `"adam"` comes first, isn't the same in every runtime, so it isn't offered.
+New, and unused in the corpus. Both sides are strings, compared code point by code point, so every uppercase letter comes before every lowercase one: `"Zoe"` is alphabetically before `"adam"`. A string isn't alphabetically before or after itself, and it is on or before and on or after itself. A written value that isn't a string is written wrong, with `"is alphabetically before" takes text`. Missing: `absent`. `null`: `null`. Not a string: `unusable`. A locale's order, where `"adam"` comes first, isn't the same in every runtime, so it isn't offered.
 
 **[sentence.phrase.between]**
 ```
 <path> is between <value> and <value>
+<path> is not between <value> and <value>
 ```
 
-A number from the first to the second, both included. The bounds are numbers, and the first isn't above the second, or it's written wrong. Missing: `absent`. `null`: `null`. Not a number: `unusable`. After a `count of`, a `sum of`, a `plus` or an elapsed time, it reads the number they work out, as [tally.between](semantics.md#counts-and-sums-in-sentences) says. Its `and` belongs to `between`, so `whose qty is between 1 and 5 and kind is "a"` has two conditions. An implementation that splits `whose` on ` and ` has to skip the one after `between <value>`.
+A number from the first to the second, both included. The bounds are numbers, and the first isn't above the second, or it's written wrong. `is not between` passes on a number below the first or above the second. Missing: `absent`. `null`: `null`. Not a number: `unusable`, for both. After a `count of`, a `sum of`, a `plus` or an elapsed time, it reads the number they work out, as [tally.between](semantics.md#counts-and-sums-in-sentences) says. Its `and` belongs to `between`, so `whose qty is between 1 and 5 and kind is "a"` has two conditions. An implementation that splits `whose` on ` and ` has to skip the one after `between <value>`.
 
 **[sentence.phrase.time]**
 ```
@@ -476,7 +488,7 @@ Read as `is` or `equals`, and printed as one of them. With it in the grammar, ev
 | `x is it`                                                | `it can only start an assertion: write it first, like it is not empty`          |
 | `$params.m named by it is 1`                             | `it can't name a key`                                                           |
 
-**[sentence.written_wrong.self]** A sentence that compares a path with itself is written wrong, because it could only pass or only fail. That's `is`, `equals`, `is not` or `does not equal` a field, with or without `within`, the order and time phrases, `starts with` and `ends with`, when the field on the right is read from the same place as the path:
+**[sentence.written_wrong.self]** A sentence that compares a path with itself is written wrong, because it could only pass or only fail. That's `is`, `equals`, `is not` or `does not equal` a field, with or without `within`, the order and time phrases, `starts with`, `ends with`, `does not start with`, `does not end with` and the alphabetical phrases, when the field on the right is read from the same place as the path:
 
 - the same path, in an assertion or a `whose`, like `x is at least x` or `whose type equals type`
 - after `every` or `some`, the end of the path walked, because the right side starts at the item ([sentence.argument.item](#every-some-and-whose)), like `every conditions.type equals type`

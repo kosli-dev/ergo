@@ -239,7 +239,10 @@ impl Check {
                 path: left,
                 ..check.clone()
             }),
-            Check::NonEmptyString(_) => Check::NonEmptyString(kinds::NonEmptyString { path: left }),
+            Check::NonEmptyString(check) => Check::NonEmptyString(kinds::NonEmptyString {
+                path: left,
+                ..check.clone()
+            }),
             Check::Empty(check) => Check::Empty(kinds::Empty {
                 path: left,
                 ..check.clone()

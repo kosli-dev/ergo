@@ -76,8 +76,15 @@ pub enum Side {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Test {
-    Compare { cmp: Cmp, within: Option<Number> },
-    Between { min: Number, max: Number },
+    Compare {
+        cmp: Cmp,
+        within: Option<Number>,
+    },
+    Between {
+        min: Number,
+        max: Number,
+        outside: bool,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -300,8 +307,9 @@ fn decide(test: &Test, left: &Value, right: Option<Value>, ctx: &Ctx) -> Cause {
             };
             compare::run(&compare, ctx).cause
         }
-        (Test::Between { min, max }, None) => match left {
-            Value::Number(n) => value::between(min, n, max).map_or(Cause::Unusable, verdict),
+        (Test::Between { min, max, outside }, None) => match left {
+            Value::Number(n) => value::between(min, n, max)
+                .map_or(Cause::Unusable, |inside| verdict(inside != *outside)),
             _ => Cause::Unusable,
         },
         _ => Cause::Unusable,
@@ -924,9 +932,6 @@ fn lower_test(
             operand,
             within,
         } => {
-            if *not && within.is_some() {
-                return None;
-            }
             let within = match within {
                 Some(text) => match number(text, scope) {
                     Ok(n) => Some(n),
@@ -946,10 +951,19 @@ fn lower_test(
             None,
             operand,
         ),
-        s::Phrase::Between { min, max } => Some(
+        s::Phrase::Between { not, min, max } => Some(
             number(min, scope)
                 .and_then(|min| number(max, scope).map(|max| (min, max)))
-                .map(|(min, max)| (Test::Between { min, max }, None)),
+                .map(|(min, max)| {
+                    (
+                        Test::Between {
+                            min,
+                            max,
+                            outside: *not,
+                        },
+                        None,
+                    )
+                }),
         ),
         _ => None,
     }

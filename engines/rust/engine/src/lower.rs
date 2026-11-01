@@ -406,6 +406,8 @@ fn phrase_terms(phrase: &s::Phrase) -> &[s::Term] {
         | s::Phrase::Contains { operand, .. }
         | s::Phrase::StartsWith(operand)
         | s::Phrase::EndsWith(operand)
+        | s::Phrase::NotStartsWith(operand)
+        | s::Phrase::NotEndsWith(operand)
         | s::Phrase::Alphabetically { operand, .. }
         | s::Phrase::Time { operand, .. } => match operand {
             s::Operand::Field(terms) => terms,
@@ -425,8 +427,28 @@ fn phrase_words(phrase: &s::Phrase) -> &'static str {
         s::Phrase::Contains { not: true, .. } => "does not contain",
         s::Phrase::StartsWith(_) => "starts with",
         s::Phrase::EndsWith(_) => "ends with",
-        s::Phrase::Alphabetically { after: false, .. } => "is alphabetically before",
-        s::Phrase::Alphabetically { after: true, .. } => "is alphabetically after",
+        s::Phrase::NotStartsWith(_) => "does not start with",
+        s::Phrase::NotEndsWith(_) => "does not end with",
+        s::Phrase::Alphabetically {
+            after: false,
+            or_equal: false,
+            ..
+        } => "is alphabetically before",
+        s::Phrase::Alphabetically {
+            after: true,
+            or_equal: false,
+            ..
+        } => "is alphabetically after",
+        s::Phrase::Alphabetically {
+            after: false,
+            or_equal: true,
+            ..
+        } => "is alphabetically on or before",
+        s::Phrase::Alphabetically {
+            after: true,
+            or_equal: true,
+            ..
+        } => "is alphabetically on or after",
         s::Phrase::Time { time, .. } => match time {
             s::TimeOrder::Before => "is before",
             s::TimeOrder::After => "is after",

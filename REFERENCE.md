@@ -825,27 +825,73 @@ A sentence is a path, then a phrase, then what the phrase takes:
 | `digest equals fingerprint`, a field on the right                                    | `compare` with `eq`                                                      |
 | `cost is 2.5 within 0.01`, `cost equals total within 0.01`                           | `compare` with `eq` and `within`                                         |
 | `env is not "prod"`, `author does not equal approver`                                | `compare` with `ne`, so two values of different types fail as `unusable` |
+| `size is not 100 within 5`, `size does not equal limit within 5`                     | `compare` with `ne` and `within`                                         |
 | `env is one of "dev", "test"`, `user is in $params.staff`                            | `in`                                                                     |
 | `env is not one of "prod"`, `user is not in $params.bots`                            | `not_in`                                                                 |
 | `ticket exists`, `ticket does not exist`                                             | `present`, `missing`                                                     |
 | `approved_by is a non-empty string`                                                  | `non_empty_string`                                                       |
+| `approved_by is not a non-empty string`                                              | `not_non_empty_string`                                                   |
 | `tags is a list`, `config is an object`                                              | `has_type`: `list`, `string`, `number`, `boolean` or `object`            |
+| `tags is not a list`, `config is not an object`                                      | `lacks_type`                                                             |
 | `findings is empty`, `tickets is not empty`                                          | `empty_string_or_list`, `not_empty_string_or_list`                       |
 | `labels contains "bug"`, `labels does not contain "wip"`                             | `includes`, `excludes` with `value`                                      |
 | `labels contains all of "a", "b"`, `labels contains none of ...`                     | `includes`, `excludes` with `values`                                     |
+| `labels contains some of "a", "b"`, `labels does not contain all of ...`             | `includes_some`, `not_includes_all`                                      |
 | `branch matches '^release/'`, `branch does not match ...`                            | `matches_any`, `not_matches_any`                                         |
 | `branch starts with "release/"`, `file ends with suffix`                             | `compare` with `starts_with`, `ends_with`                                |
+| `branch does not start with "wip/"`, `file does not end with suffix`                 | `compare` with `not_starts_with`, `not_ends_with`                        |
 | `tested_by is in reviewers`, `files contains all of gap_files`                       | `compare` with `in`, `includes_all`, `matches_any`, ...                  |
 | `score is at least 3`, `is at most`, `is more than`, `is less than`                  | `compare` with `gte`, `lte`, `gt`, `lt`, on numbers only                 |
 | `name is alphabetically before "m"`, `is alphabetically after`                       | `compare` with `alphabetically_before`, `alphabetically_after`           |
+| `name is alphabetically on or before "m"`, `is alphabetically on or after`           | `compare` with `alphabetically_lte`, `alphabetically_gte`                |
 | `score is between 1 and 5`                                                           | `range`                                                                  |
+| `score is not between 1 and 5`                                                       | `outside_range`                                                          |
 | `reviewed_at is before deployed_at`, `is after`, `is on or after`, `is on or before` | `compare_time` with `lt`, `gt`, `gte`, `lte`                             |
 
 The time phrases can take a written time or number too, like `opened is before "2024-01-01T00:00:00Z"` or `opened is after 100`. The field and the written value must both be RFC 3339 times, both be dates like `"2026-10-01"`, or both be numbers, or the check fails as `unusable`. A date and an RFC 3339 time fail too, even one at midnight, because a date doesn't say in which time zone it starts. A written value that isn't a time, a date or a number, like `opened is before "yesterday"`, is written wrong, with `"is before" takes a time or a number`.
 
+`is not ... within` and `does not equal ... within` pass when the two numbers are further apart than the number after `within`, so `x is not 0.1 within 0.19` passes on `0.3` and fails on `0.29`. They fail like the positive forms when a side is missing, `null` or not a number, so the opposite of a check never passes by reading nothing. The same goes for `does not start with` and `does not end with`, for `is not a <type>` and `is not a non-empty string`, which pass on `""` and on any value that isn't a string, for `is not between`, and for `contains some of` and `does not contain all of`, which need a list like `contains all of`.
+
 `within` works out the gap exactly on the decimals, so `0.3` and `0.1` are within `0.2`. That's promised for numbers with at most 15 significant digits. Longer ones, like `0.30000000000000004`, are compared on their digits too, but OPA can mix up two of them that differ only past those digits, so don't rely on it. The only numbers it can't compare are ones whose exponents, with the number after `within`, are more than 4096 apart, like `1e5000` and `1`. That check fails as `unusable`.
 
-`is empty` passes on `""` or `[]` and `is not empty` on a string or a list with something in it. Anything else that's there, like a number or an object, fails both as `unusable`. Their operators only exist for sentences. `starts with` and `ends with` compare two strings: anything else, two numbers included, fails as `unusable`, and a written value after them that isn't text, like `x starts with 1`, is written wrong. `is alphabetically before` and `is alphabetically after` order two strings in the same way, code point by code point, so every uppercase letter comes first: `"Zoe"` is alphabetically before `"adam"`.
+`is empty` passes on `""` or `[]` and `is not empty` on a string or a list with something in it. Anything else that's there, like a number or an object, fails both as `unusable`. Their operators only exist for sentences. `starts with` and `ends with` compare two strings: anything else, two numbers included, fails as `unusable`, and a written value after them that isn't text, like `x starts with 1`, is written wrong. `is alphabetically before` and `is alphabetically after` order two strings in the same way, code point by code point, so every uppercase letter comes first: `"Zoe"` is alphabetically before `"adam"`. `is alphabetically on or before` and `is alphabetically on or after` pass on two equal strings too.
+
+The negative phrases need what the positive ones need, so a field that can't be read fails them with the same cause. With this policy:
+
+```yaml
+ergo_spec: v0.4-dev
+subjects:
+  artifact:
+    from: artifacts
+    identified_by: name
+requirements:
+  releasable:
+    subject: artifact
+    checks:
+      not_a_snapshot: version does not end with "-SNAPSHOT"
+      not_near_limit: size_mb is not 100 within 5
+      trusted_license: licenses contains some of "MIT", "Apache-2.0"
+      notes_empty: notes is not a non-empty string
+```
+
+and this input:
+
+```json
+{"artifacts": [
+  {"name": "api", "version": "1.2.0-SNAPSHOT", "size_mb": 101, "licenses": ["GPL-3.0"], "notes": "ready"},
+  {"name": "web", "version": "2.0.0", "size_mb": 140, "licenses": ["MIT", "GPL-3.0"], "notes": ""},
+  {"name": "cli", "version": 3, "licenses": null, "notes": null}
+]}
+```
+
+every check fails on `api`, with `value`. `web` passes all four, `notes` being `""`. `cli` fails each of them for the reason it can't be read:
+
+| check             | `cli` fails as | because                |
+| ----------------- | -------------- | ---------------------- |
+| `not_a_snapshot`  | `unusable`     | `version` is a number  |
+| `not_near_limit`  | `absent`       | there is no `size_mb`  |
+| `trusted_license` | `null`         | `licenses` is `null`   |
+| `notes_empty`     | `null`         | `notes` is `null`      |
 
 `is at least`, `is at most`, `is more than` and `is less than` only order numbers. Two strings fail as `unusable`, because a number held as a string would be ordered as text, and with this input:
 
@@ -877,7 +923,7 @@ requirements:
 
 `most` passes on `b`, even though its `l` is bigger than the limit. OPA also remembers the result of a comparison and reuses it for any number it treats as the same, so the answer can depend on the other rows: `within` fails on `b` when `b` is the only row, but passes on `b` when `a` is also in the input. The Rust engine, which the `ergo` CLI runs, compares every digit and fails both checks on `b`. So keep the decimals you compare to at most 15 significant digits, or use the Rust engine, for example with the `ergo` CLI. [#426](https://github.com/kosli-dev/ergo/issues/426) is about fixing `ergo.rego`.
 
-After `is in`, `is not in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match`, the thing on the right can be a field too, read like the field after `is at least`: from the subject, from the name of a `for` line or from the item of a one-line `every` or `some` and a `whose`. With this policy and this input:
+After `is in`, `is not in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match`, the thing on the right can be a field too, read like the field after `is at least`: from the subject, from the name of a `for` line or from the item of a one-line `every` or `some` and a `whose`. With this policy and this input:
 
 ```yaml
 ergo_spec: v0.4-dev
@@ -918,7 +964,7 @@ requirements:
 }
 ```
 
-They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `matches_any` and `not_matches_any`, and only sentences can use those. The row has the same `passed` and `cause` as the sentence with `$params.required_tickets` holding that field's value, and the field is in the row's `inputs` after the left side instead of in `$refs`. A field on the right that's missing or `null` fails the row as `absent` or `null`, whatever the left side is. One that can't be used fails it as `unusable`: not a list after `is in`, `is not in`, `contains all of`, `contains none of`, `matches` and `does not match`, an empty list after `contains all of` and `contains none of`, and patterns that aren't all valid regular expressions. Only when the right side can be used does the left side's own cause count.
+They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `includes_some`, `not_includes_all`, `matches_any` and `not_matches_any`, and only sentences can use those. The row has the same `passed` and `cause` as the sentence with `$params.required_tickets` holding that field's value, and the field is in the row's `inputs` after the left side instead of in `$refs`. A field on the right that's missing or `null` fails the row as `absent` or `null`, whatever the left side is. One that can't be used fails it as `unusable`: not a list after `is in`, `is not in`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match`, an empty list after `contains all of`, `contains none of`, `contains some of` and `does not contain all of`, and patterns that aren't all valid regular expressions. Only when the right side can be used does the left side's own cause count.
 
 The thing on the right is a value when it's in quotes, a number, `true`, `false` or `null`, and a field otherwise. A list of values is separated by `, `. A string can be in single quotes, which keep backslashes as written, so `'^\s*FROM'` needs no doubled backslash.
 
@@ -1295,7 +1341,7 @@ With `{"x": 0.123456789012345, "y": 100}`, the sum needs 18 digits at one scale,
 ```
 
 `sum of xs is at most 1` on `{"xs": [1e20]}` fails as `unusable` too, with `sum of xs` as `null` and `xs[]` as `[100000000000000000000]`. A sum of `[0.1, 0.2, 100]` is `100.3`, and `1.50` plus `1` is `2.5`, trailing zeros or not.
-- A count goes with `is`, `equals`, `is not`, `does not equal`, `is at least`, `is at most`, `is more than`, `is less than` and `within`.
+- A count goes with `is`, `equals`, `is not`, `does not equal`, `is at least`, `is at most`, `is more than`, `is less than`, `is between`, `is not between` and `within`.
 
 `seconds`, `minutes`, `hours`, `days` and `weeks` followed by `elapsed from` and two paths, like `days elapsed from first_seen_ts to now_ts`, work out the time between two fields. Take a requirement on `vulnerabilities`, with the policy's params `{"max_days": {"high": 7, "low": 30}}` and this input:
 

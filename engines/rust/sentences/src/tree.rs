@@ -214,8 +214,10 @@ pub enum Phrase {
         /// The value compared with.
         operand: Operand,
     },
-    /// `is between` two numbers.
+    /// `is between` or `is not between` two numbers.
     Between {
+        /// True for `is not between`.
+        not: bool,
         /// The lower number, with its digits as written.
         min: String,
         /// The upper number, with its digits as written.
@@ -240,8 +242,12 @@ pub enum Phrase {
     },
     /// `is a non-empty string`.
     NonEmptyString,
+    /// `is not a non-empty string`.
+    NotNonEmptyString,
     /// `is a` followed by a type, like `is a list`.
     Type(Type),
+    /// `is not a` followed by a type, like `is not a list`.
+    NotType(Type),
     /// `contains` or `does not contain` a value.
     Contains {
         /// True for `does not contain`.
@@ -253,6 +259,10 @@ pub enum Phrase {
     ContainsAll(List),
     /// `contains none of` a list.
     ContainsNone(List),
+    /// `contains some of` a list.
+    ContainsSome(List),
+    /// `does not contain all of` a list.
+    NotContainsAll(List),
     /// `matches` or `does not match` one or more patterns.
     Matches {
         /// True for `does not match`.
@@ -264,10 +274,16 @@ pub enum Phrase {
     StartsWith(Operand),
     /// `ends with` a value.
     EndsWith(Operand),
-    /// `is alphabetically before` or `is alphabetically after` a value.
+    /// `does not start with` a value.
+    NotStartsWith(Operand),
+    /// `does not end with` a value.
+    NotEndsWith(Operand),
+    /// `is alphabetically before`, `is alphabetically after`, `is alphabetically on or before` or `is alphabetically on or after` a value.
     Alphabetically {
         /// True for `after`, false for `before`.
         after: bool,
+        /// True for `on or before` and `on or after`.
+        or_equal: bool,
         /// The value compared with.
         operand: Operand,
     },
