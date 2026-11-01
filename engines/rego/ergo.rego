@@ -3337,6 +3337,24 @@ else := "absent"
 
 _read_before_field(v) if v != _absent
 
+_walk_read_state(subj, path) := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
+	is_object(subj)
+	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+	_walks_before_field(subj, array.slice(path, 0, i))
+} else := _read_state(subj, path)
+
+_walks_before_field(subj, prefix) if {
+	some i, seg in prefix
+	is_string(seg)
+	is_array(_resolved(subj, array.slice(prefix, 0, i)))
+}
+
+_key_state(v) := "absent" if v == _absent
+
+else := "null" if v == null
+
+else := "unusable"
+
 _name_step_state(path) := "null" if {
 	_has_name_step(path)
 	some step in path
@@ -5264,7 +5282,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	not _off_subject(path)
 	not _reads_subject(path)
 	not is_object(subj)
-} else := {"states": {_read_state(subj, path)}, "list": _path_name(path), "values": [], "locations": []} if {
+} else := {"states": {_walk_read_state(subj, path)}, "list": _path_name(path), "values": [], "locations": []} if {
 	path := side[_basic_form(side)]
 	not _walk_keys({"path": path}, subj)
 } else := r if {
@@ -5307,7 +5325,7 @@ _cond_tally(item, side) := {"states": {"not_an_object"}} if {
 	not _off_subject(side.count_of)
 	not _reads_subject(side.count_of)
 	not is_object(item)
-} else := {"states": {_read_state(item, side.count_of)}} if {
+} else := {"states": {_walk_read_state(item, side.count_of)}} if {
 	not _walk_keys({"path": side.count_of}, item)
 } else := r if {
 	w := _walk(_walk_start({"path": side.count_of}, item), _walk_keys({"path": side.count_of}, item), true)
@@ -8154,7 +8172,7 @@ _walk_flawed(check) if _param_broken(check, set())
 _walk_flawed(_) if _unreadable_input
 
 _walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check))))), "failed": []} if {
-	state := _read_state(subj, check.path)
+	state := _walk_read_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
 
