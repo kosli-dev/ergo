@@ -115,6 +115,37 @@ mod tests {
     use serde_json::json;
 
     #[test]
+    fn problems_of_names_that_need_quoting_are_listed_in_the_order_the_report_writes_them() {
+        let policy = json!({
+            "ergo_spec": "v0.4-dev",
+            "subjects": {"s": {"from": "xs", "has": {"x\ty": "ys", "x y": "ys", "x\"y": "ys", "x": "ys"}}},
+            "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}
+        });
+        let report = report(&json!({"xs": [{"x": 1}]}), &policy, &json!({}));
+        let row = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == "$well_formed")
+            .unwrap();
+        let names: Vec<&str> = row["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|input| input["name"].as_str())
+            .filter(|name| name.starts_with("subjects."))
+            .collect();
+        assert_eq!(
+            names,
+            [
+                "subjects.s.has.\"x y\"",
+                "subjects.s.has.\"x\\\"y\"",
+                "subjects.s.has.\"x\\ty\""
+            ]
+        );
+    }
+
+    #[test]
     fn report_and_violations_work_from_json_alone() {
         let policy = json!({
             "ergo_spec": "v0.4-dev",
