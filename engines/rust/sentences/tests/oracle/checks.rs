@@ -2741,6 +2741,10 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("m named by k is 1", "m named by k is 1", &[], &[]),
+    ("m named by k is not 2", "m named by k is not 2", &[], &[]),
+    ("some vals is m named by k", "some vals equals m named by k", &[], &[]),
+    ("every vals is in n named by k", "every vals is in n named by k", &[], &[]),
+    ("count of n named by k is at most 5", "count of n named by k is at most 5", &[], &[]),
     (
         "every n named by k is 1",
         "every n named by k is 1",
