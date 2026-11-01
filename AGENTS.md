@@ -8,8 +8,9 @@ Ergo is a Rego library that turns policy evaluation into a structured report. Us
 - `engines/rego/ergo_test.rego` holds its tests.
 - `spec/` is the spec Ergo implements: what each check means as named rules, the syntax, JSON Schemas for a policy and a report, and cases that pin the rules down. `spec/README.md` explains it.
 - `engines/rego/spec_test.rego` runs every case in `spec/cases` against `ergo.rego`.
-- `README.md` walks a new user through a first policy.
-- `REFERENCE.md` describes every field, operator, cause and report entry.
+- `README.md` says what Ergo is and walks a new user through a first policy and its report, the same for both engines.
+- `OPA.md` is the page for `ergo.rego`: install, how to run it with OPA, Wasm, numbers, `ergo.compile`. `CLI.md` is the page for the `ergo` command: install, how to run it, exit codes, how it reads YAML.
+- `REFERENCE.md` describes every field, operator, cause and report entry of the language, the same for both engines.
 - `CONTRIBUTING.md` tells people how to report bugs and send changes, and points them here for the rules.
 - `CHANGELOG.md` says what each release of `ergo.rego` changed. The spec has its own in `spec/CHANGELOG.md`, and the Rust engine in `engines/rust/CHANGELOG.md`. A change in what a check means goes in `spec/CHANGELOG.md`, and an engine's own fixes go in that engine's file.
 - `CODE_OF_CONDUCT.md` is the Contributor Covenant 2.1, unchanged apart from the contact address.
@@ -125,7 +126,7 @@ The report must stay byte-identical for the same policy and input, whatever orde
 
 ## Docs
 
-When behaviour changes, update its rule in `spec/` and add or change cases for it, so `spec_test.rego` fails when one no longer matches. When a policy or a report changes shape, update `spec/policy/schema.json` or `spec/report/schema.json` too. Update `REFERENCE.md` in the same change. When it affects the getting-started example, update `README.md` too.
+When behaviour changes, update its rule in `spec/` and add or change cases for it, so `spec_test.rego` fails when one no longer matches. When a policy or a report changes shape, update `spec/policy/schema.json` or `spec/report/schema.json` too. Update `REFERENCE.md` in the same change. When it affects the first policy or its report, update `README.md` too, when it changes how `ergo.rego` runs, `OPA.md`, and when it changes the `ergo` command, `CLI.md`.
 
 Every output shown in the docs must come from actually running it, not from memory.
 
@@ -153,7 +154,7 @@ The first line names the part of the repo that changed, then says what the chang
 
 - `rego:` `engines/rego/ergo.rego` and its tests
 - `rust:` the Rust engine in `engines/rust/`
-- `docs:` `README.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
+- `docs:` `README.md`, `OPA.md`, `CLI.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
 - `site:` the website in `site/`
 - `ci:` workflows and Dependabot
 - `examples:` the worked examples in `examples/`

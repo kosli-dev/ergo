@@ -209,7 +209,7 @@ requirements:
           - bake.minutes is between 25 and 40
 ```
 
-Save it next to `ergo.rego` and run it as the [getting started](../../README.md#getting-started) guide shows.
+Save it next to `ergo.rego` and run it as [Ergo with OPA](../../OPA.md#run-a-policy) shows.
 
 `ergo check` lists what the tool can't place, with the line, and fails when there's any. A check written without a bold label gives:
 
