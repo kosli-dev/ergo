@@ -5454,10 +5454,6 @@ _within_problem(node) := {"invalid within" |
 	node.op == "compare"
 	"within" in object.keys(node)
 	not _non_negative(node.within)
-} | {"within needs cmp eq or ne" |
-	node.op == "compare"
-	"within" in object.keys(node)
-	not object.get(node, "cmp", null) in {"eq", "ne"}
 }
 
 _non_negative(n) if {
