@@ -239,14 +239,34 @@ fn failed(entry: &Entry, cause: Cause, value: Value) -> Raw {
     }
 }
 
+fn before_field(path: &Path, at: usize, ctx: &Ctx) -> Option<Outcome> {
+    let before = Path {
+        start: path.start.clone(),
+        steps: path.steps[..at].to_vec(),
+    };
+    let read = path::read(&before, ctx);
+    match (read.outcome, read.value) {
+        (Outcome::Found, Some(Value::Null)) => Some(Outcome::Null),
+        (Outcome::Found, _) => None,
+        (outcome, _) => Some(outcome),
+    }
+}
+
 pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
     let leading = path::leading_steps(&path.start);
     let mut segs = Vec::new();
-    for step in leading.iter().chain(path.steps.iter()) {
+    for (at, step) in leading.iter().chain(path.steps.iter()).enumerate() {
         match path::resolve(step, ctx) {
             Ok(Resolved::Key(key)) => segs.push(Seg::Key(key)),
             Ok(Resolved::Index(at)) => segs.push(Seg::Index(at)),
             Err(outcome) => {
+                let outcome = match step {
+                    Step::Field(_) => at
+                        .checked_sub(leading.len())
+                        .and_then(|own| before_field(path, own, ctx))
+                        .unwrap_or(outcome),
+                    _ => outcome,
+                };
                 return Walked {
                     items: Vec::new(),
                     failures: Vec::new(),
@@ -468,7 +488,7 @@ pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     let mut inputs = Vec::new();
     for check in checks {
         for path in check.paths().into_iter().filter(|p| reads_outside(p)) {
-            inputs.extend(path_inputs(path, ctx, &[]));
+            inputs.extend(path_inputs(path, ctx, &[], true));
         }
     }
     inputs
@@ -478,15 +498,20 @@ fn hides(path: &Path, hidden: &[&str]) -> bool {
     matches!(&path.start, Start::Alias(name) if hidden.contains(&name.as_str()))
 }
 
-pub(super) fn cut_at(path: &Path, hidden: &[&str]) -> Option<usize> {
+pub(super) fn cut_at(path: &Path, hidden: &[&str], fields_read_items: bool) -> Option<usize> {
     path.steps.iter().position(|step| match step {
-        Step::Field(_) => true,
+        Step::Field(_) => fields_read_items,
         Step::Ref(reference) => hides(reference, hidden),
         _ => false,
     })
 }
 
-pub(super) fn path_inputs(path: &Path, ctx: &Ctx, hidden: &[&str]) -> Vec<Input> {
+pub(super) fn path_inputs(
+    path: &Path,
+    ctx: &Ctx,
+    hidden: &[&str],
+    fields_read_items: bool,
+) -> Vec<Input> {
     if hides(path, hidden) {
         return path
             .steps
@@ -498,7 +523,7 @@ pub(super) fn path_inputs(path: &Path, ctx: &Ctx, hidden: &[&str]) -> Vec<Input>
             .flatten()
             .collect();
     }
-    match cut_at(path, hidden) {
+    match cut_at(path, hidden, fields_read_items) {
         None => read_path(path, ctx).inputs,
         Some(at) => {
             let before = Path {
@@ -666,6 +691,16 @@ fn cause_of(walk: &Walk, walked: &Walked, judged: &[Judged], fails: &[&Failure])
     }
 }
 
+fn with_fields(inputs: &mut Vec<Input>, list: &str, path: &Path, ctx: &Ctx) {
+    let fields: Vec<Input> = super::field_inputs(path, ctx)
+        .into_iter()
+        .filter(|field| !inputs.iter().any(|input| input.name == field.name))
+        .collect();
+    if let Some(at) = inputs.iter().position(|input| input.name == list) {
+        inputs.splice(at + 1..at + 1, fields);
+    }
+}
+
 fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     let outer = outer(ctx);
     let walked = self::walk(
@@ -679,7 +714,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     let outside = outside_inputs(walk, &outer);
     if let Some(outcome) = walked.unreadable {
         let mut inputs = vec![Input {
-            name: walked.name,
+            name: walked.name.clone(),
             value: json!([]),
             locations: Vec::new(),
             part: None,
@@ -687,6 +722,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         inputs.extend(outside);
         inputs.sort_by(|a, b| a.name.cmp(&b.name));
         inputs.dedup();
+        with_fields(&mut inputs, &walked.name, &walk.path, ctx);
         return Run {
             verdict: Verdict {
                 cause: outcome.cause().unwrap_or(Cause::Unusable),
@@ -720,6 +756,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     inputs.extend(outside);
     inputs.sort_by(|a, b| a.name.cmp(&b.name));
     inputs.dedup();
+    with_fields(&mut inputs, &walked.name, &walk.path, ctx);
     Run {
         verdict: Verdict { cause, inputs },
         failed_items,

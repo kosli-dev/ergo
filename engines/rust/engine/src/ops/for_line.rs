@@ -1090,13 +1090,14 @@ impl For {
                 continue;
             }
             match own {
-                Some((_, if_any)) if !hides(path) && walk::cut_at(path, &hidden).is_none() => {
+                Some((_, if_any)) if !hides(path) && walk::cut_at(path, &hidden, false).is_none() => {
                     inputs.push(self.list_entry(path, *if_any, ctx));
+                    inputs.extend(super::field_inputs(path, ctx));
                 }
                 _ if in_whose.contains(&std::ptr::from_ref(path)) => {
-                    inputs.extend(walk::path_inputs(path, &outer_ctx(ctx), &hidden));
+                    inputs.extend(walk::path_inputs(path, &outer_ctx(ctx), &hidden, true));
                 }
-                _ => inputs.extend(walk::path_inputs(path, ctx, &hidden)),
+                _ => inputs.extend(walk::path_inputs(path, ctx, &hidden, false)),
             }
         }
         for sentence in &self.sentences {

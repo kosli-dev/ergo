@@ -73,25 +73,34 @@ pub fn read_path(path: &Path, ctx: &Ctx) -> ReadPath {
         locations: read.location.iter().map(|l| l.render()).collect(),
         part: path::part_tag(path, ctx).map(|(name, id)| Part { name, id }),
     }];
-    if !ctx.aliases.contains_key(path::OUTER) {
-        for step in &path.steps {
-            if let Step::Field(field) = step {
-                let found = path::read(field, ctx);
-                inputs.push(Input {
-                    name: name::name(field),
-                    value: found.value.cloned().unwrap_or(Value::Null),
-                    locations: found.location.iter().map(|l| l.render()).collect(),
-                    part: None,
-                });
-            }
-        }
-    }
+    inputs.extend(field_inputs(path, ctx));
     ReadPath {
         outcome: read.outcome,
         step_unreadable: read.step_unreadable,
         value,
         inputs,
     }
+}
+
+pub fn field_inputs(path: &Path, ctx: &Ctx) -> Vec<Input> {
+    if ctx.aliases.contains_key(path::OUTER) {
+        return Vec::new();
+    }
+    path.steps
+        .iter()
+        .filter_map(|step| match step {
+            Step::Field(field) => {
+                let found = path::read(field, ctx);
+                Some(Input {
+                    name: name::name(field),
+                    value: found.value.cloned().unwrap_or(Value::Null),
+                    locations: found.location.iter().map(|l| l.render()).collect(),
+                    part: None,
+                })
+            }
+            _ => None,
+        })
+        .collect()
 }
 
 #[derive(Debug, Clone, PartialEq)]

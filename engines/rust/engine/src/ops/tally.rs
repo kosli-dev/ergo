@@ -458,6 +458,7 @@ fn counted_entries(
     result: &Result<Number, Cause>,
     list: Input,
     outside: Vec<Input>,
+    ctx: &Ctx,
 ) -> Vec<Input> {
     let mut entries = vec![Input {
         name: counted.text.clone(),
@@ -469,6 +470,7 @@ fn counted_entries(
         part: list.part.clone(),
     }];
     entries.push(list);
+    entries.extend(super::field_inputs(&counted.path, ctx));
     entries.extend(outside);
     entries
 }
@@ -484,7 +486,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             part: None,
         };
         return Worked {
-            entries: counted_entries(counted, &result, list, Vec::new()),
+            entries: counted_entries(counted, &result, list, Vec::new(), ctx),
             result,
         };
     }
@@ -508,7 +510,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             part: None,
         };
         return Worked {
-            entries: counted_entries(counted, &result, list, outside),
+            entries: counted_entries(counted, &result, list, outside, ctx),
             result,
         };
     }
@@ -557,7 +559,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         part: path::part_tag(&counted.path, &outer).map(|(name, id)| Part { name, id }),
     };
     Worked {
-        entries: counted_entries(counted, &result, list, outside),
+        entries: counted_entries(counted, &result, list, outside, ctx),
         result,
     }
 }
