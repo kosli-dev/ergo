@@ -1,4 +1,27 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (".y.k is 9", "y.k is 9", &[], &[]),
+    (".zz is 1", "zz is 1", &[], &[]),
+    ("count of .round is 1", "count of round is 1", &[], &[]),
+    ("cov is 1", "cov is 1", &[], &[]),
+    ("cov.k is 0", "cov.k is 0", &[], &[]),
+    (
+        "every .xs is at least 1",
+        "every xs is at least 1",
+        &[],
+        &[],
+    ),
+    ("i.n is 9", "i.n is 9", &[], &[]),
+    ("i.n is at least .cov.k", "i.n is at least cov.k", &[], &[]),
+    ("item 1 of .zs is 1", "item 1 of zs is 1", &[], &[]),
+    ("n is 1", "n is 1", &[], &[]),
+    ("p is 9", "p is 9", &[], &[]),
+    ("p is at least 2", "p is at least 2", &[], &[]),
+    ("q.n is 9", "q.n is 9", &[], &[]),
+    ("some .cov.xs is 9", "some cov.xs is 9", &[], &[]),
+    ("w is at least 2", "w is at least 2", &[], &[]),
+    ("z is at least 2", "z is at least 2", &[], &[]),
+    ("z is at least 9", "z is at least 9", &[], &[]),
+    ("z.y is 0", "z.y is 0", &[], &[]),
     ("count of .cov is 1", "count of cov is 1", &[], &[]),
     ("z is 9", "z is 9", &[], &[]),
     ("z is at least 1", "z is at least 1", &[], &[]),
@@ -3949,6 +3972,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
+    ("a is 9", &["a is a word of the grammar: write .a"]),
+    ("a is at least 2", &["a is a word of the grammar: write .a"]),
+    ("every items whose cov is 2 has n is 1", &["doesn't parse"]),
+    (
+        "every items.zs whose it is 1 has .cov is 1",
+        &["doesn't parse"],
+    ),
     (
         "x named by $params is 1 within",
         &["\"within\" needs a number after it"],
@@ -6113,6 +6143,58 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
+        "every .cov.xs as p, every cov.xs as q",
+        "every cov.xs as p, every cov.xs as q",
+        &[],
+        &[],
+    ),
+    (
+        "every .cov.xs as p, every items as y",
+        "every cov.xs as p, every items as y",
+        &[],
+        &[],
+    ),
+    (
+        "every .cov.xs as p, every items whose n is p as q",
+        "every cov.xs as p, every items whose n equals p as q",
+        &[],
+        &[],
+    ),
+    ("every .xs as x", "every xs as x", &[], &[]),
+    ("every .y.zs as z", "every y.zs as z", &[], &[]),
+    (
+        "every items as cov, every .cov.zs as z",
+        "every items as cov, every .cov.zs as z",
+        &[],
+        &[],
+    ),
+    (
+        "every items as y, every cov.zs as z",
+        "every items as y, every cov.zs as z",
+        &[],
+        &[],
+    ),
+    (
+        "every items as y, every rs as z",
+        "every items as y, every rs as z",
+        &[],
+        &[],
+    ),
+    (
+        "every items as y, every y.zs as z",
+        "every items as y, every y.zs as z",
+        &[],
+        &[],
+    ),
+    (
+        "every items whose .cov is 1 as i",
+        "every items whose cov is 1 as i",
+        &[],
+        &[],
+    ),
+    ("every rs as cov", "every rs as cov", &[], &[]),
+    ("some .cov.xs as p", "some cov.xs as p", &[], &[]),
+    (
         "every items as y, every .cov.zs as z",
         "every items as y, every cov.zs as z",
         &[],
@@ -7030,6 +7112,10 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "every items as y, every .y.zs as z, every .cov.xs as w",
+        &["a for line holds two items at most"],
+    ),
     ("every xs whose zz is $foo foo bar as x", &["doesn't parse"]),
     (
         " every  xs ",
@@ -7465,6 +7551,19 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    (
+        "every items as y, every .y.zs whose it is 0 as z",
+        &["it can only start an assertion: write it first, like it is not empty"],
+    ),
+    (
+        "every .cov.xs as a, every cov.xs as b",
+        &["a can't be an alias"],
+    ),
+    (
+        "every .cov.xs as a, every items as y",
+        &["a can't be an alias"],
+    ),
+    ("some .cov.xs as a", &["a can't be an alias"]),
     ("every xs whose zz is $foo as x", &["unknown name $foo"]),
     (
         "every \"$s\" named by $params.\"x y\" as it",

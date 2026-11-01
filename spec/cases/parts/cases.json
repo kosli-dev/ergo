@@ -1754,6 +1754,100 @@
     ]
   },
   {
+    "description": "a child subject whose part is named like its parent's, read in many places",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r0": {"subject": "item", "checks": {"c": "n is 1"}}, "r1": {"subject": "item", "checks": {"c": "cov.k is 0"}}, "r2": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r3": {"subject": "item", "checks": {"c": "count of .round is 1"}}, "r4": {"subject": "item", "checks": {"c": "item 1 of .zs is 1"}}}},
+    "cases": [
+      {
+        "description": "prints the dot as the policy wrote it, in the filter, the checks and the walks",
+        "rules": ["name.dot"],
+        "input": {"rounds": [{"id": "r1", "y": {"k": 1}, "cov": {"k": 1, "xs": [1, 2]}, "d": {"b": {"k": 5, "xs": [1]}}, "items": [{"id": "i1", "n": 1, "cov": 1, "round": 1, "zs": [1], "y": {"k": 0}}, {"id": "i2", "n": 3, "cov": 2, "round": 2, "zs": [2], "y": {"k": 9}}], "rs": [{"cov": 1, "y": 3}]}]},
+        "status": {"r0": "not_met", "r1": "not_met", "r2": "not_met", "r3": "not_met", "r4": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r0", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r1", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r2", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r3", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r4", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "walks and counts over an own field named like a part, in the checks and in the filters",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r0": {"subject": "round", "checks": {"c": "every .cov.xs is at least 2"}}, "r1": {"subject": "round", "checks": {"c": "some .cov.xs is 9"}}, "r2": {"subject": "round", "checks": {"c": "every items.zs whose it is 1 has .cov is 1"}}, "r3": {"subject": "round", "checks": {"c": "every items whose cov is 2 has n is 1"}}}},
+    "cases": [
+      {
+        "description": "names the failed items and the inputs of the own field with the dot",
+        "rules": ["name.dot"],
+        "input": {"rounds": [{"id": "r1", "y": {"k": 1}, "cov": {"k": 1, "xs": [1, 2]}, "d": {"b": {"k": 5, "xs": [1]}}, "items": [{"id": "i1", "n": 1, "cov": 1, "round": 1, "zs": [1], "y": {"k": 0}}, {"id": "i2", "n": 3, "cov": 2, "round": 2, "zs": [2], "y": {"k": 9}}], "rs": [{"cov": 1, "y": 3}]}]},
+        "status": {"r0": "not_met", "r1": "not_met", "r2": "not_met", "r3": "not_met"},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "round"}},
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "passed": false, "requirement": "r2", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "passed": false, "requirement": "r3", "subject": {"id": null, "type": "round"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "round"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "round"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "round"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r0", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r1", "subject": {"id": "r1", "type": "round"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject with no part of its own, reading a field named like its parent's part",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r0": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r1": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r2": {"subject": "item", "checks": {"c": ".zz is 1"}}}},
+    "cases": [
+      {
+        "description": "prints no dot, because a bare name in the child doesn't read the parent's part",
+        "rules": ["name.dot"],
+        "input": {"rounds": [{"id": "r1", "d": {"b": {"k": 5}}, "items": [{"id": "i1", "n": 1, "cov": 1, "y": {"k": 0}, "xs": [0]}, {"id": "i2", "n": 2, "cov": 2, "y": {"k": 9}, "xs": [3]}]}]},
+        "status": {"r0": "met", "r1": "not_met", "r2": "not_met"},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "item"}},
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "item"}},
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r2", "subject": {"id": null, "type": "item"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r1", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r2", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r0", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r1", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r2", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "passed": false, "requirement": "r0", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "passed": false, "requirement": "r1", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "passed": false, "requirement": "r2", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "passed": false, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "zz", "value": null}], "passed": false, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part refused for its value, read in many places",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id"}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}}}, "requirements": {"r00": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r01": {"subject": "item", "checks": {"c": "every .xs is at least 1"}}, "r02": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r03": {"subject": "item", "checks": {"c": {"for": "every .xs as x", "assert": "x is 1"}}}, "r04": {"subject": "item", "checks": {"c": "cov is 1"}}}},
+    "cases": [
+      {
+        "description": "prints the dot in every expression, because the refused name is still the part's",
+        "rules": ["name.dot", "parts.syntax"],
+        "input": {"rounds": [{"id": "r1", "d": {"b": {"k": 5}}, "items": [{"id": "i1", "n": 1, "cov": 1, "y": {"k": 0}, "xs": [0]}, {"id": "i2", "n": 2, "cov": 2, "y": {"k": 9}, "xs": [3]}]}]},
+        "status": {"r00": "not_met", "r01": "not_met", "r02": "not_met", "r03": "not_met", "r04": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r00", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r01", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r02", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r03", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r04", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "an own field named like a part, read by a walk that fails",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own": "every .cov.xs is at least 2", "part": "every cov.xs is at least 2"}}}},
     "cases": [
