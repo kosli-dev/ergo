@@ -13183,6 +13183,40 @@
     ]
   },
   {
+    "description": "a check whose for isn't a string, with an own field read after the dot",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id"}}, "requirements": {"r": {"subject": "round", "checks": {"c": {"for": ["every items as y"], "assert": "y.n is at least .y.k"}}}}},
+    "cases": [
+      {
+        "description": "is written wrong and its expression keeps the dot as written",
+        "rules": ["name.dot", "written_wrong.row"],
+        "input": {"rounds": [{"id": "r1", "y": {"k": 1}, "items": [{"id": "i1", "n": 1}]}]},
+        "expressions": {"r": {"c": "y.n is at least .y.k"}},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["invalid for"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "round"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose alias is named like a field of the subject, read by a failing walk",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id"}}, "requirements": {"r": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is 1"}}}}},
+    "cases": [
+      {
+        "description": "names the failed item of the own field with the dot",
+        "rules": ["name.dot", "for.failure_inputs"],
+        "input": {"rounds": [{"id": "r1", "y": {"k": 1}, "items": [{"id": "i1", "zs": [1, 2]}]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": ".y.zs", "locations": ["/rounds/0/y"], "path": ".y.zs", "value": null}], "inputs": [{"locations": [], "name": ".y.zs", "value": []}, {"locations": ["/rounds/0/items/0"], "name": "items[]", "value": [{"id": "i1", "zs": [1, 2]}]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a failed sentence on a for line lists its inputs in the order of its kind",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"walk": {"for": "every xs as x", "assert": "some rows.n is at least x.v"}, "aliases": {"for": "every xs as x", "assert": "some x.tags is in x.nums"}, "compare": {"for": "every xs as x", "assert": "x.v is at most m"}, "count": {"for": "every xs as x", "assert": "count of rows is at least m"}}}}},
     "cases": [

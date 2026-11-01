@@ -7466,6 +7466,20 @@ test_an_own_field_named_like_a_part_keeps_its_dot_and_the_part_does_not if {
 	[i.name | some i in _parts_row(rep, "g").inputs] == ["name"]
 }
 
+test_a_failed_item_of_an_own_field_named_like_a_part_or_a_for_alias_keeps_the_dot if {
+	policy := _parts_policy({"cov": "dd.b"}, {"c": "every .cov.xs is at least 2", "d": "every cov.xs is at least 2"})
+	rep := ergo.report({"trail": {"name": "t1", "cov": {"xs": [1, 2]}, "dd": {"b": {"xs": [1]}}}}, policy, {})
+	[f.path | some f in _parts_row(rep, "c").failed_items] == ["item 1 of .cov.xs"]
+	[f.path | some f in _parts_row(rep, "d").failed_items] == ["item 1 of cov.xs"]
+	for_policy := {
+		"ergo_spec": "v0.4-dev",
+		"subjects": {"round": {"from": "rounds", "identified_by": "id"}},
+		"requirements": {"r": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is 1"}}}},
+	}
+	for_rep := ergo.report({"rounds": [{"id": "r1", "y": {"k": 1}, "items": [{"id": "i1", "zs": [1, 2]}]}]}, for_policy, {})
+	[f.path | some r in for_rep.results; r.check == "c"; some f in r.failed_items] == [".y.zs"]
+}
+
 test_an_own_field_named_like_a_for_alias_keeps_its_dot if {
 	policy := {
 		"ergo_spec": "v0.4-dev",

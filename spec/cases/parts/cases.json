@@ -1685,6 +1685,41 @@
     ]
   },
   {
+    "description": "a child subject whose part is named like its parent's, with a filter that wrote a dot",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}}},
+    "cases": [
+      {
+        "description": "is written wrong and the report echoes the dots as they were written",
+        "rules": ["name.dot", "written_wrong.row"],
+        "input": {"rounds": [{"id": "r1", "y": {"k": 1}, "cov": 1, "d": {"b": {"k": 5}}, "items": [{"id": "i1", "cov": 1}]}]},
+        "expressions": {"r": {"$applies": ".cov is 1", "c": ".cov is 1"}},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an own field named like a part, read by a walk that fails",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own": "every .cov.xs is at least 2", "part": "every cov.xs is at least 2"}}}},
+    "cases": [
+      {
+        "description": "names the item of the own field with the dot and the item of the part without it",
+        "rules": ["name.dot", "name.part"],
+        "input": {"rounds": [{"id": "r1", "cov": {"xs": [1, 2]}, "d": {"b": {"xs": [1]}}}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "own", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "item": "item 1 of cov.xs", "locations": ["/rounds/0/d/b/xs/0"], "path": "item 1 of cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/d/b/xs/0"], "name": "cov.xs[]", "part": {"id": null, "name": "cov"}, "value": [1]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a part's alias on the right of a whose, with items that have a field of the same name",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "p"}}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": "every xs.v whose n is count of x.z is 1", "some_whose": "some xs.v whose n is count of x.z is 5", "count_whose": "count of xs whose n is count of x.z is 2", "sum_whose": "sum of xs.v whose n is count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1", "for_whose": {"for": "every xs whose n is count of x.z as y", "assert": "y.v is 1"}, "dot_right": "every xs.v whose n is count of .x.z is 1", "left": "count of xs whose count of x.z is 3 is 3"}}}},
     "cases": [

@@ -7784,7 +7784,7 @@ _walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": fail
 	judged := [_walk_judge(check, w, e) | some e in w.items]
 	fails := array.concat(array.concat(w.fails, [j.failure | some j in judged; j.failure != null]), _walk_stop(w))
 	cause := _walk_cause(check, w, judged, fails)
-	failed := _walk_failed(cause, fails)
+	failed := _walk_failed(cause, fails, check.path)
 	inputs := _merged_inputs(array.concat(_walk_inputs(check, w), array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check)))))
 }
 
@@ -8093,9 +8093,9 @@ _walk_some_kept(judged, false) if {
 
 _walk_worst(fails) := [c | some c in array.concat(_cause_precedence, ["value"]); c in {f.cause | some f in fails}][0]
 
-_walk_failed("satisfied", _) := []
+_walk_failed("satisfied", _, _) := []
 
-_walk_failed(cause, fails) := [{"path": _input_name(f.path), "item": _input_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
+_walk_failed(cause, fails, path) := [{"path": _failed_name(f.path, _dotted_roots([path])), "item": _failed_name(f.item, _dotted_roots([path])), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
 	some p in sort({f.path | some f in fails})
 	some f in fails
 	f.path == p
@@ -8709,9 +8709,26 @@ _for_verdict(item, w, judged, fails) := _walk_stop(w)[0].cause if {
 	count(_walk_stop(w)) > 0
 } else := _walk_verdict(item.q, item.if_any == true, judged, fails)
 
+_for_dotted(check) := _dotted_roots([item.path | some item in check.items])
+
+_dotted_roots(paths) := {p[0].literal |
+	some p in paths
+	is_array(p)
+	_string_literal(p[0])
+	not startswith(p[0].literal, "$")
+}
+
+default _dotted_root(_, _) := false
+
+_dotted_root(path, roots) if path[0] in roots
+
+_failed_name(path, roots) := _input_name(path) if not _dotted_root(path, roots)
+
+_failed_name(path, roots) := _with_dot(_input_name(path), true) if _dotted_root(path, roots)
+
 _for_failed(_, "satisfied", _) := []
 
-_for_failed(check, cause, fails) := [object.union({"path": _input_name(f.path), "item": _input_name(f.item), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f)}, _for_unchecked(check, object.get(f, "inner", []))) |
+_for_failed(check, cause, fails) := [object.union({"path": _failed_name(f.path, _for_dotted(check)), "item": _failed_name(f.item, _for_dotted(check)), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f)}, _for_unchecked(check, object.get(f, "inner", []))) |
 	some p in sort({f.path | some f in fails; not object.get(f, "nothing_picked", false)})
 	some f in fails
 	f.path == p
