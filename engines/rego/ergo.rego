@@ -3308,15 +3308,38 @@ _any_read_state(subj, path) := s if {
 _field_step_state(subj, path) := "not_an_object" if {
 	_has_field_step(path)
 	not is_object(subj)
+} else := s if {
+	prefix := array.slice(path, 0, _first_field_step(path))
+	not _read_before_field(_resolved(subj, prefix))
+	s := _state_before_field(subj, prefix)
 } else := "null" if {
-	some seg in path
+	some i, seg in path
 	_field_step(seg)
+	_read_before_field(_resolved(subj, array.slice(path, 0, i)))
 	subj[seg.named_by_field] == null
 } else := "unusable" if {
-	some seg in path
+	some i, seg in path
 	_field_step(seg)
+	_read_before_field(_resolved(subj, array.slice(path, 0, i)))
 	v := subj[seg.named_by_field]
 	not is_string(v)
+}
+
+_first_field_step(path) := min({i | some i, seg in path; _field_step(seg)})
+
+_state_before_field(subj, prefix) := "null" if _resolved(subj, prefix) == null
+
+else := "unusable" if {
+	start := _start_of(subj, prefix)
+	is_object(start)
+	_blocked(start, _keys_in(subj, prefix))
+}
+
+else := "absent"
+
+_read_before_field(v) if {
+	v != _absent
+	v != null
 }
 
 _name_step_state(path) := "null" if {
@@ -3607,31 +3630,24 @@ _row_inputs(subj, check) := _with_key_fields(subj, check, _check_inputs(subj, ch
 
 _with_key_fields(subj, check, inputs) := inputs if count(_key_fields(check)) == 0
 
-else := _once([x |
-	some i, entry in inputs
-	some x in array.concat([entry], [_path_input(subj, [f]) | some f in _own_key_fields(_written_paths(check)[i])])
-]) if {
-	_in_written_order(check, inputs)
-}
+else := _once(array.concat(
+	[x |
+		some entry in inputs
+		some x in array.concat([entry], [_path_input(subj, [f]) | some p in _field_paths(check); _names_path(entry, p); some f in _own_key_fields(p)])
+	],
+	[_path_input(subj, [f]) | some f in _key_fields(check)],
+))
 
-else := _once(array.concat(inputs, [_path_input(subj, [f]) | some f in _key_fields(check)]))
+_names_path(entry, path) if entry.name == _input_name(path)
 
-_in_written_order(check, inputs) if {
-	check.op in {"compare", "compare_time"}
-	every f in ["left", "right"] {
-		_basic_form(object.get(check, f, null)) in {"path", "literal"}
-	}
-	count(_written_paths(check)) == count(inputs)
-}
+_names_path(entry, path) if entry.name == concat("", [_input_name(path), "[]"])
 
-_in_written_order(check, inputs) if {
-	check.op == "compare"
-	_side_form(check.right) == "join"
-	_basic_form(check.left) == "path"
-	count(_written_paths(check)) == count(inputs)
-}
-
-_written_paths(check) := array.concat(_side_paths(object.get(check, "left", null)), _side_paths(object.get(check, "right", null)))
+_field_paths(check) := [p |
+	is_object(check)
+	some p in array.concat([object.get(check, "path", [])], array.concat(_side_paths(object.get(check, "left", null)), _side_paths(object.get(check, "right", null))))
+	is_array(p)
+	count(_own_key_fields(p)) > 0
+]
 
 _own_key_fields(path) := [seg.named_by_field |
 	some seg in path
