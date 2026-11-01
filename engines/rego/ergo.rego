@@ -427,7 +427,7 @@ _field_problem_inputs(req) := [{"name": _field_key_name(k), "value": sort({p[1] 
 
 _field_sort_key(f) := [1, _field_name(f)] if is_string(f)
 
-_field_sort_key(f) := [1, _field_name(f)] if is_array(f)
+_field_sort_key(f) := [2, _field_name(f)] if is_array(f)
 
 _field_sort_key(f) := [0, f] if {
 	not is_string(f)
@@ -435,6 +435,8 @@ _field_sort_key(f) := [0, f] if {
 }
 
 _field_key_name([1, name]) := name
+
+_field_key_name([2, name]) := name
 
 _field_key_name([0, f]) := _field_name(f)
 

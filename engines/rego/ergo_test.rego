@@ -1888,8 +1888,8 @@ test_problems_with_several_fields_are_listed_by_field if {
 		{"name": "require", "value": ["neither every nor some"], "locations": []},
 		{"name": "checks", "value": ["empty"], "locations": []},
 		{"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []},
-		{"name": "subjects.subject.from", "value": ["not a string"], "locations": []},
 		{"name": "zz", "value": ["unknown field"], "locations": []},
+		{"name": "subjects.subject.from", "value": ["not a string"], "locations": []},
 	]
 }
 
