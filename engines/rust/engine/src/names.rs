@@ -1,3 +1,4 @@
+const EMPTY_NAME: &str = "a name can't be empty";
 const DOLLAR_NAME: &str = "a name can't start with $";
 const EDGE_NAME: &str = "a name can't start or end with a space or an invisible character";
 
@@ -42,9 +43,12 @@ fn edge_char(c: char) -> bool {
         .any(|(low, high)| (*low..=*high).contains(&c))
 }
 
-/// What is wrong with a name a user wrote: it starts with `$`, or starts or ends with a space or an invisible character. Sorted, so the same names give the same list in every report.
+/// What is wrong with a name a user wrote: it is empty, it starts with `$`, or starts or ends with a space or an invisible character. Sorted, so the same names give the same list in every report.
 pub fn written_name_problems(name: &str) -> Vec<&'static str> {
     let mut found = Vec::new();
+    if name.is_empty() {
+        found.push(EMPTY_NAME);
+    }
     let edge =
         name.chars().next().is_some_and(edge_char) || name.chars().last().is_some_and(edge_char);
     if edge {
@@ -85,6 +89,12 @@ mod tests {
         ] {
             assert_eq!(written_name_problems(name), vec![EDGE], "{name:?}");
         }
+    }
+
+    #[test]
+    fn an_empty_name_is_listed_and_a_name_with_text_is_not() {
+        assert_eq!(written_name_problems(""), vec!["a name can't be empty"]);
+        assert!(written_name_problems("a").is_empty());
     }
 
     #[test]

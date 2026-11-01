@@ -1571,7 +1571,7 @@ mod tests {
     fn part_problems_are_listed_under_the_alias() {
         let (_, r) = reading(json!({"r": {"from": "rs", "has": {
             "who": "art whose x exists", "in_params": "$params.x", "blank": " ",
-            "every": "art", "with space": "art", "bare_by": "art named by foo", "$dollar": "art"
+            "every": "art", "with space": "art", "bare_by": "art named by foo", "$dollar": "art", "": "art"
         }}}));
         let problems = &r.infos["r"].problems;
         assert_eq!(
@@ -1585,6 +1585,7 @@ mod tests {
         assert!(problems["subjects.r.has.every"].contains("invalid alias"));
         assert!(problems["subjects.r.has.\"with space\""].contains("invalid alias"));
         assert!(problems["subjects.r.has.$dollar"].contains("a name can't start with $"));
+        assert!(problems["subjects.r.has.\"\""].contains("a name can't be empty"));
         assert!(problems["subjects.r.has.bare_by"].contains("from: unknown alias foo"));
     }
 
