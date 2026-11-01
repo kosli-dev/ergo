@@ -14,6 +14,7 @@ pub enum Right {
     Written(Value),
     Ref(Path),
     Field(Path),
+    Join(Vec<Right>),
 }
 
 impl Right {
@@ -25,6 +26,7 @@ impl Right {
                 .collect(),
             Right::Ref(path) => step_refs(path),
             Right::Field(path) => step_refs(path),
+            Right::Join(pieces) => pieces.iter().flat_map(Right::refs).collect(),
         }
     }
 }
@@ -58,10 +60,11 @@ pub struct Matches {
 }
 
 impl Right {
-    fn shown_path(&self) -> Option<&Path> {
+    fn shown_paths(&self) -> Vec<&Path> {
         match self {
-            Right::Written(_) | Right::Ref(_) => None,
-            Right::Field(path) => Some(path),
+            Right::Written(_) | Right::Ref(_) => Vec::new(),
+            Right::Field(path) => vec![path],
+            Right::Join(pieces) => pieces.iter().flat_map(Right::shown_paths).collect(),
         }
     }
 }
@@ -69,7 +72,7 @@ impl Right {
 impl In {
     pub fn paths(&self) -> Vec<&Path> {
         std::iter::once(&self.path)
-            .chain(self.values.shown_path())
+            .chain(self.values.shown_paths())
             .collect()
     }
 
@@ -87,7 +90,7 @@ impl Contains {
             Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => right,
         };
         std::iter::once(&self.path)
-            .chain(right.shown_path())
+            .chain(right.shown_paths())
             .collect()
     }
 
@@ -105,7 +108,7 @@ impl Contains {
 impl Matches {
     pub fn paths(&self) -> Vec<&Path> {
         std::iter::once(&self.path)
-            .chain(self.patterns.shown_path())
+            .chain(self.patterns.shown_paths())
             .collect()
     }
 
@@ -144,6 +147,38 @@ fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
                 outcome: read.outcome,
                 value: read.value,
                 inputs: read.inputs,
+            }
+        }
+        Right::Join(pieces) => {
+            let reads: Vec<RightRead> = pieces.iter().map(|p| read_right(p, ctx)).collect();
+            let inputs = reads
+                .iter()
+                .flat_map(|r| r.inputs.iter().cloned())
+                .collect();
+            let mut text = String::new();
+            for read in &reads {
+                match (read.outcome, &read.value) {
+                    (Outcome::Found, Some(Value::String(piece))) => text.push_str(piece),
+                    (Outcome::Found, _) => {
+                        return RightRead {
+                            outcome: Outcome::Found,
+                            value: None,
+                            inputs,
+                        };
+                    }
+                    (outcome, _) => {
+                        return RightRead {
+                            outcome,
+                            value: None,
+                            inputs,
+                        };
+                    }
+                }
+            }
+            RightRead {
+                outcome: Outcome::Found,
+                value: Some(Value::String(text)),
+                inputs,
             }
         }
     }
@@ -194,7 +229,7 @@ fn ref_read(right: &Right, ctx: &Ctx) -> Option<Value> {
                 _ => None,
             }
         }
-        Right::Written(_) | Right::Field(_) => None,
+        Right::Written(_) | Right::Field(_) | Right::Join(_) => None,
     }
 }
 
@@ -373,6 +408,22 @@ fn operand_right(operand: &tree::Operand, scope: &Scope) -> Option<Result<Right,
             [tree::Term::Path(p)] => Some(path_right(p, scope)),
             _ => None,
         },
+        tree::Operand::Joined(pieces) => {
+            let mut rights = Vec::new();
+            let mut problems = Vec::new();
+            for piece in pieces {
+                match operand_right(piece, scope) {
+                    Some(Ok(right)) => rights.push(right),
+                    Some(Err(found)) => problems.extend(found),
+                    None => return None,
+                }
+            }
+            Some(if problems.is_empty() {
+                Ok(Right::Join(rights))
+            } else {
+                Err(problems)
+            })
+        }
     }
 }
 
@@ -677,6 +728,44 @@ mod tests {
             Cause::Satisfied
         );
         assert_eq!(contains(json!({"x": ["c", "a"]}), all, true), Cause::Value);
+    }
+
+    #[test]
+    fn contains_a_joined_string_looks_for_the_pieces_put_together() {
+        let joined = || {
+            Wanted::One(Right::Join(vec![
+                written(json!("x")),
+                Right::Field(key_path(Start::Subject, &["y"])),
+            ]))
+        };
+        assert_eq!(
+            contains(json!({"x": ["x1", "b"], "y": "1"}), joined(), false),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            contains(json!({"x": ["x1", "b"], "y": "1"}), joined(), true),
+            Cause::Value
+        );
+        assert_eq!(
+            contains(json!({"x": ["a"], "y": "1"}), joined(), true),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            contains(json!({"x": ["a"], "y": 1}), joined(), false),
+            Cause::Unusable
+        );
+        assert_eq!(
+            contains(json!({"x": ["a"]}), joined(), false),
+            Cause::Absent
+        );
+        assert_eq!(
+            contains(json!({"x": "a", "y": null}), joined(), false),
+            Cause::Null
+        );
+        assert_eq!(
+            contains(json!({"x": "a", "y": "1"}), joined(), false),
+            Cause::Unusable
+        );
     }
 
     #[test]

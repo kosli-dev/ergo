@@ -1582,6 +1582,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "x whose aa is not 1 within 2",
     ),
     ("x whose aa is not a list", "x whose aa is not a list"),
+    (
+        "things whose v is \"x\" followed by t",
+        "things whose v is \"x\" followed by t",
+    ),
+    ("status.coverage.data", "status.coverage.data"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2742,6 +2747,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("xs", "xs"),
     ("ys", "ys"),
     ("cov", "cov"),
+    ("status.coverage.data", "status.coverage.data"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[

@@ -47,7 +47,8 @@ derived-left      = derived [WS whose]
                   / 1*(term WS "plus" WS) (term / derived WS whose)
 field             = (right-path / derived / elapsed) *(WS "plus" WS term)
                   / number 1*(WS "plus" WS term)
-operand           = value / field
+operand           = value / field / joined
+joined            = (value / field) 1*(WS "followed" WS "by" WS (value / right-path))
 
 ; Phrases. compare-phrase is the subset a derived value can take.
 phrase            = one-of-phrase / exists-phrase / empty-phrase / type-phrase

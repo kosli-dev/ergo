@@ -8887,5 +8887,433 @@
         ]
       }
     ]
+  },
+  {
+    "description": "is a value followed by a field",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}}},
+    "cases": [
+      {
+        "description": "read the pieces in order, and each check passes or fails on its own",
+        "rules": ["sentence.operand.followed_by", "compare.join", "compare.inputs"],
+        "input": {"things": [{"id": "t1", "v": "x1.2-dev", "t": "1.2", "u": "-dev"}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}, {"locations": ["/things/0/u"], "name": "u", "value": "-dev"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      },
+      {
+        "description": "fail as value when the text is another",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": "zz", "t": "1.2", "u": "-dev"}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "zz"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "zz"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "zz"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "zz"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}, {"locations": ["/things/0/u"], "name": "u", "value": "-dev"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      },
+      {
+        "description": "fail as unusable when a piece is a number",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": "x1", "t": 1, "u": "a"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": 1}, {"locations": ["/things/0/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      },
+      {
+        "description": "fail as unusable when a piece is a list",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": "x1", "t": ["1"], "u": "a"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": ["1"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": ["1"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": ["1"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": ["1"]}, {"locations": ["/things/0/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      },
+      {
+        "description": "fail as unusable when the field on the left is a number",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": 3, "t": "1", "u": "a"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 3}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 3}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 3}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 3}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}, {"locations": ["/things/0/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      },
+      {
+        "description": "fail as absent when a piece is missing",
+        "rules": ["sentence.operand.followed_by", "compare.join", "path.absent"],
+        "input": {"things": [{"id": "t1", "v": "x1", "u": "a"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0"], "name": "t", "value": null}, {"locations": ["/things/0/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      },
+      {
+        "description": "fail as null when a piece is null",
+        "rules": ["sentence.operand.followed_by", "compare.join", "path.null"],
+        "input": {"things": [{"id": "t1", "v": "x1", "t": null, "u": "a"}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": null}, {"locations": ["/things/0/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      },
+      {
+        "description": "fail as the cause of the first piece that can't be read",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": "x1", "t": null, "u": 5}, {"id": "t1", "v": "x1", "u": null, "t": 5}, {"id": "t1", "v": "x1"}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1"}, {"locations": ["/things/0/t"], "name": "t", "value": null}, {"locations": ["/things/0/u"], "name": "u", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "x1"}, {"locations": ["/things/1/t"], "name": "t", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "x1"}, {"locations": ["/things/1/t"], "name": "t", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "x1"}, {"locations": ["/things/1/t"], "name": "t", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "x1"}, {"locations": ["/things/1/t"], "name": "t", "value": 5}, {"locations": ["/things/1/u"], "name": "u", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "x1"}, {"locations": ["/things/2"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "x1"}, {"locations": ["/things/2"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "x1"}, {"locations": ["/things/2"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "x1"}, {"locations": ["/things/2"], "name": "t", "value": null}, {"locations": ["/things/2"], "name": "u", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      },
+      {
+        "description": "fail as the cause of the pieces before the left side",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "t": 5, "u": "a"}, {"id": "t1", "v": null, "t": 5, "u": "a"}, {"id": "t1", "v": 7, "u": "a"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0"], "name": "v", "value": null}, {"locations": ["/things/0/t"], "name": "t", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0"], "name": "v", "value": null}, {"locations": ["/things/0/t"], "name": "t", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "v", "value": null}, {"locations": ["/things/0/t"], "name": "t", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0"], "name": "v", "value": null}, {"locations": ["/things/0/t"], "name": "t", "value": 5}, {"locations": ["/things/0/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": 5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": 5}, {"locations": ["/things/1/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": 7}, {"locations": ["/things/2"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": 7}, {"locations": ["/things/2"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": 7}, {"locations": ["/things/2"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": 7}, {"locations": ["/things/2"], "name": "t", "value": null}, {"locations": ["/things/2/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      },
+      {
+        "description": "fail as absent or null for the left side when the pieces can be read",
+        "rules": ["sentence.operand.followed_by", "compare.join", "path.absent", "path.null"],
+        "input": {"things": [{"id": "t1", "t": "1", "u": "a"}, {"id": "t1", "v": null, "t": "1", "u": "a"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0"], "name": "v", "value": null}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/0"], "name": "v", "value": null}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "v", "value": null}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/0"], "name": "v", "value": null}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}, {"locations": ["/things/0/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": "1"}, {"locations": ["/things/1/u"], "name": "u", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"-dev\"", "c": "v is \"x\" followed by t followed by \"-dev\"", "d": "v is t followed by u"}}
+      }
+    ]
+  },
+  {
+    "description": "followed by after the phrases that take text",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"s": "v starts with \"x\" followed by t", "e": "v ends with t followed by \"dev\"", "ns": "v does not start with \"x\" followed by t", "ne": "v does not end with t followed by \"dev\"", "c": "l contains \"x\" followed by t", "nc": "l does not contain \"x\" followed by t", "ab": "v is alphabetically before \"x\" followed by t", "ao": "v is alphabetically on or after \"x\" followed by t"}}}},
+    "cases": [
+      {
+        "description": "read the joined text like the text on its own",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": "x1.2-dev", "t": "1.2", "l": ["x1.2"]}]},
+        "results": [
+          {"cause": "value", "check": "ab", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "ao", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["x1.2"]}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "e", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "nc", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["x1.2"]}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "ne", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "ns", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "s", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1.2-dev"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"c": "l contains \"x\" followed by t", "nc": "l does not contain \"x\" followed by t"}}
+      },
+      {
+        "description": "read it the other way round when the text is another",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": "y", "t": "1.2", "l": ["a"]}]},
+        "results": [
+          {"cause": "value", "check": "ab", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "ao", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "e", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "nc", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "ne", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "ns", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "s", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "y"}, {"locations": ["/things/0/t"], "name": "t", "value": "1.2"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"c": "l contains \"x\" followed by t", "nc": "l does not contain \"x\" followed by t"}}
+      },
+      {
+        "description": "fail as unusable when the pieces or the left side have the wrong type",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": 1, "t": "1", "l": "a"}, {"id": "t1", "v": "a", "t": 1, "l": ["a"]}, {"id": "t1", "v": "a", "t": "1", "l": ["a", 1]}]},
+        "results": [
+          {"cause": "unusable", "check": "ab", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 1}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "ao", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 1}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": "a"}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 1}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "nc", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": "a"}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "ne", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 1}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "ns", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 1}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "s", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": 1}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "ab", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "a"}, {"locations": ["/things/1/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "ao", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "a"}, {"locations": ["/things/1/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/1/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "a"}, {"locations": ["/things/1/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "nc", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/1/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "ne", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "a"}, {"locations": ["/things/1/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "ns", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "a"}, {"locations": ["/things/1/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "s", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "a"}, {"locations": ["/things/1/t"], "name": "t", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "ab", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "a"}, {"locations": ["/things/2/t"], "name": "t", "value": "1"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "ao", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "a"}, {"locations": ["/things/2/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/2/l"], "name": "l", "value": ["a", 1]}, {"locations": ["/things/2/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "e", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "a"}, {"locations": ["/things/2/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "nc", "inputs": [{"locations": ["/things/2/l"], "name": "l", "value": ["a", 1]}, {"locations": ["/things/2/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "ne", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "a"}, {"locations": ["/things/2/t"], "name": "t", "value": "1"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "ns", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "a"}, {"locations": ["/things/2/t"], "name": "t", "value": "1"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "s", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "a"}, {"locations": ["/things/2/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"c": "l contains \"x\" followed by t", "nc": "l does not contain \"x\" followed by t"}}
+      },
+      {
+        "description": "fail as absent or null",
+        "rules": ["sentence.operand.followed_by", "compare.join", "path.absent", "path.null"],
+        "input": {"things": [{"id": "t1", "v": "a", "l": ["a"]}, {"id": "t1", "v": null, "t": null, "l": null}]},
+        "results": [
+          {"cause": "absent", "check": "ab", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "ao", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "e", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "nc", "inputs": [{"locations": ["/things/0/l"], "name": "l", "value": ["a"]}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "ne", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "ns", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "s", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/things/0"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "ab", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "ao", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "e", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "nc", "inputs": [{"locations": ["/things/1/l"], "name": "l", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "ne", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "ns", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "s", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": null}, {"locations": ["/things/1/t"], "name": "t", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"c": "l contains \"x\" followed by t", "nc": "l does not contain \"x\" followed by t"}}
+      }
+    ]
+  },
+  {
+    "description": "followed by with a written value that isn't text",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is \"x\" followed by 1", "b": "v is \"x\" followed by null", "c": "v is not true followed by t", "d": "v starts with \"x\" followed by 1.5"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because it could only fail",
+        "rules": ["sentence.operand.followed_by", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "v": "x1", "t": "1"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["\"followed by\" takes text"]}, {"locations": [], "name": "checks.b", "value": ["\"followed by\" takes text"]}, {"locations": [], "name": "checks.c", "value": ["\"followed by\" takes text"]}, {"locations": [], "name": "checks.d", "value": ["\"followed by\" takes text"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "followed by after a phrase that takes numbers, times or a count",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is at least \"x\" followed by t", "b": "v is before \"x\" followed by t", "c": "n is \"x\" followed by t within 1", "d": "count of l is \"x\" followed by t", "e": "v is y plus 1 followed by \"a\"", "f": "v is \"x\" followed by t plus 1", "g": "v is \"x\" followed by count of l", "h": "v is between 1 followed by 2 and 3", "i": "v matches \"x\" followed by t", "j": "v is one of \"x\" followed by t"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and says why",
+        "rules": ["sentence.operand.followed_by", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "v": "x1", "t": "1", "n": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 10}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["\"is at least\" can't take followed by"]}, {"locations": [], "name": "checks.b", "value": ["\"is before\" can't take followed by"]}, {"locations": [], "name": "checks.c", "value": ["\"within\" can't take followed by"]}, {"locations": [], "name": "checks.d", "value": ["\"followed by\" can't follow a count of, a sum of or a plus"]}, {"locations": [], "name": "checks.e", "value": ["\"followed by\" can't take a count of, a sum of or a plus"]}, {"locations": [], "name": "checks.f", "value": ["doesn't parse"]}, {"locations": [], "name": "checks.g", "value": ["doesn't parse"]}, {"locations": [], "name": "checks.h", "value": ["doesn't parse"]}, {"locations": [], "name": "checks.i", "value": ["doesn't parse"]}, {"locations": [], "name": "checks.j", "value": ["doesn't parse"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "followed by after every or some and in a whose",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "every l is \"x\" followed by t", "b": "some l starts with \"x\" followed by t", "c": {"for": "every l whose x is \"a\" followed by t as i", "assert": "v exists"}, "d": "count of l whose x is \"a\" followed by t is 1"}}}},
+    "cases": [
+      {
+        "description": "is written wrong where it isn't run yet",
+        "rules": ["sentence.operand.followed_by", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "v": "x1", "t": "1", "l": ["x1"]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["\"followed by\" isn't supported yet after every or some, or in a whose"]}, {"locations": [], "name": "checks.b", "value": ["\"followed by\" isn't supported yet after every or some, or in a whose"]}, {"locations": [], "name": "checks.c", "value": ["for: \"followed by\" isn't supported yet after every or some, or in a whose"]}, {"locations": [], "name": "checks.d", "value": ["\"followed by\" isn't supported yet after every or some, or in a whose"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "followed by under a for alias",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"e": {"for": "every l as i", "assert": ["i is \"x\" followed by t", "v is i followed by \"-dev\""]}}}}},
+    "cases": [
+      {
+        "description": "reads the alias as a piece and as the text before it",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": "x1-dev", "t": "1", "l": ["x1"]}, {"id": "t1", "v": "y", "t": "1", "l": ["x1", "x2"]}]},
+        "results": [
+          {"cause": "satisfied", "check": "e", "failed_items": [], "inputs": [{"locations": ["/things/0/l/0"], "name": "l[]", "value": ["x1"]}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}, {"locations": ["/things/0/v"], "name": "v", "value": "x1-dev"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "e", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "v is i followed by \"-dev\"", "cause": "value", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "y"}, {"locations": ["/things/1/l/0"], "name": "i", "value": "x1"}]}], "item": "item 1 of l", "locations": ["/things/1/l/0"], "path": "item 1 of l", "value": "x1"}, {"cause": "value", "failed_assertions": [{"assertion": "i is \"x\" followed by t", "cause": "value", "inputs": [{"locations": ["/things/1/l/1"], "name": "i", "value": "x2"}, {"locations": ["/things/1/t"], "name": "t", "value": "1"}]}, {"assertion": "v is i followed by \"-dev\"", "cause": "value", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "y"}, {"locations": ["/things/1/l/1"], "name": "i", "value": "x2"}]}], "item": "item 2 of l", "locations": ["/things/1/l/1"], "path": "item 2 of l", "value": "x2"}], "inputs": [{"locations": ["/things/1/l/0", "/things/1/l/1"], "name": "l[]", "value": ["x1", "x2"]}, {"locations": ["/things/1/t"], "name": "t", "value": "1"}, {"locations": ["/things/1/v"], "name": "v", "value": "y"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "followed by in a string and as the text of a piece",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is \"a followed by b\"", "b": "v is \"a followed by\" followed by t", "c": "v is 'x' followed by 'y followed by z' followed by t"}}}},
+    "cases": [
+      {
+        "description": "keeps text that spells the words as one piece",
+        "rules": ["sentence.operand.followed_by", "compare.join", "sentence.value.scalar"],
+        "input": {"things": [{"id": "t1", "v": "a followed by b", "t": "1"}, {"id": "t1", "v": "xy followed by z1", "t": "1"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a followed by b"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a followed by b"}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a followed by b"}, {"locations": ["/things/0/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "xy followed by z1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "xy followed by z1"}, {"locations": ["/things/1/t"], "name": "t", "value": "1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "xy followed by z1"}, {"locations": ["/things/1/t"], "name": "t", "value": "1"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"a followed by b\"", "b": "v is \"a followed by\" followed by t", "c": "v is \"x\" followed by \"y followed by z\" followed by t"}}
+      }
+    ]
+  },
+  {
+    "description": "followed by prints as written",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v   is \"x\"   followed   by   t", "b": "v is not t followed by 'y'", "c": "v   starts with   $params.p followed by    t"}}}},
+    "params": {"p": "a"},
+    "cases": [
+      {
+        "description": "prints with single spaces and double quotes",
+        "rules": ["sentence.operand.followed_by", "sentence.print.canonical"],
+        "input": {"things": [{"id": "t1", "v": "a", "t": "b"}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/things/0/t"], "name": "t", "value": "b"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["/things/0/t"], "name": "t", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "a"}, {"locations": ["$params:/p"], "name": "$params.p", "value": "a"}, {"locations": ["/things/0/t"], "name": "t", "value": "b"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "v is \"x\" followed by t", "b": "v is not t followed by \"y\"", "c": "v starts with $params.p followed by t"}}
+      }
+    ]
+  },
+  {
+    "description": "followed by a param and a field next to it",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is $params.p followed by t", "b": "v is $params.p followed by $params.q", "c": "v is \"x\" followed by $params.missing"}}}},
+    "params": {"p": "p", "q": "q"},
+    "cases": [
+      {
+        "description": "read each piece, and a param that isn't given is absent",
+        "rules": ["sentence.operand.followed_by", "compare.join", "value.ref"],
+        "input": {"things": [{"id": "t1", "v": "pa", "t": "a"}, {"id": "t1", "v": "x", "t": "a"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "pa"}, {"locations": ["$params:/p"], "name": "$params.p", "value": "p"}, {"locations": ["/things/0/t"], "name": "t", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "pa"}, {"locations": ["$params:/p"], "name": "$params.p", "value": "p"}, {"locations": ["$params:/q"], "name": "$params.q", "value": "q"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "pa"}, {"locations": ["$params:"], "name": "$params.missing", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "x"}, {"locations": ["$params:/p"], "name": "$params.p", "value": "p"}, {"locations": ["/things/1/t"], "name": "t", "value": "a"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "x"}, {"locations": ["$params:/p"], "name": "$params.p", "value": "p"}, {"locations": ["$params:/q"], "name": "$params.q", "value": "q"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "x"}, {"locations": ["$params:"], "name": "$params.missing", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "followed by with a field that stands for a position",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "v is first of l followed by \"-dev\"", "b": "v is item 2 of l followed by \"x\""}}}},
+    "cases": [
+      {
+        "description": "reads the position as a piece",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"things": [{"id": "t1", "v": "x1-dev", "l": ["x1", "y"]}, {"id": "t1", "v": "yx", "l": ["x1", "y"]}, {"id": "t1", "v": "x1-dev", "l": []}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1-dev"}, {"locations": ["/things/0/l/0"], "name": "item 1 of l", "value": "x1"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/things/0/v"], "name": "v", "value": "x1-dev"}, {"locations": ["/things/0/l/1"], "name": "item 2 of l", "value": "y"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "yx"}, {"locations": ["/things/1/l/0"], "name": "item 1 of l", "value": "x1"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/things/1/v"], "name": "v", "value": "yx"}, {"locations": ["/things/1/l/1"], "name": "item 2 of l", "value": "y"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "x1-dev"}, {"locations": ["/things/2/l"], "name": "item 1 of l", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/things/2/v"], "name": "v", "value": "x1-dev"}, {"locations": ["/things/2/l"], "name": "item 2 of l", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "followed by in the whose of a from line",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things whose v is \"x\" followed by t", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "v exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong where it isn't run yet",
+        "rules": ["sentence.operand.followed_by", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "v": "x1", "t": "1"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.thing.from", "value": ["\"followed by\" isn't supported yet after every or some, or in a whose"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "followed by in the whose of a for line",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every l whose x is \"a\" followed by t as i", "assert": "v exists"}}}}},
+    "cases": [
+      {
+        "description": "is written wrong where it isn't run yet",
+        "rules": ["sentence.operand.followed_by", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "t1", "v": "x1", "t": "1", "l": [{"x": "a1"}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: \"followed by\" isn't supported yet after every or some, or in a whose"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "followed by with a part of the subject as a piece",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "trail", "identified_by": "name", "has": {"cov": "status.coverage.data"}}}, "requirements": {"r": {"subject": "round", "checks": {"a": "tag is \"v\" followed by cov.version", "b": "tag is cov.prefix followed by \"-\" followed by cov.version", "c": "tag starts with cov.prefix followed by \"-\""}}}},
+    "cases": [
+      {
+        "description": "reads the part like any field",
+        "rules": ["sentence.operand.followed_by", "compare.join", "parts.where"],
+        "input": {"trail": {"name": "t1", "tag": "v1", "status": {"coverage": {"data": {"version": "1", "prefix": "v1"}}}}},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/trail/tag"], "name": "tag", "value": "v1"}, {"locations": ["/trail/status/coverage/data/version"], "name": "cov.version", "part": {"id": null, "name": "cov"}, "value": "1"}], "passed": true, "requirement": "r", "subject": {"id": "t1", "type": "round"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/trail/tag"], "name": "tag", "value": "v1"}, {"locations": ["/trail/status/coverage/data/prefix"], "name": "cov.prefix", "part": {"id": null, "name": "cov"}, "value": "v1"}, {"locations": ["/trail/status/coverage/data/version"], "name": "cov.version", "part": {"id": null, "name": "cov"}, "value": "1"}], "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "round"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/trail/tag"], "name": "tag", "value": "v1"}, {"locations": ["/trail/status/coverage/data/prefix"], "name": "cov.prefix", "part": {"id": null, "name": "cov"}, "value": "v1"}], "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "round"}}
+        ]
+      },
+      {
+        "description": "fails as the cause of the first piece that can't be read",
+        "rules": ["sentence.operand.followed_by", "compare.join"],
+        "input": {"trail": {"name": "t2", "tag": "v1", "status": {"coverage": {"data": {"prefix": 4}}}}},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/trail/tag"], "name": "tag", "value": "v1"}, {"locations": ["/trail/status/coverage/data"], "name": "cov.version", "part": {"id": null, "name": "cov"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "t2", "type": "round"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/trail/tag"], "name": "tag", "value": "v1"}, {"locations": ["/trail/status/coverage/data/prefix"], "name": "cov.prefix", "part": {"id": null, "name": "cov"}, "value": 4}, {"locations": ["/trail/status/coverage/data"], "name": "cov.version", "part": {"id": null, "name": "cov"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "t2", "type": "round"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/trail/tag"], "name": "tag", "value": "v1"}, {"locations": ["/trail/status/coverage/data/prefix"], "name": "cov.prefix", "part": {"id": null, "name": "cov"}, "value": 4}], "passed": false, "requirement": "r", "subject": {"id": "t2", "type": "round"}}
+        ]
+      }
+    ]
   }
 ]

@@ -376,6 +376,8 @@ pub enum Operand {
     Value(Value),
     /// A field, or fields added with `plus`.
     Field(Vec<Term>),
+    /// Pieces joined with `followed by`, each a written value or a field.
+    Joined(Vec<Operand>),
 }
 
 /// The `list` rule: values written out, or a path to a list.

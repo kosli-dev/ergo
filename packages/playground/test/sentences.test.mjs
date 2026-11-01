@@ -454,6 +454,8 @@ const failsClosed = [
   ["x does not match $params.p", "x is missing, null or not a string, or the patterns are missing, null, not a list or not all valid regular expressions"],
   ['x starts with "a"', "x is missing, null or not a string"],
   ['x does not start with "a"', "x is missing, null or not a string"],
+  ['x is "a" followed by y', "x or one of the pieces it is compared with is missing or null, or one of them or x is not a string"],
+  ['x starts with y followed by "a"', "x or what it is compared with is missing, null or not a string"],
   ["x does not end with y", "x or what it is compared with is missing, null or not a string"],
   ['x is alphabetically on or before "b"', "x is missing, null or not a string"],
   ["x is not a list", "x is missing, null or a list"],

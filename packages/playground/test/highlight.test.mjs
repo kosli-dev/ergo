@@ -28,6 +28,7 @@ test("the words of the negative phrases are marked as grammar words", () => {
   assert.deepEqual(words("x does not contain all of 1"), ["does", "not", "contain", "all", "of"]);
   assert.deepEqual(words("x is alphabetically on or before y"), ["is", "alphabetically", "on", "or", "before"]);
   assert.deepEqual(words("x is not between 1 and 2"), ["is", "not", "between", "and"]);
+  assert.deepEqual(words('x is "v" followed by y'), ["is", "followed", "by"]);
   assert.deepEqual(words("x is not a non-empty string"), ["is", "not", "a", "non-empty", "string"]);
 });
 

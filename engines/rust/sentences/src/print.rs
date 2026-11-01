@@ -415,6 +415,11 @@ fn operand_text(operand: &Operand, aliases: &[&str]) -> String {
     match operand {
         Operand::Value(value) => value_text(value),
         Operand::Field(terms) => terms_text(terms, aliases),
+        Operand::Joined(pieces) => pieces
+            .iter()
+            .map(|piece| operand_text(piece, aliases))
+            .collect::<Vec<_>>()
+            .join(" followed by "),
     }
 }
 

@@ -1062,8 +1062,22 @@ _derived_eval(check, subj) := {"passed": passed, "cause": cause, "inputs": array
 	l := _side_eval(subj, check.left)
 	r := _side_eval(subj, check.right)
 	passed := _eval_compared(check, l.v, r.v)
-	states := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)}
+	states := _eval_states(check, l, r)
 	cause := _eval_cause(passed, _ref_cause(check), states)
+}
+
+_eval_states(check, _, r) := r.states if {
+	_side_form(check.right) == "join"
+	count(r.states) > 0
+}
+
+_eval_states(check, l, r) := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)} if {
+	not _side_form(check.right) == "join"
+}
+
+_eval_states(check, l, r) := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)} if {
+	_side_form(check.right) == "join"
+	count(r.states) == 0
 }
 
 _eval_compared(check, [lv], [rv]) if _compared(check, lv, rv)
@@ -1101,6 +1115,43 @@ _side_eval(subj, side) := {"v": v, "found": v, "states": (union({o.states | some
 	ops := [_operand_eval(subj, operand) | some operand in side.add]
 	operands := [i | some o in ops; some i in o.inputs]
 	v := _added(side, ops)
+}
+
+_side_eval(subj, side) := {"v": v, "found": v, "states": _join_states(ops), "inputs": [i | some o in ops; some i in o.inputs]} if {
+	_side_form(side) == "join"
+	ops := [_basic_eval(subj, piece) | some piece in side.join]
+	v := _joined_pieces(ops)
+}
+
+_joined_pieces(ops) := [concat("", pieces)] if {
+	pieces := [v | some o in ops; [v] := o.v]
+	count(pieces) == count(ops)
+	every v in pieces {
+		is_string(v)
+	}
+} else := []
+
+_piece_state(o) := state if {
+	count(o.states) == 1
+	some state in o.states
+	state != "value"
+}
+
+_piece_state(o) := "unusable" if {
+	o.states == {"value"}
+	[v] := o.v
+	not is_string(v)
+}
+
+_join_states(ops) := {_piece_state(ops[i]) |
+	some i, _ in ops
+	not _earlier_bad(ops, i)
+}
+
+_earlier_bad(ops, i) if {
+	some j, o in ops
+	j < i
+	_piece_state(o)
 }
 
 _operand_eval(subj, operand) := object.union(_basic_eval(subj, operand), {"states": _number_states(subj, operand)}) if _basic_form(operand) == "path"
@@ -4878,6 +4929,24 @@ _side_form(side) := "add" if {
 	}
 }
 
+_side_form(side) := "join" if {
+	is_object(side)
+	object.keys(side) - {"text"} == {"join"}
+	is_string(object.get(side, "text", ""))
+	is_array(side.join)
+	count(side.join) > 0
+	every piece in side.join {
+		_join_piece(piece)
+	}
+}
+
+_join_piece(piece) if _basic_form(piece) == "path"
+
+_join_piece(piece) if {
+	_basic_form(piece) == "literal"
+	is_string(_written(piece))
+}
+
 _operand(x) if _basic_form(x) in {"path", "count_of", "sum_of", "elapsed"}
 
 _operand(x) if {
@@ -4887,7 +4956,7 @@ _operand(x) if {
 
 default _derived(_) := false
 
-_derived(side) if _side_form(side) in {"add", "count_of", "sum_of", "elapsed"}
+_derived(side) if _side_form(side) in {"add", "join", "count_of", "sum_of", "elapsed"}
 
 default _derived_sides(_) := []
 
@@ -5001,6 +5070,13 @@ _usable_sides(check, l, r) if {
 _usable_sides(check, l, r) if {
 	"within" in object.keys(check)
 	_within_usable(check, l, r)
+}
+
+_usable_sides(check, l, r) if {
+	check.cmp in {"includes", "excludes"}
+	is_array(l)
+	is_string(r)
+	_items_fit(l, [r])
 }
 
 _within_usable(check, l, r) if {
@@ -5135,6 +5211,8 @@ _basic_inputs(subj, side) := [_number_input(side.text, _first_or_null([x | x := 
 }
 
 _side_inputs(subj, side) := _basic_inputs(subj, side) if _basic_form(side)
+
+_side_inputs(subj, side) := [i | some piece in side.join; some i in _basic_inputs(subj, piece)] if _side_form(side) == "join"
 
 _side_inputs(subj, side) := array.concat([_derived_input(subj, side, _side_text(side), operands)], operands) if {
 	_side_form(side) == "add"
@@ -5301,6 +5379,8 @@ _side_paths(side) := _basic_paths(side) if _basic_form(side)
 
 _side_paths(side) := [p | some operand in side.add; some p in _basic_paths(operand)] if _side_form(side) == "add"
 
+_side_paths(side) := [p | some piece in side.join; some p in _basic_paths(piece)] if _side_form(side) == "join"
+
 _side_paths(side) := [] if not _side_form(side)
 
 _where_children(node, names) := [[c, array.concat(at, ["whose", i]), "where", names] |
@@ -5386,7 +5466,7 @@ _s_patterns := {
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
 	"cond": concat("", [`^(`, left, `) +(`, phrase, `)$`]),
 	"phrases": phrases,
-	"kinds": {kind[0]: concat("", [`^(?:`, kind[1], `)$`]) | some kind in kinds},
+	"kinds": object.union({kind[0]: concat("", [`^(?:`, kind[1], `)$`]) | some kind in kinds}, {"operand": concat("", [`^(?:`, joined, `)$`]), "operand_within": concat("", [`^(?:`, joined, `(?: +within +`, num, `)?)$`])}),
 	"plain": concat("", [`^(`, path, `) +(\S.*)$`]),
 	"quantified": concat("", [`^(every|some) +(`, path, `) +(\S.*)$`]),
 	"path": concat("", [`^`, path, `$`]),
@@ -5400,7 +5480,9 @@ _s_patterns := {
 	"values": concat("", [`^`, values, `$`]),
 	"each_value": value,
 	"range": concat("", [`^(`, num, `) +and +(`, num, `)$`]),
-	"operand_within": concat("", [`^(`, operand, `)(?: +within +(`, num, `))?$`]),
+	"operand_within": concat("", [`^(`, joined, `)(?: +within +(`, num, `))?$`]),
+	"join": concat("", [`^(`, single, `)((?:`, later, `)+)$`]),
+	"join_rest": concat("", [` +followed +by +(`, value, `|`, rpath, `)`]),
 	"quotes": `^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[^"']+)*`,
 	"strings": `"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'`,
 	"string": concat("", [`^(?:`, dq, `|`, sq, `)$`]),
@@ -5426,7 +5508,12 @@ _s_patterns := {
 	left := concat("", [`(?:`, path, `|`, terms, `)`])
 	value := concat("", [`(?:`, dq, `|`, sq, `|`, num, `|true|false|null)`])
 	values := concat("", [value, `(?:, *`, value, `)*`])
-	operand := concat("", [`(?:`, num, `(?: +plus +`, term, `)+|`, value, `|(?:`, derived, `|`, rpath, `)(?: +plus +`, term, `)*)`])
+	single := concat("", [`(?:`, num, `(?: +plus +`, term, `)+|`, value, `|(?:`, derived, `|`, rpath, `)(?: +plus +`, term, `)*)`])
+	later := concat("", [` +followed +by +(?:`, value, `|`, rpath, `)`])
+	bit := `(?:[^\s"'\\]|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\\.)+`
+	roughly := concat("", [` +followed +by +(?:`, pos, `)?`, bit, `(?: +named +by +`, bit, `)*`])
+	operand := single
+	joined := concat("", [single, `(?:`, later, `)*`])
 	list := concat("", [`(?:`, values, `|`, rpath, `)`])
 	type := `(?:list|string|number|boolean|object)`
 	phrases := [
@@ -5466,9 +5553,9 @@ _s_patterns := {
 		["range", concat("", [num, ` +and +`, num])],
 		["list", list],
 		["operand", operand],
-		["operand_within", concat("", [operand, `(?: +within +`, num, `)?`])],
+		["operand_within", concat("", [operand, `(?:`, roughly, `)*(?: +within +`, num, `)?`])],
 	]
-	phrase := concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds])
+	phrase := concat("", [`(?:`, concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds]), `)(?:`, roughly, `)*`])
 	cond := concat("", [`(?:`, derived, `|`, path, `) +(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
 	from_cond := concat("", [`(?:(?:every|some) +`, path, `(?:, +if +any,)?|(?:`, derived, `|`, path, `)) +(?:`, phrase, `)`])
@@ -5833,7 +5920,16 @@ _s_within_of(number) := {"within": _s_number(number)} if number != ""
 
 _s_operand_of(text, pat) := {"value": _s_value_of(text)} if {
 	regex.match(pat.value, text)
+} else := {"join": array.concat([_s_piece_of(first, pat)], [_s_piece_of(m[1], pat) | some m in rest])} if {
+	joined := regex.find_all_string_submatch_n(pat.join, text, 1)[0]
+	first := joined[1]
+	rest := regex.find_all_string_submatch_n(pat.join_rest, joined[2], -1)
+	concat("", [m[0] | some m in rest]) == joined[2]
 } else := {"terms": _s_terms_of(text, pat)}
+
+_s_piece_of(text, pat) := {"value": _s_value_of(text)} if regex.match(pat.value, text)
+
+_s_piece_of(text, pat) := {"terms": _s_terms_of(text, pat)} if not regex.match(pat.value, text)
 
 _s_values_of(text, pat) := [_s_value_of(m[0]) | some m in regex.find_all_string_submatch_n(pat.each_value, text, -1)]
 
@@ -5893,7 +5989,50 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := _s_base_problems(parsed) | _s_it_problems(parsed)
+_s_sentence_problems(parsed) := (_s_base_problems(parsed) | _s_it_problems(parsed)) | _s_join_problems(parsed)
+
+_s_join_problems(parsed) := set() if not _s_joins(parsed)
+
+_s_join_problems(parsed) := _s_join_flaws([node |
+	_s_joins(parsed)
+	some node in _s_nodes(parsed)
+	is_object(node)
+	_s_has_join(node)
+])
+
+_s_joins(x) if contains(json.marshal(x), `"join":`)
+
+_s_has_join(node) if "join" in object.keys(node)
+
+_s_has_join(node) if {
+	"terms" in object.keys(node)
+	"phrase" in object.keys(node)
+	"join" in object.keys(node.phrase)
+}
+
+_s_join_flaws(nodes) := ((({`"followed by" takes text` |
+	some node in nodes
+	some piece in object.get(node, "join", [])
+	"value" in object.keys(piece)
+	not is_string(piece.value)
+} | {`"followed by" can't take a count of, a sum of or a plus` |
+	some node in nodes
+	some piece in object.get(node, "join", [])
+	"terms" in object.keys(piece)
+	not _s_one_path(piece.terms)
+}) | {concat("", [`"`, node.op, `" can't take followed by`]) |
+	some node in nodes
+	"join" in object.keys(node)
+	node.op in object.keys(_s_takes)
+}) | {`"within" can't take followed by` |
+	some node in nodes
+	"join" in object.keys(node)
+	"within" in object.keys(node)
+}) | {`"followed by" can't follow a count of, a sum of or a plus` |
+	some node in nodes
+	"terms" in object.keys(node)
+	"join" in object.keys(object.get(node, "phrase", {}))
+}
 
 _s_text_names(text) := {concat("", ["unknown name ", m[1]]) |
 	some m in regex.find_all_string_submatch_n(concat("", [_s_patterns.strings, `|(?:^|[ ,\[])(\$[A-Za-z_]\w*)`]), text, -1)
@@ -6405,7 +6544,7 @@ _s_phrase_words(ph) := "equals" if {
 
 _s_phrase_words(ph) := "is" if {
 	ph.op == "is"
-	"value" in object.keys(ph)
+	object.keys(ph) & {"value", "join"} != set()
 }
 
 _s_phrase_words(ph) := "does not equal" if {
@@ -6415,7 +6554,7 @@ _s_phrase_words(ph) := "does not equal" if {
 
 _s_phrase_words(ph) := "is not" if {
 	ph.op == "is not"
-	"value" in object.keys(ph)
+	object.keys(ph) & {"value", "join"} != set()
 }
 
 _s_phrase_words(ph) := "is one of" if {
@@ -6475,11 +6614,17 @@ _s_operand_text(ph) := _s_value_text(ph.value) if "value" in object.keys(ph)
 
 _s_operand_text(ph) := _s_terms_text(ph.terms) if "terms" in object.keys(ph)
 
+_s_operand_text(ph) := concat(" followed by ", [_s_piece_text(piece) | some piece in ph.join]) if "join" in object.keys(ph)
+
+_s_piece_text(piece) := _s_value_text(piece.value) if "value" in object.keys(piece)
+
+_s_piece_text(piece) := _s_terms_text(piece.terms) if "terms" in object.keys(piece)
+
 _s_operand_text(ph) := concat(", ", [_s_value_text(v) | some v in ph.values]) if "values" in object.keys(ph)
 
 _s_operand_text(ph) := _s_path_text(ph.path, "right") if "path" in object.keys(ph)
 
-_s_operand_text(ph) := "" if object.keys(ph) & {"value", "terms", "values", "path"} == set()
+_s_operand_text(ph) := "" if object.keys(ph) & {"value", "terms", "values", "path", "join"} == set()
 
 _s_value_text(v) := concat("", ["'", v, "'"]) if {
 	_s_single_quoted(v)
@@ -6692,7 +6837,7 @@ _s_from_read_of(name, fl, subjects, chains) := object.union(object.union({"probl
 	keep := names | object.keys(_p_steps_of(object.get(chains.parts, name, {})))
 	pc := {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}
 	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc), keep), names), pc) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
-	problems := sort(((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {_whose_problem(p) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}))
+	problems := sort((((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {_whose_problem(p) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}) | _s_join_unsupported({"where": object.get(fl, "where", [])})))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 	every_list := object.get(fl, "every", false) == true
@@ -7152,6 +7297,8 @@ _p_item_path(path, pc) := _p_path(_p_own_named(path), pc, "o") if {
 
 _p_item_right(side, pc) := object.union(side, {"add": [_p_item_right_one(o, pc) | some o in side.add]}) if is_array(object.get(side, "add", null))
 
+else := object.union(side, {"join": [_p_item_right_one(o, pc) | some o in side.join]}) if is_array(object.get(side, "join", null))
+
 else := _p_item_right_one(side, pc)
 
 _p_item_right_one(side, pc) := _p_item_path(side, pc) if is_array(side)
@@ -7169,9 +7316,15 @@ _p_side(side, pc, mode) := object.union(side, {"add": [_p_side_one(o, pc, mode) 
 	is_array(object.get(side, "add", null))
 }
 
+_p_side(side, pc, mode) := object.union(side, {"join": [_p_side_one(o, pc, mode) | some o in side.join]}) if {
+	is_object(side)
+	is_array(object.get(side, "join", null))
+}
+
 _p_side(side, pc, mode) := _p_side_one(side, pc, mode) if {
 	is_object(side)
 	not "add" in object.keys(side)
+	not "join" in object.keys(side)
 }
 
 _p_side_one(side, pc, mode) := _p_path(side, pc, mode) if is_array(side)
@@ -7590,11 +7743,25 @@ _s_model(a) := {
 	q != ""
 }
 
-_s_paths_unsupported(a) := {`last of isn't supported yet here: pick the item on a for line, like "for: last of commits as commit"` |
+_s_paths_unsupported(a) := ({`last of isn't supported yet here: pick the item on a for line, like "for: last of commits as commit"` |
 	some node in _s_nodes(a)
 	is_object(node)
 	_s_from_last(node)
-} | _s_elapsed_unsupported(a)
+} | _s_elapsed_unsupported(a)) | _s_join_unsupported(a)
+
+_s_join_unsupported(a) := set() if not _s_joins(a)
+
+_s_join_unsupported(a) := {`"followed by" isn't supported yet after every or some, or in a whose` |
+	_s_joins(a)
+	some node in _s_nodes(a)
+	is_object(node)
+	"join" in object.keys(node)
+	_s_join_misplaced(a, node)
+}
+
+_s_join_misplaced(a, _) if object.keys(a) & {"every", "some"} != set()
+
+_s_join_misplaced(a, node) if node in _s_nodes(object.get(a, "where", []))
 
 _s_from_last(node) if object.get(node, "position", null) == "last"
 
@@ -7740,6 +7907,11 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 	not _s_field_arg(a.phrase)
 }
 
+_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_side(a.phrase)} if {
+	a.phrase.op in {"contains", "does not contain"}
+	"join" in object.keys(a.phrase)
+}
+
 _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
 	a.phrase.op in {"contains all of", "contains none of", "contains some of", "does not contain all of"}
 	not _s_field_arg(a.phrase)
@@ -7810,11 +7982,19 @@ _s_side_given(ph) if "terms" in object.keys(ph)
 
 _s_side_given(ph) if "within" in object.keys(ph)
 
+_s_side_given(ph) if "join" in object.keys(ph)
+
 _s_side(ph) := {"literal": ph.value} if "value" in object.keys(ph)
 
 _s_side(ph) := {"literal": ph.min} if ph.op in {"is between", "is not between"}
 
 _s_side(ph) := _s_bare_side(ph.terms) if "terms" in object.keys(ph)
+
+_s_side(ph) := {"join": [_s_piece_side(piece) | some piece in ph.join], "text": _s_operand_text(ph)} if "join" in object.keys(ph)
+
+_s_piece_side(piece) := {"literal": piece.value} if "value" in object.keys(piece)
+
+_s_piece_side(piece) := _s_bare_side(piece.terms) if "terms" in object.keys(piece)
 
 _s_bare_side([t]) := _s_term_side(t)
 
@@ -8430,9 +8610,15 @@ _s_named_side(side, names) := object.union(side, {"add": [_s_named_tally(o, name
 	"add" in object.keys(side)
 }
 
+_s_named_side(side, names) := object.union(side, {"join": [_s_named_tally(o, names) | some o in side.join]}) if {
+	is_object(side)
+	"join" in object.keys(side)
+}
+
 _s_named_side(side, names) := _s_named_tally(side, names) if {
 	is_object(side)
 	not "add" in object.keys(side)
+	not "join" in object.keys(side)
 }
 
 _s_named_tally(side, names) := _s_named_path(side, names) if is_array(side)

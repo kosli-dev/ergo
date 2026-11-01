@@ -329,6 +329,30 @@ impl Walk {
         match operand {
             Operand::Value(value) => self.value(value),
             Operand::Field(terms) => terms.iter().for_each(|t| self.term(t)),
+            Operand::Joined(pieces) => pieces.iter().for_each(|p| self.operand(p)),
+        }
+    }
+
+    fn joined(&mut self, operand: &Operand, within: bool) {
+        let Operand::Joined(pieces) = operand else {
+            return;
+        };
+        if within {
+            self.out
+                .insert("\"within\" can't take followed by".to_string());
+        }
+        for piece in pieces {
+            match piece {
+                Operand::Value(value) if !matches!(value, Value::String(_)) => {
+                    self.out.insert("\"followed by\" takes text".to_string());
+                }
+                Operand::Field(terms) if !matches!(terms.as_slice(), [Term::Path(_)]) => {
+                    self.out.insert(
+                        "\"followed by\" can't take a count of, a sum of or a plus".to_string(),
+                    );
+                }
+                _ => {}
+            }
         }
     }
 
@@ -381,9 +405,14 @@ impl Walk {
                     }
                     self.number(within);
                 }
+                self.joined(operand, within.is_some());
                 self.operand(operand);
             }
             Phrase::Order { operand, .. } => {
+                if matches!(operand, Operand::Joined(_)) {
+                    self.out.insert(format!("\"{op}\" can't take followed by"));
+                }
+                self.joined(operand, false);
                 if let Operand::Value(value) = operand
                     && !matches!(value, Value::Number(_))
                 {
@@ -392,6 +421,10 @@ impl Walk {
                 self.operand(operand);
             }
             Phrase::Time { operand, .. } => {
+                if matches!(operand, Operand::Joined(_)) {
+                    self.out.insert(format!("\"{op}\" can't take followed by"));
+                }
+                self.joined(operand, false);
                 if let Operand::Value(value) = operand {
                     let fine = match value {
                         Value::Number(_) => true,
@@ -415,9 +448,13 @@ impl Walk {
                 {
                     self.out.insert(format!("\"{op}\" takes text"));
                 }
+                self.joined(operand, false);
                 self.operand(operand);
             }
-            Phrase::Contains { operand, .. } => self.operand(operand),
+            Phrase::Contains { operand, .. } => {
+                self.joined(operand, false);
+                self.operand(operand);
+            }
             Phrase::Between { min, max, .. } => {
                 self.number(min);
                 self.number(max);
@@ -463,6 +500,34 @@ impl Walk {
     }
 
     fn after_terms(&mut self, terms: &[Term], phrase: &Phrase) {
+        if let Phrase::Is {
+            operand: Operand::Joined(_),
+            ..
+        }
+        | Phrase::Contains {
+            operand: Operand::Joined(_),
+            ..
+        }
+        | Phrase::StartsWith(Operand::Joined(_))
+        | Phrase::EndsWith(Operand::Joined(_))
+        | Phrase::NotStartsWith(Operand::Joined(_))
+        | Phrase::NotEndsWith(Operand::Joined(_))
+        | Phrase::Alphabetically {
+            operand: Operand::Joined(_),
+            ..
+        }
+        | Phrase::Order {
+            operand: Operand::Joined(_),
+            ..
+        }
+        | Phrase::Time {
+            operand: Operand::Joined(_),
+            ..
+        } = phrase
+        {
+            self.out
+                .insert("\"followed by\" can't follow a count of, a sum of or a plus".to_string());
+        }
         if !comparable(phrase) {
             self.out.insert(format!(
                 "{} can't follow a count of, a sum of or a plus",

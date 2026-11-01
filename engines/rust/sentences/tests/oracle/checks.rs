@@ -4066,6 +4066,187 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of l whose x is \"a\" followed by t is 1",
+        "count of l whose x is \"a\" followed by t is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every l is \"x\" followed by t",
+        "every l is \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "i is \"x\" followed by t",
+        "i is \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "l contains \"x\" followed by t",
+        "l contains \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "l does not contain \"x\" followed by t",
+        "l does not contain \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "some l starts with \"x\" followed by t",
+        "some l starts with \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v   is \"x\"   followed   by   t",
+        "v is \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v   starts with   $params.p followed by    t",
+        "v starts with $params.p followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v does not end with t followed by \"dev\"",
+        "v does not end with t followed by \"dev\"",
+        &[],
+        &[],
+    ),
+    (
+        "v does not start with \"x\" followed by t",
+        "v does not start with \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v ends with t followed by \"dev\"",
+        "v ends with t followed by \"dev\"",
+        &[],
+        &[],
+    ),
+    (
+        "v is \"a followed by b\"",
+        "v is \"a followed by b\"",
+        &[],
+        &[],
+    ),
+    (
+        "v is \"a followed by\" followed by t",
+        "v is \"a followed by\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v is \"x\" followed by $params.missing",
+        "v is \"x\" followed by $params.missing",
+        &[],
+        &[],
+    ),
+    (
+        "v is \"x\" followed by t",
+        "v is \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v is \"x\" followed by t followed by \"-dev\"",
+        "v is \"x\" followed by t followed by \"-dev\"",
+        &[],
+        &[],
+    ),
+    (
+        "v is $params.p followed by $params.q",
+        "v is $params.p followed by $params.q",
+        &[],
+        &[],
+    ),
+    (
+        "v is $params.p followed by t",
+        "v is $params.p followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v is 'x' followed by 'y followed by z' followed by t",
+        "v is \"x\" followed by \"y followed by z\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v is alphabetically before \"x\" followed by t",
+        "v is alphabetically before \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v is alphabetically on or after \"x\" followed by t",
+        "v is alphabetically on or after \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "v is first of l followed by \"-dev\"",
+        "v is first of l followed by \"-dev\"",
+        &[],
+        &[],
+    ),
+    (
+        "v is i followed by \"-dev\"",
+        "v is i followed by \"-dev\"",
+        &[],
+        &[],
+    ),
+    (
+        "v is item 2 of l followed by \"x\"",
+        "v is item 2 of l followed by \"x\"",
+        &[],
+        &[],
+    ),
+    (
+        "v is not t followed by \"-dev\"",
+        "v is not t followed by \"-dev\"",
+        &[],
+        &[],
+    ),
+    (
+        "v is not t followed by 'y'",
+        "v is not t followed by \"y\"",
+        &[],
+        &[],
+    ),
+    ("v is t followed by u", "v is t followed by u", &[], &[]),
+    (
+        "v starts with \"x\" followed by t",
+        "v starts with \"x\" followed by t",
+        &[],
+        &[],
+    ),
+    (
+        "tag is \"v\" followed by cov.version",
+        "tag is \"v\" followed by cov.version",
+        &[],
+        &[],
+    ),
+    (
+        "tag is cov.prefix followed by \"-\" followed by cov.version",
+        "tag is cov.prefix followed by \"-\" followed by cov.version",
+        &[],
+        &[],
+    ),
+    (
+        "tag starts with cov.prefix followed by \"-\"",
+        "tag starts with cov.prefix followed by \"-\"",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -5181,6 +5362,11 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ("l contains some of", &["doesn't parse"]),
     ("l does not contain all of", &["doesn't parse"]),
     ("x is not 1 within", &["\"within\" needs a number after it"]),
+    ("v is \"x\" followed by count of l", &["doesn't parse"]),
+    ("v is \"x\" followed by t plus 1", &["doesn't parse"]),
+    ("v is between 1 followed by 2 and 3", &["doesn't parse"]),
+    ("v is one of \"x\" followed by t", &["doesn't parse"]),
+    ("v matches \"x\" followed by t", &["doesn't parse"]),
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
@@ -6268,6 +6454,39 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         "some last of $params.p[3].\"é\" does not equal true within 2",
         &["\"within\" only compares numbers"],
     ),
+    (
+        "count of l is \"x\" followed by t",
+        &["\"followed by\" can't follow a count of, a sum of or a plus"],
+    ),
+    (
+        "n is \"x\" followed by t within 1",
+        &["\"within\" can't take followed by"],
+    ),
+    ("v is \"x\" followed by 1", &["\"followed by\" takes text"]),
+    (
+        "v is \"x\" followed by null",
+        &["\"followed by\" takes text"],
+    ),
+    (
+        "v is at least \"x\" followed by t",
+        &["\"is at least\" can't take followed by"],
+    ),
+    (
+        "v is before \"x\" followed by t",
+        &["\"is before\" can't take followed by"],
+    ),
+    (
+        "v is not true followed by t",
+        &["\"followed by\" takes text"],
+    ),
+    (
+        "v is y plus 1 followed by \"a\"",
+        &["\"followed by\" can't take a count of, a sum of or a plus"],
+    ),
+    (
+        "v starts with \"x\" followed by 1.5",
+        &["\"followed by\" takes text"],
+    ),
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
@@ -7167,6 +7386,13 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every .art.xs as x", "every art.xs as x", &[], &[]),
+    ("every l as i", "every l as i", &[], &[]),
+    (
+        "every l whose x is \"a\" followed by t as i",
+        "every l whose x is \"a\" followed by t as i",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

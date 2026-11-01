@@ -544,3 +544,62 @@ fn a_string_operand_holding_and_does_not_split_the_condition() {
     let line = from("x whose a1 is \"p and q is 1\" and b1 exists");
     assert_eq!(line.whose.len(), 2);
 }
+
+#[test]
+fn followed_by_joins_values_and_fields_in_the_order_written() {
+    assert_eq!(
+        phrase("is \"v\" followed by k"),
+        Phrase::Is {
+            not: false,
+            operand: Operand::Joined(vec![value(text("v")), field("k")]),
+            within: None
+        }
+    );
+    assert_eq!(
+        phrase("does not equal k followed by 'a' followed by m"),
+        Phrase::Is {
+            not: true,
+            operand: Operand::Joined(vec![field("k"), value(text("a")), field("m")]),
+            within: None
+        }
+    );
+    assert_eq!(
+        phrase("ends with k followed by \"x\""),
+        Phrase::EndsWith(Operand::Joined(vec![field("k"), value(text("x"))]))
+    );
+    assert_eq!(
+        phrase("contains \"a\" followed by k"),
+        Phrase::Contains {
+            not: false,
+            operand: Operand::Joined(vec![value(text("a")), field("k")])
+        }
+    );
+}
+
+#[test]
+fn followed_by_inside_a_string_is_part_of_the_string() {
+    assert_eq!(
+        phrase("is \"a followed by b\""),
+        Phrase::Is {
+            not: false,
+            operand: value(text("a followed by b")),
+            within: None
+        }
+    );
+    assert_eq!(
+        phrase("is 'x followed by y' followed by k"),
+        Phrase::Is {
+            not: false,
+            operand: Operand::Joined(vec![value(text("x followed by y")), field("k")]),
+            within: None
+        }
+    );
+}
+
+#[test]
+fn followed_by_needs_a_piece_after_it_and_none_of_them_takes_a_plus() {
+    assert!(parse_from("x whose y is k followed by").is_err());
+    assert!(parse_from("x whose y is k followed by 1 plus 2").is_err());
+    assert!(parse_from("x whose y is k followed by count of z").is_err());
+    assert!(parse_from("x whose y is followed by k").is_err());
+}

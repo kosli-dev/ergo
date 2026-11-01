@@ -2,7 +2,7 @@
 export const GRAMMAR_WORDS = new Set([
   "a", "after", "all", "alphabetically", "an", "and", "as", "at", "before", "between", "boolean", "by",
   "contain", "contains", "count", "days", "does", "each", "elapsed", "empty", "end", "ends", "equal", "equals",
-  "every", "exist", "exists", "false", "first", "from", "hours", "if", "in", "is", "it", "item", "last",
+  "every", "exist", "exists", "false", "first", "followed", "from", "hours", "if", "in", "is", "it", "item", "last",
   "least", "less", "list", "match", "matches", "minutes", "more", "most", "named", "non-empty", "none",
   "not", "null", "number", "object", "of", "on", "one", "or", "plus", "seconds", "some", "sorted",
   "start", "starts", "string", "sum", "than", "to", "true", "weeks", "whose", "with", "within",

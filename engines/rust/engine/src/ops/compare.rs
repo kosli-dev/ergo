@@ -14,6 +14,7 @@ use std::cmp::Ordering;
 pub enum Side {
     Path(Path),
     Value(Value),
+    Join(Vec<Side>),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -42,6 +43,16 @@ pub struct Compare {
     pub within: Option<Number>,
 }
 
+impl Side {
+    pub fn paths(&self) -> Vec<&Path> {
+        match self {
+            Side::Path(path) => vec![path],
+            Side::Value(_) => Vec::new(),
+            Side::Join(pieces) => pieces.iter().flat_map(Side::paths).collect(),
+        }
+    }
+}
+
 pub struct SideRead {
     pub outcome: Outcome,
     pub value: Option<Value>,
@@ -58,6 +69,7 @@ pub fn read_side(side: &Side, ctx: &Ctx) -> SideRead {
                 inputs: read.inputs,
             }
         }
+        Side::Join(pieces) => read_join(pieces, ctx),
         Side::Value(Value::Null) => SideRead {
             outcome: Outcome::Null,
             value: None,
@@ -68,6 +80,39 @@ pub fn read_side(side: &Side, ctx: &Ctx) -> SideRead {
             value: Some(v.clone()),
             inputs: Vec::new(),
         },
+    }
+}
+
+fn read_join(pieces: &[Side], ctx: &Ctx) -> SideRead {
+    let reads: Vec<SideRead> = pieces.iter().map(|piece| read_side(piece, ctx)).collect();
+    let inputs = reads
+        .iter()
+        .flat_map(|r| r.inputs.iter().cloned())
+        .collect();
+    let mut text = String::new();
+    for read in &reads {
+        match (read.outcome, &read.value) {
+            (Outcome::Found, Some(Value::String(piece))) => text.push_str(piece),
+            (Outcome::Found, _) => {
+                return SideRead {
+                    outcome: Outcome::Found,
+                    value: None,
+                    inputs,
+                };
+            }
+            (outcome, _) => {
+                return SideRead {
+                    outcome,
+                    value: None,
+                    inputs,
+                };
+            }
+        }
+    }
+    SideRead {
+        outcome: Outcome::Found,
+        value: Some(Value::String(text)),
+        inputs,
     }
 }
 
@@ -85,8 +130,16 @@ pub fn unread_cause(l: &SideRead, r: &SideRead) -> Option<Cause> {
 pub fn side_refs(left: &Side, right: &Side) -> Vec<Path> {
     let mut refs = Vec::new();
     for side in [left, right] {
-        if let Side::Path(path) = side {
-            refs.extend(path::step_refs(path));
+        match side {
+            Side::Path(path) => refs.extend(path::step_refs(path)),
+            Side::Join(pieces) => {
+                for piece in pieces {
+                    if let Side::Path(path) = piece {
+                        refs.extend(path::step_refs(path));
+                    }
+                }
+            }
+            Side::Value(_) => {}
         }
     }
     refs
@@ -100,7 +153,14 @@ impl Compare {
 
 pub fn run(check: &Compare, ctx: &Ctx) -> Verdict {
     let (l, r, inputs) = read_sides(&check.left, &check.right, ctx);
-    let cause = match unread_cause(&l, &r) {
+    let joined_cause = match &check.right {
+        Side::Join(_) => r
+            .outcome
+            .cause()
+            .or_else(|| r.value.is_none().then_some(Cause::Unusable)),
+        _ => None,
+    };
+    let cause = match joined_cause.or_else(|| unread_cause(&l, &r)) {
         Some(cause) => cause,
         None => match (&l.value, &r.value) {
             (Some(a), Some(b)) => compared(check, a, b),
@@ -299,6 +359,22 @@ fn operand_side(operand: &tree::Operand, scope: &Scope) -> Option<Result<Side, V
             [tree::Term::Path(p)] => Some(scope.path(p).map(Side::Path)),
             _ => None,
         },
+        tree::Operand::Joined(pieces) => {
+            let mut sides = Vec::new();
+            let mut problems = Vec::new();
+            for piece in pieces {
+                match operand_side(piece, scope) {
+                    Some(Ok(side)) => sides.push(side),
+                    Some(Err(found)) => problems.extend(found),
+                    None => return None,
+                }
+            }
+            Some(if problems.is_empty() {
+                Ok(Side::Join(sides))
+            } else {
+                Err(problems)
+            })
+        }
     }
 }
 
@@ -656,6 +732,72 @@ mod tests {
         assert_eq!(cause(json!({"a": "1", "b": "9"}), &far), Cause::Unusable);
         assert_eq!(cause(json!({"a": 1}), &far), Cause::Absent);
         assert_eq!(cause(json!({"a": null, "b": 1}), &far), Cause::Null);
+    }
+
+    fn joined(pieces: Vec<Side>) -> Side {
+        Side::Join(pieces)
+    }
+
+    #[test]
+    fn a_join_puts_its_pieces_next_to_each_other_in_order() {
+        let right = joined(vec![Side::Value(json!("x")), field("b"), field("c")]);
+        let eq = check(Cmp::Eq, right);
+        assert_eq!(
+            cause(json!({"a": "x1.2-dev", "b": "1.2", "c": "-dev"}), &eq),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(json!({"a": "x1.2", "b": "1.2", "c": "-dev"}), &eq),
+            Cause::Value
+        );
+        let v = run_on(json!({"a": "x", "b": "1", "c": "2"}), &eq);
+        let names: Vec<_> = v.inputs.iter().map(|i| i.name.as_str()).collect();
+        assert_eq!(names, [".a", "b", "c"]);
+    }
+
+    #[test]
+    fn a_join_fails_as_the_first_piece_that_cannot_be_read_whatever_the_left_side_is() {
+        let eq = check(
+            Cmp::Eq,
+            joined(vec![Side::Value(json!("x")), field("b"), field("c")]),
+        );
+        assert_eq!(cause(json!({"a": "x", "c": null}), &eq), Cause::Absent);
+        assert_eq!(cause(json!({"a": "x", "b": null}), &eq), Cause::Null);
+        assert_eq!(cause(json!({"a": "x", "b": 1}), &eq), Cause::Unusable);
+        assert_eq!(
+            cause(json!({"a": "x", "b": 1, "c": null}), &eq),
+            Cause::Unusable
+        );
+        assert_eq!(
+            cause(json!({"a": "x", "b": null, "c": 1}), &eq),
+            Cause::Null
+        );
+        assert_eq!(cause(json!({"b": 1, "c": "z"}), &eq), Cause::Unusable);
+        assert_eq!(
+            cause(json!({"a": null, "b": "1", "c": "2"}), &eq),
+            Cause::Null
+        );
+        assert_eq!(cause(json!({"b": "1", "c": "2"}), &eq), Cause::Absent);
+        assert_eq!(
+            cause(json!({"a": 3, "b": "1", "c": "2"}), &eq),
+            Cause::Unusable
+        );
+    }
+
+    #[test]
+    fn a_join_after_a_text_comparison_joins_before_it_compares() {
+        let starts = check(
+            Cmp::StartsWith,
+            joined(vec![Side::Value(json!("re")), field("b")]),
+        );
+        assert_eq!(
+            cause(json!({"a": "release/1", "b": "lease/"}), &starts),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(json!({"a": "main", "b": "lease/"}), &starts),
+            Cause::Value
+        );
     }
 
     #[test]

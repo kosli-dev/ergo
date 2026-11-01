@@ -893,6 +893,35 @@ every check fails on `api`, with `value`. `web` passes all four, `notes` being `
 | `trusted_license` | `null`         | `licenses` is `null`   |
 | `notes_empty`     | `null`         | `notes` is `null`      |
 
+Text can be joined on the right side with `followed by`, from written strings and fields, as many pieces as you like: `rego.version is tag.version followed by "-dev"`, or `rego.spec is "v" followed by tag.version`. It goes after `is`, `equals`, `is not`, `does not equal`, `starts with`, `ends with`, `does not start with`, `does not end with`, `contains`, `does not contain` and the alphabetical phrases, and the sentence asks what the phrase asks of the joined text. There is no `preceded by`, because `"v" followed by x` says it. Every piece must be a string: a written one that isn't, like `followed by 1`, is written wrong, and a field that isn't one fails the check as `unusable`. With this policy:
+
+```yaml
+ergo_spec: v0.4-dev
+subjects:
+  release:
+    from: releases
+    identified_by: tag.version
+requirements:
+  ready:
+    subject: release
+    checks:
+      dev_version: rego.version is tag.version followed by "-dev"
+      spec_is_tagged: rego.spec is "v" followed by tag.version
+```
+
+and this input:
+
+```json
+{"releases": [
+  {"tag": {"version": "0.4"}, "rego": {"version": "0.4-dev", "spec": "v0.4"}},
+  {"tag": {"version": "0.5"}, "rego": {"version": "0.5", "spec": "v0.4"}},
+  {"tag": {"version": 5}, "rego": {"version": "5-dev", "spec": "v5"}},
+  {"tag": {}, "rego": {"version": "x", "spec": "v"}}
+]}
+```
+
+both checks pass for `0.4`, fail as `value` for `0.5`, whose `rego.version` doesn't end with `-dev` and whose `rego.spec` isn't `v0.5`, fail as `unusable` for `5`, because `tag.version` is a number, and fail as `absent` for the last one, because it has no `tag.version`. The row of each check shows the left side and then each piece that is a field, in order: for `0.5` the `dev_version` row has `rego.version` with `"0.5"` and `tag.version` with `"0.5"`, and the joined text isn't one of them. When a piece can't be read, the check fails with the cause of the first piece that can't, left to right, even when the left side is missing too. `followed by` isn't run yet after `every` or `some`, in a `whose` or in a `from` line, where it is written wrong with `"followed by" isn't supported yet after every or some, or in a whose`. It is run in an assertion and under a `for` line, where a piece can be the alias. Text that spells the words, like `"a followed by b"`, is one string.
+
 `is at least`, `is at most`, `is more than` and `is less than` only order numbers. Two strings fail as `unusable`, because a number held as a string would be ordered as text, and with this input:
 
 ```json

@@ -7,6 +7,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 ### New
 
 - Every phrase that lacked an opposite has one, as spec 0.4 says: `does not start with`, `does not end with`, `is not a <type>`, `is not a non-empty string`, `is not between`, `is not <value> within <number>`, `does not equal <field> within <number>`, `contains some of` and `does not contain all of`, plus `is alphabetically on or before` and `is alphabetically on or after`. The sentence reader's `Phrase` has the variants `NotStartsWith`, `NotEndsWith`, `NotType`, `NotNonEmptyString`, `ContainsSome` and `NotContainsAll`, `Between` has a `not` field and `Alphabetically` an `or_equal` field. A count, a sum, a plus or an elapsed time can now be followed by `is not ... within` too, which the engine refused before.
+- Text can be joined on the right side with `followed by`, as spec 0.4 says: `rego.version is tag.version followed by "-dev"`. The sentence reader's `Operand` has a new variant `Joined`, with the pieces in order, and `compare` and `contains` read it.
 
 ### Changed
 

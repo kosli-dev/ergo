@@ -504,3 +504,19 @@ fn a_dot_written_on_the_left_of_a_from_condition_stays_when_the_name_is_an_alias
         "art.items whose art.k is 1 and item 1 of art.xs is 5 and count of art.xs is 1"
     );
 }
+
+#[test]
+fn followed_by_prints_with_one_space_and_double_quotes() {
+    assert_eq!(
+        printed_check("x   is  'a'   followed   by  k"),
+        "x is \"a\" followed by k"
+    );
+    assert_eq!(
+        printed_check("x does not equal k followed by \"-dev\""),
+        "x is not k followed by \"-dev\""
+    );
+    assert_eq!(
+        printed_check("x starts with $params.p followed by k"),
+        "x starts with $params.p followed by k"
+    );
+}

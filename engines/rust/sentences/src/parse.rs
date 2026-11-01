@@ -779,7 +779,49 @@ impl Parser {
                 out.push((Operand::Field(all), end));
             }
         }
+        let singles = out.clone();
+        for (first, end) in singles {
+            for (rest, stop) in self.joined_tail(end) {
+                let mut all = vec![first.clone()];
+                all.extend(rest);
+                out.push((Operand::Joined(all), stop));
+            }
+        }
         out
+    }
+
+    fn joined_tail(&self, i: usize) -> Reads<Vec<Operand>> {
+        let mut done = Vec::new();
+        let mut pending: Vec<(Vec<Operand>, usize)> = vec![(Vec::new(), i)];
+        while let Some((pieces, at)) = pending.pop() {
+            let mut next: Reads<Operand> = Vec::new();
+            if let Some(k) = self.ws(at).and_then(|m| self.lead(m, "followed by")) {
+                next.extend(
+                    self.value(k)
+                        .into_iter()
+                        .map(|(v, j)| (Operand::Value(v), j)),
+                );
+                let value_ends: Vec<usize> = next.iter().map(|(_, j)| *j).collect();
+                next.extend(
+                    self.path(k, Side::Right)
+                        .into_iter()
+                        .filter(|(_, j)| !value_ends.contains(j))
+                        .map(|(p, j)| (Operand::Field(vec![Term::Path(p)]), j)),
+                );
+            }
+            if next.is_empty() {
+                if !pieces.is_empty() {
+                    done.push((pieces, at));
+                }
+                continue;
+            }
+            for (piece, j) in next {
+                let mut grown = pieces.clone();
+                grown.push(piece);
+                pending.push((grown, j));
+            }
+        }
+        done
     }
 
     fn list_phrases(

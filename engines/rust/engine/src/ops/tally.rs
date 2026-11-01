@@ -101,8 +101,7 @@ struct Worked<T> {
 
 fn side_paths(side: &Side) -> Vec<&Path> {
     match side {
-        Side::Plain(compare::Side::Path(path)) => vec![path],
-        Side::Plain(compare::Side::Value(_)) => Vec::new(),
+        Side::Plain(plain) => plain.paths(),
         Side::Derived(derived) => {
             let mut paths = Vec::new();
             for term in &derived.terms {
@@ -124,8 +123,11 @@ fn side_paths(side: &Side) -> Vec<&Path> {
 fn side_candidates(side: &Side) -> Vec<SidePath<'_>> {
     let one = |path, needs_list| SidePath { path, needs_list };
     match side {
-        Side::Plain(compare::Side::Path(path)) => vec![one(path, false)],
-        Side::Plain(compare::Side::Value(_)) => Vec::new(),
+        Side::Plain(plain) => plain
+            .paths()
+            .into_iter()
+            .map(|path| one(path, false))
+            .collect(),
         Side::Derived(derived) => {
             let mut paths = Vec::new();
             for term in &derived.terms {
@@ -904,6 +906,7 @@ fn plain_right(
     match operand {
         s::Operand::Value(v) => Ok(Some(Side::Plain(compare::Side::Value(scope.value(v)?)))),
         s::Operand::Field(terms) => lower_side(terms, scope, names),
+        s::Operand::Joined(_) => Ok(None),
     }
 }
 

@@ -115,6 +115,7 @@ const derivedOps = (derived, out, aliases) => {
 const operandOps = (operand, out, aliases) => {
   const [type, body] = variant(operand);
   if (type === "Value") valueOps(body, out);
+  else if (type === "Joined") for (const piece of body) operandOps(piece, out, aliases);
   else for (const t of body) termOps(t, out, aliases);
 };
 
@@ -316,7 +317,9 @@ const termText = (term) => {
 
 const operandText = (operand) => {
   const [type, body] = variant(operand);
-  return type === "Value" ? valueText(body) : body.map(termText).join(" plus ");
+  if (type === "Value") return valueText(body);
+  if (type === "Joined") return body.map(operandText).join(" followed by ");
+  return body.map(termText).join(" plus ");
 };
 
 const listText = (list) => {
@@ -369,6 +372,7 @@ const valueNeed = (value) => {
 };
 
 const isValue = (operand) => variant(operand)[0] === "Value";
+const isJoined = (operand) => variant(operand)[0] === "Joined";
 const missingOr = (subject, need) => `${subject} is missing, null or ${need}`;
 const withOther = (subject, operand) => (isValue(operand) ? subject : `${subject} or what it is compared with`);
 
@@ -380,6 +384,7 @@ const failText = (subject, phrase, nested) => {
       const value = variant(b.operand)[1];
       return variant(value)[0] === "Null" ? `${subject} is missing` : missingOr(subject, `not ${valueNeed(value)}`);
     }
+    if (isJoined(b.operand)) return `${subject} or one of the pieces it is compared with is missing or null, or one of them or ${subject} is not a string`;
     const terms = b.operand.Field;
     if (terms.length === 1 && variant(terms[0])[0] === "Path") return `${subject} or what it is compared with is missing or null, or the two have different types`;
     return missingOr(withOther(subject, b.operand), "not a number");
@@ -464,6 +469,7 @@ const collectPaths = (kind, tree) => {
     const operand = (o) => {
       const [t, body] = variant(o);
       if (t === "Field") for (const term of body) fromTerm(term);
+      else if (t === "Joined") for (const piece of body) operand(piece);
     };
     const list = (l) => {
       const [t, body] = variant(l);
