@@ -3297,9 +3297,9 @@ else := "unusable" if _blocked(subj, path)
 
 else := "absent"
 
-default _any_read_state(_, _) := "absent"
+default _path_read_state(_, _) := "absent"
 
-_any_read_state(subj, path) := "not_an_object" if {
+_path_read_state(subj, path) := "not_an_object" if {
 	start := _start_of(subj, path)
 	not is_object(start)
 	not _reads_itself(path)
@@ -3321,12 +3321,11 @@ _list_subject_path(path) if {
 
 _position_first(path) if _index_step(_keys_of(path)[0])
 
-_any_read_state(_, path) := _name_step_state(path) if _name_step_state(path)
-
 _any_read_state(subj, path) := s if {
-	not _name_step_state(path)
-	s := _field_step_state(subj, path)
-}
+	s := _name_step_state(path)
+} else := _path_read_state(subj, path)
+
+_path_read_state(subj, path) := _field_step_state(subj, path)
 
 _field_step_state(subj, path) := "not_an_object" if {
 	_has_field_step(path)
@@ -3418,15 +3417,15 @@ _name_step_state(path) := "null" if {
 	not is_string(input["ergo/names"][step.named_by])
 }
 
-_any_read_state(subj, path) := "null" if _resolved(subj, path) == null
+_path_read_state(subj, path) := "null" if _resolved(subj, path) == null
 
-_any_read_state(subj, path) := "unusable" if {
+_path_read_state(subj, path) := "unusable" if {
 	start := _start_of(subj, path)
 	is_object(start)
 	_blocked(start, _keys_in(subj, path))
 }
 
-_any_read_state(subj, path) := "unusable" if {
+_path_read_state(subj, path) := "unusable" if {
 	_position_first(path)
 	start := _start_of(subj, path)
 	start != null
@@ -3434,7 +3433,7 @@ _any_read_state(subj, path) := "unusable" if {
 	not is_object(start)
 }
 
-_any_read_state(subj, path) := "value" if {
+_path_read_state(subj, path) := "value" if {
 	v := _resolved(subj, path)
 	v != _absent
 	v != null
