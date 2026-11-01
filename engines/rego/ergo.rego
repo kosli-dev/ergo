@@ -3362,13 +3362,27 @@ _read_before_field(v) if v != _absent
 
 _walk_read_state(subj, path) := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
 	is_object(subj)
-	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+	i := _bad_field_at(subj, path)
 	_walks_before_field(subj, array.slice(path, 0, i))
 } else := "null" if {
 	is_object(subj)
-	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+	i := _bad_field_at(subj, path)
 	_null_before_field(subj, array.slice(path, 0, i))
 } else := _read_state(subj, path)
+
+_bad_field_at(subj, path) := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+
+_null_prefix_fails(item, subj) := array.concat(w.fails, _walk_stop(w)) if {
+	is_object(subj)
+	prefix := array.slice(item.path, 0, _bad_field_at(subj, item.path))
+	_null_before_field(subj, prefix)
+	p := object.union(item, {"path": prefix})
+	w := _walk(_walk_start(p, subj), _walk_keys(p, subj), false)
+} else := []
+
+_for_null_fails(item, subj, names) := fails if {
+	fails := _null_prefix_fails(item, subj) with input as {"ergo/names": names}
+}
 
 _null_before_field(subj, prefix) if {
 	some j, _ in prefix
@@ -8210,7 +8224,7 @@ _walk_flawed(check) if _param_broken(check, set())
 
 _walk_flawed(_) if _unreadable_input
 
-_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check))))), "failed": []} if {
+_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check))))), "failed": _walk_failed(state, _null_prefix_fails(check, subj), check.path)} if {
 	state := _walk_read_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
@@ -8759,7 +8773,7 @@ _for_row(check, subj) := object.union(_for_outer(check, subj, _for_names), {"cau
 	not is_object(subj)
 } else := _for_outer(check, subj, _for_names)
 
-_for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": []} if {
+_for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": _for_failed(check, w.unread, [object.union(f, {"lines": []}) | some f in w.fails])} if {
 	w := _for_walk(check.items[0], subj, names)
 	"unread" in object.keys(w)
 } else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(check, cause, [object.union(f, {"lines": []}) | some f in _for_pick_fails(check, pre)])} if {
@@ -8780,6 +8794,8 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 }
 
 _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] if not "unread" in object.keys(w)
+
+else := w.fails if w.fails != []
 
 else := [object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {}))]
 
@@ -8824,15 +8840,15 @@ _for_only_shared(f, t) if {
 _for_walk(item, subj, names) := _for_picked(item, w, names) if {
 	keys := _walk_keys(item, subj) with input as {"ergo/names": names}
 	w := _walk(_walk_start(item, subj), keys, _for_empty_ok(item)) with input as {"ergo/names": names}
-} else := object.union({"items": [], "fails": [], "walked": set(), "trail": [], "unread": _for_unread(subj, item.path, names)}, _unread_at(subj, item, names))
+} else := object.union({"items": [], "fails": _for_null_fails(item, subj, names), "walked": set(), "trail": [], "unread": _for_unread(subj, item.path, names)}, _unread_at(subj, item, names))
 
 _for_unread(subj, path, names) := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
 	is_object(subj)
-	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+	i := _bad_field_at(subj, path)
 	_open_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
 } else := "null" if {
 	is_object(subj)
-	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+	i := _bad_field_at(subj, path)
 	_null_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
 } else := _walk_read_state(subj, path)
 
