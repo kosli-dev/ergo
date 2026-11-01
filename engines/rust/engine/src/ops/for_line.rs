@@ -1140,6 +1140,21 @@ impl For {
                 inputs.push(empty_list(crate::name::name(&item.path)));
             }
         }
+        for item in &self.items {
+            for step in &item.path.steps {
+                if let Step::Field(field) = step
+                    && !matches!(field.start, Start::Alias(_))
+                {
+                    inputs.extend(super::field_inputs(
+                        &Path {
+                            start: item.path.start.clone(),
+                            steps: vec![step.clone()],
+                        },
+                        ctx,
+                    ));
+                }
+            }
+        }
         inputs.extend(self.subject_inputs(ctx));
         inputs.sort_by(|a, b| {
             a.name
