@@ -8810,7 +8810,17 @@ _for_only_shared(f, t) if {
 _for_walk(item, subj, names) := _for_picked(item, w, names) if {
 	keys := _walk_keys(item, subj) with input as {"ergo/names": names}
 	w := _walk(_walk_start(item, subj), keys, _for_empty_ok(item)) with input as {"ergo/names": names}
-} else := object.union({"items": [], "fails": [], "walked": set(), "trail": [], "unread": _read_state(subj, item.path)}, _unread_at(subj, item, names))
+} else := object.union({"items": [], "fails": [], "walked": set(), "trail": [], "unread": _for_unread(subj, item.path, names)}, _unread_at(subj, item, names))
+
+_for_unread(subj, path, names) := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
+	is_object(subj)
+	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+	_open_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
+} else := _walk_read_state(subj, path)
+
+_open_before_field(subj, prefix) if _read_before_field(_resolved(subj, prefix))
+
+_open_before_field(subj, prefix) if _walks_before_field(subj, prefix)
 
 _unread_at(subj, item, names) := {"unread_at": {"at": at}} if at := _unread_pointer(subj, item.path) with input as {"ergo/names": names}
 

@@ -22,6 +22,10 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 - The `$well_formed` row lists the problems of fields, parts and checks sorted by name as the report writes it, quotes and escapes included, by code point, where parts were sorted by the raw name. Reports change for parts with names that need quoting, and a `require` that is written wrong is listed second in the `$well_formed` row.
 - An own field named like a part of the subject or like a `for` alias keeps its dot in the name of an input, like `.cov.pct`, and so does the list a `count of`, `sum of` or a walk reads, like `.art.xs[]`. Reports change for such policies: they were named `cov.pct` and `art.xs[]`. The `failed_items` of a walk or a `for` line keep the dot too.
 
+### Fixed
+
+- A `for` line whose check reads a path with a `named by` field, like `row.w named by p is "xy"` under `every rows as row`, stopped the whole report with `eval_conflict_error` when an item wasn't an object and `p` was `null` or a number. The row fails as `not_an_object` now, with the item in `failed_items`, as in the Rust engine.
+
 ## 0.3.1
 
 `ergo.rego` is the same as in 0.3.0 apart from its version, and follows spec 0.3. This release brings the docs up to date with the first release of the Rust engine: [README.md](README.md#the-ergo-cli-experimental) says how to install the `ergo` CLI from crates.io or download it, and calls it the `ergo` CLI where it meant the command. It also says again how to update `ergo.rego`.
