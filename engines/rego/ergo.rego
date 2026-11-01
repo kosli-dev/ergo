@@ -5432,36 +5432,27 @@ _s_patterns := {
 	phrases := [
 		["is not one of", `is +not +(?:one +of|in) +`, list, "list"],
 		["is one of", `is +(?:one +of|in) +`, list, "list"],
-		["is not a non-empty string", `is +not +a +non-empty +string`, ``, "none"],
-		["is a non-empty string", `is +a +non-empty +string`, ``, "none"],
-		["is not a", `is +not +an? +`, type, "type"],
-		["is a", `is +an? +`, type, "type"],
+		["is a non-empty string", `is +(?:not +)?a +non-empty +string`, ``, "none", [["not", "is not a non-empty string"]]],
+		["is a", `is +(?:not +)?an? +`, type, "type", [["not", "is not a"]]],
 		["is not empty", `is +not +empty`, ``, "none"],
 		["is empty", `is +empty`, ``, "none"],
 		["does not exist", `does +not +exist`, ``, "none"],
 		["exists", `exists`, ``, "none"],
-		["does not contain all of", `does +not +contain +all +of +`, list, "list"],
-		["contains some of", `contains +some +of +`, list, "list"],
-		["contains all of", `contains +all +of +`, list, "list"],
-		["contains none of", `contains +none +of +`, list, "list"],
+		["contains all of", `(?:contains|does +not +contain) +all +of +`, list, "list", [["not", "does not contain all of"]]],
+		["contains none of", `contains +(?:none|some) +of +`, list, "list", [["some", "contains some of"]]],
 		["does not contain", `does +not +contain +`, operand, "operand"],
 		["contains", `contains +`, operand, "operand"],
 		["does not match", `does +not +match +`, list, "list"],
 		["matches", `matches +`, list, "list"],
-		["does not start with", `does +not +start +with +`, operand, "operand"],
-		["does not end with", `does +not +end +with +`, operand, "operand"],
-		["starts with", `starts +with +`, operand, "operand"],
-		["ends with", `ends +with +`, operand, "operand"],
-		["is alphabetically on or before", `is +alphabetically +on +or +before +`, operand, "operand"],
-		["is alphabetically on or after", `is +alphabetically +on +or +after +`, operand, "operand"],
-		["is alphabetically before", `is +alphabetically +before +`, operand, "operand"],
-		["is alphabetically after", `is +alphabetically +after +`, operand, "operand"],
+		["starts with", `(?:starts|does +not +start) +with +`, operand, "operand", [["not", "does not start with"]]],
+		["ends with", `(?:ends|does +not +end) +with +`, operand, "operand", [["not", "does not end with"]]],
+		["is alphabetically before", `is +alphabetically +(?:on +or +)?before +`, operand, "operand", [["on", "is alphabetically on or before"]]],
+		["is alphabetically after", `is +alphabetically +(?:on +or +)?after +`, operand, "operand", [["on", "is alphabetically on or after"]]],
 		["is at least", `is +at +least +`, operand, "operand"],
 		["is at most", `is +at +most +`, operand, "operand"],
 		["is more than", `is +more +than +`, operand, "operand"],
 		["is less than", `is +less +than +`, operand, "operand"],
-		["is not between", `is +not +between +`, concat("", [num, ` +and +`, num]), "range"],
-		["is between", `is +between +`, concat("", [num, ` +and +`, num]), "range"],
+		["is between", `is +(?:not +)?between +`, concat("", [num, ` +and +`, num]), "range", [["not", "is not between"]]],
 		["is on or after", `is +on +or +after +`, operand, "operand"],
 		["is on or before", `is +on +or +before +`, operand, "operand"],
 		["is before", `is +before +`, operand, "operand"],
@@ -5793,13 +5784,29 @@ _s_ref_of(text) := {"steps": [text]} if {
 
 _s_ref_of(text) := {"steps": [text], "bad_name": text} if _s_bad_name(text)
 
-_s_phrase_of(text, pat) := object.union({"op": pat.phrases[hit[0]][0]}, _s_args_of(pat.phrases[hit[0]][3], hit[1], pat)) if {
+_s_phrase_of(text, pat) := object.union({"op": _s_op_of(pat.phrases[hit[0]], text, hit[1])}, _s_args_of(pat.phrases[hit[0]][3], hit[1], pat)) if {
 	hits := [[i, m[1]] |
 		some i, ph in pat.phrases
 		m := regex.find_all_string_submatch_n(concat("", [`^(?:`, ph[1], `)(.*)$`]), text, 1)[0]
 		regex.match(pat.kinds[ph[3]], m[1])
 	]
 	hit := hits[0]
+}
+
+_s_op_of(phrase, _, _) := phrase[0] if count(phrase) == 4
+
+_s_op_of(phrase, text, rest) := phrase[0] if {
+	count(phrase) == 5
+	prefix := substring(text, 0, count(text) - count(rest))
+	every choice in phrase[4] {
+		not contains(prefix, choice[0])
+	}
+}
+
+_s_op_of(phrase, text, rest) := choice[1] if {
+	count(phrase) == 5
+	some choice in phrase[4]
+	contains(substring(text, 0, count(text) - count(rest)), choice[0])
 }
 
 _s_args_of("none", _, _) := {}

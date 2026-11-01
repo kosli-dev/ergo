@@ -125,21 +125,13 @@ _part_passes(topic, n, parts) if _failures(topic, _part(topic, n, parts)) == kno
 	some c in group.cases
 }
 
-test_the_sentences_cases_pass_part_1_of_4 if _part_passes("sentences", 0, 4)
+test_the_even_sentences_cases_pass if _part_passes("sentences", 0, 2)
 
-test_the_sentences_cases_pass_part_2_of_4 if _part_passes("sentences", 1, 4)
+test_the_odd_sentences_cases_pass if _part_passes("sentences", 1, 2)
 
-test_the_sentences_cases_pass_part_3_of_4 if _part_passes("sentences", 2, 4)
+test_the_even_sentences_cases_pass_compiled if _differences_compiled("sentences", _part("sentences", 0, 2)) == set()
 
-test_the_sentences_cases_pass_part_4_of_4 if _part_passes("sentences", 3, 4)
-
-test_the_sentences_cases_pass_compiled_part_1_of_4 if _differences_compiled("sentences", _part("sentences", 0, 4)) == set()
-
-test_the_sentences_cases_pass_compiled_part_2_of_4 if _differences_compiled("sentences", _part("sentences", 1, 4)) == set()
-
-test_the_sentences_cases_pass_compiled_part_3_of_4 if _differences_compiled("sentences", _part("sentences", 2, 4)) == set()
-
-test_the_sentences_cases_pass_compiled_part_4_of_4 if _differences_compiled("sentences", _part("sentences", 3, 4)) == set()
+test_the_odd_sentences_cases_pass_compiled if _differences_compiled("sentences", _part("sentences", 1, 2)) == set()
 
 test_the_subjects_cases_pass_part_1_of_6 if _part_passes("subjects", 0, 6)
 
