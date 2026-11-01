@@ -244,11 +244,9 @@ fn before_field(path: &Path, at: usize, ctx: &Ctx) -> Option<Outcome> {
         start: path.start.clone(),
         steps: path.steps[..at].to_vec(),
     };
-    let read = path::read(&before, ctx);
-    match (read.outcome, read.value) {
-        (Outcome::Found, Some(Value::Null)) => Some(Outcome::Null),
-        (Outcome::Found, _) => None,
-        (outcome, _) => Some(outcome),
+    match path::read(&before, ctx).outcome {
+        Outcome::Found | Outcome::Null => None,
+        outcome => Some(outcome),
     }
 }
 
