@@ -232,15 +232,16 @@ grep -qxF 'version := "0.11.0"' site/prepared/ergo.rego.txt || {
 }
 out=$(FAKE_RELEASES="rego-v0.11.0 spec-v0.1" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
 case $out in
-  *"don't all have OPA.md and CLI.md yet"*) ;;
+  *"don't all have OPA.md and CLI.md yet, so the site has no page from CLI.md"*) ;;
   *)
-    echo "prepare.sh should say the docs come from the old layout when there is no Rust release, and said: $out" >&2
+    echo "prepare.sh should say the CLI page is missing when there is no Rust release, and said: $out" >&2
     exit 1
     ;;
 esac
-says site/prepared/source rego-v0.11.0
-says site/prepared/data/release.json '{"source": "rego-v0.11.0", "rego": "0.11.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1", "opa": "", "cli": ""}'
-lacks site/prepared/repo/OPA.md
+says site/prepared/source spec-v0.1
+says site/prepared/data/release.json '{"source": "spec-v0.1", "rego": "0.11.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": ""}'
+has site/prepared/repo/OPA.md
+lacks site/prepared/repo/CLI.md
 for name in policy report; do
   printf '{\n  "$id": "https://ergo.kosli.com/spec/0.2/%s.schema.json"\n}\n' "$name" > "spec/$name/schema.json"
 done
@@ -257,6 +258,12 @@ case $out in
 esac
 says site/prepared/source spec-v0.1
 says site/prepared/data/release.json '{"source": "spec-v0.1", "rego": "0.11.0", "rust": "0.5.0", "spec": "0.2", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": "rust-v0.5.0"}'
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag --force spec-v0.1 rego-v0.1.0 > /dev/null
+FAKE_RELEASES="rego-v0.11.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh > /dev/null
+says site/prepared/source rego-v0.11.0
+says site/prepared/data/release.json '{"source": "rego-v0.11.0", "rego": "0.11.0", "rust": "0.5.0", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": "rust-v0.5.0"}'
+has site/prepared/repo/OPA.md
+has site/prepared/repo/CLI.md
 git tag --delete spec-v0.2 rego-v0.11.0 rust-v0.5.0 > /dev/null
 git tag --delete spec-v0.1 > /dev/null
 (FAKE_RELEASES="rego-v0.10.0 spec-v0.1"; FAKE_ASSET_VERSION=0.10.0; expected="There's no spec-v0.1 tag here. Fetch the tags with: git fetch --tags"; fails)

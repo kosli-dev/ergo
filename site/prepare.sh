@@ -64,30 +64,37 @@ if [ "$mode" = release ]; then
     { git show "$1:engines/rego/ergo.rego" 2> /dev/null || git show "$1:ergo.rego" 2> /dev/null; } | sed -n 's/^_spec := "\(v[0-9][0-9]*\.[0-9][0-9]*\)"$/\1/p'
   }
 
-  layout=old
+  found_spec=
+  found_ergo=
+  for candidate_spec in $(printf '%s\n' $spec_tags | sort -V -r); do
+    for candidate in $(printf '%s\n' "$releases" | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V -r); do
+      has_tag "$candidate"
+      if [ "$(spec_of "$candidate")" = "v${candidate_spec#spec-v}" ]; then
+        found_spec=$candidate_spec
+        found_ergo=$candidate
+        break 2
+      fi
+    done
+  done
   docs_tag=$rego_tag
   ergo_tag=$rego_tag
-  if [ -n "$rust_tag" ] && in_tag "$rego_tag" OPA.md && in_tag "$rust_tag" CLI.md; then
-    for candidate_spec in $(printf '%s\n' $spec_tags | sort -V -r); do
-      for candidate in $(printf '%s\n' "$releases" | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V -r); do
-        has_tag "$candidate"
-        if [ "$(spec_of "$candidate")" = "v${candidate_spec#spec-v}" ]; then
-          found_spec=$candidate_spec
-          found_ergo=$candidate
-          break 2
-        fi
-      done
-    done
-    if [ -n "${found_spec:-}" ] && in_tag "$found_spec" OPA.md; then
-      layout=new
-      docs_tag=$found_spec
-      ergo_tag=$found_ergo
-      [ "$found_spec" = "$spec_tag" ] || echo "No published rego release reads $spec_tag yet, so the docs and the tutorial come from $found_spec, which $found_ergo reads"
-    fi
+  if [ -n "$found_spec" ] && in_tag "$found_spec" OPA.md; then
+    docs_tag=$found_spec
+    ergo_tag=$found_ergo
+    [ "$found_spec" = "$spec_tag" ] || echo "No published rego release reads $spec_tag yet, so the docs and the tutorial come from $found_spec, which $found_ergo reads"
   fi
-  if [ "$layout" = old ]; then
-    echo "The latest releases don't all have OPA.md and CLI.md yet, so the docs come from $rego_tag, with the engines in README.md"
+  opa_source=
+  cli_source=
+  if in_tag "$rego_tag" OPA.md; then
+    opa_source=$rego_tag
   fi
+  if [ -n "$rust_tag" ] && in_tag "$rust_tag" CLI.md; then
+    cli_source=$rust_tag
+  fi
+  missing=
+  [ -n "$opa_source" ] || missing=OPA.md
+  [ -n "$cli_source" ] || missing="${missing:+$missing and }CLI.md"
+  [ -z "$missing" ] || echo "The latest releases don't all have OPA.md and CLI.md yet, so the site has no page from $missing"
   tag=$docs_tag
   version=${ergo_tag#rego-v}
 
@@ -123,22 +130,20 @@ if [ "$mode" = release ]; then
     mv "$2.tmp" "$2"
   }
   docs_version=$version
-  [ "$layout" = old ] || docs_version=$(rego_version_of "$docs_tag" | sed 's/-dev$//')
+  [ "$docs_tag" = "$ergo_tag" ] || docs_version=$(rego_version_of "$docs_tag" | sed 's/-dev$//')
   for file in README.md REFERENCE.md; do
     [ -z "$docs_version" ] || undev "$docs_version" "$dir/tag/$file"
   done
   docs=$dir/tag
   source=$tag
-  opa_source=
-  cli_source=
-  if [ "$layout" = new ]; then
-    git archive --output "$dir/opa.tar" "$rego_tag" OPA.md
+  if [ -n "$opa_source" ]; then
+    git archive --output "$dir/opa.tar" "$opa_source" OPA.md
     tar -x -f "$dir/opa.tar" -C "$dir/tag"
-    git archive --output "$dir/cli.tar" "$rust_tag" CLI.md
+    undev "${opa_source#rego-v}" "$dir/tag/OPA.md"
+  fi
+  if [ -n "$cli_source" ]; then
+    git archive --output "$dir/cli.tar" "$cli_source" CLI.md
     tar -x -f "$dir/cli.tar" -C "$dir/tag"
-    undev "${rego_tag#rego-v}" "$dir/tag/OPA.md"
-    opa_source=$rego_tag
-    cli_source=$rust_tag
   fi
 else
   rego=engines/rego/ergo.rego
@@ -147,16 +152,13 @@ else
   source="working tree"
   opa_source=
   cli_source=
-  layout=new
 fi
 
 mkdir -p "$prepared/repo"
 cp "$docs/README.md" "$docs/REFERENCE.md" "$prepared/repo/"
-if [ "$layout" = new ]; then
-  for file in OPA.md CLI.md; do
-    [ ! -f "$docs/$file" ] || cp "$docs/$file" "$prepared/repo/"
-  done
-fi
+for file in OPA.md CLI.md; do
+  [ ! -f "$docs/$file" ] || cp "$docs/$file" "$prepared/repo/"
+done
 (cd "$docs" && find examples -type f) > "$dir/examples.txt"
 while IFS= read -r file; do
   mkdir -p "$prepared/$(dirname "$file")"

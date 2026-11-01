@@ -189,4 +189,15 @@ fits "the new layout links each page to its own release"
 docs_page cli spec-v0.1 CLI.md
 fails "docs/cli/ doesn't link to CLI.md in rust-v0.1.0"
 
+build
+echo '{"source": "spec-v0.1", "rego": "0.1.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.1.0", "cli": ""}' > "$dir/site/prepared/data/release.json"
+mkdir -p "$dir/site/prepared/repo"
+touch "$dir/site/prepared/repo/README.md" "$dir/site/prepared/repo/REFERENCE.md" "$dir/site/prepared/repo/OPA.md"
+docs_page getting-started spec-v0.1 README.md
+docs_page reference spec-v0.1 REFERENCE.md
+docs_page opa rego-v0.1.0 OPA.md
+fits "a release without a CLI page builds three pages"
+printf '<a href=../cli/>Ergo CLI</a>\n' >> "$dir/public/docs/getting-started/index.html"
+fails "docs/getting-started/ links to docs/cli/, which wasn't built"
+
 echo "check_build.py fails when the built site doesn't show what was prepared"

@@ -4,12 +4,21 @@
   (dict "file" "repo/OPA.md" "name" "OPA.md" "path" "opa" "title" "Ergo with OPA" "weight" 3 "ref" "opa" "optional" true)
   (dict "file" "repo/CLI.md" "name" "CLI.md" "path" "cli" "title" "Ergo CLI" "weight" 4 "ref" "cli" "optional" true)
 }}
+{{ $built := dict }}
+{{ range $docs }}
+  {{ if resources.Get .file }}{{ $built = merge $built (dict .name true) }}{{ end }}
+{{ end }}
 {{ range $docs }}
   {{ $doc := . }}
   {{ with resources.Get $doc.file }}
     {{ $md := .Content }}
     {{ $md = replaceRE `^# [^\n]*\n+` "" $md 1 }}
     {{ $md = replaceRE `(?m)^## Getting started\n+` "" $md 1 }}
+    {{ range $file := slice "OPA.md" "CLI.md" }}
+      {{ if not (index $built $file) }}
+        {{ $md = replaceRE (printf `\[([^\]]*)\]\(%s(#[^)]*)?\)` (replace $file "." `\.`)) "${1}" $md }}
+      {{ end }}
+    {{ end }}
     {{ $md = replaceRE `\(REFERENCE\.md(#[^)]*)?\)` "(../reference/${1})" $md }}
     {{ $md = replaceRE `\(README\.md(#[^)]*)?\)` "(../getting-started/${1})" $md }}
     {{ $md = replaceRE `\(OPA\.md(#[^)]*)?\)` "(../opa/${1})" $md }}

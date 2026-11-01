@@ -114,6 +114,11 @@ for page_name, file, key in (("getting-started", "README.md", ""), ("reference",
         if f"/blob/{ref}/{file}" not in built_page.read_text(errors="replace"):
             problems.append(f"docs/{page_name}/ doesn't link to {file} in {ref}")
 
+for built_page in sorted((public / "docs").glob("*/index.html")):
+    for target in sorted(set(re.findall(r"""href=["']?(?:\.\./|/docs/)(opa|cli|reference|getting-started)/""", built_page.read_text(errors="replace")))):
+        if not (public / "docs" / target / "index.html").exists():
+            problems.append(f"docs/{built_page.parent.name}/ links to docs/{target}/, which wasn't built")
+
 if problems:
     print("\n".join(problems))
     raise SystemExit(1)
