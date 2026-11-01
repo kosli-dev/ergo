@@ -25,6 +25,7 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 ### Fixed
 
 - A `for` line whose check reads a path with a `named by` field, like `row.w named by p is "xy"` under `every rows as row`, stopped the whole report with `eval_conflict_error` when an item wasn't an object and `p` was `null` or a number. The row fails as `not_an_object` now, with the item in `failed_items`, as in the Rust engine.
+- A later `for` item whose path is named by an alias of an earlier one, like `every ks as k, every m named by k as x`, failed as `absent` when the alias held an object, a list, a number or `null`. It fails as `unusable` now, and as `null` when the alias holds `null`, as [for.named_by](spec/semantics.md#for) says and as the Rust engine does. So does `every rows as r, every r.xs named by r.k as x`, where the key after `named by` is the one word `r`, the whole row. Reports change for such policies, in the cause only: none of them passed.
 
 ## 0.3.1
 

@@ -8850,7 +8850,9 @@ _for_unread(subj, path, names) := _key_state(object.get(subj, path[i].named_by_f
 	is_object(subj)
 	i := _bad_field_at(subj, path)
 	_null_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
-} else := _walk_read_state(subj, path)
+} else := s if {
+	s := _walk_read_state(subj, path) with input as {"ergo/names": names}
+}
 
 _open_before_field(subj, prefix) if _read_before_field(_resolved(subj, prefix))
 
