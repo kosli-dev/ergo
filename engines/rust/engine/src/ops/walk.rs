@@ -251,6 +251,9 @@ fn before_field(path: &Path, at: usize, ctx: &Ctx) -> Option<Outcome> {
     if walks {
         return None;
     }
+    if (1..at).any(|end| matches!(path::read(&upto(end), ctx).value, Some(Value::Null))) {
+        return Some(Outcome::Null);
+    }
     match path::read(&upto(at), ctx).outcome {
         Outcome::Found | Outcome::Null => None,
         outcome => Some(outcome),
