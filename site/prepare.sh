@@ -50,14 +50,48 @@ rm -rf "$prepared"
 mkdir -p "$prepared/data"
 
 if [ "$mode" = release ]; then
-  tag=$(printf '%s\n' "$releases" | site/latest-release.sh rego)
-  [ -n "$tag" ] || fail "$repo has no published rego-vX.Y.Z release"
-  version=${tag#rego-v}
-  has_tag "$tag"
+  rego_tag=$(printf '%s\n' "$releases" | site/latest-release.sh rego)
+  [ -n "$rego_tag" ] || fail "$repo has no published rego-vX.Y.Z release"
+  has_tag "$rego_tag"
 
-  gh release download "$tag" --repo "$repo" --pattern ergo.rego --dir "$dir/asset"
+  in_tag() {
+    git cat-file -e "$1:$2" 2> /dev/null
+  }
+  rego_version_of() {
+    git show "$1:engines/rego/ergo.rego" 2> /dev/null | sed -n 's/^version := "\(.*\)"$/\1/p'
+  }
+  spec_of() {
+    { git show "$1:engines/rego/ergo.rego" 2> /dev/null || git show "$1:ergo.rego" 2> /dev/null; } | sed -n 's/^_spec := "\(v[0-9][0-9]*\.[0-9][0-9]*\)"$/\1/p'
+  }
+
+  layout=old
+  if [ -n "$rust_tag" ] && in_tag "$rego_tag" OPA.md && in_tag "$rust_tag" CLI.md && in_tag "$spec_tag" OPA.md; then
+    layout=new
+  else
+    echo "The latest releases don't all have OPA.md and CLI.md yet, so the docs come from $rego_tag, with the engines in README.md"
+  fi
+
+  if [ "$layout" = new ]; then
+    docs_tag=$spec_tag
+    ergo_tag=
+    for candidate in $(printf '%s\n' "$releases" | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V -r); do
+      has_tag "$candidate"
+      if [ "$(spec_of "$candidate")" = "v${spec_tag#spec-v}" ]; then
+        ergo_tag=$candidate
+        break
+      fi
+    done
+    [ -n "$ergo_tag" ] || fail "No published rego-vX.Y.Z release reads spec v${spec_tag#spec-v}, so the tutorial has no ergo.rego to run"
+  else
+    docs_tag=$rego_tag
+    ergo_tag=$rego_tag
+  fi
+  tag=$docs_tag
+  version=${ergo_tag#rego-v}
+
+  gh release download "$ergo_tag" --repo "$repo" --pattern ergo.rego --dir "$dir/asset"
   rego=$dir/asset/ergo.rego
-  grep -qxF "version := \"$version\"" "$rego" || fail "The ergo.rego of release $tag should say version := \"$version\""
+  grep -qxF "version := \"$version\"" "$rego" || fail "The ergo.rego of release $ergo_tag should say version := \"$version\""
 
   paths="README.md REFERENCE.md examples site/assets/js/tutorial site/assets/css/tutorial.css site/assets/css/ergo.css site/layouts/tutorial.html site/content/tutorial.md"
   if git cat-file -e "$tag:site/data/examples.yaml" 2> /dev/null; then
@@ -81,21 +115,46 @@ if [ "$mode" = release ]; then
     cp "$dir/tag/site/data/examples.yaml" "$prepared/data/"
   fi
   cp "$rego" "$prepared/ergo.rego.txt"
+
+  undev() {
+    VERSION=$1 perl -pe 's/(?<![\w.])\Q$ENV{VERSION}\E-dev(?![\w-])/$ENV{VERSION}/g' "$2" > "$2.tmp"
+    mv "$2.tmp" "$2"
+  }
+  docs_version=$version
+  [ "$layout" = old ] || docs_version=$(rego_version_of "$docs_tag" | sed 's/-dev$//')
   for file in README.md REFERENCE.md; do
-    VERSION=$version perl -pe 's/(?<![\w.])\Q$ENV{VERSION}\E-dev(?![\w-])/$ENV{VERSION}/g' "$dir/tag/$file" > "$dir/tag/$file.tmp"
-    mv "$dir/tag/$file.tmp" "$dir/tag/$file"
+    [ -z "$docs_version" ] || undev "$docs_version" "$dir/tag/$file"
   done
   docs=$dir/tag
   source=$tag
+  opa_source=
+  cli_source=
+  if [ "$layout" = new ]; then
+    git archive --output "$dir/opa.tar" "$rego_tag" OPA.md
+    tar -x -f "$dir/opa.tar" -C "$dir/tag"
+    git archive --output "$dir/cli.tar" "$rust_tag" CLI.md
+    tar -x -f "$dir/cli.tar" -C "$dir/tag"
+    undev "${rego_tag#rego-v}" "$dir/tag/OPA.md"
+    opa_source=$rego_tag
+    cli_source=$rust_tag
+  fi
 else
   rego=engines/rego/ergo.rego
   version=
   docs=.
   source="working tree"
+  opa_source=
+  cli_source=
+  layout=new
 fi
 
 mkdir -p "$prepared/repo"
 cp "$docs/README.md" "$docs/REFERENCE.md" "$prepared/repo/"
+if [ "$layout" = new ]; then
+  for file in OPA.md CLI.md; do
+    [ ! -f "$docs/$file" ] || cp "$docs/$file" "$prepared/repo/"
+  done
+fi
 (cd "$docs" && find examples -type f) > "$dir/examples.txt"
 while IFS= read -r file; do
   mkdir -p "$prepared/$(dirname "$file")"
@@ -108,11 +167,11 @@ if [ "$mode" = release ]; then
   case $ergo_spec in
     *-dev) ;;
     *)
-      printf '%s\n' $spec_tags | grep -qxF "spec-$ergo_spec" || fail "The ergo.rego of $source reads spec $ergo_spec, and spec-$ergo_spec isn't published, so the site would link to schemas it doesn't have"
+      printf '%s\n' $spec_tags | grep -qxF "spec-$ergo_spec" || fail "The ergo.rego of ${ergo_tag:-$source} reads spec $ergo_spec, and spec-$ergo_spec isn't published, so the site would link to schemas it doesn't have"
       ;;
   esac
 fi
-printf '{"source": "%s", "rego": "%s", "rust": "%s", "spec": "%s", "ergo_spec": "%s"}\n' "$source" "$version" "${rust_tag#rust-v}" "${spec_tag#spec-v}" "$ergo_spec" > "$prepared/data/release.json"
+printf '{"source": "%s", "rego": "%s", "rust": "%s", "spec": "%s", "ergo_spec": "%s", "opa": "%s", "cli": "%s"}\n' "$source" "$version" "${rust_tag#rust-v}" "${spec_tag#spec-v}" "$ergo_spec" "$opa_source" "$cli_source" > "$prepared/data/release.json"
 
 out=site/assets/tutorial
 rm -rf "$out"

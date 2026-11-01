@@ -101,6 +101,19 @@ for name, found in (("playground", playground_page), ("old editor", old_editor_p
     if found.exists() and not re.search(r"""<meta\s+name=["']robots["']\s+content=["']noindex["']""", found.read_text(errors="replace"), re.I):
         problems.append(f"the {name} page has no noindex meta")
 
+repo_files = prepared / "repo"
+for page_name, file, key in (("getting-started", "README.md", ""), ("reference", "REFERENCE.md", ""), ("opa", "OPA.md", "opa"), ("cli", "CLI.md", "cli")):
+    built_page = public / "docs" / page_name / "index.html"
+    prepared_file = repo_files / file
+    if prepared_file.exists() and not built_page.exists():
+        problems.append(f"the build has no docs/{page_name}/ page, and site/prepared/repo has {file}")
+    if built_page.exists() and not prepared_file.exists():
+        problems.append(f"the build has a docs/{page_name}/ page, and site/prepared/repo has no {file}")
+    if built_page.exists():
+        ref = release.get(key) or (release["source"] if release["source"] != "working tree" else "main")
+        if f"/blob/{ref}/{file}" not in built_page.read_text(errors="replace"):
+            problems.append(f"docs/{page_name}/ doesn't link to {file} in {ref}")
+
 if problems:
     print("\n".join(problems))
     raise SystemExit(1)

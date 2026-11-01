@@ -155,4 +155,38 @@ mkdir -p "$dir/public/docs"
 echo '<a href="/docs/">Docs</a>' > "$dir/public/docs/index.html"
 fits "the playground page is missing"
 
+
+docs_page() {
+  mkdir -p "$dir/public/docs/$1"
+  printf '<a href="https://github.com/kosli-dev/ergo/blob/%s/%s">Source</a>\n' "$2" "$3" > "$dir/public/docs/$1/index.html"
+}
+
+build
+mkdir -p "$dir/site/prepared/repo"
+touch "$dir/site/prepared/repo/README.md" "$dir/site/prepared/repo/REFERENCE.md"
+docs_page getting-started rego-v0.1.0 README.md
+docs_page reference rego-v0.1.0 REFERENCE.md
+fits "the old layout has the two pages of the release"
+
+build
+mkdir -p "$dir/site/prepared/repo"
+touch "$dir/site/prepared/repo/README.md"
+fails "the build has no docs/getting-started/ page, and site/prepared/repo has README.md"
+
+build
+docs_page opa rego-v0.1.0 OPA.md
+fails "the build has a docs/opa/ page, and site/prepared/repo has no OPA.md"
+
+build
+echo '{"source": "spec-v0.1", "rego": "0.1.0", "rust": "0.1.0", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.1.0", "cli": "rust-v0.1.0"}' > "$dir/site/prepared/data/release.json"
+mkdir -p "$dir/site/prepared/repo"
+touch "$dir/site/prepared/repo/README.md" "$dir/site/prepared/repo/REFERENCE.md" "$dir/site/prepared/repo/OPA.md" "$dir/site/prepared/repo/CLI.md"
+docs_page getting-started spec-v0.1 README.md
+docs_page reference spec-v0.1 REFERENCE.md
+docs_page opa rego-v0.1.0 OPA.md
+docs_page cli rust-v0.1.0 CLI.md
+fits "the new layout links each page to its own release"
+docs_page cli spec-v0.1 CLI.md
+fails "docs/cli/ doesn't link to CLI.md in rust-v0.1.0"
+
 echo "check_build.py fails when the built site doesn't show what was prepared"
