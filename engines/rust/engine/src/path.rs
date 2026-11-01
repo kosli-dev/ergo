@@ -186,6 +186,9 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
             }
             match read.value {
                 Some(Value::String(text)) => Ok(Resolved::Key(text.clone())),
+                Some(Value::Number(_)) if matches!(reference.start, Start::Alias(_)) => {
+                    Err(Outcome::Unusable)
+                }
                 Some(Value::Number(number)) => Decimal::parse(&number.to_string())
                     .and_then(|d| d.as_position())
                     .map(Resolved::Index)
@@ -468,6 +471,41 @@ mod tests {
         assert_eq!(r.location.unwrap().render(), "/prs/0");
         let r = read(&at(Start::Alias("pr".into()), vec![]), &ctx);
         assert_eq!(r.outcome, Outcome::Found);
+    }
+
+    #[test]
+    fn a_number_an_alias_holds_is_unusable_as_a_key_not_a_position() {
+        let w = World::new(r#"{"m": [5, 1]}"#);
+        for (held, outcome) in [
+            ("1", Outcome::Unusable),
+            ("[1]", Outcome::Unusable),
+            ("{\"a\": 1}", Outcome::Unusable),
+            ("null", Outcome::Null),
+        ] {
+            let alias_value = v(held);
+            let mut aliases = BTreeMap::new();
+            aliases.insert(
+                "k".to_string(),
+                Located {
+                    value: &alias_value,
+                    location: Location::input_root().key("ks").index(0),
+                },
+            );
+            let ctx = Ctx {
+                subject: Located {
+                    value: &w.subject,
+                    location: Location::input_root(),
+                },
+                input: &w.input,
+                params: None,
+                aliases,
+            };
+            let step = Step::Ref(Box::new(at(Start::Alias("k".into()), vec![])));
+            assert!(
+                matches!(resolve(&step, &ctx), Err(found) if found == outcome),
+                "{held}"
+            );
+        }
     }
 
     #[test]

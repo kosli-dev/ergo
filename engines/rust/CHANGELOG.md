@@ -23,6 +23,10 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - A name that starts with `$` is written wrong, whether it names a subject, a requirement, a check, an `any_of` option or a part, with `a name can't start with $`, as spec 0.4 says, in place of `name reserved`, `a subject can't be named $input` and `invalid alias` for a part called `$dollar`. A check with such a name has no entry in `requirements`. Reports change for such policies.
 - A name that starts or ends with a space or an invisible character (Unicode White_Space or general category Cf, like U+200B or U+FEFF) is written wrong too, with `a name can't start or end with a space or an invisible character`, as spec 0.4 says, for a subject, a requirement, a check, an `any_of` option and a part. Reports change for such policies.
 
+### Fixed
+
+- A check could pass when it should fail. A path named by a `for` alias that holds a number read the number as a list position, so `m named by k is 1` under `every ks as k` passed on `{"ks": [1], "m": [5, 1]}`, by reading `m[1]`. So did a later item, `every ks as k, every m named by k as x`, and a one-line `every` or `some` under the `for` line. A `for` alias that holds anything but a string now fails as `unusable`, as [for.named_by](../../spec/semantics.md#for) says, and as `ergo.rego` does. When the path before it is an object, the failed item is named `m named by k`, where it was `item 4 of m` for a `3`. A number from `$params` or `$input` is still a position. Reports change for such policies: some that passed now fail.
+
 ## 0.1.0
 
 ### New

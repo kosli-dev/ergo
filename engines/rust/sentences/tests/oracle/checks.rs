@@ -2741,6 +2741,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("m named by k is 1", "m named by k is 1", &[], &[]),
+    (
+        "every n named by k is 1",
+        "every n named by k is 1",
+        &[],
+        &[],
+    ),
+    ("some n named by k is 1", "some n named by k is 1", &[], &[]),
     ("meta.\"b.c\" exists", "meta.\"b.c\" exists", &[], &[]),
     (
         "metadata.\"app.kubernetes.io/name\" is \"web\"",
@@ -7192,6 +7199,13 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every kids as part", "every kids as part", &[], &[]),
     ("every kinds as k", "every kinds as k", &[], &[]),
+    ("every ks as k", "every ks as k", &[], &[]),
+    (
+        "every ks as k, every n named by k as x",
+        "every ks as k, every n named by k as x",
+        &[],
+        &[],
+    ),
     ("every l as e", "every l as e", &[], &[]),
     ("every last of zz as pr", "every last of zz as pr", &[], &[]),
     ("every lst as entry", "every lst as entry", &[], &[]),
@@ -7755,6 +7769,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every rows as r, every r.a.xs.k as x",
         "every rows as r, every r.a.xs.k as x",
+        &[],
+        &[],
+    ),
+    (
+        "every rows as r, every r.xs named by r.k as x",
+        "every rows as r, every r.xs named by r.k as x",
         &[],
         &[],
     ),
