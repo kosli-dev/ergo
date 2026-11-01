@@ -5151,152 +5151,118 @@
             "check": "$well_formed",
             "inputs": [
               {
+                "locations": [],
                 "name": "count(checks)",
-                "value": 1,
-                "locations": [
-
-                ]
+                "value": 1
               },
               {
+                "locations": [],
                 "name": "require",
-                "value": "every",
-                "locations": [
-
-                ]
+                "value": "every"
               },
               {
-                "name": "subjects.round.has.$dollar",
-                "value": [
-                  "a name can't start with $"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.bare_by",
-                "value": [
-                  "from: unknown alias foo"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.blank",
-                "value": [
-                  "from: doesn't parse"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.each_of",
-                "value": [
-                  "from: a part is a path: whose and named by each of can't go in it"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.every",
-                "value": [
-                  "invalid alias"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.extra",
-                "value": [
-                  "unknown field other"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.fromnum",
-                "value": [
-                  "invalid from"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.idbad",
-                "value": [
-                  "identified_by: a part is a path: whose and named by each of can't go in it"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.idnum",
-                "value": [
-                  "invalid identified_by"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.in_input",
-                "value": [
-                  "from: a part reads inside its subject, so it can't start at $params or $input"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.in_params",
-                "value": [
-                  "from: a part reads inside its subject, so it can't start at $params or $input"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.nofrom",
-                "value": [
-                  "missing from"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.num",
-                "value": [
-                  "not a string or an object"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
-                "name": "subjects.round.has.who",
-                "value": [
-                  "from: a part is a path: whose and named by each of can't go in it"
-                ],
-                "locations": [
-
-                ]
-              },
-              {
+                "locations": [],
                 "name": "subjects.round.has.\"with space\"",
                 "value": [
                   "invalid alias"
-                ],
-                "locations": [
-
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.$dollar",
+                "value": [
+                  "a name can't start with $"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.bare_by",
+                "value": [
+                  "from: unknown alias foo"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.blank",
+                "value": [
+                  "from: doesn't parse"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.each_of",
+                "value": [
+                  "from: a part is a path: whose and named by each of can't go in it"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.every",
+                "value": [
+                  "invalid alias"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.extra",
+                "value": [
+                  "unknown field other"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.fromnum",
+                "value": [
+                  "invalid from"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.idbad",
+                "value": [
+                  "identified_by: a part is a path: whose and named by each of can't go in it"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.idnum",
+                "value": [
+                  "invalid identified_by"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.in_input",
+                "value": [
+                  "from: a part reads inside its subject, so it can't start at $params or $input"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.in_params",
+                "value": [
+                  "from: a part reads inside its subject, so it can't start at $params or $input"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.nofrom",
+                "value": [
+                  "missing from"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.num",
+                "value": [
+                  "not a string or an object"
+                ]
+              },
+              {
+                "locations": [],
+                "name": "subjects.round.has.who",
+                "value": [
+                  "from: a part is a path: whose and named by each of can't go in it"
                 ]
               }
             ],
@@ -5307,6 +5273,36 @@
               "type": "round"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "checks whose names need quoting in the report",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"$x\ty": "id exists", "$x y": "id exists", "$x\"y": "id exists", "$x": "id exists", "$a-b": "id exists"}}}},
+    "cases": [
+      {
+        "description": "lists the wrong checks sorted by the name as the report writes it, quotes and escapes included",
+        "rules": ["written_wrong.row", "names.dollar"],
+        "input": {"things": [{"id": "a", "x": 1}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 5}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"$x y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\\"y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\ty\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$a-b", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$x", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "parts whose names need quoting in the report",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id", "has": {"x\ty": "cov", "x y": "cov", "x\"y": "cov", "x": "cov"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "lists the wrong parts sorted by the name as the report writes it, quotes and escapes included",
+        "rules": ["written_wrong.row"],
+        "input": {"things": [{"id": "a", "x": 1}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\\"y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\ty\"", "value": ["invalid alias"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]

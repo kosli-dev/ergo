@@ -1885,11 +1885,11 @@ test_problems_with_several_fields_are_listed_by_field if {
 	row := rows_for(report({"items": [{"id": 1}]}, {"s": req}), "s", "$well_formed")[0]
 	row.inputs == [
 		{"name": "count(checks)", "value": 0, "locations": []},
+		{"name": "require", "value": ["neither every nor some"], "locations": []},
 		{"name": "checks", "value": ["empty"], "locations": []},
 		{"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []},
-		{"name": "require", "value": ["neither every nor some"], "locations": []},
-		{"name": "zz", "value": ["unknown field"], "locations": []},
 		{"name": "subjects.subject.from", "value": ["not a string"], "locations": []},
+		{"name": "zz", "value": ["unknown field"], "locations": []},
 	]
 }
 
@@ -10990,6 +10990,12 @@ test_a_name_that_starts_with_a_dollar_sign_is_written_wrong_wherever_it_stands i
 	[i.value | some i in rows_for(rep, "k", "$well_formed")[0].inputs; i.name == "checks.$k"] == [wrong]
 	[i.value | some i in rows_for(rep, "k", "$well_formed")[0].inputs; i.name == "subjects.t.has.$p"] == [wrong]
 	[i.name | some i in rows_for(rep, "ok", "$well_formed")[0].inputs; startswith(i.name, "checks.")] == []
+}
+
+test_the_problems_of_parts_with_quoted_names_are_listed_in_the_order_the_report_writes_them if {
+	policy := {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "has": {"x\ty": "ys", "x y": "ys", "x\"y": "ys", "x": "ys"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}}
+	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+	[i.name | some i in rows_for(rep, "r", "$well_formed")[0].inputs; startswith(i.name, "subjects.")] == ["subjects.s.has.\"x y\"", "subjects.s.has.\"x\\\"y\"", "subjects.s.has.\"x\\ty\""]
 }
 
 test_an_empty_name_is_written_wrong_wherever_it_stands if {

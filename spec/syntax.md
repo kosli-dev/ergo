@@ -498,7 +498,7 @@ Most often the writer meant the subject's field. In a `whose` and after `every` 
 
 `environment is prod` and `approved_by is empy` parse, as comparisons with a field called `prod` or `empy`, unless the subject has no such field. That's the one mistake the grammar can't catch, so the message for a missing field in an `is` argument should suggest quotes.
 
-**[written_wrong.row]** A check [written wrong](semantics.md#the-model-of-a-check) makes the `$well_formed` row list it in its `inputs`, after `count(checks)` and `require`, sorted by name, with the list of what's wrong, sorted. A check of the requirement is named `checks.<name>`, and a field of a subject definition `subjects.<subject>.<field>`, like `subjects.deployment.from`. An `ergo_spec`, `description` or `meta` of the policy that's written wrong comes last, named `policy ergo_spec`, `policy description` or `policy meta` and sorted by name, in words and not as a path, because a name that starts with `$` is one a check can read.
+**[written_wrong.row]** A check [written wrong](semantics.md#the-model-of-a-check) makes the `$well_formed` row list it in its `inputs`, after `count(checks)` and `require`, sorted by name as the report writes it, quotes and escapes included, by code point, with the list of what's wrong, sorted. A check of the requirement is named `checks.<name>`, and a field of a subject definition `subjects.<subject>.<field>`, like `subjects.deployment.from`. An `ergo_spec`, `description` or `meta` of the policy that's written wrong comes last, named `policy ergo_spec`, `policy description` or `policy meta` and sorted by name, in words and not as a path, because a name that starts with `$` is one a check can read.
 
 ## Printing the sentence
 
