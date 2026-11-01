@@ -1648,7 +1648,7 @@ _step_key(seg) := _key(seg.literal) if _is_literal(seg)
 _step_key(seg) := _key(v) if {
 	_is_ref(seg)
 	v := _ref_read(seg.ref)
-	_is_key(v)
+	is_string(v)
 }
 
 _step_key(seg) := _key(seg) if {
@@ -3359,7 +3359,10 @@ else := "absent"
 
 _read_before_field(v) if v != _absent
 
-_walk_read_state(subj, path) := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
+_walk_read_state(subj, path) := _worst_of(flaws) if {
+	flaws := {f | some seg in path; f := _ref_step_flaw(seg)}
+	flaws != set()
+} else := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
 	is_object(subj)
 	i := _bad_field_at(subj, path)
 	_walks_before_field(subj, array.slice(path, 0, i))
@@ -3368,6 +3371,16 @@ _walk_read_state(subj, path) := _key_state(object.get(subj, path[i].named_by_fie
 	i := _bad_field_at(subj, path)
 	_null_before_field(subj, array.slice(path, 0, i))
 } else := _read_state(subj, path)
+
+_ref_step_flaw(seg) := "unusable" if {
+	_is_ref(seg)
+	_ref_state(seg.ref) == "value"
+	not is_string(_ref_read(seg.ref))
+} else := s if {
+	_is_ref(seg)
+	s := _ref_state(seg.ref)
+	s != "value"
+}
 
 _bad_field_at(subj, path) := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
 
@@ -3532,7 +3545,6 @@ _step_refs(check) := {x.ref |
 	_is_ref(x)
 	not _under_literal(check, p)
 	count(p) >= 2
-	p[count(p) - 2] in {"path", "left", "right", "each"}
 	is_number(p[count(p) - 1])
 }
 
@@ -3543,7 +3555,7 @@ _used_ref_state(check, r) := _ref_state(r) if not _wrong_step(check, r)
 _wrong_step(check, r) if {
 	r in _step_refs(check)
 	_ref_state(r) == "value"
-	not _is_key(_ref_read(r))
+	not is_string(_ref_read(r))
 }
 
 _under_literal(check, p) if {
