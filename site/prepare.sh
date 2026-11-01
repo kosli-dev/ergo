@@ -85,13 +85,23 @@ if [ "$mode" = release ]; then
     ergo_tag=$found_ergo
     opa_source=$rego_tag
     [ "$found_spec" = "$spec_tag" ] || echo "No published rego release reads $spec_tag yet, so the docs and the tutorial come from $found_spec, which $found_ergo reads"
+  elif in_tag "$rego_tag" OPA.md; then
+    opa_source=$rego_tag
+    echo "No published spec release has OPA.md yet, so the docs come from $rego_tag, which has it"
+  else
+    echo "The latest releases don't have OPA.md yet, so the site keeps the old layout, from $rego_tag, with no OPA or CLI page"
+  fi
+  if [ -n "$opa_source" ]; then
     if [ -n "$rust_tag" ] && in_tag "$rust_tag" CLI.md; then
       cli_source=$rust_tag
     else
-      echo "The latest releases don't all have OPA.md and CLI.md yet, so the site has no page from CLI.md"
+      echo "The latest Rust release has no CLI.md yet, so the site has no CLI page"
     fi
+  fi
+  if in_tag "$docs_tag" OPA.md; then
+    [ -n "$opa_source" ] || fail "The docs come from $docs_tag, which has the short README, and there is no OPA page for it to link to"
   else
-    echo "The latest releases don't all have OPA.md and CLI.md yet, so the site keeps the old layout, from $rego_tag, with no OPA or CLI page"
+    [ -z "$opa_source" ] || fail "The docs come from $docs_tag, which has the long README, and an OPA page would repeat it"
   fi
   tag=$docs_tag
   version=${ergo_tag#rego-v}

@@ -116,6 +116,25 @@ says() {
   }
 }
 
+consistent() {
+  source=$(cat site/prepared/source)
+  if git cat-file -e "$source:OPA.md" 2> /dev/null; then
+    [ -e site/prepared/repo/OPA.md ] || {
+      echo "the docs come from $source, which has OPA.md, so the site should have an OPA page" >&2
+      exit 1
+    }
+  else
+    [ ! -e site/prepared/repo/OPA.md ] || {
+      echo "the docs come from $source, which has no OPA.md, so the site shouldn't have an OPA page" >&2
+      exit 1
+    }
+  fi
+  [ ! -e site/prepared/repo/CLI.md ] || [ -e site/prepared/repo/OPA.md ] || {
+    echo "the site has a CLI page and no OPA page" >&2
+    exit 1
+  }
+}
+
 FAKE_RELEASES="rego-v0.1.0 rego-v0.3.0-rc1 rego-vlatest spec-v0.1"
 FAKE_ASSET_VERSION=0.1.0
 export FAKE_RELEASES FAKE_ASSET_VERSION
@@ -232,7 +251,7 @@ grep -qxF 'version := "0.11.0"' site/prepared/ergo.rego.txt || {
 }
 out=$(FAKE_RELEASES="rego-v0.11.0 spec-v0.1" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
 case $out in
-  *"don't all have OPA.md and CLI.md yet, so the site has no page from CLI.md"*) ;;
+  *"The latest Rust release has no CLI.md yet, so the site has no CLI page"*) ;;
   *)
     echo "prepare.sh should say the CLI page is missing when there is no Rust release, and said: $out" >&2
     exit 1
@@ -242,6 +261,7 @@ says site/prepared/source spec-v0.1
 says site/prepared/data/release.json '{"source": "spec-v0.1", "rego": "0.11.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": ""}'
 has site/prepared/repo/OPA.md
 lacks site/prepared/repo/CLI.md
+consistent
 for name in policy report; do
   printf '{\n  "$id": "https://ergo.kosli.com/spec/0.2/%s.schema.json"\n}\n' "$name" > "spec/$name/schema.json"
 done
@@ -263,6 +283,7 @@ old_layout() {
   says site/prepared/data/release.json "{\"source\": \"$1\", \"rego\": \"$2\", \"rust\": \"$3\", \"spec\": \"0.1\", \"ergo_spec\": \"v0.1\", \"opa\": \"\", \"cli\": \"\"}"
   lacks site/prepared/repo/OPA.md
   lacks site/prepared/repo/CLI.md
+  consistent
 }
 out=$(FAKE_RELEASES="rego-v0.1.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.1.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
 case $out in
@@ -274,8 +295,19 @@ case $out in
 esac
 old_layout rego-v0.1.0 0.1.0 0.5.0
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag --force spec-v0.1 rego-v0.1.0 > /dev/null
-FAKE_RELEASES="rego-v0.11.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh > /dev/null
-old_layout rego-v0.11.0 0.11.0 0.5.0
+out=$(FAKE_RELEASES="rego-v0.11.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
+case $out in
+  *"No published spec release has OPA.md yet, so the docs come from rego-v0.11.0, which has it"*) ;;
+  *)
+    echo "prepare.sh should take the docs from the rego release that has OPA.md when no spec has it, and said: $out" >&2
+    exit 1
+    ;;
+esac
+says site/prepared/source rego-v0.11.0
+says site/prepared/data/release.json '{"source": "rego-v0.11.0", "rego": "0.11.0", "rust": "0.5.0", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": "rust-v0.5.0"}'
+has site/prepared/repo/OPA.md
+has site/prepared/repo/CLI.md
+consistent
 FAKE_RELEASES="rego-v0.1.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.1.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh > /dev/null
 old_layout rego-v0.1.0 0.1.0 0.5.0
 git tag --delete spec-v0.2 rego-v0.11.0 rust-v0.5.0 > /dev/null
