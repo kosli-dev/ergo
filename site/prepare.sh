@@ -65,26 +65,28 @@ if [ "$mode" = release ]; then
   }
 
   layout=old
-  if [ -n "$rust_tag" ] && in_tag "$rego_tag" OPA.md && in_tag "$rust_tag" CLI.md && in_tag "$spec_tag" OPA.md; then
-    layout=new
-  else
-    echo "The latest releases don't all have OPA.md and CLI.md yet, so the docs come from $rego_tag, with the engines in README.md"
-  fi
-
-  if [ "$layout" = new ]; then
-    docs_tag=$spec_tag
-    ergo_tag=
-    for candidate in $(printf '%s\n' "$releases" | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V -r); do
-      has_tag "$candidate"
-      if [ "$(spec_of "$candidate")" = "v${spec_tag#spec-v}" ]; then
-        ergo_tag=$candidate
-        break
-      fi
+  docs_tag=$rego_tag
+  ergo_tag=$rego_tag
+  if [ -n "$rust_tag" ] && in_tag "$rego_tag" OPA.md && in_tag "$rust_tag" CLI.md; then
+    for candidate_spec in $(printf '%s\n' $spec_tags | sort -V -r); do
+      for candidate in $(printf '%s\n' "$releases" | grep -E '^rego-v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V -r); do
+        has_tag "$candidate"
+        if [ "$(spec_of "$candidate")" = "v${candidate_spec#spec-v}" ]; then
+          found_spec=$candidate_spec
+          found_ergo=$candidate
+          break 2
+        fi
+      done
     done
-    [ -n "$ergo_tag" ] || fail "No published rego-vX.Y.Z release reads spec v${spec_tag#spec-v}, so the tutorial has no ergo.rego to run"
-  else
-    docs_tag=$rego_tag
-    ergo_tag=$rego_tag
+    if [ -n "${found_spec:-}" ] && in_tag "$found_spec" OPA.md; then
+      layout=new
+      docs_tag=$found_spec
+      ergo_tag=$found_ergo
+      [ "$found_spec" = "$spec_tag" ] || echo "No published rego release reads $spec_tag yet, so the docs and the tutorial come from $found_spec, which $found_ergo reads"
+    fi
+  fi
+  if [ "$layout" = old ]; then
+    echo "The latest releases don't all have OPA.md and CLI.md yet, so the docs come from $rego_tag, with the engines in README.md"
   fi
   tag=$docs_tag
   version=${ergo_tag#rego-v}

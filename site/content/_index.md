@@ -114,7 +114,7 @@ start:
       body: Either one runs the same policy.
       options:
         - engine: OPA with ergo.rego
-          body: Copy it next to the policy, with a few lines of Rego that hand the policy to it. [Get started](/docs/getting-started/) shows them.
+          body: Copy it next to the policy, with a few lines of Rego that hand the policy to it. [Get started](/docs/getting-started/) shows how to run it.
           code: |-
             policy/
               policy.yaml

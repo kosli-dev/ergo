@@ -241,8 +241,22 @@ esac
 says site/prepared/source rego-v0.11.0
 says site/prepared/data/release.json '{"source": "rego-v0.11.0", "rego": "0.11.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1", "opa": "", "cli": ""}'
 lacks site/prepared/repo/OPA.md
+for name in policy report; do
+  printf '{\n  "$id": "https://ergo.kosli.com/spec/0.2/%s.schema.json"\n}\n' "$name" > "spec/$name/schema.json"
+done
+git add spec
+git -c user.name=test -c user.email=test@example.com -c commit.gpgSign=false commit --quiet --message "spec 0.2"
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag spec-v0.2
-(FAKE_RELEASES="rego-v0.11.0 rust-v0.5.0 spec-v0.1 spec-v0.2"; FAKE_ASSET_VERSION=0.11.0; FAKE_ASSET_SPEC=v0.1; expected="No published rego-vX.Y.Z release reads spec v0.2, so the tutorial has no ergo.rego to run"; fails)
+out=$(FAKE_RELEASES="rego-v0.11.0 rust-v0.5.0 spec-v0.1 spec-v0.2" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
+case $out in
+  *"No published rego release reads spec-v0.2 yet, so the docs and the tutorial come from spec-v0.1, which rego-v0.11.0 reads"*) ;;
+  *)
+    echo "prepare.sh should fall back to the newest spec a rego release reads, and said: $out" >&2
+    exit 1
+    ;;
+esac
+says site/prepared/source spec-v0.1
+says site/prepared/data/release.json '{"source": "spec-v0.1", "rego": "0.11.0", "rust": "0.5.0", "spec": "0.2", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": "rust-v0.5.0"}'
 git tag --delete spec-v0.2 rego-v0.11.0 rust-v0.5.0 > /dev/null
 git tag --delete spec-v0.1 > /dev/null
 (FAKE_RELEASES="rego-v0.10.0 spec-v0.1"; FAKE_ASSET_VERSION=0.10.0; expected="There's no spec-v0.1 tag here. Fetch the tags with: git fetch --tags"; fails)
