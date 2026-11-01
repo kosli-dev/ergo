@@ -13,15 +13,15 @@ git fetch --quiet --tags origin
 commit=$(git rev-parse origin/main)
 files=$(mktemp -d)
 trap 'rm -rf "$files"' EXIT
-git archive "$commit" README.md engines/rego/ergo.rego CHANGELOG.md spec/CHANGELOG.md spec/policy/schema.json spec/report/schema.json engines/rust/Cargo.toml engines/rust/CHANGELOG.md engines/rust/engine/Cargo.toml engines/rust/cli/Cargo.toml engines/rust/sentences-wasm/Cargo.toml | tar -x -C "$files"
+git archive "$commit" OPA.md CLI.md engines/rego/ergo.rego CHANGELOG.md spec/CHANGELOG.md spec/policy/schema.json spec/report/schema.json engines/rust/Cargo.toml engines/rust/CHANGELOG.md engines/rust/engine/Cargo.toml engines/rust/cli/Cargo.toml engines/rust/sentences-wasm/Cargo.toml | tar -x -C "$files"
 
 fail() {
   echo "$1"
   exit 1
 }
 
-readme_shows() {
-  tr -d '[:space:]' < "$files/README.md" | grep -qF "$(tr -d '[:space:]' <<<"$1")"
+page_shows() {
+  tr -d '[:space:]' < "$files/$1" | grep -qF "$(tr -d '[:space:]' <<<"$2")"
 }
 
 check_rego() {
@@ -32,7 +32,7 @@ check_rego() {
   fi
   grep -qxF "## $version" "$files/CHANGELOG.md" || fail "CHANGELOG.md on main has no \"## $version\" heading"
   notes=$(awk -v h="## $version" '$0 == h { on = 1; next } /^## / { on = 0 } on' "$files/CHANGELOG.md")
-  readme_shows "\"name\": \"ergo-rego\", \"version\": \"$version\"" || fail "README.md on main must show the report's engine as \"name\": \"ergo-rego\" with \"version\": \"$version\". Change it in a pull request, from a run of that commit's ergo.rego."
+  page_shows OPA.md "\"name\": \"ergo-rego\", \"version\": \"$version\"" || fail "OPA.md on main must show the report's engine as \"name\": \"ergo-rego\" with \"version\": \"$version\". Change it in a pull request, from a run of that commit's ergo.rego."
   grep -q '[^[:space:]]' <<<"$notes" || fail "CHANGELOG.md has nothing under \"## $version\", so there are no release notes"
 }
 
@@ -61,7 +61,7 @@ check_rust() {
     fi
   done
   grep -qxF "## $version" "$files/engines/rust/CHANGELOG.md" || fail "engines/rust/CHANGELOG.md on main has no \"## $version\" heading"
-  readme_shows "{\"name\": \"ergo-rust\", \"version\": \"$version\"}" || fail "README.md on main must show the CLI's engine as {\"name\": \"ergo-rust\", \"version\": \"$version\"}. Change it in a pull request first."
+  page_shows CLI.md "{\"name\": \"ergo-rust\", \"version\": \"$version\"}" || fail "CLI.md on main must show the CLI's engine as {\"name\": \"ergo-rust\", \"version\": \"$version\"}. Change it in a pull request first."
   notes=$(awk -v h="## $version" '$0 == h { on = 1; next } /^## / { on = 0 } on' "$files/engines/rust/CHANGELOG.md")
   grep -q '[^[:space:]]' <<<"$notes" || fail "engines/rust/CHANGELOG.md has nothing under \"## $version\", so there are no release notes"
 }
