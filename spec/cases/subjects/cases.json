@@ -5160,17 +5160,45 @@
           {
             "cause": "unusable",
             "check": "$min_subjects",
-            "failed_items": [
+            "failed_items": [],
+            "inputs": [
               {
-                "cause": "unusable",
-                "item": "item 2 of x",
-                "locations": [
-                  "/x"
-                ],
-                "path": "item 2 of x",
-                "value": null
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
               }
             ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds a list",
+        "rules": ["subjects.from", "subjects.sentence", "path.ref_step"],
+        "input": {
+          "x": [
+            {
+              "id": 1
+            },
+            {
+              "id": 2
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "failed_items": [],
             "inputs": [
               {
                 "locations": [],
@@ -5523,6 +5551,43 @@
             }
           }
         ]
+      },
+      {
+        "description": "keeps the requirement and fails min_subjects when the input holds a list",
+        "rules": ["subjects.from", "subjects.sentence", "path.ref_step"],
+        "input": {
+          "x": [
+            {
+              "id": 1
+            },
+            {
+              "id": 2
+            }
+          ]
+        },
+        "status": {
+          "s": "not_met"
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope thing count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ]
       }
     ]
   },
@@ -5550,7 +5615,7 @@
     },
     "cases": [
       {
-        "description": "reads the first item when the param is 0",
+        "description": "fails min_subjects as unusable, because a number from a param is never a position",
         "rules": ["subjects.sentence", "subjects.from"],
         "input": {
           "x": [
@@ -5565,45 +5630,24 @@
           ]
         },
         "status": {
-          "s": "met"
+          "s": "not_met"
         },
-        "compliant": true,
+        "compliant": false,
         "results": [
           {
-            "cause": "satisfied",
+            "cause": "unusable",
             "check": "$min_subjects",
             "inputs": [
               {
-                "locations": [
-                  "/x/0"
-                ],
+                "locations": [],
                 "name": "in-scope thing count",
-                "value": 1
+                "value": 0
               }
             ],
-            "passed": true,
+            "passed": false,
             "requirement": "s",
             "subject": {
               "id": null,
-              "type": "thing"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "inputs": [
-              {
-                "locations": [
-                  "/x/0/id"
-                ],
-                "name": "id",
-                "value": 1
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": 1,
               "type": "thing"
             }
           }
@@ -5635,7 +5679,7 @@
     },
     "cases": [
       {
-        "description": "reads the second item when the param is 1",
+        "description": "fails min_subjects as unusable, because a number from a param is never a position",
         "rules": ["subjects.sentence", "subjects.from"],
         "input": {
           "x": [
@@ -5650,45 +5694,24 @@
           ]
         },
         "status": {
-          "s": "met"
+          "s": "not_met"
         },
-        "compliant": true,
+        "compliant": false,
         "results": [
           {
-            "cause": "satisfied",
+            "cause": "unusable",
             "check": "$min_subjects",
             "inputs": [
               {
-                "locations": [
-                  "/x/1"
-                ],
+                "locations": [],
                 "name": "in-scope thing count",
-                "value": 1
+                "value": 0
               }
             ],
-            "passed": true,
+            "passed": false,
             "requirement": "s",
             "subject": {
               "id": null,
-              "type": "thing"
-            }
-          },
-          {
-            "cause": "satisfied",
-            "check": "c",
-            "inputs": [
-              {
-                "locations": [
-                  "/x/1/id"
-                ],
-                "name": "id",
-                "value": 2
-              }
-            ],
-            "passed": true,
-            "requirement": "s",
-            "subject": {
-              "id": 2,
               "type": "thing"
             }
           }
@@ -7138,10 +7161,7 @@
     "cases": [
       {
         "description": "fails min_subjects as unusable, so a check that passes on a missing field can't meet the requirement",
-        "rules": [
-          "subjects.sentence",
-          "path.ref_step"
-        ],
+        "rules": ["subjects.sentence", "path.ref_step"],
         "input": {
           "scans": {
             "prod": {
@@ -7157,59 +7177,38 @@
         "compliant": false,
         "results": [
           {
-            "requirement": "s",
-            "subject": {
-              "id": null,
-              "type": "scan"
-            },
-            "check": "$min_subjects",
-            "passed": false,
             "cause": "unusable",
+            "check": "$min_subjects",
             "inputs": [
               {
-                "locations": [
-                  "/scans"
-                ],
+                "locations": [],
                 "name": "in-scope scan count",
-                "value": 1
+                "value": 0
               }
-            ]
-          },
-          {
+            ],
+            "passed": false,
             "requirement": "s",
             "subject": {
               "id": null,
               "type": "scan"
-            },
-            "check": "$unique_ids",
-            "passed": true,
+            }
+          },
+          {
             "cause": "satisfied",
+            "check": "$unique_ids",
             "inputs": [
               {
                 "locations": [],
                 "name": "repeated scan ids",
                 "value": []
               }
-            ]
-          },
-          {
+            ],
+            "passed": true,
             "requirement": "s",
             "subject": {
-              "id": "sast",
+              "id": null,
               "type": "scan"
-            },
-            "check": "c",
-            "passed": true,
-            "cause": "satisfied",
-            "inputs": [
-              {
-                "locations": [
-                  "/scans"
-                ],
-                "name": "x",
-                "value": null
-              }
-            ]
+            }
           }
         ]
       }

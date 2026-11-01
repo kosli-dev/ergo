@@ -236,27 +236,27 @@
   {
     "description": "a key read through a ref step",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a named by $params.i is 2"}}}},
-    "params": {"i": 1},
+    "params": {"i": "x"},
     "cases": [
       {
         "description": "adds the key the ref read",
         "rules": ["location.read"],
-        "input": {"things": [{"id": "t1", "a": [1, 2]}]},
+        "input": {"things": [{"id": "t1", "a": {"w": 1, "x": 2}}]},
         "results": [
-          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/a/1"], "name": ".a named by $params.i", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/a/x"], "name": ".a named by $params.i", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
   },
   {
-    "description": "a ref step that reads a position the list doesn't have",
+    "description": "a ref step that reads a key the object doesn't have",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": ".a named by $params.i is 2"}}}},
-    "params": {"i": 5},
+    "params": {"i": "y"},
     "cases": [
       {
-        "description": "stops at the list",
+        "description": "stops at the object",
         "rules": ["location.read"],
-        "input": {"things": [{"id": "t1", "a": [1, 2]}]},
+        "input": {"things": [{"id": "t1", "a": {"w": 1, "x": 2}}]},
         "results": [
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/a"], "name": ".a named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
