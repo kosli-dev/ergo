@@ -3916,6 +3916,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("\"x y\".k is 2", "\"x y\".k is 2", &[], &[]),
     ("\"x y\".pa.k is 1", "\"x y\".pa.k is 1", &[], &[]),
     (".\"x y\".k is 3", "\"x y\".k is 3", &[], &[]),
+    ("\" y\" is 1", "\" y\" is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -7409,6 +7410,10 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
         &["an item starts with \"every\", \"some\" or a position, like \"last of\""],
     ),
     ("every ys as $y", &["doesn't parse"]),
+    (
+        "every ys as \" y\"",
+        &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
+    ),
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[

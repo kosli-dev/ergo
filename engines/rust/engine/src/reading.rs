@@ -170,8 +170,11 @@ fn read_part(
 ) -> PartRead {
     let at = field_name(&["subjects", subject, "has", alias]);
     let mut bad = false;
-    if alias.starts_with('$') {
-        add_problem(problems, at.clone(), crate::policy::DOLLAR_NAME);
+    let name_problems = crate::policy::written_name_problems(alias);
+    if !name_problems.is_empty() {
+        for problem in name_problems {
+            add_problem(problems, at.clone(), problem);
+        }
         bad = true;
     } else if bad_alias(alias) {
         add_problem(problems, at.clone(), "invalid alias");

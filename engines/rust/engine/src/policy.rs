@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 pub const SPEC: &str = "v0.4-dev";
 
-pub const DOLLAR_NAME: &str = "a name can't start with $";
+pub use crate::names::written_name_problems;
 
 pub type Problems = BTreeMap<String, BTreeSet<String>>;
 
@@ -339,8 +339,8 @@ fn read_subject(name: &str, value: &Value) -> Subject {
             "it is a word of the grammar, so a subject can't be called it",
         );
     }
-    if name.starts_with('$') {
-        add_problem(&mut problems, field_name(&["subjects", name]), DOLLAR_NAME);
+    for problem in written_name_problems(name) {
+        add_problem(&mut problems, field_name(&["subjects", name]), problem);
     }
     Subject { def, problems }
 }
@@ -394,9 +394,12 @@ fn read_any_of(
                 .iter()
                 .map(|(name, option)| {
                     let read = read_option(option);
+                    let wrong = written_name_problems(name);
                     match &read {
-                        _ if name.starts_with('$') => {
-                            problems.insert(format!("option {name}: {DOLLAR_NAME}"));
+                        _ if !wrong.is_empty() => {
+                            for problem in wrong {
+                                problems.insert(format!("option {name}: {problem}"));
+                            }
                         }
                         OptionLines::Lines(lines) if lines.is_empty() => {
                             problems.insert(format!("empty option {name}"));
@@ -662,8 +665,8 @@ fn read_requirement(value: &Value, subjects: &Subjects) -> Requirement {
                 problem.clone(),
             );
         }
-        if name.starts_with('$') {
-            add_problem(&mut problems, field_name(&["checks", name]), DOLLAR_NAME);
+        for problem in written_name_problems(name) {
+            add_problem(&mut problems, field_name(&["checks", name]), problem);
         }
     }
     Requirement {
