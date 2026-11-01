@@ -3327,9 +3327,7 @@ _field_step_state(subj, path) := "not_an_object" if {
 
 _first_field_step(path) := min({i | some i, seg in path; _field_step(seg)})
 
-_state_before_field(subj, prefix) := "null" if _resolved(subj, prefix) == null
-
-else := "unusable" if {
+_state_before_field(subj, prefix) := "unusable" if {
 	start := _start_of(subj, prefix)
 	is_object(start)
 	_blocked(start, _keys_in(subj, prefix))
@@ -3337,10 +3335,7 @@ else := "unusable" if {
 
 else := "absent"
 
-_read_before_field(v) if {
-	v != _absent
-	v != null
-}
+_read_before_field(v) if v != _absent
 
 _name_step_state(path) := "null" if {
 	_has_name_step(path)
