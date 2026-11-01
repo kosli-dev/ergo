@@ -1,4 +1,18 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (".cov is 1", "cov is 1", &[], &[]),
+    (
+        "every .cov.xs is at least 2",
+        "every cov.xs is at least 2",
+        &[],
+        &[],
+    ),
+    (
+        "every cov.xs is at least 2",
+        "every cov.xs is at least 2",
+        &[],
+        &[],
+    ),
+    ("y.n is at least .y.k", "y.n is at least y.k", &[], &[]),
     (".\"$x\".k is 3", "\"$x\".k is 3", &[], &[]),
     ("\"$x\".k is 2", "\"$x\".k is 2", &[], &[]),
     ("\"$x\".pa.k is 1", "\"$x\".pa.k is 1", &[], &[]),
@@ -6095,6 +6109,13 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("every items as y", "every items as y", &[], &[]),
+    (
+        "every items as y, every .y.zs as z",
+        "every items as y, every .y.zs as z",
+        &[],
+        &[],
+    ),
     (
         "every xs as p, every ys whose k is 1 as q",
         "every xs as p, every ys whose k is 1 as q",

@@ -117,10 +117,19 @@ fn read_one(
     reading: &Reading,
     subject: Option<&str>,
 ) -> CheckRead {
+    let written = written_expression(check);
+    if check.problems.contains("invalid for") {
+        return CheckRead {
+            expression: written,
+            problems: BTreeSet::new(),
+            plan: None,
+        };
+    }
     let aliases_owned = scope.aliases();
     let aliases: Vec<&str> = aliases_owned.iter().map(String::as_str).collect();
+    let print_owned = reading.printed_aliases(subject, scope);
+    let print_aliases: Vec<&str> = print_owned.iter().map(String::as_str).collect();
     let mut problems = BTreeSet::new();
-    let written = written_expression(check);
     let wrong = |problems: BTreeSet<String>| CheckRead {
         expression: written.clone(),
         problems,
@@ -134,7 +143,7 @@ fn read_one(
                 return wrong(problems);
             }
             CheckRead {
-                expression: printed(&lines.trees, &aliases),
+                expression: printed(&lines.trees, &print_aliases),
                 plan,
                 problems,
             }
@@ -191,7 +200,7 @@ fn read_one(
                         return wrong(problems);
                     }
                     CheckRead {
-                        expression: printed(&parsed.trees, &aliases),
+                        expression: printed(&parsed.trees, &print_aliases),
                         plan,
                         problems,
                     }
@@ -199,7 +208,7 @@ fn read_one(
                 Some(tree) => {
                     let expression = format!(
                         "for {}: {}",
-                        s::print_for(&tree, &aliases),
+                        s::print_for(&tree, &print_aliases),
                         printed(&parsed.trees, &name_refs)
                     );
                     let mut assertions: Vec<s::Assertion> = Vec::new();
@@ -266,7 +275,10 @@ fn read_one(
                         ) {
                             lowered_options.push(plan.items.into_iter().map(|i| i.check).collect());
                         }
-                        parts.push(format!("{option}({})", printed(&found.trees, &aliases)));
+                        parts.push(format!(
+                            "{option}({})",
+                            printed(&found.trees, &print_aliases)
+                        ));
                     }
                     _ => ok = false,
                 }
@@ -369,6 +381,29 @@ mod tests {
         read(json!({"t": {"from": "ts"}}), checks)
             .remove("c")
             .unwrap()
+    }
+
+    #[test]
+    fn a_check_whose_for_is_not_a_string_keeps_the_dot_it_was_written_with() {
+        let read =
+            one(json!({"c": {"for": ["every items as y"], "assert": "y.n is at least .y.k"}}));
+        assert_eq!(read.expression, "y.n is at least .y.k");
+        assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn a_part_that_clashes_with_its_parent_still_prints_the_dot_of_a_field_called_like_it() {
+        let policy = Policy::read(&json!({
+            "ergo_spec": "v0.4-dev",
+            "subjects": {
+                "round": {"from": "rounds", "has": {"cov": "d.b"}},
+                "item": {"from": "round.items", "has": {"cov": "y"}}
+            },
+            "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}}
+        }));
+        let reading = Reading::of(&policy);
+        let read = read_checks(&reading, &policy.requirements["r"]);
+        assert_eq!(read["c"].expression, ".cov is 1");
     }
 
     fn problems(read: &CheckRead) -> Vec<&str> {

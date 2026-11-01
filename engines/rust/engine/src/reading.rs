@@ -724,7 +724,8 @@ impl Reading {
                 FromState::Parsed(line) => {
                     let mut found_problems = from_problems(name, line, &raw, &names, &links);
                     let scope = scope_of(name, &raw, &effective);
-                    let aliases = scope.aliases();
+                    let mut aliases = scope.aliases();
+                    aliases.extend(declarers_of(name, &raw).into_keys());
                     let alias_refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
                     let parent_names = scope.parent_names();
                     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
@@ -953,6 +954,14 @@ impl Reading {
         problems
     }
 
+    pub fn printed_aliases(&self, subject: Option<&str>, scope: &Scope) -> Vec<String> {
+        let mut names: BTreeSet<String> = scope.aliases().into_iter().collect();
+        if let Some(info) = subject.and_then(|name| self.infos.get(name)) {
+            names.extend(info.declarers.keys().cloned());
+        }
+        names.into_iter().collect()
+    }
+
     pub fn alias_clashes(&self, subject: Option<&str>, alias: &str) -> BTreeSet<String> {
         let mut out = BTreeSet::new();
         if self.names.contains(alias) {
@@ -1116,7 +1125,8 @@ fn entry_of(
         match &found.from {
             FromState::Parsed(line) if matches!(found.def.from, Text::Written(_)) => {
                 let scope = scope_of(name, raw, effective);
-                let aliases = scope.aliases();
+                let mut aliases = scope.aliases();
+                aliases.extend(declarers_of(name, raw).into_keys());
                 let refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
                 let printed = s::print_from(line, &refs, &[]);
                 if keeps_dot(line, name, names) {

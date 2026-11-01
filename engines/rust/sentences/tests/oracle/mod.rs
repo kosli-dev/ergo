@@ -3,6 +3,8 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("round.items whose .cov is 1", "round.items whose cov is 1"),
+    ("y", "y"),
     ("\"empty\".items", ".empty.items"),
     ("\"empty\".pa.items", ".empty.pa.items"),
     (".empty.items", ".empty.items"),
