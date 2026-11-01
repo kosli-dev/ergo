@@ -13,7 +13,7 @@ git fetch --quiet --tags origin
 commit=$(git rev-parse origin/main)
 files=$(mktemp -d)
 trap 'rm -rf "$files"' EXIT
-git archive "$commit" README.md OPA.md CLI.md engines/rego/ergo.rego CHANGELOG.md spec/CHANGELOG.md spec/policy/schema.json spec/report/schema.json engines/rust/Cargo.toml engines/rust/CHANGELOG.md engines/rust/engine/Cargo.toml engines/rust/cli/Cargo.toml engines/rust/sentences-wasm/Cargo.toml | tar -x -C "$files"
+git archive "$commit" README.md REFERENCE.md OPA.md CLI.md engines/rego/ergo.rego CHANGELOG.md spec/CHANGELOG.md spec/policy/schema.json spec/report/schema.json engines/rust/Cargo.toml engines/rust/CHANGELOG.md engines/rust/engine/Cargo.toml engines/rust/cli/Cargo.toml engines/rust/sentences-wasm/Cargo.toml | tar -x -C "$files"
 
 fail() {
   echo "$1"
@@ -22,6 +22,13 @@ fail() {
 
 page_shows() {
   tr -d '[:space:]' < "$files/$1" | grep -qF "$(tr -d '[:space:]' <<<"$2")"
+}
+
+no_dev_spec() {
+  local spec=$1 file
+  for file in OPA.md REFERENCE.md; do
+    ! grep -qF "$spec-dev" "$files/$file" || fail "$file on main still says $spec-dev, the spec being released. Drop -dev from it in a pull request first."
+  done
 }
 
 check_rego() {
@@ -33,6 +40,7 @@ check_rego() {
   grep -qxF "## $version" "$files/CHANGELOG.md" || fail "CHANGELOG.md on main has no \"## $version\" heading"
   notes=$(awk -v h="## $version" '$0 == h { on = 1; next } /^## / { on = 0 } on' "$files/CHANGELOG.md")
   spec=$(sed -n 's/^_spec := "\(v[0-9.]*\)"$/\1/p' "$files/engines/rego/ergo.rego")
+  no_dev_spec "$spec"
   grep -qF "\"ergo\": \"$spec\"" "$files/OPA.md" || fail "OPA.md on main must show the report's \"ergo\": \"$spec\", the spec ergo.rego reads. Change it in a pull request first."
   page_shows OPA.md "\"name\": \"ergo-rego\", \"version\": \"$version\"" || fail "OPA.md on main must show the report's engine as \"name\": \"ergo-rego\" with \"version\": \"$version\". Change it in a pull request, from a run of that commit's ergo.rego."
   grep -q '[^[:space:]]' <<<"$notes" || fail "CHANGELOG.md has nothing under \"## $version\", so there are no release notes"
@@ -48,6 +56,7 @@ check_spec() {
   done
   grep -qxF "_spec := \"v$version\"" "$files/engines/rego/ergo.rego" || fail "ergo.rego on main must say _spec := \"v$version\", and says $(grep -m 1 '^_spec := ' "$files/engines/rego/ergo.rego")"
   grep -qxF "## $version" "$files/spec/CHANGELOG.md" || fail "spec/CHANGELOG.md on main has no \"## $version\" heading"
+  no_dev_spec "v$version"
   grep -qxF "ergo_spec: v$version" "$files/README.md" || fail "README.md on main must show the policy with the line ergo_spec: v$version. Change it in a pull request first."
   grep -qF "\"ergo\": \"v$version\"" "$files/README.md" || fail "README.md on main must show the report's \"ergo\": \"v$version\". Change it in a pull request first."
 }

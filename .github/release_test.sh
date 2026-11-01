@@ -19,6 +19,7 @@ readme() {
   printf '%s\n' '```json' '  "engine": {' '    "name": "'"$1"'",' '    "version": "'"$2"'"' '  },' '  "ergo": "v0.1",' '```' > OPA.md
   printf '%s\n' 'curl -L https://github.com/kosli-dev/ergo/releases/download/rust-v'"$4"'/ergo-'"$4"'-macos-arm64.tar.gz | tar xz' 'On Linux, the file is `ergo-'"$4"'-linux-x86_64.tar.gz`.' 'The CLI gives {"name": "'"$3"'", "version": "'"$4"'"}.' > CLI.md
   printf '%s\n' 'ergo_spec: v0.1' '  "ergo": "v0.1",' > README.md
+  printf '%s\n' 'ergo_spec: v0.1' > REFERENCE.md
 }
 
 setup() {
@@ -137,4 +138,18 @@ git commit --quiet -am "stale spec in the OPA page"
 git push --quiet origin HEAD:main 2> /dev/null
 refuses "OPA.md on main must show the report's \"ergo\": \"v0.1\", the spec ergo.rego reads" rego-v0.1.0
 
-echo "release.sh refuses a rust tag with -dev, with a version that isn't the workspace's, without notes, and until CLI.md shows the engine and the download, OPA.md the spec, and README.md the spec of the example"
+setup 0.1.0 0.1.0
+echo 'ergo_spec: v0.1-dev' >> OPA.md
+git commit --quiet -am "a dev spec left in the OPA page"
+git push --quiet origin HEAD:main 2> /dev/null
+refuses "OPA.md on main still says v0.1-dev, the spec being released" rego-v0.1.0
+refuses "OPA.md on main still says v0.1-dev, the spec being released" spec-v0.1
+
+setup 0.1.0 0.1.0
+echo 'ergo_spec: v0.1-dev' >> REFERENCE.md
+git commit --quiet -am "a dev spec left in the reference"
+git push --quiet origin HEAD:main 2> /dev/null
+refuses "REFERENCE.md on main still says v0.1-dev, the spec being released" rego-v0.1.0
+refuses "REFERENCE.md on main still says v0.1-dev, the spec being released" spec-v0.1
+
+echo "release.sh refuses a rust tag with -dev, with a version that isn't the workspace's, without notes, and until CLI.md shows the engine and the download, OPA.md the spec, and README.md the spec of the example, and until no page says the spec is -dev"
