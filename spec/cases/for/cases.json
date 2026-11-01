@@ -12403,7 +12403,7 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/arts/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"art": "a1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"art": "a1"}, "type": "item"}},
-          {"cause": "satisfied", "check": "f", "failed_items": [], "inputs": [{"locations": ["/arts/0/items/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/art/xs/0", "/arts/0/items/0/art/xs/1"], "name": "art.xs[]", "value": [5, 6]}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "item"}}
+          {"cause": "satisfied", "check": "f", "failed_items": [], "inputs": [{"locations": ["/arts/0/items/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/art/xs/0", "/arts/0/items/0/art/xs/1"], "name": ".art.xs[]", "value": [5, 6]}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "item"}}
         ]
       }
     ]
@@ -13153,11 +13153,31 @@
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some approvals.approver as approver", "assert": ".approver equals approver"}}}}},
     "cases": [
       {
-        "description": "lists the inputs that share a name by value first, then by location",
+        "description": "lists the inputs by name, so the own field's .approver comes before the alias's approver",
         "rules": ["for.failure_inputs", "location.merged"],
         "input": {"things": [{"id": "t1", "approver": "", "approvals": [{"approver": "grace"}]}]},
         "results": [
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": ".approver equals approver", "cause": "value", "inputs": [{"locations": ["/things/0/approver"], "name": "approver", "value": ""}, {"locations": ["/things/0/approvals/0/approver"], "name": "approver", "value": "grace"}]}], "item": "item 1 of approvals", "locations": ["/things/0/approvals/0/approver"], "path": "item 1 of approvals", "value": "grace"}], "inputs": [{"locations": ["/things/0/approvals/0/approver"], "name": "approvals[].approver", "value": ["grace"]}, {"locations": ["/things/0/approver"], "name": "approver", "value": ""}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": ".approver equals approver", "cause": "value", "inputs": [{"locations": ["/things/0/approver"], "name": ".approver", "value": ""}, {"locations": ["/things/0/approvals/0/approver"], "name": "approver", "value": "grace"}]}], "item": "item 1 of approvals", "locations": ["/things/0/approvals/0/approver"], "path": "item 1 of approvals", "value": "grace"}], "inputs": [{"locations": ["/things/0/approver"], "name": ".approver", "value": ""}, {"locations": ["/things/0/approvals/0/approver"], "name": "approvals[].approver", "value": ["grace"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose alias is named like a field of the subject",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"own": {"for": "every commits as c", "assert": ".c.signed is true"}, "alias": {"for": "every commits as c", "assert": "c.signed is true"}, "own_list": {"for": "every commits as c", "assert": "count of .c.xs is 1"}, "plain": {"for": "every commits as c", "assert": ".k is 1"}}}}},
+    "cases": [
+      {
+        "description": "names the own field and its list with the dot, and the alias and a field no alias is called without it",
+        "rules": ["name.dot", "for.failure_inputs"],
+        "input": {"things": [{"id": "t1", "k": 1, "c": {"signed": true, "xs": [1]}, "commits": [{"signed": false}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/0"], "name": "in-scope thing count", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated thing ids", "value": []}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.signed is true", "cause": "value", "inputs": [{"locations": ["/things/0/commits/0/signed"], "name": "c.signed", "value": false}]}], "item": "item 1 of commits", "locations": ["/things/0/commits/0"], "path": "item 1 of commits", "value": {"signed": false}}], "inputs": [{"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "own", "failed_items": [], "inputs": [{"locations": ["/things/0/c/signed"], "name": ".c.signed", "value": true}, {"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "own_list", "failed_items": [], "inputs": [{"locations": ["/things/0/c/xs/0"], "name": ".c.xs[]", "value": [1]}, {"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}, {"locations": ["/things/0/c/xs/0"], "name": "count of .c.xs", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "plain", "failed_items": [], "inputs": [{"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}, {"locations": ["/things/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]

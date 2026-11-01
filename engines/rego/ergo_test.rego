@@ -7452,8 +7452,30 @@ test_the_dot_in_front_of_a_field_reads_the_field_a_part_hides if {
 	rep := ergo.report({"trail": {"name": "t1", "cov": {"x": 2}, "dd": {"b": {"x": 1}}}}, policy, {})
 	_parts_row(rep, "c").passed
 	_parts_row(rep, "d").passed
-	_parts_row(rep, "d").inputs == [{"name": "cov.x", "value": 2, "locations": ["/trail/cov/x"]}]
+	_parts_row(rep, "d").inputs == [{"name": ".cov.x", "value": 2, "locations": ["/trail/cov/x"]}]
 	_parts_row(rep, "e").passed
+}
+
+test_an_own_field_named_like_a_part_keeps_its_dot_and_the_part_does_not if {
+	policy := _parts_policy({"cov": "dd.b"}, {"c": "cov.x is 1", "d": ".cov.x is 2", "e": "count of .cov.xs is 1", "f": "count of cov.xs is 1", "g": ".name is \"t1\""})
+	rep := ergo.report({"trail": {"name": "t1", "cov": {"x": 2, "xs": [1]}, "dd": {"b": {"x": 1, "xs": [1]}}}}, policy, {})
+	[i.name | some i in _parts_row(rep, "c").inputs] == ["cov.x"]
+	[i.name | some i in _parts_row(rep, "d").inputs] == [".cov.x"]
+	[i.name | some i in _parts_row(rep, "e").inputs] == ["count of .cov.xs", ".cov.xs[]"]
+	[i.name | some i in _parts_row(rep, "f").inputs] == ["count of cov.xs", "cov.xs[]"]
+	[i.name | some i in _parts_row(rep, "g").inputs] == ["name"]
+}
+
+test_an_own_field_named_like_a_for_alias_keeps_its_dot if {
+	policy := {
+		"ergo_spec": "v0.4-dev",
+		"subjects": {"thing": {"from": "things", "identified_by": "id"}},
+		"requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every commits as c", "assert": ".c.signed is true"}}}},
+	}
+	rep := ergo.report({"things": [{"id": "t1", "c": {"signed": true}, "commits": [{"signed": true}]}]}, policy, {})
+	some row in rep.results
+	row.check == "c"
+	".c.signed" in {i.name | some i in row.inputs}
 }
 
 test_a_field_of_the_subject_with_no_alias_in_the_way_is_read_as_before if {

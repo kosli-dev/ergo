@@ -1809,7 +1809,11 @@ _plain_step_name(i, step) := concat("", [".", _s_key_text(step)]) if {
 	is_string(step)
 }
 
-_plain_step_name(0, step) := concat("", [_s_dot(step.literal, "left"), _s_key_text(step.literal)]) if _string_literal(step)
+_plain_step_name(0, step) := concat("", [_literal_dot(step.literal), _s_key_text(step.literal)]) if _string_literal(step)
+
+_literal_dot(key) := "." if not startswith(key, "$")
+
+_literal_dot(key) := _s_dot(key, "left") if startswith(key, "$")
 
 _plain_step_name(0, step) := _s_parent_key(step.parent) if _parent_step_form(step)
 

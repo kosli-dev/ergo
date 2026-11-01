@@ -1756,14 +1756,14 @@ mod tests {
     }
 
     #[test]
-    fn a_dot_reads_the_field_and_not_the_part_and_the_name_has_no_dot() {
+    fn a_dot_reads_the_field_and_not_the_part_and_the_name_keeps_the_dot() {
         let r = run(
             json!({"thing": {"from": "ds whose .att.id exists", "has": {"att": "atts.pr"}}}),
             json!({"ds": [{"att": {"id": 1}, "atts": {"pr": {"id": 2}}}, {"atts": {"pr": {"id": 1}}}]}),
         );
         let applies = rows(&r, "$applies");
         assert_eq!(applies[0]["passed"], json!(true));
-        assert_eq!(input_of(&applies[0], 0)["name"], json!("att.id"));
+        assert_eq!(input_of(&applies[0], 0)["name"], json!(".att.id"));
         assert!(input_of(&applies[0], 0).get("part").is_none());
         assert_eq!(applies[1]["cause"], json!("value"));
     }
