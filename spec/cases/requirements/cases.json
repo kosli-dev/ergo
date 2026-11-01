@@ -3473,7 +3473,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\" $x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"$x \"", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}, {"locations": [], "name": "subjects.s.has.a$b", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\u00a0\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x\u200b\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x\u200d\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x\ufeff\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x\ud83d\ude00\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"\u00a0x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"\u200bx\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"\u2060x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"\ufeffx\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"\uff04x\"", "value": ["invalid alias"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\" $x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"$x \"", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}, {"locations": [], "name": "subjects.s.has.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x​\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x‍\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x﻿\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x😀\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"​x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"⁠x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"﻿x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"＄x\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.a$b", "value": ["invalid alias"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3489,6 +3489,129 @@
         "status": {"r": "not_met"},
         "results": [
           {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: an item ends with \"as\" and a name, like \"every pull_requests as pr\""]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a requirement written wrong in several fields, one of them require",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "zz": 1, "x y": 2, "checks": {}, "min_subjects": -1, "require": "most"}}},
+    "cases": [
+      {
+        "description": "lists require second, with what is wrong with it, and the other fields sorted by name as the report writes it",
+        "rules": ["well_formed", "written_wrong.row"],
+        "input": {"things": [{"id": "a"}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 0}, {"locations": [], "name": "require", "value": ["neither every nor some"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "checks", "value": ["empty"]}, {"locations": [], "name": "min_subjects", "value": ["not a whole number from 0 to 1000000"]}, {"locations": [], "name": "zz", "value": ["unknown field"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a requirement whose name is empty",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, with the problem under requirement name",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't be empty"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check whose name is empty",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, with the problem under checks.<name>",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"\"", "value": ["a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an any_of option whose name is empty",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"any_of": {"": "x exists", "p": "x is 1"}}}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and names the option",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option : a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part whose name is empty, written as text",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"": "ys"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, with the problem under the part's alias",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"\"", "value": ["a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part whose name is empty, written as an object",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"": {"from": "ys"}}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, with the problem under the part's alias",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"\"", "value": ["a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose name is empty that a requirement names",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is refused under subject, as an empty subject always is",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subject", "value": ["empty or not a string"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": ""}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose name is empty that no requirement names",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"": {"from": "xs", "identified_by": "id"}, "s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is never read, so it adds no problem",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "met"},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/xs/0"], "name": "in-scope s count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "s"}}
         ]
       }
     ]

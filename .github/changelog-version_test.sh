@@ -2,8 +2,14 @@
 set -euo pipefail
 script=$(cd "$(dirname "$0")" && pwd)/changelog-version.sh
 workflow=$(cd "$(dirname "$0")" && pwd)/workflows/release.yml
-if grep -q 'README\.md' "$workflow"; then
-  echo "release.yml must not change README.md, which follows the latest release and is moved by hand in the release pull request" >&2
+for page in README.md CLI.md; do
+  if grep -qF "$page" "$workflow"; then
+    echo "release.yml must not change $page, which follows the latest release and is moved by hand in the release pull request" >&2
+    exit 1
+  fi
+done
+if ! grep -q 'REFERENCE\.md OPA\.md' "$workflow"; then
+  echo "release.yml must move the -dev version in OPA.md as well as in REFERENCE.md, which follow main" >&2
   exit 1
 fi
 dir=$(mktemp -d)
@@ -65,7 +71,7 @@ setup 0.2.0 0.1.0
 fails "the version must be 0.1.1, and it is 0.2.0"
 for kind in rego rust; do
   case $(bash "$script" $kind 2>&1) in
-    *README.md*) echo "changelog-version.sh $kind must not send people to README.md, which follows the latest release" >&2; exit 1 ;;
+    *README.md*|*CLI.md*) echo "changelog-version.sh $kind must not send people to README.md or CLI.md, which follow the latest release" >&2; exit 1 ;;
   esac
 done
 

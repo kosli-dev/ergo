@@ -77,6 +77,7 @@ pub struct Info {
     pub from_text: Option<String>,
     pub scope: Scope,
     pub declarers: BTreeMap<String, BTreeSet<String>>,
+    pub own_part_names: BTreeSet<String>,
     pub unsupported: bool,
     pub from_read: bool,
     pub own_filters: Vec<String>,
@@ -373,6 +374,14 @@ fn subject_defs(policy: &Policy) -> BTreeMap<String, Option<&SubjectDef>> {
             .collect(),
         Subjects::NotAnObject => BTreeMap::new(),
     }
+}
+
+fn own_part_names(name: &str, raw: &BTreeMap<String, Raw>) -> BTreeSet<String> {
+    members_of(name, raw)
+        .iter()
+        .filter_map(|member| raw.get(member))
+        .flat_map(|found| found.own.keys().cloned())
+        .collect()
 }
 
 fn declarers_of(name: &str, raw: &BTreeMap<String, Raw>) -> BTreeMap<String, BTreeSet<String>> {
@@ -724,7 +733,8 @@ impl Reading {
                 FromState::Parsed(line) => {
                     let mut found_problems = from_problems(name, line, &raw, &names, &links);
                     let scope = scope_of(name, &raw, &effective);
-                    let aliases = scope.aliases();
+                    let mut aliases = scope.aliases();
+                    aliases.extend(own_part_names(name, &raw));
                     let alias_refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
                     let parent_names = scope.parent_names();
                     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
@@ -880,6 +890,7 @@ impl Reading {
                     from_text,
                     scope: scope_of(name, &raw, &effective),
                     declarers: declarers_of(name, &raw),
+                    own_part_names: own_part_names(name, &raw),
                     unsupported: unsupported.contains(name),
                     from_read: ok && !unsupported.contains(name),
                     own_filters: owns
@@ -951,6 +962,14 @@ impl Reading {
             }
         }
         problems
+    }
+
+    pub fn printed_aliases(&self, subject: Option<&str>, scope: &Scope) -> Vec<String> {
+        let mut names: BTreeSet<String> = scope.aliases().into_iter().collect();
+        if let Some(info) = subject.and_then(|name| self.infos.get(name)) {
+            names.extend(info.own_part_names.iter().cloned());
+        }
+        names.into_iter().collect()
     }
 
     pub fn alias_clashes(&self, subject: Option<&str>, alias: &str) -> BTreeSet<String> {
@@ -1116,7 +1135,8 @@ fn entry_of(
         match &found.from {
             FromState::Parsed(line) if matches!(found.def.from, Text::Written(_)) => {
                 let scope = scope_of(name, raw, effective);
-                let aliases = scope.aliases();
+                let mut aliases = scope.aliases();
+                aliases.extend(own_part_names(name, raw));
                 let refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
                 let printed = s::print_from(line, &refs, &[]);
                 if keeps_dot(line, name, names) {
@@ -1571,7 +1591,7 @@ mod tests {
     fn part_problems_are_listed_under_the_alias() {
         let (_, r) = reading(json!({"r": {"from": "rs", "has": {
             "who": "art whose x exists", "in_params": "$params.x", "blank": " ",
-            "every": "art", "with space": "art", "bare_by": "art named by foo", "$dollar": "art"
+            "every": "art", "with space": "art", "bare_by": "art named by foo", "$dollar": "art", "": "art"
         }}}));
         let problems = &r.infos["r"].problems;
         assert_eq!(
@@ -1585,6 +1605,7 @@ mod tests {
         assert!(problems["subjects.r.has.every"].contains("invalid alias"));
         assert!(problems["subjects.r.has.\"with space\""].contains("invalid alias"));
         assert!(problems["subjects.r.has.$dollar"].contains("a name can't start with $"));
+        assert!(problems["subjects.r.has.\"\""].contains("a name can't be empty"));
         assert!(problems["subjects.r.has.bare_by"].contains("from: unknown alias foo"));
     }
 

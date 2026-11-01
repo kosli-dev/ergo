@@ -2,7 +2,7 @@
 
 This package is an experiment, and its format may change.
 
-An Ergo policy can be written as a Markdown document that people read like any other: a title, a few paragraphs, and lists of what must be true. A tool turns it into the same policy as a [YAML policy](../../README.md#2-write-a-policy), and `ergo.rego` runs that policy as it is.
+An Ergo policy can be written as a Markdown document that people read like any other: a title, a few paragraphs, and lists of what must be true. A tool turns it into the same policy as a [YAML policy](../../README.md#a-first-policy), and `ergo.rego` runs that policy as it is.
 
 The file's name ends in `.ergo.md`.
 
@@ -209,7 +209,7 @@ requirements:
           - bake.minutes is between 25 and 40
 ```
 
-Save it next to `ergo.rego` and run it as the [getting started](../../README.md#getting-started) guide shows.
+Save it next to `ergo.rego` and run it as [Ergo with OPA](../../OPA.md#run-a-policy) shows.
 
 `ergo check` lists what the tool can't place, with the line, and fails when there's any. A check written without a bold label gives:
 

@@ -148,7 +148,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           pattern=${VERSION//./\\.}
-          sed -i "s/\b$pattern-dev\b/$next/g" engines/rego/ergo.rego REFERENCE.md
+          sed -i "s/\b$pattern-dev\b/$next/g" engines/rego/ergo.rego REFERENCE.md OPA.md
           grep -qxF "version := \"$next\"" engines/rego/ergo.rego
           if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
             echo "origin/$branch already exists, so there is nothing to commit or push"

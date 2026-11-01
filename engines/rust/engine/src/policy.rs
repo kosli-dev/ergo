@@ -1331,6 +1331,15 @@ mod tests {
     }
 
     #[test]
+    fn a_check_with_an_empty_name_is_written_wrong_and_quoted() {
+        let policy = one(json!({"subject": "thing", "checks": {"": "x is 2"}}));
+        assert_eq!(
+            requirement_problems(policy, "s"),
+            [problem("checks.\"\"", &["a name can't be empty"])]
+        );
+    }
+
+    #[test]
     fn a_reserved_check_that_is_also_written_wrong_lists_both_sorted() {
         let policy = one(json!({"subject": "thing", "checks": {"$unique_ids": {"op": "x"}}}));
         assert_eq!(

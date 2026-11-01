@@ -4,19 +4,23 @@ The landing page and docs for Ergo, built with [Hugo](https://gohugo.io/) (0.157
 
 ## What follows the release and what follows `main`
 
-The live site shows the latest published release of `ergo.rego`, so it never teaches something people can't download yet. These parts come from that release:
+Each page follows the release of what it describes, so nothing on the site is ahead of what people can install. These parts come from a release:
 
-| Part                                 | From the release                                                                                                      |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| The Ergo the tutorial runs           | the `ergo.rego` attached to the release, compiled to Wasm                                                             |
-| The tutorial                         | the release tag's `assets/js/tutorial/`, `assets/css/tutorial.css`, `layouts/tutorial.html` and `content/tutorial.md` |
-| The docs pages                       | the release tag's `README.md` and `REFERENCE.md`, with `X.Y.Z-dev` written `X.Y.Z` as in the released `ergo.rego`     |
-| The bakery page's example            | the release tag's `examples/`                                                                                         |
-| The home page's examples and reports | the release tag's `data/examples.yaml`, or this one when the tag has none, as 0.1.0 doesn't                           |
-| `ergo_spec` on the home page         | the `_spec` of the released `ergo.rego`                                                                               |
-| The spec link and `/spec/X.Y/`       | the published `spec-vX.Y` releases                                                                                    |
+| Part                                 | From the release                                                                                              | Release it follows                                  |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| Getting started and the reference    | the tag's `README.md` and `REFERENCE.md`, with `X.Y.Z-dev` written `X.Y.Z` as in the released `ergo.rego`     | the latest `spec-vX.Y`                              |
+| The tutorial                         | the tag's `assets/js/tutorial/`, `assets/css/tutorial.css`, `layouts/tutorial.html` and `content/tutorial.md` | the latest `spec-vX.Y`                              |
+| The Ergo the tutorial runs           | the `ergo.rego` attached to the release, compiled to Wasm                                                     | the newest `rego-vX.Y.Z` that reads the latest spec |
+| The bakery page's example            | the tag's `examples/`                                                                                         | the latest `spec-vX.Y`                              |
+| The home page's examples and reports | the tag's `data/examples.yaml`, or this one when the tag has none                                             | the latest `spec-vX.Y`                              |
+| "Ergo with OPA"                      | the tag's `OPA.md`                                                                                            | the latest `rego-vX.Y.Z`                            |
+| "Ergo CLI"                           | the tag's `CLI.md`                                                                                            | the latest `rust-vX.Y.Z`                            |
+| `ergo_spec` on the home page         | the `_spec` of the released `ergo.rego`                                                                       | the `ergo.rego` the tutorial runs                   |
+| The spec link and `/spec/X.Y/`       | the published `spec-vX.Y` releases                                                                            | every `spec-vX.Y`                                   |
 
-Everything else follows `main`: the home page's layout, design and words, the other pages, the CSS other than `tutorial.css`, and the bakery page's text. So a change to the tutorial, the docs, the examples or the home page's examples reaches the site at the next release, and a change to the rest reaches it when it's merged.
+The docs and the OPA page always go together: the docs come from a tag that has `OPA.md` if and only if the OPA page is built, so the short README never ships without the page it links to, and the long README, which has the engines in it, never ships next to an OPA or CLI page. When the newest spec that a published `rego-vX.Y.Z` reads and the latest `rego-vX.Y.Z` both have `OPA.md`, the docs come from that spec. When only the latest `rego-vX.Y.Z` has it, because no spec release does yet, they come from that release. When neither has it, the site keeps the old layout, everything from the latest `rego-vX.Y.Z` tag, with no OPA or CLI page. The OPA page comes from the latest `rego-vX.Y.Z`, and the CLI page from the latest `rust-vX.Y.Z` when it has `CLI.md` and the OPA page is built. `prepare.sh` says which it chose and fails if the two ever disagree. `release.json` has empty `opa` and `cli` for a page that wasn't built, and a link to such a page turns into plain text. `check_build.py` fails when a docs page links to a page or a heading that isn't there.
+
+Everything else follows `main`: the home page's layout, design and words, the other pages, the CSS other than `tutorial.css`, and the bakery page's text. The playground still follows `main`, not the releases.
 
 ## Run it locally
 
@@ -41,8 +45,8 @@ Then open http://localhost:1313. Hugo picks up edits to the working tree's tutor
 
 `site/prepare.sh` writes what Hugo needs into folders git ignores, and Hugo stops with a message naming the script when they're missing:
 
-- `site/prepared/` holds what comes from the release, laid out like `site/`, and where a file is in both, Hugo uses the one in `site/prepared/`. It always holds `README.md` and `REFERENCE.md` for the docs and `examples/` for the bakery page, from the release or the working tree, so run the script again after you edit those. The example files end in `.txt`, and the released `ergo.rego` is `ergo.rego.txt`, because OPA loads every `.rego`, `.json` and `.yaml` file under the folder it's given, and they'd clash with the repo's own.
-- `site/prepared/data/release.json` holds the versions the home page shows: the release, the newest published `rust-vX.Y.Z` release (empty when there is none, and then the home page leaves it out), the newest published `spec-vX.Y` release, and the spec that `ergo.rego` reads.
+- `site/prepared/` holds what comes from the release, laid out like `site/`, and where a file is in both, Hugo uses the one in `site/prepared/`. It always holds `README.md`, `REFERENCE.md`, `OPA.md` and `CLI.md` for the docs (the last two only when the release has them) and `examples/` for the bakery page, from the release or the working tree, so run the script again after you edit those. The example files end in `.txt`, and the released `ergo.rego` is `ergo.rego.txt`, because OPA loads every `.rego`, `.json` and `.yaml` file under the folder it's given, and they'd clash with the repo's own.
+- `site/prepared/data/release.json` holds the versions the home page shows: the `ergo.rego` the tutorial runs, the tags that the OPA and CLI pages come from (`opa` and `cli`, empty in the old layout), the newest published `rust-vX.Y.Z` release (empty when there is none, and then the home page leaves it out), the newest published `spec-vX.Y` release, and the spec that `ergo.rego` reads.
 - `site/assets/tutorial/` holds `ergo.rego` compiled to Wasm, and OPA's Wasm runtime.
 - `site/static/spec/` holds the schemas of every published spec release, from `site/spec-schemas.sh`.
 
