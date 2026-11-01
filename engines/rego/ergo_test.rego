@@ -7784,20 +7784,22 @@ test_every_way_a_part_can_be_written_wrong_is_named_with_its_alias if {
 	problems["subjects.round.has.nobare"] == ["from: unknown alias foo"]
 	problems["subjects.round.has.emp"] == ["from: doesn't parse"]
 	problems["subjects.round.has.idbad"] == ["identified_by: a part is a path: whose and named by each of can't go in it"]
-	problems["subjects.round.has.$dollar"] == ["invalid alias"]
+	problems["subjects.round.has.$dollar"] == ["a name can't start with $"]
 	problems["subjects.round.has.\"with space\""] == ["invalid alias"]
 	problems["subjects.round.has.item"] == ["invalid alias"]
 	not "subjects.round.has.plain" in object.keys(problems)
 }
 
 test_a_part_alias_must_be_a_bare_word_that_is_not_a_word_of_the_grammar_or_params_or_input if {
-	bad := ["empty", "every", "params", "input", "true", "a", "x y", "$x", "", "1x", "x.y", "é"]
+	bad := ["empty", "every", "params", "input", "true", "a", "x y", "", "1x", "x.y", "é"]
 	every alias in bad {
 		problems := _parts_problems(_parts_report({alias: "x"}, {"c": "name is \"t1\""}, {}))
 		some key, value in problems
 		contains(key, "subjects.round.has")
 		value == ["invalid alias"]
 	}
+	problems := _parts_problems(_parts_report({"$x": "x"}, {"c": "name is \"t1\""}, {}))
+	problems["subjects.round.has.$x"] == ["a name can't start with $"]
 	good := ["x", "_x", "x-y", "x_1", "Cov", "coverage-verification"]
 	every alias in good {
 		problems := _parts_problems(_parts_report({alias: "x"}, {"c": "name is \"t1\""}, {}))
@@ -9606,15 +9608,21 @@ reserved_check_rows(name) := report({"items": [{"id": 1}]}, {"s": object.union(o
 test_a_check_named_like_one_of_ergos_own_rows_is_written_wrong if {
 	every name in ["$applies", "$min_subjects", "$unique_ids", "$well_formed"] {
 		rep := reserved_check_rows(name)
-		problem_inputs(rep) == [{"name": concat(".", ["checks", name]), "value": ["name reserved"], "locations": []}]
+		problem_inputs(rep) == [{"name": concat(".", ["checks", name]), "value": ["a name can't start with $"], "locations": []}]
 		[r.passed | some r in rep.results] == [false]
 	}
 }
 
-test_a_check_named_like_an_ergo_row_ergo_never_adds_is_allowed if {
+test_a_check_named_with_a_dollar_sign_that_ergo_never_adds_is_written_wrong_and_has_no_entry if {
 	rep := reserved_check_rows("$other")
+	problem_inputs(rep) == [{"name": "checks.$other", "value": ["a name can't start with $"], "locations": []}]
+	object.keys(rep.requirements.s.checks) == {"$min_subjects", "$unique_ids", "$well_formed"}
+}
+
+test_a_check_named_with_a_dollar_sign_later_in_its_name_is_allowed if {
+	rep := reserved_check_rows("a$b")
 	problem_inputs(rep) == []
-	[r.passed | some r in rows_for(rep, "s", "$other")] == [true]
+	[r.passed | some r in rows_for(rep, "s", "a$b")] == [true]
 }
 
 test_a_check_named_like_one_of_ergos_own_rows_leaves_only_ergos_check_in_the_requirement if {
@@ -9688,7 +9696,7 @@ test_a_parent_read_with_named_by_on_the_right_side_shows_the_parents_value if {
 
 test_a_check_named_like_one_of_ergos_own_rows_that_does_not_parse_is_listed_once if {
 	rep := report({"items": [{"id": 1}]}, {"s": object.union(object.remove(typed_req, ["checks"]), {"checks": {"$unique_ids": "id is"}})})
-	problem_inputs(rep) == [{"name": "checks.$unique_ids", "value": ["doesn't parse", "name reserved"], "locations": []}]
+	problem_inputs(rep) == [{"name": "checks.$unique_ids", "value": ["a name can't start with $", "doesn't parse"], "locations": []}]
 }
 
 test_a_subject_that_leads_into_a_loop_is_named_after_its_own_from if {
@@ -10881,7 +10889,7 @@ test_a_requirement_called_policy_is_written_wrong_and_leaves_no_policy_requireme
 	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
 	object.keys(rep.requirements) == {"$policy"}
 	rep.requirements["$policy"].subject == "s"
-	[i.value | some i in rows_for(rep, "$policy", "$well_formed")[0].inputs; i.name == "requirement name"] == [["name reserved"]]
+	[i.value | some i in rows_for(rep, "$policy", "$well_formed")[0].inputs; i.name == "requirement name"] == [["a name can't start with $"]]
 }
 
 test_a_requirements_list_with_items_is_read_as_no_requirements if {
@@ -10903,4 +10911,56 @@ test_a_set_of_requirements_reads_as_none if {
 	object.keys(rep.requirements) == {"$policy"}
 	[i.value | some i in rows_for(rep, "$policy", "$well_formed")[0].inputs; i.name == "requirements"] == [["not an object"]]
 	[v.requirement | some v in ergo.violations(rep)] == ["$policy"]
+}
+
+test_a_name_that_starts_with_a_dollar_sign_is_written_wrong_wherever_it_stands if {
+	wrong := ["a name can't start with $"]
+	policy := {"ergo_spec": "v0.4-dev", "subjects": {"$s": {"from": "xs"}, "t": {"from": "xs", "has": {"$p": "ys"}}}, "requirements": {
+		"$r": {"subject": "t", "checks": {"c": "x exists"}},
+		"q": {"subject": "$s", "checks": {"c": "x exists"}},
+		"o": {"subject": "t", "checks": {"c": {"any_of": {"$o": "x exists", "p": "x is 1"}}}},
+		"k": {"subject": "t", "checks": {"$k": "x exists"}},
+		"ok": {"subject": "t", "checks": {"a$b": "x exists"}},
+	}}
+	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+	[i.value | some i in rows_for(rep, "$r", "$well_formed")[0].inputs; i.name == "requirement name"] == [wrong]
+	[i.value | some i in rows_for(rep, "q", "$well_formed")[0].inputs; i.name == "subjects.$s"] == [wrong]
+	[i.value | some i in rows_for(rep, "o", "$well_formed")[0].inputs; i.name == "checks.c"] == [["option $o: a name can't start with $"]]
+	[i.value | some i in rows_for(rep, "k", "$well_formed")[0].inputs; i.name == "checks.$k"] == [wrong]
+	[i.value | some i in rows_for(rep, "k", "$well_formed")[0].inputs; i.name == "subjects.t.has.$p"] == [wrong]
+	[i.name | some i in rows_for(rep, "ok", "$well_formed")[0].inputs; startswith(i.name, "checks.")] == []
+}
+
+test_a_name_that_starts_or_ends_with_a_space_or_an_invisible_character_is_written_wrong_wherever_it_stands if {
+	wrong := "a name can't start or end with a space or an invisible character"
+	bad := [" x", "x ", "\tx", "x\t", "\u00a0x", "x\u00a0", "\u200bx", "x\u200b", "\ufeffx", "x\ufeff", "\u2060x", "x\u200d", "\u3000x", "x\ud804\udcbd", "x\udb40\udc01"]
+	every name in bad {
+		policy := {"ergo_spec": "v0.4-dev", "subjects": {name: {"from": "xs"}, "t": {"from": "xs"}}, "requirements": {
+			name: {"subject": "t", "checks": {"c": "x exists"}},
+			"q": {"subject": name, "checks": {"c": "x exists"}},
+			"o": {"subject": "t", "checks": {"c": {"any_of": {name: "x exists", "p": "x is 1"}}}},
+			"k": {"subject": "t", "checks": {name: "x exists"}},
+		}}
+		rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+		wrong in [v | some i in rows_for(rep, name, "$well_formed")[0].inputs; i.name == "requirement name"; some v in i.value]
+		wrong in [v | some i in rows_for(rep, "q", "$well_formed")[0].inputs; i.name == ergo._field_path_name(["subjects", name]); some v in i.value]
+		concat("", ["option ", name, ": ", wrong]) in [v | some i in rows_for(rep, "o", "$well_formed")[0].inputs; i.name == "checks.c"; some v in i.value]
+		[i.value | some i in rows_for(rep, "k", "$well_formed")[0].inputs; i.name == ergo._field_path_name(["checks", name])] == [[wrong]]
+		parts := ergo.report({"xs": [{"x": 1}]}, {"ergo_spec": "v0.4-dev", "subjects": {"t": {"from": "xs", "has": {name: "ys"}}}, "requirements": {"r": {"subject": "t", "checks": {"c": "x exists"}}}}, {})
+		[i.value | some i in rows_for(parts, "r", "$well_formed")[0].inputs; i.name == ergo._field_path_name(["subjects", "t", "has", name])] == [[wrong]]
+	}
+}
+
+test_a_name_with_spaces_inside_or_a_full_width_dollar_sign_is_written_correctly if {
+	every name in ["x y", "\uff04x", "a$b", "x\ud83d\ude00"] {
+		policy := {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs"}}, "requirements": {name: {"subject": "s", "checks": {name: "x exists"}}}}
+		rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+		[i.name | some i in rows_for(rep, name, "$well_formed")[0].inputs; i.name != "count(checks)"; i.name != "require"] == []
+	}
+}
+
+test_a_name_with_both_problems_lists_both_sorted if {
+	policy := {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs"}}, "requirements": {"r": {"subject": "s", "checks": {"$x ": "x exists"}}}}
+	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+	[i.value | some i in rows_for(rep, "r", "$well_formed")[0].inputs; i.name == ergo._field_path_name(["checks", "$x "])] == [["a name can't start or end with a space or an invisible character", "a name can't start with $"]]
 }

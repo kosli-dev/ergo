@@ -5059,7 +5059,7 @@
               {
                 "name": "subjects.round.has.$dollar",
                 "value": [
-                  "invalid alias"
+                  "a name can't start with $"
                 ],
                 "locations": [
 

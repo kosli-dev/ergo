@@ -144,6 +144,8 @@ def case_lines():
     folder = os.path.join(ROOT, "spec/cases")
     for topic in sorted(os.listdir(folder)):
         for group in json.load(open(os.path.join(folder, topic, "cases.json"))):
+            if not isinstance(group["policy"], dict):
+                continue
             collect(group["policy"], lines)
             subjects = group["policy"].get("subjects")
             if isinstance(subjects, dict):

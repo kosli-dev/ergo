@@ -276,9 +276,10 @@ _member_problems(members) := union({
 		some m in members
 		m == "it"
 	},
-	{[["subjects", m], concat("", ["a subject can't be named ", m])] |
+	{[["subjects", m], p] |
 		some m in members
-		m in {"$input", "$params"}
+		_bad_name(m)
+		some p in _written_name_problems(m)
 	},
 	{[["subjects", m, f], p] |
 		some m in members
@@ -362,9 +363,55 @@ _unknown_problems(req) := {[f, "unknown field"] | some f in _unknown_req_fields(
 
 _checks_problems(req) := {["checks", "missing"] | is_object(req); not "checks" in object.keys(req)} | {["checks", "empty"] | req.checks == {}}
 
-_reserved_name_problems(req) := {[_field_path_name(["checks", name]), "name reserved"] | some name, _ in _checks_of(req); name in _reserved_checks}
+_reserved_name_problems(req) := {[_field_path_name(["checks", name]), p] |
+	some name, _ in _checks_of(req)
+	_bad_name(name)
+	some p in _written_name_problems(name)
+}
 
-_reserved_checks := {"$applies", "$min_subjects", "$unique_ids", "$well_formed"}
+_dollar_name_problem := "a name can't start with $"
+
+_edge_name_problem := "a name can't start or end with a space or an invisible character"
+
+_dollar_name(name) if {
+	is_string(name)
+	startswith(name, "$")
+}
+
+_edge_name(name) if {
+	is_string(name)
+	name != ""
+	not _plain_start(name)
+	_edge_char(substring(name, 0, 1))
+}
+
+_edge_name(name) if {
+	is_string(name)
+	name != ""
+	not _plain_end(name)
+	_edge_char(substring(name, count(name) - 1, 1))
+}
+
+_plain_start(name) if {
+	name >= "0"
+	name < "{"
+}
+
+_plain_end(name) if regex.match(`[0-9A-Za-z_-]$`, name)
+
+_edge_char(c) if {
+	c < "0"
+	c in _edge_chars
+}
+
+_edge_char(c) if {
+	c > "z"
+	c in _edge_chars
+}
+
+_written_name_problems(name) := {_dollar_name_problem | _dollar_name(name)} | {_edge_name_problem | _edge_name(name)}
+
+_edge_chars := {"\u0009", "\u000a", "\u000b", "\u000c", "\u000d", "\u0020", "\u0085", "\u00a0", "\u1680", "\u2000", "\u2001", "\u2002", "\u2003", "\u2004", "\u2005", "\u2006", "\u2007", "\u2008", "\u2009", "\u200a", "\u2028", "\u2029", "\u202f", "\u205f", "\u3000", "\u00ad", "\u0600", "\u0601", "\u0602", "\u0603", "\u0604", "\u0605", "\u061c", "\u06dd", "\u070f", "\u0890", "\u0891", "\u08e2", "\u180e", "\u200b", "\u200c", "\u200d", "\u200e", "\u200f", "\u202a", "\u202b", "\u202c", "\u202d", "\u202e", "\u2060", "\u2061", "\u2062", "\u2063", "\u2064", "\u2066", "\u2067", "\u2068", "\u2069", "\u206a", "\u206b", "\u206c", "\u206d", "\u206e", "\u206f", "\ufeff", "\ufff9", "\ufffa", "\ufffb", "\ud804\udcbd", "\ud804\udccd", "\ud80d\udc30", "\ud80d\udc31", "\ud80d\udc32", "\ud80d\udc33", "\ud80d\udc34", "\ud80d\udc35", "\ud80d\udc36", "\ud80d\udc37", "\ud80d\udc38", "\ud80d\udc39", "\ud80d\udc3a", "\ud80d\udc3b", "\ud80d\udc3c", "\ud80d\udc3d", "\ud80d\udc3e", "\ud80d\udc3f", "\ud82f\udca0", "\ud82f\udca1", "\ud82f\udca2", "\ud82f\udca3", "\ud834\udd73", "\ud834\udd74", "\ud834\udd75", "\ud834\udd76", "\ud834\udd77", "\ud834\udd78", "\ud834\udd79", "\ud834\udd7a", "\udb40\udc01", "\udb40\udc20", "\udb40\udc21", "\udb40\udc22", "\udb40\udc23", "\udb40\udc24", "\udb40\udc25", "\udb40\udc26", "\udb40\udc27", "\udb40\udc28", "\udb40\udc29", "\udb40\udc2a", "\udb40\udc2b", "\udb40\udc2c", "\udb40\udc2d", "\udb40\udc2e", "\udb40\udc2f", "\udb40\udc30", "\udb40\udc31", "\udb40\udc32", "\udb40\udc33", "\udb40\udc34", "\udb40\udc35", "\udb40\udc36", "\udb40\udc37", "\udb40\udc38", "\udb40\udc39", "\udb40\udc3a", "\udb40\udc3b", "\udb40\udc3c", "\udb40\udc3d", "\udb40\udc3e", "\udb40\udc3f", "\udb40\udc40", "\udb40\udc41", "\udb40\udc42", "\udb40\udc43", "\udb40\udc44", "\udb40\udc45", "\udb40\udc46", "\udb40\udc47", "\udb40\udc48", "\udb40\udc49", "\udb40\udc4a", "\udb40\udc4b", "\udb40\udc4c", "\udb40\udc4d", "\udb40\udc4e", "\udb40\udc4f", "\udb40\udc50", "\udb40\udc51", "\udb40\udc52", "\udb40\udc53", "\udb40\udc54", "\udb40\udc55", "\udb40\udc56", "\udb40\udc57", "\udb40\udc58", "\udb40\udc59", "\udb40\udc5a", "\udb40\udc5b", "\udb40\udc5c", "\udb40\udc5d", "\udb40\udc5e", "\udb40\udc5f", "\udb40\udc60", "\udb40\udc61", "\udb40\udc62", "\udb40\udc63", "\udb40\udc64", "\udb40\udc65", "\udb40\udc66", "\udb40\udc67", "\udb40\udc68", "\udb40\udc69", "\udb40\udc6a", "\udb40\udc6b", "\udb40\udc6c", "\udb40\udc6d", "\udb40\udc6e", "\udb40\udc6f", "\udb40\udc70", "\udb40\udc71", "\udb40\udc72", "\udb40\udc73", "\udb40\udc74", "\udb40\udc75", "\udb40\udc76", "\udb40\udc77", "\udb40\udc78", "\udb40\udc79", "\udb40\udc7a", "\udb40\udc7b", "\udb40\udc7c", "\udb40\udc7d", "\udb40\udc7e", "\udb40\udc7f"}
 
 _require_problems(req) := {["require", "neither every nor some"] | is_object(req); not _require_of(req) in {"every", "some"}}
 
@@ -3522,22 +3569,22 @@ _well_formed_def := {"$well_formed": {
 	"expression": "count(problems) == 0",
 }}
 
-default _well_formed_named(_, _) := false
+default _well_formed_with(_, _) := false
 
-_well_formed_named(req, name) if {
-	is_string(name)
-	name != "$policy"
+_well_formed_with(req, name_inputs) if {
+	count(name_inputs) == 0
 	_well_formed(req)
 }
 
-_name_problem_inputs(name) := [] if {
-	is_string(name)
-	name != "$policy"
-}
-
-_name_problem_inputs("$policy") := [{"name": "requirement name", "value": ["name reserved"], "locations": []}]
-
 _name_problem_inputs(name) := [{"name": "requirement name", "value": ["not a string"], "locations": []}] if not is_string(name)
+
+else := [] if not _bad_name(name)
+
+else := [{"name": "requirement name", "value": sort(_written_name_problems(name)), "locations": []}]
+
+_bad_name(name) if _dollar_name(name)
+
+_bad_name(name) if _edge_name(name)
 
 default _well_formed(_) := false
 
@@ -3622,7 +3669,7 @@ _requirement_checks_written_or_added(req) := object.union(
 	object.union(
 		{name: def |
 			some name, check in _checks_of(req)
-			not name in _reserved_checks
+			not _dollar_name(name)
 			def := _check_def(check, _s_written_here(req, "checks", name))
 		},
 		object.union(_min_subjects_def(req), _unique_ids_def(req)),
@@ -3689,12 +3736,13 @@ _well_formed_row(req, name, parts) := v if {
 } else := _well_formed_row_of(req, name)
 
 _well_formed_row_of(req, req_name) := row if {
-	passed := _well_formed_named(req, req_name)
+	name_inputs := _name_problem_inputs(req_name)
+	passed := _well_formed_with(req, name_inputs)
 	row := {
 		"requirement": req_name,
 		"subject": _req_subject_ref(req),
 		"check": "$well_formed",
-		"inputs": array.concat(_name_problem_inputs(req_name), _well_formed_inputs(req)),
+		"inputs": array.concat(name_inputs, _well_formed_inputs(req)),
 		"passed": passed,
 		"cause": _verdict_cause(passed),
 	}
@@ -6318,7 +6366,9 @@ _p_part_read(alias, entry) := {"from": from, "identified_by": id, "problems": so
 	problems := ((_p_alias_problems(alias) | _p_shape_problems(entry)) | _p_prefixed("from", from)) | _p_prefixed("identified_by", id)
 }
 
-_p_alias_problems(alias) := {"invalid alias" | not _p_alias_ok(alias)}
+_p_alias_problems(alias) := _written_name_problems(alias) if count(_written_name_problems(alias)) > 0
+
+_p_alias_problems(alias) := {"invalid alias" | not _p_alias_ok(alias)} if count(_written_name_problems(alias)) == 0
 
 _p_shape_problems(entry) := {"not a string or an object"} if {
 	not is_string(entry)
@@ -7099,9 +7149,21 @@ _s_options_shape(options) := {"invalid any_of"} if not is_object(options)
 
 _s_options_shape({}) := {"empty any_of"}
 
-_s_options_shape(options) := {_s_option_shape(nm, o) | some nm, o in options; _s_option_shape(nm, o) != ""} if {
+_s_options_shape(options) := {m | some nm, o in options; some m in _s_option_messages(nm, o)} if {
 	is_object(options)
 	options != {}
+}
+
+_s_option_messages(nm, _) := {concat("", ["option ", _text(nm), ": ", p]) | some p in _written_name_problems(nm)} if count(_written_name_problems(nm)) > 0
+
+_s_option_messages(nm, o) := {_s_option_shape(nm, o)} if {
+	count(_written_name_problems(nm)) == 0
+	_s_option_shape(nm, o) != ""
+}
+
+_s_option_messages(nm, o) := set() if {
+	count(_written_name_problems(nm)) == 0
+	_s_option_shape(nm, o) == ""
 }
 
 _s_option_shape(nm, o) := concat("", ["empty option ", _text(nm)]) if o == []

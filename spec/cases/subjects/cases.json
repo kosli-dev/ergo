@@ -13654,11 +13654,11 @@
     ]
   },
   {
-    "description": "a child of a subject whose name starts with a dollar sign, read through its part",
+    "description": "a child of a subject whose name has a space, read through its part",
     "policy": {
       "ergo_spec": "v0.4-dev",
       "subjects": {
-        "$x": {
+        "x y": {
           "from": "things",
           "identified_by": "id",
           "has": {
@@ -13666,7 +13666,7 @@
           }
         },
         "kid": {
-          "from": "\"$x\".pa.items",
+          "from": "\"x y\".pa.items",
           "identified_by": "n"
         }
       },
@@ -13674,14 +13674,14 @@
         "r": {
           "subject": "kid",
           "checks": {
-            "c": "\"$x\".pa.k is 1"
+            "c": "\"x y\".pa.k is 1"
           }
         }
       }
     },
     "cases": [
       {
-        "description": "reads the parent through its part, not a field of the child called $x",
+        "description": "reads the parent through its part, not a field of the child called x y",
         "rules": ["sentence.subject.chain", "sentence.subject.quoted", "parts.chain"],
         "input": {
           "things": [
@@ -13707,10 +13707,10 @@
                 "locations": [
                   "/things/0/meta/k"
                 ],
-                "name": "\"$x\".pa.k",
+                "name": "\"x y\".pa.k",
                 "part": {
                   "id": null,
-                  "name": "\"$x\".pa"
+                  "name": "\"x y\".pa"
                 },
                 "value": 1
               }
@@ -13720,7 +13720,7 @@
             "subject": {
               "id": 1,
               "in": {
-                "$x": "a"
+                "x y": "a"
               },
               "type": "kid"
             }
@@ -13729,19 +13729,19 @@
         "compliant": true,
         "expressions": {
           "r": {
-            "$min_subjects": "count(matching(\"$x\".pa.items)) >= 1",
-            "c": "\"$x\".pa.k is 1"
+            "$min_subjects": "count(matching(\"x y\".pa.items)) >= 1",
+            "c": "\"x y\".pa.k is 1"
           }
         }
       }
     ]
   },
   {
-    "description": "a check on a child that starts at a parent whose name starts with a dollar sign",
+    "description": "a check on a child that starts at a parent whose name has a space",
     "policy": {
       "ergo_spec": "v0.4-dev",
       "subjects": {
-        "$x": {
+        "x y": {
           "from": "things",
           "identified_by": "id",
           "has": {
@@ -13749,7 +13749,7 @@
           }
         },
         "kid": {
-          "from": "\"$x\".pa.items",
+          "from": "\"x y\".pa.items",
           "identified_by": "n"
         }
       },
@@ -13757,8 +13757,8 @@
         "r": {
           "subject": "kid",
           "checks": {
-            "c": "\"$x\".k is 2",
-            "d": ".\"$x\".k is 3"
+            "c": "\"x y\".k is 2",
+            "d": ".\"x y\".k is 3"
           }
         }
       }
@@ -13780,7 +13780,7 @@
                 "items": [
                   {
                     "n": 1,
-                    "$x": {
+                    "x y": {
                       "k": 3
                     }
                   }
@@ -13798,7 +13798,7 @@
                 "locations": [
                   "/things/0/k"
                 ],
-                "name": "\"$x\".k",
+                "name": "\"x y\".k",
                 "value": 2
               }
             ],
@@ -13807,7 +13807,7 @@
             "subject": {
               "id": 1,
               "in": {
-                "$x": "a"
+                "x y": "a"
               },
               "type": "kid"
             }
@@ -13818,9 +13818,9 @@
             "inputs": [
               {
                 "locations": [
-                  "/things/0/meta/items/0/$x/k"
+                  "/things/0/meta/items/0/x y/k"
                 ],
-                "name": ".\"$x\".k",
+                "name": ".\"x y\".k",
                 "value": 3
               }
             ],
@@ -13829,7 +13829,7 @@
             "subject": {
               "id": 1,
               "in": {
-                "$x": "a"
+                "x y": "a"
               },
               "type": "kid"
             }
@@ -13838,8 +13838,8 @@
         "compliant": true,
         "expressions": {
           "r": {
-            "c": "\"$x\".k is 2",
-            "d": ".\"$x\".k is 3"
+            "c": "\"x y\".k is 2",
+            "d": ".\"x y\".k is 3"
           }
         }
       }
@@ -14048,7 +14048,7 @@
               {
                 "name": "subjects.$input",
                 "value": [
-                  "a subject can't be named $input"
+                  "a name can't start with $"
                 ],
                 "locations": []
               }
@@ -14154,7 +14154,7 @@
               {
                 "name": "subjects.$input",
                 "value": [
-                  "a subject can't be named $input"
+                  "a name can't start with $"
                 ],
                 "locations": []
               }
@@ -14260,7 +14260,7 @@
               {
                 "name": "subjects.$input",
                 "value": [
-                  "a subject can't be named $input"
+                  "a name can't start with $"
                 ],
                 "locations": []
               }
@@ -14366,7 +14366,7 @@
               {
                 "name": "subjects.$input",
                 "value": [
-                  "a subject can't be named $input"
+                  "a name can't start with $"
                 ],
                 "locations": []
               }
@@ -14472,7 +14472,7 @@
               {
                 "name": "subjects.$params",
                 "value": [
-                  "a subject can't be named $params"
+                  "a name can't start with $"
                 ],
                 "locations": []
               }
@@ -14578,7 +14578,7 @@
               {
                 "name": "subjects.$params",
                 "value": [
-                  "a subject can't be named $params"
+                  "a name can't start with $"
                 ],
                 "locations": []
               }
@@ -14684,7 +14684,7 @@
               {
                 "name": "subjects.$params",
                 "value": [
-                  "a subject can't be named $params"
+                  "a name can't start with $"
                 ],
                 "locations": []
               }
@@ -14790,7 +14790,7 @@
               {
                 "name": "subjects.$params",
                 "value": [
-                  "a subject can't be named $params"
+                  "a name can't start with $"
                 ],
                 "locations": []
               }

@@ -322,6 +322,7 @@ pub fn check_defs(
     let mut defs: BTreeMap<String, CheckDef> = requirement
         .checks
         .iter()
+        .filter(|(name, _)| !name.starts_with('$'))
         .map(|(name, check)| {
             (
                 name.clone(),
@@ -423,10 +424,11 @@ pub fn well_formed_row(
     extra: Option<&Problems>,
 ) -> Row {
     let problems = requirement_problems(requirement, extra);
-    let reserved = requirement_name == POLICY;
+    let name_problems = crate::policy::written_name_problems(requirement_name);
+    let reserved = !name_problems.is_empty();
     let mut inputs = Vec::new();
     if reserved {
-        inputs.push(input("requirement name", json!(["name reserved"]), &[]));
+        inputs.push(input("requirement name", json!(name_problems), &[]));
     }
     inputs.push(input("count(checks)", json!(requirement.checks_count), &[]));
     let require_wrong = problems.contains_key("require");
@@ -1310,13 +1312,119 @@ mod tests {
     }
 
     #[test]
+    fn a_name_that_starts_with_a_dollar_sign_is_written_wrong_wherever_it_stands() {
+        let wrong = json!(["a name can't start with $"]);
+        let policy = json!({
+            "ergo_spec": "v0.4-dev",
+            "subjects": {"$s": {"from": "xs"}, "t": {"from": "xs", "has": {"$p": "ys"}}},
+            "requirements": {
+                "$r": {"subject": "t", "checks": {"c": "x exists"}},
+                "q": {"subject": "$s", "checks": {"c": "x exists"}},
+                "o": {"subject": "t", "checks": {"c": {"any_of": {"$o": "x exists", "p": "x is 1"}}}},
+                "k": {"subject": "t", "checks": {"$k": "x exists"}},
+                "ok": {"subject": "t", "checks": {"a$b": "x exists"}},
+            }
+        });
+        let report = report_of(policy, Value::Null);
+        let inputs = |requirement: &str| -> Vec<Value> {
+            row_of_check(&report, requirement, "$well_formed")["inputs"]
+                .as_array()
+                .unwrap()
+                .clone()
+        };
+        assert!(
+            inputs("$r")
+                .iter()
+                .any(|i| i["name"] == "requirement name" && i["value"] == wrong)
+        );
+        assert!(
+            inputs("q")
+                .iter()
+                .any(|i| i["name"] == "subjects.$s" && i["value"] == wrong)
+        );
+        assert!(inputs("o").iter().any(|i| i["name"] == "checks.c"
+            && i["value"] == json!(["option $o: a name can't start with $"])));
+        assert!(
+            inputs("k")
+                .iter()
+                .any(|i| i["name"] == "checks.$k" && i["value"] == wrong)
+        );
+        assert!(
+            inputs("k")
+                .iter()
+                .any(|i| i["name"] == "subjects.t.has.$p" && i["value"] == wrong)
+        );
+        assert_eq!(
+            row_of_check(&report, "ok", "$well_formed")["inputs"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|i| i["name"].as_str().is_some_and(|n| n.starts_with("checks.")))
+                .count(),
+            0
+        );
+    }
+
+    #[test]
+    fn a_name_that_starts_or_ends_with_a_space_or_an_invisible_character_is_written_wrong_wherever_it_stands()
+     {
+        let wrong = "a name can't start or end with a space or an invisible character";
+        for name in [" x", "x ", "\u{a0}x", "x\u{200b}", "\u{feff}x", "\tx"] {
+            let policy = json!({
+                "ergo_spec": "v0.4-dev",
+                "subjects": {name: {"from": "xs"}, "u": {"from": "xs"}},
+                "requirements": {
+                    name: {"subject": "u", "checks": {"c": "x exists"}},
+                    "q": {"subject": name, "checks": {"c": "x exists"}},
+                    "o": {"subject": "u", "checks": {"c": {"any_of": {name: "x exists", "p": "x is 1"}}}},
+                    "k": {"subject": "u", "checks": {name: "x exists"}},
+                }
+            });
+            let report = report_of(policy, Value::Null);
+            let has = |requirement: &str, matches: &dyn Fn(&Value) -> bool| {
+                row_of_check(&report, requirement, "$well_formed")["inputs"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(matches)
+            };
+            assert!(has(name, &|i| i["name"] == "requirement name"
+                && i["value"] == json!([wrong])));
+            assert!(has("q", &|i| i["value"] == json!([wrong])
+                && i["name"]
+                    .as_str()
+                    .is_some_and(|n| n.starts_with("subjects."))));
+            assert!(has("o", &|i| i["name"] == "checks.c"
+                && i["value"] == json!([format!("option {name}: {wrong}")])));
+            assert!(has("k", &|i| i["value"] == json!([wrong])
+                && i["name"].as_str().is_some_and(|n| n.starts_with("checks."))));
+            let parts = report_of(
+                json!({
+                    "ergo_spec": "v0.4-dev",
+                    "subjects": {"t": {"from": "xs", "has": {name: "ys"}}},
+                    "requirements": {"h": {"subject": "t", "checks": {"c": "x exists"}}}
+                }),
+                Value::Null,
+            );
+            assert!(
+                row_of_check(&parts, "h", "$well_formed")["inputs"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|i| i["value"] == json!([wrong])
+                        && i["name"].as_str().is_some_and(|n| n.contains(".has.")))
+            );
+        }
+    }
+
+    #[test]
     fn a_requirement_called_policy_is_written_wrong() {
         let report = report_of(policy(json!({"$policy": good()})), Value::Null);
         let row = row_of_check(&report, "$policy", "$well_formed");
         assert_eq!(row["passed"], json!(false));
         assert_eq!(
             row["inputs"][0],
-            json!({"name": "requirement name", "value": ["name reserved"], "locations": []})
+            json!({"name": "requirement name", "value": ["a name can't start with $"], "locations": []})
         );
     }
 
