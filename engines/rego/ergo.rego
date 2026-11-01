@@ -6535,7 +6535,7 @@ else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}
 _s_from_read_of(name, fl, subjects, chains) := object.union(object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)), _s_follows(name, fl, subjects, chains)) if {
 	"path" in object.keys(fl)
 	names := {a | some a in _s_ancestors(name, chains.descend)}
-	keep := names | object.keys(_p_steps_of(object.get(chains.parts, name, {})))
+	keep := names | object.keys(object.get(chains.parts, name, {}))
 	pc := {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}
 	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc), keep), names), pc) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
 	problems := sort(((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {_whose_problem(p) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}))
@@ -8702,7 +8702,7 @@ _name_read(x, name) if {
 
 _for_item_name(check, p) := _input_name(array.concat([substring(p[0], 1, -1)], array.slice(p, 1, count(p)))) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
 
-else := _input_name(p)
+else := _failed_name(p, _for_dotted(check))
 
 _for_verdict(item, w, judged, fails) := _walk_stop(w)[0].cause if {
 	w.walked == set()

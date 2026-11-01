@@ -7480,6 +7480,29 @@ test_a_failed_item_of_an_own_field_named_like_a_part_or_a_for_alias_keeps_the_do
 	[f.path | some r in for_rep.results; r.check == "c"; some f in r.failed_items] == [".y.zs"]
 }
 
+test_the_nested_failed_items_of_a_second_for_line_keep_the_dot_of_an_own_field if {
+	policy := {
+		"ergo_spec": "v0.4-dev",
+		"subjects": {"round": {"from": "rounds", "identified_by": "id"}},
+		"requirements": {"r": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is at least 1"}}}},
+	}
+	rep := ergo.report({"rounds": [{"id": "r1", "y": {"zs": [5, 0]}, "items": [{"id": "i1"}]}]}, policy, {})
+	[i.item | some r in rep.results; r.check == "c"; some f in r.failed_items; some a in f.failed_assertions; some i in a.items] == ["item 2 of .y.zs"]
+}
+
+test_a_part_refused_for_its_value_still_counts_as_the_part_in_the_filter_expression if {
+	policy := {
+		"ergo_spec": "v0.4-dev",
+		"subjects": {
+			"round": {"from": "rounds", "identified_by": "id"},
+			"item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}},
+		},
+		"requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}},
+	}
+	rep := ergo.report({"rounds": [{"id": "r1", "items": [{"id": "i1", "cov": 1}]}]}, policy, {})
+	rep.requirements.r.checks["$applies"].expression == ".cov is 1"
+}
+
 test_an_own_field_named_like_a_for_alias_keeps_its_dot if {
 	policy := {
 		"ergo_spec": "v0.4-dev",
