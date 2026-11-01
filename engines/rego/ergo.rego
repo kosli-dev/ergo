@@ -3364,7 +3364,21 @@ _walk_read_state(subj, path) := _key_state(object.get(subj, path[i].named_by_fie
 	is_object(subj)
 	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
 	_walks_before_field(subj, array.slice(path, 0, i))
+} else := "null" if {
+	is_object(subj)
+	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+	_null_before_field(subj, array.slice(path, 0, i))
 } else := _read_state(subj, path)
+
+_null_before_field(subj, prefix) if {
+	some j, _ in prefix
+	j > _first_key_at(prefix)
+	_resolved(subj, array.slice(prefix, 0, j)) == null
+}
+
+_first_key_at(path) := 1 if _named(path)
+
+else := 0
 
 _walks_before_field(subj, prefix) if {
 	some i, seg in prefix
@@ -8816,6 +8830,10 @@ _for_unread(subj, path, names) := _key_state(object.get(subj, path[i].named_by_f
 	is_object(subj)
 	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
 	_open_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
+} else := "null" if {
+	is_object(subj)
+	i := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+	_null_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
 } else := _walk_read_state(subj, path)
 
 _open_before_field(subj, prefix) if _read_before_field(_resolved(subj, prefix))
