@@ -4297,6 +4297,8 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("count of rows.w named by p is at least 1", "count of rows.w named by p is at least 1", &[], &[]),
+    ("count of zz.x named by p is at least 1", "count of zz.x named by p is at least 1", &[], &[]),
     (
         "days elapsed from n named by p to t is 1",
         "days elapsed from n named by p to t is 1",
@@ -4309,6 +4311,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("days elapsed from zz.x named by p to t is 1", "days elapsed from zz.x named by p to t is 1", &[], &[]),
     (
         "every m named by p is at least 1",
         "every m named by p is at least 1",
@@ -4321,6 +4324,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every rows.w named by p is \"xy\"", "every rows.w named by p is \"xy\"", &[], &[]),
     (
         "every zz named by p is 1",
         "every zz named by p is 1",
@@ -4365,7 +4369,15 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("row.v is zz.x named by p", "row.v equals zz.x named by p", &[], &[]),
+    ("row.w named by p is \"xy\"", "row.w named by p is \"xy\"", &[], &[]),
+    ("rows.w named by p is \"xy\"", "rows.w named by p is \"xy\"", &[], &[]),
     ("some m named by p is 2", "some m named by p is 2", &[], &[]),
+    ("some rows.w named by p is \"xy\"", "some rows.w named by p is \"xy\"", &[], &[]),
+    ("some zz.x named by p is 1", "some zz.x named by p is 1", &[], &[]),
+    ("sum of rows.n named by p is at least 1", "sum of rows.n named by p is at least 1", &[], &[]),
+    ("sum of zz.x named by p is at least 1", "sum of zz.x named by p is at least 1", &[], &[]),
+    ("zz.x named by p plus q is 3", "zz.x named by p plus q is 3", &[], &[]),
     (
         "sum of items.n is not 3 within 0.5",
         "sum of items.n is not 3 within 0.5",

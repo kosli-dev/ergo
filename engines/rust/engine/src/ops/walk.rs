@@ -240,11 +240,18 @@ fn failed(entry: &Entry, cause: Cause, value: Value) -> Raw {
 }
 
 fn before_field(path: &Path, at: usize, ctx: &Ctx) -> Option<Outcome> {
-    let before = Path {
+    let upto = |end: usize| Path {
         start: path.start.clone(),
-        steps: path.steps[..at].to_vec(),
+        steps: path.steps[..end].to_vec(),
     };
-    match path::read(&before, ctx).outcome {
+    let walks = (0..at).any(|end| {
+        matches!(path.steps[end], Step::Key(_))
+            && matches!(path::read(&upto(end), ctx).value, Some(Value::Array(_)))
+    });
+    if walks {
+        return None;
+    }
+    match path::read(&upto(at), ctx).outcome {
         Outcome::Found | Outcome::Null => None,
         outcome => Some(outcome),
     }
