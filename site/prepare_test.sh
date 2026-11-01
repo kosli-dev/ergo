@@ -258,12 +258,26 @@ case $out in
 esac
 says site/prepared/source spec-v0.1
 says site/prepared/data/release.json '{"source": "spec-v0.1", "rego": "0.11.0", "rust": "0.5.0", "spec": "0.2", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": "rust-v0.5.0"}'
+old_layout() {
+  says site/prepared/source "$1"
+  says site/prepared/data/release.json "{\"source\": \"$1\", \"rego\": \"$2\", \"rust\": \"$3\", \"spec\": \"0.1\", \"ergo_spec\": \"v0.1\", \"opa\": \"\", \"cli\": \"\"}"
+  lacks site/prepared/repo/OPA.md
+  lacks site/prepared/repo/CLI.md
+}
+out=$(FAKE_RELEASES="rego-v0.1.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.1.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
+case $out in
+  *"the site keeps the old layout, from rego-v0.1.0, with no OPA or CLI page"*) ;;
+  *)
+    echo "prepare.sh should keep the old layout when the spec has OPA.md and the rego release hasn't, and said: $out" >&2
+    exit 1
+    ;;
+esac
+old_layout rego-v0.1.0 0.1.0 0.5.0
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag --force spec-v0.1 rego-v0.1.0 > /dev/null
 FAKE_RELEASES="rego-v0.11.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh > /dev/null
-says site/prepared/source rego-v0.11.0
-says site/prepared/data/release.json '{"source": "rego-v0.11.0", "rego": "0.11.0", "rust": "0.5.0", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": "rust-v0.5.0"}'
-has site/prepared/repo/OPA.md
-has site/prepared/repo/CLI.md
+old_layout rego-v0.11.0 0.11.0 0.5.0
+FAKE_RELEASES="rego-v0.1.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.1.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh > /dev/null
+old_layout rego-v0.1.0 0.1.0 0.5.0
 git tag --delete spec-v0.2 rego-v0.11.0 rust-v0.5.0 > /dev/null
 git tag --delete spec-v0.1 > /dev/null
 (FAKE_RELEASES="rego-v0.10.0 spec-v0.1"; FAKE_ASSET_VERSION=0.10.0; expected="There's no spec-v0.1 tag here. Fetch the tags with: git fetch --tags"; fails)

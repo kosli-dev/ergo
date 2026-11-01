@@ -78,23 +78,21 @@ if [ "$mode" = release ]; then
   done
   docs_tag=$rego_tag
   ergo_tag=$rego_tag
-  if [ -n "$found_spec" ] && in_tag "$found_spec" OPA.md; then
-    docs_tag=$found_spec
-    ergo_tag=$found_ergo
-    [ "$found_spec" = "$spec_tag" ] || echo "No published rego release reads $spec_tag yet, so the docs and the tutorial come from $found_spec, which $found_ergo reads"
-  fi
   opa_source=
   cli_source=
-  if in_tag "$rego_tag" OPA.md; then
+  if [ -n "$found_spec" ] && in_tag "$found_spec" OPA.md && in_tag "$rego_tag" OPA.md; then
+    docs_tag=$found_spec
+    ergo_tag=$found_ergo
     opa_source=$rego_tag
+    [ "$found_spec" = "$spec_tag" ] || echo "No published rego release reads $spec_tag yet, so the docs and the tutorial come from $found_spec, which $found_ergo reads"
+    if [ -n "$rust_tag" ] && in_tag "$rust_tag" CLI.md; then
+      cli_source=$rust_tag
+    else
+      echo "The latest releases don't all have OPA.md and CLI.md yet, so the site has no page from CLI.md"
+    fi
+  else
+    echo "The latest releases don't all have OPA.md and CLI.md yet, so the site keeps the old layout, from $rego_tag, with no OPA or CLI page"
   fi
-  if [ -n "$rust_tag" ] && in_tag "$rust_tag" CLI.md; then
-    cli_source=$rust_tag
-  fi
-  missing=
-  [ -n "$opa_source" ] || missing=OPA.md
-  [ -n "$cli_source" ] || missing="${missing:+$missing and }CLI.md"
-  [ -z "$missing" ] || echo "The latest releases don't all have OPA.md and CLI.md yet, so the site has no page from $missing"
   tag=$docs_tag
   version=${ergo_tag#rego-v}
 

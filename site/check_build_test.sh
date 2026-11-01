@@ -200,4 +200,16 @@ fits "a release without a CLI page builds three pages"
 printf '<a href=../cli/>Ergo CLI</a>\n' >> "$dir/public/docs/getting-started/index.html"
 fails "docs/getting-started/ links to docs/cli/, which wasn't built"
 
+build
+mkdir -p "$dir/site/prepared/repo"
+touch "$dir/site/prepared/repo/README.md" "$dir/site/prepared/repo/REFERENCE.md"
+docs_page getting-started rego-v0.1.0 README.md
+docs_page reference rego-v0.1.0 REFERENCE.md
+printf '<h2 id=checks>Checks</h2>\n' >> "$dir/public/docs/reference/index.html"
+printf '<a href=../reference/#checks>Checks</a> <a href=#top>Top</a>\n' >> "$dir/public/docs/getting-started/index.html"
+printf '<h1 id=top>Top</h1>\n' >> "$dir/public/docs/getting-started/index.html"
+fits "a link to a heading that exists"
+printf '<a href=../reference/#nothing>Nothing</a>\n' >> "$dir/public/docs/getting-started/index.html"
+fails "docs/getting-started/ links to #nothing of docs/reference/, which has no such heading"
+
 echo "check_build.py fails when the built site doesn't show what was prepared"

@@ -119,6 +119,13 @@ for built_page in sorted((public / "docs").glob("*/index.html")):
         if not (public / "docs" / target / "index.html").exists():
             problems.append(f"docs/{built_page.parent.name}/ links to docs/{target}/, which wasn't built")
 
+docs_ids = {page.parent.name: set(re.findall(r"""\bid=["']?([^\s"'>]+)""", page.read_text(errors="replace"))) for page in (public / "docs").glob("*/index.html")}
+for built_page in sorted((public / "docs").glob("*/index.html")):
+    for target, anchor in sorted(set(re.findall(r"""href=["']?(?:(?:\.\./|/docs/)([a-z-]+)/)?#([^\s"'>]+)""", built_page.read_text(errors="replace")))):
+        target = target or built_page.parent.name
+        if target in docs_ids and anchor not in docs_ids[target]:
+            problems.append(f"docs/{built_page.parent.name}/ links to #{anchor} of docs/{target}/, which has no such heading")
+
 if problems:
     print("\n".join(problems))
     raise SystemExit(1)
