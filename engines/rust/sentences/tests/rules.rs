@@ -968,3 +968,37 @@ fn a_comparison_with_itself_is_listed_next_to_an_unknown_name_and_next_to_no_oth
         ]
     );
 }
+
+#[test]
+fn followed_by_takes_text_and_goes_where_text_goes() {
+    assert_eq!(problems("x is \"a\" followed by y"), none());
+    assert_eq!(problems("x starts with y followed by \"a\""), none());
+    assert_eq!(
+        problems("x is \"a\" followed by 1"),
+        one("\"followed by\" takes text")
+    );
+    assert_eq!(
+        problems("x is null followed by y"),
+        one("\"followed by\" takes text")
+    );
+    assert_eq!(
+        problems("x is at least \"a\" followed by y"),
+        one("\"is at least\" can't take followed by")
+    );
+    assert_eq!(
+        problems("x is before \"a\" followed by y"),
+        one("\"is before\" can't take followed by")
+    );
+    assert_eq!(
+        problems("x is \"a\" followed by y within 1"),
+        one("\"within\" can't take followed by")
+    );
+    assert_eq!(
+        problems("count of xs is \"a\" followed by y"),
+        one("\"followed by\" can't follow a count of, a sum of or a plus")
+    );
+    assert_eq!(
+        problems("x is y plus 1 followed by \"a\""),
+        one("\"followed by\" can't take a count of, a sum of or a plus")
+    );
+}

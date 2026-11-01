@@ -50,6 +50,19 @@ test("the grammar words that can come next are the ones the parser still reads",
   assert.ok(texts(at("every xs |", { kind: "for" }), "word").includes("as"));
 });
 
+test("the words of the negative phrases are suggested after does not and is not", () => {
+  const after = (head) => texts(at(`x ${head} |`), "word");
+  for (const w of ["start", "end", "contain", "equal", "match", "exist"]) assert.ok(after("does not").includes(w), w);
+  for (const w of ["a", "an", "between", "one", "in", "empty"]) assert.ok(after("is not").includes(w), w);
+  assert.ok(texts(at("x is y |"), "word").includes("followed"));
+  assert.deepEqual(texts(at("x is y followed |"), "word"), ["by"]);
+  assert.ok(after("contains").includes("some"));
+  assert.ok(after("does not contain").includes("all"));
+  assert.ok(after("is alphabetically").includes("on"));
+  assert.deepEqual(texts(at("x is alphabetically on |"), "word"), ["or"]);
+  assert.deepEqual(texts(at("x does not start |"), "word"), ["with"]);
+});
+
 test("words the corpus uses are suggested where it uses them", () => {
   let wanted = 0;
   let found = 0;

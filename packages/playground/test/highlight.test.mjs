@@ -20,6 +20,18 @@ test("the grammar words are the words spec/sentences.abnf spells out", () => {
   assert.deepEqual([...GRAMMAR_WORDS].sort(), [...words].sort());
 });
 
+test("the words of the negative phrases are marked as grammar words", () => {
+  const words = (line) => sentenceTokens(line).filter((t) => t.kind === "word").map((t) => t.text);
+  assert.deepEqual(words('x does not start with "a"'), ["does", "not", "start", "with"]);
+  assert.deepEqual(words("x does not end with y"), ["does", "not", "end", "with"]);
+  assert.deepEqual(words("x contains some of 1, 2"), ["contains", "some", "of"]);
+  assert.deepEqual(words("x does not contain all of 1"), ["does", "not", "contain", "all", "of"]);
+  assert.deepEqual(words("x is alphabetically on or before y"), ["is", "alphabetically", "on", "or", "before"]);
+  assert.deepEqual(words("x is not between 1 and 2"), ["is", "not", "between", "and"]);
+  assert.deepEqual(words('x is "v" followed by y'), ["is", "followed", "by"]);
+  assert.deepEqual(words("x is not a non-empty string"), ["is", "not", "a", "non-empty", "string"]);
+});
+
 test("a sentence marks its grammar words, strings and numbers", () => {
   assert.deepEqual(sentenceTokens('allergens does not contain "nuts"'), [
     tokens("plain", "allergens "),

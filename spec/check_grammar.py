@@ -30,6 +30,10 @@ NON_SYNTAX = [
         r"^it is the whole subject: ",
         r"^it can only start an assertion: ",
         r"^it can't name a key$",
+        r'^"[^"]*" can\'t take followed by$',
+        r'^"followed by" can\'t take a count of, a sum of or a plus$',
+        r'^"followed by" can\'t follow a count of, a sum of or a plus$',
+        r'^"followed by" isn\'t supported yet after every or some, or in a whose$',
     ]
 ]
 

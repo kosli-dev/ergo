@@ -73,25 +73,34 @@ pub fn read_path(path: &Path, ctx: &Ctx) -> ReadPath {
         locations: read.location.iter().map(|l| l.render()).collect(),
         part: path::part_tag(path, ctx).map(|(name, id)| Part { name, id }),
     }];
-    if !ctx.aliases.contains_key(path::OUTER) {
-        for step in &path.steps {
-            if let Step::Field(field) = step {
-                let found = path::read(field, ctx);
-                inputs.push(Input {
-                    name: name::name(field),
-                    value: found.value.cloned().unwrap_or(Value::Null),
-                    locations: found.location.iter().map(|l| l.render()).collect(),
-                    part: None,
-                });
-            }
-        }
-    }
+    inputs.extend(field_inputs(path, ctx));
     ReadPath {
         outcome: read.outcome,
         step_unreadable: read.step_unreadable,
         value,
         inputs,
     }
+}
+
+pub fn field_inputs(path: &Path, ctx: &Ctx) -> Vec<Input> {
+    if ctx.aliases.contains_key(path::OUTER) {
+        return Vec::new();
+    }
+    path.steps
+        .iter()
+        .filter_map(|step| match step {
+            Step::Field(field) => {
+                let found = path::read(field, ctx);
+                Some(Input {
+                    name: name::name(field),
+                    value: found.value.cloned().unwrap_or(Value::Null),
+                    locations: found.location.iter().map(|l| l.render()).collect(),
+                    part: None,
+                })
+            }
+            _ => None,
+        })
+        .collect()
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -122,13 +131,13 @@ pub struct SidePath<'a> {
 impl Check {
     pub fn sides(&self) -> Vec<Vec<SidePath<'_>>> {
         fn plain(side: &compare::Side) -> Vec<SidePath<'_>> {
-            match side {
-                compare::Side::Path(path) => vec![SidePath {
+            side.paths()
+                .into_iter()
+                .map(|path| SidePath {
                     path,
                     needs_list: false,
-                }],
-                compare::Side::Value(_) => Vec::new(),
-            }
+                })
+                .collect()
         }
         match self {
             Check::Compare(check) => vec![plain(&check.left), plain(&check.right)],
@@ -153,11 +162,11 @@ impl Check {
             Check::Range(check) => Some(&check.path),
             Check::Compare(check) => match &check.left {
                 compare::Side::Path(path) => Some(path),
-                compare::Side::Value(_) => None,
+                compare::Side::Value(_) | compare::Side::Join(_) => None,
             },
             Check::CompareTime(check) => match &check.left {
                 compare::Side::Path(path) => Some(path),
-                compare::Side::Value(_) => None,
+                compare::Side::Value(_) | compare::Side::Join(_) => None,
             },
             Check::In(check) => Some(&check.path),
             Check::Contains(check) => Some(&check.path),
@@ -171,23 +180,17 @@ impl Check {
     }
 
     pub fn paths(&self) -> Vec<&Path> {
-        fn side(side: &compare::Side) -> Option<&Path> {
-            match side {
-                compare::Side::Path(path) => Some(path),
-                compare::Side::Value(_) => None,
-            }
-        }
         match self {
             Check::Present(check) => vec![&check.path],
             Check::Equals(check) => vec![&check.path],
             Check::Range(check) => vec![&check.path],
             Check::Compare(check) => [&check.left, &check.right]
                 .into_iter()
-                .filter_map(side)
+                .flat_map(compare::Side::paths)
                 .collect(),
             Check::CompareTime(check) => [&check.left, &check.right]
                 .into_iter()
-                .filter_map(side)
+                .flat_map(compare::Side::paths)
                 .collect(),
             Check::Tally(check) => check.paths(),
             Check::AnyOf(check) => check.paths(),
@@ -239,7 +242,10 @@ impl Check {
                 path: left,
                 ..check.clone()
             }),
-            Check::NonEmptyString(_) => Check::NonEmptyString(kinds::NonEmptyString { path: left }),
+            Check::NonEmptyString(check) => Check::NonEmptyString(kinds::NonEmptyString {
+                path: left,
+                ..check.clone()
+            }),
             Check::Empty(check) => Check::Empty(kinds::Empty {
                 path: left,
                 ..check.clone()

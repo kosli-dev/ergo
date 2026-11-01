@@ -5226,6 +5226,76 @@ _within_cause(x, y, w) := cause if {
 	cause := rows[0]
 }
 
+_not_within_cause(x, y, w) := cause if {
+	rows := [row[1] | some row in _tally_rows(concat("", ["x does not equal y within ", w]), [{"id": 1, "x": x, "y": y}], {})]
+	cause := rows[0]
+}
+
+test_a_gap_is_not_within_when_it_is_further_than_the_number_on_both_sides_of_the_boundary if {
+	_not_within_cause(12345678901234567890.5, 12345678901234567890.4, "0.1") == "value"
+	_not_within_cause(12345678901234567890.5, 12345678901234567890.4, "0.09") == "satisfied"
+	_not_within_cause(0.3, 0.1, "0.2") == "value"
+	_not_within_cause(0.3, 0.1, "0.19") == "satisfied"
+	_not_within_cause(1, 5, "1") == "satisfied"
+	_not_within_cause(-1, 1, "1") == "satisfied"
+}
+
+test_a_gap_that_cannot_be_worked_out_is_unusable_for_not_within_as_well if {
+	_not_within_cause(1e5000, 1, "1") == "unusable"
+	_not_within_cause(1, 1e5000, "1") == "unusable"
+	_not_within_cause(1e4096, 1, "1") == "satisfied"
+	_not_within_cause(1e4096, 1e4096, "1") == "value"
+}
+
+test_the_phrase_table_has_no_more_entries_than_opas_wasm_regex_cache_takes_in_a_report_of_hundreds_of_patterns if count(ergo._s_patterns.phrases) == 29
+
+test_each_new_phrase_reads_into_its_op if {
+	_read(`x is not a list`).assertions[0].phrase == {"op": "is not a", "type": "list"}
+	_read(`x is not an object`).assertions[0].phrase == {"op": "is not a", "type": "object"}
+	_read(`x is not a non-empty string`).assertions[0].phrase == {"op": "is not a non-empty string"}
+	_read(`x is not between 1 and 2`).assertions[0].phrase == {"op": "is not between", "min": 1, "max": 2}
+	_read(`x is not 1 within 2`).assertions[0].phrase == {"op": "is not", "value": 1, "within": 2}
+	_read(`x does not equal y within 2`).assertions[0].phrase == {"op": "is not", "terms": [{"steps": ["y"]}], "within": 2}
+	_read(`x contains some of "a", "b"`).assertions[0].phrase == {"op": "contains some of", "values": ["a", "b"]}
+	_read(`x does not contain all of $params.k`).assertions[0].phrase == {"op": "does not contain all of", "path": {"start": "params", "steps": ["k"]}}
+	_read(`x does not start with "a"`).assertions[0].phrase == {"op": "does not start with", "value": "a"}
+	_read(`x does not end with y`).assertions[0].phrase == {"op": "does not end with", "terms": [{"steps": ["y"]}]}
+	_read(`x is alphabetically on or before "a"`).assertions[0].phrase == {"op": "is alphabetically on or before", "value": "a"}
+	_read(`x is alphabetically on or after y`).assertions[0].phrase == {"op": "is alphabetically on or after", "terms": [{"steps": ["y"]}]}
+}
+
+test_every_new_phrase_prints_back_as_written_with_its_own_article_and_spacing if {
+	every sentence in [
+		`x is not a list`,
+		`x is not an object`,
+		`x is not a non-empty string`,
+		`x is not between 1 and 2`,
+		`x is not 1 within 2`,
+		`x does not equal y within 2`,
+		`x contains some of "a", "b"`,
+		`x does not contain all of y`,
+		`x does not start with "a"`,
+		`x does not end with y`,
+		`x is alphabetically on or before "a"`,
+		`x is alphabetically on or after y`,
+		`count of x is not between 1 and 2`,
+		`count of x is not 3 within 1`,
+	] {
+		_printed(sentence) == sentence
+	}
+}
+
+test_the_negative_phrases_never_pass_on_a_field_that_is_null_or_missing if {
+	every sentence in [`x does not start with "a"`, `x does not end with "a"`, `x is alphabetically on or before "a"`, `x is alphabetically on or after "a"`, `x is not between 1 and 2`, `x is not 1 within 1`, `x contains some of 1`, `x does not contain all of 1`, `x is not a string`, `x is not a non-empty string`] {
+		every subject in [{"x": null}, {}] {
+			rows := _tally_rows(sentence, [object.union(subject, {"id": 1})], {})
+			every row in rows {
+				row[1] != "satisfied"
+			}
+		}
+	}
+}
+
 test_within_reads_numbers_opa_counts_as_equal_by_their_digits if {
 	_within_cause(1234567890.1209567990, 0, "1234567890.1209567890") == "value"
 	_within_cause(123964818.71664440535747000531389400, 123964818.7166444053574700053138940000000000000002244422625687264764923070, "0.0000000000000000000000000000000000000002244422625687264764923069") == "value"

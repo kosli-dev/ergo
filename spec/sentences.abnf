@@ -47,7 +47,8 @@ derived-left      = derived [WS whose]
                   / 1*(term WS "plus" WS) (term / derived WS whose)
 field             = (right-path / derived / elapsed) *(WS "plus" WS term)
                   / number 1*(WS "plus" WS term)
-operand           = value / field
+operand           = value / field / joined
+joined            = (value / field) 1*(WS "followed" WS "by" WS (value / right-path))
 
 ; Phrases. compare-phrase is the subset a derived value can take.
 phrase            = one-of-phrase / exists-phrase / empty-phrase / type-phrase
@@ -57,20 +58,20 @@ compare-phrase    = within-phrase / order-phrase / between-phrase / is-phrase
 
 is-phrase         = ("is" WS "not" / "does" WS "not" WS "equal") WS operand
                   / ("is" WS "equal" WS "to" / "equals" / "is") WS operand
-within-phrase     = ("is" WS "equal" WS "to" / "equals" / "is") WS operand WS "within" WS number
+within-phrase     = ("is" WS "equal" WS "to" / "equals" / "is" / "is" WS "not" / "does" WS "not" WS "equal") WS operand WS "within" WS number
 order-phrase      = ("is" WS "at" WS "least" / "is" WS "at" WS "most" / "is" WS "more" WS "than" / "is" WS "less" WS "than") WS operand
-between-phrase    = "is" WS "between" WS number WS "and" WS number
+between-phrase    = "is" WS ["not" WS] "between" WS number WS "and" WS number
 one-of-phrase     = ("is" WS "one" WS "of" / "is" WS "in") WS list
                   / ("is" WS "not" WS "one" WS "of" / "is" WS "not" WS "in") WS list
 exists-phrase     = "exists" / "does" WS "not" WS "exist"
 empty-phrase      = "is" WS "empty" / "is" WS "not" WS "empty"
-type-phrase       = "is" WS "a" WS "non-empty" WS "string" / "is" WS ("a" / "an") WS type
+type-phrase       = "is" WS ["not" WS] "a" WS "non-empty" WS "string" / "is" WS ["not" WS] ("a" / "an") WS type
 type              = "list" / "string" / "number" / "boolean" / "object"
 contains-phrase   = ("contains" / "does" WS "not" WS "contain") WS operand
-contains-all-phrase = ("contains" WS "all" WS "of" / "contains" WS "none" WS "of") WS list
+contains-all-phrase = ("contains" WS "all" WS "of" / "contains" WS "none" WS "of" / "contains" WS "some" WS "of" / "does" WS "not" WS "contain" WS "all" WS "of") WS list
 matches-phrase    = ("matches" / "does" WS "not" WS "match") WS list
-starts-phrase     = ("starts" WS "with" / "ends" WS "with") WS operand
-alphabetical-phrase = "is" WS "alphabetically" WS ("before" / "after") WS operand
+starts-phrase     = ("starts" WS "with" / "ends" WS "with" / "does" WS "not" WS "start" WS "with" / "does" WS "not" WS "end" WS "with") WS operand
+alphabetical-phrase = "is" WS "alphabetically" WS ("before" / "after" / "on" WS "or" WS "before" / "on" WS "or" WS "after") WS operand
 time-phrase       = ("is" WS "before" / "is" WS "after" / "is" WS "on" WS "or" WS "after" / "is" WS "on" WS "or" WS "before") WS operand
 
 list              = values / right-path

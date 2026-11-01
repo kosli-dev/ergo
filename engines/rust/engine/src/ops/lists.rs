@@ -14,6 +14,7 @@ pub enum Right {
     Written(Value),
     Ref(Path),
     Field(Path),
+    Join(Vec<Right>),
 }
 
 impl Right {
@@ -25,6 +26,7 @@ impl Right {
                 .collect(),
             Right::Ref(path) => step_refs(path),
             Right::Field(path) => step_refs(path),
+            Right::Join(pieces) => pieces.iter().flat_map(Right::refs).collect(),
         }
     }
 }
@@ -40,6 +42,7 @@ pub struct In {
 pub enum Wanted {
     One(Right),
     All(Right),
+    Some(Right),
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -57,10 +60,11 @@ pub struct Matches {
 }
 
 impl Right {
-    fn shown_path(&self) -> Option<&Path> {
+    fn shown_paths(&self) -> Vec<&Path> {
         match self {
-            Right::Written(_) | Right::Ref(_) => None,
-            Right::Field(path) => Some(path),
+            Right::Written(_) | Right::Ref(_) => Vec::new(),
+            Right::Field(path) => vec![path],
+            Right::Join(pieces) => pieces.iter().flat_map(Right::shown_paths).collect(),
         }
     }
 }
@@ -68,7 +72,7 @@ impl Right {
 impl In {
     pub fn paths(&self) -> Vec<&Path> {
         std::iter::once(&self.path)
-            .chain(self.values.shown_path())
+            .chain(self.values.shown_paths())
             .collect()
     }
 
@@ -83,16 +87,16 @@ impl In {
 impl Contains {
     pub fn paths(&self) -> Vec<&Path> {
         let right = match &self.wanted {
-            Wanted::One(right) | Wanted::All(right) => right,
+            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => right,
         };
         std::iter::once(&self.path)
-            .chain(right.shown_path())
+            .chain(right.shown_paths())
             .collect()
     }
 
     pub fn refs(&self) -> Vec<Path> {
         let right = match &self.wanted {
-            Wanted::One(right) | Wanted::All(right) => right,
+            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => right,
         };
         step_refs(&self.path)
             .into_iter()
@@ -104,7 +108,7 @@ impl Contains {
 impl Matches {
     pub fn paths(&self) -> Vec<&Path> {
         std::iter::once(&self.path)
-            .chain(self.patterns.shown_path())
+            .chain(self.patterns.shown_paths())
             .collect()
     }
 
@@ -143,6 +147,38 @@ fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
                 outcome: read.outcome,
                 value: read.value,
                 inputs: read.inputs,
+            }
+        }
+        Right::Join(pieces) => {
+            let reads: Vec<RightRead> = pieces.iter().map(|p| read_right(p, ctx)).collect();
+            let inputs = reads
+                .iter()
+                .flat_map(|r| r.inputs.iter().cloned())
+                .collect();
+            let mut text = String::new();
+            for read in &reads {
+                match (read.outcome, &read.value) {
+                    (Outcome::Found, Some(Value::String(piece))) => text.push_str(piece),
+                    (Outcome::Found, _) => {
+                        return RightRead {
+                            outcome: Outcome::Found,
+                            value: None,
+                            inputs,
+                        };
+                    }
+                    (outcome, _) => {
+                        return RightRead {
+                            outcome,
+                            value: None,
+                            inputs,
+                        };
+                    }
+                }
+            }
+            RightRead {
+                outcome: Outcome::Found,
+                value: Some(Value::String(text)),
+                inputs,
             }
         }
     }
@@ -193,7 +229,7 @@ fn ref_read(right: &Right, ctx: &Ctx) -> Option<Value> {
                 _ => None,
             }
         }
-        Right::Written(_) | Right::Field(_) => None,
+        Right::Written(_) | Right::Field(_) | Right::Join(_) => None,
     }
 }
 
@@ -221,7 +257,9 @@ impl Contains {
     pub fn flawed(&self, ctx: &Ctx) -> bool {
         match &self.wanted {
             Wanted::One(_) => false,
-            Wanted::All(right) => ref_read(right, ctx).is_some_and(|v| !usable_values(&v, true)),
+            Wanted::All(right) | Wanted::Some(right) => {
+                ref_read(right, ctx).is_some_and(|v| !usable_values(&v, true))
+            }
         }
     }
 }
@@ -260,7 +298,7 @@ pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
 pub fn run_contains(check: &Contains, ctx: &Ctx) -> Verdict {
     let (right, all) = match &check.wanted {
         Wanted::One(right) => (right, false),
-        Wanted::All(right) => (right, true),
+        Wanted::All(right) | Wanted::Some(right) => (right, true),
     };
     judged(&check.path, right, ctx, |wanted, outcome, found| {
         let wanted: Vec<Value> = if all {
@@ -285,10 +323,11 @@ pub fn run_contains(check: &Contains, ctx: &Ctx) -> Verdict {
         let held = wanted
             .iter()
             .map(|w| value::any_equal(items.iter().map(|item| value::equal(item, w))));
-        let decided = if check.not {
-            value::any_equal(held).map(|any| !any)
-        } else {
-            value::all_equal(held)
+        let decided = match (&check.wanted, check.not) {
+            (Wanted::Some(_), false) => value::any_equal(held),
+            (Wanted::Some(_), true) => value::all_equal(held).map(|all| !all),
+            (_, true) => value::any_equal(held).map(|any| !any),
+            (_, false) => value::all_equal(held),
         };
         decided.map_or(Cause::Unusable, verdict)
     })
@@ -369,6 +408,22 @@ fn operand_right(operand: &tree::Operand, scope: &Scope) -> Option<Result<Right,
             [tree::Term::Path(p)] => Some(path_right(p, scope)),
             _ => None,
         },
+        tree::Operand::Joined(pieces) => {
+            let mut rights = Vec::new();
+            let mut problems = Vec::new();
+            for piece in pieces {
+                match operand_right(piece, scope) {
+                    Some(Ok(right)) => rights.push(right),
+                    Some(Err(found)) => problems.extend(found),
+                    None => return None,
+                }
+            }
+            Some(if problems.is_empty() {
+                Ok(Right::Join(rights))
+            } else {
+                Err(problems)
+            })
+        }
     }
 }
 
@@ -399,6 +454,12 @@ pub fn lower_phrase(
         tree::Phrase::ContainsNone(list) => {
             contains(one_typed(list_right(list, scope)).map(Wanted::All), true)
         }
+        tree::Phrase::ContainsSome(list) => {
+            contains(one_typed(list_right(list, scope)).map(Wanted::Some), false)
+        }
+        tree::Phrase::NotContainsAll(list) => {
+            contains(one_typed(list_right(list, scope)).map(Wanted::Some), true)
+        }
         tree::Phrase::Matches { not, list } => {
             joined(left(), list_right(list, scope)).map(|(path, patterns)| {
                 Check::Matches(Matches {
@@ -408,7 +469,7 @@ pub fn lower_phrase(
                 })
             })
         }
-        tree::Phrase::Type(kind) => left().map(|path| {
+        tree::Phrase::Type(kind) | tree::Phrase::NotType(kind) => left().map(|path| {
             Check::HasType(HasType {
                 path,
                 kind: match kind {
@@ -418,11 +479,15 @@ pub fn lower_phrase(
                     tree::Type::Boolean => Kind::Boolean,
                     tree::Type::Object => Kind::Object,
                 },
+                not: matches!(phrase, tree::Phrase::NotType(_)),
             })
         }),
-        tree::Phrase::NonEmptyString => {
-            left().map(|path| Check::NonEmptyString(NonEmptyString { path }))
-        }
+        tree::Phrase::NonEmptyString | tree::Phrase::NotNonEmptyString => left().map(|path| {
+            Check::NonEmptyString(NonEmptyString {
+                path,
+                not: matches!(phrase, tree::Phrase::NotNonEmptyString),
+            })
+        }),
         tree::Phrase::Empty { not } => left().map(|path| Check::Empty(Empty { path, not: *not })),
         _ => return None,
     })
@@ -666,6 +731,104 @@ mod tests {
     }
 
     #[test]
+    fn contains_a_joined_string_looks_for_the_pieces_put_together() {
+        let joined = || {
+            Wanted::One(Right::Join(vec![
+                written(json!("x")),
+                Right::Field(key_path(Start::Subject, &["y"])),
+            ]))
+        };
+        assert_eq!(
+            contains(json!({"x": ["x1", "b"], "y": "1"}), joined(), false),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            contains(json!({"x": ["x1", "b"], "y": "1"}), joined(), true),
+            Cause::Value
+        );
+        assert_eq!(
+            contains(json!({"x": ["a"], "y": "1"}), joined(), true),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            contains(json!({"x": ["a"], "y": 1}), joined(), false),
+            Cause::Unusable
+        );
+        assert_eq!(
+            contains(json!({"x": ["a"]}), joined(), false),
+            Cause::Absent
+        );
+        assert_eq!(
+            contains(json!({"x": "a", "y": null}), joined(), false),
+            Cause::Null
+        );
+        assert_eq!(
+            contains(json!({"x": "a", "y": "1"}), joined(), false),
+            Cause::Unusable
+        );
+    }
+
+    #[test]
+    fn contains_some_of_needs_one_value_and_not_all_of_needs_one_missing() {
+        let some = Wanted::Some(written(json!(["b", "a"])));
+        assert_eq!(
+            contains(json!({"x": ["a", "c"]}), some.clone(), false),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            contains(json!({"x": ["c"]}), some.clone(), false),
+            Cause::Value
+        );
+        assert_eq!(
+            contains(json!({"x": []}), some.clone(), false),
+            Cause::Value
+        );
+        assert_eq!(
+            contains(json!({"x": ["a", "c"]}), some.clone(), true),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            contains(json!({"x": []}), some.clone(), true),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            contains(json!({"x": ["b", "a", "c"]}), some, true),
+            Cause::Value
+        );
+    }
+
+    #[test]
+    fn contains_some_of_and_not_all_of_never_pass_on_a_field_that_cannot_be_read_as_a_list() {
+        let some = Wanted::Some(written(json!(["a"])));
+        for not in [false, true] {
+            assert_eq!(
+                contains(json!({"x": "a"}), some.clone(), not),
+                Cause::Unusable
+            );
+            assert_eq!(
+                contains(json!({"x": ["a", 1]}), some.clone(), not),
+                Cause::Unusable
+            );
+            assert_eq!(contains(json!({}), some.clone(), not), Cause::Absent);
+            assert_eq!(contains(json!({"x": null}), some.clone(), not), Cause::Null);
+        }
+    }
+
+    #[test]
+    fn a_field_of_values_for_contains_some_of_fails_as_unusable_when_empty_or_not_a_list() {
+        let field = || Wanted::Some(Right::Field(key_path(Start::Subject, &["ys"])));
+        for ys in [json!([]), json!("a"), json!(["a", 1])] {
+            for not in [false, true] {
+                assert_eq!(
+                    contains(json!({"x": ["a"], "ys": ys.clone()}), field(), not),
+                    Cause::Unusable,
+                    "{ys}"
+                );
+            }
+        }
+    }
+
+    #[test]
     fn values_read_as_an_empty_list_a_non_list_or_mixed_types_fail_as_unusable() {
         let field = || Wanted::All(Right::Field(key_path(Start::Subject, &["ys"])));
         for ys in [json!([]), json!("a"), json!(["a", 1])] {
@@ -880,6 +1043,46 @@ mod tests {
                 other => panic!("{sentence}: {other:?}"),
             }
         }
+    }
+
+    #[test]
+    fn contains_some_of_and_does_not_contain_all_of_read_into_contains_some() {
+        for (sentence, not) in [
+            ("x contains some of \"a\", \"b\"", false),
+            ("x does not contain all of ys", true),
+        ] {
+            match lowered_check(sentence) {
+                Check::Contains(c) => {
+                    assert!(matches!(c.wanted, Wanted::Some(_)), "{sentence}");
+                    assert_eq!(c.not, not, "{sentence}");
+                }
+                other => panic!("{sentence}: {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn is_not_a_type_and_is_not_a_non_empty_string_read_into_their_checks() {
+        assert!(matches!(
+            lowered_check("x is not a list"),
+            Check::HasType(HasType {
+                kind: Kind::List,
+                not: true,
+                ..
+            })
+        ));
+        assert!(matches!(
+            lowered_check("x is not an object"),
+            Check::HasType(HasType {
+                kind: Kind::Object,
+                not: true,
+                ..
+            })
+        ));
+        assert!(matches!(
+            lowered_check("x is not a non-empty string"),
+            Check::NonEmptyString(NonEmptyString { not: true, .. })
+        ));
     }
 
     #[test]

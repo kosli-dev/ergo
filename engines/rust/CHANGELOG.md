@@ -4,8 +4,14 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ## 0.2.0 (not released yet)
 
+### New
+
+- Every phrase that lacked an opposite has one, as spec 0.4 says: `does not start with`, `does not end with`, `is not a <type>`, `is not a non-empty string`, `is not between`, `is not <value> within <number>`, `does not equal <field> within <number>`, `contains some of` and `does not contain all of`, plus `is alphabetically on or before` and `is alphabetically on or after`. The sentence reader's `Phrase` has the variants `NotStartsWith`, `NotEndsWith`, `NotType`, `NotNonEmptyString`, `ContainsSome` and `NotContainsAll`, `Between` has a `not` field and `Alphabetically` an `or_equal` field. A count, a sum, a plus or an elapsed time can now be followed by `is not ... within` too, which the engine refused before.
+- Text can be joined on the right side with `followed by`, as spec 0.4 says: `rego.version is tag.version followed by "-dev"`. The sentence reader's `Operand` has a new variant `Joined`, with the pieces in order, and `compare` and `contains` read it.
+
 ### Changed
 
+- A path that names its key by a field lists the field in a row's `inputs` for a `count of`, a `sum of`, an `every` and a `some` too, right after the list's entry, and the check of a `for` line keeps its whole path, `m named by p` and then `p`, where it showed only `m`, as spec 0.4 says. When the path before the field can't be read, an `every` or `some` fails with that path's cause, not the field's, so `every zz.x named by p is 1` with `zz` missing or a string is `absent` or `unusable` when `p` is `null`, where it was `null`. A list it walks before the field doesn't count, so `every rows.w named by k is "xy"` still fails as `null` when `k` is `null`. With `rows` `null` it fails as `null` whatever `k` holds, where a missing or number `k` gave `absent` or `unusable`, and `failed_items` names `rows`, where it was empty when `k` couldn't be read. A `for` line whose own path has such a field, like `every rows.w named by p as w`, lists `p` too, sorted with the rest by name, as `ergo.rego` does. A `plus` or an elapsed time that reads such a path no longer has the field's location in its own entry, as spec 0.4 says. Reports change for such policies.
 - The report's `engine` name is `ergo-rust`, where it was `ergo-policy-engine`, so it matches the Rego engine's `ergo-rego` and the `rust-v*` tag. Every report changes in that field only, and the hash leaves `engine` out, so hashes stay the same. The version is the same.
 - The engine follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released.
 - An empty name, `""`, is written wrong too, whether it names a requirement, a check, an `any_of` option or a part, with `a name can't be empty`.

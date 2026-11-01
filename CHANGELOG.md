@@ -4,6 +4,11 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 ## 0.4.0
 
+### New
+
+- Every phrase that lacked an opposite has one, as spec 0.4 says: `does not start with`, `does not end with`, `is not a <type>`, `is not a non-empty string`, `is not between`, `is not <value> within <number>`, `does not equal <field> within <number>`, `contains some of` and `does not contain all of`, plus `is alphabetically on or before` and `is alphabetically on or after`. Each fails as its opposite does when a field is missing, `null` or of the wrong type. A sentence like `x is not 3 within 1` was written wrong before and reads now, after a `count of`, a `sum of`, a `plus` or an elapsed time too (`count of x is not 3 within 1`), and a `compare` with `ne` can have a `within`. In a comparison of plain paths and written values, and in the pieces of `followed by`, a path that names its key by a field now lists the field right after the path in a row's `inputs`, as spec 0.4 says: `m named by p is q` shows `m named by p`, `p`, `q`, where it showed `m named by p`, `q`, `p`. So does a `count of`, a `sum of`, an elapsed time and a `plus`: `count of m named by p is q` shows `count of m named by p`, `m named by p[]`, `p`, `q`, where `p` came last. When the path before the field can't be read, the cause comes from that path and not from the field, so `$params.m named by p is q` with no `m` in the params fails as `absent` when `p` is `null`, where it failed as `null`, and `rows.w named by p is q` with `rows` a list fails as `unusable`. An `every`, `some`, `count of` or `sum of` walks a list before the field, so `every rows.w named by p is q` fails as the field says when `rows` is a list. When `rows` is `null`, it now fails as `null` whatever `p` holds, a missing `p` included, where a missing `p` failed as `absent`, and `failed_items` names `rows`, where it was empty when `p` couldn't be read, as `every rows.w.k is q` does.
+- Text can be joined on the right side with `followed by`, as spec 0.4 says: `rego.version is tag.version followed by "-dev"`, `rego.spec is "v" followed by tag.version`. It takes written strings and fields. Nothing that read before changes.
+
 ### Changed
 
 - This version follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released, and the report's `ergo` follows. One that says `v0.3` is written wrong, with `unsupported version v0.3, expected v0.4-dev`.
@@ -16,6 +21,10 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 - The docs are split by engine. `README.md` is short and the same for both engines, [`OPA.md`](OPA.md) holds how to install and run `ergo.rego` and the parts of `REFERENCE.md` that only it has (OPA, Wasm, numbers, `ergo.compile`), and `REFERENCE.md` describes only the language.
 - The `$well_formed` row lists the problems of fields, parts and checks sorted by name as the report writes it, quotes and escapes included, by code point, where parts were sorted by the raw name. Reports change for parts with names that need quoting, and a `require` that is written wrong is listed second in the `$well_formed` row.
 - An own field named like a part of the subject or like a `for` alias keeps its dot in the name of an input, like `.cov.pct`, and so does the list a `count of`, `sum of` or a walk reads, like `.art.xs[]`. Reports change for such policies: they were named `cov.pct` and `art.xs[]`. The `failed_items` of a walk or a `for` line keep the dot too.
+
+### Fixed
+
+- A `for` line whose check reads a path with a `named by` field, like `row.w named by p is "xy"` under `every rows as row`, stopped the whole report with `eval_conflict_error` when an item wasn't an object and `p` was `null` or a number. The row fails as `not_an_object` now, with the item in `failed_items`, as in the Rust engine.
 
 ## 0.3.1
 

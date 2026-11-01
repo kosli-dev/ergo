@@ -14,6 +14,7 @@ use std::cmp::Ordering;
 pub enum Side {
     Path(Path),
     Value(Value),
+    Join(Vec<Side>),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,8 +27,12 @@ pub enum Cmp {
     Lte,
     StartsWith,
     EndsWith,
+    NotStartsWith,
+    NotEndsWith,
     AlphabeticallyBefore,
     AlphabeticallyAfter,
+    AlphabeticallyOnOrBefore,
+    AlphabeticallyOnOrAfter,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -36,6 +41,16 @@ pub struct Compare {
     pub right: Side,
     pub cmp: Cmp,
     pub within: Option<Number>,
+}
+
+impl Side {
+    pub fn paths(&self) -> Vec<&Path> {
+        match self {
+            Side::Path(path) => vec![path],
+            Side::Value(_) => Vec::new(),
+            Side::Join(pieces) => pieces.iter().flat_map(Side::paths).collect(),
+        }
+    }
 }
 
 pub struct SideRead {
@@ -54,6 +69,7 @@ pub fn read_side(side: &Side, ctx: &Ctx) -> SideRead {
                 inputs: read.inputs,
             }
         }
+        Side::Join(pieces) => read_join(pieces, ctx),
         Side::Value(Value::Null) => SideRead {
             outcome: Outcome::Null,
             value: None,
@@ -64,6 +80,39 @@ pub fn read_side(side: &Side, ctx: &Ctx) -> SideRead {
             value: Some(v.clone()),
             inputs: Vec::new(),
         },
+    }
+}
+
+fn read_join(pieces: &[Side], ctx: &Ctx) -> SideRead {
+    let reads: Vec<SideRead> = pieces.iter().map(|piece| read_side(piece, ctx)).collect();
+    let inputs = reads
+        .iter()
+        .flat_map(|r| r.inputs.iter().cloned())
+        .collect();
+    let mut text = String::new();
+    for read in &reads {
+        match (read.outcome, &read.value) {
+            (Outcome::Found, Some(Value::String(piece))) => text.push_str(piece),
+            (Outcome::Found, _) => {
+                return SideRead {
+                    outcome: Outcome::Found,
+                    value: None,
+                    inputs,
+                };
+            }
+            (outcome, _) => {
+                return SideRead {
+                    outcome,
+                    value: None,
+                    inputs,
+                };
+            }
+        }
+    }
+    SideRead {
+        outcome: Outcome::Found,
+        value: Some(Value::String(text)),
+        inputs,
     }
 }
 
@@ -81,8 +130,16 @@ pub fn unread_cause(l: &SideRead, r: &SideRead) -> Option<Cause> {
 pub fn side_refs(left: &Side, right: &Side) -> Vec<Path> {
     let mut refs = Vec::new();
     for side in [left, right] {
-        if let Side::Path(path) = side {
-            refs.extend(path::step_refs(path));
+        match side {
+            Side::Path(path) => refs.extend(path::step_refs(path)),
+            Side::Join(pieces) => {
+                for piece in pieces {
+                    if let Side::Path(path) = piece {
+                        refs.extend(path::step_refs(path));
+                    }
+                }
+            }
+            Side::Value(_) => {}
         }
     }
     refs
@@ -96,7 +153,14 @@ impl Compare {
 
 pub fn run(check: &Compare, ctx: &Ctx) -> Verdict {
     let (l, r, inputs) = read_sides(&check.left, &check.right, ctx);
-    let cause = match unread_cause(&l, &r) {
+    let joined_cause = match &check.right {
+        Side::Join(_) => r
+            .outcome
+            .cause()
+            .or_else(|| r.value.is_none().then_some(Cause::Unusable)),
+        _ => None,
+    };
+    let cause = match joined_cause.or_else(|| unread_cause(&l, &r)) {
         Some(cause) => cause,
         None => match (&l.value, &r.value) {
             (Some(a), Some(b)) => compared(check, a, b),
@@ -109,9 +173,10 @@ pub fn run(check: &Compare, ctx: &Ctx) -> Verdict {
 fn compared(check: &Compare, l: &Value, r: &Value) -> Cause {
     if let Some(distance) = &check.within {
         return match (l, r) {
-            (Value::Number(a), Value::Number(b)) => {
-                within(a, b, distance).map_or(Cause::Unusable, verdict)
-            }
+            (Value::Number(a), Value::Number(b)) => within(a, b, distance)
+                .map_or(Cause::Unusable, |inside| {
+                    verdict(inside != (check.cmp == Cmp::Ne))
+                }),
             _ => Cause::Unusable,
         };
     }
@@ -124,17 +189,26 @@ fn compared(check: &Compare, l: &Value, r: &Value) -> Cause {
                 .map_or(Cause::Unusable, |order| verdict(ordered(check.cmp, order))),
             _ => Cause::Unusable,
         },
-        Cmp::StartsWith | Cmp::EndsWith | Cmp::AlphabeticallyBefore | Cmp::AlphabeticallyAfter => {
-            match (l, r) {
-                (Value::String(a), Value::String(b)) => verdict(match check.cmp {
-                    Cmp::StartsWith => a.starts_with(b.as_str()),
-                    Cmp::EndsWith => a.ends_with(b.as_str()),
-                    Cmp::AlphabeticallyBefore => a < b,
-                    _ => a > b,
-                }),
-                _ => Cause::Unusable,
-            }
-        }
+        Cmp::StartsWith
+        | Cmp::EndsWith
+        | Cmp::NotStartsWith
+        | Cmp::NotEndsWith
+        | Cmp::AlphabeticallyBefore
+        | Cmp::AlphabeticallyAfter
+        | Cmp::AlphabeticallyOnOrBefore
+        | Cmp::AlphabeticallyOnOrAfter => match (l, r) {
+            (Value::String(a), Value::String(b)) => verdict(match check.cmp {
+                Cmp::StartsWith => a.starts_with(b.as_str()),
+                Cmp::EndsWith => a.ends_with(b.as_str()),
+                Cmp::NotStartsWith => !a.starts_with(b.as_str()),
+                Cmp::NotEndsWith => !a.ends_with(b.as_str()),
+                Cmp::AlphabeticallyBefore => a < b,
+                Cmp::AlphabeticallyAfter => a > b,
+                Cmp::AlphabeticallyOnOrBefore => a <= b,
+                _ => a >= b,
+            }),
+            _ => Cause::Unusable,
+        },
     }
 }
 
@@ -285,6 +359,22 @@ fn operand_side(operand: &tree::Operand, scope: &Scope) -> Option<Result<Side, V
             [tree::Term::Path(p)] => Some(scope.path(p).map(Side::Path)),
             _ => None,
         },
+        tree::Operand::Joined(pieces) => {
+            let mut sides = Vec::new();
+            let mut problems = Vec::new();
+            for piece in pieces {
+                match operand_side(piece, scope) {
+                    Some(Ok(side)) => sides.push(side),
+                    Some(Err(found)) => problems.extend(found),
+                    None => return None,
+                }
+            }
+            Some(if problems.is_empty() {
+                Ok(Side::Join(sides))
+            } else {
+                Err(problems)
+            })
+        }
     }
 }
 
@@ -333,21 +423,35 @@ pub fn lower_phrase(
         ),
         tree::Phrase::StartsWith(operand) => compare(operand, Cmp::StartsWith, None),
         tree::Phrase::EndsWith(operand) => compare(operand, Cmp::EndsWith, None),
-        tree::Phrase::Alphabetically { after, operand } => compare(
+        tree::Phrase::NotStartsWith(operand) => compare(operand, Cmp::NotStartsWith, None),
+        tree::Phrase::NotEndsWith(operand) => compare(operand, Cmp::NotEndsWith, None),
+        tree::Phrase::Alphabetically {
+            after,
+            or_equal,
             operand,
-            if *after {
-                Cmp::AlphabeticallyAfter
-            } else {
-                Cmp::AlphabeticallyBefore
+        } => compare(
+            operand,
+            match (*after, *or_equal) {
+                (false, false) => Cmp::AlphabeticallyBefore,
+                (true, false) => Cmp::AlphabeticallyAfter,
+                (false, true) => Cmp::AlphabeticallyOnOrBefore,
+                (true, true) => Cmp::AlphabeticallyOnOrAfter,
             },
             None,
         ),
-        tree::Phrase::Between { min, max } => Some(
+        tree::Phrase::Between { not, min, max } => Some(
             joined(
                 scope.left_path(path),
                 joined(number(min, scope), number(max, scope)),
             )
-            .map(|(path, (min, max))| Check::Range(Range { path, min, max })),
+            .map(|(path, (min, max))| {
+                Check::Range(Range {
+                    path,
+                    min,
+                    max,
+                    outside: *not,
+                })
+            }),
         ),
         tree::Phrase::Time { time, operand } => {
             let right = operand_side(operand, scope)?;
@@ -556,6 +660,147 @@ mod tests {
     }
 
     #[test]
+    fn does_not_start_with_and_does_not_end_with_pass_only_on_two_strings() {
+        let starts = check(Cmp::NotStartsWith, field("b"));
+        let ends = check(Cmp::NotEndsWith, field("b"));
+        assert_eq!(
+            cause(json!({"a": "main", "b": "release/"}), &starts),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(json!({"a": "release/1", "b": "release/"}), &starts),
+            Cause::Value
+        );
+        assert_eq!(
+            cause(json!({"a": "a.txt", "b": ".md"}), &ends),
+            Cause::Satisfied
+        );
+        assert_eq!(cause(json!({"a": "a.md", "b": ".md"}), &ends), Cause::Value);
+        assert_eq!(cause(json!({"a": 12, "b": 1}), &starts), Cause::Unusable);
+        assert_eq!(cause(json!({"a": "1", "b": 1}), &ends), Cause::Unusable);
+        assert_eq!(cause(json!({"b": "r"}), &starts), Cause::Absent);
+        assert_eq!(cause(json!({"a": null, "b": "r"}), &ends), Cause::Null);
+        assert_eq!(cause(json!({"a": "x"}), &ends), Cause::Absent);
+    }
+
+    #[test]
+    fn alphabetical_on_or_before_and_on_or_after_include_equal_strings() {
+        let before = check(Cmp::AlphabeticallyOnOrBefore, field("b"));
+        let after = check(Cmp::AlphabeticallyOnOrAfter, field("b"));
+        assert_eq!(
+            cause(json!({"a": "m", "b": "m"}), &before),
+            Cause::Satisfied
+        );
+        assert_eq!(cause(json!({"a": "m", "b": "m"}), &after), Cause::Satisfied);
+        assert_eq!(
+            cause(json!({"a": "a", "b": "b"}), &before),
+            Cause::Satisfied
+        );
+        assert_eq!(cause(json!({"a": "a", "b": "b"}), &after), Cause::Value);
+        assert_eq!(
+            cause(json!({"a": "Z", "b": "a"}), &before),
+            Cause::Satisfied
+        );
+        assert_eq!(cause(json!({"a": "b", "b": "a"}), &before), Cause::Value);
+        assert_eq!(cause(json!({"a": 1, "b": 2}), &after), Cause::Unusable);
+        assert_eq!(cause(json!({"b": "a"}), &before), Cause::Absent);
+        assert_eq!(cause(json!({"a": null, "b": "a"}), &after), Cause::Null);
+    }
+
+    #[test]
+    fn ne_with_within_passes_only_on_numbers_further_apart() {
+        let far = Compare {
+            left: field("a"),
+            right: field("b"),
+            cmp: Cmp::Ne,
+            within: Some(number("1")),
+        };
+        assert_eq!(cause(json!({"a": 1, "b": 5}), &far), Cause::Satisfied);
+        assert_eq!(cause(json!({"a": 1, "b": 2}), &far), Cause::Value);
+        assert_eq!(cause(json!({"a": 1, "b": 1.5}), &far), Cause::Value);
+        assert_eq!(
+            cause(
+                json!({"a": 0.3, "b": 0.1}),
+                &Compare {
+                    within: Some(number("0.2")),
+                    ..far.clone()
+                }
+            ),
+            Cause::Value
+        );
+        assert_eq!(cause(json!({"a": 1, "b": "1"}), &far), Cause::Unusable);
+        assert_eq!(cause(json!({"a": "1", "b": "9"}), &far), Cause::Unusable);
+        assert_eq!(cause(json!({"a": 1}), &far), Cause::Absent);
+        assert_eq!(cause(json!({"a": null, "b": 1}), &far), Cause::Null);
+    }
+
+    fn joined(pieces: Vec<Side>) -> Side {
+        Side::Join(pieces)
+    }
+
+    #[test]
+    fn a_join_puts_its_pieces_next_to_each_other_in_order() {
+        let right = joined(vec![Side::Value(json!("x")), field("b"), field("c")]);
+        let eq = check(Cmp::Eq, right);
+        assert_eq!(
+            cause(json!({"a": "x1.2-dev", "b": "1.2", "c": "-dev"}), &eq),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(json!({"a": "x1.2", "b": "1.2", "c": "-dev"}), &eq),
+            Cause::Value
+        );
+        let v = run_on(json!({"a": "x", "b": "1", "c": "2"}), &eq);
+        let names: Vec<_> = v.inputs.iter().map(|i| i.name.as_str()).collect();
+        assert_eq!(names, [".a", "b", "c"]);
+    }
+
+    #[test]
+    fn a_join_fails_as_the_first_piece_that_cannot_be_read_whatever_the_left_side_is() {
+        let eq = check(
+            Cmp::Eq,
+            joined(vec![Side::Value(json!("x")), field("b"), field("c")]),
+        );
+        assert_eq!(cause(json!({"a": "x", "c": null}), &eq), Cause::Absent);
+        assert_eq!(cause(json!({"a": "x", "b": null}), &eq), Cause::Null);
+        assert_eq!(cause(json!({"a": "x", "b": 1}), &eq), Cause::Unusable);
+        assert_eq!(
+            cause(json!({"a": "x", "b": 1, "c": null}), &eq),
+            Cause::Unusable
+        );
+        assert_eq!(
+            cause(json!({"a": "x", "b": null, "c": 1}), &eq),
+            Cause::Null
+        );
+        assert_eq!(cause(json!({"b": 1, "c": "z"}), &eq), Cause::Unusable);
+        assert_eq!(
+            cause(json!({"a": null, "b": "1", "c": "2"}), &eq),
+            Cause::Null
+        );
+        assert_eq!(cause(json!({"b": "1", "c": "2"}), &eq), Cause::Absent);
+        assert_eq!(
+            cause(json!({"a": 3, "b": "1", "c": "2"}), &eq),
+            Cause::Unusable
+        );
+    }
+
+    #[test]
+    fn a_join_after_a_text_comparison_joins_before_it_compares() {
+        let starts = check(
+            Cmp::StartsWith,
+            joined(vec![Side::Value(json!("re")), field("b")]),
+        );
+        assert_eq!(
+            cause(json!({"a": "release/1", "b": "lease/"}), &starts),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            cause(json!({"a": "main", "b": "lease/"}), &starts),
+            Cause::Value
+        );
+    }
+
+    #[test]
     fn alphabetical_order_is_by_code_point() {
         let before = check(Cmp::AlphabeticallyBefore, field("b"));
         let after = check(Cmp::AlphabeticallyAfter, field("b"));
@@ -676,6 +921,17 @@ mod tests {
     }
 
     #[test]
+    fn is_not_with_within_reads_into_compare_ne_with_the_distance() {
+        match lowered_check("x is not 5 within 0.5") {
+            Check::Compare(c) => {
+                assert_eq!(c.cmp, Cmp::Ne);
+                assert_eq!(c.within.map(|n| n.to_string()), Some("0.5".to_string()));
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
     fn a_field_on_the_right_reads_into_compare_with_two_paths() {
         assert!(matches!(
             lowered_check("x equals y"),
@@ -704,6 +960,16 @@ mod tests {
             ("x is less than 1", Cmp::Lt),
             ("x starts with \"a\"", Cmp::StartsWith),
             ("x ends with \"a\"", Cmp::EndsWith),
+            ("x does not start with \"a\"", Cmp::NotStartsWith),
+            ("x does not end with \"a\"", Cmp::NotEndsWith),
+            (
+                "x is alphabetically on or before \"a\"",
+                Cmp::AlphabeticallyOnOrBefore,
+            ),
+            (
+                "x is alphabetically on or after \"a\"",
+                Cmp::AlphabeticallyOnOrAfter,
+            ),
             (
                 "x is alphabetically before \"a\"",
                 Cmp::AlphabeticallyBefore,

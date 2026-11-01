@@ -76,8 +76,15 @@ pub enum Side {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Test {
-    Compare { cmp: Cmp, within: Option<Number> },
-    Between { min: Number, max: Number },
+    Compare {
+        cmp: Cmp,
+        within: Option<Number>,
+    },
+    Between {
+        min: Number,
+        max: Number,
+        outside: bool,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -90,12 +97,22 @@ pub struct Tally {
 struct Worked<T> {
     result: Result<T, Cause>,
     entries: Vec<Input>,
+    located: Vec<String>,
+}
+
+fn once<'a>(locations: impl IntoIterator<Item = &'a String>) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for location in locations {
+        if !out.contains(location) {
+            out.push(location.clone());
+        }
+    }
+    out
 }
 
 fn side_paths(side: &Side) -> Vec<&Path> {
     match side {
-        Side::Plain(compare::Side::Path(path)) => vec![path],
-        Side::Plain(compare::Side::Value(_)) => Vec::new(),
+        Side::Plain(plain) => plain.paths(),
         Side::Derived(derived) => {
             let mut paths = Vec::new();
             for term in &derived.terms {
@@ -117,8 +134,11 @@ fn side_paths(side: &Side) -> Vec<&Path> {
 fn side_candidates(side: &Side) -> Vec<SidePath<'_>> {
     let one = |path, needs_list| SidePath { path, needs_list };
     match side {
-        Side::Plain(compare::Side::Path(path)) => vec![one(path, false)],
-        Side::Plain(compare::Side::Value(_)) => Vec::new(),
+        Side::Plain(plain) => plain
+            .paths()
+            .into_iter()
+            .map(|path| one(path, false))
+            .collect(),
         Side::Derived(derived) => {
             let mut paths = Vec::new();
             for term in &derived.terms {
@@ -300,8 +320,9 @@ fn decide(test: &Test, left: &Value, right: Option<Value>, ctx: &Ctx) -> Cause {
             };
             compare::run(&compare, ctx).cause
         }
-        (Test::Between { min, max }, None) => match left {
-            Value::Number(n) => value::between(min, n, max).map_or(Cause::Unusable, verdict),
+        (Test::Between { min, max, outside }, None) => match left {
+            Value::Number(n) => value::between(min, n, max)
+                .map_or(Cause::Unusable, |inside| verdict(inside != *outside)),
             _ => Cause::Unusable,
         },
         _ => Cause::Unusable,
@@ -330,6 +351,7 @@ fn work_side(side: &Side, ctx: &Ctx) -> Worked<Value> {
             Worked {
                 result,
                 entries: read.inputs,
+                located: Vec::new(),
             }
         }
         Side::Derived(derived) => {
@@ -337,18 +359,13 @@ fn work_side(side: &Side, ctx: &Ctx) -> Worked<Value> {
             Worked {
                 result: worked.result.map(Value::Number),
                 entries: worked.entries,
+                located: worked.located,
             }
         }
     }
 }
 
-fn number_entry(text: &str, result: &Result<Number, Cause>, below: &[Input]) -> Input {
-    let mut locations: Vec<String> = Vec::new();
-    for location in below.iter().flat_map(|entry| &entry.locations) {
-        if !locations.contains(location) {
-            locations.push(location.clone());
-        }
-    }
+fn number_entry(text: &str, result: &Result<Number, Cause>, locations: Vec<String>) -> Input {
     Input {
         name: text.to_string(),
         value: match result {
@@ -384,10 +401,15 @@ fn work_derived(derived: &Derived, ctx: &Ctx) -> Worked<Number> {
             add(&numbers).ok_or(Cause::Unusable)
         }
     };
+    let located = once(worked.iter().flat_map(|w| &w.located));
     let below: Vec<Input> = worked.into_iter().flat_map(|w| w.entries).collect();
-    let mut entries = vec![number_entry(&derived.text, &result, &below)];
+    let mut entries = vec![number_entry(&derived.text, &result, located.clone())];
     entries.extend(below);
-    Worked { result, entries }
+    Worked {
+        result,
+        entries,
+        located,
+    }
 }
 
 fn work_term(term: &Term, ctx: &Ctx) -> Worked<Number> {
@@ -395,6 +417,7 @@ fn work_term(term: &Term, ctx: &Ctx) -> Worked<Number> {
         Term::Number(n) => Worked {
             result: Ok(n.clone()),
             entries: Vec::new(),
+            located: Vec::new(),
         },
         Term::Path(path) => {
             let read = read_path(path, ctx);
@@ -404,6 +427,7 @@ fn work_term(term: &Term, ctx: &Ctx) -> Worked<Number> {
                 (None, _) => Err(Cause::Unusable),
             };
             Worked {
+                located: once(read.inputs.iter().take(1).flat_map(|e| &e.locations)),
                 result,
                 entries: read.inputs,
             }
@@ -448,7 +472,13 @@ fn counted_entries(
     result: &Result<Number, Cause>,
     list: Input,
     outside: Vec<Input>,
-) -> Vec<Input> {
+    ctx: &Ctx,
+) -> (Vec<Input>, Vec<String>) {
+    let located = once(
+        list.locations
+            .iter()
+            .chain(outside.iter().flat_map(|e| &e.locations)),
+    );
     let mut entries = vec![Input {
         name: counted.text.clone(),
         value: match result {
@@ -459,8 +489,9 @@ fn counted_entries(
         part: list.part.clone(),
     }];
     entries.push(list);
+    entries.extend(super::field_inputs(&counted.path, ctx));
     entries.extend(outside);
-    entries
+    (entries, located)
 }
 
 fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
@@ -473,8 +504,10 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             locations: Vec::new(),
             part: None,
         };
+        let (entries, located) = counted_entries(counted, &result, list, Vec::new(), ctx);
         return Worked {
-            entries: counted_entries(counted, &result, list, Vec::new()),
+            entries,
+            located,
             result,
         };
     }
@@ -497,8 +530,10 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             locations: Vec::new(),
             part: None,
         };
+        let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
-            entries: counted_entries(counted, &result, list, outside),
+            entries,
+            located,
             result,
         };
     }
@@ -546,8 +581,10 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             .collect(),
         part: path::part_tag(&counted.path, &outer).map(|(name, id)| Part { name, id }),
     };
+    let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
     Worked {
-        entries: counted_entries(counted, &result, list, outside),
+        entries,
+        located,
         result,
     }
 }
@@ -583,10 +620,20 @@ fn work_elapsed(elapsed: &Elapsed, ctx: &Ctx) -> Worked<Number> {
             _ => Err(Cause::Unusable),
         },
     };
+    let located = once(
+        [&from.inputs, &to.inputs]
+            .into_iter()
+            .flat_map(|inputs| inputs.iter().take(1))
+            .flat_map(|e| &e.locations),
+    );
     let below: Vec<Input> = from.inputs.into_iter().chain(to.inputs).collect();
-    let mut entries = vec![number_entry(&elapsed.text, &result, &below)];
+    let mut entries = vec![number_entry(&elapsed.text, &result, located.clone())];
     entries.extend(below);
-    Worked { result, entries }
+    Worked {
+        result,
+        entries,
+        located,
+    }
 }
 
 fn elapsed_between(unit: Unit, from: &Value, to: &Value) -> Result<Number, Cause> {
@@ -896,6 +943,7 @@ fn plain_right(
     match operand {
         s::Operand::Value(v) => Ok(Some(Side::Plain(compare::Side::Value(scope.value(v)?)))),
         s::Operand::Field(terms) => lower_side(terms, scope, names),
+        s::Operand::Joined(_) => Ok(None),
     }
 }
 
@@ -924,9 +972,6 @@ fn lower_test(
             operand,
             within,
         } => {
-            if *not && within.is_some() {
-                return None;
-            }
             let within = match within {
                 Some(text) => match number(text, scope) {
                     Ok(n) => Some(n),
@@ -946,10 +991,19 @@ fn lower_test(
             None,
             operand,
         ),
-        s::Phrase::Between { min, max } => Some(
+        s::Phrase::Between { not, min, max } => Some(
             number(min, scope)
                 .and_then(|min| number(max, scope).map(|max| (min, max)))
-                .map(|(min, max)| (Test::Between { min, max }, None)),
+                .map(|(min, max)| {
+                    (
+                        Test::Between {
+                            min,
+                            max,
+                            outside: *not,
+                        },
+                        None,
+                    )
+                }),
         ),
         _ => None,
     }

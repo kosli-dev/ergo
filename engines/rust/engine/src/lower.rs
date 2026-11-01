@@ -409,10 +409,12 @@ fn phrase_terms(phrase: &s::Phrase) -> &[s::Term] {
         | s::Phrase::Contains { operand, .. }
         | s::Phrase::StartsWith(operand)
         | s::Phrase::EndsWith(operand)
+        | s::Phrase::NotStartsWith(operand)
+        | s::Phrase::NotEndsWith(operand)
         | s::Phrase::Alphabetically { operand, .. }
         | s::Phrase::Time { operand, .. } => match operand {
             s::Operand::Field(terms) => terms,
-            s::Operand::Value(_) => &[],
+            s::Operand::Value(_) | s::Operand::Joined(_) => &[],
         },
         _ => &[],
     }
@@ -428,8 +430,28 @@ fn phrase_words(phrase: &s::Phrase) -> &'static str {
         s::Phrase::Contains { not: true, .. } => "does not contain",
         s::Phrase::StartsWith(_) => "starts with",
         s::Phrase::EndsWith(_) => "ends with",
-        s::Phrase::Alphabetically { after: false, .. } => "is alphabetically before",
-        s::Phrase::Alphabetically { after: true, .. } => "is alphabetically after",
+        s::Phrase::NotStartsWith(_) => "does not start with",
+        s::Phrase::NotEndsWith(_) => "does not end with",
+        s::Phrase::Alphabetically {
+            after: false,
+            or_equal: false,
+            ..
+        } => "is alphabetically before",
+        s::Phrase::Alphabetically {
+            after: true,
+            or_equal: false,
+            ..
+        } => "is alphabetically after",
+        s::Phrase::Alphabetically {
+            after: false,
+            or_equal: true,
+            ..
+        } => "is alphabetically on or before",
+        s::Phrase::Alphabetically {
+            after: true,
+            or_equal: true,
+            ..
+        } => "is alphabetically on or after",
         s::Phrase::Time { time, .. } => match time {
             s::TimeOrder::Before => "is before",
             s::TimeOrder::After => "is after",
@@ -460,6 +482,34 @@ fn argument_problems(phrase: &s::Phrase) -> Vec<String> {
         "\"{}\" can't take a count of, a sum of or a plus",
         phrase_words(phrase)
     )]
+}
+
+const JOINED_AFTER_QUANTIFIER: &str =
+    "\"followed by\" isn't supported yet after every or some, or in a whose";
+
+fn joined_problems(phrase: &s::Phrase) -> Vec<String> {
+    let joined = matches!(
+        phrase,
+        s::Phrase::Is {
+            operand: s::Operand::Joined(_),
+            ..
+        } | s::Phrase::Contains {
+            operand: s::Operand::Joined(_),
+            ..
+        } | s::Phrase::StartsWith(s::Operand::Joined(_))
+            | s::Phrase::EndsWith(s::Operand::Joined(_))
+            | s::Phrase::NotStartsWith(s::Operand::Joined(_))
+            | s::Phrase::NotEndsWith(s::Operand::Joined(_))
+            | s::Phrase::Alphabetically {
+                operand: s::Operand::Joined(_),
+                ..
+            }
+    );
+    if joined {
+        vec![JOINED_AFTER_QUANTIFIER.to_string()]
+    } else {
+        Vec::new()
+    }
 }
 
 fn after_quantifier_problems(phrase: &s::Phrase) -> Vec<String> {
@@ -578,7 +628,10 @@ fn with_problems(
 pub fn lower_condition(condition: &s::Condition, scope: &Scope) -> Result<Check, Vec<String>> {
     with_problems(
         lower_condition_phrase(condition, scope),
-        argument_problems(&condition.phrase),
+        argument_problems(&condition.phrase)
+            .into_iter()
+            .chain(joined_problems(&condition.phrase))
+            .collect(),
     )
 }
 
@@ -689,6 +742,7 @@ pub fn lower_quantified(
     let mut problems = argument_problems(phrase);
     problems.extend(after_quantifier_problems(phrase));
     problems.extend(elapsed_after_quantifier_problems(phrase));
+    problems.extend(joined_problems(phrase));
     let walk_path = match scope.left_path(path) {
         Ok(found) => {
             problems.extend(walk_too_long(&found));

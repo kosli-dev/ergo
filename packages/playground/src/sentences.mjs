@@ -115,6 +115,7 @@ const derivedOps = (derived, out, aliases) => {
 const operandOps = (operand, out, aliases) => {
   const [type, body] = variant(operand);
   if (type === "Value") valueOps(body, out);
+  else if (type === "Joined") for (const piece of body) operandOps(piece, out, aliases);
   else for (const t of body) termOps(t, out, aliases);
 };
 
@@ -132,8 +133,8 @@ const phraseOps = (phrase, out, aliases) => {
   } else if (["Order", "Contains", "Alphabetically", "Time"].includes(type)) operandOps(body.operand, out, aliases);
   else if (type === "Between") out.push(N(body.min), N(body.max));
   else if (type === "OneOf" || type === "Matches") listOps(body.list, out, aliases);
-  else if (type === "ContainsAll" || type === "ContainsNone") listOps(body, out, aliases);
-  else if (type === "StartsWith" || type === "EndsWith") operandOps(body, out, aliases);
+  else if (["ContainsAll", "ContainsNone", "ContainsSome", "NotContainsAll"].includes(type)) listOps(body, out, aliases);
+  else if (["StartsWith", "EndsWith", "NotStartsWith", "NotEndsWith"].includes(type)) operandOps(body, out, aliases);
 };
 
 const leftOps = (left, out, aliases) => {
@@ -316,7 +317,9 @@ const termText = (term) => {
 
 const operandText = (operand) => {
   const [type, body] = variant(operand);
-  return type === "Value" ? valueText(body) : body.map(termText).join(" plus ");
+  if (type === "Value") return valueText(body);
+  if (type === "Joined") return body.map(operandText).join(" followed by ");
+  return body.map(termText).join(" plus ");
 };
 
 const listText = (list) => {
@@ -337,21 +340,27 @@ const not = (flag, yes, no) => (flag ? no : yes);
 
 const phraseText = (phrase) => {
   const [type, b] = variant(phrase);
-  if (type === "Is") return b.within === null ? `is ${not(b.not, "", "not ")}${operandText(b.operand)}` : `is within ${b.within} of ${operandText(b.operand)}`;
+  if (type === "Is") return b.within === null ? `is ${not(b.not, "", "not ")}${operandText(b.operand)}` : `is ${not(b.not, "", "not ")}within ${b.within} of ${operandText(b.operand)}`;
   if (type === "Order") return `is ${ORDER[b.order]} ${operandText(b.operand)}`;
-  if (type === "Between") return `is between ${b.min} and ${b.max}, both included`;
+  if (type === "Between") return b.not ? `is not between ${b.min} and ${b.max}, so below ${b.min} or above ${b.max}` : `is between ${b.min} and ${b.max}, both included`;
   if (type === "OneOf") return `is ${not(b.not, "", "not ")}one of ${listText(b.list)}`;
   if (type === "Exists") return b.not ? "does not exist" : "exists";
   if (type === "Empty") return `is ${not(b.not, "", "not ")}empty`;
   if (type === "NonEmptyString") return "is a string with at least one character";
+  if (type === "NotNonEmptyString") return "is not a string with at least one character";
   if (type === "Type") return `is ${TYPE[b]}`;
+  if (type === "NotType") return `is not ${TYPE[b]}`;
   if (type === "Contains") return `${b.not ? "does not contain" : "contains"} ${operandText(b.operand)}`;
   if (type === "ContainsAll") return `contains all of ${listText(b)}`;
   if (type === "ContainsNone") return `contains none of ${listText(b)}`;
+  if (type === "ContainsSome") return `contains at least one of ${listText(b)}`;
+  if (type === "NotContainsAll") return `does not contain every one of ${listText(b)}`;
   if (type === "Matches") return `${b.not ? "matches none" : "matches at least one"} of the patterns ${listText(b.list)}`;
   if (type === "StartsWith") return `starts with ${operandText(b)}`;
   if (type === "EndsWith") return `ends with ${operandText(b)}`;
-  if (type === "Alphabetically") return `is alphabetically ${b.after ? "after" : "before"} ${operandText(b.operand)}`;
+  if (type === "NotStartsWith") return `does not start with ${operandText(b)}`;
+  if (type === "NotEndsWith") return `does not end with ${operandText(b)}`;
+  if (type === "Alphabetically") return `is alphabetically ${b.or_equal ? "on or " : ""}${b.after ? "after" : "before"} ${operandText(b.operand)}`;
   return `is ${TIME[b.time]} ${operandText(b.operand)}, as times`;
 };
 
@@ -363,6 +372,7 @@ const valueNeed = (value) => {
 };
 
 const isValue = (operand) => variant(operand)[0] === "Value";
+const isJoined = (operand) => variant(operand)[0] === "Joined";
 const missingOr = (subject, need) => `${subject} is missing, null or ${need}`;
 const withOther = (subject, operand) => (isValue(operand) ? subject : `${subject} or what it is compared with`);
 
@@ -374,6 +384,7 @@ const failText = (subject, phrase, nested) => {
       const value = variant(b.operand)[1];
       return variant(value)[0] === "Null" ? `${subject} is missing` : missingOr(subject, `not ${valueNeed(value)}`);
     }
+    if (isJoined(b.operand)) return `${subject} or one of the pieces it is compared with is missing or null, or one of them or ${subject} is not a string`;
     const terms = b.operand.Field;
     if (terms.length === 1 && variant(terms[0])[0] === "Path") return `${subject} or what it is compared with is missing or null, or the two have different types`;
     return missingOr(withOther(subject, b.operand), "not a number");
@@ -388,13 +399,15 @@ const failText = (subject, phrase, nested) => {
   if (type === "Exists") return b.not ? `${subject} has a value that isn't null${nested ? ", or something it sits in is not an object" : ""}` : `${subject} is missing or null${nested ? ", or something it sits in is not an object" : ""}`;
   if (type === "Empty") return missingOr(subject, "not a list or a string");
   if (type === "NonEmptyString") return missingOr(subject, "not a string");
+  if (type === "NotNonEmptyString") return missingOr(subject, "a string with at least one character");
   if (type === "Type") return missingOr(subject, `not ${TYPE[b]}`);
+  if (type === "NotType") return missingOr(subject, TYPE[b]);
   if (type === "Contains") {
     return isValue(b.operand)
       ? missingOr(subject, "not a list, or its items are of another type than the value")
       : missingOr(subject, "not a list, or what it is compared with is missing or null or of another type than the items");
   }
-  if (type === "ContainsAll" || type === "ContainsNone") {
+  if (["ContainsAll", "ContainsNone", "ContainsSome", "NotContainsAll"].includes(type)) {
     return variant(b)[0] === "Values"
       ? missingOr(subject, "not a list, or its items are of another type than the values")
       : missingOr(subject, "not a list, or the list it is compared with is missing, null, empty or not a list of one type");
@@ -404,7 +417,7 @@ const failText = (subject, phrase, nested) => {
       ? missingOr(subject, "not a string")
       : missingOr(subject, "not a string, or the patterns are missing, null, not a list or not all valid regular expressions");
   }
-  if (type === "StartsWith" || type === "EndsWith") return missingOr(withOther(subject, b), "not a string");
+  if (["StartsWith", "EndsWith", "NotStartsWith", "NotEndsWith"].includes(type)) return missingOr(withOther(subject, b), "not a string");
   return missingOr(withOther(subject, b.operand), "not a string");
 };
 
@@ -456,6 +469,7 @@ const collectPaths = (kind, tree) => {
     const operand = (o) => {
       const [t, body] = variant(o);
       if (t === "Field") for (const term of body) fromTerm(term);
+      else if (t === "Joined") for (const piece of body) operand(piece);
     };
     const list = (l) => {
       const [t, body] = variant(l);
@@ -463,8 +477,8 @@ const collectPaths = (kind, tree) => {
     };
     if (["Is", "Order", "Contains", "Alphabetically", "Time"].includes(type)) operand(b.operand);
     else if (type === "OneOf" || type === "Matches") list(b.list);
-    else if (type === "ContainsAll" || type === "ContainsNone") list(b);
-    else if (type === "StartsWith" || type === "EndsWith") operand(b);
+    else if (["ContainsAll", "ContainsNone", "ContainsSome", "NotContainsAll"].includes(type)) list(b);
+    else if (["StartsWith", "EndsWith", "NotStartsWith", "NotEndsWith"].includes(type)) operand(b);
   };
   const fromTerm = (term) => {
     const [type, body] = variant(term);

@@ -16,11 +16,13 @@ pub enum Kind {
 pub struct HasType {
     pub path: Path,
     pub kind: Kind,
+    pub not: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct NonEmptyString {
     pub path: Path,
+    pub not: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -62,20 +64,22 @@ fn judged(path: &Path, ctx: &Ctx, decide: impl FnOnce(&Value) -> Cause) -> Verdi
 
 pub fn run_has_type(check: &HasType, ctx: &Ctx) -> Verdict {
     judged(&check.path, ctx, |found| {
-        verdict(matches!(
+        let has = matches!(
             (check.kind, found),
             (Kind::List, Value::Array(_))
                 | (Kind::String, Value::String(_))
                 | (Kind::Number, Value::Number(_))
                 | (Kind::Boolean, Value::Bool(_))
                 | (Kind::Object, Value::Object(_))
-        ))
+        );
+        verdict(has != check.not)
     })
 }
 
 pub fn run_non_empty_string(check: &NonEmptyString, ctx: &Ctx) -> Verdict {
     judged(&check.path, ctx, |found| {
-        verdict(matches!(found, Value::String(s) if !s.is_empty()))
+        let full = matches!(found, Value::String(s) if !s.is_empty());
+        verdict(full != check.not)
     })
 }
 
@@ -120,13 +124,51 @@ mod tests {
 
     fn has(kind: Kind, subject: Value) -> Cause {
         on(subject, |ctx| {
-            run_has_type(&HasType { path: x(), kind }, ctx)
+            run_has_type(
+                &HasType {
+                    path: x(),
+                    kind,
+                    not: false,
+                },
+                ctx,
+            )
+        })
+    }
+
+    fn lacks(kind: Kind, subject: Value) -> Cause {
+        on(subject, |ctx| {
+            run_has_type(
+                &HasType {
+                    path: x(),
+                    kind,
+                    not: true,
+                },
+                ctx,
+            )
         })
     }
 
     fn non_empty(subject: Value) -> Cause {
         on(subject, |ctx| {
-            run_non_empty_string(&NonEmptyString { path: x() }, ctx)
+            run_non_empty_string(
+                &NonEmptyString {
+                    path: x(),
+                    not: false,
+                },
+                ctx,
+            )
+        })
+    }
+
+    fn not_non_empty(subject: Value) -> Cause {
+        on(subject, |ctx| {
+            run_non_empty_string(
+                &NonEmptyString {
+                    path: x(),
+                    not: true,
+                },
+                ctx,
+            )
         })
     }
 
@@ -146,6 +188,41 @@ mod tests {
             assert_eq!(has(kind, json!({"x": good})), Cause::Satisfied, "{kind:?}");
             assert_eq!(has(kind, json!({"x": bad})), Cause::Value, "{kind:?}");
         }
+    }
+
+    #[test]
+    fn lacks_type_passes_on_any_other_type_and_fails_its_own_as_value() {
+        for (kind, own, other) in [
+            (Kind::List, json!([]), json!({})),
+            (Kind::String, json!(""), json!(1)),
+            (Kind::Number, json!(1.5), json!("1")),
+            (Kind::Boolean, json!(false), json!(0)),
+            (Kind::Object, json!({}), json!([])),
+        ] {
+            assert_eq!(
+                lacks(kind, json!({"x": other})),
+                Cause::Satisfied,
+                "{kind:?}"
+            );
+            assert_eq!(lacks(kind, json!({"x": own})), Cause::Value, "{kind:?}");
+        }
+    }
+
+    #[test]
+    fn lacks_type_fails_with_the_path_outcome_and_never_passes_on_nothing_read() {
+        assert_eq!(lacks(Kind::String, json!({})), Cause::Absent);
+        assert_eq!(lacks(Kind::String, json!({"x": null})), Cause::Null);
+        assert_eq!(lacks(Kind::String, json!("s")), Cause::NotAnObject);
+    }
+
+    #[test]
+    fn not_a_non_empty_string_passes_on_an_empty_string_and_on_any_other_type() {
+        assert_eq!(not_non_empty(json!({"x": ""})), Cause::Satisfied);
+        assert_eq!(not_non_empty(json!({"x": 1})), Cause::Satisfied);
+        assert_eq!(not_non_empty(json!({"x": ["a"]})), Cause::Satisfied);
+        assert_eq!(not_non_empty(json!({"x": " "})), Cause::Value);
+        assert_eq!(not_non_empty(json!({})), Cause::Absent);
+        assert_eq!(not_non_empty(json!({"x": null})), Cause::Null);
     }
 
     #[test]

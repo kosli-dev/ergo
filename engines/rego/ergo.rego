@@ -1081,8 +1081,22 @@ _derived_eval(check, subj) := {"passed": passed, "cause": cause, "inputs": array
 	l := _side_eval(subj, check.left)
 	r := _side_eval(subj, check.right)
 	passed := _eval_compared(check, l.v, r.v)
-	states := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)}
+	states := _eval_states(check, l, r)
 	cause := _eval_cause(passed, _ref_cause(check), states)
+}
+
+_eval_states(check, _, r) := r.states if {
+	_side_form(check.right) == "join"
+	count(r.states) > 0
+}
+
+_eval_states(check, l, r) := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)} if {
+	not _side_form(check.right) == "join"
+}
+
+_eval_states(check, l, r) := (l.states | r.states) | {"unusable" | [lf] := l.found; [rf] := r.found; not _usable_sides(check, lf, rf)} if {
+	_side_form(check.right) == "join"
+	count(r.states) == 0
 }
 
 _eval_compared(check, [lv], [rv]) if _compared(check, lv, rv)
@@ -1120,6 +1134,43 @@ _side_eval(subj, side) := {"v": v, "found": v, "states": (union({o.states | some
 	ops := [_operand_eval(subj, operand) | some operand in side.add]
 	operands := [i | some o in ops; some i in o.inputs]
 	v := _added(side, ops)
+}
+
+_side_eval(subj, side) := {"v": v, "found": v, "states": _join_states(ops), "inputs": [i | some o in ops; some i in o.inputs]} if {
+	_side_form(side) == "join"
+	ops := [_basic_eval(subj, piece) | some piece in side.join]
+	v := _joined_pieces(ops)
+}
+
+_joined_pieces(ops) := [concat("", pieces)] if {
+	pieces := [v | some o in ops; [v] := o.v]
+	count(pieces) == count(ops)
+	every v in pieces {
+		is_string(v)
+	}
+} else := []
+
+_piece_state(o) := state if {
+	count(o.states) == 1
+	some state in o.states
+	state != "value"
+}
+
+_piece_state(o) := "unusable" if {
+	o.states == {"value"}
+	[v] := o.v
+	not is_string(v)
+}
+
+_join_states(ops) := {_piece_state(ops[i]) |
+	some i, _ in ops
+	not _earlier_bad(ops, i)
+}
+
+_earlier_bad(ops, i) if {
+	some j, o in ops
+	j < i
+	_piece_state(o)
 }
 
 _operand_eval(subj, operand) := object.union(_basic_eval(subj, operand), {"states": _number_states(subj, operand)}) if _basic_form(operand) == "path"
@@ -2096,6 +2147,46 @@ _leaf_op_passed("range", check, subj) if {
 	v <= hi
 }
 
+_leaf_op_passed("outside_range", check, subj) if {
+	v := _value_at(subj, check.path)
+	is_number(v)
+	lo := _arg(check.min)
+	hi := _arg(check.max)
+	is_number(lo)
+	is_number(hi)
+	not v >= lo
+}
+
+_leaf_op_passed("outside_range", check, subj) if {
+	v := _value_at(subj, check.path)
+	is_number(v)
+	lo := _arg(check.min)
+	hi := _arg(check.max)
+	is_number(lo)
+	is_number(hi)
+	v > hi
+}
+
+_leaf_op_passed("includes_some", check, subj) if {
+	v := _value_at(subj, check.path)
+	is_array(v)
+	wants := _wants(check.values)
+	_wanted(wants)
+	_items_fit(v, wants)
+	some want in wants
+	want in v
+}
+
+_leaf_op_passed("not_includes_all", check, subj) if {
+	v := _value_at(subj, check.path)
+	is_array(v)
+	wants := _wants(check.values)
+	_wanted(wants)
+	_items_fit(v, wants)
+	some want in wants
+	not want in v
+}
+
 _leaf_op_passed("excludes", check, subj) if {
 	v := _value_at(subj, check.path)
 	is_array(v)
@@ -2150,6 +2241,12 @@ _leaf_op_passed("has_type", check, subj) if {
 	type_name(v) == _json_types[check.type]
 }
 
+_leaf_op_passed("lacks_type", check, subj) if {
+	v := _value_at(subj, check.path)
+	v != null
+	type_name(v) != _json_types[check.type]
+}
+
 _json_types := {"list": "array", "string": "string", "number": "number", "boolean": "boolean", "object": "object"}
 
 _leaf_op_passed("not_in", check, subj) if {
@@ -2173,6 +2270,17 @@ _leaf_op_passed("present", check, subj) if {
 
 _leaf_op_passed("non_empty_string", check, subj) if {
 	v := _value_at(subj, check.path)
+	is_string(v)
+	v != ""
+}
+
+_leaf_op_passed("not_non_empty_string", check, subj) if {
+	v := _value_at(subj, check.path)
+	v != null
+	not _non_empty_text(v)
+}
+
+_non_empty_text(v) if {
 	is_string(v)
 	v != ""
 }
@@ -2267,6 +2375,7 @@ _leaf_op_passed("compare", check, subj) if {
 _compared(check, l, r) if {
 	not "within" in object.keys(check)
 	not check.cmp in _list_cmps
+	check.cmp != "outside"
 	_comparable(l, r)
 	_orderable(check.cmp, l)
 	_cmp(check.cmp, l, r)
@@ -2292,10 +2401,37 @@ _compared(check, l, r) if {
 
 _compared(check, l, r) if {
 	"within" in object.keys(check)
+	check.cmp == "eq"
 	is_number(l)
 	is_number(r)
 	not "max" in object.keys(check)
 	_within_gap(l, r, check.within)
+}
+
+_compared(check, l, r) if {
+	"within" in object.keys(check)
+	check.cmp == "ne"
+	_within_usable(check, l, r)
+	not "max" in object.keys(check)
+	not _within_gap(l, r, check.within)
+}
+
+_compared(check, l, r) if {
+	not "within" in object.keys(check)
+	check.cmp == "outside"
+	_comparable(l, r)
+	_orderable(check.cmp, l)
+	is_number(check.max)
+	l < r
+}
+
+_compared(check, l, r) if {
+	not "within" in object.keys(check)
+	check.cmp == "outside"
+	_comparable(l, r)
+	_orderable(check.cmp, l)
+	is_number(check.max)
+	l > check.max
 }
 
 _leaf_op_passed("compare_time", check, subj) if {
@@ -2360,7 +2496,7 @@ _orderable(c, v) if {
 _unusable_states(leaf, x) := {"unusable" | _unusable(leaf, x)}
 
 _unusable(leaf, x) if {
-	leaf.op == "range"
+	leaf.op in {"range", "outside_range"}
 	v := _found(x, leaf.path)
 	not is_number(v)
 }
@@ -2372,17 +2508,19 @@ _unusable(leaf, x) if {
 }
 
 _unusable(leaf, x) if {
-	leaf.op in {"includes", "excludes"}
+	leaf.op in _contain_ops
 	v := _found(x, leaf.path)
 	not is_array(v)
 }
 
 _unusable(leaf, x) if {
-	leaf.op in {"includes", "excludes"}
+	leaf.op in _contain_ops
 	v := _found(x, leaf.path)
 	is_array(v)
 	not _items_fit(v, _leaf_wants(leaf))
 }
+
+_contain_ops := {"includes", "excludes", "includes_some", "not_includes_all"}
 
 _leaf_wants(leaf) := [_arg(leaf.value)] if "value" in object.keys(leaf)
 
@@ -2454,7 +2592,7 @@ _unusable(leaf, x) if {
 
 _unusable(leaf, x) if {
 	_list_cmp(leaf)
-	leaf.cmp in {"includes", "excludes", "includes_all", "excludes_all"}
+	leaf.cmp in ({"includes", "excludes"} | _all_cmps)
 	v := _found(x, leaf.left)
 	not is_array(v)
 }
@@ -2470,7 +2608,7 @@ _unusable(leaf, x) if {
 
 _unusable(leaf, x) if {
 	_list_cmp(leaf)
-	leaf.cmp in {"includes_all", "excludes_all"}
+	leaf.cmp in _all_cmps
 	l := _found(x, leaf.left)
 	r := _found(x, leaf.right)
 	is_array(l)
@@ -2591,6 +2729,30 @@ _cmp("ends_with", l, r) if {
 	endswith(l, r)
 }
 
+_cmp("not_starts_with", l, r) if {
+	is_string(l)
+	is_string(r)
+	not startswith(l, r)
+}
+
+_cmp("not_ends_with", l, r) if {
+	is_string(l)
+	is_string(r)
+	not endswith(l, r)
+}
+
+_cmp("alphabetically_lte", l, r) if {
+	is_string(l)
+	is_string(r)
+	l <= r
+}
+
+_cmp("alphabetically_gte", l, r) if {
+	is_string(l)
+	is_string(r)
+	l >= r
+}
+
 _cmp("alphabetically_before", l, r) if {
 	is_string(l)
 	is_string(r)
@@ -2649,6 +2811,22 @@ _cmp("excludes_all", l, r) if {
 	}
 }
 
+_cmp("includes_some", l, r) if {
+	is_array(l)
+	_wanted(r)
+	_items_fit(l, r)
+	some want in r
+	want in l
+}
+
+_cmp("not_includes_all", l, r) if {
+	is_array(l)
+	_wanted(r)
+	_items_fit(l, r)
+	some want in r
+	not want in l
+}
+
 _cmp("matches_any", l, r) if {
 	is_string(l)
 	_valid_patterns(r)
@@ -2664,7 +2842,9 @@ _cmp("not_matches_any", l, r) if {
 	}
 }
 
-_list_cmps := {"in", "not_in", "includes", "excludes", "includes_all", "excludes_all", "matches_any", "not_matches_any"}
+_all_cmps := {"includes_all", "excludes_all", "includes_some", "not_includes_all"}
+
+_list_cmps := {"in", "not_in", "includes", "excludes", "matches_any", "not_matches_any"} | _all_cmps
 
 _list_cmp(leaf) if {
 	leaf.op == "compare"
@@ -2696,7 +2876,7 @@ _list_right_usable(cmp, r) if {
 _list_right_usable(cmp, _) if cmp in {"includes", "excludes"}
 
 _list_right_usable(cmp, r) if {
-	cmp in {"includes_all", "excludes_all"}
+	cmp in _all_cmps
 	_wanted(r)
 	not _mixed_types(r)
 }
@@ -2710,6 +2890,11 @@ _leaf_ops := {"range", "excludes", "includes", "in", "equals", "present", "missi
 
 _required_fields := {
 	"range": {"path", "min", "max"},
+	"outside_range": {"path", "min", "max"},
+	"includes_some": {"path"},
+	"not_includes_all": {"path"},
+	"lacks_type": {"path", "type"},
+	"not_non_empty_string": {"path"},
 	"excludes": {"path"},
 	"includes": {"path"},
 	"in": {"path", "values"},
@@ -2809,10 +2994,10 @@ _missing_fields_problem(node) := {concat("", ["missing ", f]) |
 }
 
 _value_or_values_problem(node) := {"missing value or values" |
-	node.op in {"includes", "excludes"}
+	node.op in _contain_ops
 	count({"value", "values"} & object.keys(node)) == 0
 } | {"both value and values" |
-	node.op in {"includes", "excludes"}
+	node.op in _contain_ops
 	count({"value", "values"} & object.keys(node)) == 2
 }
 
@@ -2836,7 +3021,7 @@ _compare_max_problem(node) := ({"invalid max" |
 } | {"max needs cmp gte" |
 	node.op == "compare"
 	"max" in object.keys(node)
-	object.get(node, "cmp", null) != "gte"
+	not object.get(node, "cmp", null) in {"gte", "outside"}
 }) | {"max can't go with within" |
 	node.op == "compare"
 	"max" in object.keys(node)
@@ -2859,6 +3044,8 @@ _op_fields := object.union(_required_fields, {
 	"compare": {"left", "right", "cmp", "within"},
 	"excludes": {"path", "value", "values"},
 	"includes": {"path", "value", "values"},
+	"includes_some": {"path", "values"},
+	"not_includes_all": {"path", "values"},
 	"all": {"path", "check", "each", "as"},
 	"any": {"path", "check", "each", "as"},
 })
@@ -2881,18 +3068,18 @@ _range_order_problem(node) := {"min above max" |
 }
 
 _values_problem(node) := ({"invalid values" |
-	node.op in {"in", "not_in", "includes", "excludes"}
+	node.op in ({"in", "not_in"} | _contain_ops)
 	"values" in object.keys(node)
 	not _value_list(_written(node.values))
 	not is_set(_written(node.values))
 	not _is_ref(node.values)
 } | {"values of mixed types" |
-	node.op in {"in", "not_in", "includes", "excludes"}
+	node.op in ({"in", "not_in"} | _contain_ops)
 	vals := _written(node.values)
 	_value_list(vals)
 	_mixed_types([_written(w) | some w in vals; not _is_ref(w)])
 }) | {"empty values" |
-	node.op in {"includes", "excludes"}
+	node.op in _contain_ops
 	_value_list(_written(node.values))
 	count(_written(node.values)) == 0
 }
@@ -2949,11 +3136,11 @@ _cmp_problem(node, here) := {"invalid cmp" |
 	not _sentence_cmp(node, here)
 }
 
-_text_cmps := {"starts_with", "ends_with", "alphabetically_before", "alphabetically_after"}
+_text_cmps := {"starts_with", "ends_with", "not_starts_with", "not_ends_with", "alphabetically_before", "alphabetically_after", "alphabetically_lte", "alphabetically_gte"}
 
 _sentence_cmp(node, here) if {
 	node.op == "compare"
-	node.cmp in (_text_cmps | _list_cmps)
+	node.cmp in ((_text_cmps | _list_cmps) | {"outside"})
 	_s_read(node, here)
 }
 
@@ -3045,14 +3232,14 @@ _node_param_broken(node) if {
 }
 
 _node_param_broken(node) if {
-	node.op in {"in", "not_in", "includes", "excludes"}
+	node.op in ({"in", "not_in"} | _contain_ops)
 	vals := _wants(node.values)
 	_value_list(vals)
 	_mixed_types(vals)
 }
 
 _node_param_broken(node) if {
-	node.op in {"includes", "excludes"}
+	node.op in _contain_ops
 	_is_ref(node.values)
 	v := _arg(node.values)
 	not _wanted(v)
@@ -3144,16 +3331,80 @@ _any_read_state(subj, path) := s if {
 _field_step_state(subj, path) := "not_an_object" if {
 	_has_field_step(path)
 	not is_object(subj)
+} else := s if {
+	prefix := array.slice(path, 0, _first_field_step(path))
+	not _read_before_field(_resolved(subj, prefix))
+	s := _state_before_field(subj, prefix)
 } else := "null" if {
-	some seg in path
+	some i, seg in path
 	_field_step(seg)
+	_read_before_field(_resolved(subj, array.slice(path, 0, i)))
 	subj[seg.named_by_field] == null
 } else := "unusable" if {
-	some seg in path
+	some i, seg in path
 	_field_step(seg)
+	_read_before_field(_resolved(subj, array.slice(path, 0, i)))
 	v := subj[seg.named_by_field]
 	not is_string(v)
 }
+
+_first_field_step(path) := min({i | some i, seg in path; _field_step(seg)})
+
+_state_before_field(subj, prefix) := "unusable" if {
+	start := _start_of(subj, prefix)
+	is_object(start)
+	_blocked(start, _keys_in(subj, prefix))
+}
+
+else := "absent"
+
+_read_before_field(v) if v != _absent
+
+_walk_read_state(subj, path) := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
+	is_object(subj)
+	i := _bad_field_at(subj, path)
+	_walks_before_field(subj, array.slice(path, 0, i))
+} else := "null" if {
+	is_object(subj)
+	i := _bad_field_at(subj, path)
+	_null_before_field(subj, array.slice(path, 0, i))
+} else := _read_state(subj, path)
+
+_bad_field_at(subj, path) := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
+
+_null_prefix_fails(item, subj) := array.concat(w.fails, _walk_stop(w)) if {
+	is_object(subj)
+	prefix := array.slice(item.path, 0, _bad_field_at(subj, item.path))
+	_null_before_field(subj, prefix)
+	p := object.union(item, {"path": prefix})
+	w := _walk(_walk_start(p, subj), _walk_keys(p, subj), false)
+} else := []
+
+_for_null_fails(item, subj, names) := fails if {
+	fails := _null_prefix_fails(item, subj) with input as {"ergo/names": names}
+}
+
+_null_before_field(subj, prefix) if {
+	some j, _ in prefix
+	j > _first_key_at(prefix)
+	_resolved(subj, array.slice(prefix, 0, j)) == null
+}
+
+_first_key_at(path) := 1 if _named(path)
+
+else := 0
+
+_walks_before_field(subj, prefix) if {
+	some i, seg in prefix
+	is_string(seg)
+	is_array(_resolved(subj, array.slice(prefix, 0, i)))
+}
+
+_key_state(v) := "absent" if v == _absent
+
+else := "null" if v == null
+
+else := "unusable"
 
 _name_step_state(path) := "null" if {
 	_has_name_step(path)
@@ -3441,9 +3692,31 @@ _leaf_paths(leaf) := [leaf.path] if {
 
 _row_inputs(subj, check) := _with_key_fields(subj, check, _check_inputs(subj, check))
 
-_with_key_fields(subj, check, inputs) := _once(array.concat(inputs, [_path_input(subj, [f]) | some f in _key_fields(check)])) if count(_key_fields(check)) > 0
+_with_key_fields(subj, check, inputs) := inputs if count(_key_fields(check)) == 0
 
-else := inputs
+else := _once(array.concat(
+	[x |
+		some entry in inputs
+		some x in array.concat([entry], [_path_input(subj, [f]) | some p in _field_paths(check); _names_path(entry, p); some f in _own_key_fields(p)])
+	],
+	[_path_input(subj, [f]) | some f in _key_fields(check)],
+))
+
+_names_path(entry, path) if entry.name == _input_name(path)
+
+_names_path(entry, path) if entry.name == concat("", [_input_name(path), "[]"])
+
+_field_paths(check) := [p |
+	is_object(check)
+	some p in array.concat([object.get(check, "path", [])], array.concat(_side_paths(object.get(check, "left", null)), _side_paths(object.get(check, "right", null))))
+	is_array(p)
+	count(_own_key_fields(p)) > 0
+]
+
+_own_key_fields(path) := [seg.named_by_field |
+	some seg in path
+	_field_step(seg)
+]
 
 _key_fields(check) := sort({seg.named_by_field |
 	is_object(check)
@@ -4767,6 +5040,24 @@ _side_form(side) := "add" if {
 	}
 }
 
+_side_form(side) := "join" if {
+	is_object(side)
+	object.keys(side) - {"text"} == {"join"}
+	is_string(object.get(side, "text", ""))
+	is_array(side.join)
+	count(side.join) > 0
+	every piece in side.join {
+		_join_piece(piece)
+	}
+}
+
+_join_piece(piece) if _basic_form(piece) == "path"
+
+_join_piece(piece) if {
+	_basic_form(piece) == "literal"
+	is_string(_written(piece))
+}
+
 _operand(x) if _basic_form(x) in {"path", "count_of", "sum_of", "elapsed"}
 
 _operand(x) if {
@@ -4776,7 +5067,7 @@ _operand(x) if {
 
 default _derived(_) := false
 
-_derived(side) if _side_form(side) in {"add", "count_of", "sum_of", "elapsed"}
+_derived(side) if _side_form(side) in {"add", "join", "count_of", "sum_of", "elapsed"}
 
 default _derived_sides(_) := []
 
@@ -4890,6 +5181,13 @@ _usable_sides(check, l, r) if {
 _usable_sides(check, l, r) if {
 	"within" in object.keys(check)
 	_within_usable(check, l, r)
+}
+
+_usable_sides(check, l, r) if {
+	check.cmp in {"includes", "excludes"}
+	is_array(l)
+	is_string(r)
+	_items_fit(l, [r])
 }
 
 _within_usable(check, l, r) if {
@@ -5025,6 +5323,8 @@ _basic_inputs(subj, side) := [_number_input(side.text, _first_or_null([x | x := 
 
 _side_inputs(subj, side) := _basic_inputs(subj, side) if _basic_form(side)
 
+_side_inputs(subj, side) := [i | some piece in side.join; some i in _basic_inputs(subj, piece)] if _side_form(side) == "join"
+
 _side_inputs(subj, side) := array.concat([_derived_input(subj, side, _side_text(side), operands)], operands) if {
 	_side_form(side) == "add"
 	operands := [i | some operand in side.add; some i in _basic_inputs(subj, operand)]
@@ -5035,7 +5335,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	not _off_subject(path)
 	not _reads_subject(path)
 	not is_object(subj)
-} else := {"states": {_read_state(subj, path)}, "list": _path_name(path), "values": [], "locations": []} if {
+} else := {"states": {_walk_read_state(subj, path)}, "list": _path_name(path), "values": [], "locations": []} if {
 	path := side[_basic_form(side)]
 	not _walk_keys({"path": path}, subj)
 } else := r if {
@@ -5078,7 +5378,7 @@ _cond_tally(item, side) := {"states": {"not_an_object"}} if {
 	not _off_subject(side.count_of)
 	not _reads_subject(side.count_of)
 	not is_object(item)
-} else := {"states": {_read_state(item, side.count_of)}} if {
+} else := {"states": {_walk_read_state(item, side.count_of)}} if {
 	not _walk_keys({"path": side.count_of}, item)
 } else := r if {
 	w := _walk(_walk_start({"path": side.count_of}, item), _walk_keys({"path": side.count_of}, item), true)
@@ -5190,6 +5490,8 @@ _side_paths(side) := _basic_paths(side) if _basic_form(side)
 
 _side_paths(side) := [p | some operand in side.add; some p in _basic_paths(operand)] if _side_form(side) == "add"
 
+_side_paths(side) := [p | some piece in side.join; some p in _basic_paths(piece)] if _side_form(side) == "join"
+
 _side_paths(side) := [] if not _side_form(side)
 
 _where_children(node, names) := [[c, array.concat(at, ["whose", i]), "where", names] |
@@ -5234,10 +5536,6 @@ _within_problem(node) := {"invalid within" |
 	node.op == "compare"
 	"within" in object.keys(node)
 	not _non_negative(node.within)
-} | {"within needs cmp eq" |
-	node.op == "compare"
-	"within" in object.keys(node)
-	object.get(node, "cmp", null) != "eq"
 }
 
 _non_negative(n) if {
@@ -5275,7 +5573,7 @@ _s_patterns := {
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
 	"cond": concat("", [`^(`, left, `) +(`, phrase, `)$`]),
 	"phrases": phrases,
-	"kinds": {kind[0]: concat("", [`^(?:`, kind[1], `)$`]) | some kind in kinds},
+	"kinds": object.union({kind[0]: concat("", [`^(?:`, kind[1], `)$`]) | some kind in kinds}, {"operand": concat("", [`^(?:`, joined, `)$`]), "operand_within": concat("", [`^(?:`, joined, `(?: +within +`, num, `)?)$`])}),
 	"plain": concat("", [`^(`, path, `) +(\S.*)$`]),
 	"quantified": concat("", [`^(every|some) +(`, path, `) +(\S.*)$`]),
 	"path": concat("", [`^`, path, `$`]),
@@ -5289,7 +5587,9 @@ _s_patterns := {
 	"values": concat("", [`^`, values, `$`]),
 	"each_value": value,
 	"range": concat("", [`^(`, num, `) +and +(`, num, `)$`]),
-	"operand_within": concat("", [`^(`, operand, `)(?: +within +(`, num, `))?$`]),
+	"operand_within": concat("", [`^(`, joined, `)(?: +within +(`, num, `))?$`]),
+	"join": concat("", [`^(`, single, `)((?:`, later, `)+)$`]),
+	"join_rest": concat("", [` +followed +by +(`, value, `|`, rpath, `)`]),
 	"quotes": `^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[^"']+)*`,
 	"strings": `"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'`,
 	"string": concat("", [`^(?:`, dq, `|`, sq, `)$`]),
@@ -5315,38 +5615,43 @@ _s_patterns := {
 	left := concat("", [`(?:`, path, `|`, terms, `)`])
 	value := concat("", [`(?:`, dq, `|`, sq, `|`, num, `|true|false|null)`])
 	values := concat("", [value, `(?:, *`, value, `)*`])
-	operand := concat("", [`(?:`, num, `(?: +plus +`, term, `)+|`, value, `|(?:`, derived, `|`, rpath, `)(?: +plus +`, term, `)*)`])
+	single := concat("", [`(?:`, num, `(?: +plus +`, term, `)+|`, value, `|(?:`, derived, `|`, rpath, `)(?: +plus +`, term, `)*)`])
+	later := concat("", [` +followed +by +(?:`, value, `|`, rpath, `)`])
+	bit := `(?:[^\s"'\\]|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\\.)+`
+	roughly := concat("", [` +followed +by +(?:`, pos, `)?`, bit, `(?: +named +by +`, bit, `)*`])
+	operand := single
+	joined := concat("", [single, `(?:`, later, `)*`])
 	list := concat("", [`(?:`, values, `|`, rpath, `)`])
 	type := `(?:list|string|number|boolean|object)`
 	phrases := [
 		["is not one of", `is +not +(?:one +of|in) +`, list, "list"],
 		["is one of", `is +(?:one +of|in) +`, list, "list"],
-		["is a non-empty string", `is +a +non-empty +string`, ``, "none"],
-		["is a", `is +an? +`, type, "type"],
+		["is a non-empty string", `is +(?:not +)?a +non-empty +string`, ``, "none", [["not", "is not a non-empty string"]]],
+		["is a", `is +(?:not +)?an? +`, type, "type", [["not", "is not a"]]],
 		["is not empty", `is +not +empty`, ``, "none"],
 		["is empty", `is +empty`, ``, "none"],
 		["does not exist", `does +not +exist`, ``, "none"],
 		["exists", `exists`, ``, "none"],
-		["contains all of", `contains +all +of +`, list, "list"],
-		["contains none of", `contains +none +of +`, list, "list"],
+		["contains all of", `(?:contains|does +not +contain) +all +of +`, list, "list", [["not", "does not contain all of"]]],
+		["contains none of", `contains +(?:none|some) +of +`, list, "list", [["some", "contains some of"]]],
 		["does not contain", `does +not +contain +`, operand, "operand"],
 		["contains", `contains +`, operand, "operand"],
 		["does not match", `does +not +match +`, list, "list"],
 		["matches", `matches +`, list, "list"],
-		["starts with", `starts +with +`, operand, "operand"],
-		["ends with", `ends +with +`, operand, "operand"],
-		["is alphabetically before", `is +alphabetically +before +`, operand, "operand"],
-		["is alphabetically after", `is +alphabetically +after +`, operand, "operand"],
+		["starts with", `(?:starts|does +not +start) +with +`, operand, "operand", [["not", "does not start with"]]],
+		["ends with", `(?:ends|does +not +end) +with +`, operand, "operand", [["not", "does not end with"]]],
+		["is alphabetically before", `is +alphabetically +(?:on +or +)?before +`, operand, "operand", [["on", "is alphabetically on or before"]]],
+		["is alphabetically after", `is +alphabetically +(?:on +or +)?after +`, operand, "operand", [["on", "is alphabetically on or after"]]],
 		["is at least", `is +at +least +`, operand, "operand"],
 		["is at most", `is +at +most +`, operand, "operand"],
 		["is more than", `is +more +than +`, operand, "operand"],
 		["is less than", `is +less +than +`, operand, "operand"],
-		["is between", `is +between +`, concat("", [num, ` +and +`, num]), "range"],
+		["is between", `is +(?:not +)?between +`, concat("", [num, ` +and +`, num]), "range", [["not", "is not between"]]],
 		["is on or after", `is +on +or +after +`, operand, "operand"],
 		["is on or before", `is +on +or +before +`, operand, "operand"],
 		["is before", `is +before +`, operand, "operand"],
 		["is after", `is +after +`, operand, "operand"],
-		["is not", `(?:is +not|does +not +equal) +`, operand, "operand"],
+		["is not", `(?:is +not|does +not +equal) +`, concat("", [operand, `(?: +within +`, num, `)?`]), "operand_within"],
 		["is", `(?:is +equal +to|equals|is) +`, concat("", [operand, `(?: +within +`, num, `)?`]), "operand_within"],
 	]
 	kinds := [
@@ -5355,9 +5660,9 @@ _s_patterns := {
 		["range", concat("", [num, ` +and +`, num])],
 		["list", list],
 		["operand", operand],
-		["operand_within", concat("", [operand, `(?: +within +`, num, `)?`])],
+		["operand_within", concat("", [operand, `(?:`, roughly, `)*(?: +within +`, num, `)?`])],
 	]
-	phrase := concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds])
+	phrase := concat("", [`(?:`, concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds]), `)(?:`, roughly, `)*`])
 	cond := concat("", [`(?:`, derived, `|`, path, `) +(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
 	from_cond := concat("", [`(?:(?:every|some) +`, path, `(?:, +if +any,)?|(?:`, derived, `|`, path, `)) +(?:`, phrase, `)`])
@@ -5673,13 +5978,29 @@ _s_ref_of(text) := {"steps": [text]} if {
 
 _s_ref_of(text) := {"steps": [text], "bad_name": text} if _s_bad_name(text)
 
-_s_phrase_of(text, pat) := object.union({"op": pat.phrases[hit[0]][0]}, _s_args_of(pat.phrases[hit[0]][3], hit[1], pat)) if {
+_s_phrase_of(text, pat) := object.union({"op": _s_op_of(pat.phrases[hit[0]], text, hit[1])}, _s_args_of(pat.phrases[hit[0]][3], hit[1], pat)) if {
 	hits := [[i, m[1]] |
 		some i, ph in pat.phrases
 		m := regex.find_all_string_submatch_n(concat("", [`^(?:`, ph[1], `)(.*)$`]), text, 1)[0]
 		regex.match(pat.kinds[ph[3]], m[1])
 	]
 	hit := hits[0]
+}
+
+_s_op_of(phrase, _, _) := phrase[0] if count(phrase) == 4
+
+_s_op_of(phrase, text, rest) := phrase[0] if {
+	count(phrase) == 5
+	prefix := substring(text, 0, count(text) - count(rest))
+	every choice in phrase[4] {
+		not contains(prefix, choice[0])
+	}
+}
+
+_s_op_of(phrase, text, rest) := choice[1] if {
+	count(phrase) == 5
+	some choice in phrase[4]
+	contains(substring(text, 0, count(text) - count(rest)), choice[0])
 }
 
 _s_args_of("none", _, _) := {}
@@ -5706,7 +6027,16 @@ _s_within_of(number) := {"within": _s_number(number)} if number != ""
 
 _s_operand_of(text, pat) := {"value": _s_value_of(text)} if {
 	regex.match(pat.value, text)
+} else := {"join": array.concat([_s_piece_of(first, pat)], [_s_piece_of(m[1], pat) | some m in rest])} if {
+	joined := regex.find_all_string_submatch_n(pat.join, text, 1)[0]
+	first := joined[1]
+	rest := regex.find_all_string_submatch_n(pat.join_rest, joined[2], -1)
+	concat("", [m[0] | some m in rest]) == joined[2]
 } else := {"terms": _s_terms_of(text, pat)}
+
+_s_piece_of(text, pat) := {"value": _s_value_of(text)} if regex.match(pat.value, text)
+
+_s_piece_of(text, pat) := {"terms": _s_terms_of(text, pat)} if not regex.match(pat.value, text)
 
 _s_values_of(text, pat) := [_s_value_of(m[0]) | some m in regex.find_all_string_submatch_n(pat.each_value, text, -1)]
 
@@ -5766,7 +6096,50 @@ _s_sq_char(`\\`) := `\`
 
 _s_sq_char(c) := c if not c in {`\'`, `\\`}
 
-_s_sentence_problems(parsed) := _s_base_problems(parsed) | _s_it_problems(parsed)
+_s_sentence_problems(parsed) := (_s_base_problems(parsed) | _s_it_problems(parsed)) | _s_join_problems(parsed)
+
+_s_join_problems(parsed) := set() if not _s_joins(parsed)
+
+_s_join_problems(parsed) := _s_join_flaws([node |
+	_s_joins(parsed)
+	some node in _s_nodes(parsed)
+	is_object(node)
+	_s_has_join(node)
+])
+
+_s_joins(x) if contains(json.marshal(x), `"join":`)
+
+_s_has_join(node) if "join" in object.keys(node)
+
+_s_has_join(node) if {
+	"terms" in object.keys(node)
+	"phrase" in object.keys(node)
+	"join" in object.keys(node.phrase)
+}
+
+_s_join_flaws(nodes) := ((({`"followed by" takes text` |
+	some node in nodes
+	some piece in object.get(node, "join", [])
+	"value" in object.keys(piece)
+	not is_string(piece.value)
+} | {`"followed by" can't take a count of, a sum of or a plus` |
+	some node in nodes
+	some piece in object.get(node, "join", [])
+	"terms" in object.keys(piece)
+	not _s_one_path(piece.terms)
+}) | {concat("", [`"`, node.op, `" can't take followed by`]) |
+	some node in nodes
+	"join" in object.keys(node)
+	node.op in object.keys(_s_takes)
+}) | {`"within" can't take followed by` |
+	some node in nodes
+	"join" in object.keys(node)
+	"within" in object.keys(node)
+}) | {`"followed by" can't follow a count of, a sum of or a plus` |
+	some node in nodes
+	"terms" in object.keys(node)
+	"join" in object.keys(object.get(node, "phrase", {}))
+}
 
 _s_text_names(text) := {concat("", ["unknown name ", m[1]]) |
 	some m in regex.find_all_string_submatch_n(concat("", [_s_patterns.strings, `|(?:^|[ ,\[])(\$[A-Za-z_]\w*)`]), text, -1)
@@ -5885,7 +6258,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 	some node in _s_nodes(parsed)
 	is_object(node)
 	"terms" in object.keys(node)
-	not node.phrase.op in {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is between"}
+	not node.phrase.op in {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is between", "is not between"}
 }) | {"a number can't start a sentence" |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -5894,7 +6267,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 }) | {"min above max" |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	node.op == "is between"
+	node.op in {"is between", "is not between"}
 	is_number(node.min)
 	is_number(node.max)
 	node.min > node.max
@@ -5922,7 +6295,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 }) | {concat("", [`"`, node.op, `" takes text`]) |
 	some node in _s_nodes(parsed)
 	is_object(node)
-	node.op in {"starts with", "ends with", "is alphabetically before", "is alphabetically after"}
+	node.op in _s_text_ops
 	"value" in object.keys(node)
 	not is_string(node.value)
 }) | {concat("", [`"`, node.op, `" takes `, _s_takes[node.op]]) |
@@ -5935,7 +6308,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 	some node in _s_nodes(parsed)
 	is_object(node)
 	object.keys(node) & {"every", "some"} != set()
-	node.phrase.op in {"contains", "does not contain", "contains all of", "contains none of"}
+	node.phrase.op in {"contains", "does not contain", "contains all of", "contains none of", "contains some of", "does not contain all of"}
 }) | {`"within" only compares numbers` |
 	some node in _s_nodes(parsed)
 	is_object(node)
@@ -5965,7 +6338,9 @@ _s_bad_name(name) if name in {"params", "input"}
 
 _s_nodes(x) := {y | walk(x, [_, y])}
 
-_s_self_ops := {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is before", "is after", "is on or after", "is on or before", "starts with", "ends with", "is alphabetically before", "is alphabetically after"}
+_s_text_ops := {"starts with", "ends with", "does not start with", "does not end with", "is alphabetically before", "is alphabetically after", "is alphabetically on or before", "is alphabetically on or after"}
+
+_s_self_ops := {"is", "is not", "is at least", "is at most", "is more than", "is less than", "is before", "is after", "is on or after", "is on or before"} | _s_text_ops
 
 _s_self_term(node) := node.phrase.terms[0] if {
 	node.phrase.op in _s_self_ops
@@ -6276,7 +6651,7 @@ _s_phrase_words(ph) := "equals" if {
 
 _s_phrase_words(ph) := "is" if {
 	ph.op == "is"
-	"value" in object.keys(ph)
+	object.keys(ph) & {"value", "join"} != set()
 }
 
 _s_phrase_words(ph) := "does not equal" if {
@@ -6286,7 +6661,7 @@ _s_phrase_words(ph) := "does not equal" if {
 
 _s_phrase_words(ph) := "is not" if {
 	ph.op == "is not"
-	"value" in object.keys(ph)
+	object.keys(ph) & {"value", "join"} != set()
 }
 
 _s_phrase_words(ph) := "is one of" if {
@@ -6319,16 +6694,26 @@ _s_phrase_words(ph) := "is a" if {
 	ph.type != "object"
 }
 
-_s_phrase_words(ph) := ph.op if not ph.op in {"is", "is not", "is one of", "is not one of", "is a"}
+_s_phrase_words(ph) := "is not an" if {
+	ph.op == "is not a"
+	ph.type == "object"
+}
 
-_s_args_text(ph) := ph.type if ph.op == "is a"
+_s_phrase_words(ph) := "is not a" if {
+	ph.op == "is not a"
+	ph.type != "object"
+}
 
-_s_args_text(ph) := concat(" and ", [_json_text(ph.min), _json_text(ph.max)]) if ph.op == "is between"
+_s_phrase_words(ph) := ph.op if not ph.op in {"is", "is not", "is one of", "is not one of", "is a", "is not a"}
+
+_s_args_text(ph) := ph.type if ph.op in {"is a", "is not a"}
+
+_s_args_text(ph) := concat(" and ", [_json_text(ph.min), _json_text(ph.max)]) if ph.op in {"is between", "is not between"}
 
 _s_args_text(ph) := concat(" within ", [_s_operand_text(ph), _json_text(ph.within)]) if "within" in object.keys(ph)
 
 _s_args_text(ph) := _s_operand_text(ph) if {
-	not ph.op in {"is a", "is between"}
+	not ph.op in {"is a", "is not a", "is between", "is not between"}
 	not "within" in object.keys(ph)
 }
 
@@ -6336,11 +6721,17 @@ _s_operand_text(ph) := _s_value_text(ph.value) if "value" in object.keys(ph)
 
 _s_operand_text(ph) := _s_terms_text(ph.terms) if "terms" in object.keys(ph)
 
+_s_operand_text(ph) := concat(" followed by ", [_s_piece_text(piece) | some piece in ph.join]) if "join" in object.keys(ph)
+
+_s_piece_text(piece) := _s_value_text(piece.value) if "value" in object.keys(piece)
+
+_s_piece_text(piece) := _s_terms_text(piece.terms) if "terms" in object.keys(piece)
+
 _s_operand_text(ph) := concat(", ", [_s_value_text(v) | some v in ph.values]) if "values" in object.keys(ph)
 
 _s_operand_text(ph) := _s_path_text(ph.path, "right") if "path" in object.keys(ph)
 
-_s_operand_text(ph) := "" if object.keys(ph) & {"value", "terms", "values", "path"} == set()
+_s_operand_text(ph) := "" if object.keys(ph) & {"value", "terms", "values", "path", "join"} == set()
 
 _s_value_text(v) := concat("", ["'", v, "'"]) if {
 	_s_single_quoted(v)
@@ -6553,7 +6944,7 @@ _s_from_read_of(name, fl, subjects, chains) := object.union(object.union({"probl
 	keep := names | object.keys(object.get(chains.parts, name, {}))
 	pc := {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}
 	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc), keep), names), pc) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
-	problems := sort(((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {_whose_problem(p) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}))
+	problems := sort((((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {_whose_problem(p) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}) | _s_join_unsupported({"where": object.get(fl, "where", [])})))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 	every_list := object.get(fl, "every", false) == true
@@ -7013,6 +7404,8 @@ _p_item_path(path, pc) := _p_path(_p_own_named(path), pc, "o") if {
 
 _p_item_right(side, pc) := object.union(side, {"add": [_p_item_right_one(o, pc) | some o in side.add]}) if is_array(object.get(side, "add", null))
 
+else := object.union(side, {"join": [_p_item_right_one(o, pc) | some o in side.join]}) if is_array(object.get(side, "join", null))
+
 else := _p_item_right_one(side, pc)
 
 _p_item_right_one(side, pc) := _p_item_path(side, pc) if is_array(side)
@@ -7030,9 +7423,15 @@ _p_side(side, pc, mode) := object.union(side, {"add": [_p_side_one(o, pc, mode) 
 	is_array(object.get(side, "add", null))
 }
 
+_p_side(side, pc, mode) := object.union(side, {"join": [_p_side_one(o, pc, mode) | some o in side.join]}) if {
+	is_object(side)
+	is_array(object.get(side, "join", null))
+}
+
 _p_side(side, pc, mode) := _p_side_one(side, pc, mode) if {
 	is_object(side)
 	not "add" in object.keys(side)
+	not "join" in object.keys(side)
 }
 
 _p_side_one(side, pc, mode) := _p_path(side, pc, mode) if is_array(side)
@@ -7451,11 +7850,25 @@ _s_model(a) := {
 	q != ""
 }
 
-_s_paths_unsupported(a) := {`last of isn't supported yet here: pick the item on a for line, like "for: last of commits as commit"` |
+_s_paths_unsupported(a) := ({`last of isn't supported yet here: pick the item on a for line, like "for: last of commits as commit"` |
 	some node in _s_nodes(a)
 	is_object(node)
 	_s_from_last(node)
-} | _s_elapsed_unsupported(a)
+} | _s_elapsed_unsupported(a)) | _s_join_unsupported(a)
+
+_s_join_unsupported(a) := set() if not _s_joins(a)
+
+_s_join_unsupported(a) := {`"followed by" isn't supported yet after every or some, or in a whose` |
+	_s_joins(a)
+	some node in _s_nodes(a)
+	is_object(node)
+	"join" in object.keys(node)
+	_s_join_misplaced(a, node)
+}
+
+_s_join_misplaced(a, _) if object.keys(a) & {"every", "some"} != set()
+
+_s_join_misplaced(a, node) if node in _s_nodes(object.get(a, "where", []))
 
 _s_from_last(node) if object.get(node, "position", null) == "last"
 
@@ -7509,7 +7922,7 @@ _s_one_path(terms) if {
 	"steps" in object.keys(terms[0])
 }
 
-_s_list_ops := {"is one of", "is not one of", "contains", "does not contain", "contains all of", "contains none of", "matches", "does not match"}
+_s_list_ops := {"is one of", "is not one of", "contains", "does not contain", "contains all of", "contains none of", "contains some of", "does not contain all of", "matches", "does not match"}
 
 _s_list_path(ph) := ph.path if "path" in object.keys(ph)
 
@@ -7553,7 +7966,7 @@ _s_cond_model(c) := _s_plain_model(c) if not "terms" in object.keys(c)
 
 _s_cond_model(c) := object.union({"op": "compare", "left": _s_bare_side(c.terms), "cmp": _s_derived_cmps[c.phrase.op], "right": _s_side(c.phrase)}, object.filter(c.phrase, {"within", "max"})) if "terms" in object.keys(c)
 
-_s_derived_cmps := {"is between": "gte", "is": "eq", "is not": "ne", "is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
+_s_derived_cmps := {"is between": "gte", "is not between": "outside", "is": "eq", "is not": "ne", "is at least": "gte", "is at most": "lte", "is more than": "gt", "is less than": "lt"}
 
 _s_plain_model(a) := {"op": "equals", "path": _s_model_path(a.path), "value": a.phrase.value} if {
 	a.phrase.op == "is"
@@ -7566,7 +7979,7 @@ _s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path
 	_s_side_given(a.phrase)
 }
 
-_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)} if a.phrase.op == "is not"
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": "ne", "right": _s_side(a.phrase)}, object.filter(a.phrase, {"within"})) if a.phrase.op == "is not"
 
 _s_plain_model(a) := {"op": _s_compare_ops[a.phrase.op][0], "left": _s_model_path(a.path), "cmp": _s_compare_ops[a.phrase.op][1], "right": _s_side(a.phrase)} if a.phrase.op in object.keys(_s_compare_ops)
 
@@ -7576,6 +7989,10 @@ _s_plain_model(a) := {"op": "in", "path": _s_model_path(a.path), "values": _s_li
 }
 
 _s_plain_model(a) := {"op": "has_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is a"
+
+_s_plain_model(a) := {"op": "lacks_type", "path": _s_model_path(a.path), "type": a.phrase.type} if a.phrase.op == "is not a"
+
+_s_plain_model(a) := {"op": "not_non_empty_string", "path": _s_model_path(a.path)} if a.phrase.op == "is not a non-empty string"
 
 _s_plain_model(a) := {"op": "not_in", "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
 	a.phrase.op == "is not one of"
@@ -7597,8 +8014,13 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 	not _s_field_arg(a.phrase)
 }
 
+_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_side(a.phrase)} if {
+	a.phrase.op in {"contains", "does not contain"}
+	"join" in object.keys(a.phrase)
+}
+
 _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(a.path), "values": _s_list(a.phrase)} if {
-	a.phrase.op in {"contains all of", "contains none of"}
+	a.phrase.op in {"contains all of", "contains none of", "contains some of", "does not contain all of"}
 	not _s_field_arg(a.phrase)
 }
 
@@ -7637,15 +8059,19 @@ _s_list_cmps := {
 	"does not contain": "excludes",
 	"contains all of": "includes_all",
 	"contains none of": "excludes_all",
+	"contains some of": "includes_some",
+	"does not contain all of": "not_includes_all",
 	"matches": "matches_any",
 	"does not match": "not_matches_any",
 }
 
 _s_plain_model(a) := {"op": "range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is between"
 
+_s_plain_model(a) := {"op": "outside_range", "path": _s_model_path(a.path), "min": a.phrase.min, "max": a.phrase.max} if a.phrase.op == "is not between"
+
 _s_compare_ops := object.union(
 	object.union({op: ["compare", cmp] | some op, cmp in _s_order_cmps}, {op: ["compare_time", cmp] | some op, cmp in _s_time_cmps}),
-	{"starts with": ["compare", "starts_with"], "ends with": ["compare", "ends_with"], "is alphabetically before": ["compare", "alphabetically_before"], "is alphabetically after": ["compare", "alphabetically_after"]},
+	{"starts with": ["compare", "starts_with"], "ends with": ["compare", "ends_with"], "does not start with": ["compare", "not_starts_with"], "does not end with": ["compare", "not_ends_with"], "is alphabetically before": ["compare", "alphabetically_before"], "is alphabetically after": ["compare", "alphabetically_after"], "is alphabetically on or before": ["compare", "alphabetically_lte"], "is alphabetically on or after": ["compare", "alphabetically_gte"]},
 )
 
 _s_contains_ops := {
@@ -7653,6 +8079,8 @@ _s_contains_ops := {
 	"does not contain": "excludes",
 	"contains all of": "includes",
 	"contains none of": "excludes",
+	"contains some of": "includes_some",
+	"does not contain all of": "not_includes_all",
 	"matches": "matches_any",
 	"does not match": "not_matches_any",
 }
@@ -7661,11 +8089,19 @@ _s_side_given(ph) if "terms" in object.keys(ph)
 
 _s_side_given(ph) if "within" in object.keys(ph)
 
+_s_side_given(ph) if "join" in object.keys(ph)
+
 _s_side(ph) := {"literal": ph.value} if "value" in object.keys(ph)
 
-_s_side(ph) := {"literal": ph.min} if ph.op == "is between"
+_s_side(ph) := {"literal": ph.min} if ph.op in {"is between", "is not between"}
 
 _s_side(ph) := _s_bare_side(ph.terms) if "terms" in object.keys(ph)
+
+_s_side(ph) := {"join": [_s_piece_side(piece) | some piece in ph.join], "text": _s_operand_text(ph)} if "join" in object.keys(ph)
+
+_s_piece_side(piece) := {"literal": piece.value} if "value" in object.keys(piece)
+
+_s_piece_side(piece) := _s_bare_side(piece.terms) if "terms" in object.keys(piece)
 
 _s_bare_side([t]) := _s_term_side(t)
 
@@ -7788,8 +8224,8 @@ _walk_flawed(check) if _param_broken(check, set())
 
 _walk_flawed(_) if _unreadable_input
 
-_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check))))), "failed": []} if {
-	state := _read_state(subj, check.path)
+_walk_read_row(check, subj) := {"cause": state, "inputs": _merged_inputs(array.concat([{"name": _path_name(check.path), "value": [], "locations": []}], array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check))))), "failed": _walk_failed(state, _null_prefix_fails(check, subj), check.path)} if {
+	state := _walk_read_state(subj, check.path)
 	not _walk_keys(check, subj)
 }
 
@@ -8281,9 +8717,15 @@ _s_named_side(side, names) := object.union(side, {"add": [_s_named_tally(o, name
 	"add" in object.keys(side)
 }
 
+_s_named_side(side, names) := object.union(side, {"join": [_s_named_tally(o, names) | some o in side.join]}) if {
+	is_object(side)
+	"join" in object.keys(side)
+}
+
 _s_named_side(side, names) := _s_named_tally(side, names) if {
 	is_object(side)
 	not "add" in object.keys(side)
+	not "join" in object.keys(side)
 }
 
 _s_named_tally(side, names) := _s_named_path(side, names) if is_array(side)
@@ -8331,7 +8773,7 @@ _for_row(check, subj) := object.union(_for_outer(check, subj, _for_names), {"cau
 	not is_object(subj)
 } else := _for_outer(check, subj, _for_names)
 
-_for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": []} if {
+_for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": _for_failed(check, w.unread, [object.union(f, {"lines": []}) | some f in w.fails])} if {
 	w := _for_walk(check.items[0], subj, names)
 	"unread" in object.keys(w)
 } else := {"cause": cause, "inputs": _for_inputs(check, subj, names, check.items[0], _for_walk(check.items[0], subj, names)), "failed": _for_failed(check, cause, [object.union(f, {"lines": []}) | some f in _for_pick_fails(check, pre)])} if {
@@ -8352,6 +8794,8 @@ _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(chec
 }
 
 _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] if not "unread" in object.keys(w)
+
+else := w.fails if w.fails != []
 
 else := [object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {}))]
 
@@ -8396,7 +8840,21 @@ _for_only_shared(f, t) if {
 _for_walk(item, subj, names) := _for_picked(item, w, names) if {
 	keys := _walk_keys(item, subj) with input as {"ergo/names": names}
 	w := _walk(_walk_start(item, subj), keys, _for_empty_ok(item)) with input as {"ergo/names": names}
-} else := object.union({"items": [], "fails": [], "walked": set(), "trail": [], "unread": _read_state(subj, item.path)}, _unread_at(subj, item, names))
+} else := object.union({"items": [], "fails": _for_null_fails(item, subj, names), "walked": set(), "trail": [], "unread": _for_unread(subj, item.path, names)}, _unread_at(subj, item, names))
+
+_for_unread(subj, path, names) := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
+	is_object(subj)
+	i := _bad_field_at(subj, path)
+	_open_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
+} else := "null" if {
+	is_object(subj)
+	i := _bad_field_at(subj, path)
+	_null_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
+} else := _walk_read_state(subj, path)
+
+_open_before_field(subj, prefix) if _read_before_field(_resolved(subj, prefix))
+
+_open_before_field(subj, prefix) if _walks_before_field(subj, prefix)
 
 _unread_at(subj, item, names) := {"unread_at": {"at": at}} if at := _unread_pointer(subj, item.path) with input as {"ergo/names": names}
 
