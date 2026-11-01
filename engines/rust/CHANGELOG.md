@@ -11,6 +11,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### Changed
 
+- A path that names its key by a field lists the field in a row's `inputs` for a `count of`, a `sum of`, an `every` and a `some` too, right after the list's entry, and the check of a `for` line keeps its whole path, `m named by p` and then `p`, where it showed only `m`, as spec 0.4 says. When the path before the field can't be read, an `every` or `some` fails with that path's cause, not the field's. Reports change for such policies.
 - The report's `engine` name is `ergo-rust`, where it was `ergo-policy-engine`, so it matches the Rego engine's `ergo-rego` and the `rust-v*` tag. Every report changes in that field only, and the hash leaves `engine` out, so hashes stay the same. The version is the same.
 - The engine follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released.
 - An input that reads the item's own field named like a parent subject keeps its dot, like `.art.k`, as spec 0.4 says. A `from` that starts at the input with a `named by` step is written as it is in the `$min_subjects` and `$unique_ids` expressions, so `every $input named by $params.k` is no longer `count(matching(every [$params.k]))`. Reports change for such policies. The `from` a subject gets in `subjects` keeps every dot the policy wrote on the left of a `whose`, like `.art.k`, `.art.xs[0]` or a part's `.att.id`, where it dropped them.
