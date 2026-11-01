@@ -3605,9 +3605,38 @@ _leaf_paths(leaf) := [leaf.path] if {
 
 _row_inputs(subj, check) := _with_key_fields(subj, check, _check_inputs(subj, check))
 
-_with_key_fields(subj, check, inputs) := _once(array.concat(inputs, [_path_input(subj, [f]) | some f in _key_fields(check)])) if count(_key_fields(check)) > 0
+_with_key_fields(subj, check, inputs) := inputs if count(_key_fields(check)) == 0
 
-else := inputs
+else := _once([x |
+	some i, entry in inputs
+	some x in array.concat([entry], [_path_input(subj, [f]) | some f in _own_key_fields(_written_paths(check)[i])])
+]) if {
+	_in_written_order(check, inputs)
+}
+
+else := _once(array.concat(inputs, [_path_input(subj, [f]) | some f in _key_fields(check)]))
+
+_in_written_order(check, inputs) if {
+	check.op in {"compare", "compare_time"}
+	every f in ["left", "right"] {
+		_basic_form(object.get(check, f, null)) in {"path", "literal"}
+	}
+	count(_written_paths(check)) == count(inputs)
+}
+
+_in_written_order(check, inputs) if {
+	check.op == "compare"
+	_side_form(check.right) == "join"
+	_basic_form(check.left) == "path"
+	count(_written_paths(check)) == count(inputs)
+}
+
+_written_paths(check) := array.concat(_side_paths(object.get(check, "left", null)), _side_paths(object.get(check, "right", null)))
+
+_own_key_fields(path) := [seg.named_by_field |
+	some seg in path
+	_field_step(seg)
+]
 
 _key_fields(check) := sort({seg.named_by_field |
 	is_object(check)

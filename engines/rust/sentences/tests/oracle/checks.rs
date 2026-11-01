@@ -4247,6 +4247,56 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "ab is m named by p followed by q",
+        "ab is m named by p followed by q",
+        &[],
+        &[],
+    ),
+    (
+        "ab is q followed by m named by p",
+        "ab is q followed by m named by p",
+        &[],
+        &[],
+    ),
+    (
+        "days elapsed from s to e is not 2 within 0.5",
+        "days elapsed from s to e is not 2 within 0.5",
+        &[],
+        &[],
+    ),
+    (
+        "days elapsed from s to e is not between 1 and 2",
+        "days elapsed from s to e is not between 1 and 2",
+        &[],
+        &[],
+    ),
+    ("m named by p is q", "m named by p equals q", &[], &[]),
+    ("q is m named by p", "q equals m named by p", &[], &[]),
+    (
+        "sum of items.n is not 3 within 0.5",
+        "sum of items.n is not 3 within 0.5",
+        &[],
+        &[],
+    ),
+    (
+        "sum of items.n is not between 2 and 3",
+        "sum of items.n is not between 2 and 3",
+        &[],
+        &[],
+    ),
+    (
+        "x plus y is not 3 within 1",
+        "x plus y is not 3 within 1",
+        &[],
+        &[],
+    ),
+    (
+        "x plus y is not between 3 and 4",
+        "x plus y is not between 3 and 4",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

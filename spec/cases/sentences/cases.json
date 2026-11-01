@@ -9315,5 +9315,323 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count of a list of another kind is not between two numbers",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "count of l is not between 2 and 3"}}}},
+    "cases": [
+      {
+        "description": "counts the items of a list of strings",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "l": ["a", "b", "c", "d"]}, {"id": "t1", "l": ["a", "b"]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l/0", "/things/0/l/1", "/things/0/l/2", "/things/0/l/3"], "name": "count of l", "value": 4}, {"locations": ["/things/0/l/0", "/things/0/l/1", "/things/0/l/2", "/things/0/l/3"], "name": "l[]", "value": ["a", "b", "c", "d"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/l/0", "/things/1/l/1"], "name": "count of l", "value": 2}, {"locations": ["/things/1/l/0", "/things/1/l/1"], "name": "l[]", "value": ["a", "b"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "counts the items of a list of numbers",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "l": [1]}, {"id": "t1", "l": [1, 2, 3, 4, 5]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/l/0"], "name": "count of l", "value": 1}, {"locations": ["/things/0/l/0"], "name": "l[]", "value": [1]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/1/l/0", "/things/1/l/1", "/things/1/l/2", "/things/1/l/3", "/things/1/l/4"], "name": "count of l", "value": 5}, {"locations": ["/things/1/l/0", "/things/1/l/1", "/things/1/l/2", "/things/1/l/3", "/things/1/l/4"], "name": "l[]", "value": [1, 2, 3, 4, 5]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as unusable when the field isn't a list",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "l": "abc"}, {"id": "t1", "l": 3}, {"id": "t1", "l": {"k": 1}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sum of is not between two numbers",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "sum of items.n is not between 2 and 3"}}}},
+    "cases": [
+      {
+        "description": "passes below and above the range",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "items": [{"n": 1}]}, {"id": "t1", "items": [{"n": 2}, {"n": 1.5}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/items/0/n"], "name": "sum of items.n", "value": 1}, {"locations": ["/things/0/items/0/n"], "name": "items[].n", "value": [1]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/1/items/0/n", "/things/1/items/1/n"], "name": "sum of items.n", "value": 3.5}, {"locations": ["/things/1/items/0/n", "/things/1/items/1/n"], "name": "items[].n", "value": [2, 1.5]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "sum of items.n is not between 2 and 3"}}
+      },
+      {
+        "description": "fails as value from the first number to the second",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "items": [{"n": 2}]}, {"id": "t1", "items": [{"n": 1}, {"n": 2}]}, {"id": "t1", "items": [{"n": 3}]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/items/0/n"], "name": "sum of items.n", "value": 2}, {"locations": ["/things/0/items/0/n"], "name": "items[].n", "value": [2]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/items/0/n", "/things/1/items/1/n"], "name": "sum of items.n", "value": 3}, {"locations": ["/things/1/items/0/n", "/things/1/items/1/n"], "name": "items[].n", "value": [1, 2]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/2/items/0/n"], "name": "sum of items.n", "value": 3}, {"locations": ["/things/2/items/0/n"], "name": "items[].n", "value": [3]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "sum of items.n is not between 2 and 3"}}
+      },
+      {
+        "description": "fails as unusable on a value that isn't a number",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "items": [{"n": "2"}]}, {"id": "t1", "items": [{"n": 1}, {"n": [2]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/items/0/n"], "name": "sum of items.n", "value": null}, {"locations": ["/things/0/items/0/n"], "name": "items[].n", "value": ["2"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/1/items/1/n/0"], "name": "sum of items.n", "value": null}, {"locations": ["/things/1/items/1/n/0"], "name": "items[].n[]", "value": [2]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "sum of items.n is not between 2 and 3"}}
+      },
+      {
+        "description": "fails as absent or null when a value or the list is missing or null",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "items": [{"n": 1}, {}]}, {"id": "t1", "items": [{"n": null}]}, {"id": "t1"}, {"id": "t1", "items": null}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0/items/0/n", "/things/0/items/1"], "name": "sum of items.n", "value": null}, {"locations": ["/things/0/items/0/n", "/things/0/items/1"], "name": "items[].n", "value": [1, null]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/1/items/0/n"], "name": "sum of items.n", "value": null}, {"locations": ["/things/1/items/0/n"], "name": "items[].n", "value": [null]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": [], "name": "sum of items.n", "value": null}, {"locations": [], "name": "items.n", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": [], "name": "sum of items.n", "value": null}, {"locations": [], "name": "items.n", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "sum of items.n is not between 2 and 3"}}
+      }
+    ]
+  },
+  {
+    "description": "a plus is not between two numbers",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x plus y is not between 3 and 4"}}}},
+    "cases": [
+      {
+        "description": "passes below and above the range",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1}, {"id": "t1", "x": 3, "y": 2}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x", "/things/0/y"], "name": "x plus y", "value": 2}, {"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0/y"], "name": "y", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/1/x", "/things/1/y"], "name": "x plus y", "value": 5}, {"locations": ["/things/1/x"], "name": "x", "value": 3}, {"locations": ["/things/1/y"], "name": "y", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x plus y is not between 3 and 4"}}
+      },
+      {
+        "description": "fails as value from the first number to the second",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 2}, {"id": "t1", "x": 2, "y": 2}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x", "/things/0/y"], "name": "x plus y", "value": 3}, {"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0/y"], "name": "y", "value": 2}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/x", "/things/1/y"], "name": "x plus y", "value": 4}, {"locations": ["/things/1/x"], "name": "x", "value": 2}, {"locations": ["/things/1/y"], "name": "y", "value": 2}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x plus y is not between 3 and 4"}}
+      },
+      {
+        "description": "fails as unusable on a value that isn't a number",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "x": "1", "y": 2}, {"id": "t1", "x": 1, "y": [2]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/x", "/things/0/y"], "name": "x plus y", "value": null}, {"locations": ["/things/0/x"], "name": "x", "value": "1"}, {"locations": ["/things/0/y"], "name": "y", "value": 2}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/1/x", "/things/1/y"], "name": "x plus y", "value": null}, {"locations": ["/things/1/x"], "name": "x", "value": 1}, {"locations": ["/things/1/y"], "name": "y", "value": [2]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x plus y is not between 3 and 4"}}
+      },
+      {
+        "description": "fails as absent or null when a field is missing or null",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "x": 1}, {"id": "t1", "x": null, "y": 1}, {"id": "t1", "y": 1}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0/x", "/things/0"], "name": "x plus y", "value": null}, {"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0"], "name": "y", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/1/x", "/things/1/y"], "name": "x plus y", "value": null}, {"locations": ["/things/1/x"], "name": "x", "value": null}, {"locations": ["/things/1/y"], "name": "y", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/2", "/things/2/y"], "name": "x plus y", "value": null}, {"locations": ["/things/2"], "name": "x", "value": null}, {"locations": ["/things/2/y"], "name": "y", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x plus y is not between 3 and 4"}}
+      }
+    ]
+  },
+  {
+    "description": "an elapsed time is not between two numbers",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "days elapsed from s to e is not between 1 and 2"}}}},
+    "cases": [
+      {
+        "description": "passes below and above the range",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "s": "2026-10-01", "e": "2026-10-01"}, {"id": "t1", "s": "2026-10-01", "e": "2026-10-04"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/s", "/things/0/e"], "name": "days elapsed from s to e", "value": 0}, {"locations": ["/things/0/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/0/e"], "name": "e", "value": "2026-10-01"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/1/s", "/things/1/e"], "name": "days elapsed from s to e", "value": 3}, {"locations": ["/things/1/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/1/e"], "name": "e", "value": "2026-10-04"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "days elapsed from s to e is not between 1 and 2"}}
+      },
+      {
+        "description": "fails as value from the first number to the second",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "s": "2026-10-01", "e": "2026-10-02"}, {"id": "t1", "s": "2026-10-01", "e": "2026-10-03"}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/s", "/things/0/e"], "name": "days elapsed from s to e", "value": 1}, {"locations": ["/things/0/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/0/e"], "name": "e", "value": "2026-10-02"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/s", "/things/1/e"], "name": "days elapsed from s to e", "value": 2}, {"locations": ["/things/1/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/1/e"], "name": "e", "value": "2026-10-03"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "days elapsed from s to e is not between 1 and 2"}}
+      },
+      {
+        "description": "fails as unusable on times of two kinds or on text that isn't a time",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "s": "2026-10-01", "e": "2026-10-02T00:00:00Z"}, {"id": "t1", "s": "yesterday", "e": "today"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/s", "/things/0/e"], "name": "days elapsed from s to e", "value": null}, {"locations": ["/things/0/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/0/e"], "name": "e", "value": "2026-10-02T00:00:00Z"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/1/s", "/things/1/e"], "name": "days elapsed from s to e", "value": null}, {"locations": ["/things/1/s"], "name": "s", "value": "yesterday"}, {"locations": ["/things/1/e"], "name": "e", "value": "today"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "days elapsed from s to e is not between 1 and 2"}}
+      },
+      {
+        "description": "fails as absent or null when a time is missing or null",
+        "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
+        "input": {"things": [{"id": "t1", "s": "2026-10-01"}, {"id": "t1", "s": null, "e": "2026-10-02"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0/s", "/things/0"], "name": "days elapsed from s to e", "value": null}, {"locations": ["/things/0/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/0"], "name": "e", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/1/s", "/things/1/e"], "name": "days elapsed from s to e", "value": null}, {"locations": ["/things/1/s"], "name": "s", "value": null}, {"locations": ["/things/1/e"], "name": "e", "value": "2026-10-02"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "days elapsed from s to e is not between 1 and 2"}}
+      }
+    ]
+  },
+  {
+    "description": "a sum of is not a value within a number",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "sum of items.n is not 3 within 0.5"}}}},
+    "cases": [
+      {
+        "description": "passes when further apart",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "items": [{"n": 1}]}, {"id": "t1", "items": [{"n": 2}, {"n": 1.6}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/items/0/n"], "name": "sum of items.n", "value": 1}, {"locations": ["/things/0/items/0/n"], "name": "items[].n", "value": [1]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/1/items/0/n", "/things/1/items/1/n"], "name": "sum of items.n", "value": 3.6}, {"locations": ["/things/1/items/0/n", "/things/1/items/1/n"], "name": "items[].n", "value": [2, 1.6]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "sum of items.n is not 3 within 0.5"}}
+      },
+      {
+        "description": "fails as value when exactly or less than that far apart",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "items": [{"n": 3}]}, {"id": "t1", "items": [{"n": 3.5}]}, {"id": "t1", "items": [{"n": 2}, {"n": 1.2}]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/items/0/n"], "name": "sum of items.n", "value": 3}, {"locations": ["/things/0/items/0/n"], "name": "items[].n", "value": [3]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/items/0/n"], "name": "sum of items.n", "value": 3.5}, {"locations": ["/things/1/items/0/n"], "name": "items[].n", "value": [3.5]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/2/items/0/n", "/things/2/items/1/n"], "name": "sum of items.n", "value": 3.2}, {"locations": ["/things/2/items/0/n", "/things/2/items/1/n"], "name": "items[].n", "value": [2, 1.2]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "sum of items.n is not 3 within 0.5"}}
+      },
+      {
+        "description": "fails as unusable, absent or null like the sum does",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "items": [{"n": "3"}]}, {"id": "t1", "items": [{"n": 1}, {}]}, {"id": "t1", "items": [{"n": null}]}, {"id": "t1"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/items/0/n"], "name": "sum of items.n", "value": null}, {"locations": ["/things/0/items/0/n"], "name": "items[].n", "value": ["3"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/1/items/0/n", "/things/1/items/1"], "name": "sum of items.n", "value": null}, {"locations": ["/things/1/items/0/n", "/things/1/items/1"], "name": "items[].n", "value": [1, null]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/2/items/0/n"], "name": "sum of items.n", "value": null}, {"locations": ["/things/2/items/0/n"], "name": "items[].n", "value": [null]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": [], "name": "sum of items.n", "value": null}, {"locations": [], "name": "items.n", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "sum of items.n is not 3 within 0.5"}}
+      }
+    ]
+  },
+  {
+    "description": "a plus is not a value within a number",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x plus y is not 3 within 1"}}}},
+    "cases": [
+      {
+        "description": "passes when further apart",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 0.5}, {"id": "t1", "x": 3, "y": 3}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/x", "/things/0/y"], "name": "x plus y", "value": 1.5}, {"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0/y"], "name": "y", "value": 0.5}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/1/x", "/things/1/y"], "name": "x plus y", "value": 6}, {"locations": ["/things/1/x"], "name": "x", "value": 3}, {"locations": ["/things/1/y"], "name": "y", "value": 3}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x plus y is not 3 within 1"}}
+      },
+      {
+        "description": "fails as value when exactly or less than that far apart",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "x": 1, "y": 1}, {"id": "t1", "x": 2, "y": 2}, {"id": "t1", "x": 1.5, "y": 1.5}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/x", "/things/0/y"], "name": "x plus y", "value": 2}, {"locations": ["/things/0/x"], "name": "x", "value": 1}, {"locations": ["/things/0/y"], "name": "y", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/x", "/things/1/y"], "name": "x plus y", "value": 4}, {"locations": ["/things/1/x"], "name": "x", "value": 2}, {"locations": ["/things/1/y"], "name": "y", "value": 2}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/2/x", "/things/2/y"], "name": "x plus y", "value": 3}, {"locations": ["/things/2/x"], "name": "x", "value": 1.5}, {"locations": ["/things/2/y"], "name": "y", "value": 1.5}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x plus y is not 3 within 1"}}
+      },
+      {
+        "description": "fails as unusable, absent or null like the plus does",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "x": "1", "y": 2}, {"id": "t1", "x": 1}, {"id": "t1", "x": null, "y": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/x", "/things/0/y"], "name": "x plus y", "value": null}, {"locations": ["/things/0/x"], "name": "x", "value": "1"}, {"locations": ["/things/0/y"], "name": "y", "value": 2}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/1/x", "/things/1"], "name": "x plus y", "value": null}, {"locations": ["/things/1/x"], "name": "x", "value": 1}, {"locations": ["/things/1"], "name": "y", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/2/x", "/things/2/y"], "name": "x plus y", "value": null}, {"locations": ["/things/2/x"], "name": "x", "value": null}, {"locations": ["/things/2/y"], "name": "y", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "x plus y is not 3 within 1"}}
+      }
+    ]
+  },
+  {
+    "description": "an elapsed time is not a value within a number",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "days elapsed from s to e is not 2 within 0.5"}}}},
+    "cases": [
+      {
+        "description": "passes when further apart",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "s": "2026-10-01", "e": "2026-10-01"}, {"id": "t1", "s": "2026-10-01", "e": "2026-10-04"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/s", "/things/0/e"], "name": "days elapsed from s to e", "value": 0}, {"locations": ["/things/0/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/0/e"], "name": "e", "value": "2026-10-01"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/1/s", "/things/1/e"], "name": "days elapsed from s to e", "value": 3}, {"locations": ["/things/1/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/1/e"], "name": "e", "value": "2026-10-04"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "days elapsed from s to e is not 2 within 0.5"}}
+      },
+      {
+        "description": "fails as value when exactly or less than that far apart",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "s": "2026-10-01", "e": "2026-10-03"}, {"id": "t1", "s": "2026-10-01T00:00:00Z", "e": "2026-10-03T12:00:00Z"}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/s", "/things/0/e"], "name": "days elapsed from s to e", "value": 2}, {"locations": ["/things/0/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/0/e"], "name": "e", "value": "2026-10-03"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/1/s", "/things/1/e"], "name": "days elapsed from s to e", "value": 2.5}, {"locations": ["/things/1/s"], "name": "s", "value": "2026-10-01T00:00:00Z"}, {"locations": ["/things/1/e"], "name": "e", "value": "2026-10-03T12:00:00Z"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "days elapsed from s to e is not 2 within 0.5"}}
+      },
+      {
+        "description": "fails as unusable, absent or null like the elapsed time does",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "s": "yesterday", "e": "today"}, {"id": "t1", "s": "2026-10-01"}, {"id": "t1", "s": null, "e": "2026-10-02"}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/s", "/things/0/e"], "name": "days elapsed from s to e", "value": null}, {"locations": ["/things/0/s"], "name": "s", "value": "yesterday"}, {"locations": ["/things/0/e"], "name": "e", "value": "today"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/1/s", "/things/1"], "name": "days elapsed from s to e", "value": null}, {"locations": ["/things/1/s"], "name": "s", "value": "2026-10-01"}, {"locations": ["/things/1"], "name": "e", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/2/s", "/things/2/e"], "name": "days elapsed from s to e", "value": null}, {"locations": ["/things/2/s"], "name": "s", "value": null}, {"locations": ["/things/2/e"], "name": "e", "value": "2026-10-02"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "expressions": {"s": {"a": "days elapsed from s to e is not 2 within 0.5"}}
+      }
+    ]
+  },
+  {
+    "description": "a path that names its key by a field lists the field right after the path",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"l": {"subject": "t", "checks": {"c": "m named by p is q"}}, "r": {"subject": "t", "checks": {"c": "q is m named by p"}}, "j": {"subject": "t", "checks": {"c": "ab is q followed by m named by p"}}, "k": {"subject": "t", "checks": {"c": "ab is m named by p followed by q"}}}},
+    "cases": [
+      {
+        "description": "on the left of a compare, on the right and in a followed by piece",
+        "rules": ["path.field_step", "compare.inputs", "compare.join"],
+        "input": {"things": [{"id": "t", "ab": "x", "m": {"x": "x"}, "p": "x", "q": "x"}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/ab"], "name": "ab", "value": "x"}, {"locations": ["/things/0/q"], "name": "q", "value": "x"}, {"locations": ["/things/0/m/x"], "name": "m named by p", "value": "x"}, {"locations": ["/things/0/p"], "name": "p", "value": "x"}], "passed": false, "requirement": "j", "subject": {"id": "t", "type": "t"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/ab"], "name": "ab", "value": "x"}, {"locations": ["/things/0/m/x"], "name": "m named by p", "value": "x"}, {"locations": ["/things/0/p"], "name": "p", "value": "x"}, {"locations": ["/things/0/q"], "name": "q", "value": "x"}], "passed": false, "requirement": "k", "subject": {"id": "t", "type": "t"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/m/x"], "name": "m named by p", "value": "x"}, {"locations": ["/things/0/p"], "name": "p", "value": "x"}, {"locations": ["/things/0/q"], "name": "q", "value": "x"}], "passed": true, "requirement": "l", "subject": {"id": "t", "type": "t"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/q"], "name": "q", "value": "x"}, {"locations": ["/things/0/m/x"], "name": "m named by p", "value": "x"}, {"locations": ["/things/0/p"], "name": "p", "value": "x"}], "passed": true, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      },
+      {
+        "description": "when the field can't be read",
+        "rules": ["path.field_step", "compare.inputs", "compare.join"],
+        "input": {"things": [{"id": "t", "ab": "x", "m": {"x": "x"}, "q": "x"}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/ab"], "name": "ab", "value": "x"}, {"locations": ["/things/0/q"], "name": "q", "value": "x"}, {"locations": ["/things/0/m"], "name": "m named by p", "value": null}, {"locations": ["/things/0"], "name": "p", "value": null}], "passed": false, "requirement": "j", "subject": {"id": "t", "type": "t"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/ab"], "name": "ab", "value": "x"}, {"locations": ["/things/0/m"], "name": "m named by p", "value": null}, {"locations": ["/things/0"], "name": "p", "value": null}, {"locations": ["/things/0/q"], "name": "q", "value": "x"}], "passed": false, "requirement": "k", "subject": {"id": "t", "type": "t"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/m"], "name": "m named by p", "value": null}, {"locations": ["/things/0"], "name": "p", "value": null}, {"locations": ["/things/0/q"], "name": "q", "value": "x"}], "passed": false, "requirement": "l", "subject": {"id": "t", "type": "t"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/q"], "name": "q", "value": "x"}, {"locations": ["/things/0/m"], "name": "m named by p", "value": null}, {"locations": ["/things/0"], "name": "p", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
   }
 ]
