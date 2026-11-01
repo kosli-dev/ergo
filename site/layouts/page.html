@@ -17,8 +17,9 @@
   <article class="prose">
     <h1>{{ .Title }}</h1>
     {{ .Content }}
-    {{- $file := cond (eq .Weight 1) "README.md" "REFERENCE.md" }}
+    {{- $file := .Params.sourceFile }}
     {{- $ref := partial "repo-ref.html" . }}
+    {{- with .Params.sourceRef }}{{ with index hugo.Data.release . }}{{ $ref = . }}{{ end }}{{ end }}
     <p class="docs__source mono">Source: <a href="{{ site.Params.repo }}/blob/{{ $ref }}/{{ $file }}">{{ $file }}</a>{{ if ne $ref "main" }} in {{ $ref }}{{ end }}. Edit it on <code>main</code>, and this page follows at the next release.</p>
   </article>
 </div>

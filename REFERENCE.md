@@ -1,6 +1,6 @@
 # Ergo reference
 
-This page describes everything Ergo accepts and everything it returns. If you haven't used Ergo before, start with the [README](README.md).
+This page describes everything Ergo accepts and everything it returns, the same for both engines. If you haven't used Ergo before, start with the [README](README.md). How to run Ergo is on the page of each engine: [Ergo with OPA](OPA.md) for `ergo.rego`, and [Ergo CLI](CLI.md) for the `ergo` command.
 
 - [Policies](#policies)
 - [Subjects](#subjects)
@@ -9,14 +9,12 @@ This page describes everything Ergo accepts and everything it returns. If you ha
 - [The report](#the-report)
 - [Causes](#causes)
 - [Violations](#violations)
-- [Compiling to Wasm](#compiling-to-wasm)
-- [Compiling a policy](#compiling-a-policy)
 - [Failing closed](#failing-closed)
 - [Policies written before 0.1](#policies-written-before-01)
 
 ## Policies
 
-A policy is an object with two sections and the version of the [spec](spec/README.md#versions) it's written for, and it can [describe itself](#describing-a-policy) too. `subjects` says what the policy checks and where to find it in the input, and `requirements` says what must be true of it. Each section maps names to definitions. A policy is plain data, so it usually lives in a YAML file that OPA loads. A file in the policy directory with top-level `ergo_spec`, `subjects` and `requirements` keys is read as `data.ergo_spec`, `data.subjects` and `data.requirements`:
+A policy is an object with two sections and the version of the [spec](spec/README.md#versions) it's written for, and it can [describe itself](#describing-a-policy) too. `subjects` says what the policy checks and where to find it in the input, and `requirements` says what must be true of it. Each section maps names to definitions. A policy is plain data, so it usually lives in a YAML or JSON file with top-level `ergo_spec`, `subjects` and `requirements` keys:
 
 ```yaml
 ergo_spec: v0.4-dev
@@ -28,37 +26,13 @@ requirements:
   signed_commits: { subject: commit, ... }
 ```
 
-You pass the policy to `ergo.report` along with the input and the [params](#params):
-
-```rego
-default ergo_spec := null
-
-ergo_spec := data.ergo_spec
-
-default subjects := {}
-
-subjects := data.subjects
-
-default requirements := {}
-
-requirements := data.requirements
-
-default params := {}
-
-params := data.params
-
-report := ergo.report(input, {"ergo_spec": ergo_spec, "subjects": subjects, "requirements": requirements}, params)
-```
-
-`ergo.report` reads only its three arguments, so the same arguments always give the same report. The policy can also be written in Rego, like `subjects := {"deployment": {"from": "deployments", "identified_by": "id"}}`.
-
-Give each argument a default like this when it comes from `data`. Rego doesn't call a function with an argument that isn't defined, so a file without `requirements:`, or a run without params, would make the whole report undefined, with no rows to say why. The defaults still fail closed: without `ergo_spec` every requirement is written wrong, with no subjects every requirement fails, because the subject it names isn't there, with no requirements the policy isn't compliant, and with no params every `$params` read fails as `absent`. The same goes for the input: if it can be missing, give it a default too.
+An engine takes the policy, the input and the [params](#params), and reads only those, so the same arguments always give the same report. How to hand them over is on the page of each engine.
 
 `ergo_spec` is the version of the spec the policy is written for, and this copy of Ergo follows `v0.4-dev`. A policy without it, or with `null`, a number like `0.1`, or another version, is written wrong, so every requirement's `$well_formed` row fails and lists it with the policy's other problems, as an input named `policy ergo_spec`. Its value says what's wrong: `missing`, `not a string`, `not a version V0.1` for a string that isn't shaped like a version, or `unsupported version v0.1, expected v0.4-dev` for one this copy of Ergo doesn't follow. When the policy is in a file, pass `ergo_spec` from that file, like `data.ergo_spec` above, and don't write it in the Rego that hands the policy over: a fixed value there would say the file follows `v0.4-dev` whatever it was written for. A policy written in Rego says it in the policy itself, like `{"ergo_spec": "v0.4-dev", "subjects": ...}`.
 
 Because each name is an object key, two requirements can't share a name, and every row in the report points back to exactly one requirement.
 
-A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. Its report then has a requirement of Ergo's own, `$policy`, with one `$well_formed` row that fails and says what is wrong, so `ergo.violations` doesn't come back empty. For the policy `{"ergo_spec": "v0.4-dev"}` and the input `{}`, the row is:
+A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. Its report then has a requirement of Ergo's own, `$policy`, with one `$well_formed` row that fails and says what is wrong, so the violations don't come back empty. For the policy `{"ergo_spec": "v0.4-dev"}` and the input `{}`, the row is:
 
 ```json
 {
@@ -84,8 +58,6 @@ A policy with no requirements is never compliant: it doesn't check anything, so 
 
 `requirements` says `missing`, `not an object` or `empty`, and a wrong `ergo_spec`, `description` or `meta` is listed next to it, as `policy ergo_spec`. A requirement can't be called `$policy`, or anything else that starts with `$`: it is written wrong, with `requirement name` holding `a name can't start with $` in its `$well_formed` row. Ergo leaves out any other section of the policy, so it changes nothing in the report.
 
-From your own policies, call only `ergo.report` and `ergo.violations`. Rules whose names start with `_`, like `ergo._row_cause`, are Ergo's own and can change or disappear in any release. If you lint with [Regal](https://www.openpolicyagent.org/projects/regal), its `leaked-internal-reference` rule flags a call to one.
-
 ### Describing a policy
 
 A policy can have a `description` and a `meta` of its own, next to its sections. They work like a [requirement's](#requirements): `description` says what the policy asks for, `meta` keeps anything else, like the id of the control the policy checks, and Ergo copies both to the top of the report and never reads them. This is where a control with several requirements keeps its text:
@@ -107,20 +79,6 @@ requirements:
     subject: deployment
     checks:
       reviewed: reviewer is a non-empty string
-```
-
-OPA reads them as `data.description` and `data.meta`, so pass them in with the sections:
-
-```rego
-default description := null
-
-description := data.description
-
-default meta := null
-
-meta := data.meta
-
-report := ergo.report(input, {"ergo_spec": ergo_spec, "description": description, "meta": meta, "subjects": subjects, "requirements": requirements}, params)
 ```
 
 With this input:
@@ -152,7 +110,7 @@ the report starts with:
 
 ### Params
 
-Params are the third argument to `ergo.report`. Ergo doesn't look for them anywhere else, so the policy that calls it picks where they come from. Reading them from `data.params`, as above, means `opa eval -d params.json` passes them in when the file holds `{"params": ...}`, and a test can write `with data.params as {...}`.
+Params are the values that change between runs, like the regions a policy allows. They aren't in the policy or the input, and an engine doesn't look for them anywhere else, so how they are passed in is on the page of each engine.
 
 A sentence reads them with `$params`, like `region is in $params.regions`. Params aren't part of the input, so `$input.params` doesn't reach them, and `$params` doesn't read the input. With params of `{}`, a read of a field in them, like `$params.regions`, fails as `absent`, as any missing field does. With no params, `null`, it fails as `absent` too, and that includes `exists`, which otherwise fails a missing field as `value`, and `does not exist`, which otherwise passes. So a condition like that on a param fails the requirement instead of deciding the scope. Params that are anything else, like a string or a list, can only be a mistake, so they fail every check and every `$min_subjects` row as `unusable`, even in a policy that reads no params, and `$min_subjects` says why: `{"name": "$params", "value": ["not an object"], "locations": []}`. Ergo has no defaults, so a policy run without its params fails instead of checking something nobody configured.
 
@@ -843,7 +801,7 @@ A sentence is a path, then a phrase, then what the phrase takes:
 
 The time phrases can take a written time or number too, like `opened is before "2024-01-01T00:00:00Z"` or `opened is after 100`. The field and the written value must both be RFC 3339 times, both be dates like `"2026-10-01"`, or both be numbers, or the check fails as `unusable`. A date and an RFC 3339 time fail too, even one at midnight, because a date doesn't say in which time zone it starts. A written value that isn't a time, a date or a number, like `opened is before "yesterday"`, is written wrong, with `"is before" takes a time or a number`.
 
-`within` works out the gap exactly on the decimals, so `0.3` and `0.1` are within `0.2`. That's promised for numbers with at most 15 significant digits. Longer ones, like `0.30000000000000004`, are compared on their digits too, but OPA can mix up two of them that differ only past those digits, so don't rely on it. The only numbers it can't compare are ones whose exponents, with the number after `within`, are more than 4096 apart, like `1e5000` and `1`. That check fails as `unusable`.
+`within` works out the gap exactly on the decimals, so `0.3` and `0.1` are within `0.2`. That's promised for numbers with at most 15 significant digits. Longer ones, like `0.30000000000000004`, are compared on their digits too, but an engine may not tell two of them apart when they differ only past those digits, so don't rely on it: [Ergo with OPA](OPA.md#numbers) says what `ergo.rego` does. The only numbers it can't compare are ones whose exponents, with the number after `within`, are more than 4096 apart, like `1e5000` and `1`. That check fails as `unusable`.
 
 `is empty` passes on `""` or `[]` and `is not empty` on a string or a list with something in it. Anything else that's there, like a number or an object, fails both as `unusable`. Their operators only exist for sentences. `starts with` and `ends with` compare two strings: anything else, two numbers included, fails as `unusable`, and a written value after them that isn't text, like `x starts with 1`, is written wrong. `is alphabetically before` and `is alphabetically after` order two strings in the same way, code point by code point, so every uppercase letter comes first: `"Zoe"` is alphabetically before `"adam"`.
 
@@ -854,28 +812,6 @@ The time phrases can take a written time or number too, like `opened is before "
 ```
 
 `every conditions.value is at least errorThreshold` would pass, since `"9"` comes after `"80"` as text. A written value that isn't a number, like `score is at least "3"`, is written wrong, with `"is at least" takes a number`.
-
-`ergo.rego` compares numbers with OPA, and OPA can treat two decimals as the same when they only differ after the 15th significant digit. Whole numbers are always compared exactly. With this policy and this input:
-
-```yaml
-ergo_spec: v0.4-dev
-subjects:
-  row:
-    from: rows
-    identified_by: id
-requirements:
-  r:
-    subject: row
-    checks:
-      most: l is at most 1234567890.1209567890
-      within: l equals r within 1234567889.6209567890
-```
-
-```json
-{"rows": [{"id": "a", "l": 1234567890.1209567890, "r": 0.5}, {"id": "b", "l": 1234567890.1209567990, "r": 0.5}]}
-```
-
-`most` passes on `b`, even though its `l` is bigger than the limit. OPA also remembers the result of a comparison and reuses it for any number it treats as the same, so the answer can depend on the other rows: `within` fails on `b` when `b` is the only row, but passes on `b` when `a` is also in the input. The Rust engine, which the `ergo` CLI runs, compares every digit and fails both checks on `b`. So keep the decimals you compare to at most 15 significant digits, or use the Rust engine, for example with the `ergo` CLI. [#426](https://github.com/kosli-dev/ergo/issues/426) is about fixing `ergo.rego`.
 
 After `is in`, `is not in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `matches` and `does not match`, the thing on the right can be a field too, read like the field after `is at least`: from the subject, from the name of a `for` line or from the item of a one-line `every` or `some` and a `whose`. With this policy and this input:
 
@@ -1423,7 +1359,7 @@ Reading the subject from the right side of a phrase, like `x equals it`, is left
 
 ## The report
 
-`ergo.report(input, policy, params)` returns:
+The report of a policy, an input and params is:
 
 ```json
 {
@@ -1445,7 +1381,7 @@ Reading the subject from the right side of a phrase, like `x equals it`, is left
 
 `description` and `meta` are the [policy's](#describing-a-policy), or `""` and `{}` when it has none.
 
-`ergo` is the version of the [spec](spec/README.md#versions) the report follows. `engine` says what made it: `ergo-rego` and its version, which a policy can read as `ergo.version`. It doesn't say which OPA ran it, because that would make the report depend on the machine and not only on the policy, the input and the params. If you need to know, record it next to the report.
+`ergo` is the version of the [spec](spec/README.md#versions) the report follows. `engine` says what made it: `ergo-rego` or `ergo-rust` and its version. It doesn't say which OPA or which machine ran it, because that would make the report depend on the machine and not only on the policy, the input and the params. If you need to know, record it next to the report.
 
 `subjects` says where the subjects come from, as [Subjects in the report](#subjects-in-the-report) shows.
 
@@ -1837,7 +1773,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 ## Violations
 
-`ergo.violations(report)` returns the rows that are real problems, each with its check's `description` and `expression` added, and its `$refs` added to the end of `inputs`:
+The violations are the rows of the report that are real problems, each with its check's `description` and `expression` added, and its `$refs` added to the end of `inputs`:
 
 ```json
 [
@@ -1867,94 +1803,6 @@ It only reads the report, never the input or the policy. It returns a list in th
 
 To decide whether to allow something, use `report.compliant`, not whether `violations` is empty. The two are worked out separately, so a mistake in how you use violations can't let something through.
 
-## Compiling to Wasm
-
-Ergo runs in a policy compiled with `opa build -t wasm` and run with OPA's JavaScript runtime, `@open-policy-agent/opa-wasm`. One built-in is missing from that runtime: `time.parse_rfc3339_ns`, which `compare_time` uses on RFC 3339 strings. A policy with such a check fails with `not implemented: built-in function`, unless you pass the built-in in yourself, as the third argument to `loadPolicy`.
-
-Ergo only passes it a time it has already checked: an uppercase `T` and `Z`, a date that exists and a year from 1678 to 2261. So it only has to turn that into nanoseconds since 1970, exactly. A JavaScript number can't hold that: today's are about 1.76×10¹⁸, where a number can only step by 256. So return the digits with `JSON.rawJSON` (Node 21 and later). This is the version Ergo's CI uses, and it gives the same nanoseconds as OPA on 16,922 generated timestamps, before and after 1970:
-
-```js
-const parseTime = (v) => {
-  const [, time, fraction = "", zone] = /^(.{19})(?:\.(\d+))?(.*)$/.exec(v);
-  return JSON.rawJSON(String(BigInt(Date.parse(time + zone)) / 1000n * 1000000000n + BigInt(fraction.padEnd(9, "0").slice(0, 9))));
-};
-
-const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": parseTime });
-```
-
-## Compiling a policy
-
-**Experimental:** `ergo.compile` may change or go away in any version of Ergo.
-
-`ergo.report` reads every sentence of the policy each time it runs. When the same policy runs many times, like in a test suite, you can do that once with `ergo.compile(policy)`, save what it returns as JSON, and pass that to `ergo.report` in place of the policy. The report is the same. This is Ergo's own step, not OPA's: OPA still compiles `ergo.rego` as usual.
-
-Treat a compiled policy like a compiler's object file. Make it in the build that uses it, don't commit it, and make it again whenever the policy or your copy of `ergo.rego` changes. Its shape is Ergo's own and changes between versions. A compiled policy holds the `engine` that compiled it, the same name and version a report gives. When it's missing or isn't the one running, `ergo.report` reads the policy the compiled one came from and fails every requirement's `$well_formed` row with an input like:
-
-```json
-{"name": "ergo/compiled engine", "value": ["compiled by another engine, expected ergo-rego 0.4.0-dev"], "locations": []}
-```
-
-or `["missing"]` when the compiled policy has no `engine`. That only tells released versions apart: every copy of `ergo.rego` between two releases has the same `-dev` version, so a compiled policy from an older copy of the same version still runs and can give a wrong report. Ergo doesn't check that nobody edited it either, so don't edit it. One with a field missing or of the wrong type fails like a policy Ergo can't read, and compiling a compiled policy gives it back unchanged, even one from another engine.
-
-A `make` rule keeps it fresh, since it runs again when either file changes. With this `policy.yaml`:
-
-```yaml
-ergo_spec: v0.4-dev
-subjects:
-  deployment:
-    from: deployments
-    identified_by: id
-requirements:
-  approved_deploy:
-    subject: deployment
-    checks:
-      approved: approved_by is not empty
-```
-
-this `Makefile` compiles it:
-
-```make
-compiled_policy.json: policy.yaml ergo.rego
-	opa eval -d ergo.rego -d policy.yaml --format raw \
-	  'json.marshal({"compiled_policy": data.ergo.compile({"ergo_spec": data.ergo_spec, "subjects": data.subjects, "requirements": data.requirements})})' > $@
-```
-
-and `policy.rego` runs it:
-
-```rego
-package policy
-
-import data.ergo
-
-report := ergo.report(input, data.compiled_policy, {})
-```
-
-On this `input.json`:
-
-```json
-{"deployments": [{"id": "d-1", "approved_by": "alice"}, {"id": "d-2", "approved_by": ""}]}
-```
-
-`make` and then `opa eval -d ergo.rego -d policy.rego -d compiled_policy.json -i input.json --format pretty 'data.ergo.violations(data.policy.report)'` give the same violation as the policy itself:
-
-```json
-[
-  {
-    "cause": "value",
-    "check": "approved",
-    "description": "",
-    "expression": "approved_by is not empty",
-    "inputs": [{ "name": "approved_by", "value": "", "locations": ["/deployments/1/approved_by"] }],
-    "requirement": "approved_deploy",
-    "subject": { "id": "d-2", "type": "deployment" }
-  }
-]
-```
-
-The input and the params are read on each run, so a compiled policy works with any of them. Put `compiled_policy.json` in `.gitignore`: a fresh clone gives files the time of checkout, so a committed one can look newer than an `ergo.rego` it doesn't match.
-
-Compiling is part of `ergo.rego`, not of the [spec](spec/README.md), so other implementations of Ergo don't have it.
-
 ## Failing closed
 
 Ergo fails a check whenever it can't be sure, instead of letting it pass. Rego doesn't do that by default in a few places, so these are handled on purpose. Some of them name the operators that sentences run as, as the table in [Checks](#checks) shows:
@@ -1975,7 +1823,6 @@ Ergo fails a check whenever it can't be sure, instead of letting it pass. Rego d
 - Ergo only reads what JSON can hold. Rego can build sets and object keys that aren't strings, but JSON and YAML can't, so Ergo turns both down and gives the same report however it's run. A set or such a key anywhere in the input or the params fails every check on a subject, every `$applies` row and every `$min_subjects` row with cause `unusable`, so even a requirement with no subjects isn't met. `$min_subjects` says why in its inputs, like `{"name": "$input", "value": ["holds a set"], "locations": []}`, or `$params` for the params. In a policy, a requirement or check holding either one is [written wrong](#checks-ergo-adds), and so is a requirement whose name isn't a string. So when you build the input in Rego, make lists, `[x | ...]`, not sets, `{x | ...}`.
 - A requirement that isn't an object, a field of the wrong type, or a field Ergo doesn't know, fails `$well_formed` and keeps its place in the report, so a typo in the policy can't make a requirement vanish.
 - A malformed timestamp fails `compare_time` rather than stopping the whole evaluation with an error.
-- Running OPA with `--strict-builtin-errors` gives the same report as running without it, because Ergo checks a value's type before it passes it to a built-in like `object.get` or `count`.
 
 ## Policies written before 0.1
 
@@ -2001,75 +1848,4 @@ A `from` written as the list `[deployments]` isn't a string. The requirement is 
 
 `applies_to` and `of` are fields Ergo doesn't know, so each gets `["unknown field"]`, like `{"name": "subjects.deployment.applies_to", "value": ["unknown field"], "locations": []}`.
 
-### Moving a policy to sentences
-
-`ergo.as_sentences(policy)` rewrites a policy written the old way into sentences, wherever a sentence reads back as exactly what was written. It always sets `ergo_spec: v0.4-dev` on what it returns. Anything it can't rewrite stays as it was, and under 0.1 that is written wrong, so you rewrite those parts by hand. With this `policy.yaml`:
-
-```yaml
-subjects:
-  deployment:
-    from: [deployments]
-    identified_by: [id]
-    applies_to:
-      is_prod: {op: equals, path: [environment], value: prod}
-requirements:
-  approved:
-    subject: deployment
-    checks:
-      approved:
-        description: Someone approved the deployment
-        op: non_empty_string
-        path: [approved_by]
-      region: {op: in, path: [region], values: [eu-west-1, us-east-1]}
-      signed: {op: all, path: [commits], check: {op: equals, path: [signed], value: true}}
-```
-
-this command:
-
-```sh
-opa eval -d ergo.rego -d policy.yaml --format raw \
-  'yaml.marshal(data.ergo.as_sentences({"subjects": data.subjects, "requirements": data.requirements}))'
-```
-
-prints:
-
-```yaml
-ergo_spec: v0.4-dev
-requirements:
-  approved:
-    checks:
-      approved:
-        assert: approved_by is a non-empty string
-        description: Someone approved the deployment
-      region: region is one of "eu-west-1", "us-east-1"
-      signed:
-        check:
-          op: equals
-          path:
-            - signed
-          value: true
-        op: all
-        path:
-          - commits
-    subject: deployment
-subjects:
-  deployment:
-    from: deployments whose environment is "prod"
-    identified_by: id
-```
-
-`signed` is still in the old form, so it is written wrong, with `["missing assert", "unknown field check", "unknown field op", "unknown field path"]`. To fix it, write `every commits.signed is true`.
-
-These have no sentence form, so `as_sentences` leaves them as they are:
-
-- `all` and `any`. They read one list, or two with `each`, where `every` and `some` walk every list along their path, so a policy could pass where it failed. Write the check with `every` or `some`, or with a `for` line.
-- `any_of` options written with `op`. Write each option as a sentence, under `any_of`.
-- A selector, like `{"where": {...}}`, in a path. Pick the item with a `for` line.
-- A literal list of keys after `each_as`. `named by each of $params.x` reads the keys from the params.
-- `inputs` on a check. A row shows the fields its sentence reads.
-- A name, a `description` or a `meta` on an `applies_to` filter. A `whose` condition has none of them, so a subject with one keeps its `applies_to`, which is written wrong.
-- A side written as `count`, `sum`, `add` or `literal`. Write it as `count of`, `sum of` or `plus`.
-- A check that compares a field with itself, because that sentence is written wrong.
-- A check of a subject read from or built on another subject, like `from: artifact.pull_requests` or an old `of`. A sentence there reads `artifact` as that subject.
-
-The comments of a YAML file are lost, since OPA reads it as data.
+`ergo.rego` has a function that rewrites what it can as sentences: see [Moving a policy to sentences](OPA.md#moving-a-policy-to-sentences).

@@ -116,6 +116,25 @@ says() {
   }
 }
 
+consistent() {
+  source=$(cat site/prepared/source)
+  if git cat-file -e "$source:OPA.md" 2> /dev/null; then
+    [ -e site/prepared/repo/OPA.md ] || {
+      echo "the docs come from $source, which has OPA.md, so the site should have an OPA page" >&2
+      exit 1
+    }
+  else
+    [ ! -e site/prepared/repo/OPA.md ] || {
+      echo "the docs come from $source, which has no OPA.md, so the site shouldn't have an OPA page" >&2
+      exit 1
+    }
+  fi
+  [ ! -e site/prepared/repo/CLI.md ] || [ -e site/prepared/repo/OPA.md ] || {
+    echo "the site has a CLI page and no OPA page" >&2
+    exit 1
+  }
+}
+
 FAKE_RELEASES="rego-v0.1.0 rego-v0.3.0-rc1 rego-vlatest spec-v0.1"
 FAKE_ASSET_VERSION=0.1.0
 export FAKE_RELEASES FAKE_ASSET_VERSION
@@ -129,7 +148,7 @@ case $out in
     ;;
 esac
 says site/prepared/source rego-v0.1.0
-says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1"}'
+says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1", "opa": "", "cli": ""}'
 says site/prepared/repo/README.md '# Readme
 "version": "0.1.0"
 10.1.0-dev
@@ -170,11 +189,11 @@ has site/prepared/data/examples.yaml
 
 FAKE_RELEASES="rego-v0.1.0 spec-v0.1" FAKE_PRE_RELEASES="rego-v0.10.0 spec-v0.9" FAKE_DRAFTS="rego-v0.10.0 spec-v0.9" site/prepare.sh > /dev/null
 says site/prepared/source rego-v0.1.0
-says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1"}'
+says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1", "opa": "", "cli": ""}'
 
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rust-v0.2.0
 FAKE_RELEASES="rego-v0.1.0 spec-v0.1 rust-v0.1.0 rust-v0.2.0 rust-v0.10.0-rc1" site/prepare.sh > /dev/null
-says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "0.2.0", "spec": "0.1", "ergo_spec": "v0.1"}'
+says site/prepared/data/release.json '{"source": "rego-v0.1.0", "rego": "0.1.0", "rust": "0.2.0", "spec": "0.1", "ergo_spec": "v0.1", "opa": "", "cli": ""}'
 
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag spec-v0.2
 FAKE_RELEASES="rego-v0.10.0 spec-v0.1" FAKE_ASSET_VERSION=0.10.0 site/prepare.sh > /dev/null
@@ -190,7 +209,7 @@ echo "# Working" > README.md
 site/prepare.sh --working-tree > /dev/null
 says site/prepared/source "working tree"
 says site/prepared/repo/README.md "# Working"
-says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "", "spec": "0.1", "ergo_spec": "v0.2-dev"}'
+says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "", "spec": "0.1", "ergo_spec": "v0.2-dev", "opa": "", "cli": ""}'
 has site/prepared/repo/README.md
 has site/prepared/examples/demo/demo.rego.txt
 lacks site/prepared/assets
@@ -199,12 +218,12 @@ has site/assets/tutorial/ergo.wasm
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rust-v0.4.1
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rust-v0.4.0
 site/prepare.sh --working-tree > /dev/null
-says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "0.4.1", "spec": "0.1", "ergo_spec": "v0.2-dev"}'
+says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "0.4.1", "spec": "0.1", "ergo_spec": "v0.2-dev", "opa": "", "cli": ""}'
 git tag --delete rust-v0.4.1 rust-v0.4.0 > /dev/null
 
 printf 'package ergo\n\nversion := "0.3.0-dev"\n\n_spec := "v0.3"\n' > engines/rego/ergo.rego
 site/prepare.sh --working-tree > /dev/null
-says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "", "spec": "0.1", "ergo_spec": "v0.3"}'
+says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "", "spec": "0.1", "ergo_spec": "v0.3", "opa": "", "cli": ""}'
 printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > engines/rego/ergo.rego
 
 (expected="usage: site/prepare.sh [--working-tree]"; fails --release)
@@ -212,6 +231,86 @@ printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > engin
 (FAKE_RELEASES="rego-v0.4.0 spec-v0.1"; expected="There's no rego-v0.4.0 tag here. Fetch the tags with: git fetch --tags"; fails)
 (FAKE_RELEASES="rego-v0.10.0 spec-v0.1"; FAKE_ASSET_VERSION=0.1.0-dev; expected='The ergo.rego of release rego-v0.10.0 should say version := "0.10.0"'; fails)
 (export FAKE_GH_FAILS=1; expected="To build from this working tree instead, run: site/prepare.sh --working-tree"; fails)
+echo "# OPA" > OPA.md
+echo "# CLI" > CLI.md
+git add OPA.md CLI.md
+git -c user.name=test -c user.email=test@example.com -c commit.gpgSign=false commit --quiet --message "the engine pages"
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag --force spec-v0.1 > /dev/null
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rego-v0.11.0
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rust-v0.5.0
+FAKE_RELEASES="rego-v0.11.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh > /dev/null
+says site/prepared/source spec-v0.1
+says site/prepared/data/release.json '{"source": "spec-v0.1", "rego": "0.11.0", "rust": "0.5.0", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": "rust-v0.5.0"}'
+has site/prepared/repo/README.md
+has site/prepared/repo/REFERENCE.md
+says site/prepared/repo/OPA.md "# OPA"
+says site/prepared/repo/CLI.md "# CLI"
+grep -qxF 'version := "0.11.0"' site/prepared/ergo.rego.txt || {
+  echo "prepare.sh should run the ergo.rego of the newest release that reads the spec, which says 0.11.0" >&2
+  exit 1
+}
+out=$(FAKE_RELEASES="rego-v0.11.0 spec-v0.1" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
+case $out in
+  *"The latest Rust release has no CLI.md yet, so the site has no CLI page"*) ;;
+  *)
+    echo "prepare.sh should say the CLI page is missing when there is no Rust release, and said: $out" >&2
+    exit 1
+    ;;
+esac
+says site/prepared/source spec-v0.1
+says site/prepared/data/release.json '{"source": "spec-v0.1", "rego": "0.11.0", "rust": "", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": ""}'
+has site/prepared/repo/OPA.md
+lacks site/prepared/repo/CLI.md
+consistent
+for name in policy report; do
+  printf '{\n  "$id": "https://ergo.kosli.com/spec/0.2/%s.schema.json"\n}\n' "$name" > "spec/$name/schema.json"
+done
+git add spec
+git -c user.name=test -c user.email=test@example.com -c commit.gpgSign=false commit --quiet --message "spec 0.2"
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag spec-v0.2
+out=$(FAKE_RELEASES="rego-v0.11.0 rust-v0.5.0 spec-v0.1 spec-v0.2" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
+case $out in
+  *"No published rego release reads spec-v0.2 yet, so the docs and the tutorial come from spec-v0.1, which rego-v0.11.0 reads"*) ;;
+  *)
+    echo "prepare.sh should fall back to the newest spec a rego release reads, and said: $out" >&2
+    exit 1
+    ;;
+esac
+says site/prepared/source spec-v0.1
+says site/prepared/data/release.json '{"source": "spec-v0.1", "rego": "0.11.0", "rust": "0.5.0", "spec": "0.2", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": "rust-v0.5.0"}'
+old_layout() {
+  says site/prepared/source "$1"
+  says site/prepared/data/release.json "{\"source\": \"$1\", \"rego\": \"$2\", \"rust\": \"$3\", \"spec\": \"0.1\", \"ergo_spec\": \"v0.1\", \"opa\": \"\", \"cli\": \"\"}"
+  lacks site/prepared/repo/OPA.md
+  lacks site/prepared/repo/CLI.md
+  consistent
+}
+out=$(FAKE_RELEASES="rego-v0.1.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.1.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
+case $out in
+  *"the site keeps the old layout, from rego-v0.1.0, with no OPA or CLI page"*) ;;
+  *)
+    echo "prepare.sh should keep the old layout when the spec has OPA.md and the rego release hasn't, and said: $out" >&2
+    exit 1
+    ;;
+esac
+old_layout rego-v0.1.0 0.1.0 0.5.0
+git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag --force spec-v0.1 rego-v0.1.0 > /dev/null
+out=$(FAKE_RELEASES="rego-v0.11.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.11.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh)
+case $out in
+  *"No published spec release has OPA.md yet, so the docs come from rego-v0.11.0, which has it"*) ;;
+  *)
+    echo "prepare.sh should take the docs from the rego release that has OPA.md when no spec has it, and said: $out" >&2
+    exit 1
+    ;;
+esac
+says site/prepared/source rego-v0.11.0
+says site/prepared/data/release.json '{"source": "rego-v0.11.0", "rego": "0.11.0", "rust": "0.5.0", "spec": "0.1", "ergo_spec": "v0.1", "opa": "rego-v0.11.0", "cli": "rust-v0.5.0"}'
+has site/prepared/repo/OPA.md
+has site/prepared/repo/CLI.md
+consistent
+FAKE_RELEASES="rego-v0.1.0 rust-v0.5.0 spec-v0.1" FAKE_ASSET_VERSION=0.1.0 FAKE_ASSET_SPEC=v0.1 site/prepare.sh > /dev/null
+old_layout rego-v0.1.0 0.1.0 0.5.0
+git tag --delete spec-v0.2 rego-v0.11.0 rust-v0.5.0 > /dev/null
 git tag --delete spec-v0.1 > /dev/null
 (FAKE_RELEASES="rego-v0.10.0 spec-v0.1"; FAKE_ASSET_VERSION=0.10.0; expected="There's no spec-v0.1 tag here. Fetch the tags with: git fetch --tags"; fails)
 (expected="There's no spec-vX.Y tag here. Fetch the tags with: git fetch --tags"; fails --working-tree)

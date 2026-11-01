@@ -13,7 +13,7 @@ case $kind in
   rego)
     tagprefix=rego-v
     changelog=CHANGELOG.md
-    files='engines/rego/ergo.rego and REFERENCE.md'
+    files='engines/rego/ergo.rego, REFERENCE.md and OPA.md'
     version=$(sed -n 's/^version := "\([0-9]*\.[0-9]*\.[0-9]*\)-dev"$/\1/p' engines/rego/ergo.rego)
     [ -n "$version" ] || fail 'ergo.rego must say version := "X.Y.Z-dev" on main'
     ;;
