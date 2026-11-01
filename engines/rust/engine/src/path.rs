@@ -1,5 +1,4 @@
 use crate::cause::Cause;
-use crate::value::Decimal;
 use serde_json::Value;
 use std::collections::BTreeMap;
 
@@ -186,13 +185,6 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
             }
             match read.value {
                 Some(Value::String(text)) => Ok(Resolved::Key(text.clone())),
-                Some(Value::Number(_)) if matches!(reference.start, Start::Alias(_)) => {
-                    Err(Outcome::Unusable)
-                }
-                Some(Value::Number(number)) => Decimal::parse(&number.to_string())
-                    .and_then(|d| d.as_position())
-                    .map(Resolved::Index)
-                    .ok_or(Outcome::Unusable),
                 _ => Err(Outcome::Unusable),
             }
         }
@@ -713,16 +705,18 @@ mod tests {
     }
 
     #[test]
-    fn a_ref_step_with_a_whole_number_reads_a_list_item() {
-        let w = World::new(r#"{"xs": [10, 20, 30]}"#).with_params(r#"{"i": 2.0}"#);
-        let reference = at(Start::Params, vec![key("i")]);
-        let (o, value, l) = w.run(&subject_path(vec![
-            key("xs"),
-            Step::Ref(Box::new(reference)),
-        ]));
-        assert_eq!(o, Outcome::Found);
-        assert_eq!(value, Some(v("30")));
-        assert_eq!(l, loc("/s/xs/2"));
+    fn a_ref_step_holding_a_whole_number_is_never_a_list_position() {
+        for params in [r#"{"i": 2}"#, r#"{"i": 2.0}"#, r#"{"i": 0}"#] {
+            let w = World::new(r#"{"xs": [10, 20, 30]}"#).with_params(params);
+            let reference = at(Start::Params, vec![key("i")]);
+            let (o, value, l) = w.run(&subject_path(vec![
+                key("xs"),
+                Step::Ref(Box::new(reference)),
+            ]));
+            assert_eq!(o, Outcome::Unusable, "{params}");
+            assert_eq!(value, None);
+            assert_eq!(l, loc("/s/xs"));
+        }
     }
 
     #[test]
@@ -820,18 +814,21 @@ mod tests {
     }
 
     #[test]
-    fn a_ref_holding_a_number_on_a_subject_list_reads_the_item() {
+    fn a_ref_holding_a_number_on_a_subject_list_is_unusable() {
         let w = World::new("[7, 8]").with_params(r#"{"k": 1}"#);
         let reference = at(Start::Params, vec![key("k")]);
         let (o, value, _) = w.run(&subject_path(vec![Step::Ref(Box::new(reference))]));
-        assert_eq!(o, Outcome::Found);
-        assert_eq!(value, Some(v("8")));
+        assert_eq!(o, Outcome::Unusable);
+        assert_eq!(value, None);
     }
 
     #[test]
     fn a_ref_value_that_cannot_be_a_key_is_unusable() {
         for params in [
             r#"{"k": true}"#,
+            r#"{"k": 0}"#,
+            r#"{"k": 1}"#,
+            r#"{"k": 1.0}"#,
             r#"{"k": 1.5}"#,
             r#"{"k": -1}"#,
             r#"{"k": [0]}"#,

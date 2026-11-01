@@ -171,5 +171,735 @@
         }
       }
     }
+  },
+  {
+    "description": "named by each of object list, keys missing, narrow, refbad, min_subjects 0: the bad ref before the list decides the cause, where ergo.rego gives the list's cause",
+    "input": {
+      "scans": [
+        {
+          "name": "a"
+        }
+      ]
+    },
+    "params": {
+      "env": 5
+    },
+    "policy": {
+      "ergo_spec": "v0.4-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "min_subjects": 0,
+          "subject": "only"
+        }
+      },
+      "subjects": {
+        "only": {
+          "from": "scan whose name is \"a\""
+        },
+        "scan": {
+          "from": "scans named by $params.env named by each of $params.k"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.4-dev",
+      "meta": {},
+      "requirements": {
+        "r": {
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$applies": {
+              "description": "The only is in scope",
+              "expression": "name is \"a\"",
+              "meta": {}
+            },
+            "$min_subjects": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/env"
+                  ],
+                  "name": "$params.env",
+                  "value": 5
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.k",
+                  "value": null
+                }
+              ],
+              "description": "The in-scope only count is at least 0",
+              "expression": "count(matching(scans named by $params.env)) >= 0",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/env"
+                  ],
+                  "name": "$params.env",
+                  "value": 5
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.k",
+                  "value": null
+                }
+              ],
+              "description": "Every only id is unique",
+              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "x does not exist",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "only",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "only"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "in-scope only count",
+              "value": 0
+            }
+          ],
+          "passed": false,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "only"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated only ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "only"
+          }
+        }
+      ],
+      "subjects": {
+        "only": {
+          "description": "",
+          "from": "scan whose name is \"a\"",
+          "identified_by": null,
+          "parts": {}
+        },
+        "scan": {
+          "description": "",
+          "from": "scans named by $params.env named by each of $params.k",
+          "identified_by": null,
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "named by each of object list, keys missing, plain, refbad, min_subjects 0: the bad ref before the list decides the cause, where ergo.rego gives the list's cause",
+    "input": {
+      "scans": [
+        {
+          "name": "a"
+        }
+      ]
+    },
+    "params": {
+      "env": 5
+    },
+    "policy": {
+      "ergo_spec": "v0.4-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "min_subjects": 0,
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by $params.env named by each of $params.k"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.4-dev",
+      "meta": {},
+      "requirements": {
+        "r": {
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/env"
+                  ],
+                  "name": "$params.env",
+                  "value": 5
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.k",
+                  "value": null
+                }
+              ],
+              "description": "The in-scope scan count is at least 0",
+              "expression": "count(matching(scans named by $params.env)) >= 0",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/env"
+                  ],
+                  "name": "$params.env",
+                  "value": 5
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.k",
+                  "value": null
+                }
+              ],
+              "description": "Every scan id is unique",
+              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "x does not exist",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "scan",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "in-scope scan count",
+              "value": 0
+            }
+          ],
+          "passed": false,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated scan ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
+          }
+        }
+      ],
+      "subjects": {
+        "scan": {
+          "description": "",
+          "from": "scans named by $params.env named by each of $params.k",
+          "identified_by": null,
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "named by each of object list, keys null, narrow, refbad, min_subjects 0: the bad ref before the list decides the cause, where ergo.rego gives the list's cause",
+    "input": {
+      "scans": [
+        {
+          "name": "a"
+        }
+      ]
+    },
+    "params": {
+      "env": 5,
+      "k": null
+    },
+    "policy": {
+      "ergo_spec": "v0.4-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "min_subjects": 0,
+          "subject": "only"
+        }
+      },
+      "subjects": {
+        "only": {
+          "from": "scan whose name is \"a\""
+        },
+        "scan": {
+          "from": "scans named by $params.env named by each of $params.k"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.4-dev",
+      "meta": {},
+      "requirements": {
+        "r": {
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$applies": {
+              "description": "The only is in scope",
+              "expression": "name is \"a\"",
+              "meta": {}
+            },
+            "$min_subjects": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/env"
+                  ],
+                  "name": "$params.env",
+                  "value": 5
+                },
+                {
+                  "locations": [
+                    "$params:/k"
+                  ],
+                  "name": "$params.k",
+                  "value": null
+                }
+              ],
+              "description": "The in-scope only count is at least 0",
+              "expression": "count(matching(scans named by $params.env)) >= 0",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/env"
+                  ],
+                  "name": "$params.env",
+                  "value": 5
+                },
+                {
+                  "locations": [
+                    "$params:/k"
+                  ],
+                  "name": "$params.k",
+                  "value": null
+                }
+              ],
+              "description": "Every only id is unique",
+              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "x does not exist",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "only",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "only"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "in-scope only count",
+              "value": 0
+            }
+          ],
+          "passed": false,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "only"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated only ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "only"
+          }
+        }
+      ],
+      "subjects": {
+        "only": {
+          "description": "",
+          "from": "scan whose name is \"a\"",
+          "identified_by": null,
+          "parts": {}
+        },
+        "scan": {
+          "description": "",
+          "from": "scans named by $params.env named by each of $params.k",
+          "identified_by": null,
+          "parts": {}
+        }
+      }
+    }
+  },
+  {
+    "description": "named by each of object list, keys null, plain, refbad, min_subjects 0: the bad ref before the list decides the cause, where ergo.rego gives the list's cause",
+    "input": {
+      "scans": [
+        {
+          "name": "a"
+        }
+      ]
+    },
+    "params": {
+      "env": 5,
+      "k": null
+    },
+    "policy": {
+      "ergo_spec": "v0.4-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "x does not exist"
+          },
+          "min_subjects": 0,
+          "subject": "scan"
+        }
+      },
+      "subjects": {
+        "scan": {
+          "from": "scans named by $params.env named by each of $params.k"
+        }
+      }
+    },
+    "report": {
+      "compliant": false,
+      "description": "",
+      "ergo": "v0.4-dev",
+      "meta": {},
+      "requirements": {
+        "r": {
+          "causes": [
+            {
+              "cause": "unusable",
+              "rows": 1
+            }
+          ],
+          "checks": {
+            "$min_subjects": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/env"
+                  ],
+                  "name": "$params.env",
+                  "value": 5
+                },
+                {
+                  "locations": [
+                    "$params:/k"
+                  ],
+                  "name": "$params.k",
+                  "value": null
+                }
+              ],
+              "description": "The in-scope scan count is at least 0",
+              "expression": "count(matching(scans named by $params.env)) >= 0",
+              "meta": {}
+            },
+            "$unique_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/env"
+                  ],
+                  "name": "$params.env",
+                  "value": 5
+                },
+                {
+                  "locations": [
+                    "$params:/k"
+                  ],
+                  "name": "$params.k",
+                  "value": null
+                }
+              ],
+              "description": "Every scan id is unique",
+              "expression": "count(repeated(ids(scans named by $params.env))) == 0",
+              "meta": {}
+            },
+            "$well_formed": {
+              "description": "The requirement is written correctly",
+              "expression": "count(problems) == 0",
+              "meta": {}
+            },
+            "c": {
+              "description": "",
+              "expression": "x does not exist",
+              "meta": {}
+            }
+          },
+          "description": "",
+          "meta": {},
+          "require": "every",
+          "status": "not_met",
+          "subject": "scan",
+          "subjects": {
+            "matching": 0,
+            "total": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "cause": "satisfied",
+          "check": "$well_formed",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "count(checks)",
+              "value": 1
+            },
+            {
+              "locations": [],
+              "name": "require",
+              "value": "every"
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
+          }
+        },
+        {
+          "cause": "unusable",
+          "check": "$min_subjects",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "in-scope scan count",
+              "value": 0
+            }
+          ],
+          "passed": false,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated scan ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
+          }
+        }
+      ],
+      "subjects": {
+        "scan": {
+          "description": "",
+          "from": "scans named by $params.env named by each of $params.k",
+          "identified_by": null,
+          "parts": {}
+        }
+      }
+    }
   }
 ]
