@@ -352,7 +352,10 @@ impl Scope {
                 return (Start::Alias(key.to_string()), steps);
             }
         }
-        if (dot || !parents) && self.parents.contains_key(key) {
+        if self.parents.contains_key(key)
+            || self.parts.contains_key(key)
+            || self.for_aliases.contains(key)
+        {
             steps.insert(0, Step::Key(key.to_string()));
             return (Start::Own, steps);
         }
@@ -828,12 +831,14 @@ mod tests {
     #[test]
     fn a_dot_always_reads_a_field_even_when_an_alias_has_the_name() {
         let p = lowered(&scope(), ".cov.x");
-        assert_eq!(p.start, Start::Subject);
+        assert_eq!(p.start, Start::Own);
         assert_eq!(p.steps, [key("cov"), key("x")]);
         let p = lowered(&scope(), ".artifact.x");
         assert_eq!(p.start, Start::Own);
         assert_eq!(p.steps, [key("artifact"), key("x")]);
         let p = lowered(&scope(), ".pr.x");
+        assert_eq!(p.start, Start::Own);
+        let p = lowered(&scope(), ".free.x");
         assert_eq!(p.start, Start::Subject);
         let p = lowered(&Scope::new(), ".empty");
         assert_eq!(p.steps, [key("empty")]);
@@ -884,8 +889,9 @@ mod tests {
         let p = left("artifact.owner");
         assert_eq!(p.start, Start::Own);
         assert_eq!(p.steps, [key("artifact"), key("owner")]);
-        assert_eq!(left("pr.author").start, Start::Subject);
-        assert!(matches!(left(".cov.x").start, Start::Subject));
+        assert_eq!(left("pr.author").start, Start::Own);
+        assert_eq!(left("free.author").start, Start::Subject);
+        assert!(matches!(left(".cov.x").start, Start::Own));
     }
 
     #[test]

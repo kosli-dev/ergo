@@ -468,7 +468,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
     if walk::path_needs_an_object_subject(&counted.path, ctx) {
         let result = Err(Cause::NotAnObject);
         let list = Input {
-            name: name::plain_name(&counted.path),
+            name: name::name(&counted.path),
             value: Value::Array(Vec::new()),
             locations: Vec::new(),
             part: None,

@@ -3494,6 +3494,114 @@
     ]
   },
   {
+    "description": "a requirement whose name is empty",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, with the problem under requirement name",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't be empty"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check whose name is empty",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, with the problem under checks.<name>",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"\"", "value": ["a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an any_of option whose name is empty",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"any_of": {"": "x exists", "p": "x is 1"}}}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and names the option",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option : a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part whose name is empty, written as text",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"": "ys"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, with the problem under the part's alias",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"\"", "value": ["a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part whose name is empty, written as an object",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"": {"from": "ys"}}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, with the problem under the part's alias",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"\"", "value": ["a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose name is empty that a requirement names",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is refused under subject, as an empty subject always is",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "not_met"},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subject", "value": ["empty or not a string"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": ""}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose name is empty that no requirement names",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"": {"from": "xs", "identified_by": "id"}, "s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is never read, so it adds no problem",
+        "rules": ["names.empty"],
+        "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
+        "status": {"r": "met"},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/xs/0"], "name": "in-scope s count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "checks written wrong",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": 5, "b": {"description": "no sentence"}, "c": {"for": "every xs as x"}, "d": {"for": " every  xs ", "assert": [" x  is ", 3]}, "e": {"assert": []}, "f": {"for": 3, "assert": "x is 1"}, "g": " x   is  ", "h": {"any_of": 3}, "i": {"any_of": {}}, "j": {"any_of": {"b": " x   is  1 ", "a": [], "c": 3}}, "k": {"assert": " x  is  1", "description": 3}}}}},
     "cases": [

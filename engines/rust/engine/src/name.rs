@@ -79,17 +79,6 @@ pub fn name(path: &Path) -> String {
     render(path, None)
 }
 
-pub fn plain_name(path: &Path) -> String {
-    if path.start == Start::Own {
-        name(&Path {
-            start: Start::Subject,
-            steps: path.steps.clone(),
-        })
-    } else {
-        name(path)
-    }
-}
-
 pub fn marked_name(path: &Path, marks: &BTreeSet<usize>) -> String {
     render(path, Some(marks))
 }
@@ -116,7 +105,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
         match step {
             Step::Key(key) => {
                 if out.is_empty() {
-                    if is_word(key) || (at == 0 && marks.is_none() && path.start == Start::Own) {
+                    if is_word(key) || (at == 0 && path.start == Start::Own) {
                         out.push('.');
                     }
                 } else {
@@ -249,7 +238,11 @@ mod tests {
         };
         assert_eq!(name(&own(vec![k("art"), k("k")])), ".art.k");
         assert_eq!(name(&own(vec![k("$x"), k("k")])), ".\"$x\".k");
-        assert_eq!(plain_name(&own(vec![k("art"), k("k")])), "art.k");
+        let marks = BTreeSet::from([2]);
+        assert_eq!(
+            marked_name(&own(vec![k("art"), k("xs")]), &marks),
+            ".art.xs[]"
+        );
     }
 
     #[test]

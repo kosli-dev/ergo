@@ -7452,8 +7452,67 @@ test_the_dot_in_front_of_a_field_reads_the_field_a_part_hides if {
 	rep := ergo.report({"trail": {"name": "t1", "cov": {"x": 2}, "dd": {"b": {"x": 1}}}}, policy, {})
 	_parts_row(rep, "c").passed
 	_parts_row(rep, "d").passed
-	_parts_row(rep, "d").inputs == [{"name": "cov.x", "value": 2, "locations": ["/trail/cov/x"]}]
+	_parts_row(rep, "d").inputs == [{"name": ".cov.x", "value": 2, "locations": ["/trail/cov/x"]}]
 	_parts_row(rep, "e").passed
+}
+
+test_an_own_field_named_like_a_part_keeps_its_dot_and_the_part_does_not if {
+	policy := _parts_policy({"cov": "dd.b"}, {"c": "cov.x is 1", "d": ".cov.x is 2", "e": "count of .cov.xs is 1", "f": "count of cov.xs is 1", "g": ".name is \"t1\""})
+	rep := ergo.report({"trail": {"name": "t1", "cov": {"x": 2, "xs": [1]}, "dd": {"b": {"x": 1, "xs": [1]}}}}, policy, {})
+	[i.name | some i in _parts_row(rep, "c").inputs] == ["cov.x"]
+	[i.name | some i in _parts_row(rep, "d").inputs] == [".cov.x"]
+	[i.name | some i in _parts_row(rep, "e").inputs] == ["count of .cov.xs", ".cov.xs[]"]
+	[i.name | some i in _parts_row(rep, "f").inputs] == ["count of cov.xs", "cov.xs[]"]
+	[i.name | some i in _parts_row(rep, "g").inputs] == ["name"]
+}
+
+test_a_failed_item_of_an_own_field_named_like_a_part_or_a_for_alias_keeps_the_dot if {
+	policy := _parts_policy({"cov": "dd.b"}, {"c": "every .cov.xs is at least 2", "d": "every cov.xs is at least 2"})
+	rep := ergo.report({"trail": {"name": "t1", "cov": {"xs": [1, 2]}, "dd": {"b": {"xs": [1]}}}}, policy, {})
+	[f.path | some f in _parts_row(rep, "c").failed_items] == ["item 1 of .cov.xs"]
+	[f.path | some f in _parts_row(rep, "d").failed_items] == ["item 1 of cov.xs"]
+	for_policy := {
+		"ergo_spec": "v0.4-dev",
+		"subjects": {"round": {"from": "rounds", "identified_by": "id"}},
+		"requirements": {"r": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is 1"}}}},
+	}
+	for_rep := ergo.report({"rounds": [{"id": "r1", "y": {"k": 1}, "items": [{"id": "i1", "zs": [1, 2]}]}]}, for_policy, {})
+	[f.path | some r in for_rep.results; r.check == "c"; some f in r.failed_items] == [".y.zs"]
+}
+
+test_the_nested_failed_items_of_a_second_for_line_keep_the_dot_of_an_own_field if {
+	policy := {
+		"ergo_spec": "v0.4-dev",
+		"subjects": {"round": {"from": "rounds", "identified_by": "id"}},
+		"requirements": {"r": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is at least 1"}}}},
+	}
+	rep := ergo.report({"rounds": [{"id": "r1", "y": {"zs": [5, 0]}, "items": [{"id": "i1"}]}]}, policy, {})
+	[i.item | some r in rep.results; r.check == "c"; some f in r.failed_items; some a in f.failed_assertions; some i in a.items] == ["item 2 of .y.zs"]
+}
+
+test_a_part_refused_for_its_value_still_counts_as_the_part_in_the_filter_expression if {
+	policy := {
+		"ergo_spec": "v0.4-dev",
+		"subjects": {
+			"round": {"from": "rounds", "identified_by": "id"},
+			"item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}},
+		},
+		"requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}},
+	}
+	rep := ergo.report({"rounds": [{"id": "r1", "items": [{"id": "i1", "cov": 1}]}]}, policy, {})
+	rep.requirements.r.checks["$applies"].expression == ".cov is 1"
+}
+
+test_an_own_field_named_like_a_for_alias_keeps_its_dot if {
+	policy := {
+		"ergo_spec": "v0.4-dev",
+		"subjects": {"thing": {"from": "things", "identified_by": "id"}},
+		"requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every commits as c", "assert": ".c.signed is true"}}}},
+	}
+	rep := ergo.report({"things": [{"id": "t1", "c": {"signed": true}, "commits": [{"signed": true}]}]}, policy, {})
+	some row in rep.results
+	row.check == "c"
+	".c.signed" in {i.name | some i in row.inputs}
 }
 
 test_a_field_of_the_subject_with_no_alias_in_the_way_is_read_as_before if {
@@ -7791,7 +7850,7 @@ test_every_way_a_part_can_be_written_wrong_is_named_with_its_alias if {
 }
 
 test_a_part_alias_must_be_a_bare_word_that_is_not_a_word_of_the_grammar_or_params_or_input if {
-	bad := ["empty", "every", "params", "input", "true", "a", "x y", "", "1x", "x.y", "é"]
+	bad := ["empty", "every", "params", "input", "true", "a", "x y", "1x", "x.y", "é"]
 	every alias in bad {
 		problems := _parts_problems(_parts_report({alias: "x"}, {"c": "name is \"t1\""}, {}))
 		some key, value in problems
@@ -7800,6 +7859,8 @@ test_a_part_alias_must_be_a_bare_word_that_is_not_a_word_of_the_grammar_or_param
 	}
 	problems := _parts_problems(_parts_report({"$x": "x"}, {"c": "name is \"t1\""}, {}))
 	problems["subjects.round.has.$x"] == ["a name can't start with $"]
+	problems_empty := _parts_problems(_parts_report({"": "x"}, {"c": "name is \"t1\""}, {}))
+	problems_empty["subjects.round.has.\"\""] == ["a name can't be empty"]
 	good := ["x", "_x", "x-y", "x_1", "Cov", "coverage-verification"]
 	every alias in good {
 		problems := _parts_problems(_parts_report({alias: "x"}, {"c": "name is \"t1\""}, {}))
@@ -10929,6 +10990,26 @@ test_a_name_that_starts_with_a_dollar_sign_is_written_wrong_wherever_it_stands i
 	[i.value | some i in rows_for(rep, "k", "$well_formed")[0].inputs; i.name == "checks.$k"] == [wrong]
 	[i.value | some i in rows_for(rep, "k", "$well_formed")[0].inputs; i.name == "subjects.t.has.$p"] == [wrong]
 	[i.name | some i in rows_for(rep, "ok", "$well_formed")[0].inputs; startswith(i.name, "checks.")] == []
+}
+
+test_an_empty_name_is_written_wrong_wherever_it_stands if {
+	wrong := ["a name can't be empty"]
+	policy := {"ergo_spec": "v0.4-dev", "subjects": {"t": {"from": "xs", "has": {"": "ys"}}}, "requirements": {
+		"": {"subject": "t", "checks": {"c": "x exists"}},
+		"o": {"subject": "t", "checks": {"c": {"any_of": {"": "x exists", "p": "x is 1"}}}},
+		"k": {"subject": "t", "checks": {"": "x exists"}},
+	}}
+	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+	[i.value | some i in rows_for(rep, "", "$well_formed")[0].inputs; i.name == "requirement name"] == [wrong]
+	[i.value | some i in rows_for(rep, "o", "$well_formed")[0].inputs; i.name == "checks.c"] == [["option : a name can't be empty"]]
+	[i.value | some i in rows_for(rep, "k", "$well_formed")[0].inputs; i.name == "checks.\"\""] == [wrong]
+	[i.value | some i in rows_for(rep, "k", "$well_formed")[0].inputs; i.name == "subjects.t.has.\"\""] == [wrong]
+}
+
+test_a_requirement_whose_subject_is_empty_says_so_under_subject if {
+	policy := {"ergo_spec": "v0.4-dev", "subjects": {"": {"from": "xs"}}, "requirements": {"r": {"subject": "", "checks": {"c": "x exists"}}}}
+	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
+	[i.value | some i in rows_for(rep, "r", "$well_formed")[0].inputs; i.name == "subject"] == [["empty or not a string"]]
 }
 
 test_a_name_that_starts_or_ends_with_a_space_or_an_invisible_character_is_written_wrong_wherever_it_stands if {

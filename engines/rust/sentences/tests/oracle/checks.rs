@@ -1,4 +1,21 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("count of .cov is 1", "count of cov is 1", &[], &[]),
+    ("z is 9", "z is 9", &[], &[]),
+    ("z is at least 1", "z is at least 1", &[], &[]),
+    (".cov is 1", "cov is 1", &[], &[]),
+    (
+        "every .cov.xs is at least 2",
+        "every cov.xs is at least 2",
+        &[],
+        &[],
+    ),
+    (
+        "every cov.xs is at least 2",
+        "every cov.xs is at least 2",
+        &[],
+        &[],
+    ),
+    ("y.n is at least .y.k", "y.n is at least y.k", &[], &[]),
     (".\"$x\".k is 3", "\"$x\".k is 3", &[], &[]),
     ("\"$x\".k is 2", "\"$x\".k is 2", &[], &[]),
     ("\"$x\".pa.k is 1", "\"$x\".pa.k is 1", &[], &[]),
@@ -507,6 +524,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &["approver is compared with itself"],
     ),
     (".cov.n is 3", "cov.n is 3", &[], &[]),
+    (".c.signed is true", "c.signed is true", &[], &[]),
+    (".k is 1", "k is 1", &[], &[]),
+    (".name is \"r1\"", "name is \"r1\"", &[], &[]),
+    ("count of .c.xs is 1", "count of c.xs is 1", &[], &[]),
+    ("count of .cov.xs is 2", "count of cov.xs is 2", &[], &[]),
+    ("count of cov.xs is 1", "count of cov.xs is 1", &[], &[]),
+    (
+        "every .cov.xs is at least 1",
+        "every cov.xs is at least 1",
+        &[],
+        &[],
+    ),
     (".days is 1", ".days is 1", &[], &[]),
     (
         ".empty contains none of \"a\\u00e9\"",
@@ -6083,6 +6112,25 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every items as y, every .cov.zs as z",
+        "every items as y, every cov.zs as z",
+        &[],
+        &[],
+    ),
+    (
+        "every items as y, some .y.zs as z",
+        "every items as y, some .y.zs as z",
+        &[],
+        &[],
+    ),
+    ("every items as y", "every items as y", &[], &[]),
+    (
+        "every items as y, every .y.zs as z",
+        "every items as y, every .y.zs as z",
+        &[],
+        &[],
+    ),
     (
         "every xs as p, every ys whose k is 1 as q",
         "every xs as p, every ys whose k is 1 as q",

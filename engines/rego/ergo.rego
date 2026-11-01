@@ -373,10 +373,14 @@ _dollar_name_problem := "a name can't start with $"
 
 _edge_name_problem := "a name can't start or end with a space or an invisible character"
 
+_empty_name_problem := "a name can't be empty"
+
 _dollar_name(name) if {
 	is_string(name)
 	startswith(name, "$")
 }
+
+_empty_name(name) if name == ""
 
 _edge_name(name) if {
 	is_string(name)
@@ -409,7 +413,7 @@ _edge_char(c) if {
 	c in _edge_chars
 }
 
-_written_name_problems(name) := {_dollar_name_problem | _dollar_name(name)} | {_edge_name_problem | _edge_name(name)}
+_written_name_problems(name) := ({_dollar_name_problem | _dollar_name(name)} | {_edge_name_problem | _edge_name(name)}) | {_empty_name_problem | _empty_name(name)}
 
 _edge_chars := {"\u0009", "\u000a", "\u000b", "\u000c", "\u000d", "\u0020", "\u0085", "\u00a0", "\u1680", "\u2000", "\u2001", "\u2002", "\u2003", "\u2004", "\u2005", "\u2006", "\u2007", "\u2008", "\u2009", "\u200a", "\u2028", "\u2029", "\u202f", "\u205f", "\u3000", "\u00ad", "\u0600", "\u0601", "\u0602", "\u0603", "\u0604", "\u0605", "\u061c", "\u06dd", "\u070f", "\u0890", "\u0891", "\u08e2", "\u180e", "\u200b", "\u200c", "\u200d", "\u200e", "\u200f", "\u202a", "\u202b", "\u202c", "\u202d", "\u202e", "\u2060", "\u2061", "\u2062", "\u2063", "\u2064", "\u2066", "\u2067", "\u2068", "\u2069", "\u206a", "\u206b", "\u206c", "\u206d", "\u206e", "\u206f", "\ufeff", "\ufff9", "\ufffa", "\ufffb", "\ud804\udcbd", "\ud804\udccd", "\ud80d\udc30", "\ud80d\udc31", "\ud80d\udc32", "\ud80d\udc33", "\ud80d\udc34", "\ud80d\udc35", "\ud80d\udc36", "\ud80d\udc37", "\ud80d\udc38", "\ud80d\udc39", "\ud80d\udc3a", "\ud80d\udc3b", "\ud80d\udc3c", "\ud80d\udc3d", "\ud80d\udc3e", "\ud80d\udc3f", "\ud82f\udca0", "\ud82f\udca1", "\ud82f\udca2", "\ud82f\udca3", "\ud834\udd73", "\ud834\udd74", "\ud834\udd75", "\ud834\udd76", "\ud834\udd77", "\ud834\udd78", "\ud834\udd79", "\ud834\udd7a", "\udb40\udc01", "\udb40\udc20", "\udb40\udc21", "\udb40\udc22", "\udb40\udc23", "\udb40\udc24", "\udb40\udc25", "\udb40\udc26", "\udb40\udc27", "\udb40\udc28", "\udb40\udc29", "\udb40\udc2a", "\udb40\udc2b", "\udb40\udc2c", "\udb40\udc2d", "\udb40\udc2e", "\udb40\udc2f", "\udb40\udc30", "\udb40\udc31", "\udb40\udc32", "\udb40\udc33", "\udb40\udc34", "\udb40\udc35", "\udb40\udc36", "\udb40\udc37", "\udb40\udc38", "\udb40\udc39", "\udb40\udc3a", "\udb40\udc3b", "\udb40\udc3c", "\udb40\udc3d", "\udb40\udc3e", "\udb40\udc3f", "\udb40\udc40", "\udb40\udc41", "\udb40\udc42", "\udb40\udc43", "\udb40\udc44", "\udb40\udc45", "\udb40\udc46", "\udb40\udc47", "\udb40\udc48", "\udb40\udc49", "\udb40\udc4a", "\udb40\udc4b", "\udb40\udc4c", "\udb40\udc4d", "\udb40\udc4e", "\udb40\udc4f", "\udb40\udc50", "\udb40\udc51", "\udb40\udc52", "\udb40\udc53", "\udb40\udc54", "\udb40\udc55", "\udb40\udc56", "\udb40\udc57", "\udb40\udc58", "\udb40\udc59", "\udb40\udc5a", "\udb40\udc5b", "\udb40\udc5c", "\udb40\udc5d", "\udb40\udc5e", "\udb40\udc5f", "\udb40\udc60", "\udb40\udc61", "\udb40\udc62", "\udb40\udc63", "\udb40\udc64", "\udb40\udc65", "\udb40\udc66", "\udb40\udc67", "\udb40\udc68", "\udb40\udc69", "\udb40\udc6a", "\udb40\udc6b", "\udb40\udc6c", "\udb40\udc6d", "\udb40\udc6e", "\udb40\udc6f", "\udb40\udc70", "\udb40\udc71", "\udb40\udc72", "\udb40\udc73", "\udb40\udc74", "\udb40\udc75", "\udb40\udc76", "\udb40\udc77", "\udb40\udc78", "\udb40\udc79", "\udb40\udc7a", "\udb40\udc7b", "\udb40\udc7c", "\udb40\udc7d", "\udb40\udc7e", "\udb40\udc7f"}
 
@@ -1809,7 +1813,11 @@ _plain_step_name(i, step) := concat("", [".", _s_key_text(step)]) if {
 	is_string(step)
 }
 
-_plain_step_name(0, step) := concat("", [_s_dot(step.literal, "left"), _s_key_text(step.literal)]) if _string_literal(step)
+_plain_step_name(0, step) := concat("", [_literal_dot(step.literal), _s_key_text(step.literal)]) if _string_literal(step)
+
+_literal_dot(key) := "." if not startswith(key, "$")
+
+_literal_dot(key) := _s_dot(key, "left") if startswith(key, "$")
 
 _plain_step_name(0, step) := _s_parent_key(step.parent) if _parent_step_form(step)
 
@@ -3585,6 +3593,8 @@ else := [{"name": "requirement name", "value": sort(_written_name_problems(name)
 _bad_name(name) if _dollar_name(name)
 
 _bad_name(name) if _edge_name(name)
+
+_bad_name(name) if _empty_name(name)
 
 default _well_formed(_) := false
 
@@ -6525,7 +6535,7 @@ else := {"problems": object.get(fl, "problems", ["doesn't parse"]), "fields": {}
 _s_from_read_of(name, fl, subjects, chains) := object.union(object.union({"problems": problems, "fields": fields, "parent": parent, "every": every_list}, _p_from_part(name, fl, subjects, chains.parts)), _s_follows(name, fl, subjects, chains)) if {
 	"path" in object.keys(fl)
 	names := {a | some a in _s_ancestors(name, chains.descend)}
-	keep := names | object.keys(_p_steps_of(object.get(chains.parts, name, {})))
+	keep := names | object.keys(object.get(chains.parts, name, {}))
 	pc := {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}
 	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc), keep), names), pc) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
 	problems := sort(((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {_whose_problem(p) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}))
@@ -7774,7 +7784,7 @@ _walk_read_row(check, subj) := {"cause": cause, "inputs": inputs, "failed": fail
 	judged := [_walk_judge(check, w, e) | some e in w.items]
 	fails := array.concat(array.concat(w.fails, [j.failure | some j in judged; j.failure != null]), _walk_stop(w))
 	cause := _walk_cause(check, w, judged, fails)
-	failed := _walk_failed(cause, fails)
+	failed := _walk_failed(cause, fails, check.path)
 	inputs := _merged_inputs(array.concat(_walk_inputs(check, w), array.concat(_named_inputs(subj, _walk_condition_paths(check)), _field_named_inputs(subj, _walk_condition_paths(check)))))
 }
 
@@ -8083,9 +8093,9 @@ _walk_some_kept(judged, false) if {
 
 _walk_worst(fails) := [c | some c in array.concat(_cause_precedence, ["value"]); c in {f.cause | some f in fails}][0]
 
-_walk_failed("satisfied", _) := []
+_walk_failed("satisfied", _, _) := []
 
-_walk_failed(cause, fails) := [{"path": _input_name(f.path), "item": _input_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
+_walk_failed(cause, fails, path) := [{"path": _failed_name(f.path, _dotted_roots([path])), "item": _failed_name(f.item, _dotted_roots([path])), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
 	some p in sort({f.path | some f in fails})
 	some f in fails
 	f.path == p
@@ -8692,16 +8702,33 @@ _name_read(x, name) if {
 
 _for_item_name(check, p) := _input_name(array.concat([substring(p[0], 1, -1)], array.slice(p, 1, count(p)))) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
 
-else := _input_name(p)
+else := _failed_name(p, _for_dotted(check))
 
 _for_verdict(item, w, judged, fails) := _walk_stop(w)[0].cause if {
 	w.walked == set()
 	count(_walk_stop(w)) > 0
 } else := _walk_verdict(item.q, item.if_any == true, judged, fails)
 
+_for_dotted(check) := _dotted_roots([item.path | some item in check.items])
+
+_dotted_roots(paths) := {p[0].literal |
+	some p in paths
+	is_array(p)
+	_string_literal(p[0])
+	not startswith(p[0].literal, "$")
+}
+
+default _dotted_root(_, _) := false
+
+_dotted_root(path, roots) if path[0] in roots
+
+_failed_name(path, roots) := _input_name(path) if not _dotted_root(path, roots)
+
+_failed_name(path, roots) := _with_dot(_input_name(path), true) if _dotted_root(path, roots)
+
 _for_failed(_, "satisfied", _) := []
 
-_for_failed(check, cause, fails) := [object.union({"path": _input_name(f.path), "item": _input_name(f.item), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f)}, _for_unchecked(check, object.get(f, "inner", []))) |
+_for_failed(check, cause, fails) := [object.union({"path": _failed_name(f.path, _for_dotted(check)), "item": _failed_name(f.item, _for_dotted(check)), "cause": f.cause, "value": f.value, "failed_assertions": f.lines, "locations": _fail_locations(f)}, _for_unchecked(check, object.get(f, "inner", []))) |
 	some p in sort({f.path | some f in fails; not object.get(f, "nothing_picked", false)})
 	some f in fails
 	f.path == p

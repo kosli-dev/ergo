@@ -654,13 +654,13 @@
           "inputs": [
             {
               "locations": [],
-              "name": "count of .kid.arr",
-              "value": null
+              "name": ".kid.arr",
+              "value": []
             },
             {
               "locations": [],
-              "name": "kid.arr",
-              "value": []
+              "name": "count of .kid.arr",
+              "value": null
             }
           ],
           "passed": false,
@@ -679,13 +679,13 @@
           "inputs": [
             {
               "locations": [],
-              "name": "count of .kid.arr",
-              "value": null
+              "name": ".kid.arr",
+              "value": []
             },
             {
               "locations": [],
-              "name": "kid.arr",
-              "value": []
+              "name": "count of .kid.arr",
+              "value": null
             }
           ],
           "passed": false,
