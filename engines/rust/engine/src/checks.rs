@@ -406,6 +406,21 @@ mod tests {
         assert_eq!(read["c"].expression, ".cov is 1");
     }
 
+    #[test]
+    fn a_field_named_like_a_part_of_the_parent_only_prints_no_dot() {
+        let policy = Policy::read(&json!({
+            "ergo_spec": "v0.4-dev",
+            "subjects": {
+                "round": {"from": "rounds", "has": {"cov": "d.b"}},
+                "item": {"from": "round.items"}
+            },
+            "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}}
+        }));
+        let reading = Reading::of(&policy);
+        let read = read_checks(&reading, &policy.requirements["r"]);
+        assert_eq!(read["c"].expression, "cov is 1");
+    }
+
     fn problems(read: &CheckRead) -> Vec<&str> {
         read.problems.iter().map(String::as_str).collect()
     }

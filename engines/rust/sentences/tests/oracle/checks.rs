@@ -1,4 +1,7 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("count of .cov is 1", "count of cov is 1", &[], &[]),
+    ("z is 9", "z is 9", &[], &[]),
+    ("z is at least 1", "z is at least 1", &[], &[]),
     (".cov is 1", "cov is 1", &[], &[]),
     (
         "every .cov.xs is at least 2",
@@ -6109,6 +6112,18 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every items as y, every .cov.zs as z",
+        "every items as y, every cov.zs as z",
+        &[],
+        &[],
+    ),
+    (
+        "every items as y, some .y.zs as z",
+        "every items as y, some .y.zs as z",
+        &[],
+        &[],
+    ),
     ("every items as y", "every items as y", &[], &[]),
     (
         "every items as y, every .y.zs as z",
