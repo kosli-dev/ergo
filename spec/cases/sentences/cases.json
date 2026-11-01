@@ -8579,28 +8579,6 @@
     ]
   },
   {
-    "description": "count of is not a value within a number",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "count of l is not 3 within 1"}}}},
-    "cases": [
-      {
-        "description": "passes when further apart",
-        "rules": ["sentence.phrase.within", "compare.within"],
-        "input": {"things": [{"id": "t1", "l": []}]},
-        "results": [
-          {"cause": "satisfied", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": 0}, {"locations": [], "name": "l[]", "value": []}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
-        ]
-      },
-      {
-        "description": "fails as value when close",
-        "rules": ["sentence.phrase.within", "compare.within"],
-        "input": {"things": [{"id": "t1", "l": [1, 2]}]},
-        "results": [
-          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/l/0", "/things/0/l/1"], "name": "count of l", "value": 2}, {"locations": ["/things/0/l/0", "/things/0/l/1"], "name": "l[]", "value": [1, 2]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
-        ]
-      }
-    ]
-  },
-  {
     "description": "is not with a value that isn't a number within a number",
     "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is not \"a\" within 1", "b": "x is not 1 within -1", "c": "x is not 1 within"}}}},
     "cases": [
@@ -9630,6 +9608,47 @@
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/ab"], "name": "ab", "value": "x"}, {"locations": ["/things/0/m"], "name": "m named by p", "value": null}, {"locations": ["/things/0"], "name": "p", "value": null}, {"locations": ["/things/0/q"], "name": "q", "value": "x"}], "passed": false, "requirement": "k", "subject": {"id": "t", "type": "t"}},
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/m"], "name": "m named by p", "value": null}, {"locations": ["/things/0"], "name": "p", "value": null}, {"locations": ["/things/0/q"], "name": "q", "value": "x"}], "passed": false, "requirement": "l", "subject": {"id": "t", "type": "t"}},
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/q"], "name": "q", "value": "x"}, {"locations": ["/things/0/m"], "name": "m named by p", "value": null}, {"locations": ["/things/0"], "name": "p", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of is not a value within a number",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "count of l is not 3 within 1"}}}},
+    "cases": [
+      {
+        "description": "passes when further apart",
+        "rules": ["sentence.phrase.within", "compare.within"],
+        "input": {"things": [{"id": "t1", "l": []}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": 0}, {"locations": [], "name": "l[]", "value": []}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as value when close",
+        "rules": ["sentence.phrase.within", "compare.within"],
+        "input": {"things": [{"id": "t1", "l": [1, 2]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/l/0", "/things/0/l/1"], "name": "count of l", "value": 2}, {"locations": ["/things/0/l/0", "/things/0/l/1"], "name": "l[]", "value": [1, 2]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as absent or null when the list is missing or null",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1"}, {"id": "t1", "l": null}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as unusable when the field isn't a list",
+        "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
+        "input": {"things": [{"id": "t1", "l": "abc"}, {"id": "t1", "l": 3}, {"id": "t1", "l": {"k": 1}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]

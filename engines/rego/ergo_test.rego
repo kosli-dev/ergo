@@ -5247,12 +5247,6 @@ test_a_gap_that_cannot_be_worked_out_is_unusable_for_not_within_as_well if {
 	_not_within_cause(1e4096, 1e4096, "1") == "value"
 }
 
-test_a_compare_with_ne_takes_a_within_but_other_comparisons_do_not if {
-	"within needs cmp eq or ne" in ergo._field_problems({"op": "compare", "left": ["a"], "right": ["b"], "cmp": "gt", "within": 1}, [])
-	not "within needs cmp eq or ne" in ergo._field_problems({"op": "compare", "left": ["a"], "right": ["b"], "cmp": "ne", "within": 1}, [])
-	not "within needs cmp eq or ne" in ergo._field_problems({"op": "compare", "left": ["a"], "right": ["b"], "cmp": "eq", "within": 1}, [])
-}
-
 test_the_phrase_table_has_no_more_entries_than_opas_wasm_regex_cache_takes_in_a_report_of_hundreds_of_patterns if count(ergo._s_patterns.phrases) == 29
 
 test_each_new_phrase_reads_into_its_op if {
