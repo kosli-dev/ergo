@@ -9659,7 +9659,7 @@
     "cases": [
       {
         "description": "lists the field right after the list or the path it names, before the other side, on either side, and fails as the field says",
-        "rules": ["path.field_step", "tally.inputs"],
+        "rules": ["path.field_step", "tally.inputs", "location.worked_out"],
         "input": {"things": [{"id": "t1", "m": {"k": [1, 2]}, "n": {"k": 1}, "q": 2, "p": "k"}, {"id": "t2", "m": {"k": [1, 2]}, "n": {"k": 1}, "q": 2}, {"id": "t3", "m": {"k": [1, 2]}, "n": {"k": 1}, "q": 2, "p": null}, {"id": "t4", "m": {"k": [1, 2]}, "n": {"k": 1}, "q": 2, "p": 3}]},
         "results": [
           {"cause": "value", "check": "a", "inputs": [{"locations": ["/things/0/m/k/0", "/things/0/m/k/1"], "name": "count of m named by p", "value": 2}, {"locations": ["/things/0/m/k/0", "/things/0/m/k/1"], "name": "m named by p[]", "value": [1, 2]}, {"locations": ["/things/0/p"], "name": "p", "value": "k"}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
@@ -9696,7 +9696,7 @@
     "cases": [
       {
         "description": "lists the field right after the path it names, whichever end of the time it is",
-        "rules": ["path.field_step", "tally.elapsed"],
+        "rules": ["path.field_step", "tally.elapsed", "location.worked_out"],
         "input": {"things": [{"id": "t1", "n": {"k": "2026-01-01T00:00:00Z"}, "t": "2026-01-02T00:00:00Z", "p": "k"}, {"id": "t2", "n": {"k": "2026-01-01T00:00:00Z"}, "t": "2026-01-02T00:00:00Z"}, {"id": "t3", "n": {"k": "2026-01-01T00:00:00Z"}, "t": "2026-01-02T00:00:00Z", "p": null}, {"id": "t4", "n": {"k": "2026-01-01T00:00:00Z"}, "t": "2026-01-02T00:00:00Z", "p": 3}]},
         "results": [
           {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/n/k", "/things/0/t"], "name": "days elapsed from n named by p to t", "value": 1}, {"locations": ["/things/0/n/k"], "name": "n named by p", "value": "2026-01-01T00:00:00Z"}, {"locations": ["/things/0/p"], "name": "p", "value": "k"}, {"locations": ["/things/0/t"], "name": "t", "value": "2026-01-02T00:00:00Z"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
