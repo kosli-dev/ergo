@@ -97,6 +97,17 @@ pub struct Tally {
 struct Worked<T> {
     result: Result<T, Cause>,
     entries: Vec<Input>,
+    located: Vec<String>,
+}
+
+fn once<'a>(locations: impl IntoIterator<Item = &'a String>) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for location in locations {
+        if !out.contains(location) {
+            out.push(location.clone());
+        }
+    }
+    out
 }
 
 fn side_paths(side: &Side) -> Vec<&Path> {
@@ -340,6 +351,7 @@ fn work_side(side: &Side, ctx: &Ctx) -> Worked<Value> {
             Worked {
                 result,
                 entries: read.inputs,
+                located: Vec::new(),
             }
         }
         Side::Derived(derived) => {
@@ -347,18 +359,13 @@ fn work_side(side: &Side, ctx: &Ctx) -> Worked<Value> {
             Worked {
                 result: worked.result.map(Value::Number),
                 entries: worked.entries,
+                located: worked.located,
             }
         }
     }
 }
 
-fn number_entry(text: &str, result: &Result<Number, Cause>, below: &[Input]) -> Input {
-    let mut locations: Vec<String> = Vec::new();
-    for location in below.iter().flat_map(|entry| &entry.locations) {
-        if !locations.contains(location) {
-            locations.push(location.clone());
-        }
-    }
+fn number_entry(text: &str, result: &Result<Number, Cause>, locations: Vec<String>) -> Input {
     Input {
         name: text.to_string(),
         value: match result {
@@ -394,10 +401,15 @@ fn work_derived(derived: &Derived, ctx: &Ctx) -> Worked<Number> {
             add(&numbers).ok_or(Cause::Unusable)
         }
     };
+    let located = once(worked.iter().flat_map(|w| &w.located));
     let below: Vec<Input> = worked.into_iter().flat_map(|w| w.entries).collect();
-    let mut entries = vec![number_entry(&derived.text, &result, &below)];
+    let mut entries = vec![number_entry(&derived.text, &result, located.clone())];
     entries.extend(below);
-    Worked { result, entries }
+    Worked {
+        result,
+        entries,
+        located,
+    }
 }
 
 fn work_term(term: &Term, ctx: &Ctx) -> Worked<Number> {
@@ -405,6 +417,7 @@ fn work_term(term: &Term, ctx: &Ctx) -> Worked<Number> {
         Term::Number(n) => Worked {
             result: Ok(n.clone()),
             entries: Vec::new(),
+            located: Vec::new(),
         },
         Term::Path(path) => {
             let read = read_path(path, ctx);
@@ -414,6 +427,7 @@ fn work_term(term: &Term, ctx: &Ctx) -> Worked<Number> {
                 (None, _) => Err(Cause::Unusable),
             };
             Worked {
+                located: once(read.inputs.iter().take(1).flat_map(|e| &e.locations)),
                 result,
                 entries: read.inputs,
             }
@@ -459,7 +473,12 @@ fn counted_entries(
     list: Input,
     outside: Vec<Input>,
     ctx: &Ctx,
-) -> Vec<Input> {
+) -> (Vec<Input>, Vec<String>) {
+    let located = once(
+        list.locations
+            .iter()
+            .chain(outside.iter().flat_map(|e| &e.locations)),
+    );
     let mut entries = vec![Input {
         name: counted.text.clone(),
         value: match result {
@@ -472,7 +491,7 @@ fn counted_entries(
     entries.push(list);
     entries.extend(super::field_inputs(&counted.path, ctx));
     entries.extend(outside);
-    entries
+    (entries, located)
 }
 
 fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
@@ -485,8 +504,10 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             locations: Vec::new(),
             part: None,
         };
+        let (entries, located) = counted_entries(counted, &result, list, Vec::new(), ctx);
         return Worked {
-            entries: counted_entries(counted, &result, list, Vec::new(), ctx),
+            entries,
+            located,
             result,
         };
     }
@@ -509,8 +530,10 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             locations: Vec::new(),
             part: None,
         };
+        let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
-            entries: counted_entries(counted, &result, list, outside, ctx),
+            entries,
+            located,
             result,
         };
     }
@@ -558,8 +581,10 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             .collect(),
         part: path::part_tag(&counted.path, &outer).map(|(name, id)| Part { name, id }),
     };
+    let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
     Worked {
-        entries: counted_entries(counted, &result, list, outside, ctx),
+        entries,
+        located,
         result,
     }
 }
@@ -595,10 +620,20 @@ fn work_elapsed(elapsed: &Elapsed, ctx: &Ctx) -> Worked<Number> {
             _ => Err(Cause::Unusable),
         },
     };
+    let located = once(
+        [&from.inputs, &to.inputs]
+            .into_iter()
+            .flat_map(|inputs| inputs.iter().take(1))
+            .flat_map(|e| &e.locations),
+    );
     let below: Vec<Input> = from.inputs.into_iter().chain(to.inputs).collect();
-    let mut entries = vec![number_entry(&elapsed.text, &result, &below)];
+    let mut entries = vec![number_entry(&elapsed.text, &result, located.clone())];
     entries.extend(below);
-    Worked { result, entries }
+    Worked {
+        result,
+        entries,
+        located,
+    }
 }
 
 fn elapsed_between(unit: Unit, from: &Value, to: &Value) -> Result<Number, Cause> {
