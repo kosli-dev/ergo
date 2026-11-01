@@ -1739,7 +1739,7 @@ the inputs are:
 
 A problem with a sentence in an `any_of` option is listed under the check, with the option's name in front, like `option standard: line 2: doesn't parse` or `option standard: line 1: values of mixed types` under `checks.permitted`. A problem with one line of an `assert` list of two or more starts with the line's number, like `line 2: values of mixed types` under `checks.signed`, and a problem with the `for` line, its `whose` included, starts with `for: `, like `for: values of mixed types`. A problem with a sentence is listed under the check, never under a place inside it, and a sentence lists every problem it has, so `x is one of 1, 'a' and y is at least y` gives both `values of mixed types` and `y is compared with itself`. A name that needs quotes is quoted: `checks."a.b"`.
 
-The fields of the requirement and its subject get an input of the same form when something is wrong with them. The requirement's own fields come first, named after the field, and then the subject's, named after the subject and the field. Each group is sorted by field. `require` is shown with its value when it's fine, and with what's wrong instead when it isn't, so no name appears twice. With a requirement like this on the same subject, with `from: deployments`:
+The fields of the requirement and its subject get an input of the same form when something is wrong with them. After `count(checks)` and `require`, the requirement's own fields come first, named after the field, then the subject's, named after the subject and the field, like `subjects.deployment.from`, and then the checks, named `checks.<name>`. Each group is sorted by the name as the report writes it, quotes and escapes included, by code point, so a field called `zz` comes before `subjects.deployment.from`, and `"x y"` (a name that needs quotes) comes before `x`. `require` is always second: it shows its value when it's fine, and what's wrong with it instead when it isn't, so no name appears twice. With a requirement like this on the same subject, with `from: deployments`:
 
 ```yaml
 approved:
@@ -1755,9 +1755,9 @@ the inputs are:
 ```json
 "inputs": [
   { "name": "count(checks)", "value": 0, "locations": [] },
+  { "name": "require", "value": ["neither every nor some"], "locations": [] },
   { "name": "checks", "value": ["empty"], "locations": [] },
   { "name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": [] },
-  { "name": "require", "value": ["neither every nor some"], "locations": [] },
   { "name": "zz", "value": ["unknown field"], "locations": [] }
 ]
 ```

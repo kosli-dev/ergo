@@ -441,7 +441,14 @@ pub fn well_formed_row(
         inputs.push(input("requirement", raw.clone(), &[]));
     }
     let mut listed: Vec<(&String, &std::collections::BTreeSet<String>)> = problems.iter().collect();
-    listed.sort_by_key(|(name, _)| (name.starts_with("checks."), name.replace('"', "")));
+    listed.sort_by_key(|(name, _)| {
+        let group = if name.starts_with("checks.") {
+            2
+        } else {
+            u8::from(name.starts_with("subjects."))
+        };
+        (group, name.as_str())
+    });
     for (name, texts) in listed {
         if name == "require" {
             continue;

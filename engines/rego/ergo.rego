@@ -421,9 +421,24 @@ _require_problems(req) := {["require", "neither every nor some"] | is_object(req
 
 _path_problems(req, f) := {[f, "number out of range"] | is_array(_req_field(req, f, null)); _out_of_range(req[f])}
 
-_field_problem_inputs(req) := [{"name": _field_name(f), "value": sort({p[1] | some p in problems; p[0] == f}), "locations": []} | some f in sort({p[0] | some p in problems})] if {
+_field_problem_inputs(req) := [{"name": _field_key_name(k), "value": sort({p[1] | some p in problems; _field_sort_key(p[0]) == k}), "locations": []} | some k in sort({_field_sort_key(p[0]) | some p in problems; p[0] != "require"})] if {
 	problems := _req_problems(req)
 }
+
+_field_sort_key(f) := [1, _field_name(f)] if is_string(f)
+
+_field_sort_key(f) := [2, _field_name(f)] if is_array(f)
+
+_field_sort_key(f) := [0, f] if {
+	not is_string(f)
+	not is_array(f)
+}
+
+_field_key_name([1, name]) := name
+
+_field_key_name([2, name]) := name
+
+_field_key_name([0, f]) := _field_name(f)
 
 _field_name(f) := _field_path_name([f]) if is_string(f)
 
@@ -3648,14 +3663,14 @@ _from_names(req, here) := ({n |
 _well_formed_inputs(req) := array.concat(
 	array.concat(
 		[{"name": "count(checks)", "value": count(_checks_of(req)), "locations": []}],
-		_echo(req, "require", _require_of(req)),
+		_require_input(req),
 	),
 	array.concat(array.concat(array.concat(_not_an_object_inputs(req), _field_problem_inputs(req)), _check_problem_inputs(req)), _policy_problems),
 )
 
-_echo(req, f, v) := [{"name": _field_name(f), "value": v, "locations": []}] if not _has_problems(req, f)
+_require_input(req) := [{"name": "require", "value": _require_of(req), "locations": []}] if not _has_problems(req, "require")
 
-_echo(req, f, _) := [] if _has_problems(req, f)
+_require_input(req) := [{"name": "require", "value": sort({p[1] | some p in _req_problems(req); p[0] == "require"}), "locations": []}] if _has_problems(req, "require")
 
 _applies_description(req) := concat("", ["The ", _text(_subject_type_of(req)), " is in scope"])
 
