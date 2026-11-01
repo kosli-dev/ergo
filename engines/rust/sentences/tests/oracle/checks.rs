@@ -7747,8 +7747,32 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every rows as r, every r.a.xs named by p as x",
+        "every rows as r, every r.a.xs named by p as x",
+        &[],
+        &[],
+    ),
+    (
+        "every rows as r, every r.a.xs.k as x",
+        "every rows as r, every r.a.xs.k as x",
+        &[],
+        &[],
+    ),
+    (
+        "every rows as r, every s.x.xs named by p as x",
+        "every rows as r, every s.x.xs named by p as x",
+        &[],
+        &[],
+    ),
+    (
         "every rows.w named by p as w",
         "every rows.w named by p as w",
+        &[],
+        &[],
+    ),
+    (
+        "every s.x.ys named by p as y",
+        "every s.x.ys named by p as y",
         &[],
         &[],
     ),

@@ -268,16 +268,26 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             Ok(Resolved::Key(key)) => segs.push(Seg::Key(key)),
             Ok(Resolved::Index(at)) => segs.push(Seg::Index(at)),
             Err(outcome) => {
-                let outcome = match step {
+                let before = match step {
                     Step::Field(_) => at
                         .checked_sub(leading.len())
-                        .and_then(|own| before_field(path, own, ctx))
-                        .unwrap_or(outcome),
-                    _ => outcome,
+                        .and_then(|own| before_field(path, own, ctx).map(|outcome| (own, outcome))),
+                    _ => None,
                 };
+                let failures = match before {
+                    Some((own, Outcome::Null)) => {
+                        let prefix = Path {
+                            start: path.start.clone(),
+                            steps: path.steps[..own].to_vec(),
+                        };
+                        walk(&prefix, ctx, Options::default()).failures
+                    }
+                    _ => Vec::new(),
+                };
+                let outcome = before.map_or(outcome, |(_, outcome)| outcome);
                 return Walked {
                     items: Vec::new(),
-                    failures: Vec::new(),
+                    failures,
                     walked: BTreeSet::new(),
                     steps: segs.len(),
                     name: name::name(path),
@@ -736,7 +746,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
                 cause: outcome.cause().unwrap_or(Cause::Unusable),
                 inputs,
             },
-            failed_items: Vec::new(),
+            failed_items: walked.failures.iter().map(Failure::to_json).collect(),
         };
     }
     let judged = judge(walk, &walked, &outer);

@@ -451,7 +451,7 @@ impl For {
         if let Some(outcome) = walked.unreadable {
             return Cands {
                 live: Vec::new(),
-                dead: Vec::new(),
+                dead: walked.failures.iter().map(Dead::of_failure).collect(),
                 list: empty_list(walked.name),
                 unreadable: Some(outcome.cause().unwrap_or(Cause::Unusable)),
                 walked_none: false,
@@ -812,7 +812,14 @@ impl For {
         let independent = depth > 0 && !reads_path(&item.path, &self.items[0].alias);
         collect.add(depth, cands.list, independent);
         if let Some(cause) = cands.unreadable {
-            let dead = if depth > 0 {
+            let shared = depth > 0 && !reads_path(&item.path, &self.items[0].alias);
+            let dead = if !cands.dead.is_empty() {
+                cands
+                    .dead
+                    .into_iter()
+                    .map(|entry| Dead { shared, ..entry })
+                    .collect()
+            } else if depth > 0 {
                 let before: Vec<Step> = item
                     .path
                     .steps
