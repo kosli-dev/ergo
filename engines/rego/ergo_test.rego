@@ -5253,6 +5253,8 @@ test_a_compare_with_ne_takes_a_within_but_other_comparisons_do_not if {
 	not "within needs cmp eq or ne" in ergo._field_problems({"op": "compare", "left": ["a"], "right": ["b"], "cmp": "eq", "within": 1}, [])
 }
 
+test_the_phrase_table_has_no_more_entries_than_opas_wasm_regex_cache_takes_in_a_report_of_hundreds_of_patterns if count(ergo._s_patterns.phrases) == 29
+
 test_each_new_phrase_reads_into_its_op if {
 	_read(`x is not a list`).assertions[0].phrase == {"op": "is not a", "type": "list"}
 	_read(`x is not an object`).assertions[0].phrase == {"op": "is not a", "type": "object"}
