@@ -4988,11 +4988,15 @@ violations(report) := [object.union(
 		"inputs": array.concat(row.inputs, _recorded_refs(report.requirements, row)),
 		"cause": row.cause,
 	},
-	object.union(_failed_items_of(row), _failed_assertions_of(row)),
+	object.union(object.union(_failed_items_of(row), _failed_assertions_of(row)), _message_of(row)),
 ) |
 	some row in report.results
 	_is_violation(report.requirements, row)
 ]
+
+_message_of(row) := {"message": row.message} if "message" in object.keys(row)
+
+_message_of(row) := {} if not "message" in object.keys(row)
 
 _failed_items_of(row) := {"failed_items": row.failed_items} if "failed_items" in object.keys(row)
 
