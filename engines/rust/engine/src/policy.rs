@@ -841,10 +841,7 @@ mod tests {
             ["not a version v0.2-beta"]
         );
         assert_eq!(spec_problems(json!("v0.2-")), ["not a version v0.2-"]);
-        assert_eq!(
-            spec_problems(json!("v0.4.1")),
-            ["not a version v0.4.1"]
-        );
+        assert_eq!(spec_problems(json!("v0.4.1")), ["not a version v0.4.1"]);
         assert_eq!(spec_problems(json!("v.2")), ["not a version v.2"]);
         assert_eq!(spec_problems(json!("")), ["not a version "]);
         assert_eq!(
@@ -956,7 +953,8 @@ mod tests {
     #[test]
     fn subjects_that_are_not_an_object_fail_every_requirement_that_names_one() {
         for subjects in [json!(null), json!("thing"), json!(["thing"]), json!(1)] {
-            let policy = json!({"ergo_spec": "v0.4", "subjects": subjects, "requirements": {"s": valid()}});
+            let policy =
+                json!({"ergo_spec": "v0.4", "subjects": subjects, "requirements": {"s": valid()}});
             assert_eq!(
                 requirement_problems(policy, "s"),
                 [problem("subjects", &["not an object"])]
