@@ -11234,3 +11234,18 @@ test_message_of_a_walk_that_failed_without_a_list_to_show_repeats_its_expression
 	check := {"path": ["xs"], "expression": "every xs.ok is true"}
 	ergo._walk_parts(check, {}, {"cause": "value"}, {"failed": []}) == ["every xs.ok is true is false"]
 }
+
+test_message_of_a_count_names_an_item_whose_field_cant_hold_the_next_step if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of xs.n.b is 1"}}}}
+	r := ergo.report({"things": [{"id": "t", "xs": [{"n": 5}]}]}, policy, {})
+	some row in r.results
+	row.check == "c"
+	row.message == "item 1 of xs: n is 5, which isn't an object"
+}
+
+test_message_names_an_item_by_the_part_of_the_subject_it_goes_through if {
+	marker := ergo._p_marker("cov", 0, null, false)
+	ergo._m_item_name(["xs", marker, "z"], set()) == "cov.z"
+	ergo._m_off_item_path(["xs", marker])
+	not ergo._m_off_item_path(["xs", "z"])
+}
