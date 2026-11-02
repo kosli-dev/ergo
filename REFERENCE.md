@@ -95,7 +95,7 @@ the report starts with:
   "description": "Production changes are reviewed and approved",
   "engine": {
     "name": "ergo-rego",
-    "version": "0.4.0-dev"
+    "version": "0.4.1-dev"
   },
   "ergo": "v0.4",
   "meta": {
@@ -1442,7 +1442,7 @@ The report of a policy, an input and params is:
   "description": "",
   "engine": {
     "name": "ergo-rego",
-    "version": "0.4.0-dev"
+    "version": "0.4.1-dev"
   },
   "ergo": "v0.4",
   "meta": {},
