@@ -206,7 +206,12 @@ fn each_of_entries<'a>(
 }
 
 fn broken_from(failure: &walk::Failure) -> Broken {
-    let msg = match failure.msg.strip_suffix("which isn't a list") {
+    let head = failure
+        .msg
+        .strip_suffix("which isn't a list or an object")
+        .or_else(|| failure.msg.strip_suffix("which isn't a list"));
+    let msg = match head {
+        Some(head) if failure.value.is_object() => format!("{head}which isn't a list"),
         Some(head) => format!("{head}which isn't a list or an object"),
         None => failure.msg.clone(),
     };
@@ -396,8 +401,7 @@ fn from_message(
         match (read.outcome, read.value) {
             (Outcome::Absent, _) => return Some(format!("{named} is missing")),
             (Outcome::Null, _) => return Some(format!("{named} is null")),
-            (Outcome::Found, Some(value))
-                if !matches!(value, Value::Array(items) if items.iter().all(Value::is_string)) =>
+            (Outcome::Found, Some(value)) if !matches!(value, Value::Array(items) if items.iter().all(Value::is_string)) =>
             {
                 return Some(ops::message::isnt(&named, value, "a list of text"));
             }
@@ -408,6 +412,9 @@ fn from_message(
     if let Some(bare) = name.strip_prefix("$input.") {
         name = bare.to_string();
     } else if name == "$input" {
+        name = "it".to_string();
+    }
+    if name.is_empty() {
         name = "it".to_string();
     }
     let every = matches!(&lowered.source, Source::Root { every: true, .. });
@@ -453,6 +460,10 @@ fn from_message(
                 _ => "a list or an object",
             };
             Some(crate::ops::message::isnt(&name, value, kind))
+        }
+        Cause::NotAnObject => {
+            let parent = anc.last()?.at.value;
+            Some(ops::message::isnt("it", parent, "a list or an object"))
         }
         _ => None,
     }
@@ -793,7 +804,7 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     let every = matches!(&lowered.source, Source::Root { every: true, .. });
     let read = Cause::worst(broken.iter().map(|b| b.cause));
     let mut min = min_row(env, in_scope.len() as u64, &locations, read);
-    if !every && env.unreadable.is_empty() && min.cause != Cause::Satisfied {
+    if !every && env.unreadable.is_empty() && read.is_some() && min.cause != Cause::Satisfied {
         let said: Vec<String> = broken
             .iter()
             .filter(|b| !b.msg.is_empty())
