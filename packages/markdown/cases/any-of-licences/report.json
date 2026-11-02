@@ -248,6 +248,7 @@
           "value": "leftpad"
         }
       ],
+      "message": "declared: item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]; known: licenses is [{\"license\": {\"id\": \"WTFPL\"}}], and $params.known_package_licenses named by name is missing",
       "passed": false,
       "requirement": "licences",
       "subject": {

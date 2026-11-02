@@ -163,6 +163,7 @@
           "value": "staging"
         }
       ],
+      "message": "environment is \"staging\"",
       "passed": false,
       "requirement": "prod_deploy",
       "subject": {
@@ -201,6 +202,7 @@
           "value": null
         }
       ],
+      "message": "approved_by is missing",
       "passed": false,
       "requirement": "prod_deploy",
       "subject": {

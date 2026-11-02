@@ -203,6 +203,7 @@
           ]
         }
       ],
+      "message": "allergens is [\"nuts\", \"milk\"]",
       "passed": false,
       "requirement": "cake_batch",
       "subject": {
@@ -260,6 +261,7 @@
           "value": "nuts"
         }
       ],
+      "message": "allergens is \"nuts\", which isn't a list",
       "passed": false,
       "requirement": "cake_batch",
       "subject": {
@@ -317,6 +319,7 @@
           "value": null
         }
       ],
+      "message": "allergens is missing",
       "passed": false,
       "requirement": "cake_batch",
       "subject": {
