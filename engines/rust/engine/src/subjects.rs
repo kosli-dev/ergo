@@ -293,23 +293,20 @@ fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
             (path, each_of.as_ref())
         }
     };
-    let mut causes: Vec<Cause> = path::step_refs(path)
-        .iter()
-        .filter_map(|reference| {
-            let step = Step::Ref(Box::new(reference.clone()));
-            path::resolve(&step, &ctx)
-                .err()
-                .map(|outcome| outcome.cause().unwrap_or(Cause::Unusable))
-        })
-        .collect();
-    if let Some(each_of) = each_of {
-        let read = path::read(each_of, &ctx);
-        match (read.outcome, read.value) {
-            (Outcome::Found, _) => {}
-            (other, _) => causes.push(other.cause().unwrap_or(Cause::Unusable)),
-        }
+    let first_bad_ref = path::step_refs(path).iter().find_map(|reference| {
+        let step = Step::Ref(Box::new(reference.clone()));
+        path::resolve(&step, &ctx)
+            .err()
+            .map(|outcome| outcome.cause().unwrap_or(Cause::Unusable))
+    });
+    if first_bad_ref.is_some() {
+        return first_bad_ref;
     }
-    Cause::worst(causes)
+    let read = path::read(each_of?, &ctx);
+    match read.outcome {
+        Outcome::Found => None,
+        other => Some(other.cause().unwrap_or(Cause::Unusable)),
+    }
 }
 
 fn read_entries<'a>(

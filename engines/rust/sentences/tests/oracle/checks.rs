@@ -4626,6 +4626,39 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of n named by $input.k is 1",
+        "count of n named by $input.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of n named by $params.k is 1",
+        "count of n named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every n named by $params.k is 1",
+        "every n named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    ("m[$input.k] is 1", "m named by $input.k is 1", &[], &[]),
+    ("m[$params.k] is 1", "m named by $params.k is 1", &[], &[]),
+    (
+        "s is \"a\" followed by t named by $input.k",
+        "s is \"a\" followed by t named by $input.k",
+        &[],
+        &[],
+    ),
+    (
+        "s is \"a\" followed by t named by $params.k",
+        "s is \"a\" followed by t named by $params.k",
+        &[],
+        &[],
+    ),
+    ("v is 1", "v is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -7903,6 +7936,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every s.x.ys named by p as y",
         "every s.x.ys named by p as y",
+        &[],
+        &[],
+    ),
+    (
+        "every n named by $input.k as x",
+        "every n named by $input.k as x",
+        &[],
+        &[],
+    ),
+    (
+        "every n named by $params.k as x",
+        "every n named by $params.k as x",
         &[],
         &[],
     ),
