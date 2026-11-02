@@ -367,18 +367,50 @@ fn from_message(
 ) -> Option<String> {
     let (Source::Root { path, .. } | Source::Child { path, .. }) = &lowered.source;
     let ctx = context(env, input_root(env), anc);
-    let name = crate::name::name(path);
+    let mut name = crate::name::name(path);
+    if let Some(bare) = name.strip_prefix("$input.")
+        && !lowered.from_text.contains("$input")
+    {
+        name = bare.to_string();
+    }
     let read = path::read(path, &ctx);
     let _ = empty;
+    let state = |want| ops::message::key_states_of(path, &ctx, want).join(", and ");
     match cause {
-        Cause::Absent => Some(format!("{name} is missing")),
-        Cause::Null => Some(format!("{name} is null")),
+        Cause::Absent | Cause::Null => {
+            let want = if cause == Cause::Absent {
+                Outcome::Absent
+            } else {
+                Outcome::Null
+            };
+            let keys = state(want);
+            if !keys.is_empty() {
+                return Some(keys);
+            }
+            if !read.step_unreadable {
+                name = ops::message::resolved_name(path, &ctx);
+            }
+            let word = if cause == Cause::Absent {
+                "missing"
+            } else {
+                "null"
+            };
+            Some(format!("{name} is {word}"))
+        }
         Cause::Unusable => {
+            let faults = ops::message::key_faults_of(path, &ctx);
+            if !faults.is_empty() {
+                return Some(faults.join(", and "));
+            }
             let value = read.value?;
             if value.is_object() || value.is_array() {
                 return None;
             }
-            Some(crate::ops::message::isnt(&name, value, "a list or an object"))
+            Some(crate::ops::message::isnt(
+                &name,
+                value,
+                "a list or an object",
+            ))
         }
         _ => None,
     }

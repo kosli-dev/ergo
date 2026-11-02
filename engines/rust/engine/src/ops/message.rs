@@ -185,9 +185,26 @@ fn key_steps(path: &Path) -> impl Iterator<Item = &Path> {
 }
 
 fn key_states(check: &Check, ctx: &Ctx, want: Outcome) -> Vec<String> {
-    let Some(path) = single_path(check) else {
-        return Vec::new();
-    };
+    single_path(check).map_or_else(Vec::new, |path| key_states_of(path, ctx, want))
+}
+
+pub fn resolved_name(path: &Path, ctx: &Ctx) -> String {
+    let steps = path
+        .steps
+        .iter()
+        .map(|step| match path::resolve(step, ctx) {
+            Ok(Resolved::Key(key)) => Step::Key(key),
+            Ok(Resolved::Index(at)) => Step::Index(at),
+            Err(_) => step.clone(),
+        })
+        .collect();
+    name::name(&Path {
+        start: path.start.clone(),
+        steps,
+    })
+}
+
+pub fn key_states_of(path: &Path, ctx: &Ctx, want: Outcome) -> Vec<String> {
     let mut out = Vec::new();
     for key in key_steps(path) {
         if let Some(input) = first_input(key, ctx)
@@ -455,7 +472,11 @@ fn join_text(side: &Side) -> String {
     match side {
         Side::Path(path) => name::name(path),
         Side::Value(value) => print(value),
-        Side::Join(pieces) => pieces.iter().map(join_text).collect::<Vec<_>>().join(" followed by "),
+        Side::Join(pieces) => pieces
+            .iter()
+            .map(join_text)
+            .collect::<Vec<_>>()
+            .join(" followed by "),
     }
 }
 
@@ -473,7 +494,10 @@ fn plain_side_inputs(side: &Side, ctx: &Ctx) -> Vec<Input> {
                     part: None,
                     state: Outcome::Found,
                 }],
-                _ => pieces.iter().flat_map(|p| plain_side_inputs(p, ctx)).collect(),
+                _ => pieces
+                    .iter()
+                    .flat_map(|p| plain_side_inputs(p, ctx))
+                    .collect(),
             }
         }
     }

@@ -392,7 +392,12 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
                             });
                         }
                     }
-                    None => raws.push(failed(&entry, entry.val.cause(), entry.val.shown(), "a list")),
+                    None => raws.push(failed(
+                        &entry,
+                        entry.val.cause(),
+                        entry.val.shown(),
+                        "a list",
+                    )),
                 }
             }
             entries = next;
