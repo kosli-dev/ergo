@@ -815,7 +815,7 @@ fn sort_failure(
     }
 }
 
-type SortRead = (Live, Result<Value, Cause>, Option<Location>, String);
+type SortRead<'a> = (Live<'a>, Result<Value, Cause>, Option<Location>, String);
 
 struct Sfail {
     names: Vec<String>,
