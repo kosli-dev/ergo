@@ -9789,6 +9789,11 @@ _message(check, subj, "value") := m if {
 
 _message(check, subj, cause) := m if {
 	cause in {"absent", "null"}
+	clauses := _m_key_states(subj, check, cause)
+	count(clauses) > 0
+	m := concat(", and ", clauses)
+} else := m if {
+	cause in {"absent", "null"}
 	clauses := array.concat([concat("", [s.name, " is ", _m_state_word(cause)]) | some s in _m_sources(subj, check); s.state == cause], _m_tallies(subj, check, cause))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
@@ -9796,6 +9801,14 @@ _message(check, subj, cause) := m if {
 
 _message(check, subj, "unusable") := m if {
 	clauses := _once(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_blocked(subj, check)), _m_faults(subj, check)), _m_tallies(subj, check, "unusable")))
+	count(clauses) > 0
+	m := concat(", and ", clauses)
+} else := m if {
+	clauses := [concat("", [side.text, " needs more than 15 digits"]) |
+		some side in _m_sides(check)
+		_side_form(side) in {"add", "sum_of"}
+		_side_eval(subj, side).v == []
+	]
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check)
@@ -9821,10 +9834,55 @@ _m_key_faults(subj, check) := [c |
 	c := _m_key_fault(subj, step)
 ]
 
+_m_key_states(subj, check, cause) := _once([c |
+	some side in _m_sides(check)
+	some p in _m_side_paths(side)
+	is_array(p)
+	some step in p
+	_m_key_state(subj, step) == cause
+	c := concat("", [_m_key_name(step), " is ", _m_state_word(cause)])
+])
+
+_m_key_state(_, step) := _ref_state(step.ref) if _is_ref(step)
+
+_m_key_state(_, step) := "null" if {
+	is_object(step)
+	object.keys(step) == {"named_by"}
+	input["ergo/names"][step.named_by] == null
+}
+
+_m_key_state(subj, step) := "null" if {
+	is_object(step)
+	is_object(subj)
+	subj[step.named_by_field] == null
+}
+
+_m_key_state(subj, step) := "absent" if {
+	is_object(step)
+	is_string(step.named_by_field)
+	is_object(subj)
+	not step.named_by_field in object.keys(subj)
+}
+
+_m_key_name(step) := _ref_name(step.ref) if _is_ref(step)
+
+_m_key_name(step) := step.named_by if object.keys(step) == {"named_by"}
+
+_m_key_name(step) := step.named_by_field if object.keys(step) == {"named_by_field"}
+
 _m_key_fault(_, step) := _m_isnt(_ref_name(step.ref), v, "text") if {
 	_is_ref(step)
 	_ref_state(step.ref) == "value"
 	v := _ref_shown(step.ref)
+	not is_string(v)
+}
+
+_m_key_fault(_, step) := _m_isnt(step.named_by, v, "text") if {
+	is_object(step)
+	object.keys(step) == {"named_by"}
+	is_string(step.named_by)
+	v := input["ergo/names"][step.named_by]
+	v != null
 	not is_string(v)
 }
 
@@ -9871,6 +9929,14 @@ _m_step_key(_, step) := k if {
 	is_string(k)
 }
 
+_m_step_key(_, step) := k if {
+	is_object(step)
+	object.keys(step) == {"named_by"}
+	is_string(step.named_by)
+	k := input["ergo/names"][step.named_by]
+	is_string(k)
+}
+
 _m_step_key(subj, step) := k if {
 	is_object(step)
 	is_object(subj)
@@ -9889,59 +9955,79 @@ _m_faults(subj, check) := [_m_isnt(s.name, s.value, kind) |
 	kind := f[1]
 ]
 
-_m_fault(subj, check) := [[check.path, "a number"]] if {
+_m_ref_list_fault(_, check) := [[check[f], _m_right_kind(cmp, v)]] if {
+	some f in ["values", "patterns"]
+	_is_ref(check[f])
+	cmp := _m_ref_cmp(check.op, f)
+	_ref_state(check[f].ref) == "value"
+	v := _ref_shown(check[f].ref)
+	not _list_right_usable(cmp, v)
+} else := []
+
+_m_ref_cmp(op, "values") := "includes_all" if op == "includes"
+
+_m_ref_cmp(op, "values") := "excludes_all" if op == "excludes"
+
+_m_ref_cmp(op, f) := op if {
+	not op in {"includes", "excludes"}
+	f in {"values", "patterns"}
+}
+
+_m_fault(subj, check) := [f | some g in [_m_fault_1(subj, check), _m_fault_2(subj, check), _m_fault_3(subj, check), _m_fault_4(subj, check), _m_fault_5(subj, check), _m_fault_6(subj, check), _m_fault_7(subj, check), _m_fault_8(subj, check), _m_fault_9(subj, check), _m_fault_10(subj, check), _m_fault_11(subj, check), _m_ref_list_fault(subj, check)]; some f in g]
+
+_m_fault_1(subj, check) := [[check.path, "a number"]] if {
 	check.op in {"range", "outside_range"}
 	not is_number(_found(subj, check.path))
-}
+} else := []
 
-_m_fault(subj, check) := [[check.path, "text"]] if {
+_m_fault_2(subj, check) := [[check.path, "text"]] if {
 	check.op in {"matches_any", "not_matches_any"}
 	not is_string(_found(subj, check.path))
-}
+} else := []
 
-_m_fault(subj, check) := [[check.path, "text or a list"]] if {
+_m_fault_3(subj, check) := [[check.path, "text or a list"]] if {
 	check.op in {"empty_string_or_list", "not_empty_string_or_list"}
 	not _string_or_list(_found(subj, check.path))
-}
+} else := []
 
-_m_fault(subj, check) := [[check.path, "a list"]] if {
+_m_fault_4(subj, check) := [[check.path, "a list"]] if {
 	check.op in _contain_ops
 	not is_array(_found(subj, check.path))
-}
+} else := []
 
-_m_fault(subj, check) := [[check.path, _m_list_of(_leaf_wants(check))]] if {
+_m_fault_5(subj, check) := [[check.path, _m_list_of(_leaf_wants(check))]] if {
 	check.op in _contain_ops
 	v := _found(subj, check.path)
 	is_array(v)
 	not _items_fit(v, _leaf_wants(check))
-}
+} else := []
 
-_m_fault(subj, check) := [[check.path, _m_kind(w)]] if {
+_m_fault_6(subj, check) := [[check.path, _m_kind(w)]] if {
 	check.op == "equals"
 	v := _found(subj, check.path)
 	w := _arg(check.value)
 	w != null
 	type_name(v) != type_name(w)
-}
+} else := []
 
-_m_fault(subj, check) := [[check.path, _m_kinds(vals)]] if {
+_m_fault_7(subj, check) := [[check.path, _m_kinds(vals)]] if {
 	check.op in {"in", "not_in"}
 	v := _found(subj, check.path)
 	vals := _wants(check.values)
 	_value_list(vals)
 	not _fits_list(v, vals)
-}
+} else := []
 
-_m_fault(subj, check) := [f | some s in [check.left, check.right]; some f in _m_side_fault(subj, check, s)] if {
+_m_fault_8(subj, check) := [f | some s in [check.left, check.right]; some f in _m_side_fault(subj, check, s)] if {
 	check.op == "compare"
 	not _list_cmp(check)
-}
+} else := []
 
-_m_fault(subj, check) := fs if {
+_m_fault_9(subj, check) := fs if {
 	_list_cmp(check)
 	fs := array.concat(_m_list_left(subj, check), _m_list_right(subj, check))
 	fs != []
-}
+} else := []
 
 _m_list_right(subj, check) := [[check.right, _m_right_kind(check.cmp, r)]] if {
 	_read_state(subj, check.right) == "value"
@@ -9993,20 +10079,20 @@ _m_list_left(subj, check) := [[check.left, "text"]] if {
 	not _items_fit(l, [r])
 } else := []
 
-_m_fault(subj, check) := fs if {
+_m_fault_10(subj, check) := fs if {
 	check.op == "compare_time"
 	fs := [[s, "a time"] | some s in [check.left, check.right]; v := _m_side_value(subj, s); not _m_time(v)]
 	fs != []
-}
+} else := []
 
-_m_fault(subj, check) := [[check.left, concat("", ["a time written like ", _m_print(r)])]] if {
+_m_fault_11(subj, check) := [[check.left, concat("", ["a time written like ", _m_print(r)])]] if {
 	check.op == "compare_time"
 	l := _m_side_value(subj, check.left)
 	r := _m_side_value(subj, check.right)
 	_m_time(l)
 	_m_time(r)
 	not _timestamps(l, r)
-}
+} else := []
 
 _m_time(v) if _rfc3339_shaped(v)
 
@@ -10134,9 +10220,22 @@ _walk_parts(check, _, raw, r) := [concat("", [_path_name(check.path), " is ", _m
 	raw.cause in {"absent", "null"}
 }
 
+_walk_parts(check, subj, raw, r) := fs if {
+	r.failed == []
+	raw.cause == "unusable"
+	fs := _m_key_faults(subj, check)
+	fs != []
+}
+
+_walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
+	r.failed == []
+	raw.cause == "unusable"
+	_m_key_faults(subj, check) == []
+}
+
 _walk_parts(check, _, raw, r) := [_m_fallback(check)] if {
 	r.failed == []
-	not raw.cause in {"absent", "null", "not_an_object"}
+	not raw.cause in {"absent", "null", "not_an_object", "unusable"}
 }
 
 _m_named_fail(f) := _m_is(f.path, f.value) if f.cause == "value"
@@ -10217,12 +10316,32 @@ _m_tally(subj, side) := [["unusable", c] | some c in _m_parent_clause(subj, {"op
 }
 
 _m_tally(subj, side) := array.concat(
-	[[f.cause, _m_fail(f, set())] | some f in array.concat(w.fails, _walk_stop(w))],
-	[x | some e in w.items; some x in _m_tally_item(f, e)],
+	array.concat(
+		[[f.cause, _m_fail(f, set())] | some f in array.concat(w.fails, _walk_stop(w))],
+		[[s, concat("", [_ref_name(r), " is ", _m_state_word(s)])] | some r in sort({r | some c in side.whose; some r in _check_refs(c)}); s := _ref_state(r); s in {"absent", "null"}],
+	),
+	[x | some e in w.items; some x in array.concat(_m_whose_undecided(side, e, flaws), [y | _tally_judge(side, e, flaws).read; some y in _m_tally_item(f, e)])],
 ) if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
+	flaws := [_cond_flaw(c) | some c in side.whose]
 }
+
+_m_whose_undecided(side, e, flaws) := [[cause, _m_leaf(e.i, _m_cond_message(c, e.iv, cause))] |
+	some i, c in side.whose
+	cause := _tally_cond_cause(c, e.iv, flaws[i])
+	not cause in {"satisfied", "value", "missing"}
+]
+
+_m_cond_message(c, item, cause) := concat(", and ", cs) if {
+	cause in {"absent", "null"}
+	cs := array.concat(_m_key_states(item, c, cause), [concat("", [s.name, " is ", _m_state_word(cause)]) | some s in _m_sources(item, c); s.state == cause])
+	cs != []
+} else := concat(", and ", cs) if {
+	cause == "unusable"
+	cs := _once(array.concat(array.concat(_m_key_faults(item, c), _m_blocked(item, c)), _m_faults(item, c)))
+	cs != []
+} else := _m_fallback(c)
 
 _m_tally_item(_, e) := [["not_an_object", _m_isnt(_m_item_name(e.i, set()), e.iv, "an object")]] if {
 	e.v == _absent
