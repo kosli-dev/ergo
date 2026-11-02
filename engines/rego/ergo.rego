@@ -10308,8 +10308,6 @@ _m_side_kind(subj, check, side) := _m_kind(o) if {
 
 _m_fits_kind(v, k) if _m_kind(v) == k
 
-_m_fits_kind(v, "a number") if is_number(v)
-
 _messaged(raw, _, _) := raw if raw.passed == true
 
 _messaged(raw, check, subj) := object.union(raw, {"message": _row_message(check, subj, raw)}) if {
