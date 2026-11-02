@@ -4,6 +4,10 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ## 0.2.1 (not released yet)
 
+### New
+
+- Every failed row has a `message`, a line that says in plain words what Ergo found, as spec 0.5 says: `approver is "ana", and author is "ana"`, `item 2 of tests: ok is missing` or `signed: signature is missing; reviewed: reviewer is missing`. A row that passed has none. The Rego engine writes the same text.
+
 ## 0.2.0
 
 ### New
