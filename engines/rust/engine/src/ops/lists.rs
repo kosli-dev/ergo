@@ -581,7 +581,7 @@ fn ref_fault(
     usable: impl Fn(&Value) -> bool,
     kind: impl Fn(&Value) -> String,
 ) -> Vec<String> {
-    let Right::Ref(path) = right else {
+    let (Right::Ref(path) | Right::Field(path)) = right else {
         return Vec::new();
     };
     let read = read_path(path, ctx);
@@ -615,12 +615,13 @@ pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<String> {
         left_found(&check.path, ctx),
         right_value(&check.values, ctx),
     ) {
+        let mixed = one_type(values.iter()).is_err();
         let fits = match one_type(values.iter()) {
             Ok(None) => true,
             Ok(Some(kind)) => kind == value::type_name(&found),
             Err(()) => false,
         };
-        if !fits {
+        if !fits && !(mixed && matches!(check.values, Right::Field(_))) {
             out.push(super::message::isnt(&name, &found, &kinds_of(&values)));
         }
     }
@@ -655,7 +656,10 @@ pub fn contains_faults(check: &Contains, ctx: &Ctx) -> Vec<String> {
     if let Some((name, found)) = left_found(&check.path, ctx) {
         match (&found, &wanted) {
             (Value::Array(items), Some(wanted)) => {
-                if one_type(items.iter().chain(wanted.iter())).is_err() {
+                let skipped = matches!(right, Right::Field(_))
+                    && all
+                    && !usable_values(&Value::Array(wanted.clone()), true);
+                if !skipped && one_type(items.iter().chain(wanted.iter())).is_err() {
                     out.push(super::message::isnt(&name, &found, &list_of(wanted)));
                 }
             }
