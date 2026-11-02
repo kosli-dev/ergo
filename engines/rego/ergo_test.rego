@@ -11216,3 +11216,21 @@ test_message_of_an_empty_for_list_that_is_missing_names_the_list if {
 	check := {"op": "for", "items": [{"path": ["xs"]}]}
 	ergo._m_for_empty(check, {}, "absent") == ["xs is missing"]
 }
+
+test_message_a_check_whose_path_is_not_a_path_has_only_its_refs_as_sides if {
+	ergo._m_found_sides({"op": "for", "path": "x"}) == []
+}
+
+test_message_of_an_unusable_check_with_nothing_to_blame_repeats_its_expression if {
+	check := {"$sides": [], "op": "present", "path": ["x"], "expression": "x exists"}
+	ergo._m_message(check, {"x": 1}, "unusable") == "x exists is false"
+}
+
+test_message_of_a_walk_whose_path_is_not_a_path_names_no_blocked_parent if {
+	ergo._m_walk_blocked({}, {"path": "x"}) == []
+}
+
+test_message_of_a_walk_that_failed_without_a_list_to_show_repeats_its_expression if {
+	check := {"path": ["xs"], "expression": "every xs.ok is true"}
+	ergo._walk_parts(check, {}, {"cause": "value"}, {"failed": []}) == ["every xs.ok is true is false"]
+}

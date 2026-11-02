@@ -10876,11 +10876,7 @@ _m_walk_leaf(e, leaf, cause) := concat(", and ", off) if {
 
 else := ""
 
-_m_line(c, subj, cause, assertion) := m if {
-	m := _m_sentence(c, subj, cause)
-} else := [concat("", [assertion, " is false"])] if is_string(assertion)
-
-else := ["the check is false"]
+_m_line(c, subj, cause, _) := _m_sentence(c, subj, cause)
 
 _m_aliases_blocked(check) := [_m_isnt(p[0], v, _m_holder(p[1])) |
 	some side in _m_sides(check)
