@@ -1,4 +1,5 @@
 use super::compare::{Cmp, Side, read_side};
+use super::tally::{self, Side as TallySide};
 use super::{Check, Input, Verdict, lists, read_path};
 use crate::cause::Cause;
 use crate::name;
@@ -157,10 +158,11 @@ fn sources(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Input> {
     match check {
         Check::Compare(compare) => [&compare.left, &compare.right]
             .into_iter()
-            .filter_map(|side| match side {
-                Side::Path(_) => read_side(side, ctx).inputs.into_iter().next(),
-                _ => None,
-            })
+            .flat_map(|side| plain_side_inputs(side, ctx))
+            .collect(),
+        Check::Tally(tally) => tally::tally_sides(tally)
+            .into_iter()
+            .flat_map(|side| tally_inputs(side, ctx, verdict.cause))
             .collect(),
         _ => match single_path(check) {
             Some(path) => {
@@ -291,6 +293,7 @@ fn faults(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
         (Check::Contains(c), _) => lists::contains_faults(c, ctx),
         (Check::Matches(c), _) => lists::matches_faults(c, ctx),
         (Check::Compare(compare), _) => compare_faults(compare, ctx),
+        (Check::Tally(tally), _) => tally_faults(tally, ctx),
         _ => {
             let _ = verdict;
             Vec::new()
@@ -420,4 +423,92 @@ pub fn joined(parts: Vec<String>) -> String {
         shown.push(format!("and {more} more"));
         shown.join("; ")
     }
+}
+
+fn join_text(side: &Side) -> String {
+    match side {
+        Side::Path(path) => name::name(path),
+        Side::Value(value) => print(value),
+        Side::Join(pieces) => pieces.iter().map(join_text).collect::<Vec<_>>().join(" followed by "),
+    }
+}
+
+fn plain_side_inputs(side: &Side, ctx: &Ctx) -> Vec<Input> {
+    match side {
+        Side::Path(_) => read_side(side, ctx).inputs.into_iter().take(1).collect(),
+        Side::Value(_) => Vec::new(),
+        Side::Join(pieces) => {
+            let read = read_side(side, ctx);
+            match (read.outcome, read.value) {
+                (Outcome::Found, Some(value)) => vec![Input {
+                    name: join_text(side),
+                    value,
+                    locations: Vec::new(),
+                    part: None,
+                    state: Outcome::Found,
+                }],
+                _ => pieces.iter().flat_map(|p| plain_side_inputs(p, ctx)).collect(),
+            }
+        }
+    }
+}
+
+fn tally_inputs(side: &TallySide, ctx: &Ctx, cause: Cause) -> Vec<Input> {
+    match side {
+        TallySide::Plain(plain) => plain_side_inputs(plain, ctx),
+        TallySide::Derived(derived) => {
+            let (plain, counted) = tally::derived_operands(derived);
+            match (cause, tally::derived_value(derived, ctx)) {
+                (Cause::Value, Ok(number)) => vec![Input {
+                    name: derived.text.clone(),
+                    value: Value::Number(number),
+                    locations: Vec::new(),
+                    part: None,
+                    state: Outcome::Found,
+                }],
+                (Cause::Value, Err(_)) => Vec::new(),
+                _ => plain
+                    .into_iter()
+                    .chain(counted)
+                    .filter_map(|p| first_input(p, ctx))
+                    .collect(),
+            }
+        }
+    }
+}
+
+fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
+    let mut out = Vec::new();
+    for side in tally::tally_sides(check) {
+        match side {
+            TallySide::Derived(derived) => {
+                let (plain, counted) = tally::derived_operands(derived);
+                let mut any = false;
+                for path in plain {
+                    if let Some(input) = first_input(path, ctx)
+                        && input.state == Outcome::Found
+                        && !input.value.is_number()
+                    {
+                        out.push(isnt(&input.name, &input.value, "a number"));
+                        any = true;
+                    }
+                }
+                for path in counted {
+                    if let Some(input) = first_input(path, ctx)
+                        && input.state == Outcome::Found
+                        && !input.value.is_array()
+                        && !input.value.is_object()
+                    {
+                        out.push(isnt(&input.name, &input.value, "a list or an object"));
+                        any = true;
+                    }
+                }
+                if !any && tally::derived_value(derived, ctx).is_err() {
+                    out.push(format!("{} needs more than 15 digits", derived.text));
+                }
+            }
+            TallySide::Plain(_) => {}
+        }
+    }
+    out
 }

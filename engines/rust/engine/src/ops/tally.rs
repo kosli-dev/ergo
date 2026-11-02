@@ -1084,6 +1084,33 @@ pub fn lower_condition(
     Some(lower_terms(&[term], phrase, scope).map(|lowered| lowered.map(Check::Tally)))
 }
 
+pub fn derived_value(derived: &Derived, ctx: &Ctx) -> Result<Number, Cause> {
+    work_derived(derived, ctx).result
+}
+
+pub fn derived_operands(derived: &Derived) -> (Vec<&Path>, Vec<&Path>) {
+    let mut plain = Vec::new();
+    let mut counted = Vec::new();
+    for term in &derived.terms {
+        match term {
+            Term::Path(path) => plain.push(path),
+            Term::Elapsed(elapsed) => {
+                plain.push(&elapsed.from);
+                plain.push(&elapsed.to);
+            }
+            Term::Counted(c) => counted.push(&c.path),
+            Term::Number(_) => {}
+        }
+    }
+    (plain, counted)
+}
+
+pub fn tally_sides(check: &Tally) -> Vec<&Side> {
+    std::iter::once(&check.left)
+        .chain(check.right.as_ref())
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
