@@ -270,7 +270,7 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
         match holds {
             Some(next) => value = next,
             None => {
-                if at > leading && !value.is_null() {
+                if at >= leading && !value.is_null() {
                     let prefix = Path {
                         start: path.start.clone(),
                         steps: path.steps[..at - leading].to_vec(),
@@ -280,7 +280,13 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
                     } else {
                         "an object"
                     };
-                    return vec![isnt(&name::name(&prefix), value, holder)];
+                    let shown = name::name(&prefix);
+                    let shown = if shown.is_empty() {
+                        "it".to_string()
+                    } else {
+                        shown
+                    };
+                    return vec![isnt(&shown, value, holder)];
                 }
                 return Vec::new();
             }
@@ -376,7 +382,13 @@ fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
             continue;
         }
         let name = any.names.get(at).cloned().unwrap_or_default();
-        parts.push(format!("{name}: {}", lines.join(", and ")));
+        let mut once: Vec<String> = Vec::new();
+        for line in lines {
+            if !once.contains(&line) {
+                once.push(line);
+            }
+        }
+        parts.push(format!("{name}: {}", once.join(", and ")));
     }
     if parts.is_empty() {
         "the check is false".to_string()
@@ -598,11 +610,7 @@ fn time_faults(check: &super::time::CompareTime, ctx: &Ctx) -> Vec<String> {
     for (side, read) in &reads {
         let (Side::Path(_), Some(value), Some(first)) = (side, &read.value, read.inputs.first())
         else {
-            times.push(
-                read.value
-                    .as_ref()
-                    .and_then(super::time::read_time),
-            );
+            times.push(read.value.as_ref().and_then(super::time::read_time));
             continue;
         };
         let time = super::time::read_time(value);

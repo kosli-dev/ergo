@@ -368,11 +368,12 @@ fn from_message(
     let (Source::Root { path, .. } | Source::Child { path, .. }) = &lowered.source;
     let ctx = context(env, input_root(env), anc);
     let mut name = crate::name::name(path);
-    if let Some(bare) = name.strip_prefix("$input.")
-        && !lowered.from_text.contains("$input")
-    {
+    if let Some(bare) = name.strip_prefix("$input.") {
         name = bare.to_string();
+    } else if name == "$input" {
+        name = "it".to_string();
     }
+    let every = matches!(&lowered.source, Source::Root { every: true, .. });
     let read = path::read(path, &ctx);
     let _ = empty;
     let state = |want| ops::message::key_states_of(path, &ctx, want).join(", and ");
@@ -403,14 +404,13 @@ fn from_message(
                 return Some(faults.join(", and "));
             }
             let value = read.value?;
-            if value.is_object() || value.is_array() {
-                return None;
-            }
-            Some(crate::ops::message::isnt(
-                &name,
-                value,
-                "a list or an object",
-            ))
+            let kind = match value {
+                Value::Array(_) => return None,
+                Value::Object(_) if every => "a list",
+                Value::Object(_) => return None,
+                _ => "a list or an object",
+            };
+            Some(crate::ops::message::isnt(&name, value, kind))
         }
         _ => None,
     }
