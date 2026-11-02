@@ -10524,7 +10524,12 @@ _m_sentence(c, subj, cause) := [_message(c, subj, cause)] if not _walks(c)
 
 _m_sentence(c, subj, cause) := _walk_parts(c, subj, {"cause": cause}, _walk_row(c, subj)) if _walks(c)
 
-_m_aliased(check, m) := regex.replace(m, concat("", [`\$(`, concat("|", sort([_quoted(item.as) | some item in check.items])), `)([.\[ ,]|$)`]), "${1}${2}")
+_m_aliased(check, m) := _m_alias_end(check, strings.replace_n({concat("", ["$", item.as, c]): concat("", [item.as, c]) | some item in check.items; some c in [".", "[", " ", ","]}, m))
+
+_m_alias_end(check, m) := concat("", [trim_suffix(m, concat("", ["$", a])), a]) if {
+	some a in {item.as | some item in check.items}
+	endswith(m, concat("", ["$", a]))
+} else := m
 
 _for_why(_, _, _, _, _, null) := null
 
