@@ -11129,3 +11129,90 @@ test_a_name_with_both_problems_lists_both_sorted if {
 	rep := ergo.report({"xs": [{"x": 1}]}, policy, {})
 	[i.value | some i in rows_for(rep, "r", "$well_formed")[0].inputs; i.name == ergo._field_path_name(["checks", "$x "])] == [["a name can't start or end with a space or an invisible character", "a name can't start with $"]]
 }
+
+test_message_of_an_object_whose_keys_are_long_counts_its_keys if {
+	long := {"aaaaaaaaaaaa": 1, "bbbbbbbbbbbb": 2, "cccccccccccc": 3, "dddddddddddd": 4, "eeeeeeeeeeee": 5}
+	ergo._m_object_item(long) == "an object with 5 keys"
+}
+
+test_message_prints_null_inside_a_flat_object if {
+	ergo._m_flat_value(null)
+	ergo._m_flat(null) == "null"
+	ergo._m_object_item({"a": null}) == "{\"a\": null}"
+}
+
+test_message_names_the_kind_of_null if {
+	ergo._m_kind(null) == "null"
+}
+
+test_message_a_number_fits_the_kind_a_number if {
+	ergo._m_fits_kind(5, "a number")
+	not ergo._m_fits_kind("5", "a number")
+}
+
+test_message_of_a_passed_walk_has_no_parts if {
+	ergo._m_fail_parts("satisfied", [], set()) == []
+}
+
+test_message_a_list_holds_a_position_and_an_object_holds_a_key if {
+	ergo._m_holds([1], 0)
+	ergo._m_holds({"a": 1}, "a")
+	not ergo._m_holds({"a": 1}, 0)
+	not ergo._m_holds([1], "a")
+}
+
+test_message_for_item_that_has_nothing_to_walk_is_narrowed_when_its_list_is_empty if {
+	ergo._m_narrows({"xs": []}, {"path": ["xs"]})
+	not ergo._m_narrows({"xs": [1]}, {"path": ["xs"]})
+}
+
+test_message_for_item_that_isnt_an_object_says_so if {
+	ergo._m_named_item({"cause": "not_an_object", "item": "item 1 of xs", "value": 5}) == "item 1 of xs is 5, which isn't an object"
+}
+
+test_message_tie_without_a_sort_key_names_no_key if {
+	ergo._m_tie_on({"items": [{}]}, 0) == ""
+}
+
+test_message_ties_in_different_lists_are_joined_with_and if {
+	ergo._m_listed(["item 1 of xs", "item 2 of ys"]) == "item 1 of xs and item 2 of ys"
+	ergo._m_listed(["item 1 of xs", "item 2 of xs"]) == "item 1 and item 2 of xs"
+}
+
+test_message_of_a_subject_that_does_not_match_without_a_filter_message if {
+	ergo._m_applies({}, {}, false) == {"message": "the subject doesn't match"}
+}
+
+test_message_names_the_object_that_cant_hold_a_key_read_from_a_field if {
+	r := ergo.report({"things": [{"id": "t", "m": 5, "p": "k"}]}, {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "m named by p is 1"}}}}, {})
+	some row in r.results
+	row.check == "c"
+	row.message == "m is 5, which isn't an object"
+}
+
+test_message_names_a_param_that_isnt_a_number_on_the_right_of_a_comparison if {
+	r := ergo.report({"things": [{"id": "t", "x": 4}]}, {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is more than $params.max"}}}}, {"max": "5"})
+	some row in r.results
+	row.check == "c"
+	row.message == "$params.max is \"5\", which isn't a number"
+}
+
+test_message_a_for_alias_that_ends_a_message_loses_its_marker if {
+	ergo._m_alias_end({"items": [{"as": "c"}]}, "x is $c") == "x is c"
+	ergo._m_alias_end({"items": [{"as": "c"}]}, "x is 1") == "x is 1"
+}
+
+test_message_a_key_named_by_another_name_is_another_name if {
+	ergo._m_other_name({"named_by": "z"}, "c")
+	ergo._m_other_name({"named_by_field": "z"}, "c")
+	not ergo._m_other_name({"named_by": "c"}, "c")
+}
+
+test_message_stripping_a_failed_item_without_assertions_drops_its_messages if {
+	ergo._m_strip({"a": 1, "msg": "x", "said": "y"}) == {"a": 1}
+}
+
+test_message_of_an_empty_for_list_that_is_missing_names_the_list if {
+	check := {"op": "for", "items": [{"path": ["xs"]}]}
+	ergo._m_for_empty(check, {}, "absent") == ["xs is missing"]
+}
