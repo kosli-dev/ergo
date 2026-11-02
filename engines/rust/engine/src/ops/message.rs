@@ -147,13 +147,6 @@ fn first_input(path: &Path, ctx: &Ctx) -> Option<Input> {
     read_path(path, ctx).inputs.into_iter().next()
 }
 
-fn sorted_refs(check: &Check) -> Vec<Path> {
-    let mut refs = check.refs();
-    refs.sort_by_key(name::name);
-    refs.dedup();
-    refs
-}
-
 fn sources(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Input> {
     match check {
         Check::Compare(compare) => [&compare.left, &compare.right]
