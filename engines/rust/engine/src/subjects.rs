@@ -738,6 +738,16 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
     };
     let mut row = row_of(env.requirement_name, env.requirement, name, cause, inputs);
     row.subject_id = judged.id.clone();
+    if cause != Cause::Satisfied {
+        let messages: Vec<String> = plan
+            .items
+            .iter()
+            .zip(&verdicts)
+            .filter(|(_, v)| !v.passed())
+            .map(|(item, v)| ops::message::message(&item.check, ctx, v))
+            .collect();
+        row.message = Some(messages.join("; "));
+    }
     if plan.items.len() == 1 {
         row.failed_items = failed_items;
     }

@@ -17,6 +17,7 @@ pub struct Row {
     pub check: String,
     pub cause: Cause,
     pub inputs: Vec<Value>,
+    pub message: Option<String>,
     pub failed_items: Option<Value>,
     pub failed_assertions: Option<Value>,
 }
@@ -40,6 +41,9 @@ impl Row {
         row.insert("passed".to_string(), json!(self.passed()));
         row.insert("cause".to_string(), json!(self.cause.name()));
         row.insert("inputs".to_string(), Value::Array(self.inputs.clone()));
+        if let Some(message) = &self.message {
+            row.insert("message".to_string(), json!(message));
+        }
         if let Some(items) = &self.failed_items {
             row.insert("failed_items".to_string(), items.clone());
         }
@@ -94,6 +98,7 @@ pub fn row_of(
         check: check.to_string(),
         cause,
         inputs,
+        message: None,
         failed_items: None,
         failed_assertions: None,
     }
@@ -723,6 +728,7 @@ fn policy_row(policy: &Policy) -> Row {
             .into_iter()
             .map(|(name, value)| input(&name, value, &[]))
             .collect(),
+        message: None,
         failed_items: None,
         failed_assertions: None,
     }

@@ -1182,3 +1182,152 @@ mod tests {
         assert!(!flawed_with(&lowered_check("x is in ys"), json!({})));
     }
 }
+
+fn kind_word(value: &Value) -> &'static str {
+    super::message::kind(value)
+}
+
+fn kinds_of(values: &[Value]) -> String {
+    let mut words: Vec<&str> = values
+        .iter()
+        .filter(|v| !v.is_null())
+        .map(kind_word)
+        .collect();
+    words.sort_unstable();
+    words.dedup();
+    words.join(" or ")
+}
+
+fn list_of(values: &[Value]) -> String {
+    let mut words: Vec<&str> = values
+        .iter()
+        .filter(|v| !v.is_null())
+        .map(|v| match v {
+            Value::String(_) => "text",
+            Value::Number(_) => "numbers",
+            Value::Bool(_) => "true or false values",
+            Value::Array(_) => "lists",
+            Value::Object(_) => "objects",
+            Value::Null => "",
+        })
+        .collect();
+    words.sort_unstable();
+    words.dedup();
+    format!("a list of {}", words.join(" or "))
+}
+
+fn ref_fault(right: &Right, ctx: &Ctx, usable: impl Fn(&Value) -> bool, kind: impl Fn(&Value) -> String) -> Vec<String> {
+    let Right::Ref(path) = right else {
+        return Vec::new();
+    };
+    let read = read_path(path, ctx);
+    match (read.outcome, read.value, read.inputs.first()) {
+        (Outcome::Found, Some(value), Some(first)) if !usable(&value) => {
+            vec![super::message::isnt(&first.name, &value, &kind(&value))]
+        }
+        _ => Vec::new(),
+    }
+}
+
+fn right_value(right: &Right, ctx: &Ctx) -> Option<Value> {
+    let read = read_right(right, ctx);
+    match read.outcome {
+        Outcome::Found => read.value,
+        _ => None,
+    }
+}
+
+fn left_found(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
+    let read = read_path(path, ctx);
+    match (read.outcome, read.value, read.inputs.first()) {
+        (Outcome::Found, Some(value), Some(first)) => Some((first.name.clone(), value)),
+        _ => None,
+    }
+}
+
+pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<String> {
+    let mut out = Vec::new();
+    if let (Some((name, found)), Some(Value::Array(values))) =
+        (left_found(&check.path, ctx), right_value(&check.values, ctx))
+    {
+        let fits = match one_type(values.iter()) {
+            Ok(None) => true,
+            Ok(Some(kind)) => kind == value::type_name(&found),
+            Err(()) => false,
+        };
+        if !fits {
+            out.push(super::message::isnt(&name, &found, &kinds_of(&values)));
+        }
+    }
+    out.extend(ref_fault(
+        &check.values,
+        ctx,
+        |v| usable_values(v, false),
+        |v| match v {
+            Value::Array(_) => "a list of one kind of value".to_string(),
+            _ => "a list".to_string(),
+        },
+    ));
+    out
+}
+
+pub fn contains_faults(check: &Contains, ctx: &Ctx) -> Vec<String> {
+    let (right, all) = match &check.wanted {
+        Wanted::One(right) => (right, false),
+        Wanted::All(right) | Wanted::Some(right) => (right, true),
+    };
+    let mut out = Vec::new();
+    let wanted: Option<Vec<Value>> = right_value(right, ctx).map(|w| {
+        if all {
+            match w {
+                Value::Array(values) => values,
+                other => vec![other],
+            }
+        } else {
+            vec![w]
+        }
+    });
+    if let Some((name, found)) = left_found(&check.path, ctx) {
+        match (&found, &wanted) {
+            (Value::Array(items), Some(wanted)) => {
+                if one_type(items.iter().chain(wanted.iter())).is_err() {
+                    out.push(super::message::isnt(&name, &found, &list_of(wanted)));
+                }
+            }
+            (Value::Array(_), None) => {}
+            _ => out.push(super::message::isnt(&name, &found, "a list")),
+        }
+    }
+    if all {
+        out.extend(ref_fault(
+            right,
+            ctx,
+            |v| usable_values(v, true),
+            |v| match v {
+                Value::Array(items) if items.is_empty() => "a list with at least one value".to_string(),
+                Value::Array(_) => "a list of one kind of value".to_string(),
+                _ => "a list".to_string(),
+            },
+        ));
+    }
+    out
+}
+
+pub fn matches_faults(check: &Matches, ctx: &Ctx) -> Vec<String> {
+    let mut out = Vec::new();
+    if let Some((name, found)) = left_found(&check.path, ctx) {
+        if !found.is_string() {
+            out.push(super::message::isnt(&name, &found, "text"));
+        }
+    }
+    out.extend(ref_fault(
+        &check.patterns,
+        ctx,
+        usable_patterns,
+        |v| match v {
+            Value::Array(_) => "a list of patterns".to_string(),
+            _ => "a list".to_string(),
+        },
+    ));
+    out
+}

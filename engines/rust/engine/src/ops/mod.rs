@@ -4,6 +4,7 @@ pub mod equals;
 pub mod for_line;
 pub mod kinds;
 pub mod lists;
+pub mod message;
 pub mod present;
 pub mod range;
 pub mod tally;
@@ -27,6 +28,7 @@ pub struct Input {
     pub value: Value,
     pub locations: Vec<String>,
     pub part: Option<Part>,
+    pub state: Outcome,
 }
 
 impl Input {
@@ -72,6 +74,7 @@ pub fn read_path(path: &Path, ctx: &Ctx) -> ReadPath {
         value: value.clone().unwrap_or(Value::Null),
         locations: read.location.iter().map(|l| l.render()).collect(),
         part: path::part_tag(path, ctx).map(|(name, id)| Part { name, id }),
+        state: read.outcome,
     }];
     inputs.extend(field_inputs(path, ctx));
     ReadPath {
@@ -96,6 +99,7 @@ pub fn field_inputs(path: &Path, ctx: &Ctx) -> Vec<Input> {
                     value: found.value.cloned().unwrap_or(Value::Null),
                     locations: found.location.iter().map(|l| l.render()).collect(),
                     part: None,
+                    state: found.outcome,
                 })
             }
             _ => None,

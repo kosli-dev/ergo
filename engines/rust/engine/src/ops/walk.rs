@@ -736,6 +736,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             value: json!([]),
             locations: Vec::new(),
             part: None,
+            state: crate::path::Outcome::Found,
         }];
         inputs.extend(outside);
         inputs.sort_by(|a, b| a.name.cmp(&b.name));
@@ -770,6 +771,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             .map(|item| item.end_location.render())
             .collect(),
         part: tag,
+        state: crate::path::Outcome::Found,
     }];
     inputs.extend(outside);
     inputs.sort_by(|a, b| a.name.cmp(&b.name));
