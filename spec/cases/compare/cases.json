@@ -32,7 +32,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"a": "1", "b": 1, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": "1", "locations": ["/things/0/a"]}, {"name": "b", "value": 1, "locations": ["/things/0/b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is \"1\", which isn't a number", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": "1", "locations": ["/things/0/a"]}, {"name": "b", "value": 1, "locations": ["/things/0/b"]}]}
         ]
       },
       {
@@ -40,7 +40,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"a": null, "b": null, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "null", "inputs": [{"name": ".a", "value": null, "locations": ["/things/0/a"]}, {"name": "b", "value": null, "locations": ["/things/0/b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is null, and b is null", "passed": false, "cause": "null", "inputs": [{"name": ".a", "value": null, "locations": ["/things/0/a"]}, {"name": "b", "value": null, "locations": ["/things/0/b"]}]}
         ]
       },
       {
@@ -48,7 +48,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"b": null, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null, "locations": ["/things/0"]}, {"name": "b", "value": null, "locations": ["/things/0/b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is missing", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null, "locations": ["/things/0"]}, {"name": "b", "value": null, "locations": ["/things/0/b"]}]}
         ]
       }
     ]
@@ -70,7 +70,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"a": "1", "b": 1, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": "1", "locations": ["/things/0/a"]}, {"name": "b", "value": 1, "locations": ["/things/0/b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is \"1\", which isn't a number", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": "1", "locations": ["/things/0/a"]}, {"name": "b", "value": 1, "locations": ["/things/0/b"]}]}
         ]
       },
       {
@@ -78,7 +78,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null, "locations": ["/things/0"]}, {"name": "b", "value": null, "locations": ["/things/0"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is missing, and b is missing", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null, "locations": ["/things/0"]}, {"name": "b", "value": null, "locations": ["/things/0"]}]}
         ]
       }
     ]
@@ -101,7 +101,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"a": 2, "b": 1, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": 2, "locations": ["/things/0/a"]}, {"name": "b", "value": 1, "locations": ["/things/0/b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is 2, and b is 1", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": 2, "locations": ["/things/0/a"]}, {"name": "b", "value": 1, "locations": ["/things/0/b"]}]}
         ]
       },
       {
@@ -109,7 +109,7 @@
         "rules": ["compare.pass", "compare.fail"],
         "input": {"things": [{"a": "80", "b": "9", "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": "80", "locations": ["/things/0/a"]}, {"name": "b", "value": "9", "locations": ["/things/0/b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is \"80\", which isn't a number, and b is \"9\", which isn't a number", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": "80", "locations": ["/things/0/a"]}, {"name": "b", "value": "9", "locations": ["/things/0/b"]}]}
         ]
       },
       {
@@ -117,7 +117,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"a": false, "b": true, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": false, "locations": ["/things/0/a"]}, {"name": "b", "value": true, "locations": ["/things/0/b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is false, which isn't a number, and b is true, which isn't a number", "passed": false, "cause": "unusable", "inputs": [{"name": ".a", "value": false, "locations": ["/things/0/a"]}, {"name": "b", "value": true, "locations": ["/things/0/b"]}]}
         ]
       },
       {
@@ -129,6 +129,7 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
+            "message": ".a is {\"n\": 1}, which isn't a number, and b is {\"o\": 1}, which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": {"n": 1}, "locations": ["/things/0/a"]}, {"name": "b", "value": {"o": 1}, "locations": ["/things/0/b"]}]
@@ -140,7 +141,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"b": 5, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null, "locations": ["/things/0"]}, {"name": "b", "value": 5, "locations": ["/things/0/b"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is missing", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null, "locations": ["/things/0"]}, {"name": "b", "value": 5, "locations": ["/things/0/b"]}]}
         ]
       }
     ]
@@ -206,7 +207,7 @@
         "rules": ["location.read", "location.start"],
         "input": {"things": [{"id": "t1", "n": 3}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/n"], "name": "n", "value": 3}, {"locations": ["$params:"], "name": "$params.max_days.high", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/n"], "name": "n", "value": 3}, {"locations": ["$params:"], "name": "$params.max_days.high", "value": null}], "message": "$params.max_days.high is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -228,7 +229,7 @@
         "rules": ["location.start", "location.read"],
         "input": {"limits": {}, "things": [{"id": "t1", "n": 3}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/n"], "name": "n", "value": 3}, {"locations": ["/limits"], "name": "$input.limits.high", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/n"], "name": "n", "value": 3}, {"locations": ["/limits"], "name": "$input.limits.high", "value": null}], "message": "$input.limits.high is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -258,7 +259,7 @@
         "rules": ["location.read"],
         "input": {"things": [{"id": "t1", "a": {"w": 1, "x": 2}}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/a"], "name": ".a named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/a"], "name": ".a named by $params.i", "value": null}], "message": ".a named by $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -273,8 +274,8 @@
         "input": {"things": [{"id": "t1", "key": "k1", "values": {"k1": 5}}, {"id": "t2", "key": "zz", "values": {"k1": 5}}, {"id": "t3", "values": {"k1": 5}}]},
         "results": [
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/values/k1"], "name": "values named by key", "value": 5}, {"locations": ["/things/0/key"], "name": "key", "value": "k1"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/1/values"], "name": "values named by key", "value": null}, {"locations": ["/things/1/key"], "name": "key", "value": "zz"}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/2/values"], "name": "values named by key", "value": null}, {"locations": ["/things/2"], "name": "key", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/1/values"], "name": "values named by key", "value": null}, {"locations": ["/things/1/key"], "name": "key", "value": "zz"}], "message": "values named by key is missing", "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/2/values"], "name": "values named by key", "value": null}, {"locations": ["/things/2"], "name": "key", "value": null}], "message": "values named by key is missing", "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}}
         ]
       }
     ]

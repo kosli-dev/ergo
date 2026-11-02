@@ -17,7 +17,7 @@
         "rules": ["patterns.fail"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -25,7 +25,7 @@
         "rules": ["patterns.fail"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is 1, which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -33,7 +33,7 @@
         "rules": ["patterns.fail", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       }
     ]
@@ -56,7 +56,7 @@
         "rules": ["patterns.fail"],
         "input": {"things": [{"id": "t1", "x": "bob"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "bob", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"bob\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "bob", "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -64,7 +64,7 @@
         "rules": ["patterns.fail"],
         "input": {"things": [{"id": "t1", "x": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is 1, which isn't text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
         ]
       },
       {
@@ -72,7 +72,7 @@
         "rules": ["patterns.fail", "path.absent"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       }
     ]
@@ -86,7 +86,7 @@
         "rules": ["patterns.syntax"],
         "input": {"things": [{"id": "t1", "x": "a\nb"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a\nb", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\\nb\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a\nb", "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -100,7 +100,7 @@
         "rules": ["patterns.syntax"],
         "input": {"things": [{"id": "t1", "x": "a\n"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a\n", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\\n\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "a\n", "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -159,7 +159,7 @@
         "rules": ["patterns.list"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x matches $params.ps is false", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -174,9 +174,9 @@
         "input": {"things": [{"id": "t1", "x": "٣", "y": "é", "z": "\u000b\u00a0", "v": "aé"}]},
         "results": [
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "v", "value": "aé", "locations": ["/things/0/v"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "٣", "locations": ["/things/0/x"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "s", "passed": false, "cause": "value", "inputs": [{"name": "z", "value": "\u000b\u00a0", "locations": ["/things/0/z"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "w", "passed": false, "cause": "value", "inputs": [{"name": "y", "value": "é", "locations": ["/things/0/y"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "message": "x is \"٣\"", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": "٣", "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "s", "message": "z is \"\\u000b \"", "passed": false, "cause": "value", "inputs": [{"name": "z", "value": "\u000b\u00a0", "locations": ["/things/0/z"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "w", "message": "y is \"é\"", "passed": false, "cause": "value", "inputs": [{"name": "y", "value": "é", "locations": ["/things/0/y"]}]}
         ]
       }
     ]

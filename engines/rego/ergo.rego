@@ -9963,15 +9963,18 @@ _m_side_value(subj, side) := v if {
 	[v] := _side_eval(subj, side).v
 }
 
-_m_side_fault(subj, check, side) := [[side, k]] if {
+_m_side_fault(subj, check, side) := f if {
+	f := _m_parts_fault(subj, side)
+	f != []
+} else := [[side, k]] if {
 	k := _m_side_kind(subj, check, side)
 	v := _m_side_value(subj, side)
 	not _m_fits_kind(v, k)
 }
 
-_m_side_fault(subj, _, side) := [[p, "a number"] | some p in side.add; v := _found(subj, p); not is_number(v)] if _side_form(side) == "add"
+_m_parts_fault(subj, side) := [[p, "a number"] | some p in side.add; v := _found(subj, p); not is_number(v)] if _side_form(side) == "add"
 
-_m_side_fault(subj, _, side) := [[p, "text"] | some p in side.join; v := _found(subj, p); not is_string(v)] if _side_form(side) == "join"
+_m_parts_fault(subj, side) := [[p, "text"] | some p in side.join; v := _found(subj, p); not is_string(v)] if _side_form(side) == "join"
 
 _m_side_kind(_, check, _) := "a number" if "within" in object.keys(check)
 
