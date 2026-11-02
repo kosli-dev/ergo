@@ -844,6 +844,7 @@ mod tests {
             check: check.to_string(),
             cause,
             inputs: vec![input("x", json!(1), &["/t/0/x".to_string()])],
+            message: None,
             failed_items: None,
             failed_assertions: None,
         }

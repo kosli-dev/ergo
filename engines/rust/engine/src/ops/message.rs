@@ -11,7 +11,10 @@ const OBJECT_LIMIT: usize = 80;
 const LIST_LIMIT: usize = 3;
 
 fn quoted(text: &str) -> String {
-    if text.chars().any(|c| c == '"' || c == '\\' || c.is_control()) {
+    if text
+        .chars()
+        .any(|c| c == '"' || c == '\\' || c.is_control())
+    {
         json_text(&Value::String(text.to_string()))
     } else {
         format!("\"{text}\"")
@@ -185,12 +188,12 @@ fn key_states(check: &Check, ctx: &Ctx, want: Outcome) -> Vec<String> {
     };
     let mut out = Vec::new();
     for key in key_steps(path) {
-        if let Some(input) = first_input(key, ctx) {
-            if input.state == want {
-                let clause = format!("{} is {}", input.name, state_word(want));
-                if !out.contains(&clause) {
-                    out.push(clause);
-                }
+        if let Some(input) = first_input(key, ctx)
+            && input.state == want
+        {
+            let clause = format!("{} is {}", input.name, state_word(want));
+            if !out.contains(&clause) {
+                out.push(clause);
             }
         }
     }
@@ -203,12 +206,13 @@ fn key_faults(check: &Check, ctx: &Ctx) -> Vec<String> {
     };
     let mut out = Vec::new();
     for key in key_steps(path) {
-        if let Some(input) = first_input(key, ctx) {
-            if input.state == Outcome::Found && !input.value.is_string() {
-                let clause = isnt(&input.name, &input.value, "text");
-                if !out.contains(&clause) {
-                    out.push(clause);
-                }
+        if let Some(input) = first_input(key, ctx)
+            && input.state == Outcome::Found
+            && !input.value.is_string()
+        {
+            let clause = isnt(&input.name, &input.value, "text");
+            if !out.contains(&clause) {
+                out.push(clause);
             }
         }
     }
@@ -266,9 +270,7 @@ fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
 
 fn faults(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
     let input = single_path(check).and_then(|p| first_input(p, ctx));
-    let found = input
-        .as_ref()
-        .is_some_and(|i| i.state == Outcome::Found);
+    let found = input.as_ref().is_some_and(|i| i.state == Outcome::Found);
     match (check, &input) {
         (Check::Range(_), Some(i)) if found && !i.value.is_number() => {
             vec![isnt(&i.name, &i.value, "a number")]
@@ -323,6 +325,11 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<String> {
         let (Some(value), Some(first)) = (&read.value, read.inputs.first()) else {
             continue;
         };
+        let eq_like = compare.within.is_none() && matches!(compare.cmp, Cmp::Eq | Cmp::Ne);
+        let left_literal = matches!(compare.left, Side::Value(_));
+        if eq_like && ((index == 1) != left_literal) {
+            continue;
+        }
         let other = &reads[1 - index].1;
         let want = wanted(other.value.as_ref().unwrap_or(&Value::Null));
         if kind(value) != want {
