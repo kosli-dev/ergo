@@ -744,6 +744,7 @@ fn sort_failure(found: &Live, cause: Cause, value: Value, location: Option<Locat
 }
 
 struct Sfail {
+    own: bool,
     text: String,
     idx: usize,
     cause: Cause,
@@ -758,6 +759,7 @@ struct Child {
 }
 
 struct Outcome {
+    bare: bool,
     said: String,
     cause: Cause,
     assertions: Vec<Value>,
@@ -884,6 +886,7 @@ impl For {
             let (outcome, sfails) = if into_non_object {
                 (
                     Some(Outcome {
+                        bare: false,
                         said: String::new(),
                         cause: Cause::NotAnObject,
                         assertions: Vec::new(),
@@ -907,6 +910,7 @@ impl For {
                     parts.extend(nested.dead.iter().map(|d| self.dead_text(d)));
                     (
                         Some(Outcome {
+                            bare: false,
                             said: parts.join("; "),
                             cause: nested.cause,
                             assertions,
@@ -975,7 +979,12 @@ impl For {
         for (idx, sentence) in self.sentences.iter().enumerate() {
             let verdict = run_check(&sentence.check, ctx);
             if !verdict.passed() {
+                let alias = self.items.last().map(|i| i.alias.as_str()).unwrap_or_default();
+                let own = verdict.inputs.iter().all(|i| {
+                    i.name == alias || i.name.starts_with(&format!("{alias}."))
+                });
                 sfails.push(Sfail {
+                    own,
                     text: super::message::message(&sentence.check, ctx, &verdict),
                     idx,
                     cause: verdict.cause,
@@ -999,13 +1008,21 @@ impl For {
                         })
                     })
                     .collect();
+                let all_own = sfails.iter().all(|f| f.own);
                 let said = sfails
                     .iter()
                     .map(|f| f.text.clone())
                     .collect::<Vec<_>>()
                     .join(", and ");
+                let said = if all_own { self.strip(&said) } else { said };
+                let alias = self.items.last().map(|i| i.alias.as_str()).unwrap_or_default();
+                let (said, bare) = match said.strip_prefix(&format!("{alias} ")) {
+                    Some(rest) if all_own => (format!(" {rest}"), true),
+                    _ => (said, false),
+                };
                 (
                     Some(Outcome {
+                        bare,
                         said,
                         cause,
                         assertions,
@@ -1291,8 +1308,10 @@ impl For {
             super::message::isnt(&name, &child.entry.value, "an object")
         } else if outcome.said.is_empty() {
             super::message::is(&name, &child.entry.value)
+        } else if outcome.bare {
+            format!("{name}{}", outcome.said)
         } else {
-            format!("{name}: {}", self.strip(&outcome.said))
+            format!("{name}: {}", outcome.said)
         })
     }
 
