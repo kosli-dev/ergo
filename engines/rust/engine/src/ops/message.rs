@@ -311,6 +311,7 @@ fn faults(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
         (Check::Matches(c), _) => lists::matches_faults(c, ctx),
         (Check::Compare(compare), _) => compare_faults(compare, ctx),
         (Check::Tally(tally), _) => tally_faults(tally, ctx),
+        (Check::CompareTime(time_check), _) => time_faults(time_check, ctx),
         _ => {
             let _ = verdict;
             Vec::new()
@@ -583,6 +584,48 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
             }
             TallySide::Plain(_) => {}
         }
+    }
+    out
+}
+
+fn time_faults(check: &super::time::CompareTime, ctx: &Ctx) -> Vec<String> {
+    let reads = [
+        (&check.left, read_side(&check.left, ctx)),
+        (&check.right, read_side(&check.right, ctx)),
+    ];
+    let mut out = Vec::new();
+    let mut times = Vec::new();
+    for (side, read) in &reads {
+        let (Side::Path(_), Some(value), Some(first)) = (side, &read.value, read.inputs.first())
+        else {
+            times.push(
+                read.value
+                    .as_ref()
+                    .and_then(super::time::read_time),
+            );
+            continue;
+        };
+        let time = super::time::read_time(value);
+        if time.is_none() {
+            out.push(isnt(&first.name, value, "a time"));
+        }
+        times.push(time);
+    }
+    if out.is_empty()
+        && let [Some(a), Some(b)] = times.as_slice()
+        && std::mem::discriminant(a) != std::mem::discriminant(b)
+        && let (Side::Path(_), Some(first), Some(left), Some(right)) = (
+            reads[0].0,
+            reads[0].1.inputs.first(),
+            reads[0].1.value.as_ref(),
+            reads[1].1.value.as_ref(),
+        )
+    {
+        out.push(isnt(
+            &first.name,
+            left,
+            &format!("a time written like {}", print(right)),
+        ));
     }
     out
 }
