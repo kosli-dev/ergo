@@ -186,14 +186,23 @@ fn each_of_entries<'a>(
     let shown_name = shown_name
         .strip_prefix("$input.")
         .map_or(shown_name.clone(), str::to_string);
+    let shown_name = if shown_name == "$input" {
+        "it".to_string()
+    } else {
+        shown_name
+    };
     let broken = unread
         .map(|cause| Broken {
-            msg: ops::message::stated(
-                &shown_name,
-                cause,
-                object.value.unwrap_or(&Value::Null),
-                "a list or an object",
-            ),
+            msg: if matches!(object.value, Some(Value::Array(_))) {
+                String::new()
+            } else {
+                ops::message::stated(
+                    &shown_name,
+                    cause,
+                    object.value.unwrap_or(&Value::Null),
+                    "a list or an object",
+                )
+            },
             order: Vec::new(),
             path: String::new(),
             cause,
@@ -414,6 +423,11 @@ fn from_message(
     } else if name == "$input" {
         name = "it".to_string();
     }
+    if let (Source::Child { .. }, Some(parent)) = (&lowered.source, anc.last())
+        && let Some(rest) = name.strip_prefix(&format!("{}.", parent.name))
+    {
+        name = rest.to_string();
+    }
     if name.is_empty() {
         name = "it".to_string();
     }
@@ -438,6 +452,11 @@ fn from_message(
                     name = bare.to_string();
                 } else if name == "$input" {
                     name = "it".to_string();
+                }
+                if let (Source::Child { .. }, Some(parent)) = (&lowered.source, anc.last())
+                    && let Some(rest) = name.strip_prefix(&format!("{}.", parent.name))
+                {
+                    name = rest.to_string();
                 }
             }
             let word = if cause == Cause::Absent {

@@ -496,8 +496,13 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             let mut all = key_faults(check, ctx);
             all.extend(blocked(check, ctx));
             all.extend(faults(check, ctx, verdict));
+            let digits = " needs more than 15 digits";
+            let others = all.iter().any(|c| !c.ends_with(digits));
             let mut once = Vec::new();
             for clause in all {
+                if others && clause.ends_with(digits) {
+                    continue;
+                }
                 if !once.contains(&clause) {
                     once.push(clause);
                 }
