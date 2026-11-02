@@ -9209,7 +9209,7 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 }
 
 _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of_cause(lines), "lines": lines} if {
-	lines := [{"assertion": check.assertions[i], "cause": cause, "inputs": _for_line_inputs(check, c, read), "msg": [_m_aliased(check, x) | some x in m]} |
+	lines := [object.union({"assertion": check.assertions[i], "cause": cause, "inputs": _for_line_inputs(check, c, read), "msg": [_m_aliased(check, x) | some x in m]}, _m_own_msg(check, c, m, count(read) == 1)) |
 		some i, c in check.checks
 		cause := _for_cause(c, subj) with input as {"ergo/names": names}
 		cause != "satisfied"
@@ -9247,7 +9247,7 @@ _for_input_name(name, aliases) := concat("", [m[1], alias, m[2]]) if {
 	m := regex.find_all_string_submatch_n(concat("", [`(?s)^((?:item [0-9]+ of )?)\$`, _quoted(alias), `((?:[.\[ ].*)?)$`]), name, 1)[0]
 } else := name
 
-_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(check, f.path), "cause": l.cause, "inputs": l.inputs, "msg": [concat("", [_m_for_item_name(check, f.path), ": ", x]) | some x in l.msg]} |
+_for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(check, f.path), "cause": l.cause, "inputs": l.inputs, "msg": [_m_under(_m_for_item_name(check, f.path), x) | some x in l.msg], "own": _m_own_under(_m_for_item_name(check, f.path), object.get(l, "own_msg", null))} |
 	some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})
 	some f in fails
 	f.path == p
@@ -9288,9 +9288,23 @@ _for_item_name(check, p) := _input_name(array.concat([substring(p[0], 1, -1)], a
 
 else := _failed_name(p, _for_dotted(check))
 
-_m_for_item_name(check, p) := _for_item_name(check, p) if p[0] in {concat("", ["$", item.as]) | some item in check.items}
+_m_for_item_name(check, p) := _input_name(array.slice(p, 1, count(p))) if {
+	p[0] in {concat("", ["$", item.as]) | some item in check.items}
+	_m_unaliased(p)
+}
 
-else := _m_item_name(p, _for_dotted(check))
+_m_for_item_name(check, p) := _for_item_name(check, p) if {
+	p[0] in {concat("", ["$", item.as]) | some item in check.items}
+	not _m_unaliased(p)
+}
+
+_m_for_item_name(check, p) := _m_item_name(p, _for_dotted(check)) if not p[0] in {concat("", ["$", item.as]) | some item in check.items}
+
+_m_unaliased(p) if {
+	count(p) > 2
+	not is_number(p[1])
+	startswith(p[0], "$")
+}
 
 _for_verdict(item, w, judged, fails) := _walk_stop(w)[0].cause if {
 	w.walked == set()
@@ -10560,6 +10574,77 @@ _m_sentence(c, subj, cause) := [_message(c, subj, cause)] if not _walks(c)
 
 _m_sentence(c, subj, cause) := _walk_parts(c, subj, {"cause": cause}, _walk_row(c, subj)) if _walks(c)
 
+_m_own_msg(check, c, m, one) := {"own_msg": [_m_aliased(check, _m_unalias(a, one, x)) | some x in m]} if {
+	a := check.items[count(check.items) - 1].as
+	_reads_name(c, a)
+	not _m_reads_other(c, a)
+} else := {}
+
+_m_reads_other(c, a) if {
+	walk(c, [at, x])
+	not _under_data(at)
+	not _under_literal(c, at)
+	_m_other_name(x, a)
+}
+
+_m_reads_other(c, a) if {
+	walk(c, [at, x])
+	not _under_data(at)
+	not _under_literal(c, at)
+	not _m_relative(at)
+	_m_other_path(x, a)
+}
+
+_m_reads_other(c, a) if {
+	some r in _check_refs(c)
+	not r[0] in {concat("", ["$", a]), concat("", ["$$", a])}
+}
+
+_m_relative(at) if {
+	some k in at
+	k in {"check", "whose"}
+}
+
+_m_other_path(x, a) if {
+	is_array(x)
+	count(x) > 0
+	is_string(x[0])
+	x[0] != concat("", ["$", a])
+}
+
+_m_other_name(x, _) if {
+	is_object(x)
+	"text" in object.keys(x)
+}
+
+_m_other_name(x, _) if {
+	is_object(x)
+	"named_by_field" in object.keys(x)
+}
+
+_m_other_name(x, a) if {
+	is_object(x)
+	"named_by" in object.keys(x)
+	x.named_by != a
+}
+
+_m_unalias(a, one, x) := _m_lead_alias(a, one, strings.replace_n({concat("", ["$", a, "."]): ""}, x))
+
+_m_lead_alias(a, one, y) := concat("", ["\u0001", a, "\u0001", substring(y, count(a) + 1, -1)]) if {
+	one == true
+	startswith(y, concat("", ["$", a, " is "]))
+}
+
+else := y
+
+_m_under(name, x) := concat("", [name, substring(substring(x, 1, -1), indexof(substring(x, 1, -1), "\u0001") + 1, -1)]) if startswith(x, "\u0001")
+
+else := concat("", [name, ": ", x])
+
+_m_first_marked(xs) := array.concat([xs[0]], [_m_unmarked(x) | some x in array.slice(xs, 1, count(xs))])
+
+_m_unmarked(x) := strings.replace_n({"\u0001": ""}, x)
+
 _m_aliased(check, m) := _m_alias_end(check, strings.replace_n({concat("", ["$", item.as, c]): concat("", [item.as, c]) | some item in check.items; some c in [".", "[", " ", ","]}, m))
 
 _m_alias_end(check, m) := concat("", [trim_suffix(m, concat("", ["$", a])), a]) if {
@@ -10594,9 +10679,9 @@ _m_strip_items(f) := {"failed_items": [object.remove(x, ["msg", "text"]) | some 
 
 else := {}
 
-_m_strip_line(l) := object.union(object.remove(l, ["msg"]), {"items": [object.remove(x, ["msg"]) | some x in l.items]}) if "items" in object.keys(l)
+_m_strip_line(l) := object.union(object.remove(l, ["msg", "own_msg"]), {"items": [object.remove(x, ["msg", "own"]) | some x in l.items]}) if "items" in object.keys(l)
 
-else := object.remove(l, ["msg"])
+else := object.remove(l, ["msg", "own_msg"])
 
 _for_message(_, subj, r) := _message(null, subj, "not_an_object") if {
 	r.cause == "not_an_object"
@@ -10689,21 +10774,21 @@ _m_for_fail(f) := [_m_isnt(object.get(f, "said", f.item), f.value, "an object")]
 	not is_object(f.value)
 }
 
-_m_for_fail(f) := [concat("", [object.get(f, "said", f.item), ": ", concat(", and ", _once([ps[0] | some ps in lines]))])] if {
+_m_for_fail(f) := [_m_under(object.get(f, "said", f.item), concat(", and ", _m_first_marked(_once([ps[0] | some ps in lines]))))] if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions != []
-	lines := [_m_line_msg(l) | some l in f.failed_assertions]
+	lines := [_m_line_msg(l, _m_owns(f)) | some l in f.failed_assertions]
 	every ps in lines {
 		count(ps) == 1
 	}
 }
 
-_m_for_fail(f) := _once([concat("", [object.get(f, "said", f.item), ": ", p]) | some ps in lines; some p in ps]) if {
+_m_for_fail(f) := _once([_m_under(object.get(f, "said", f.item), p) | some ps in lines; some p in ps]) if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions != []
-	lines := [_m_line_msg(l) | some l in f.failed_assertions]
+	lines := [_m_line_msg(l, _m_owns(f)) | some l in f.failed_assertions]
 	some ps in lines
 	count(ps) != 1
 }
@@ -10722,9 +10807,43 @@ _m_for_fail(f) := [_m_named_item(f)] if {
 	count(object.get(f, "failed_items", [])) == 0
 }
 
-_m_line_msg(l) := [p | some x in l.items; some p in x.msg] if "items" in object.keys(l)
+_m_line_msg(l, own) := [p | some x in l.items; some p in _m_line_text(x, own)] if "items" in object.keys(l)
 
-_m_line_msg(l) := l.msg if not "items" in object.keys(l)
+_m_line_msg(l, own) := _m_pick_msg(l, own) if not "items" in object.keys(l)
+
+_m_line_text(x, false) := x.msg
+
+_m_line_text(x, true) := x.own
+
+_m_own_under(_, null) := null
+
+_m_own_under(name, ms) := [_m_under(name, y) | some y in ms] if is_array(ms)
+
+_m_pick_msg(l, false) := l.msg
+
+_m_pick_msg(l, true) := l.own_msg
+
+_m_all_owned(f) if {
+	every l in f.failed_assertions {
+		_m_owned(l)
+	}
+}
+
+_m_owned(l) if {
+	"items" in object.keys(l)
+	every x in l.items {
+		is_array(x.own)
+	}
+}
+
+_m_owned(l) if {
+	not "items" in object.keys(l)
+	"own_msg" in object.keys(l)
+}
+
+_m_owns(f) if _m_all_owned(f)
+
+else := false
 
 _m_named_item(f) := _m_is(object.get(f, "said", f.item), f.value) if f.cause == "value"
 

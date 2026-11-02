@@ -1560,7 +1560,7 @@
                 ]
               }
             ],
-            "message": "item 2 of files: item 1 of f.tags is \"bob\", and artifact.owner is \"ann\"",
+            "message": "item 2 of files: item 1 of tags is \"bob\", and artifact.owner is \"ann\"",
             "passed": false,
             "requirement": "s",
             "subject": {
