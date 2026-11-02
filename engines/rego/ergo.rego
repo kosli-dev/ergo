@@ -9026,6 +9026,10 @@ _m_sort_why(item, e, names) := {"why": [m]} if {
 	m := _m_sort_text(item, e, state) with input as {"ergo/names": names}
 } else := {}
 
+_m_sort_kind(true) := "text"
+
+_m_sort_kind(false) := "a number, a time or a date"
+
 _m_sort_text(item, e, state) := _message({"op": "present", "path": item.pick.by}, e.iv, state) if state in {"absent", "null"}
 
 else := m if {
@@ -9036,7 +9040,7 @@ else := m if {
 	ms := _m_blocked(e.iv, {"op": "present", "path": item.pick.by})
 	ms != []
 	m := concat(", and ", ms)
-} else := _m_isnt(_input_name(item.pick.by), v, "a number, a time or text") if {
+} else := _m_isnt(_input_name(item.pick.by), v, _m_sort_kind(object.get(item.pick, "alphabetically", false))) if {
 	v := _resolved(e.iv, item.pick.by)
 	v != _absent
 }
@@ -10574,9 +10578,18 @@ _m_for_empty(check, subj, cause) := cs if {
 	cs := _once([c | some item in check.items; some c in array.concat(_m_key_faults(subj, _m_for_item(item)), _m_whose_ref_faults(item))])
 	cs != []
 } else := cs if {
+	cs := _once([c | some item in check.items; _m_narrows(subj, item); some c in _m_list_found(subj, item.path)])
+	cs != []
+} else := cs if {
 	cs := _once([c | some item in check.items; some c in _m_list_found(subj, item.path)])
 	cs != []
 } else := [_m_fallback(check)]
+
+_m_narrows(_, item) if count(object.get(item, "whose", [])) > 0
+
+_m_narrows(_, item) if "pick" in object.keys(item)
+
+_m_narrows(subj, item) if _value_at(subj, item.path) == []
 
 _m_whose_ref_faults(item) := [_m_isnt(_ref_name(f[0].ref), _ref_shown(f[0].ref), f[1]) |
 	some c in object.get(item, "whose", [])
@@ -10592,10 +10605,38 @@ _m_list_found(subj, path) := [_m_is(_input_name(p), _value_at(subj, p))] if {
 	p := array.slice(path, 0, i)
 } else := []
 
-_for_message(_, _, r) := _m_joined(array.concat(
-	[p | some f in r.failed; f.cause != "ambiguous"; some p in _m_for_fail(f)],
-	array.slice([_m_tie(r.failed) | some f in r.failed; f.cause == "ambiguous"], 0, 1),
-)) if r.failed != []
+_for_message(check, _, r) := _m_joined([p | some i, f in r.failed; some p in _m_for_part(check, r.failed, i, f)]) if r.failed != []
+
+_m_for_part(_, _, _, f) := _m_for_fail(f) if f.cause != "ambiguous"
+
+_m_for_part(check, _, _, f) := [concat("", [object.get(f, "said", f.item), ": ", _m_tie(check, 1, f.failed_items)])] if {
+	f.cause == "ambiguous"
+	_m_nested_tie(f)
+}
+
+_m_for_part(check, failed, i, f) := [_m_tie(check, 0, failed)] if {
+	f.cause == "ambiguous"
+	not _m_nested_tie(f)
+	not _m_earlier_tie(failed, i)
+}
+
+_m_for_part(_, failed, i, f) := [] if {
+	f.cause == "ambiguous"
+	not _m_nested_tie(f)
+	_m_earlier_tie(failed, i)
+}
+
+_m_nested_tie(f) if {
+	some x in object.get(f, "failed_items", [])
+	x.cause == "ambiguous"
+}
+
+_m_earlier_tie(failed, i) if {
+	some j, g in failed
+	j < i
+	g.cause == "ambiguous"
+	not _m_nested_tie(g)
+}
 
 _m_for_fail(f) := f.msg if "msg" in object.keys(f)
 
@@ -10650,7 +10691,12 @@ _m_named_item(f) := _m_isnt(object.get(f, "said", f.item), f.value, "an object")
 
 _m_named_item(f) := _m_isnt(object.get(f, "said", f.item), f.value, _m_walk_kind(f.value)) if f.cause == "unusable"
 
-_m_tie(failed) := concat("", [_m_listed([f.item | some f in failed; f.cause == "ambiguous"]), " tie"])
+_m_tie(check, k, failed) := concat("", [_m_listed([f.item | some f in failed; f.cause == "ambiguous"]), " tie", _m_tie_on(check, k)])
+
+_m_tie_on(check, k) := concat("", [" on ", _input_name(by)]) if {
+	by := [item.pick.by | some j, item in check.items; j >= k; is_object(object.get(item, "pick", null)); "by" in object.keys(item.pick)][0]
+	is_array(by)
+} else := ""
 
 _m_listed(names) := concat("", ["item ", concat(" and item ", [m[1] | some m in ms]), " of ", ms[0][2]]) if {
 	ms := [m | some n in names; m := regex.find_all_string_submatch_n(`^item ([0-9]+) of (.+)$`, n, 1)[0]]
