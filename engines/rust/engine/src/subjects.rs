@@ -712,6 +712,7 @@ fn check_rows(env: &Env, judged: &Judged, anc: &[Anc]) -> Vec<Row> {
 
 fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
     let mut failed_items = None;
+    let mut said: Vec<Option<String>> = Vec::new();
     let verdicts: Vec<Verdict> = plan
         .items
         .iter()
@@ -719,10 +720,13 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             let ran = ops::run_full(&item.check, ctx);
             failed_items = ran.failed_items.map(Value::Array);
             let mut verdict = ran.verdict;
+            let mut own = ran.message;
             if !env.unreadable.is_empty() {
                 verdict.cause = Cause::Unusable;
                 failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
+                own = None;
             }
+            said.push(own);
             verdict
         })
         .collect();
@@ -743,8 +747,12 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             .items
             .iter()
             .zip(&verdicts)
-            .filter(|(_, v)| !v.passed())
-            .map(|(item, v)| ops::message::message(&item.check, ctx, v))
+            .zip(&said)
+            .filter(|((_, v), _)| !v.passed())
+            .map(|((item, v), own)| match own {
+                Some(text) => text.clone(),
+                None => ops::message::message(&item.check, ctx, v),
+            })
             .collect();
         row.message = Some(messages.join("; "));
     }

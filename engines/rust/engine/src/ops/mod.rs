@@ -293,6 +293,7 @@ impl Check {
 pub struct Ran {
     pub verdict: Verdict,
     pub failed_items: Option<Vec<Value>>,
+    pub message: Option<String>,
 }
 
 pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
@@ -302,6 +303,7 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
             Ran {
                 verdict: run.verdict,
                 failed_items: Some(run.failed_items),
+                message: run.message,
             }
         }
         Check::For(check) => {
@@ -309,11 +311,13 @@ pub fn run_full(check: &Check, ctx: &Ctx) -> Ran {
             Ran {
                 verdict: run.verdict,
                 failed_items: Some(run.failed_items),
+                message: run.message,
             }
         }
         other => Ran {
             verdict: run(other, ctx),
             failed_items: None,
+            message: None,
         },
     }
 }

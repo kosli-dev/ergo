@@ -1,3 +1,4 @@
+use super::message;
 use super::{Check, Input, SidePath, Verdict, read_path, run as run_check};
 use crate::cause::Cause;
 use crate::name;
@@ -67,6 +68,7 @@ pub struct Failure {
     pub cause: Cause,
     pub value: Value,
     pub location: Option<Location>,
+    pub msg: String,
 }
 
 impl Failure {
@@ -125,6 +127,40 @@ impl Walked<'_> {
 
     pub fn name_of(&self, segs: &[Seg], unaliased: bool) -> String {
         self.name_of_steps(segs.iter().map(Seg::to_step).collect(), unaliased)
+    }
+
+    pub fn item_name(&self, segs: &[Seg]) -> String {
+        let indexes: Vec<usize> = segs
+            .iter()
+            .enumerate()
+            .filter(|(_, seg)| matches!(seg, Seg::Index(_)))
+            .map(|(at, _)| at)
+            .collect();
+        let Some(first) = indexes.first() else {
+            return self.name_of(segs, true);
+        };
+        let plain = |segs: &[Seg]| {
+            name::name(&Path {
+                start: Start::Subject,
+                steps: segs.iter().map(Seg::to_step).collect(),
+            })
+        };
+        let mut parts = vec![self.name_of(&segs[..=*first], true)];
+        for pair in indexes.windows(2) {
+            let Seg::Index(at) = &segs[pair[1]] else {
+                continue;
+            };
+            parts.push(format!(
+                "item {} of {}",
+                at + 1,
+                plain(&segs[pair[0] + 1..pair[1]])
+            ));
+        }
+        let tail = &segs[indexes[indexes.len() - 1] + 1..];
+        if !tail.is_empty() {
+            parts.push(plain(tail));
+        }
+        parts.join(": ")
     }
 
     pub fn name_of_steps(&self, steps: Vec<Step>, unaliased: bool) -> String {
@@ -222,6 +258,7 @@ struct Entry<'a> {
 }
 
 struct Raw {
+    kind: &'static str,
     segs: Vec<Seg>,
     unaliased: bool,
     cause: Cause,
@@ -229,8 +266,9 @@ struct Raw {
     location: Location,
 }
 
-fn failed(entry: &Entry, cause: Cause, value: Value) -> Raw {
+fn failed(entry: &Entry, cause: Cause, value: Value, kind: &'static str) -> Raw {
     Raw {
+        kind,
         segs: entry.segs.clone(),
         unaliased: entry.unaliased,
         cause,
@@ -335,7 +373,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
                 match entry.val.array() {
                     Some(items) => {
                         if items.is_empty() && !empty_ok {
-                            raws.push(failed(&entry, Cause::Value, json!([])));
+                            raws.push(failed(&entry, Cause::Value, json!([]), "a list"));
                         }
                         for (at, value) in items.iter().enumerate() {
                             let mut item_segs = entry.segs.clone();
@@ -354,7 +392,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
                             });
                         }
                     }
-                    None => raws.push(failed(&entry, entry.val.cause(), entry.val.shown())),
+                    None => raws.push(failed(&entry, entry.val.cause(), entry.val.shown(), "a list")),
                 }
             }
             entries = next;
@@ -383,6 +421,11 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             .or(trail.last());
         if let Some((stop_segs, val, location)) = stopped {
             raws.push(Raw {
+                kind: if matches!(val.shown(), Value::Object(_)) {
+                    "a list"
+                } else {
+                    "a list or an object"
+                },
                 segs: stop_segs.clone(),
                 unaliased: false,
                 cause: if val.gone() {
@@ -456,6 +499,12 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
         .map(|raw| Failure {
             path: walked_all.name_of(&raw.segs, raw.unaliased),
             item: walked_all.name_of(&raw.segs, raw.unaliased),
+            msg: message::stated(
+                &walked_all.item_name(&raw.segs),
+                raw.cause,
+                &raw.value,
+                raw.kind,
+            ),
             order: raw.segs,
             cause: raw.cause,
             value: raw.value,
@@ -471,6 +520,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
 pub struct Run {
     pub verdict: Verdict,
     pub failed_items: Vec<Value>,
+    pub message: Option<String>,
 }
 
 fn outer<'a>(ctx: &Ctx<'a>) -> Ctx<'a> {
@@ -632,7 +682,8 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 .iter()
                 .find(|(_, v)| !matches!(v.cause, Cause::Satisfied | Cause::Value));
             let kept = !verdicts.iter().any(|(_, v)| v.cause == Cause::Value);
-            let leaf = run_check(&walk.check.with_left(item.rest_path()), &at);
+            let leaf_check = walk.check.with_left(item.rest_path());
+            let leaf = run_check(&leaf_check, &at);
             let passed = undecided.is_none() && kept && leaf.passed();
             let failure = if let Some((check, verdict)) = undecided {
                 let named = named_side(check, &at);
@@ -657,7 +708,12 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     walked.name_of_steps(named_steps, item.unaliased)
                 };
                 let read = named.map(|(_, read)| read);
+                let said = message::prefixed(
+                    &walked.item_name(&item.item_segs),
+                    &message::message(check, &at, verdict),
+                );
                 Some(Failure {
+                    msg: said,
                     order,
                     path: name,
                     item: walked.name_of(&item.item_segs, item.unaliased),
@@ -669,7 +725,12 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     location: read.and_then(|r| r.location),
                 })
             } else if kept && !passed {
+                let said = message::prefixed(
+                    &walked.item_name(&item.item_segs),
+                    &message::message(&leaf_check, &at, &leaf),
+                );
                 Some(Failure {
+                    msg: said,
                     order: item.end_segs.clone(),
                     path: walked.name_of(&item.end_segs, item.unaliased),
                     item: walked.name_of(&item.item_segs, item.unaliased),
@@ -742,23 +803,37 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         inputs.sort_by(|a, b| a.name.cmp(&b.name));
         inputs.dedup();
         with_fields(&mut inputs, &walked.name, &walk.path, ctx);
+        let cause = outcome.cause().unwrap_or(Cause::Unusable);
+        let said = if walked.failures.is_empty() {
+            match cause {
+                Cause::Absent => format!("{} is missing", walked.name),
+                Cause::Null => format!("{} is null", walked.name),
+                _ => {
+                    let mut faults = message::key_faults_of(&walk.path, &outer);
+                    faults.extend(message::blocked_of(&walk.path, &outer));
+                    faults.join(", and ")
+                }
+            }
+        } else {
+            message::joined(walked.failures.iter().map(|f| f.msg.clone()).collect())
+        };
         return Run {
-            verdict: Verdict {
-                cause: outcome.cause().unwrap_or(Cause::Unusable),
-                inputs,
-            },
+            verdict: Verdict { cause, inputs },
             failed_items: walked.failures.iter().map(Failure::to_json).collect(),
+            message: Some(said),
         };
     }
     let judged = judge(walk, &walked, &outer);
     let mut fails: Vec<&Failure> = walked.failures.iter().collect();
     fails.extend(judged.iter().filter_map(|j| j.failure.as_ref()));
     let cause = cause_of(walk, &walked, &judged, &fails);
+    let mut sorted_msgs: Vec<String> = Vec::new();
     let failed_items = if cause == Cause::Satisfied {
         Vec::new()
     } else {
         let mut sorted = fails.clone();
         sorted.sort_by(|a, b| a.order.cmp(&b.order));
+        sorted_msgs = sorted.iter().map(|f| f.msg.clone()).collect();
         sorted.iter().map(|f| f.to_json()).collect()
     };
     let tag = path::part_tag(&walk.path, &outer).map(|(name, id)| super::Part { name, id });
@@ -777,10 +852,34 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     inputs.sort_by(|a, b| a.name.cmp(&b.name));
     inputs.dedup();
     with_fields(&mut inputs, &walked.name, &walk.path, ctx);
+    let said = if cause == Cause::Satisfied {
+        None
+    } else if sorted_msgs.is_empty() {
+        Some(first_list(&walk.path, &outer))
+    } else {
+        Some(message::joined(sorted_msgs))
+    };
     Run {
         verdict: Verdict { cause, inputs },
         failed_items,
+        message: said,
     }
+}
+
+fn first_list(path: &Path, ctx: &Ctx) -> String {
+    for at in 1..=path.steps.len() {
+        let prefix = Path {
+            start: path.start.clone(),
+            steps: path.steps[..at].to_vec(),
+        };
+        let read = path::read(&prefix, ctx);
+        if let Some(value) = read.value
+            && value.is_array()
+        {
+            return message::is(&name::name(&prefix), value);
+        }
+    }
+    "the check is false".to_string()
 }
 
 pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
@@ -792,12 +891,14 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
                 inputs: Vec::new(),
             },
             failed_items: Vec::new(),
+            message: Some(message::isnt("it", ctx.subject.value, "an object")),
         };
     }
     let mut row = read_row(walk, ctx);
     if flawed {
         row.verdict.cause = Cause::Unusable;
         row.failed_items = Vec::new();
+        row.message = None;
     }
     row
 }

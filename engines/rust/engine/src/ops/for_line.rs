@@ -70,6 +70,7 @@ impl For {
 pub struct Run {
     pub verdict: Verdict,
     pub failed_items: Vec<Value>,
+    pub message: Option<String>,
 }
 
 fn all_paths(check: &Check) -> Vec<&Path> {
@@ -1134,6 +1135,7 @@ impl For {
                     inputs: Vec::new(),
                 },
                 failed_items: Vec::new(),
+                message: None,
             };
         }
         let mut collect = Collect {
@@ -1201,6 +1203,7 @@ impl For {
         Run {
             verdict: Verdict { cause, inputs },
             failed_items: failed,
+            message: None,
         }
     }
 

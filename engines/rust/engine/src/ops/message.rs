@@ -201,9 +201,10 @@ fn key_states(check: &Check, ctx: &Ctx, want: Outcome) -> Vec<String> {
 }
 
 fn key_faults(check: &Check, ctx: &Ctx) -> Vec<String> {
-    let Some(path) = single_path(check) else {
-        return Vec::new();
-    };
+    single_path(check).map_or_else(Vec::new, |path| key_faults_of(path, ctx))
+}
+
+pub fn key_faults_of(path: &Path, ctx: &Ctx) -> Vec<String> {
     let mut out = Vec::new();
     for key in key_steps(path) {
         if let Some(input) = first_input(key, ctx)
@@ -220,9 +221,10 @@ fn key_faults(check: &Check, ctx: &Ctx) -> Vec<String> {
 }
 
 fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
-    let Some(path) = single_path(check) else {
-        return Vec::new();
-    };
+    single_path(check).map_or_else(Vec::new, |path| blocked_of(path, ctx))
+}
+
+pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
     let read = path::read(path, ctx);
     if read.outcome != Outcome::Unusable || read.step_unreadable {
         return Vec::new();
@@ -384,5 +386,38 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         "the check is false".to_string()
     } else {
         clauses.join(", and ")
+    }
+}
+
+pub fn stated(name: &str, cause: Cause, value: &Value, kind: &str) -> String {
+    match cause {
+        Cause::Absent => format!("{name} is missing"),
+        Cause::Null => format!("{name} is null"),
+        Cause::Unusable => isnt(name, value, kind),
+        _ => is(name, value),
+    }
+}
+
+pub fn prefixed(item: &str, said: &str) -> String {
+    match said.strip_prefix("it ") {
+        Some(rest) => format!("{item} {rest}"),
+        None => format!("{item}: {said}"),
+    }
+}
+
+pub fn joined(parts: Vec<String>) -> String {
+    let mut once: Vec<String> = Vec::new();
+    for part in parts {
+        if !once.contains(&part) {
+            once.push(part);
+        }
+    }
+    if once.len() <= 3 {
+        once.join("; ")
+    } else {
+        let more = once.len() - 3;
+        let mut shown: Vec<String> = once.into_iter().take(3).collect();
+        shown.push(format!("and {more} more"));
+        shown.join("; ")
     }
 }
