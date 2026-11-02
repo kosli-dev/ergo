@@ -979,10 +979,14 @@ impl For {
         for (idx, sentence) in self.sentences.iter().enumerate() {
             let verdict = run_check(&sentence.check, ctx);
             if !verdict.passed() {
-                let alias = self.items.last().map(|i| i.alias.as_str()).unwrap_or_default();
-                let own = verdict.inputs.iter().all(|i| {
-                    i.name == alias || i.name.starts_with(&format!("{alias}."))
-                });
+                let alias = self
+                    .items
+                    .last()
+                    .map(|i| i.alias.as_str())
+                    .unwrap_or_default();
+                let own = super::message::shown_names(&sentence.check, ctx, &verdict)
+                    .iter()
+                    .all(|name| name == alias || name.starts_with(&format!("{alias}.")));
                 sfails.push(Sfail {
                     own,
                     text: super::message::message(&sentence.check, ctx, &verdict),
@@ -1015,7 +1019,11 @@ impl For {
                     .collect::<Vec<_>>()
                     .join(", and ");
                 let said = if all_own { self.strip(&said) } else { said };
-                let alias = self.items.last().map(|i| i.alias.as_str()).unwrap_or_default();
+                let alias = self
+                    .items
+                    .last()
+                    .map(|i| i.alias.as_str())
+                    .unwrap_or_default();
                 let (said, bare) = match said.strip_prefix(&format!("{alias} ")) {
                     Some(rest) if all_own => (format!(" {rest}"), true),
                     _ => (said, false),

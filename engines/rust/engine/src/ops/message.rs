@@ -147,6 +147,13 @@ fn first_input(path: &Path, ctx: &Ctx) -> Option<Input> {
     read_path(path, ctx).inputs.into_iter().next()
 }
 
+pub fn shown_names(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
+    sources(check, ctx, verdict)
+        .into_iter()
+        .map(|i| i.name)
+        .collect()
+}
+
 fn sources(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Input> {
     match check {
         Check::Compare(compare) => [&compare.left, &compare.right]
