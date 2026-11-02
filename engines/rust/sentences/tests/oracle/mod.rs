@@ -1679,6 +1679,16 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "scans named by $params.ez named by each of $params.kz",
         "scans named by $params.ez named by each of $params.kz",
     ),
+    ("lists named by $input.kn", "lists named by $input.kn"),
+    ("lists named by $input.ko", "lists named by $input.ko"),
+    ("lists named by $input.ks", "lists named by $input.ks"),
+    ("lists named by $input.kx", "lists named by $input.kx"),
+    ("lists named by $input.kz", "lists named by $input.kz"),
+    ("lists[$input.kn]", "lists named by $input.kn"),
+    ("lists[$input.ko]", "lists named by $input.ko"),
+    ("lists[$input.ks]", "lists named by $input.ks"),
+    ("lists[$input.kx]", "lists named by $input.kx"),
+    ("lists[$input.kz]", "lists named by $input.kz"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

@@ -4659,6 +4659,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("v is 1", "v is 1", &[], &[]),
+    ("r.v is 1", "r.v is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -7948,6 +7949,36 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every n named by $params.k as x",
         "every n named by $params.k as x",
+        &[],
+        &[],
+    ),
+    (
+        "first of rows sorted by m named by $params.km as r",
+        "first of rows sorted by m named by $params.km as r",
+        &[],
+        &[],
+    ),
+    (
+        "first of rows sorted by m named by $params.kn as r",
+        "first of rows sorted by m named by $params.kn as r",
+        &[],
+        &[],
+    ),
+    (
+        "first of rows sorted by m named by $params.ko as r",
+        "first of rows sorted by m named by $params.ko as r",
+        &[],
+        &[],
+    ),
+    (
+        "first of rows sorted by m named by $params.ks as r",
+        "first of rows sorted by m named by $params.ks as r",
+        &[],
+        &[],
+    ),
+    (
+        "first of rows sorted by m named by $params.kz as r",
+        "first of rows sorted by m named by $params.kz as r",
         &[],
         &[],
     ),
