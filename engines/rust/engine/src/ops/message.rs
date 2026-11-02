@@ -439,10 +439,16 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         }
         _ => Vec::new(),
     };
-    if clauses.is_empty() {
+    let mut once: Vec<String> = Vec::new();
+    for clause in clauses {
+        if !once.contains(&clause) {
+            once.push(clause);
+        }
+    }
+    if once.is_empty() {
         "the check is false".to_string()
     } else {
-        clauses.join(", and ")
+        once.join(", and ")
     }
 }
 
@@ -528,12 +534,13 @@ fn tally_inputs(side: &TallySide, ctx: &Ctx, cause: Cause) -> Vec<Input> {
                     part: None,
                     state: Outcome::Found,
                 }],
-                (Cause::Value, Err(_)) => Vec::new(),
-                _ => plain
-                    .into_iter()
-                    .chain(counted)
-                    .filter_map(|p| first_input(p, ctx))
-                    .collect(),
+                (Cause::Value, Err(_)) | (_, _) => {
+                    let _ = counted;
+                    plain
+                        .into_iter()
+                        .filter_map(|p| first_input(p, ctx))
+                        .collect()
+                }
             }
         }
     }
