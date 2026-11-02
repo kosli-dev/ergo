@@ -156,7 +156,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: c.signed is false",
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -273,7 +273,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: c.signed is false; item 3 of commits: c.signed is 1, which isn't true or false",
+            "message": "item 1 of commits: signed is false; item 3 of commits: signed is 1, which isn't true or false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -351,7 +351,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: c.signed is missing",
+            "message": "item 2 of commits: signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -866,7 +866,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: c.signed is false",
+            "message": "item 1 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1058,7 +1058,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: c.signed is false; item 2 of commits: c.signed is false",
+            "message": "item 1 of commits: signed is false; item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1267,7 +1267,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: c.signed is false; item 2 of commits: c.signed is missing",
+            "message": "item 1 of commits: signed is false; item 2 of commits: signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1562,7 +1562,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: c.signed is false",
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1621,7 +1621,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: c.signed is false",
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1680,7 +1680,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: c.signed is false",
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2030,7 +2030,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: kind is missing; item 2 of commits: c.signed is false",
+            "message": "item 1 of commits: kind is missing; item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2102,7 +2102,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: kind is missing; item 2 of commits: c.signed is false",
+            "message": "item 1 of commits: kind is missing; item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2174,7 +2174,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: kind is missing; item 2 of commits: c.signed is false",
+            "message": "item 1 of commits: kind is missing; item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2731,7 +2731,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: author.signed is missing",
+            "message": "item 1 of commits: signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3484,7 +3484,7 @@
                 ]
               }
             ],
-            "message": "item 2 of pull_requests: item 1 of pr.approvers: approver.username is \"eve\", and pr.author is \"eve\"",
+            "message": "item 2 of pull_requests: item 1 of approvers: approver.username is \"eve\", and pr.author is \"eve\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3914,7 +3914,7 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: item 1 of pr.approvers: approver.username is missing",
+            "message": "item 1 of pull_requests: item 1 of approvers: approver.username is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4018,7 +4018,7 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: item 1 of pr.approvers is missing",
+            "message": "item 1 of pull_requests: item 1 of approvers is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4286,7 +4286,7 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: item 1 of pr.commits: commit.signed is false",
+            "message": "item 1 of pull_requests: item 1 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5546,7 +5546,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: c.signed is false",
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5928,7 +5928,7 @@
                 ]
               }
             ],
-            "message": "item 1 of groups: g.shas named by $params.k is missing",
+            "message": "item 1 of groups: shas named by $params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9440,7 +9440,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: c is null",
+            "message": "item 1 of commits is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11255,7 +11255,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: item 1 of z.subs: y is 1",
+            "message": "item 1 of items: item 1 of subs is 1",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11448,7 +11448,7 @@
                 ]
               }
             ],
-            "message": "item 1 of deep: item 2 of z.subs: item 1 of y.leaves is 9",
+            "message": "item 1 of deep: item 2 of subs: item 1 of leaves is 9",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -12350,7 +12350,7 @@
         "rules": ["for.failure_inputs", "location.read"],
         "input": {"items": [{"id": "t1", "m": [{"q": [{"z": 1}]}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "item 3 of x.q is 1", "cause": "absent", "inputs": [{"locations": ["/items/0/m/0/q"], "name": "item 3 of x.q", "value": null}]}], "item": "item 1 of m", "locations": ["/items/0/m/0"], "path": "item 1 of m", "value": {"q": [{"z": 1}]}}], "inputs": [{"locations": ["/items/0/m/0"], "name": "m[]", "value": [{"q": [{"z": 1}]}]}], "message": "item 1 of m: item 3 of x.q is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "item"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "item 3 of x.q is 1", "cause": "absent", "inputs": [{"locations": ["/items/0/m/0/q"], "name": "item 3 of x.q", "value": null}]}], "item": "item 1 of m", "locations": ["/items/0/m/0"], "path": "item 1 of m", "value": {"q": [{"z": 1}]}}], "inputs": [{"locations": ["/items/0/m/0"], "name": "m[]", "value": [{"q": [{"z": 1}]}]}], "message": "item 1 of m: item 3 of q is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "item"}}
         ]
       }
     ]
@@ -12780,7 +12780,7 @@
                 ]
               }
             ],
-            "message": "item 1 of keys: item 1 of $input.top: x is 11",
+            "message": "item 1 of keys: item 1 of $input.top is 11",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -12846,7 +12846,7 @@
                 ]
               }
             ],
-            "message": "item 1 of keys: item 1 of $params.l: x is 12",
+            "message": "item 1 of keys: item 1 of $params.l is 12",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13144,7 +13144,7 @@
                 ]
               }
             ],
-            "message": "item 1 of keys: item 2 of artifact.ap.w: x.ok is false",
+            "message": "item 1 of keys: item 2 of artifact.ap.w: ok is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13282,7 +13282,7 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/0"], "name": "in-scope thing count", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated thing ids", "value": []}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
-          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.signed is true", "cause": "value", "inputs": [{"locations": ["/things/0/commits/0/signed"], "name": "c.signed", "value": false}]}], "item": "item 1 of commits", "locations": ["/things/0/commits/0"], "path": "item 1 of commits", "value": {"signed": false}}], "inputs": [{"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}], "message": "item 1 of commits: c.signed is false", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.signed is true", "cause": "value", "inputs": [{"locations": ["/things/0/commits/0/signed"], "name": "c.signed", "value": false}]}], "item": "item 1 of commits", "locations": ["/things/0/commits/0"], "path": "item 1 of commits", "value": {"signed": false}}], "inputs": [{"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}], "message": "item 1 of commits: signed is false", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "satisfied", "check": "own", "failed_items": [], "inputs": [{"locations": ["/things/0/c/signed"], "name": ".c.signed", "value": true}, {"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "satisfied", "check": "own_list", "failed_items": [], "inputs": [{"locations": ["/things/0/c/xs/0"], "name": ".c.xs[]", "value": [1]}, {"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}, {"locations": ["/things/0/c/xs/0"], "name": "count of .c.xs", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "satisfied", "check": "plain", "failed_items": [], "inputs": [{"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}, {"locations": ["/things/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
@@ -13337,9 +13337,9 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 3}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "message": "item 1 of items: item 2 of .y.zs: z is 0; item 2 of items: item 2 of .y.zs: z is 0", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": ".cov.zs[]", "value": [0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "message": "item 1 of items: item 1 of .cov.zs: z is 0; item 2 of items: item 1 of .cov.zs: z is 0", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "some", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "message": "item 1 of items: item 1 of .y.zs: z is 5; item 1 of items: item 2 of .y.zs: z is 0; item 2 of items: item 1 of .y.zs: z is 5; and 1 more", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "message": "item 1 of items: item 2 of .y.zs is 0; item 2 of items: item 2 of .y.zs is 0", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": ".cov.zs[]", "value": [0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "message": "item 1 of items: item 1 of .cov.zs is 0; item 2 of items: item 1 of .cov.zs is 0", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "some", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "message": "item 1 of items: item 1 of .y.zs is 5; item 1 of items: item 2 of .y.zs is 0; item 2 of items: item 1 of .y.zs is 5; and 1 more", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
@@ -13398,14 +13398,14 @@
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r09", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r10", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r11", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 2 of .y.zs: z is 0; item 2 of items: item 2 of .y.zs: z is 0", "passed": false, "requirement": "r00", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 2", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/zs/0"], "name": "z", "value": 1}], "item": "item 1 of y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/items/0/zs/0", "/rounds/0/items/1/zs/0"], "name": "y.zs[]", "value": [1, 2]}], "message": "item 1 of items: item 1 of y.zs: z is 1", "passed": false, "requirement": "r01", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": ".cov.zs[]", "value": [0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 1 of .cov.zs: z is 0; item 2 of items: item 1 of .cov.zs: z is 0", "passed": false, "requirement": "r02", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "z", "value": 7}], "item": "item 1 of cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "z", "value": 7}], "item": "item 1 of cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "cov.zs[]", "part": {"id": null, "name": "cov"}, "value": [7]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 1 of cov.zs: z is 7; item 2 of items: item 1 of cov.zs: z is 7", "passed": false, "requirement": "r03", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z.y is 0", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/rs/0/y"], "name": "z.y", "value": 3}], "item": "item 1 of rs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z.y is 0", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/rs/0/y"], "name": "z.y", "value": 3}], "item": "item 1 of rs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/rs/0"], "name": "rs[]", "value": [{"cov": 1, "y": 3}]}], "message": "item 1 of items: item 1 of rs: z.y is 3; item 2 of items: item 1 of rs: z.y is 3", "passed": false, "requirement": "r04", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "i.n is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/n"], "name": "i.n", "value": 1}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: i.n is 1", "passed": false, "requirement": "r09", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 2 of .y.zs is 0; item 2 of items: item 2 of .y.zs is 0", "passed": false, "requirement": "r00", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 2", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/zs/0"], "name": "z", "value": 1}], "item": "item 1 of y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/items/0/zs/0", "/rounds/0/items/1/zs/0"], "name": "y.zs[]", "value": [1, 2]}], "message": "item 1 of items: item 1 of zs is 1", "passed": false, "requirement": "r01", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": ".cov.zs[]", "value": [0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 1 of .cov.zs is 0; item 2 of items: item 1 of .cov.zs is 0", "passed": false, "requirement": "r02", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "z", "value": 7}], "item": "item 1 of cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "z", "value": 7}], "item": "item 1 of cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "cov.zs[]", "part": {"id": null, "name": "cov"}, "value": [7]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 1 of cov.zs is 7; item 2 of items: item 1 of cov.zs is 7", "passed": false, "requirement": "r03", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z.y is 0", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/rs/0/y"], "name": "z.y", "value": 3}], "item": "item 1 of rs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z.y is 0", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/rs/0/y"], "name": "z.y", "value": 3}], "item": "item 1 of rs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/rs/0"], "name": "rs[]", "value": [{"cov": 1, "y": 3}]}], "message": "item 1 of items: item 1 of rs: y is 3; item 2 of items: item 1 of rs: y is 3", "passed": false, "requirement": "r04", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "i.n is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/n"], "name": "i.n", "value": 1}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: n is 1", "passed": false, "requirement": "r09", "subject": {"id": "r1", "type": "round"}},
           {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/rounds/0/cov/k"], "name": ".cov.k", "value": 1}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "passed": true, "requirement": "r10", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}]}], "item": "item 2 of y.zs", "locations": ["/rounds/0/y/zs/1"], "path": "item 2 of y.zs", "value": 0}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": "y.zs[]", "value": [5, 0]}], "message": "item 2 of y.zs: z is 0", "passed": false, "requirement": "r11", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}]}], "item": "item 2 of y.zs", "locations": ["/rounds/0/y/zs/1"], "path": "item 2 of y.zs", "value": 0}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": "y.zs[]", "value": [5, 0]}], "message": "item 2 of y.zs is 0", "passed": false, "requirement": "r11", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
@@ -13442,9 +13442,9 @@
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r07", "subject": {"id": null, "type": "round"}},
           {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is at least 2", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of .cov.xs: p is 1", "passed": false, "requirement": "r00", "subject": {"id": "r1", "type": "round"}},
           {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is at least 2", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/d/b/xs/0"], "name": "cov.xs[]", "part": {"id": null, "name": "cov"}, "value": [1]}], "message": "item 1 of .cov.xs: p is 1", "passed": false, "requirement": "r01", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "q.n is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/n"], "name": "q.n", "value": 1}], "item": "item 1 of items"}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "failed_assertions": [], "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of .cov.xs: item 1 of items: q.n is 1; item 2 of .cov.xs is 2", "passed": false, "requirement": "r02", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "failed_assertions": [{"assertion": "p is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/1"], "name": "p", "value": 2}]}], "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "message": "item 1 of .cov.xs: p is 1; item 2 of .cov.xs: p is 2", "passed": false, "requirement": "r03", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 1 of .y.zs: z is 5; item 1 of items: item 2 of .y.zs: z is 0; item 2 of items: item 1 of .y.zs: z is 5; and 1 more", "passed": false, "requirement": "r05", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "q.n is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/n"], "name": "q.n", "value": 1}], "item": "item 1 of items"}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "failed_assertions": [], "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of .cov.xs: item 1 of items: n is 1; item 2 of .cov.xs is 2", "passed": false, "requirement": "r02", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "failed_assertions": [{"assertion": "p is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/1"], "name": "p", "value": 2}]}], "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "message": "item 1 of .cov.xs is 1; item 2 of .cov.xs is 2", "passed": false, "requirement": "r03", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 1 of .y.zs is 5; item 1 of items: item 2 of .y.zs is 0; item 2 of items: item 1 of .y.zs is 5; and 1 more", "passed": false, "requirement": "r05", "subject": {"id": "r1", "type": "round"}},
           {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": ".y.k is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/k"], "name": ".y.k", "value": 1}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": ".y.k is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/k"], "name": ".y.k", "value": 1}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/k"], "name": ".y.k", "value": 1}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/items/0/zs/0", "/rounds/0/items/1/zs/0"], "name": "y.zs[]", "value": [1, 2]}], "message": "item 1 of items: .y.k is 1; item 2 of items: .y.k is 1", "passed": false, "requirement": "r07", "subject": {"id": "r1", "type": "round"}}
         ]
       }
@@ -13459,7 +13459,7 @@
         "rules": ["for.failure_inputs"],
         "input": {"things": [{"id": "t1", "m": 3, "rows": [{"n": 1}], "xs": [{"v": 5, "tags": ["t"], "nums": ["u"]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "aliases", "message": "item 1 of xs: item 1 of x.tags is \"t\", and x.nums is [\"u\"]", "passed": false, "cause": "value", "inputs": [{"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.nums", "value": ["u"], "locations": ["/things/0/xs/0/nums"]}, {"name": "x.tags[]", "value": ["t"], "locations": ["/things/0/xs/0/tags/0"]}], "assertion": "some x.tags is in x.nums"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "aliases", "message": "item 1 of xs: item 1 of tags is \"t\", and nums is [\"u\"]", "passed": false, "cause": "value", "inputs": [{"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.nums", "value": ["u"], "locations": ["/things/0/xs/0/nums"]}, {"name": "x.tags[]", "value": ["t"], "locations": ["/things/0/xs/0/tags/0"]}], "assertion": "some x.tags is in x.nums"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "compare", "message": "item 1 of xs: x.v is 5, and m is 3", "passed": false, "cause": "value", "inputs": [{"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "x.v is at most m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "count", "message": "item 1 of xs: count of rows is 1, and m is 3", "passed": false, "cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "count of rows is at least m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "walk", "message": "item 1 of xs: item 1 of rows: n is 1, and x.v is 5", "passed": false, "cause": "value", "inputs": [{"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}], "assertion": "some rows.n is at least x.v"}], "item": "item 1 of xs", "path": "item 1 of xs"}]}
@@ -15116,7 +15116,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 of x.ys: y.w is 1, which isn't a list or an object",
+            "message": "item 1 of xs: item 1 of ys: w is 1, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15602,7 +15602,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 of ys: q.n is 2",
+            "message": "item 1 of xs: item 1 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15818,7 +15818,7 @@
                 ]
               }
             ],
-            "message": "item 2 of xs: item 1 of ys: q.n is 5",
+            "message": "item 2 of xs: item 1 of ys: n is 5",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16025,7 +16025,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 2 of ys: q.n is 2",
+            "message": "item 1 of xs: item 2 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16253,7 +16253,7 @@
                 ]
               }
             ],
-            "message": "item 2 of xs: item 2 of ys: q.n is 2",
+            "message": "item 2 of xs: item 2 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16452,7 +16452,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 2 of ys: q.n is 2",
+            "message": "item 1 of xs: item 2 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16668,7 +16668,7 @@
                 ]
               }
             ],
-            "message": "item 2 of xs: item 3 of ys: q.n is 3",
+            "message": "item 2 of xs: item 3 of ys: n is 3",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16921,7 +16921,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 of ys: q.n is 2",
+            "message": "item 1 of xs: item 1 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
