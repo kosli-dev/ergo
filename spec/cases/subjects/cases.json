@@ -25228,5 +25228,367 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line whose key from $input isn't a string",
+    "policy": {
+      "ergo_spec": "v0.4-dev",
+      "requirements": {
+        "brackets, missing key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, missing key"
+        },
+        "brackets, null key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, null key"
+        },
+        "brackets, number key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, number key"
+        },
+        "brackets, object key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, object key"
+        },
+        "brackets, string key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, string key"
+        },
+        "named by, missing key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, missing key"
+        },
+        "named by, null key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, null key"
+        },
+        "named by, number key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, number key"
+        },
+        "named by, object key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, object key"
+        },
+        "named by, string key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, string key"
+        }
+      },
+      "subjects": {
+        "brackets, missing key": {
+          "from": "lists[$input.kx]",
+          "identified_by": "id"
+        },
+        "brackets, null key": {
+          "from": "lists[$input.kz]",
+          "identified_by": "id"
+        },
+        "brackets, number key": {
+          "from": "lists[$input.kn]",
+          "identified_by": "id"
+        },
+        "brackets, object key": {
+          "from": "lists[$input.ko]",
+          "identified_by": "id"
+        },
+        "brackets, string key": {
+          "from": "lists[$input.ks]",
+          "identified_by": "id"
+        },
+        "named by, missing key": {
+          "from": "lists named by $input.kx",
+          "identified_by": "id"
+        },
+        "named by, null key": {
+          "from": "lists named by $input.kz",
+          "identified_by": "id"
+        },
+        "named by, number key": {
+          "from": "lists named by $input.kn",
+          "identified_by": "id"
+        },
+        "named by, object key": {
+          "from": "lists named by $input.ko",
+          "identified_by": "id"
+        },
+        "named by, string key": {
+          "from": "lists named by $input.ks",
+          "identified_by": "id"
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "gives no subjects and fails min_subjects as unusable for a number or an object, as null for null and as absent for a key the input doesn't have, after named by and in brackets, and a string key reads that list",
+        "rules": [
+          "subjects.from",
+          "path.ref_step",
+          "sentence.path.brackets"
+        ],
+        "input": {
+          "lists": {
+            "q": [
+              {
+                "id": "z"
+              }
+            ]
+          },
+          "kn": 1,
+          "ko": {
+            "a": 1
+          },
+          "kz": null,
+          "ks": "q"
+        },
+        "status": {
+          "brackets, missing key": "not_met",
+          "brackets, null key": "not_met",
+          "brackets, number key": "not_met",
+          "brackets, object key": "not_met",
+          "brackets, string key": "met",
+          "named by, missing key": "not_met",
+          "named by, null key": "not_met",
+          "named by, number key": "not_met",
+          "named by, object key": "not_met",
+          "named by, string key": "met"
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope brackets, missing key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "brackets, missing key",
+            "subject": {
+              "id": null,
+              "type": "brackets, missing key"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope brackets, null key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "brackets, null key",
+            "subject": {
+              "id": null,
+              "type": "brackets, null key"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope brackets, number key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "brackets, number key",
+            "subject": {
+              "id": null,
+              "type": "brackets, number key"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope brackets, object key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "brackets, object key",
+            "subject": {
+              "id": null,
+              "type": "brackets, object key"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/lists/q/0"
+                ],
+                "name": "in-scope brackets, string key count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "brackets, string key",
+            "subject": {
+              "id": null,
+              "type": "brackets, string key"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope named by, missing key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "named by, missing key",
+            "subject": {
+              "id": null,
+              "type": "named by, missing key"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope named by, null key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "named by, null key",
+            "subject": {
+              "id": null,
+              "type": "named by, null key"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope named by, number key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "named by, number key",
+            "subject": {
+              "id": null,
+              "type": "named by, number key"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope named by, object key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "named by, object key",
+            "subject": {
+              "id": null,
+              "type": "named by, object key"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/lists/q/0"
+                ],
+                "name": "in-scope named by, string key count",
+                "value": 1
+              }
+            ],
+            "passed": true,
+            "requirement": "named by, string key",
+            "subject": {
+              "id": null,
+              "type": "named by, string key"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/lists/q/0/id"
+                ],
+                "name": "id",
+                "value": "z"
+              }
+            ],
+            "passed": true,
+            "requirement": "brackets, string key",
+            "subject": {
+              "id": "z",
+              "type": "brackets, string key"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/lists/q/0/id"
+                ],
+                "name": "id",
+                "value": "z"
+              }
+            ],
+            "passed": true,
+            "requirement": "named by, string key",
+            "subject": {
+              "id": "z",
+              "type": "named by, string key"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
