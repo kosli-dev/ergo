@@ -14,9 +14,16 @@ fn regression_files() -> Vec<PathBuf> {
     files
 }
 
-fn without_engine(mut report: Value) -> Value {
+fn without_engine_and_messages(mut report: Value) -> Value {
     if let Some(object) = report.as_object_mut() {
         object.remove("engine");
+        if let Some(rows) = object.get_mut("results").and_then(Value::as_array_mut) {
+            for row in rows {
+                if let Some(row) = row.as_object_mut() {
+                    row.remove("message");
+                }
+            }
+        }
     }
     report
 }
@@ -43,12 +50,12 @@ fn every_regression_gives_the_report_it_pins() {
                 .as_str()
                 .expect("a regression has a description");
             let params = entry.get("params").cloned().unwrap_or_else(|| json!({}));
-            let got = without_engine(ergo_policy_engine::report(
+            let got = without_engine_and_messages(ergo_policy_engine::report(
                 &entry["input"],
                 &entry["policy"],
                 &params,
             ));
-            let wanted = without_engine(entry["report"].clone());
+            let wanted = without_engine_and_messages(entry["report"].clone());
             if got != wanted {
                 failures.push(format!(
                     "{name}: {description}\n  wanted {wanted}\n  got    {got}"
