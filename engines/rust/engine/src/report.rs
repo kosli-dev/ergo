@@ -834,7 +834,7 @@ pub fn violations(report: &Value) -> Value {
             "cause".to_string(),
             row.get("cause").cloned().unwrap_or(Value::Null),
         );
-        for key in ["failed_items", "failed_assertions"] {
+        for key in ["message", "failed_items", "failed_assertions"] {
             if let Some(value) = row.get(key) {
                 violation.insert(key.to_string(), value.clone());
             }
