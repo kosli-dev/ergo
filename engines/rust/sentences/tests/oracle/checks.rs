@@ -4660,6 +4660,28 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("v is 1", "v is 1", &[], &[]),
     ("r.v is 1", "r.v is 1", &[], &[]),
+    (
+        "approver is not author",
+        "approver does not equal author",
+        &[],
+        &[],
+    ),
+    ("commit.ok is true", "commit.ok is true", &[], &[]),
+    ("count of tests is 2", "count of tests is 2", &[], &[]),
+    ("every tests.ok is true", "every tests.ok is true", &[], &[]),
+    ("review.ok is true", "review.ok is true", &[], &[]),
+    (
+        "spec is \"v\" followed by version",
+        "spec is \"v\" followed by version",
+        &[],
+        &[],
+    ),
+    (
+        "sum of items.n plus extra is 10",
+        "sum of items.n plus extra is 10",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -7979,6 +8001,24 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "first of rows sorted by m named by $params.kz as r",
         "first of rows sorted by m named by $params.kz as r",
+        &[],
+        &[],
+    ),
+    (
+        "every commits as commit, every commit.reviews as review",
+        "every commits as commit, every commit.reviews as review",
+        &[],
+        &[],
+    ),
+    (
+        "first of commits whose signed is true as commit",
+        "first of commits whose signed is true as commit",
+        &[],
+        &[],
+    ),
+    (
+        "last of commits sorted by ts as commit",
+        "last of commits sorted by ts as commit",
         &[],
         &[],
     ),
