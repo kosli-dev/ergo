@@ -1242,7 +1242,17 @@ impl For {
         } else {
             self.failed_items(level)
         };
-        let message = (!said.is_empty()).then(|| super::message::joined(said));
+        let message = if flawed {
+            let checks: Vec<&Check> = self
+                .items
+                .iter()
+                .flat_map(|item| item.whose.iter())
+                .chain(self.sentences.iter().map(|s| &s.check))
+                .collect();
+            super::message::flawed_text(&checks, &outer)
+        } else {
+            (!said.is_empty()).then(|| super::message::joined(said))
+        };
         Run {
             verdict: Verdict { cause, inputs },
             failed_items: failed,

@@ -669,3 +669,15 @@ fn time_faults(check: &super::time::CompareTime, ctx: &Ctx) -> Vec<String> {
     }
     out
 }
+
+pub fn flawed_text(checks: &[&Check], ctx: &Ctx) -> Option<String> {
+    let mut out: Vec<String> = Vec::new();
+    for check in checks {
+        for fault in lists::ref_faults(check, ctx) {
+            if !out.contains(&fault) {
+                out.push(fault);
+            }
+        }
+    }
+    (!out.is_empty()).then(|| out.join(", and "))
+}

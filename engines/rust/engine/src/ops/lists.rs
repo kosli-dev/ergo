@@ -540,6 +540,40 @@ pub fn right_inputs(check: &super::Check, ctx: &Ctx) -> Vec<Input> {
     }
 }
 
+pub fn ref_faults(check: &super::Check, ctx: &Ctx) -> Vec<String> {
+    match check {
+        super::Check::In(c) => ref_fault(
+            &c.values,
+            ctx,
+            |v| usable_values(v, false),
+            |v| match v {
+                Value::Array(_) => "a list of one kind of value".to_string(),
+                _ => "a list".to_string(),
+            },
+        ),
+        super::Check::Contains(c) => match &c.wanted {
+            Wanted::All(right) | Wanted::Some(right) => ref_fault(
+                right,
+                ctx,
+                |v| usable_values(v, true),
+                |v| match v {
+                    Value::Array(items) if items.is_empty() => {
+                        "a list with at least one value".to_string()
+                    }
+                    Value::Array(_) => "a list of one kind of value".to_string(),
+                    _ => "a list".to_string(),
+                },
+            ),
+            Wanted::One(_) => Vec::new(),
+        },
+        super::Check::Matches(c) => ref_fault(&c.patterns, ctx, usable_patterns, |v| match v {
+            Value::Array(_) => "a list of patterns".to_string(),
+            _ => "a list".to_string(),
+        }),
+        _ => Vec::new(),
+    }
+}
+
 fn kind_word(value: &Value) -> &'static str {
     super::message::kind(value)
 }

@@ -903,7 +903,9 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
     if flawed {
         row.verdict.cause = Cause::Unusable;
         row.failed_items = Vec::new();
-        row.message = None;
+        let outer_ctx = outer(ctx);
+        let checks: Vec<&Check> = walk.whose.iter().chain(std::iter::once(&*walk.check)).collect();
+        row.message = message::flawed_text(&checks, &outer_ctx);
     }
     row
 }
