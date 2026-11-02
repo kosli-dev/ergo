@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: release
+  group: release-${{ inputs.tag || github.ref_name }}
   cancel-in-progress: false
 
 env:
@@ -426,6 +426,7 @@ jobs:
     needs: [check-rust, build-rust, publish-rust]
     runs-on: ubuntu-latest
     permissions:
+      actions: write
       contents: write
     env:
       GH_TOKEN: ${{ github.token }}
@@ -458,6 +459,8 @@ jobs:
             --notes-file "$RUNNER_TEMP/notes.md" \
             --latest=false \
             --verify-tag
+      - name: Start the site deploy, so the CLI page and the playground follow this release
+        run: gh workflow run pages.yml --ref main
 
   bump-rust:
     needs: release-rust
