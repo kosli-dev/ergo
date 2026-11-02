@@ -8964,7 +8964,7 @@ _for_unsortable(item, w, names) := array.concat(unread, mixed) if {
 
 _for_sort_state(item, e, names) := s if {
 	is_object(e.iv)
-	s := _read_state(e.iv, item.pick.by) with input as {"ergo/names": names}
+	s := _walk_read_state(e.iv, item.pick.by) with input as {"ergo/names": names}
 	s != "value"
 } else := "unusable" if is_object(e.iv)
 
