@@ -10233,9 +10233,17 @@ _walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
 	_m_key_faults(subj, check) == []
 }
 
-_walk_parts(check, _, raw, r) := [_m_fallback(check)] if {
+_walk_parts(check, subj, raw, r) := fs if {
 	r.failed == []
 	not raw.cause in {"absent", "null", "not_an_object", "unusable"}
+	fs := _m_list_found(subj, check.path)
+	fs != []
+}
+
+_walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
+	r.failed == []
+	not raw.cause in {"absent", "null", "not_an_object", "unusable"}
+	_m_list_found(subj, check.path) == []
 }
 
 _m_named_fail(f) := _m_is(f.path, f.value) if f.cause == "value"
@@ -10474,10 +10482,34 @@ _for_message(_, subj, r) := _message(null, subj, "not_an_object") if {
 	r.failed == []
 }
 
-_for_message(check, _, r) := _m_fallback(check) if {
+_for_message(check, subj, r) := _m_joined(_m_for_empty(check, subj, r.cause)) if {
 	r.cause != "not_an_object"
 	r.failed == []
 }
+
+_m_for_empty(check, subj, cause) := cs if {
+	cause in {"absent", "null"}
+	cs := _once([c | some item in check.items; some c in _m_key_states(subj, _m_for_item(item), cause)])
+	cs != []
+} else := cs if {
+	cause in {"absent", "null"}
+	cs := _once([concat("", [s.name, " is ", _m_state_word(cause)]) | some item in check.items; some s in _m_sources(subj, _m_for_item(item)); s.state == cause])
+	cs != []
+} else := cs if {
+	cause == "unusable"
+	cs := _once([c | some item in check.items; some c in array.concat(_m_key_faults(subj, _m_for_item(item)), _m_ref_list_fault(subj, _m_for_item(item)))])
+	cs != []
+} else := cs if {
+	cs := _once([c | some item in check.items; some c in _m_list_found(subj, item.path)])
+	cs != []
+} else := [_m_fallback(check)]
+
+_m_for_item(item) := {"op": "present", "path": item.path, "whose": object.get(item, "whose", [])}
+
+_m_list_found(subj, path) := [_m_is(_input_name(p), _value_at(subj, p))] if {
+	i := min({j | some j in numbers.range(1, count(path)); is_array(_value_at(subj, array.slice(path, 0, j)))})
+	p := array.slice(path, 0, i)
+} else := []
 
 _for_message(_, _, r) := _m_joined(array.concat(
 	[p | some f in r.failed; f.cause != "ambiguous"; some p in _m_for_fail(f)],
