@@ -83,6 +83,7 @@
       {
         "description": "fails as value when an item fails, and lists the item with the sentence that failed",
         "rules": [
+          "message.alias",
           "for.walk",
           "for.try",
           "for.pass",
@@ -2832,6 +2833,7 @@
       {
         "description": "fails when an item has the owner as author",
         "rules": [
+          "message.alias",
           "sentence.for.scope",
           "for.failed_items",
           "for.inputs",
@@ -5666,6 +5668,7 @@
       {
         "description": "fails an item whose field isn't in the list",
         "rules": [
+          "message.alias",
           "for.walk",
           "for.try",
           "for.pass",
@@ -9383,6 +9386,7 @@
       {
         "description": "fails as null, as a walk from a field holding null does",
         "rules": [
+          "message.alias",
           "walk.lists",
           "for.walk",
           "for.failed_items"

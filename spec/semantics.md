@@ -94,7 +94,9 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[message.followed_by]** A side written with `followed by` is printed as the text it joins to: `spec is "v0.4", and "v" followed by version is "v0.4.1"`.
 
-**[message.items]** An `every` or `some`, and a `for` line, lists only the items that failed, each as `item N of <list>: ` and what was found there, counted from 1, and joined with `; `: `item 2 of tests: ok is false; item 3 of tests: ok is missing`. An item of a list in a list names both: `item 1 of commits: item 2 of commit.reviews: review.ok is false`. After three items, the message ends with `; and N more`. `failed_items` keeps its paths as they were.
+**[message.items]** An `every` or `some`, and a `for` line, lists only the items that failed, each as `item N of <list>: ` and what was found there, counted from 1, and joined with `; `: `item 2 of tests: ok is false; item 3 of tests: ok is missing`. An item of a list in a list names both, and names the inner list without the outer item's alias: `item 1 of commits: item 2 of reviews: ok is false`. After three items, the message ends with `; and N more`. `failed_items` keeps its paths as they were.
+
+**[message.alias]** In a `for` line, an item's names drop its alias when every name its sentences read belongs to that item, the last one the line picks: `item 2 of commits: signed is false`. The alias on its own becomes the item, when it's the only thing a sentence read: `item 1 of commits is null`. When a sentence of that item also reads anything else, like a subject's field, a param, `$input`, a name in `named by`, a worked-out value or another item, every name of that item stays as the policy wrote it: `item 2 of commits: c.author is "ann", and owner is "ann"`.
 
 **[message.join]** A check with several sentences gives each failed sentence's message, joined with `; `, in the order of its sentences: `x is 2; y is missing`. In an `any_of`, each option's message starts with the option's name: `one: x is 2; two: y is missing`.
 
