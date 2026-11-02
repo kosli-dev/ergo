@@ -188,8 +188,31 @@ fn key_steps(path: &Path) -> impl Iterator<Item = &Path> {
     })
 }
 
+fn side_paths(check: &Check) -> Vec<&Path> {
+    match check {
+        Check::Compare(c) => c.left.paths().into_iter().chain(c.right.paths()).collect(),
+        Check::CompareTime(c) => c.left.paths().into_iter().chain(c.right.paths()).collect(),
+        _ => single_path(check).into_iter().collect(),
+    }
+}
+
+fn once_of(all: Vec<String>) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for text in all {
+        if !out.contains(&text) {
+            out.push(text);
+        }
+    }
+    out
+}
+
 fn key_states(check: &Check, ctx: &Ctx, want: Outcome) -> Vec<String> {
-    single_path(check).map_or_else(Vec::new, |path| key_states_of(path, ctx, want))
+    once_of(
+        side_paths(check)
+            .into_iter()
+            .flat_map(|path| key_states_of(path, ctx, want))
+            .collect(),
+    )
 }
 
 pub fn resolved_name(path: &Path, ctx: &Ctx) -> String {
@@ -224,7 +247,12 @@ pub fn key_states_of(path: &Path, ctx: &Ctx, want: Outcome) -> Vec<String> {
 }
 
 fn key_faults(check: &Check, ctx: &Ctx) -> Vec<String> {
-    single_path(check).map_or_else(Vec::new, |path| key_faults_of(path, ctx))
+    once_of(
+        side_paths(check)
+            .into_iter()
+            .flat_map(|path| key_faults_of(path, ctx))
+            .collect(),
+    )
 }
 
 pub fn key_faults_of(path: &Path, ctx: &Ctx) -> Vec<String> {

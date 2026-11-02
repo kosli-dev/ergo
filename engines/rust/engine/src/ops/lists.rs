@@ -508,11 +508,9 @@ fn right_text(right: &Right) -> String {
 fn right_shown(right: &Right, ctx: &Ctx) -> Vec<Input> {
     match right {
         Right::Written(_) => Vec::new(),
-        Right::Ref(path) | Right::Field(path) => read_path(path, ctx)
-            .inputs
-            .into_iter()
-            .take(1)
-            .collect(),
+        Right::Ref(path) | Right::Field(path) => {
+            read_path(path, ctx).inputs.into_iter().take(1).collect()
+        }
         Right::Join(pieces) => {
             let read = read_right(right, ctx);
             match (read.outcome, read.value) {
