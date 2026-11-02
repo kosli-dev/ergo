@@ -182,9 +182,18 @@ fn each_of_entries<'a>(
             }
         })
         .collect();
+    let shown_name = crate::name::name(path);
+    let shown_name = shown_name
+        .strip_prefix("$input.")
+        .map_or(shown_name.clone(), str::to_string);
     let broken = unread
         .map(|cause| Broken {
-            msg: String::new(),
+            msg: ops::message::stated(
+                &shown_name,
+                cause,
+                object.value.unwrap_or(&Value::Null),
+                "a list or an object",
+            ),
             order: Vec::new(),
             path: String::new(),
             cause,
@@ -197,8 +206,12 @@ fn each_of_entries<'a>(
 }
 
 fn broken_from(failure: &walk::Failure) -> Broken {
+    let msg = match failure.msg.strip_suffix("which isn't a list") {
+        Some(head) => format!("{head}which isn't a list or an object"),
+        None => failure.msg.clone(),
+    };
     Broken {
-        msg: failure.msg.clone(),
+        msg,
         order: failure.order.clone(),
         path: failure.path.clone(),
         cause: failure.cause,
@@ -375,8 +388,22 @@ fn from_message(
     anc: &[Anc],
     cause: Cause,
 ) -> Option<String> {
-    let (Source::Root { path, .. } | Source::Child { path, .. }) = &lowered.source;
+    let (Source::Root { path, each_of, .. } | Source::Child { path, each_of }) = &lowered.source;
     let ctx = context(env, input_root(env), anc);
+    if let Some(keys) = each_of {
+        let read = path::read(keys, &ctx);
+        let named = crate::name::name(keys);
+        match (read.outcome, read.value) {
+            (Outcome::Absent, _) => return Some(format!("{named} is missing")),
+            (Outcome::Null, _) => return Some(format!("{named} is null")),
+            (Outcome::Found, Some(value))
+                if !matches!(value, Value::Array(items) if items.iter().all(Value::is_string)) =>
+            {
+                return Some(ops::message::isnt(&named, value, "a list of text"));
+            }
+            _ => {}
+        }
+    }
     let mut name = crate::name::name(path);
     if let Some(bare) = name.strip_prefix("$input.") {
         name = bare.to_string();
@@ -766,6 +793,16 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     let every = matches!(&lowered.source, Source::Root { every: true, .. });
     let read = Cause::worst(broken.iter().map(|b| b.cause));
     let mut min = min_row(env, in_scope.len() as u64, &locations, read);
+    if !every && env.unreadable.is_empty() && min.cause != Cause::Satisfied {
+        let said: Vec<String> = broken
+            .iter()
+            .filter(|b| !b.msg.is_empty())
+            .map(|b| b.msg.clone())
+            .collect();
+        if !said.is_empty() {
+            min.message = Some(ops::message::joined(said));
+        }
+    }
     if every {
         let listed = if env.unreadable.is_empty() {
             broken.iter().map(Broken::to_json).collect()
