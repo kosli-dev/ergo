@@ -2,7 +2,7 @@ use crate::value::{Decimal, fits_a_float};
 use serde_json::{Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
-pub const SPEC: &str = "v0.4-dev";
+pub const SPEC: &str = "v0.4";
 
 pub use crate::names::written_name_problems;
 
@@ -770,7 +770,7 @@ mod tests {
 
     fn one(requirement: Value) -> Value {
         json!({
-            "ergo_spec": "v0.4-dev",
+            "ergo_spec": "v0.4",
             "subjects": {"thing": {"from": "things"}},
             "requirements": {"s": requirement}
         })
@@ -796,7 +796,7 @@ mod tests {
 
     #[test]
     fn requirements_that_are_not_an_object_leave_no_requirement() {
-        let policy = read(json!({"ergo_spec": "v0.4-dev", "requirements": [1]}));
+        let policy = read(json!({"ergo_spec": "v0.4", "requirements": [1]}));
         assert!(policy.requirements.is_empty());
     }
 
@@ -849,21 +849,21 @@ mod tests {
         assert_eq!(spec_problems(json!("")), ["not a version "]);
         assert_eq!(
             spec_problems(json!("v0.1")),
-            ["unsupported version v0.1, expected v0.4-dev"]
+            ["unsupported version v0.1, expected v0.4"]
         );
         assert_eq!(
             spec_problems(json!("v0.2")),
-            ["unsupported version v0.2, expected v0.4-dev"]
+            ["unsupported version v0.2, expected v0.4"]
         );
         assert_eq!(
             spec_problems(json!("v0.3-dev")),
-            ["unsupported version v0.3-dev, expected v0.4-dev"]
+            ["unsupported version v0.3-dev, expected v0.4"]
         );
         assert_eq!(
             spec_problems(json!("v9.9")),
-            ["unsupported version v9.9, expected v0.4-dev"]
+            ["unsupported version v9.9, expected v0.4"]
         );
-        assert!(spec_problems(json!("v0.4-dev")).is_empty());
+        assert!(spec_problems(json!("v0.4")).is_empty());
     }
 
     #[test]
@@ -930,7 +930,7 @@ mod tests {
             ),
             [problem("subject", &["not in subjects"])]
         );
-        let policy = json!({"ergo_spec": "v0.4-dev", "requirements": {"s": valid()}});
+        let policy = json!({"ergo_spec": "v0.4", "requirements": {"s": valid()}});
         assert_eq!(
             requirement_problems(policy, "s"),
             [problem("subject", &["not in subjects"])]
@@ -956,7 +956,8 @@ mod tests {
     #[test]
     fn subjects_that_are_not_an_object_fail_every_requirement_that_names_one() {
         for subjects in [json!(null), json!("thing"), json!(["thing"]), json!(1)] {
-            let policy = json!({"ergo_spec": "v0.4-dev", "subjects": subjects, "requirements": {"s": valid()}});
+            let policy =
+                json!({"ergo_spec": "v0.4", "subjects": subjects, "requirements": {"s": valid()}});
             assert_eq!(
                 requirement_problems(policy, "s"),
                 [problem("subjects", &["not an object"])]
@@ -967,7 +968,7 @@ mod tests {
     #[test]
     fn a_subject_that_is_not_an_object_fails_the_requirements_that_name_it() {
         for def in [json!("things"), json!([]), json!(1), json!(true)] {
-            let policy = json!({"ergo_spec": "v0.4-dev", "subjects": {"thing": def}, "requirements": {"s": valid()}});
+            let policy = json!({"ergo_spec": "v0.4", "subjects": {"thing": def}, "requirements": {"s": valid()}});
             assert_eq!(
                 requirement_problems(policy, "s"),
                 [problem("subjects.thing", &["not an object"])]
@@ -977,7 +978,7 @@ mod tests {
 
     #[test]
     fn a_subject_with_nothing_under_it_is_read_without_problems() {
-        let policy = json!({"ergo_spec": "v0.4-dev", "subjects": {"thing": null}, "requirements": {"s": valid()}});
+        let policy = json!({"ergo_spec": "v0.4", "subjects": {"thing": null}, "requirements": {"s": valid()}});
         let read = read(policy);
         assert!(read.requirements["s"].problems.is_empty());
         let def = read.subject("thing").unwrap().def.as_ref().unwrap();
@@ -987,13 +988,13 @@ mod tests {
 
     #[test]
     fn the_problems_of_a_subject_nobody_names_are_left_out() {
-        let policy = json!({"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "t"}, "bad": {"from": 5}}, "requirements": {"s": valid()}});
+        let policy = json!({"ergo_spec": "v0.4", "subjects": {"thing": {"from": "t"}, "bad": {"from": 5}}, "requirements": {"s": valid()}});
         assert!(read(policy).requirements["s"].problems.is_empty());
     }
 
     #[test]
     fn a_subject_called_it_is_written_wrong() {
-        let policy = json!({"ergo_spec": "v0.4-dev", "subjects": {"it": {"from": "t"}}, "requirements": {"s": {"subject": "it", "checks": {"c": "x"}}}});
+        let policy = json!({"ergo_spec": "v0.4", "subjects": {"it": {"from": "t"}}, "requirements": {"s": {"subject": "it", "checks": {"c": "x"}}}});
         assert_eq!(
             requirement_problems(policy, "s"),
             [problem(
@@ -1005,7 +1006,7 @@ mod tests {
 
     #[test]
     fn subject_fields_of_the_wrong_type_are_not_a_string() {
-        let policy = json!({"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": 5, "identified_by": ["id"], "description": 5}}, "requirements": {"s": valid()}});
+        let policy = json!({"ergo_spec": "v0.4", "subjects": {"thing": {"from": 5, "identified_by": ["id"], "description": 5}}, "requirements": {"s": valid()}});
         assert_eq!(
             requirement_problems(policy, "s"),
             [
@@ -1018,7 +1019,7 @@ mod tests {
 
     #[test]
     fn a_null_from_is_not_a_string() {
-        let policy = json!({"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": null}}, "requirements": {"s": valid()}});
+        let policy = json!({"ergo_spec": "v0.4", "subjects": {"thing": {"from": null}}, "requirements": {"s": valid()}});
         assert_eq!(
             requirement_problems(policy, "s"),
             [problem("subjects.thing.from", &["not a string"])]
@@ -1027,7 +1028,7 @@ mod tests {
 
     #[test]
     fn a_subject_field_it_does_not_take_is_unknown_and_quoted_when_the_name_needs_it() {
-        let policy = json!({"ergo_spec": "v0.4-dev", "subjects": {"pull request": {"from": "t", "applies_to": {}, "id": ["id"]}}, "requirements": {"s": {"subject": "pull request", "checks": {"c": "x"}}}});
+        let policy = json!({"ergo_spec": "v0.4", "subjects": {"pull request": {"from": "t", "applies_to": {}, "id": ["id"]}}, "requirements": {"s": {"subject": "pull request", "checks": {"c": "x"}}}});
         assert_eq!(
             requirement_problems(policy, "s"),
             [
@@ -1038,7 +1039,7 @@ mod tests {
     }
 
     fn has_problems(has: Value) -> Vec<(String, Vec<String>)> {
-        let policy = json!({"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "t", "has": has}}, "requirements": {"s": {"subject": "round", "checks": {"c": "x"}}}});
+        let policy = json!({"ergo_spec": "v0.4", "subjects": {"round": {"from": "t", "has": has}}, "requirements": {"s": {"subject": "round", "checks": {"c": "x"}}}});
         requirement_problems(policy, "s")
     }
 
@@ -1109,7 +1110,7 @@ mod tests {
     #[test]
     fn parts_keep_what_was_written() {
         let policy = read(
-            json!({"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "t", "has": {
+            json!({"ergo_spec": "v0.4", "subjects": {"round": {"from": "t", "has": {
                 "a": "x.y", "b": {"from": "x", "identified_by": "id"}, "c": 1
             }}}}),
         );

@@ -2,7 +2,7 @@
   {
     "description": "a subject with two parts, one written as a line and one with an id",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "trail",
@@ -611,7 +611,7 @@
   {
     "description": "the same check written with an alias and with the path it stands for",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "s": {
           "from": "items",
@@ -1190,7 +1190,7 @@
   {
     "description": "where a part's alias is read",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "rounds whose cov.x is 1",
@@ -1666,7 +1666,7 @@
   },
   {
     "description": "an own field named like a part keeps its dot, and so does the list a count or a walk reads from it",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own_count": "count of .cov.xs is 2", "part_count": "count of cov.xs is 1", "own_walk": "every .cov.xs is at least 1", "own_plain": ".name is \"r1\""}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own_count": "count of .cov.xs is 2", "part_count": "count of cov.xs is 1", "own_walk": "every .cov.xs is at least 1", "own_plain": ".name is \"r1\""}}}},
     "cases": [
       {
         "description": "names the own field, its list and its walk with the dot, and the part and a field no alias is called without it",
@@ -1686,7 +1686,7 @@
   },
   {
     "description": "a child subject whose part is named like its parent's, with a filter that wrote a dot",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}}},
     "cases": [
       {
         "description": "is written wrong and the report echoes the dots as they were written",
@@ -1702,7 +1702,7 @@
   },
   {
     "description": "a child subject that reads its own field named like its parent's part, with no part of its own",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
     "cases": [
       {
         "description": "prints no dot, because a bare name in the child doesn't read the parent's part",
@@ -1723,7 +1723,7 @@
   },
   {
     "description": "a child subject whose part is refused for its name, with a field named like it",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov ": "x"}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov ": "x"}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
     "cases": [
       {
         "description": "prints no dot, because the refused name isn't cov",
@@ -1739,7 +1739,7 @@
   },
   {
     "description": "a child subject whose part is refused for its value, with a field named like it",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
     "cases": [
       {
         "description": "prints the dot in the filter's expression as in its from, because the name is still the part's",
@@ -1755,7 +1755,7 @@
   },
   {
     "description": "a child subject whose part is named like its parent's, read in many places",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r0": {"subject": "item", "checks": {"c": "n is 1"}}, "r1": {"subject": "item", "checks": {"c": "cov.k is 0"}}, "r2": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r3": {"subject": "item", "checks": {"c": "count of .round is 1"}}, "r4": {"subject": "item", "checks": {"c": "item 1 of .zs is 1"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r0": {"subject": "item", "checks": {"c": "n is 1"}}, "r1": {"subject": "item", "checks": {"c": "cov.k is 0"}}, "r2": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r3": {"subject": "item", "checks": {"c": "count of .round is 1"}}, "r4": {"subject": "item", "checks": {"c": "item 1 of .zs is 1"}}}},
     "cases": [
       {
         "description": "prints the dot as the policy wrote it, in the filter, the checks and the walks",
@@ -1774,7 +1774,7 @@
   },
   {
     "description": "walks and counts over an own field named like a part, in the checks and in the filters",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r0": {"subject": "round", "checks": {"c": "every .cov.xs is at least 2"}}, "r1": {"subject": "round", "checks": {"c": "some .cov.xs is 9"}}, "r2": {"subject": "round", "checks": {"c": "every items.zs whose it is 1 has .cov is 1"}}, "r3": {"subject": "round", "checks": {"c": "every items whose cov is 2 has n is 1"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r0": {"subject": "round", "checks": {"c": "every .cov.xs is at least 2"}}, "r1": {"subject": "round", "checks": {"c": "some .cov.xs is 9"}}, "r2": {"subject": "round", "checks": {"c": "every items.zs whose it is 1 has .cov is 1"}}, "r3": {"subject": "round", "checks": {"c": "every items whose cov is 2 has n is 1"}}}},
     "cases": [
       {
         "description": "names the failed items and the inputs of the own field with the dot",
@@ -1798,7 +1798,7 @@
   },
   {
     "description": "a child subject with no part of its own, reading a field named like its parent's part",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r0": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r1": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r2": {"subject": "item", "checks": {"c": ".zz is 1"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r0": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r1": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r2": {"subject": "item", "checks": {"c": ".zz is 1"}}}},
     "cases": [
       {
         "description": "prints no dot, because a bare name in the child doesn't read the parent's part",
@@ -1830,7 +1830,7 @@
   },
   {
     "description": "a part refused for its value, read in many places",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id"}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}}}, "requirements": {"r00": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r01": {"subject": "item", "checks": {"c": "every .xs is at least 1"}}, "r02": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r03": {"subject": "item", "checks": {"c": {"for": "every .xs as x", "assert": "x is 1"}}}, "r04": {"subject": "item", "checks": {"c": "cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id"}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}}}, "requirements": {"r00": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r01": {"subject": "item", "checks": {"c": "every .xs is at least 1"}}, "r02": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r03": {"subject": "item", "checks": {"c": {"for": "every .xs as x", "assert": "x is 1"}}}, "r04": {"subject": "item", "checks": {"c": "cov is 1"}}}},
     "cases": [
       {
         "description": "prints the dot in every expression, because the refused name is still the part's",
@@ -1849,7 +1849,7 @@
   },
   {
     "description": "an own field named like a part, read by a walk that fails",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own": "every .cov.xs is at least 2", "part": "every cov.xs is at least 2"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own": "every .cov.xs is at least 2", "part": "every cov.xs is at least 2"}}}},
     "cases": [
       {
         "description": "names the item of the own field with the dot and the item of the part without it",
@@ -1868,7 +1868,7 @@
   },
   {
     "description": "a part's alias on the right of a whose, with items that have a field of the same name",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "p"}}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": "every xs.v whose n is count of x.z is 1", "some_whose": "some xs.v whose n is count of x.z is 5", "count_whose": "count of xs whose n is count of x.z is 2", "sum_whose": "sum of xs.v whose n is count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1", "for_whose": {"for": "every xs whose n is count of x.z as y", "assert": "y.v is 1"}, "dot_right": "every xs.v whose n is count of .x.z is 1", "left": "count of xs whose count of x.z is 3 is 3"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "p"}}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": "every xs.v whose n is count of x.z is 1", "some_whose": "some xs.v whose n is count of x.z is 5", "count_whose": "count of xs whose n is count of x.z is 2", "sum_whose": "sum of xs.v whose n is count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1", "for_whose": {"for": "every xs whose n is count of x.z as y", "assert": "y.v is 1"}, "dot_right": "every xs.v whose n is count of .x.z is 1", "left": "count of xs whose count of x.z is 3 is 3"}}}},
     "cases": [
       {
         "description": "reads the part on the right, in every, some, count of, sum of and a for item, and the item's field on the left and after a dot",
@@ -1890,7 +1890,7 @@
   },
   {
     "description": "a part's alias on the right of a whose, with a part that is missing, null or not a list",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "p"}}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": "every xs.v whose n is count of x.z is 1", "count_whose": "count of xs whose n is count of x.z is 2", "sum_whose": "sum of xs.v whose n is count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "p"}}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": "every xs.v whose n is count of x.z is 1", "count_whose": "count of xs whose n is count of x.z is 2", "sum_whose": "sum of xs.v whose n is count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1"}}}},
     "cases": [
       {
         "description": "fails closed for each thing, and never reads the items' own field instead",
@@ -1925,7 +1925,7 @@
   {
     "description": "a part's alias on the right side of a whose, with and without plus",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "kid": {
           "from": "kids",
@@ -2391,7 +2391,7 @@
   {
     "description": "a part's alias in an elapsed time on the right side of a whose",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "kid": {
           "from": "kids",
@@ -2872,7 +2872,7 @@
   {
     "description": "a parent's name on the right side of a whose, with and without plus",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "fam": {
           "from": "fams",
@@ -3184,7 +3184,7 @@
   {
     "description": "a parent's name in an elapsed time on the right side of a whose",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "fam": {
           "from": "fams",
@@ -3513,7 +3513,7 @@
   {
     "description": "a for alias and the input on the right side of a whose with plus",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "kid": {
           "from": "kids",
@@ -3798,7 +3798,7 @@
   {
     "description": "a param on the right side of a whose with plus",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "kid": {
           "from": "kids",
@@ -3914,7 +3914,7 @@
   {
     "description": "a count of or sum of a parent's part on the right side of a whose, alone and in a plus",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "fam": {
           "from": "fams",
@@ -4277,7 +4277,7 @@
   },
   {
     "description": "a parent's name on the right side of a count of or sum of in a whose",
-    "policy": {"ergo_spec": "v0.4-dev", "requirements": {"r": {"checks": {"c": "count of items whose n is count of fam.z is 1", "d": "sum of items.v whose n is count of fam.z is 1", "e": "count of items whose n is count of .fam.z is 2", "f": "count of items whose count of fam.z is 1 is 3"}, "subject": "kid"}}, "subjects": {"fam": {"from": "fams", "identified_by": "id"}, "kid": {"from": "fam.kids", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "v0.4", "requirements": {"r": {"checks": {"c": "count of items whose n is count of fam.z is 1", "d": "sum of items.v whose n is count of fam.z is 1", "e": "count of items whose n is count of .fam.z is 2", "f": "count of items whose count of fam.z is 1 is 3"}, "subject": "kid"}}, "subjects": {"fam": {"from": "fams", "identified_by": "id"}, "kid": {"from": "fam.kids", "identified_by": "id"}}},
     "cases": [
       {
         "description": "counts the parent's field, not the item's field of the same name, while the left side and a name written with a dot read the item's",
@@ -4328,7 +4328,7 @@
   {
     "description": "an alias that is also a for alias",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -4414,7 +4414,7 @@
   {
     "description": "named by an alias that is a part",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -4496,7 +4496,7 @@
   {
     "description": "a subject that narrows another keeps its parts and adds its own",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -4668,7 +4668,7 @@
   {
     "description": "a subject that narrows another and adds a part with a kept alias",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -4756,7 +4756,7 @@
   {
     "description": "a chained subject reads its parent's parts",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts named by $params.art",
@@ -5012,7 +5012,7 @@
   {
     "description": "a chained subject with a part named like its parent",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts named by $params.art",
@@ -5106,7 +5106,7 @@
   {
     "description": "a subject whose parts are written wrong",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -5407,7 +5407,7 @@
   },
   {
     "description": "checks whose names need quoting in the report",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"$x\ty": "id exists", "$x y": "id exists", "$x\"y": "id exists", "$x": "id exists", "$a-b": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"$x\ty": "id exists", "$x y": "id exists", "$x\"y": "id exists", "$x": "id exists", "$a-b": "id exists"}}}},
     "cases": [
       {
         "description": "lists the wrong checks sorted by the name as the report writes it, quotes and escapes included",
@@ -5422,7 +5422,7 @@
   },
   {
     "description": "a requirement whose checks have awkward names",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"x y": 5, "x\"y": 5, "x\\y": 5, "x\ty": 5, "x<y": 5, "x>y": 5, "x&y": 5, "x\u2028y": 5, "x\u2029y": 5, "x\u007fy": 5, "x\by": 5, "x\fy": 5, "x\u0001y": 5, "x\ny": 5, "\u00e9": 5, "x.y": 5, "0x": 5, "a-b": 5, "a1": 5, "A": 5, "x": 5, "x/y": 5, "x'y": 5, "\u00e9x": 5, "x\u00a0y": 5, "x\u200by": 5, "x\ud83d\ude00": 5}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"x y": 5, "x\"y": 5, "x\\y": 5, "x\ty": 5, "x<y": 5, "x>y": 5, "x&y": 5, "x\u2028y": 5, "x\u2029y": 5, "x\u007fy": 5, "x\by": 5, "x\fy": 5, "x\u0001y": 5, "x\ny": 5, "\u00e9": 5, "x.y": 5, "0x": 5, "a-b": 5, "a1": 5, "A": 5, "x": 5, "x/y": 5, "x'y": 5, "\u00e9x": 5, "x\u00a0y": 5, "x\u200by": 5, "x\ud83d\ude00": 5}}}},
     "cases": [
       {
         "description": "lists the checks sorted by the name as the report writes it, quotes and escapes included, by code point",
@@ -5437,7 +5437,7 @@
   },
   {
     "description": "a subject whose parts have awkward names",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id", "has": {"x y": 5, "x\"y": 5, "x\\y": 5, "x\ty": 5, "x<y": 5, "x>y": 5, "x&y": 5, "x\u2028y": 5, "x\u2029y": 5, "x\u007fy": 5, "x\by": 5, "x\fy": 5, "x\u0001y": 5, "x\ny": 5, "\u00e9": 5, "x.y": 5, "0x": 5, "a-b": 5, "a1": 5, "A": 5, "x": 5, "x/y": 5, "x'y": 5, "\u00e9x": 5, "x\u00a0y": 5, "x\u200by": 5, "x\ud83d\ude00": 5}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id", "has": {"x y": 5, "x\"y": 5, "x\\y": 5, "x\ty": 5, "x<y": 5, "x>y": 5, "x&y": 5, "x\u2028y": 5, "x\u2029y": 5, "x\u007fy": 5, "x\by": 5, "x\fy": 5, "x\u0001y": 5, "x\ny": 5, "\u00e9": 5, "x.y": 5, "0x": 5, "a-b": 5, "a1": 5, "A": 5, "x": 5, "x/y": 5, "x'y": 5, "\u00e9x": 5, "x\u00a0y": 5, "x\u200by": 5, "x\ud83d\ude00": 5}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "lists the parts sorted by the name as the report writes it, quotes and escapes included, by code point",
@@ -5452,7 +5452,7 @@
   },
   {
     "description": "a requirement with unknown fields that have awkward names",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}, "require": "bad", "x y": 1, "x\"y": 1, "x\\y": 1, "x\ty": 1, "x<y": 1, "x>y": 1, "x&y": 1, "x\u2028y": 1, "x\u2029y": 1, "x\u007fy": 1, "x\by": 1, "x\fy": 1, "x\u0001y": 1, "x\ny": 1, "\u00e9": 1, "x.y": 1, "0x": 1, "a-b": 1, "a1": 1, "A": 1, "x": 1, "x/y": 1, "x'y": 1, "\u00e9x": 1, "x\u00a0y": 1, "x\u200by": 1, "x\ud83d\ude00": 1}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}, "require": "bad", "x y": 1, "x\"y": 1, "x\\y": 1, "x\ty": 1, "x<y": 1, "x>y": 1, "x&y": 1, "x\u2028y": 1, "x\u2029y": 1, "x\u007fy": 1, "x\by": 1, "x\fy": 1, "x\u0001y": 1, "x\ny": 1, "\u00e9": 1, "x.y": 1, "0x": 1, "a-b": 1, "a1": 1, "A": 1, "x": 1, "x/y": 1, "x'y": 1, "\u00e9x": 1, "x\u00a0y": 1, "x\u200by": 1, "x\ud83d\ude00": 1}}},
     "cases": [
       {
         "description": "lists require second, then the fields sorted by the name as the report writes it, by code point",
@@ -5467,7 +5467,7 @@
   },
   {
     "description": "a subject with unknown fields that have awkward names",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id", "x y": 1, "x\"y": 1, "x\\y": 1, "x\ty": 1, "x<y": 1, "x>y": 1, "x&y": 1, "x\u2028y": 1, "x\u2029y": 1, "x\u007fy": 1, "x\by": 1, "x\fy": 1, "x\u0001y": 1, "x\ny": 1, "\u00e9": 1, "x.y": 1, "0x": 1, "a-b": 1, "a1": 1, "A": 1, "x": 1, "x/y": 1, "x'y": 1, "\u00e9x": 1, "x\u00a0y": 1, "x\u200by": 1, "x\ud83d\ude00": 1}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id", "x y": 1, "x\"y": 1, "x\\y": 1, "x\ty": 1, "x<y": 1, "x>y": 1, "x&y": 1, "x\u2028y": 1, "x\u2029y": 1, "x\u007fy": 1, "x\by": 1, "x\fy": 1, "x\u0001y": 1, "x\ny": 1, "\u00e9": 1, "x.y": 1, "0x": 1, "a-b": 1, "a1": 1, "A": 1, "x": 1, "x/y": 1, "x'y": 1, "\u00e9x": 1, "x\u00a0y": 1, "x\u200by": 1, "x\ud83d\ude00": 1}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "lists the fields of the subject sorted by the name as the report writes it, by code point",
@@ -5482,7 +5482,7 @@
   },
   {
     "description": "a requirement's own fields next to a subject's fields and parts",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id", "zq": 1, "has": {"x y": 5}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}, "zz": 1, "a": 1, "x y": 1}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id", "zq": 1, "has": {"x y": 5}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}, "zz": 1, "a": 1, "x y": 1}}},
     "cases": [
       {
         "description": "lists the requirement's fields first, then the subject's, each sorted by name, so zz comes before subjects.s.zq",
@@ -5497,7 +5497,7 @@
   },
   {
     "description": "parts whose names need quoting in the report",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"s": {"from": "things", "identified_by": "id", "has": {"x\ty": "cov", "x y": "cov", "x\"y": "cov", "x": "cov"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id", "has": {"x\ty": "cov", "x y": "cov", "x\"y": "cov", "x": "cov"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "lists the wrong parts sorted by the name as the report writes it, quotes and escapes included",
@@ -5513,7 +5513,7 @@
   {
     "description": "a subject whose has is not an object",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -5596,7 +5596,7 @@
   {
     "description": "the parts a report lists",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -5691,7 +5691,7 @@
   {
     "description": "a part whose path goes through a list",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "s": {
           "from": "$input",
@@ -5831,7 +5831,7 @@
   {
     "description": "a part written with a dot on the left of a whose in the subject's own from line",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "kid": {
           "from": "kids whose .att.id is 1",
@@ -6018,7 +6018,7 @@
   },
   {
     "description": "a part written with a dot on the left of a whose in a child's from line",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose .cov.k is 1", "identified_by": "id", "has": {"cov": "cov"}}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose .cov.k is 1", "identified_by": "id", "has": {"cov": "cov"}}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "prints the dot the policy wrote",
@@ -6035,7 +6035,7 @@
   {
     "description": "a part read in a check with named by on its right side",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "t": {
           "from": "things",
@@ -6188,7 +6188,7 @@
   },
   {
     "description": "a part read through its alias",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"cov": "att.cov"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "cov.n is 2"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"cov": "att.cov"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "cov.n is 2"}}}},
     "cases": [
       {
         "description": "starts at the part's path inside the subject",
@@ -6203,7 +6203,7 @@
   {
     "description": "a failed sentence on a for line tags the inputs it read through a part",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "round": {
           "from": "trail",
@@ -6344,7 +6344,7 @@
   },
   {
     "description": "a count of and a sum of whose whose reads a part",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": {"from": "pa", "identified_by": "id"}}}}, "requirements": {"r": {"subject": "thing", "checks": {"count_of_items": "count of items whose w is pa.w is 1", "sum_of_items": "sum of items.n whose w is pa.w is 3", "count_of_part": "count of pa.items whose w is pa.w is 1", "sum_of_part": "sum of pa.items.n whose w is 2 is 5", "both": "count of items whose w is pa.w is count of pa.items"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": {"from": "pa", "identified_by": "id"}}}}, "requirements": {"r": {"subject": "thing", "checks": {"count_of_items": "count of items whose w is pa.w is 1", "sum_of_items": "sum of items.n whose w is pa.w is 3", "count_of_part": "count of pa.items whose w is pa.w is 1", "sum_of_part": "sum of pa.items.n whose w is 2 is 5", "both": "count of items whose w is pa.w is count of pa.items"}}}},
     "cases": [
       {
         "description": "carry the part's tag only when the counted or summed list comes from the part, and the part's own value keeps it",
@@ -6364,7 +6364,7 @@
   {
     "description": "a for alias named like a parent subject",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6480,7 +6480,7 @@
   {
     "description": "a for alias named like the check's own subject",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6596,7 +6596,7 @@
   {
     "description": "a for alias named like a subject that isn't a parent",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6716,7 +6716,7 @@
   {
     "description": "a for alias named like a part of a parent subject",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6832,7 +6832,7 @@
   {
     "description": "a for alias named like a subject and like a part of a parent",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6958,7 +6958,7 @@
   {
     "description": "a for alias that isn't named like a subject or a part",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7114,7 +7114,7 @@
   {
     "description": "a part named like the subject it belongs to",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7207,7 +7207,7 @@
   {
     "description": "a part named like a subject that isn't a parent",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7304,7 +7304,7 @@
   {
     "description": "a part named like a part of a parent",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7397,7 +7397,7 @@
   {
     "description": "a for alias named like a part of a grandparent subject",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "gp": {
           "from": "gps",
@@ -7505,7 +7505,7 @@
   {
     "description": "a for alias on the second item named like a part of a parent subject",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7621,7 +7621,7 @@
   {
     "description": "a for alias on a first of item named like a parent subject",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7737,7 +7737,7 @@
   {
     "description": "a for alias named like a part kept from a subject the checked subject narrows",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7856,7 +7856,7 @@
   {
     "description": "a for alias named like a part kept by the parent of the checked subject from a subject it narrows",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7975,7 +7975,7 @@
   {
     "description": "a for alias named like a part of a subject that isn't a parent",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -8138,7 +8138,7 @@
   {
     "description": "a for alias named like a part of a subject with a space in its name",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "pull request": {
           "from": "bs",
@@ -8254,7 +8254,7 @@
   {
     "description": "a part named like a part of a grandparent subject",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "gp": {
           "from": "gps",
@@ -8361,7 +8361,7 @@
   {
     "description": "a part named like a part kept through two narrowings",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "base": {
           "from": "bs",
@@ -8479,7 +8479,7 @@
   {
     "description": "a part declared again by a subject it narrows",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "base": {
           "from": "bs",
@@ -8572,7 +8572,7 @@
   {
     "description": "a part named like a part of a subject that isn't a parent",
     "policy": {
-      "ergo_spec": "v0.4-dev",
+      "ergo_spec": "v0.4",
       "subjects": {
         "b": {
           "from": "bs",
@@ -8707,7 +8707,7 @@
   },
   {
     "description": "a from line with a field named like a part",
-    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"kid": {"from": "kids whose .att.id is 1", "identified_by": "id", "has": {"att": {"from": "atts.pr", "identified_by": "id"}}}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.4", "subjects": {"kid": {"from": "kids whose .att.id is 1", "identified_by": "id", "has": {"att": {"from": "atts.pr", "identified_by": "id"}}}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "prints the filter with the dot it was written with, so it doesn't read as the part",

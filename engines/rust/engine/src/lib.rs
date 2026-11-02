@@ -8,7 +8,7 @@
 //! use serde_json::json;
 //!
 //! let policy = json!({
-//!     "ergo_spec": "v0.4-dev",
+//!     "ergo_spec": "v0.4",
 //!     "subjects": {"deployment": {"from": "deployments"}},
 //!     "requirements": {
 //!         "approved": {
@@ -117,7 +117,7 @@ mod tests {
     #[test]
     fn problems_of_names_that_need_quoting_are_listed_in_the_order_the_report_writes_them() {
         let policy = json!({
-            "ergo_spec": "v0.4-dev",
+            "ergo_spec": "v0.4",
             "subjects": {"s": {"from": "xs", "has": {"x\ty": "ys", "x y": "ys", "x\"y": "ys", "x": "ys"}}},
             "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}
         });
@@ -148,7 +148,7 @@ mod tests {
     #[test]
     fn the_fields_of_a_requirement_come_before_the_fields_of_its_subject() {
         let policy = json!({
-            "ergo_spec": "v0.4-dev",
+            "ergo_spec": "v0.4",
             "subjects": {"s": {"from": "xs", "zq": 1}},
             "requirements": {"r": {"subject": "s", "zz": 1, "checks": {"c": "x exists"}}}
         });
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn report_and_violations_work_from_json_alone() {
         let policy = json!({
-            "ergo_spec": "v0.4-dev",
+            "ergo_spec": "v0.4",
             "subjects": {"thing": {"from": "things"}},
             "requirements": {"s": {"subject": "thing", "require": "most", "checks": {"c": "x exists"}}}
         });
@@ -184,8 +184,8 @@ mod tests {
 
     #[test]
     fn the_same_policy_gives_the_same_report_whatever_order_it_was_written_in() {
-        let a: Value = serde_json::from_str(r#"{"requirements": {"b": {"subject": "t", "checks": {"y": "x exists", "x": "x exists"}}, "a": {"subject": "t", "checks": {"c": "x exists"}}}, "subjects": {"t": {"from": "t"}, "u": null}, "ergo_spec": "v0.4-dev"}"#).unwrap();
-        let b: Value = serde_json::from_str(r#"{"ergo_spec": "v0.4-dev", "subjects": {"u": null, "t": {"from": "t"}}, "requirements": {"a": {"checks": {"c": "x exists"}, "subject": "t"}, "b": {"checks": {"x": "x exists", "y": "x exists"}, "subject": "t"}}}"#).unwrap();
+        let a: Value = serde_json::from_str(r#"{"requirements": {"b": {"subject": "t", "checks": {"y": "x exists", "x": "x exists"}}, "a": {"subject": "t", "checks": {"c": "x exists"}}}, "subjects": {"t": {"from": "t"}, "u": null}, "ergo_spec": "v0.4"}"#).unwrap();
+        let b: Value = serde_json::from_str(r#"{"ergo_spec": "v0.4", "subjects": {"u": null, "t": {"from": "t"}}, "requirements": {"a": {"checks": {"c": "x exists"}, "subject": "t"}, "b": {"checks": {"x": "x exists", "y": "x exists"}, "subject": "t"}}}"#).unwrap();
         let input = json!({"t": []});
         assert_eq!(
             report(&input, &a, &Value::Null).to_string(),
@@ -196,7 +196,7 @@ mod tests {
     #[test]
     fn extra_problems_reach_the_report() {
         let policy = json!({
-            "ergo_spec": "v0.4-dev",
+            "ergo_spec": "v0.4",
             "subjects": {"thing": {"from": "things"}},
             "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
         });
@@ -238,7 +238,7 @@ mod tests {
         .unwrap();
         let params: Value = serde_json::from_str(r#"{"k": [1.50, 2.0], "m": 1e1}"#).unwrap();
         let policy: Value = serde_json::from_str(
-            r#"{"ergo_spec": "v0.4-dev",
+            r#"{"ergo_spec": "v0.4",
                 "subjects": {"d": {"from": "items", "identified_by": "id"}},
                 "requirements": {"r": {"subject": "d", "min_subjects": 2.0,
                     "checks": {"a": "x is 1.50", "b": "y is 0.0", "c": "z is at least 1e2",

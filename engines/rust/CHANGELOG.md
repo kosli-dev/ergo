@@ -2,7 +2,7 @@
 
 Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](../../spec/CHANGELOG.md), and those of `ergo.rego` in [CHANGELOG.md](../../CHANGELOG.md).
 
-## 0.2.0 (not released yet)
+## 0.2.0
 
 ### New
 
@@ -13,7 +13,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A path that names its key by a field lists the field in a row's `inputs` for a `count of`, a `sum of`, an `every` and a `some` too, right after the list's entry, and the check of a `for` line keeps its whole path, `m named by p` and then `p`, where it showed only `m`, as spec 0.4 says. When the path before the field can't be read, an `every` or `some` fails with that path's cause, not the field's, so `every zz.x named by p is 1` with `zz` missing or a string is `absent` or `unusable` when `p` is `null`, where it was `null`. A list it walks before the field doesn't count, so `every rows.w named by k is "xy"` still fails as `null` when `k` is `null`. With `rows` `null` it fails as `null` whatever `k` holds, where a missing or number `k` gave `absent` or `unusable`, and `failed_items` names `rows`, where it was empty when `k` couldn't be read. A `for` line whose own path has such a field, like `every rows.w named by p as w`, lists `p` too, sorted with the rest by name, as `ergo.rego` does. A `plus` or an elapsed time that reads such a path no longer has the field's location in its own entry, as spec 0.4 says. Reports change for such policies.
 - The report's `engine` name is `ergo-rust`, where it was `ergo-policy-engine`, so it matches the Rego engine's `ergo-rego` and the `rust-v*` tag. Every report changes in that field only, and the hash leaves `engine` out, so hashes stay the same. The version is the same.
-- The engine follows spec 0.4, so a policy says `ergo_spec: v0.4-dev` until the spec is released.
+- The engine follows spec 0.4, so a policy says `ergo_spec: v0.4`.
 - An empty name, `""`, is written wrong too, whether it names a requirement, a check, an `any_of` option or a part, with `a name can't be empty`.
 - The CLI has its own page, [`CLI.md`](../../CLI.md): install, how to run it, its exit codes and how it reads YAML. They were in the README and in this folder's README.
 - The `$well_formed` row lists the problems of fields, parts and checks sorted by name as the report writes it, quotes and escapes included, by code point, where the quotes were left out, and lists the requirement's own fields first, then the subject's, then the checks. Reports change for names that need quoting and for a requirement with both a field and a subject problem.

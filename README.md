@@ -2,7 +2,7 @@
 
 Ergo checks that your deployments, pull requests or expenses follow rules written as plain sentences, like `approved_by is a non-empty string`, and gives back a report that says what it checked, what it found and why each check passed or failed. Whoever owns a rule can write it, and whoever has to trust the result can read the report without knowing how it was computed.
 
-Ergo is at 0.3. Any 0.x release may still change what a policy says or what a report shows, and [`CHANGELOG.md`](CHANGELOG.md) says when it does.
+Ergo is at 0.4. Any 0.x release may still change what a policy says or what a report shows, and [`CHANGELOG.md`](CHANGELOG.md) says when it does.
 
 ## What Ergo does
 
@@ -46,7 +46,7 @@ Here is a policy that says "_every production deployment must have an approver_"
 `policy.yaml`:
 
 ```yaml
-ergo_spec: v0.3
+ergo_spec: v0.4
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -97,7 +97,7 @@ The report records every check Ergo ran, including the ones that passed. It come
   "compliant": false,
   "description": "",
   "engine": { ... },
-  "ergo": "v0.3",
+  "ergo": "v0.4",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
