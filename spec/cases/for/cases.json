@@ -4807,7 +4807,7 @@
               "id": "p1"
             },
             "check": "c",
-            "message": "approvers is [{\"state\": \"PENDING\", \"timestamp\": \"2026-10-05T00:00:00Z\", \"username\": \"bob\"}]; commits is [{\"timestamp\": \"2026-10-01T00:00:00Z\"}, {\"timestamp\": \"2026-10-02T00:00:00Z\"}]",
+            "message": "approvers is [{\"state\": \"PENDING\", \"timestamp\": \"2026-10-05T00:00:00Z\", \"username\": \"bob\"}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7254,7 +7254,7 @@
                 ]
               }
             ],
-            "message": "item 1 and item 2 of commits tie",
+            "message": "item 1 and item 2 of commits tie on timestamp",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7549,7 +7549,7 @@
                 ]
               }
             ],
-            "message": "item 2 of commits: timestamp is \"yesterday\", which isn't a number, a time or text",
+            "message": "item 2 of commits: timestamp is \"yesterday\", which isn't a number, a time or a date",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7675,7 +7675,7 @@
                 ]
               }
             ],
-            "message": "approvers is [{\"username\": \"grace\"}]; commits is []",
+            "message": "commits is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8203,7 +8203,7 @@
                 ]
               }
             ],
-            "message": "item 2 of owners: name is 7, which isn't a number, a time or text",
+            "message": "item 2 of owners: name is 7, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8286,7 +8286,7 @@
                 ]
               }
             ],
-            "message": "item 1 and item 2 of owners tie",
+            "message": "item 1 and item 2 of owners tie on name",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8513,7 +8513,7 @@
                 ]
               }
             ],
-            "message": "item 1 of audits is \"2026-10-02\", which isn't a list or an object",
+            "message": "item 1 of audits: held_on is \"2026-10-02\", which isn't a time",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8584,7 +8584,7 @@
                 ]
               }
             ],
-            "message": "item 1 of audits: held_on is \"2026-02-29\", which isn't a number, a time or text",
+            "message": "item 1 of audits: held_on is \"2026-02-29\", which isn't a number, a time or a date",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9993,7 +9993,7 @@
               "id": "t"
             },
             "check": "c",
-            "message": "xs is [{\"v\": 1}, {\"v\": 2}]; ys is []",
+            "message": "ys is []",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -16749,7 +16749,7 @@
                 "value": []
               }
             ],
-            "message": "xs is [{\"k\": 1}, {\"k\": 2}]; ys is []",
+            "message": "ys is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16810,7 +16810,7 @@
                 ]
               }
             ],
-            "message": "xs is [{\"k\": 3}]; ys is [{\"k\": 1, \"n\": 1}]",
+            "message": "ys is [{\"k\": 1, \"n\": 1}]",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17562,7 +17562,7 @@
                 ]
               }
             ],
-            "message": "item 2 of xs: p.ys is missing; item 1 of xs tie",
+            "message": "item 1 of xs: item 1 and item 2 of p.ys tie on n; item 2 of xs: p.ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

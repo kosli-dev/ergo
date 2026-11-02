@@ -9008,7 +9008,7 @@ _for_unsortable(item, w, names) := array.concat(unread, mixed) if {
 	items := w.items
 	unread := [object.union({"path": e.i, "item": e.i, "cause": _for_sort_state(item, e, names), "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)}, _m_sort_why(item, e, names)) | some e in items; not _for_sort_key(item, e, names)]
 	kinds := {_for_sort_key(item, e, names)[0] | some e in items}
-	mixed := [{"path": e.i, "item": e.i, "cause": "unusable", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)} |
+	mixed := [{"path": e.i, "item": e.i, "cause": "unusable", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names), "why": [_m_leaf(e.i, _m_isnt(_input_name(item.pick.by), _for_sort_shown(item, e, names), _m_kind_word[_for_kept_kind(kinds)]))]} |
 		count(kinds) > 1
 		some e in items
 		_for_sort_key(item, e, names)[0] != _for_kept_kind(kinds)
@@ -9025,6 +9025,8 @@ _m_sort_why(item, e, names) := {"why": [m]} if {
 	state := _for_sort_state(item, e, names)
 	m := _m_sort_text(item, e, state) with input as {"ergo/names": names}
 } else := {}
+
+_m_kind_word := {"number": "a number", "time": "a time", "date": "a date", "text": "text"}
 
 _m_sort_kind(true) := "text"
 
