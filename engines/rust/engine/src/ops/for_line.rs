@@ -611,8 +611,7 @@ impl For {
         if let Some(sorted) = sorted {
             let mut failed: Vec<Dead> = Vec::new();
             let mut at = outer.clone();
-            let mut checks: Vec<(Live, Result<Value, Cause>, Option<Location>, String)> =
-                Vec::new();
+            let mut checks: Vec<SortRead> = Vec::new();
             for found in live {
                 let holder = walked
                     .items
@@ -815,6 +814,8 @@ fn sort_failure(
         location,
     }
 }
+
+type SortRead = (Live, Result<Value, Cause>, Option<Location>, String);
 
 struct Sfail {
     names: Vec<String>,
