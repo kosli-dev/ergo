@@ -116,6 +116,7 @@ fn violations_gives_the_one_violation_the_readme_shows() {
             "description": "Someone approved the deployment",
             "expression": "approved_by is a non-empty string",
             "inputs": [{"name": "approved_by", "value": null, "locations": ["/deployments/1"]}],
+            "message": "approved_by is missing",
             "requirement": "prod_deploy",
             "subject": {"id": "d-2", "type": "deployment"}
         }])
@@ -352,6 +353,7 @@ fn output_is_pretty_with_two_spaces_sorted_keys_and_a_trailing_newline() {
         "value": null
       }
     ],
+    "message": "approved_by is missing",
     "requirement": "prod_deploy",
     "subject": {
       "id": "d-2",
