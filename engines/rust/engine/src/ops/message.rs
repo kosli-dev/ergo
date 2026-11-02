@@ -397,11 +397,22 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             let want = state_of(verdict.cause).unwrap_or(Outcome::Absent);
             let keys = key_states(check, ctx, want);
             if keys.is_empty() {
-                sources(check, ctx, verdict)
+                let mut found: Vec<String> = sources(check, ctx, verdict)
                     .iter()
                     .filter(|i| i.state == want)
                     .map(|i| format!("{} is {}", i.name, state_word(want)))
-                    .collect()
+                    .collect();
+                if let Check::Tally(tally_check) = check {
+                    for side in tally::tally_sides(tally_check) {
+                        if let TallySide::Derived(derived) = side {
+                            let said = tally::counted_texts(derived, ctx, verdict.cause);
+                            if !said.is_empty() {
+                                found.push(joined(said));
+                            }
+                        }
+                    }
+                }
+                found
             } else {
                 keys
             }
@@ -553,6 +564,11 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         out.push(isnt(&input.name, &input.value, "a list or an object"));
                         any = true;
                     }
+                }
+                let counted_said = tally::counted_texts(derived, ctx, Cause::Unusable);
+                if !counted_said.is_empty() {
+                    out.push(joined(counted_said));
+                    any = true;
                 }
                 if !any && tally::derived_value(derived, ctx).is_err() {
                     out.push(format!("{} needs more than 15 digits", derived.text));

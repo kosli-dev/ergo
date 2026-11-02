@@ -1111,6 +1111,93 @@ pub fn tally_sides(check: &Tally) -> Vec<&Side> {
         .collect()
 }
 
+pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> {
+    let mut out = Vec::new();
+    for term in &derived.terms {
+        let Term::Counted(counted) = term else {
+            continue;
+        };
+        let outer = outer_ctx(ctx);
+        if walk::path_needs_an_object_subject(&counted.path, ctx) {
+            continue;
+        }
+        let walked = walk::walk(
+            &counted.path,
+            &outer,
+            Options {
+                if_any: false,
+                empty_adds_nothing: true,
+            },
+        );
+        if walked.unreadable.is_some() {
+            continue;
+        }
+        let mut found: Vec<(Cause, String)> = walked
+            .failures
+            .iter()
+            .map(|f| (f.cause, f.msg.clone()))
+            .collect();
+        let mut at = outer.clone();
+        for item in &walked.items {
+            at.subject = item.item.clone();
+            let name = walked.item_name(&item.item_segs);
+            let mut undecided = false;
+            for check in &counted.whose {
+                let verdict = run_check(check, &at);
+                if !matches!(verdict.cause, Cause::Satisfied | Cause::Value) {
+                    undecided = true;
+                    found.push((
+                        verdict.cause,
+                        super::message::prefixed(
+                            &name,
+                            &super::message::message(check, &at, &verdict),
+                        ),
+                    ));
+                }
+            }
+            let kept = counted
+                .whose
+                .iter()
+                .all(|check| run_check(check, &at).cause != Cause::Value);
+            if undecided || !kept {
+                continue;
+            }
+            let rest = crate::name::name(&item.rest_path());
+            match item.end {
+                None => found.push((
+                    item.miss,
+                    super::message::prefixed(
+                        &name,
+                        &super::message::stated(&rest, item.miss, &Value::Null, "a number"),
+                    ),
+                )),
+                Some(end) if counted.kind == Kind::Sum && !end.is_number() => {
+                    let c = if end.is_null() {
+                        Cause::Null
+                    } else {
+                        Cause::Unusable
+                    };
+                    found.push((
+                        c,
+                        super::message::prefixed(
+                            &name,
+                            &super::message::stated(&rest, c, end, "a number"),
+                        ),
+                    ));
+                }
+                _ => {}
+            }
+        }
+        out.extend(
+            found
+                .into_iter()
+                .filter(|(c, _)| *c == cause)
+                .map(|(_, text)| text),
+        );
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
