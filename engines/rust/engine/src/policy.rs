@@ -956,8 +956,7 @@ mod tests {
     #[test]
     fn subjects_that_are_not_an_object_fail_every_requirement_that_names_one() {
         for subjects in [json!(null), json!("thing"), json!(["thing"]), json!(1)] {
-            let policy =
-                json!({"ergo_spec": "v0.5-dev", "subjects": subjects, "requirements": {"s": valid()}});
+            let policy = json!({"ergo_spec": "v0.5-dev", "subjects": subjects, "requirements": {"s": valid()}});
             assert_eq!(
                 requirement_problems(policy, "s"),
                 [problem("subjects", &["not an object"])]
