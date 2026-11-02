@@ -10252,7 +10252,15 @@ _m_leaf(item, m) := concat("", [_m_item_name(item, set()), substring(m, 2, -1)])
 
 _m_leaf(item, m) := concat("", [_m_item_name(item, set()), ": ", m]) if not startswith(m, "it ")
 
-_m_item_name(path, roots) := _failed_name(path, roots) if count([j | some j, step in path; is_number(step)]) == 0
+_m_item_name(path, _) := _input_name(_as_subject_part(array.slice(path, k, count(path)))) if {
+	k := min({k | some k, step in path; _subject_part([step])})
+	k > 0
+}
+
+_m_item_name(path, roots) := _failed_name(path, roots) if {
+	count([j | some j, step in path; is_number(step)]) == 0
+	not _m_off_item_path(path)
+}
 
 _m_item_name(path, roots) := concat(": ", array.concat(
 	array.concat([_failed_name(array.slice(path, 0, idx[0] + 1), roots)], [concat("", ["item ", _literal_text(path[idx[k]] + 1), " of ", _plain_steps_name(array.slice(path, idx[k - 1] + 1, idx[k]))]) | some k in numbers.range(1, count(idx) - 1)]),
@@ -10260,6 +10268,13 @@ _m_item_name(path, roots) := concat(": ", array.concat(
 )) if {
 	idx := [j | some j, step in path; is_number(step)]
 	count(idx) > 0
+	not _m_off_item_path(path)
+}
+
+_m_off_item_path(path) if {
+	some k, step in path
+	k > 0
+	_subject_part([step])
 }
 
 _m_fail(f, _) := f.msg if {
@@ -10320,18 +10335,39 @@ _m_tally(subj, side) := array.concat(
 		[[f.cause, _m_fail(f, set())] | some f in array.concat(w.fails, _walk_stop(w))],
 		[[s, concat("", [_ref_name(r), " is ", _m_state_word(s)])] | some r in sort({r | some c in side.whose; some r in _check_refs(c)}); s := _ref_state(r); s in {"absent", "null"}],
 	),
-	[x | some e in w.items; some x in array.concat(_m_whose_undecided(side, e, flaws), [y | _tally_judge(side, e, flaws).read; some y in _m_tally_item(f, e)])],
+	[x | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws), [y | _tally_judge(side, e, flaws).read; some y in _m_tally_item(f, e)])],
 ) if {
 	f := _basic_form(side)
 	w := _walk(_walk_start({"path": side[f]}, subj), _walk_keys({"path": side[f]}, subj), true)
 	flaws := [_cond_flaw(c) | some c in side.whose]
 }
 
-_m_whose_undecided(side, e, flaws) := [[cause, _m_leaf(e.i, _m_cond_message(c, e.iv, cause))] |
+_m_whose_undecided(subj, side, e, flaws) := [[cause, _m_undecided_text(subj, c, e, cause)] |
 	some i, c in side.whose
 	cause := _tally_cond_cause(c, e.iv, flaws[i])
 	not cause in {"satisfied", "value", "missing"}
 ]
+
+_m_undecided_text(subj, c, e, cause) := concat(", and ", off) if {
+	off := _m_off_item(subj, c, cause)
+	off != []
+} else := _m_leaf(e.i, _m_cond_message(c, e.iv, cause))
+
+_m_off_item(subj, c, "unusable") := _once([_m_isnt(_input_name(shown), v, "a list or an object") |
+	some side in {x | walk(c, [_, x]); _basic_form(x) in {"count_of", "sum_of"}; _subject_part(x[_basic_form(x)])}
+	shown := _as_subject_part(side[_basic_form(side)])
+	v := _value_at(subj, shown)
+	not is_array(v)
+	not is_object(v)
+	v != null
+])
+
+_m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ", _m_state_word(cause)]) |
+	some p in sort({x | walk(c, [_, x]); _subject_part(x)})
+	shown := _as_subject_part(p)
+	i := min({j | some j in numbers.range(1, count(shown)); _read_state(subj, array.slice(shown, 0, j)) == cause})
+	shown_at := array.slice(shown, 0, i)
+]) if cause in {"absent", "null"}
 
 _m_cond_message(c, item, cause) := concat(", and ", cs) if {
 	cause in {"absent", "null"}
@@ -10480,7 +10516,11 @@ _m_listed(names) := concat("", ["item ", concat(" and item ", [m[1] | some m in 
 	count({m[2] | some m in ms}) == 1
 } else := concat(" and ", names)
 
-_m_walk_leaf(e, leaf, cause) := _m_leaf(e.i, _message(leaf, e.iv, cause)) if leaf != null
+_m_walk_leaf(e, leaf, cause) := concat(", and ", off) if {
+	leaf != null
+	off := _m_off_item(input["ergo/names"]["ergo/subject"], leaf, cause)
+	off != []
+} else := _m_leaf(e.i, _message(leaf, e.iv, cause)) if leaf != null
 
 else := ""
 
