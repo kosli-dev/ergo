@@ -1,6 +1,6 @@
 use super::compare::{Cmp, Side, read_side};
 use super::tally::{self, Side as TallySide};
-use super::{Check, Input, Verdict, lists, read_path};
+use super::{Check, Input, Verdict, lists, read_path, run as run_check};
 use crate::cause::Cause;
 use crate::name;
 use crate::path::{self, Ctx, Outcome, Path, Resolved, Step};
@@ -344,7 +344,33 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<String> {
     out
 }
 
+fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
+    let mut parts = Vec::new();
+    for (at, option) in any.options.iter().enumerate() {
+        let lines: Vec<String> = option
+            .iter()
+            .filter_map(|line| {
+                let verdict = run_check(line, ctx);
+                (!verdict.passed()).then(|| message(line, ctx, &verdict))
+            })
+            .collect();
+        if lines.is_empty() {
+            continue;
+        }
+        let name = any.names.get(at).cloned().unwrap_or_default();
+        parts.push(format!("{name}: {}", lines.join(", and ")));
+    }
+    if parts.is_empty() {
+        "the check is false".to_string()
+    } else {
+        parts.join("; ")
+    }
+}
+
 pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
+    if let Check::AnyOf(any) = check {
+        return any_of_message(any, ctx);
+    }
     let clauses: Vec<String> = match verdict.cause {
         Cause::Value => sources(check, ctx, verdict)
             .iter()

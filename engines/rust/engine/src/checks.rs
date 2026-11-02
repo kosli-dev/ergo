@@ -250,6 +250,7 @@ fn read_one(
         Form::AnyOf(Some(options)) => {
             let mut parts = Vec::new();
             let mut lowered_options = Vec::new();
+            let mut lowered_names: Vec<String> = Vec::new();
             let mut ok = !options.is_empty();
             for (option, read) in options {
                 match read {
@@ -273,6 +274,7 @@ fn read_one(
                             &aliases,
                             &mut problems,
                         ) {
+                            lowered_names.push(option.to_string());
                             lowered_options.push(plan.items.into_iter().map(|i| i.check).collect());
                         }
                         parts.push(format!(
@@ -291,6 +293,7 @@ fn read_one(
                 items: vec![Item {
                     text: expression.clone(),
                     check: Check::AnyOf(AnyOf {
+                        names: lowered_names,
                         options: lowered_options,
                     }),
                 }],

@@ -983,6 +983,7 @@ mod tests {
         let wrapped = every(
             &["xs"],
             vec![Check::AnyOf(crate::ops::any_of::AnyOf {
+                names: Vec::new(),
                 options: vec![vec![Check::Walk(Box::new(inner))]],
             })],
             equals(json!(1)),
