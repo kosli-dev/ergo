@@ -24278,5 +24278,955 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line with named by each of, when a ref before the list can't be read",
+    "policy": {
+      "ergo_spec": "v0.4-dev",
+      "requirements": {
+        "missing env, list keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "missing env, list keys"
+        },
+        "missing env, missing keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "missing env, missing keys"
+        },
+        "missing env, null keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "missing env, null keys"
+        },
+        "missing env, number keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "missing env, number keys"
+        },
+        "null env, list keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "null env, list keys"
+        },
+        "null env, missing keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "null env, missing keys"
+        },
+        "null env, null keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "null env, null keys"
+        },
+        "null env, number keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "null env, number keys"
+        },
+        "number env, list keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "number env, list keys"
+        },
+        "number env, missing keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "number env, missing keys"
+        },
+        "number env, null keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "number env, null keys"
+        },
+        "number env, number keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "number env, number keys"
+        },
+        "object env, list keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "object env, list keys"
+        },
+        "object env, missing keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "object env, missing keys"
+        },
+        "object env, null keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "object env, null keys"
+        },
+        "object env, number keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "object env, number keys"
+        },
+        "string env, list keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "string env, list keys"
+        },
+        "string env, missing keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "string env, missing keys"
+        },
+        "string env, null keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "string env, null keys"
+        },
+        "string env, number keys": {
+          "checks": {
+            "c": "v is 1"
+          },
+          "min_subjects": 0,
+          "subject": "string env, number keys"
+        }
+      },
+      "subjects": {
+        "missing env, list keys": {
+          "from": "scans named by $params.em named by each of $params.kl"
+        },
+        "missing env, missing keys": {
+          "from": "scans named by $params.em named by each of $params.km"
+        },
+        "missing env, null keys": {
+          "from": "scans named by $params.em named by each of $params.kz"
+        },
+        "missing env, number keys": {
+          "from": "scans named by $params.em named by each of $params.kn"
+        },
+        "null env, list keys": {
+          "from": "scans named by $params.ez named by each of $params.kl"
+        },
+        "null env, missing keys": {
+          "from": "scans named by $params.ez named by each of $params.km"
+        },
+        "null env, null keys": {
+          "from": "scans named by $params.ez named by each of $params.kz"
+        },
+        "null env, number keys": {
+          "from": "scans named by $params.ez named by each of $params.kn"
+        },
+        "number env, list keys": {
+          "from": "scans named by $params.en named by each of $params.kl"
+        },
+        "number env, missing keys": {
+          "from": "scans named by $params.en named by each of $params.km"
+        },
+        "number env, null keys": {
+          "from": "scans named by $params.en named by each of $params.kz"
+        },
+        "number env, number keys": {
+          "from": "scans named by $params.en named by each of $params.kn"
+        },
+        "object env, list keys": {
+          "from": "scans named by $params.eo named by each of $params.kl"
+        },
+        "object env, missing keys": {
+          "from": "scans named by $params.eo named by each of $params.km"
+        },
+        "object env, null keys": {
+          "from": "scans named by $params.eo named by each of $params.kz"
+        },
+        "object env, number keys": {
+          "from": "scans named by $params.eo named by each of $params.kn"
+        },
+        "string env, list keys": {
+          "from": "scans named by $params.es named by each of $params.kl"
+        },
+        "string env, missing keys": {
+          "from": "scans named by $params.es named by each of $params.km"
+        },
+        "string env, null keys": {
+          "from": "scans named by $params.es named by each of $params.kz"
+        },
+        "string env, number keys": {
+          "from": "scans named by $params.es named by each of $params.kn"
+        }
+      }
+    },
+    "params": {
+      "en": 1,
+      "eo": {
+        "x": 1
+      },
+      "es": "nope",
+      "ez": null,
+      "kl": [
+        "a"
+      ],
+      "kn": 1,
+      "kz": null
+    },
+    "cases": [
+      {
+        "description": "the path is read before the list, so a ref in it that is missing, null or not a string decides the cause, absent, null or unusable, even with min_subjects 0 and whatever the list holds, and only a string ref leaves the cause to the list: a missing list gives absent, a null one null, a number unusable, and a list of strings makes each key a subject",
+        "rules": [
+          "subjects.sentence",
+          "path.ref_step",
+          "value.ref"
+        ],
+        "input": {
+          "scans": {
+            "prod": {
+              "a": {
+                "v": 1
+              }
+            }
+          }
+        },
+        "status": {
+          "missing env, list keys": "not_met",
+          "missing env, missing keys": "not_met",
+          "missing env, null keys": "not_met",
+          "missing env, number keys": "not_met",
+          "null env, list keys": "not_met",
+          "null env, missing keys": "not_met",
+          "null env, null keys": "not_met",
+          "null env, number keys": "not_met",
+          "number env, list keys": "not_met",
+          "number env, missing keys": "not_met",
+          "number env, null keys": "not_met",
+          "number env, number keys": "not_met",
+          "object env, list keys": "not_met",
+          "object env, missing keys": "not_met",
+          "object env, null keys": "not_met",
+          "object env, number keys": "not_met",
+          "string env, list keys": "not_met",
+          "string env, missing keys": "not_met",
+          "string env, null keys": "not_met",
+          "string env, number keys": "not_met"
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope missing env, list keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "missing env, list keys",
+            "subject": {
+              "id": null,
+              "type": "missing env, list keys"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope missing env, missing keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "missing env, missing keys",
+            "subject": {
+              "id": null,
+              "type": "missing env, missing keys"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope missing env, null keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "missing env, null keys",
+            "subject": {
+              "id": null,
+              "type": "missing env, null keys"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope missing env, number keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "missing env, number keys",
+            "subject": {
+              "id": null,
+              "type": "missing env, number keys"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope null env, list keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "null env, list keys",
+            "subject": {
+              "id": null,
+              "type": "null env, list keys"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope null env, missing keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "null env, missing keys",
+            "subject": {
+              "id": null,
+              "type": "null env, missing keys"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope null env, null keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "null env, null keys",
+            "subject": {
+              "id": null,
+              "type": "null env, null keys"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope null env, number keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "null env, number keys",
+            "subject": {
+              "id": null,
+              "type": "null env, number keys"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope number env, list keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "number env, list keys",
+            "subject": {
+              "id": null,
+              "type": "number env, list keys"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope number env, missing keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "number env, missing keys",
+            "subject": {
+              "id": null,
+              "type": "number env, missing keys"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope number env, null keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "number env, null keys",
+            "subject": {
+              "id": null,
+              "type": "number env, null keys"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope number env, number keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "number env, number keys",
+            "subject": {
+              "id": null,
+              "type": "number env, number keys"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope object env, list keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "object env, list keys",
+            "subject": {
+              "id": null,
+              "type": "object env, list keys"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope object env, missing keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "object env, missing keys",
+            "subject": {
+              "id": null,
+              "type": "object env, missing keys"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope object env, null keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "object env, null keys",
+            "subject": {
+              "id": null,
+              "type": "object env, null keys"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope object env, number keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "object env, number keys",
+            "subject": {
+              "id": null,
+              "type": "object env, number keys"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "in-scope string env, list keys count",
+                "value": 1
+              }
+            ],
+            "passed": false,
+            "requirement": "string env, list keys",
+            "subject": {
+              "id": null,
+              "type": "string env, list keys"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope string env, missing keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "string env, missing keys",
+            "subject": {
+              "id": null,
+              "type": "string env, missing keys"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope string env, null keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "string env, null keys",
+            "subject": {
+              "id": null,
+              "type": "string env, null keys"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope string env, number keys count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "string env, number keys",
+            "subject": {
+              "id": null,
+              "type": "string env, number keys"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "inputs": [
+              {
+                "locations": [
+                  "/scans"
+                ],
+                "name": "v",
+                "value": null
+              }
+            ],
+            "passed": false,
+            "requirement": "string env, list keys",
+            "subject": {
+              "id": "a",
+              "type": "string env, list keys"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose key from $params isn't a string",
+    "policy": {
+      "ergo_spec": "v0.4-dev",
+      "requirements": {
+        "brackets, boolean key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, boolean key"
+        },
+        "brackets, list key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, list key"
+        },
+        "brackets, missing key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, missing key"
+        },
+        "brackets, null key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, null key"
+        },
+        "brackets, object key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "brackets, object key"
+        },
+        "named by, boolean key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, boolean key"
+        },
+        "named by, list key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, list key"
+        },
+        "named by, missing key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, missing key"
+        },
+        "named by, null key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, null key"
+        },
+        "named by, object key": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "named by, object key"
+        }
+      },
+      "subjects": {
+        "brackets, boolean key": {
+          "from": "lists[$params.kt]",
+          "identified_by": "id"
+        },
+        "brackets, list key": {
+          "from": "lists[$params.kl]",
+          "identified_by": "id"
+        },
+        "brackets, missing key": {
+          "from": "lists[$params.kx]",
+          "identified_by": "id"
+        },
+        "brackets, null key": {
+          "from": "lists[$params.kn]",
+          "identified_by": "id"
+        },
+        "brackets, object key": {
+          "from": "lists[$params.ko]",
+          "identified_by": "id"
+        },
+        "named by, boolean key": {
+          "from": "lists named by $params.kt",
+          "identified_by": "id"
+        },
+        "named by, list key": {
+          "from": "lists named by $params.kl",
+          "identified_by": "id"
+        },
+        "named by, missing key": {
+          "from": "lists named by $params.kx",
+          "identified_by": "id"
+        },
+        "named by, null key": {
+          "from": "lists named by $params.kn",
+          "identified_by": "id"
+        },
+        "named by, object key": {
+          "from": "lists named by $params.ko",
+          "identified_by": "id"
+        }
+      }
+    },
+    "params": {
+      "kl": [
+        "q"
+      ],
+      "kn": null,
+      "ko": {
+        "a": 1
+      },
+      "kt": true
+    },
+    "cases": [
+      {
+        "description": "gives no subjects and fails min_subjects as unusable for a boolean, an object or a list, as null for null and as absent for a key the params don't have, after named by and in brackets",
+        "rules": [
+          "subjects.from",
+          "path.ref_step",
+          "sentence.path.brackets"
+        ],
+        "input": {
+          "lists": {
+            "q": [
+              {
+                "id": "z"
+              }
+            ]
+          }
+        },
+        "status": {
+          "brackets, boolean key": "not_met",
+          "brackets, list key": "not_met",
+          "brackets, missing key": "not_met",
+          "brackets, null key": "not_met",
+          "brackets, object key": "not_met",
+          "named by, boolean key": "not_met",
+          "named by, list key": "not_met",
+          "named by, missing key": "not_met",
+          "named by, null key": "not_met",
+          "named by, object key": "not_met"
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope brackets, boolean key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "brackets, boolean key",
+            "subject": {
+              "id": null,
+              "type": "brackets, boolean key"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope brackets, list key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "brackets, list key",
+            "subject": {
+              "id": null,
+              "type": "brackets, list key"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope brackets, missing key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "brackets, missing key",
+            "subject": {
+              "id": null,
+              "type": "brackets, missing key"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope brackets, null key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "brackets, null key",
+            "subject": {
+              "id": null,
+              "type": "brackets, null key"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope brackets, object key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "brackets, object key",
+            "subject": {
+              "id": null,
+              "type": "brackets, object key"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope named by, boolean key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "named by, boolean key",
+            "subject": {
+              "id": null,
+              "type": "named by, boolean key"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope named by, list key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "named by, list key",
+            "subject": {
+              "id": null,
+              "type": "named by, list key"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope named by, missing key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "named by, missing key",
+            "subject": {
+              "id": null,
+              "type": "named by, missing key"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope named by, null key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "named by, null key",
+            "subject": {
+              "id": null,
+              "type": "named by, null key"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope named by, object key count",
+                "value": 0
+              }
+            ],
+            "passed": false,
+            "requirement": "named by, object key",
+            "subject": {
+              "id": null,
+              "type": "named by, object key"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
