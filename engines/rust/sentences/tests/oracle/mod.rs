@@ -1589,6 +1589,106 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "things whose v is \"x\" followed by t",
     ),
     ("status.coverage.data", "status.coverage.data"),
+    ("lists named by $params.kl", "lists named by $params.kl"),
+    ("lists named by $params.kn", "lists named by $params.kn"),
+    ("lists named by $params.ko", "lists named by $params.ko"),
+    ("lists named by $params.kt", "lists named by $params.kt"),
+    ("lists named by $params.kx", "lists named by $params.kx"),
+    ("lists[$params.kl]", "lists named by $params.kl"),
+    ("lists[$params.kn]", "lists named by $params.kn"),
+    ("lists[$params.ko]", "lists named by $params.ko"),
+    ("lists[$params.kt]", "lists named by $params.kt"),
+    ("lists[$params.kx]", "lists named by $params.kx"),
+    (
+        "scans named by $params.em named by each of $params.kl",
+        "scans named by $params.em named by each of $params.kl",
+    ),
+    (
+        "scans named by $params.em named by each of $params.km",
+        "scans named by $params.em named by each of $params.km",
+    ),
+    (
+        "scans named by $params.em named by each of $params.kn",
+        "scans named by $params.em named by each of $params.kn",
+    ),
+    (
+        "scans named by $params.em named by each of $params.kz",
+        "scans named by $params.em named by each of $params.kz",
+    ),
+    (
+        "scans named by $params.en named by each of $params.kl",
+        "scans named by $params.en named by each of $params.kl",
+    ),
+    (
+        "scans named by $params.en named by each of $params.km",
+        "scans named by $params.en named by each of $params.km",
+    ),
+    (
+        "scans named by $params.en named by each of $params.kn",
+        "scans named by $params.en named by each of $params.kn",
+    ),
+    (
+        "scans named by $params.en named by each of $params.kz",
+        "scans named by $params.en named by each of $params.kz",
+    ),
+    (
+        "scans named by $params.eo named by each of $params.kl",
+        "scans named by $params.eo named by each of $params.kl",
+    ),
+    (
+        "scans named by $params.eo named by each of $params.km",
+        "scans named by $params.eo named by each of $params.km",
+    ),
+    (
+        "scans named by $params.eo named by each of $params.kn",
+        "scans named by $params.eo named by each of $params.kn",
+    ),
+    (
+        "scans named by $params.eo named by each of $params.kz",
+        "scans named by $params.eo named by each of $params.kz",
+    ),
+    (
+        "scans named by $params.es named by each of $params.kl",
+        "scans named by $params.es named by each of $params.kl",
+    ),
+    (
+        "scans named by $params.es named by each of $params.km",
+        "scans named by $params.es named by each of $params.km",
+    ),
+    (
+        "scans named by $params.es named by each of $params.kn",
+        "scans named by $params.es named by each of $params.kn",
+    ),
+    (
+        "scans named by $params.es named by each of $params.kz",
+        "scans named by $params.es named by each of $params.kz",
+    ),
+    (
+        "scans named by $params.ez named by each of $params.kl",
+        "scans named by $params.ez named by each of $params.kl",
+    ),
+    (
+        "scans named by $params.ez named by each of $params.km",
+        "scans named by $params.ez named by each of $params.km",
+    ),
+    (
+        "scans named by $params.ez named by each of $params.kn",
+        "scans named by $params.ez named by each of $params.kn",
+    ),
+    (
+        "scans named by $params.ez named by each of $params.kz",
+        "scans named by $params.ez named by each of $params.kz",
+    ),
+    ("lists named by $input.kn", "lists named by $input.kn"),
+    ("lists named by $input.ko", "lists named by $input.ko"),
+    ("lists named by $input.ks", "lists named by $input.ks"),
+    ("lists named by $input.kx", "lists named by $input.kx"),
+    ("lists named by $input.kz", "lists named by $input.kz"),
+    ("lists[$input.kn]", "lists named by $input.kn"),
+    ("lists[$input.ko]", "lists named by $input.ko"),
+    ("lists[$input.ks]", "lists named by $input.ks"),
+    ("lists[$input.kx]", "lists named by $input.kx"),
+    ("lists[$input.kz]", "lists named by $input.kz"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

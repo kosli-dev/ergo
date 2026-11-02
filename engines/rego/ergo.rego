@@ -707,14 +707,18 @@ _from_unreadable(req) if {
 	not is_string(k)
 }
 
-_from_cause(req) := _worst_of(unread) if {
-	unread := _from_ref_states(req) - {"value"}
+_from_cause(req) := flaws[0] if {
+	flaws := _from_path_flaws(req)
+	count(flaws) > 0
+} else := _worst_of(unread) if {
+	unread := {_ref_state(r) | some r in _keys_refs(_each_step(req))} - {"value"}
 	count(unread) > 0
+} else := "unusable"
+
+_from_path_flaws(req) := [f | some seg in p; f := _ref_step_flaw(seg)] if {
+	p := _from_path(req)
+	is_array(p)
 }
-
-_from_cause(req) := "unusable" if _from_ref_states(req) - {"value"} == set()
-
-_from_ref_states(req) := {_ref_state(seg.ref) | some seg in _from_path(req); _is_ref(seg)} | {_ref_state(r) | some r in _keys_refs(_each_step(req))}
 
 _keys_refs(step) := {step.keys.ref} if _is_ref(step.keys)
 
@@ -1648,7 +1652,7 @@ _step_key(seg) := _key(seg.literal) if _is_literal(seg)
 _step_key(seg) := _key(v) if {
 	_is_ref(seg)
 	v := _ref_read(seg.ref)
-	_is_key(v)
+	is_string(v)
 }
 
 _step_key(seg) := _key(seg) if {
@@ -3297,9 +3301,9 @@ else := "unusable" if _blocked(subj, path)
 
 else := "absent"
 
-default _any_read_state(_, _) := "absent"
+default _path_read_state(_, _) := "absent"
 
-_any_read_state(subj, path) := "not_an_object" if {
+_path_read_state(subj, path) := "not_an_object" if {
 	start := _start_of(subj, path)
 	not is_object(start)
 	not _reads_itself(path)
@@ -3321,12 +3325,11 @@ _list_subject_path(path) if {
 
 _position_first(path) if _index_step(_keys_of(path)[0])
 
-_any_read_state(_, path) := _name_step_state(path) if _name_step_state(path)
-
 _any_read_state(subj, path) := s if {
-	not _name_step_state(path)
-	s := _field_step_state(subj, path)
-}
+	s := _name_step_state(path)
+} else := _path_read_state(subj, path)
+
+_path_read_state(subj, path) := _field_step_state(subj, path)
 
 _field_step_state(subj, path) := "not_an_object" if {
 	_has_field_step(path)
@@ -3360,7 +3363,10 @@ else := "absent"
 
 _read_before_field(v) if v != _absent
 
-_walk_read_state(subj, path) := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
+_walk_read_state(subj, path) := _worst_of(flaws) if {
+	flaws := {f | some seg in path; f := _ref_step_flaw(seg)}
+	flaws != set()
+} else := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
 	is_object(subj)
 	i := _bad_field_at(subj, path)
 	_walks_before_field(subj, array.slice(path, 0, i))
@@ -3369,6 +3375,16 @@ _walk_read_state(subj, path) := _key_state(object.get(subj, path[i].named_by_fie
 	i := _bad_field_at(subj, path)
 	_null_before_field(subj, array.slice(path, 0, i))
 } else := _read_state(subj, path)
+
+_ref_step_flaw(seg) := "unusable" if {
+	_is_ref(seg)
+	_ref_state(seg.ref) == "value"
+	not is_string(_ref_read(seg.ref))
+} else := s if {
+	_is_ref(seg)
+	s := _ref_state(seg.ref)
+	s != "value"
+}
 
 _bad_field_at(subj, path) := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(subj, seg.named_by_field, null))})
 
@@ -3418,15 +3434,15 @@ _name_step_state(path) := "null" if {
 	not is_string(input["ergo/names"][step.named_by])
 }
 
-_any_read_state(subj, path) := "null" if _resolved(subj, path) == null
+_path_read_state(subj, path) := "null" if _resolved(subj, path) == null
 
-_any_read_state(subj, path) := "unusable" if {
+_path_read_state(subj, path) := "unusable" if {
 	start := _start_of(subj, path)
 	is_object(start)
 	_blocked(start, _keys_in(subj, path))
 }
 
-_any_read_state(subj, path) := "unusable" if {
+_path_read_state(subj, path) := "unusable" if {
 	_position_first(path)
 	start := _start_of(subj, path)
 	start != null
@@ -3434,7 +3450,7 @@ _any_read_state(subj, path) := "unusable" if {
 	not is_object(start)
 }
 
-_any_read_state(subj, path) := "value" if {
+_path_read_state(subj, path) := "value" if {
 	v := _resolved(subj, path)
 	v != _absent
 	v != null
@@ -3533,7 +3549,6 @@ _step_refs(check) := {x.ref |
 	_is_ref(x)
 	not _under_literal(check, p)
 	count(p) >= 2
-	p[count(p) - 2] in {"path", "left", "right", "each"}
 	is_number(p[count(p) - 1])
 }
 
@@ -3544,7 +3559,7 @@ _used_ref_state(check, r) := _ref_state(r) if not _wrong_step(check, r)
 _wrong_step(check, r) if {
 	r in _step_refs(check)
 	_ref_state(r) == "value"
-	not _is_key(_ref_read(r))
+	not is_string(_ref_read(r))
 }
 
 _under_literal(check, p) if {
@@ -8850,7 +8865,9 @@ _for_unread(subj, path, names) := _key_state(object.get(subj, path[i].named_by_f
 	is_object(subj)
 	i := _bad_field_at(subj, path)
 	_null_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
-} else := _walk_read_state(subj, path)
+} else := s if {
+	s := _walk_read_state(subj, path) with input as {"ergo/names": names}
+}
 
 _open_before_field(subj, prefix) if _read_before_field(_resolved(subj, prefix))
 
@@ -8947,7 +8964,7 @@ _for_unsortable(item, w, names) := array.concat(unread, mixed) if {
 
 _for_sort_state(item, e, names) := s if {
 	is_object(e.iv)
-	s := _read_state(e.iv, item.pick.by) with input as {"ergo/names": names}
+	s := _walk_read_state(e.iv, item.pick.by) with input as {"ergo/names": names}
 	s != "value"
 } else := "unusable" if is_object(e.iv)
 

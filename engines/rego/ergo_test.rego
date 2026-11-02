@@ -827,9 +827,10 @@ test_a_list_index_written_as_a_whole_number_reads_the_item if {
 	verdict({"id": 1, "a": [1, 2]}, "item 1 of .a is 1") == true
 }
 
-test_a_ref_step_that_reads_a_list_index_written_with_an_exponent_reads_the_item if {
+test_a_ref_step_that_reads_a_number_written_with_an_exponent_is_not_a_list_position if {
 	check := ".a named by $params.i exists"
-	params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check) == [[true, "satisfied", [{"name": ".a named by $params.i", "value": 2, "locations": ["/items/0/a/1"]}]]] with data.params as {"i": 1e0}
+	r := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 1e0}
+	[r[0], r[1]] == [false, "unusable"]
 }
 
 test_a_list_index_reads_the_same_item_however_other_checks_write_it if {
@@ -847,20 +848,19 @@ test_a_list_index_reads_the_same_item_however_other_checks_write_it if {
 
 test_a_ref_step_that_reads_something_that_cannot_be_a_key_fails_as_unusable if {
 	check := ".a named by $params.i exists"
-	params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check) == [[true, "satisfied", [{"name": ".a named by $params.i", "value": 2, "locations": ["/items/0/a/1"]}]]] with data.params as {"i": 1}
-	r := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": -1}
-	[r[0], r[1]] == [false, "unusable"]
-	s := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 1.5}
-	[s[0], s[1]] == [false, "unusable"]
+	every i in [1, 0, -1, 1.5, true, {"a": 1}, ["a"]] {
+		r := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": i}
+		[r[0], r[1]] == [false, "unusable"]
+	}
+	params_rows({"items": [{"id": 1, "a": {"x": 2}}]}, check) == [[true, "satisfied", [{"name": ".a named by $params.i", "value": 2, "locations": ["/items/0/a/x"]}]]] with data.params as {"i": "x"}
 }
 
-test_a_ref_step_that_reads_a_number_too_big_to_be_a_list_position_fails_as_unusable_so_does_not_exist_cannot_pass if {
+test_a_ref_step_that_reads_a_number_fails_as_unusable_so_does_not_exist_cannot_pass if {
 	check := ".a named by $params.i does not exist"
-	params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check) == [[true, "satisfied", [{"name": ".a named by $params.i", "value": null, "locations": ["/items/0/a"]}]]] with data.params as {"i": 9007199254740991}
-	r := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 9007199254740992}
-	[r[0], r[1]] == [false, "unusable"]
-	s := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": 1e20}
-	[s[0], s[1]] == [false, "unusable"]
+	every i in [2, 9007199254740991, 9007199254740992, 1e20] {
+		r := params_rows({"items": [{"id": 1, "a": [1, 2]}]}, check)[0] with data.params as {"i": i}
+		[r[0], r[1]] == [false, "unusable"]
+	}
 }
 
 test_a_check_with_a_number_too_big_for_a_float_fails_closed if {
@@ -3086,9 +3086,9 @@ test_a_ref_step_renders_and_is_recorded_like_any_ref if {
 	ergo.violations(rep)[0].inputs == [{"name": "attestations named by $params.att.status", "value": "FAILED", "locations": ["/trail/artifacts/app/attestations/junit/status"]}, {"name": "$params.att", "value": "junit", "locations": ["$params:/att"]}]
 }
 
-test_a_ref_step_can_be_a_list_index if {
+test_a_ref_step_is_never_a_list_position if {
 	check := "tags named by $params.i is \"v2\""
-	[r[0] | some r in trail_rows(check)] == [true] with data.params as {"artifact": "app", "i": 1}
+	[r[0] | some r in trail_rows(check)] == [false] with data.params as {"artifact": "app", "i": 1}
 }
 
 test_a_ref_step_that_cannot_be_read_fails_the_check if {
@@ -9936,9 +9936,9 @@ test_a_path_from_the_input_starts_at_the_root_of_the_input_whatever_the_subject 
 test_a_ref_step_adds_the_key_it_read_and_stops_before_it_when_it_cannot_be_read if {
 	check := {"c": ".a named by $params.i exists"}
 	doc := {"things": [{"id": "t1", "a": [1, 2]}]}
-	_located_rows(check, doc, {"i": 1}) == [["t1", "c", [{"name": ".a named by $params.i", "locations": ["/things/0/a/1"]}]]]
-	_located_rows(check, doc, {"i": 2}) == [["t1", "c", [{"name": ".a named by $params.i", "locations": ["/things/0/a"]}]]]
-	every i in [-1, 1.5, "1", null, [1]] {
+	_located_rows(check, {"things": [{"id": "t1", "a": {"x": 2}}]}, {"i": "x"}) == [["t1", "c", [{"name": ".a named by $params.i", "locations": ["/things/0/a/x"]}]]]
+	_located_rows(check, doc, {"i": "y"}) == [["t1", "c", [{"name": ".a named by $params.i", "locations": ["/things/0/a"]}]]]
+	every i in [1, 2, -1, 1.5, "1", null, [1]] {
 		_located_rows(check, doc, {"i": i}) == [["t1", "c", [{"name": ".a named by $params.i", "locations": ["/things/0/a"]}]]]
 	}
 	_located_rows(check, doc, {}) == [["t1", "c", [{"name": ".a named by $params.i", "locations": ["/things/0/a"]}]]]

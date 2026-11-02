@@ -1,5 +1,4 @@
 use crate::cause::Cause;
-use crate::value::Decimal;
 use serde_json::Value;
 use std::collections::BTreeMap;
 
@@ -186,10 +185,6 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
             }
             match read.value {
                 Some(Value::String(text)) => Ok(Resolved::Key(text.clone())),
-                Some(Value::Number(number)) => Decimal::parse(&number.to_string())
-                    .and_then(|d| d.as_position())
-                    .map(Resolved::Index)
-                    .ok_or(Outcome::Unusable),
                 _ => Err(Outcome::Unusable),
             }
         }
@@ -471,6 +466,41 @@ mod tests {
     }
 
     #[test]
+    fn a_number_an_alias_holds_is_unusable_as_a_key_not_a_position() {
+        let w = World::new(r#"{"m": [5, 1]}"#);
+        for (held, outcome) in [
+            ("1", Outcome::Unusable),
+            ("[1]", Outcome::Unusable),
+            ("{\"a\": 1}", Outcome::Unusable),
+            ("null", Outcome::Null),
+        ] {
+            let alias_value = v(held);
+            let mut aliases = BTreeMap::new();
+            aliases.insert(
+                "k".to_string(),
+                Located {
+                    value: &alias_value,
+                    location: Location::input_root().key("ks").index(0),
+                },
+            );
+            let ctx = Ctx {
+                subject: Located {
+                    value: &w.subject,
+                    location: Location::input_root(),
+                },
+                input: &w.input,
+                params: None,
+                aliases,
+            };
+            let step = Step::Ref(Box::new(at(Start::Alias("k".into()), vec![])));
+            assert!(
+                matches!(resolve(&step, &ctx), Err(found) if found == outcome),
+                "{held}"
+            );
+        }
+    }
+
+    #[test]
     fn an_alias_nothing_holds_is_absent_with_no_location() {
         let w = World::new("{}");
         let ctx = Ctx {
@@ -675,16 +705,18 @@ mod tests {
     }
 
     #[test]
-    fn a_ref_step_with_a_whole_number_reads_a_list_item() {
-        let w = World::new(r#"{"xs": [10, 20, 30]}"#).with_params(r#"{"i": 2.0}"#);
-        let reference = at(Start::Params, vec![key("i")]);
-        let (o, value, l) = w.run(&subject_path(vec![
-            key("xs"),
-            Step::Ref(Box::new(reference)),
-        ]));
-        assert_eq!(o, Outcome::Found);
-        assert_eq!(value, Some(v("30")));
-        assert_eq!(l, loc("/s/xs/2"));
+    fn a_ref_step_holding_a_whole_number_is_never_a_list_position() {
+        for params in [r#"{"i": 2}"#, r#"{"i": 2.0}"#, r#"{"i": 0}"#] {
+            let w = World::new(r#"{"xs": [10, 20, 30]}"#).with_params(params);
+            let reference = at(Start::Params, vec![key("i")]);
+            let (o, value, l) = w.run(&subject_path(vec![
+                key("xs"),
+                Step::Ref(Box::new(reference)),
+            ]));
+            assert_eq!(o, Outcome::Unusable, "{params}");
+            assert_eq!(value, None);
+            assert_eq!(l, loc("/s/xs"));
+        }
     }
 
     #[test]
@@ -782,18 +814,21 @@ mod tests {
     }
 
     #[test]
-    fn a_ref_holding_a_number_on_a_subject_list_reads_the_item() {
+    fn a_ref_holding_a_number_on_a_subject_list_is_unusable() {
         let w = World::new("[7, 8]").with_params(r#"{"k": 1}"#);
         let reference = at(Start::Params, vec![key("k")]);
         let (o, value, _) = w.run(&subject_path(vec![Step::Ref(Box::new(reference))]));
-        assert_eq!(o, Outcome::Found);
-        assert_eq!(value, Some(v("8")));
+        assert_eq!(o, Outcome::Unusable);
+        assert_eq!(value, None);
     }
 
     #[test]
     fn a_ref_value_that_cannot_be_a_key_is_unusable() {
         for params in [
             r#"{"k": true}"#,
+            r#"{"k": 0}"#,
+            r#"{"k": 1}"#,
+            r#"{"k": 1.0}"#,
             r#"{"k": 1.5}"#,
             r#"{"k": -1}"#,
             r#"{"k": [0]}"#,

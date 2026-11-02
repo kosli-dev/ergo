@@ -8016,7 +8016,7 @@
         "r": {
           "causes": [
             {
-              "cause": "absent",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -8095,7 +8095,7 @@
           }
         },
         {
-          "cause": "absent",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
@@ -17201,8 +17201,8 @@
         "r": {
           "causes": [
             {
-              "cause": "absent",
-              "rows": 2
+              "cause": "unusable",
+              "rows": 1
             }
           ],
           "checks": {
@@ -17277,7 +17277,7 @@
           "subject": "only",
           "subjects": {
             "matching": 0,
-            "total": 1
+            "total": 0
           }
         }
       },
@@ -17305,7 +17305,7 @@
           }
         },
         {
-          "cause": "absent",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
@@ -17335,25 +17335,6 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "only"
-          }
-        },
-        {
-          "cause": "absent",
-          "check": "$applies",
-          "inputs": [
-            {
-              "locations": [
-                "/scans"
-              ],
-              "name": "name",
-              "value": null
-            }
-          ],
-          "passed": false,
-          "requirement": "r",
-          "subject": {
-            "id": "a",
             "type": "only"
           }
         }
@@ -17418,8 +17399,8 @@
         "r": {
           "causes": [
             {
-              "cause": "absent",
-              "rows": 2
+              "cause": "unusable",
+              "rows": 1
             }
           ],
           "checks": {
@@ -17494,7 +17475,7 @@
           "subject": "only",
           "subjects": {
             "matching": 0,
-            "total": 1
+            "total": 0
           }
         }
       },
@@ -17522,7 +17503,7 @@
           }
         },
         {
-          "cause": "absent",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
@@ -17552,25 +17533,6 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "only"
-          }
-        },
-        {
-          "cause": "absent",
-          "check": "$applies",
-          "inputs": [
-            {
-              "locations": [
-                "/scans"
-              ],
-              "name": "name",
-              "value": null
-            }
-          ],
-          "passed": false,
-          "requirement": "r",
-          "subject": {
-            "id": "a",
             "type": "only"
           }
         }
@@ -18627,7 +18589,7 @@
         "r": {
           "causes": [
             {
-              "cause": "absent",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -18697,8 +18659,8 @@
           "status": "not_met",
           "subject": "scan",
           "subjects": {
-            "matching": 1,
-            "total": 1
+            "matching": 0,
+            "total": 0
           }
         }
       },
@@ -18726,15 +18688,13 @@
           }
         },
         {
-          "cause": "absent",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
-              "locations": [
-                "/scans"
-              ],
+              "locations": [],
               "name": "in-scope scan count",
-              "value": 1
+              "value": 0
             }
           ],
           "passed": false,
@@ -18758,25 +18718,6 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "scan"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "c",
-          "inputs": [
-            {
-              "locations": [
-                "/scans"
-              ],
-              "name": "x",
-              "value": null
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": "a",
             "type": "scan"
           }
         }
@@ -18832,7 +18773,7 @@
         "r": {
           "causes": [
             {
-              "cause": "absent",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -18902,8 +18843,8 @@
           "status": "not_met",
           "subject": "scan",
           "subjects": {
-            "matching": 1,
-            "total": 1
+            "matching": 0,
+            "total": 0
           }
         }
       },
@@ -18931,15 +18872,13 @@
           }
         },
         {
-          "cause": "absent",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
-              "locations": [
-                "/scans"
-              ],
+              "locations": [],
               "name": "in-scope scan count",
-              "value": 1
+              "value": 0
             }
           ],
           "passed": false,
@@ -18963,25 +18902,6 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "scan"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "c",
-          "inputs": [
-            {
-              "locations": [
-                "/scans"
-              ],
-              "name": "x",
-              "value": null
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": "a",
             "type": "scan"
           }
         }
@@ -19954,7 +19874,7 @@
         "r": {
           "causes": [
             {
-              "cause": "absent",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -20052,7 +19972,7 @@
           }
         },
         {
-          "cause": "absent",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
@@ -21006,7 +20926,7 @@
         "r": {
           "causes": [
             {
-              "cause": "absent",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -21099,7 +21019,7 @@
           }
         },
         {
-          "cause": "absent",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
@@ -21723,7 +21643,7 @@
         "r": {
           "causes": [
             {
-              "cause": "absent",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -21821,7 +21741,7 @@
           }
         },
         {
-          "cause": "absent",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
@@ -22245,7 +22165,7 @@
         "r": {
           "causes": [
             {
-              "cause": "absent",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -22338,7 +22258,7 @@
           }
         },
         {
-          "cause": "absent",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
@@ -24681,7 +24601,7 @@
         "r": {
           "causes": [
             {
-              "cause": "null",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -24779,7 +24699,7 @@
           }
         },
         {
-          "cause": "null",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
@@ -25207,7 +25127,7 @@
         "r": {
           "causes": [
             {
-              "cause": "null",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -25300,7 +25220,7 @@
           }
         },
         {
-          "cause": "null",
+          "cause": "unusable",
           "check": "$min_subjects",
           "inputs": [
             {
@@ -34620,10 +34540,6 @@
             {
               "cause": "unusable",
               "rows": 1
-            },
-            {
-              "cause": "absent",
-              "rows": 1
             }
           ],
           "checks": {
@@ -34698,7 +34614,7 @@
           "subject": "only",
           "subjects": {
             "matching": 0,
-            "total": 1
+            "total": 0
           }
         }
       },
@@ -34756,25 +34672,6 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "only"
-          }
-        },
-        {
-          "cause": "absent",
-          "check": "$applies",
-          "inputs": [
-            {
-              "locations": [
-                "/scans"
-              ],
-              "name": "name",
-              "value": null
-            }
-          ],
-          "passed": false,
-          "requirement": "r",
-          "subject": {
-            "id": "a",
             "type": "only"
           }
         }
@@ -34836,10 +34733,6 @@
           "causes": [
             {
               "cause": "unusable",
-              "rows": 1
-            },
-            {
-              "cause": "absent",
               "rows": 1
             }
           ],
@@ -34915,7 +34808,7 @@
           "subject": "only",
           "subjects": {
             "matching": 0,
-            "total": 1
+            "total": 0
           }
         }
       },
@@ -34973,25 +34866,6 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "only"
-          }
-        },
-        {
-          "cause": "absent",
-          "check": "$applies",
-          "inputs": [
-            {
-              "locations": [
-                "/scans"
-              ],
-              "name": "name",
-              "value": null
-            }
-          ],
-          "passed": false,
-          "requirement": "r",
-          "subject": {
-            "id": "a",
             "type": "only"
           }
         }
@@ -35120,8 +34994,8 @@
           "status": "not_met",
           "subject": "scan",
           "subjects": {
-            "matching": 1,
-            "total": 1
+            "matching": 0,
+            "total": 0
           }
         }
       },
@@ -35153,11 +35027,9 @@
           "check": "$min_subjects",
           "inputs": [
             {
-              "locations": [
-                "/scans"
-              ],
+              "locations": [],
               "name": "in-scope scan count",
-              "value": 1
+              "value": 0
             }
           ],
           "passed": false,
@@ -35181,25 +35053,6 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "scan"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "c",
-          "inputs": [
-            {
-              "locations": [
-                "/scans"
-              ],
-              "name": "x",
-              "value": null
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": "a",
             "type": "scan"
           }
         }
@@ -35321,8 +35174,8 @@
           "status": "not_met",
           "subject": "scan",
           "subjects": {
-            "matching": 1,
-            "total": 1
+            "matching": 0,
+            "total": 0
           }
         }
       },
@@ -35354,11 +35207,9 @@
           "check": "$min_subjects",
           "inputs": [
             {
-              "locations": [
-                "/scans"
-              ],
+              "locations": [],
               "name": "in-scope scan count",
-              "value": 1
+              "value": 0
             }
           ],
           "passed": false,
@@ -35382,25 +35233,6 @@
           "requirement": "r",
           "subject": {
             "id": null,
-            "type": "scan"
-          }
-        },
-        {
-          "cause": "satisfied",
-          "check": "c",
-          "inputs": [
-            {
-              "locations": [
-                "/scans"
-              ],
-              "name": "x",
-              "value": null
-            }
-          ],
-          "passed": true,
-          "requirement": "r",
-          "subject": {
-            "id": "a",
             "type": "scan"
           }
         }

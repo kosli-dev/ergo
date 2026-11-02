@@ -89,6 +89,10 @@ The spec doesn't settle these yet, because the two engines give different report
 
 - **A check with a field it doesn't take.** [sentence.print.written_wrong](syntax.md#printing-the-sentence) doesn't say how a check prints when its sentences read but it has an unknown field, a `for` that isn't a string, or `for` or `assert` next to `any_of`. `ergo.rego` prints it as written and Rust prints it from its parse, so `{"assert": " x  is  1", "zzz": 1}` gives `x  is  1` with one and `x is 1` with the other.
 
+## Where both engines differ from a rule
+
+- **A bad ref before `named by each of`, with a good list.** [subjects.sentence](semantics.md#requirements) says each key is a subject even when the path before `named by each of` doesn't end `found` on an object. With `from: scans named by $params.env named by each of $params.k`, `env` holding `1` and `k` holding `["a"]`, neither engine makes a subject of `a`: both give no subjects, and `$min_subjects` fails as `unusable`. The rule should either make the keys subjects there too, or say that a bad ref in the path gives none.
+
 ## Rules without cases
 
 Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about hashing numbers above. `report.keys` is about how the report is written out, and a case compares a report as values, where the order of keys doesn't count. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.

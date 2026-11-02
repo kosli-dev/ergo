@@ -10042,5 +10042,340 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for alias that holds anything but a string, after named by",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": {"for": "every ks as k", "assert": "m named by k is 1"}, "b": {"for": "every ks as k, every n named by k as x", "assert": "x is 1"}, "c": {"for": "every ks as k", "assert": "every n named by k is 1"}, "d": {"for": "every ks as k", "assert": "some n named by k is 1"}, "e": {"for": "every ks as k", "assert": "some vals is m named by k"}, "f": {"for": "every ks as k", "assert": "every vals is in n named by k"}, "g": {"for": "every ks as k", "assert": "m named by k is not 2"}, "h": {"for": "every ks as k", "assert": "count of n named by k is at most 5"}}}}},
+    "cases": [
+      {
+        "description": "fails as null when it holds null and as unusable otherwise, in an assertion, in a second item and in a one-line every or some, a number never read as a position, and the failed item shows what it held",
+        "rules": ["for.named_by", "sentence.path.dynamic"],
+        "input": {"things": [{"id": "t1", "vals": [1], "ks": [{"a": 1}], "m": {"q": 1}, "n": {"q": [1]}}, {"id": "t2", "vals": [1], "ks": [["q"]], "m": {"q": 1}, "n": {"q": [1]}}, {"id": "t3", "vals": [1], "ks": [3], "m": {"q": 1}, "n": {"q": [1]}}, {"id": "t4", "vals": [1], "ks": [null], "m": {"q": 1}, "n": {"q": [1]}}, {"id": "t5", "vals": [1], "ks": [1], "m": [5, 1], "n": [[5], [1]]}, {"id": "t6", "vals": [1], "ks": ["q"], "m": {"q": 1}, "n": {"q": [1]}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m named by k is 1", "cause": "unusable", "inputs": [{"locations": ["/things/0/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/0/ks/0"], "path": "item 1 of ks", "value": {"a": 1}}], "inputs": [{"locations": ["/things/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": ["/things/0/m"], "name": "m", "value": {"q": 1}}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [{"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "n named by k", "locations": ["/things/0/n"], "path": "n named by k", "value": null}], "item": "item 1 of ks", "locations": ["/things/0/ks/0"], "path": "item 1 of ks", "value": {"a": 1}}], "inputs": [{"locations": ["/things/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": [], "name": "n named by k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every n named by k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/0/ks/0"], "path": "item 1 of ks", "value": {"a": 1}}], "inputs": [{"locations": ["/things/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": ["/things/0/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "some n named by k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/0/ks/0"], "path": "item 1 of ks", "value": {"a": 1}}], "inputs": [{"locations": ["/things/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": ["/things/0/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "some vals equals m named by k", "cause": "unusable", "inputs": [{"locations": ["/things/0/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/0/ks/0"], "path": "item 1 of ks", "value": {"a": 1}}], "inputs": [{"locations": ["/things/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": ["/things/0/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every vals is in n named by k", "cause": "unusable", "inputs": [{"locations": ["/things/0/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/0/ks/0"], "path": "item 1 of ks", "value": {"a": 1}}], "inputs": [{"locations": ["/things/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": ["/things/0/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "g", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m named by k is not 2", "cause": "unusable", "inputs": [{"locations": ["/things/0/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/0/ks/0"], "path": "item 1 of ks", "value": {"a": 1}}], "inputs": [{"locations": ["/things/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": ["/things/0/m"], "name": "m", "value": {"q": 1}}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "h", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of n named by k is at most 5", "cause": "unusable", "inputs": [{"locations": [], "name": "count of n named by k", "value": null}, {"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/0/ks/0"], "path": "item 1 of ks", "value": {"a": 1}}], "inputs": [{"locations": ["/things/0/ks/0"], "name": "ks[]", "value": [{"a": 1}]}, {"locations": ["/things/0/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m named by k is 1", "cause": "unusable", "inputs": [{"locations": ["/things/1/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/1/ks/0"], "path": "item 1 of ks", "value": ["q"]}], "inputs": [{"locations": ["/things/1/ks/0"], "name": "ks[]", "value": [["q"]]}, {"locations": ["/things/1/m"], "name": "m", "value": {"q": 1}}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [{"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "n named by k", "locations": ["/things/1/n"], "path": "n named by k", "value": null}], "item": "item 1 of ks", "locations": ["/things/1/ks/0"], "path": "item 1 of ks", "value": ["q"]}], "inputs": [{"locations": ["/things/1/ks/0"], "name": "ks[]", "value": [["q"]]}, {"locations": [], "name": "n named by k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every n named by k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/1/ks/0"], "path": "item 1 of ks", "value": ["q"]}], "inputs": [{"locations": ["/things/1/ks/0"], "name": "ks[]", "value": [["q"]]}, {"locations": ["/things/1/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "some n named by k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/1/ks/0"], "path": "item 1 of ks", "value": ["q"]}], "inputs": [{"locations": ["/things/1/ks/0"], "name": "ks[]", "value": [["q"]]}, {"locations": ["/things/1/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "some vals equals m named by k", "cause": "unusable", "inputs": [{"locations": ["/things/1/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/1/ks/0"], "path": "item 1 of ks", "value": ["q"]}], "inputs": [{"locations": ["/things/1/ks/0"], "name": "ks[]", "value": [["q"]]}, {"locations": ["/things/1/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every vals is in n named by k", "cause": "unusable", "inputs": [{"locations": ["/things/1/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/1/ks/0"], "path": "item 1 of ks", "value": ["q"]}], "inputs": [{"locations": ["/things/1/ks/0"], "name": "ks[]", "value": [["q"]]}, {"locations": ["/things/1/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "g", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m named by k is not 2", "cause": "unusable", "inputs": [{"locations": ["/things/1/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/1/ks/0"], "path": "item 1 of ks", "value": ["q"]}], "inputs": [{"locations": ["/things/1/ks/0"], "name": "ks[]", "value": [["q"]]}, {"locations": ["/things/1/m"], "name": "m", "value": {"q": 1}}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "h", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of n named by k is at most 5", "cause": "unusable", "inputs": [{"locations": [], "name": "count of n named by k", "value": null}, {"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/1/ks/0"], "path": "item 1 of ks", "value": ["q"]}], "inputs": [{"locations": ["/things/1/ks/0"], "name": "ks[]", "value": [["q"]]}, {"locations": ["/things/1/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m named by k is 1", "cause": "unusable", "inputs": [{"locations": ["/things/2/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/2/ks/0"], "path": "item 1 of ks", "value": 3}], "inputs": [{"locations": ["/things/2/ks/0"], "name": "ks[]", "value": [3]}, {"locations": ["/things/2/m"], "name": "m", "value": {"q": 1}}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [{"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "n named by k", "locations": ["/things/2/n"], "path": "n named by k", "value": null}], "item": "item 1 of ks", "locations": ["/things/2/ks/0"], "path": "item 1 of ks", "value": 3}], "inputs": [{"locations": ["/things/2/ks/0"], "name": "ks[]", "value": [3]}, {"locations": [], "name": "n named by k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every n named by k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/2/ks/0"], "path": "item 1 of ks", "value": 3}], "inputs": [{"locations": ["/things/2/ks/0"], "name": "ks[]", "value": [3]}, {"locations": ["/things/2/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "some n named by k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/2/ks/0"], "path": "item 1 of ks", "value": 3}], "inputs": [{"locations": ["/things/2/ks/0"], "name": "ks[]", "value": [3]}, {"locations": ["/things/2/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "some vals equals m named by k", "cause": "unusable", "inputs": [{"locations": ["/things/2/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/2/ks/0"], "path": "item 1 of ks", "value": 3}], "inputs": [{"locations": ["/things/2/ks/0"], "name": "ks[]", "value": [3]}, {"locations": ["/things/2/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every vals is in n named by k", "cause": "unusable", "inputs": [{"locations": ["/things/2/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/2/ks/0"], "path": "item 1 of ks", "value": 3}], "inputs": [{"locations": ["/things/2/ks/0"], "name": "ks[]", "value": [3]}, {"locations": ["/things/2/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "unusable", "check": "g", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m named by k is not 2", "cause": "unusable", "inputs": [{"locations": ["/things/2/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/2/ks/0"], "path": "item 1 of ks", "value": 3}], "inputs": [{"locations": ["/things/2/ks/0"], "name": "ks[]", "value": [3]}, {"locations": ["/things/2/m"], "name": "m", "value": {"q": 1}}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "unusable", "check": "h", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of n named by k is at most 5", "cause": "unusable", "inputs": [{"locations": [], "name": "count of n named by k", "value": null}, {"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/2/ks/0"], "path": "item 1 of ks", "value": 3}], "inputs": [{"locations": ["/things/2/ks/0"], "name": "ks[]", "value": [3]}, {"locations": ["/things/2/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
+          {"cause": "null", "check": "a", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "m named by k is 1", "cause": "null", "inputs": [{"locations": ["/things/3/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/3/ks/0"], "path": "item 1 of ks", "value": null}], "inputs": [{"locations": ["/things/3/ks/0"], "name": "ks[]", "value": [null]}, {"locations": ["/things/3/m"], "name": "m", "value": {"q": 1}}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}},
+          {"cause": "null", "check": "b", "failed_items": [{"cause": "null", "failed_assertions": [], "failed_items": [{"cause": "null", "item": "n named by k", "locations": ["/things/3/n"], "path": "n named by k", "value": null}], "item": "item 1 of ks", "locations": ["/things/3/ks/0"], "path": "item 1 of ks", "value": null}], "inputs": [{"locations": ["/things/3/ks/0"], "name": "ks[]", "value": [null]}, {"locations": [], "name": "n named by k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}},
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "every n named by k is 1", "cause": "null", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/3/ks/0"], "path": "item 1 of ks", "value": null}], "inputs": [{"locations": ["/things/3/ks/0"], "name": "ks[]", "value": [null]}, {"locations": ["/things/3/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}},
+          {"cause": "null", "check": "d", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "some n named by k is 1", "cause": "null", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/3/ks/0"], "path": "item 1 of ks", "value": null}], "inputs": [{"locations": ["/things/3/ks/0"], "name": "ks[]", "value": [null]}, {"locations": ["/things/3/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}},
+          {"cause": "null", "check": "e", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "some vals equals m named by k", "cause": "null", "inputs": [{"locations": ["/things/3/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/3/ks/0"], "path": "item 1 of ks", "value": null}], "inputs": [{"locations": ["/things/3/ks/0"], "name": "ks[]", "value": [null]}, {"locations": ["/things/3/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}},
+          {"cause": "null", "check": "f", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "every vals is in n named by k", "cause": "null", "inputs": [{"locations": ["/things/3/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/3/ks/0"], "path": "item 1 of ks", "value": null}], "inputs": [{"locations": ["/things/3/ks/0"], "name": "ks[]", "value": [null]}, {"locations": ["/things/3/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}},
+          {"cause": "null", "check": "g", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "m named by k is not 2", "cause": "null", "inputs": [{"locations": ["/things/3/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/3/ks/0"], "path": "item 1 of ks", "value": null}], "inputs": [{"locations": ["/things/3/ks/0"], "name": "ks[]", "value": [null]}, {"locations": ["/things/3/m"], "name": "m", "value": {"q": 1}}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}},
+          {"cause": "null", "check": "h", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "count of n named by k is at most 5", "cause": "null", "inputs": [{"locations": [], "name": "count of n named by k", "value": null}, {"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/3/ks/0"], "path": "item 1 of ks", "value": null}], "inputs": [{"locations": ["/things/3/ks/0"], "name": "ks[]", "value": [null]}, {"locations": ["/things/3/n"], "name": "n", "value": {"q": [1]}}], "passed": false, "requirement": "s", "subject": {"id": "t4", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m named by k is 1", "cause": "unusable", "inputs": [{"locations": ["/things/4/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/4/ks/0"], "path": "item 1 of ks", "value": 1}], "inputs": [{"locations": ["/things/4/ks/0"], "name": "ks[]", "value": [1]}, {"locations": ["/things/4/m"], "name": "m", "value": [5, 1]}], "passed": false, "requirement": "s", "subject": {"id": "t5", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [{"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "n named by k", "locations": ["/things/4/n"], "path": "n named by k", "value": null}], "item": "item 1 of ks", "locations": ["/things/4/ks/0"], "path": "item 1 of ks", "value": 1}], "inputs": [{"locations": ["/things/4/ks/0"], "name": "ks[]", "value": [1]}, {"locations": [], "name": "n named by k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t5", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every n named by k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/4/ks/0"], "path": "item 1 of ks", "value": 1}], "inputs": [{"locations": ["/things/4/ks/0"], "name": "ks[]", "value": [1]}, {"locations": ["/things/4/n"], "name": "n", "value": [[5], [1]]}], "passed": false, "requirement": "s", "subject": {"id": "t5", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "some n named by k is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/4/ks/0"], "path": "item 1 of ks", "value": 1}], "inputs": [{"locations": ["/things/4/ks/0"], "name": "ks[]", "value": [1]}, {"locations": ["/things/4/n"], "name": "n", "value": [[5], [1]]}], "passed": false, "requirement": "s", "subject": {"id": "t5", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "some vals equals m named by k", "cause": "unusable", "inputs": [{"locations": ["/things/4/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/4/ks/0"], "path": "item 1 of ks", "value": 1}], "inputs": [{"locations": ["/things/4/ks/0"], "name": "ks[]", "value": [1]}, {"locations": ["/things/4/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t5", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every vals is in n named by k", "cause": "unusable", "inputs": [{"locations": ["/things/4/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/4/ks/0"], "path": "item 1 of ks", "value": 1}], "inputs": [{"locations": ["/things/4/ks/0"], "name": "ks[]", "value": [1]}, {"locations": ["/things/4/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t5", "type": "thing"}},
+          {"cause": "unusable", "check": "g", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m named by k is not 2", "cause": "unusable", "inputs": [{"locations": ["/things/4/m"], "name": "m named by k", "value": null}]}], "item": "item 1 of ks", "locations": ["/things/4/ks/0"], "path": "item 1 of ks", "value": 1}], "inputs": [{"locations": ["/things/4/ks/0"], "name": "ks[]", "value": [1]}, {"locations": ["/things/4/m"], "name": "m", "value": [5, 1]}], "passed": false, "requirement": "s", "subject": {"id": "t5", "type": "thing"}},
+          {"cause": "unusable", "check": "h", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of n named by k is at most 5", "cause": "unusable", "inputs": [{"locations": [], "name": "count of n named by k", "value": null}, {"locations": [], "name": "n named by k", "value": []}]}], "item": "item 1 of ks", "locations": ["/things/4/ks/0"], "path": "item 1 of ks", "value": 1}], "inputs": [{"locations": ["/things/4/ks/0"], "name": "ks[]", "value": [1]}, {"locations": ["/things/4/n"], "name": "n", "value": [[5], [1]]}], "passed": false, "requirement": "s", "subject": {"id": "t5", "type": "thing"}},
+          {"cause": "satisfied", "check": "a", "failed_items": [], "inputs": [{"locations": ["/things/5/ks/0"], "name": "ks[]", "value": ["q"]}, {"locations": ["/things/5/m"], "name": "m", "value": {"q": 1}}], "passed": true, "requirement": "s", "subject": {"id": "t6", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "failed_items": [], "inputs": [{"locations": ["/things/5/ks/0"], "name": "ks[]", "value": ["q"]}, {"locations": ["/things/5/n/q/0"], "name": "n named by k[]", "value": [1]}], "passed": true, "requirement": "s", "subject": {"id": "t6", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/things/5/ks/0"], "name": "ks[]", "value": ["q"]}, {"locations": ["/things/5/n"], "name": "n", "value": {"q": [1]}}], "passed": true, "requirement": "s", "subject": {"id": "t6", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "failed_items": [], "inputs": [{"locations": ["/things/5/ks/0"], "name": "ks[]", "value": ["q"]}, {"locations": ["/things/5/n"], "name": "n", "value": {"q": [1]}}], "passed": true, "requirement": "s", "subject": {"id": "t6", "type": "thing"}},
+          {"cause": "not_an_object", "check": "e", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "some vals equals m named by k", "cause": "not_an_object", "inputs": [{"locations": ["/things/5/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/5/ks/0"], "path": "item 1 of ks", "value": "q"}], "inputs": [{"locations": ["/things/5/ks/0"], "name": "ks[]", "value": ["q"]}, {"locations": ["/things/5/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t6", "type": "thing"}},
+          {"cause": "not_an_object", "check": "f", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "every vals is in n named by k", "cause": "not_an_object", "inputs": [{"locations": ["/things/5/vals/0"], "name": "vals[]", "value": [1]}]}], "item": "item 1 of ks", "locations": ["/things/5/ks/0"], "path": "item 1 of ks", "value": "q"}], "inputs": [{"locations": ["/things/5/ks/0"], "name": "ks[]", "value": ["q"]}, {"locations": ["/things/5/vals/0"], "name": "vals[]", "value": [1]}], "passed": false, "requirement": "s", "subject": {"id": "t6", "type": "thing"}},
+          {"cause": "satisfied", "check": "g", "failed_items": [], "inputs": [{"locations": ["/things/5/ks/0"], "name": "ks[]", "value": ["q"]}, {"locations": ["/things/5/m"], "name": "m", "value": {"q": 1}}], "passed": true, "requirement": "s", "subject": {"id": "t6", "type": "thing"}},
+          {"cause": "satisfied", "check": "h", "failed_items": [], "inputs": [{"locations": ["/things/5/ks/0"], "name": "ks[]", "value": ["q"]}, {"locations": ["/things/5/n"], "name": "n", "value": {"q": [1]}}], "passed": true, "requirement": "s", "subject": {"id": "t6", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias that holds an object, after named by in a later item",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": {"for": "every rows as r, every r.xs named by r.k as x", "assert": "x is 1"}}}}},
+    "cases": [
+      {
+        "description": "the key after named by is one word, so r.xs named by r.k reads the key r holds, which is the whole row, and fails as unusable",
+        "rules": ["for.named_by", "sentence.path.dynamic"],
+        "input": {"things": [{"id": "t1", "vals": [1], "rows": [{"k": "q", "xs": {"q": [1]}}]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "failed_items": [{"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "r.xs named by r.k", "locations": ["/things/0/rows/0/xs"], "path": "r.xs named by r.k", "value": null}], "item": "item 1 of rows", "locations": ["/things/0/rows/0"], "path": "item 1 of rows", "value": {"k": "q", "xs": {"q": [1]}}}], "inputs": [{"locations": [], "name": "r.xs named by r.k", "value": []}, {"locations": ["/things/0/rows/0"], "name": "rows[]", "value": [{"k": "q", "xs": {"q": [1]}}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a key from $params that isn't a string, after named by",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "m named by $params.k1 is 1", "b": "m named by $params.k0 is 1", "c": "m named by $params.kf is 1", "d": "m named by $params.kt is 1", "e": "m named by $params.ko is 1", "f": "m named by $params.kl is 1", "g": "m named by $params.kn is 1", "h": "m named by $params.kx is 1", "i": "m named by $params.ks is 1", "j": "every n named by $params.k1 is 1", "k": "count of n named by $params.k1 is 1", "l": "s is \"a\" followed by t named by $params.k1", "m": "m[$params.k1] is 1", "n": {"for": "every n named by $params.k1 as x", "assert": "x is 1"}}}}},
+    "params": {"k1": 1, "k0": 0, "kf": 1.0, "kt": true, "ko": {"a": 1}, "kl": ["q"], "kn": null, "ks": "q"},
+    "cases": [
+      {
+        "description": "a number, a boolean, an object or a list fails as unusable, null as null and a missing key as absent, in a comparison, an every, a count, a followed by piece, brackets and a for line, and a number never reads a list position, so m named by $params.k1 with m [5, 1] fails and doesn't read 1; a string key reads an object and fails as unusable on a list",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"things": [{"id": "t1", "s": "ab", "m": [5, 1], "n": [[5], [1]], "t": ["x", "b"]}, {"id": "t2", "s": "ab", "m": {"q": 1}, "n": {"q": [1]}, "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k1", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k0", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.kf", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.kt", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.ko", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.kl", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "g", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.kn", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "h", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.kx", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "i", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.ks", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "j", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k1", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "k", "inputs": [{"locations": [], "name": "count of n named by $params.k1", "value": null}, {"locations": [], "name": "n named by $params.k1", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "l", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $params.k1", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "m", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k1", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "n", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k1", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/1/m"], "name": "m named by $params.k1", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/things/1/m"], "name": "m named by $params.k0", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/1/m"], "name": "m named by $params.kf", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/1/m"], "name": "m named by $params.kt", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/1/m"], "name": "m named by $params.ko", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "inputs": [{"locations": ["/things/1/m"], "name": "m named by $params.kl", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "null", "check": "g", "inputs": [{"locations": ["/things/1/m"], "name": "m named by $params.kn", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "absent", "check": "h", "inputs": [{"locations": ["/things/1/m"], "name": "m named by $params.kx", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "satisfied", "check": "i", "inputs": [{"locations": ["/things/1/m/q"], "name": "m named by $params.ks", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "j", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k1", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "k", "inputs": [{"locations": [], "name": "count of n named by $params.k1", "value": null}, {"locations": [], "name": "n named by $params.k1", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "l", "inputs": [{"locations": ["/things/1/s"], "name": "s", "value": "ab"}, {"locations": ["/things/1/t"], "name": "t named by $params.k1", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "m", "inputs": [{"locations": ["/things/1/m"], "name": "m named by $params.k1", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "unusable", "check": "n", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k1", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a key from $input that isn't a string, after named by",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "m named by $input.k is 1", "b": "every n named by $input.k is 1", "c": "count of n named by $input.k is 1", "d": "s is \"a\" followed by t named by $input.k", "e": "m[$input.k] is 1", "f": {"for": "every n named by $input.k as x", "assert": "x is 1"}}}}},
+    "cases": [
+      {
+        "description": "a number key fails as unusable and never reads a list position, so m with [5, 1] and k 1 fails and doesn't read 1",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"k": 1, "things": [{"id": "t1", "m": [5, 1], "n": [[5], [1]], "s": "ab", "t": ["x", "b"]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of n named by $input.k", "value": null}, {"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a key of 0 fails as unusable and never reads a list position",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"k": 0, "things": [{"id": "t1", "m": [1, 5], "n": [[1], [5]], "s": "ab", "t": ["b", "x"]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of n named by $input.k", "value": null}, {"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a key of 1.0 fails as unusable and never reads a list position",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"k": 1.0, "things": [{"id": "t1", "m": [5, 1], "n": [[5], [1]], "s": "ab", "t": ["x", "b"]}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of n named by $input.k", "value": null}, {"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a boolean key fails as unusable",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"k": true, "things": [{"id": "t1", "m": {"true": 1}, "n": {"true": [1]}, "s": "ab", "t": {"true": "b"}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of n named by $input.k", "value": null}, {"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an object key fails as unusable",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"k": {"a": 1}, "things": [{"id": "t1", "m": {"a": 1}, "n": {"a": [1]}, "s": "ab", "t": {"a": "b"}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of n named by $input.k", "value": null}, {"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a list key fails as unusable",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"k": ["q"], "things": [{"id": "t1", "m": {"q": 1}, "n": {"q": [1]}, "s": "ab", "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of n named by $input.k", "value": null}, {"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "f", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a null key fails as null",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"k": null, "things": [{"id": "t1", "m": {"q": 1}, "n": {"q": [1]}, "s": "ab", "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": [], "name": "count of n named by $input.k", "value": null}, {"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "e", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "f", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a missing key fails as absent",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"things": [{"id": "t1", "m": {"q": 1}, "n": {"q": [1]}, "s": "ab", "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": [], "name": "count of n named by $input.k", "value": null}, {"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "e", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $input.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "f", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $input.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a string key reads the object and passes",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"k": "q", "things": [{"id": "t1", "m": {"q": 1}, "n": {"q": [1]}, "s": "ab", "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/things/0/m/q"], "name": "m named by $input.k", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "b", "failed_items": [], "inputs": [{"locations": ["/things/0/n/q/0"], "name": "n named by $input.k[]", "value": [1]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/n/q/0"], "name": "count of n named by $input.k", "value": 1}, {"locations": ["/things/0/n/q/0"], "name": "n named by $input.k[]", "value": [1]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t/q"], "name": "t named by $input.k", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/things/0/m/q"], "name": "m named by $input.k", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "f", "failed_items": [], "inputs": [{"locations": ["/things/0/n/q/0"], "name": "n named by $input.k[]", "value": [1]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a key from $params that is a boolean, after named by",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "every n named by $params.k is 1", "b": "count of n named by $params.k is 1", "c": "s is \"a\" followed by t named by $params.k", "d": "m[$params.k] is 1", "e": {"for": "every n named by $params.k as x", "assert": "x is 1"}}}}},
+    "params": {"k": true},
+    "cases": [
+      {
+        "description": "fails as unusable in an every, a count, a followed by piece, brackets and a for line",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"things": [{"id": "t1", "s": "ab", "m": {"q": 1}, "n": {"q": [1]}, "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": [], "name": "count of n named by $params.k", "value": null}, {"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a key from $params that is an object, after named by",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "every n named by $params.k is 1", "b": "count of n named by $params.k is 1", "c": "s is \"a\" followed by t named by $params.k", "d": "m[$params.k] is 1", "e": {"for": "every n named by $params.k as x", "assert": "x is 1"}}}}},
+    "params": {"k": {"a": 1}},
+    "cases": [
+      {
+        "description": "fails as unusable in an every, a count, a followed by piece, brackets and a for line",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"things": [{"id": "t1", "s": "ab", "m": {"q": 1}, "n": {"q": [1]}, "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": [], "name": "count of n named by $params.k", "value": null}, {"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a key from $params that is a list, after named by",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "every n named by $params.k is 1", "b": "count of n named by $params.k is 1", "c": "s is \"a\" followed by t named by $params.k", "d": "m[$params.k] is 1", "e": {"for": "every n named by $params.k as x", "assert": "x is 1"}}}}},
+    "params": {"k": ["q"]},
+    "cases": [
+      {
+        "description": "fails as unusable in an every, a count, a followed by piece, brackets and a for line",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"things": [{"id": "t1", "s": "ab", "m": {"q": 1}, "n": {"q": [1]}, "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": [], "name": "count of n named by $params.k", "value": null}, {"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "e", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a key from $params that is null, after named by",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "every n named by $params.k is 1", "b": "count of n named by $params.k is 1", "c": "s is \"a\" followed by t named by $params.k", "d": "m[$params.k] is 1", "e": {"for": "every n named by $params.k as x", "assert": "x is 1"}}}}},
+    "params": {"k": null},
+    "cases": [
+      {
+        "description": "fails as null in an every, a count, a followed by piece, brackets and a for line",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"things": [{"id": "t1", "s": "ab", "m": {"q": 1}, "n": {"q": [1]}, "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "null", "check": "a", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "b", "inputs": [{"locations": [], "name": "count of n named by $params.k", "value": null}, {"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "e", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a key the params don't have, after named by",
+    "policy": {"ergo_spec": "v0.4-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "every n named by $params.k is 1", "b": "count of n named by $params.k is 1", "c": "s is \"a\" followed by t named by $params.k", "d": "m[$params.k] is 1", "e": {"for": "every n named by $params.k as x", "assert": "x is 1"}}}}},
+    "params": {},
+    "cases": [
+      {
+        "description": "fails as absent in an every, a count, a followed by piece, brackets and a for line",
+        "rules": ["path.ref_step", "sentence.path.dynamic", "sentence.path.brackets"],
+        "input": {"things": [{"id": "t1", "s": "ab", "m": {"q": 1}, "n": {"q": [1]}, "t": {"q": "b"}}]},
+        "results": [
+          {"cause": "absent", "check": "a", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": [], "name": "count of n named by $params.k", "value": null}, {"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/s"], "name": "s", "value": "ab"}, {"locations": ["/things/0/t"], "name": "t named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/0/m"], "name": "m named by $params.k", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "e", "failed_items": [], "inputs": [{"locations": [], "name": "n named by $params.k", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

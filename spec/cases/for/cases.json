@@ -17814,5 +17814,557 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line sorted by a path named by a key from $params",
+    "policy": {
+      "ergo_spec": "v0.4-dev",
+      "requirements": {
+        "a missing key": {
+          "checks": {
+            "c": {
+              "assert": "r.v is 1",
+              "for": "first of rows sorted by m named by $params.km as r"
+            }
+          },
+          "subject": "thing"
+        },
+        "a null key": {
+          "checks": {
+            "c": {
+              "assert": "r.v is 1",
+              "for": "first of rows sorted by m named by $params.kz as r"
+            }
+          },
+          "subject": "thing"
+        },
+        "a number key": {
+          "checks": {
+            "c": {
+              "assert": "r.v is 1",
+              "for": "first of rows sorted by m named by $params.kn as r"
+            }
+          },
+          "subject": "thing"
+        },
+        "a string key": {
+          "checks": {
+            "c": {
+              "assert": "r.v is 1",
+              "for": "first of rows sorted by m named by $params.ks as r"
+            }
+          },
+          "subject": "thing"
+        },
+        "an object key": {
+          "checks": {
+            "c": {
+              "assert": "r.v is 1",
+              "for": "first of rows sorted by m named by $params.ko as r"
+            }
+          },
+          "subject": "thing"
+        }
+      },
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      }
+    },
+    "params": {
+      "kn": 1,
+      "ko": {
+        "a": 1
+      },
+      "ks": "q",
+      "kz": null
+    },
+    "cases": [
+      {
+        "description": "a key that isn't a string fails as unusable, even on a list where a number could be a position, a null key as null and a missing one as absent, and a string key sorts by that field",
+        "rules": [
+          "for.pick",
+          "path.ref_step",
+          "sentence.path.dynamic"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t1",
+              "rows": [
+                {
+                  "m": {
+                    "q": 2
+                  },
+                  "v": 2
+                },
+                {
+                  "m": {
+                    "q": 1
+                  },
+                  "v": 1
+                }
+              ]
+            },
+            {
+              "id": "t2",
+              "rows": [
+                {
+                  "m": [
+                    5,
+                    1
+                  ],
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 1 of rows",
+                "locations": [
+                  "/things/0/rows/0/m"
+                ],
+                "path": "item 1 of rows",
+                "value": null
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 2 of rows",
+                "locations": [
+                  "/things/0/rows/1/m"
+                ],
+                "path": "item 2 of rows",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/rows/0",
+                  "/things/0/rows/1"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "m": {
+                      "q": 2
+                    },
+                    "v": 2
+                  },
+                  {
+                    "m": {
+                      "q": 1
+                    },
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "a missing key",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "item 1 of rows",
+                "locations": [
+                  "/things/1/rows/0/m"
+                ],
+                "path": "item 1 of rows",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "m": [
+                      5,
+                      1
+                    ],
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "a missing key",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "item 1 of rows",
+                "locations": [
+                  "/things/0/rows/0/m"
+                ],
+                "path": "item 1 of rows",
+                "value": null
+              },
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "item 2 of rows",
+                "locations": [
+                  "/things/0/rows/1/m"
+                ],
+                "path": "item 2 of rows",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/rows/0",
+                  "/things/0/rows/1"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "m": {
+                      "q": 2
+                    },
+                    "v": 2
+                  },
+                  {
+                    "m": {
+                      "q": 1
+                    },
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "a null key",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [],
+                "item": "item 1 of rows",
+                "locations": [
+                  "/things/1/rows/0/m"
+                ],
+                "path": "item 1 of rows",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "m": [
+                      5,
+                      1
+                    ],
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "a null key",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of rows",
+                "locations": [
+                  "/things/0/rows/0/m"
+                ],
+                "path": "item 1 of rows",
+                "value": null
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of rows",
+                "locations": [
+                  "/things/0/rows/1/m"
+                ],
+                "path": "item 2 of rows",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/rows/0",
+                  "/things/0/rows/1"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "m": {
+                      "q": 2
+                    },
+                    "v": 2
+                  },
+                  {
+                    "m": {
+                      "q": 1
+                    },
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "a number key",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of rows",
+                "locations": [
+                  "/things/1/rows/0/m"
+                ],
+                "path": "item 1 of rows",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "m": [
+                      5,
+                      1
+                    ],
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "a number key",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/rows/1"
+                ],
+                "name": "item 2 of rows",
+                "value": {
+                  "m": {
+                    "q": 1
+                  },
+                  "v": 1
+                }
+              }
+            ],
+            "passed": true,
+            "requirement": "a string key",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of rows",
+                "locations": [
+                  "/things/1/rows/0/m"
+                ],
+                "path": "item 1 of rows",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "m": [
+                      5,
+                      1
+                    ],
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "a string key",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of rows",
+                "locations": [
+                  "/things/0/rows/0/m"
+                ],
+                "path": "item 1 of rows",
+                "value": null
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of rows",
+                "locations": [
+                  "/things/0/rows/1/m"
+                ],
+                "path": "item 2 of rows",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/rows/0",
+                  "/things/0/rows/1"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "m": {
+                      "q": 2
+                    },
+                    "v": 2
+                  },
+                  {
+                    "m": {
+                      "q": 1
+                    },
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "an object key",
+            "subject": {
+              "id": "t1",
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of rows",
+                "locations": [
+                  "/things/1/rows/0/m"
+                ],
+                "path": "item 1 of rows",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/1/rows/0"
+                ],
+                "name": "rows[]",
+                "value": [
+                  {
+                    "m": [
+                      5,
+                      1
+                    ],
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "passed": false,
+            "requirement": "an object key",
+            "subject": {
+              "id": "t2",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

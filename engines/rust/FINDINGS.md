@@ -45,6 +45,10 @@ The old port, on the branch `core/conformance-suite`, listed its findings in `co
 - **Tabs at either end of a line.** `ergo.rego` drops all whitespace there (`trim_space`), so `x is 1` followed by a tab reads. The ABNF drops only spaces, and so does Rust.
 - **The messages for a line that doesn't parse.** When a check doesn't parse, `ergo.rego` also tries to read it as a `from` line and a `for` line, and lists what those readings find. So `items whose k matches "("` as a check gets `invalid pattern "("`, which comes from reading it as a `from` line, where Rust says `doesn't parse`. Rust only reports on the kind of line it was asked to read. Both reject the same lines; only the messages differ.
 
+## Where the engine doesn't follow the spec yet
+
+- **`$refs` on a subject's `$applies`.** [value.refs](../../spec/semantics.md#values) says a check that has refs gets `$refs` in its definition. `ergo.rego` gives them for the `$applies` row of a subject whose `from` line reads a ref, and the engine leaves them out. With `from: things whose m is in $params.v` and `from: things whose m named by $params.k is 1`, params `{"v": [1], "k": "q"}`, `ergo.rego` gives `requirements.<r>.checks.$applies` a `$refs` of `[{"locations": ["$params:/v"], "name": "$params.v", "value": [1]}]` and `[{"locations": ["$params:/k"], "name": "$params.k", "value": "q"}]`, and the engine gives none.
+
 ## Rules that a case contradicts
 
 Here a rule's text says one thing and a case, which `ergo.rego` passes, says another. The port follows the case, because the runner holds it to the cases, until the spec settles which one is right.
