@@ -1289,6 +1289,8 @@ impl For {
         let name = self.strip(&child.entry.name);
         Some(if outcome.cause == Cause::NotAnObject {
             super::message::isnt(&name, &child.entry.value, "an object")
+        } else if outcome.said.is_empty() {
+            super::message::is(&name, &child.entry.value)
         } else {
             format!("{name}: {}", self.strip(&outcome.said))
         })

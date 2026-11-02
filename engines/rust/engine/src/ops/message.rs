@@ -440,6 +440,7 @@ pub fn stated(name: &str, cause: Cause, value: &Value, kind: &str) -> String {
         Cause::Absent => format!("{name} is missing"),
         Cause::Null => format!("{name} is null"),
         Cause::Unusable => isnt(name, value, kind),
+        Cause::NotAnObject => isnt(name, value, "an object"),
         _ => is(name, value),
     }
 }
