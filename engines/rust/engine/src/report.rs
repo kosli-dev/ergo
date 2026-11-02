@@ -472,7 +472,32 @@ pub fn well_formed_row(
     } else {
         Cause::Satisfied
     };
-    row_of(requirement_name, requirement, "$well_formed", cause, inputs)
+    let mut row = row_of(requirement_name, requirement, "$well_formed", cause, inputs);
+    if failed {
+        row.message = Some(problems_message(&row.inputs));
+    }
+    row
+}
+
+fn problems_message(inputs: &[Value]) -> String {
+    let lines: Vec<String> = inputs
+        .iter()
+        .flat_map(|entry| {
+            let name = entry["name"].as_str().unwrap_or_default().to_string();
+            entry["value"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+                .map(|text| format!("{name}: {text}"))
+                .collect::<Vec<String>>()
+        })
+        .collect();
+    if lines.is_empty() {
+        "the policy isn't written correctly".to_string()
+    } else {
+        lines.join("; ")
+    }
 }
 
 pub fn status(
@@ -717,6 +742,11 @@ fn policy_row(policy: &Policy) -> Row {
         ));
     }
     named.sort_by(|a, b| a.0.cmp(&b.0));
+    let inputs: Vec<Value> = named
+        .into_iter()
+        .map(|(name, value)| input(&name, value, &[]))
+        .collect();
+    let message = Some(problems_message(&inputs));
     Row {
         requirement: POLICY.to_string(),
         subject_type: json!(POLICY),
@@ -724,11 +754,8 @@ fn policy_row(policy: &Policy) -> Row {
         subject_in: None,
         check: "$well_formed".to_string(),
         cause: Cause::Value,
-        inputs: named
-            .into_iter()
-            .map(|(name, value)| input(&name, value, &[]))
-            .collect(),
-        message: None,
+        inputs,
+        message,
         failed_items: None,
         failed_assertions: None,
     }
