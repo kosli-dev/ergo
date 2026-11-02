@@ -4546,7 +4546,7 @@ test_an_option_of_an_any_of_can_hold_every_some_and_counts if {
 
 test_an_any_of_row_reads_every_input_once_and_lists_no_failed_lines if {
 	r := ergo.report({"things": [{"id": "a", "x": 2, "y": 1}]}, _sentence_policy({"c": {"any_of": {"a": "x is 1 and y is 1", "b": ["x is 3", "y exists"]}}}), {})
-	[row | some row in r.results; row.check == "c"] == [{"requirement": "s", "subject": {"type": "thing", "id": "a"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2, "locations": ["/things/0/x"]}, {"name": "y", "value": 1, "locations": ["/things/0/y"]}]}]
+	[row | some row in r.results; row.check == "c"] == [{"requirement": "s", "subject": {"type": "thing", "id": "a"}, "check": "c", "passed": false, "cause": "value", "message": "a: x is 2; b: x is 2", "inputs": [{"name": "x", "value": 2, "locations": ["/things/0/x"]}, {"name": "y", "value": 1, "locations": ["/things/0/y"]}]}]
 }
 
 test_an_any_of_fails_as_unusable_when_a_param_is_the_wrong_type_even_if_another_option_passes if {

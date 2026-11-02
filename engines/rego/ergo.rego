@@ -9925,7 +9925,11 @@ _m_fault(subj, check) := [[check.left, _m_list_of([r])]] if {
 	not _items_fit(l, [r])
 }
 
-_m_fault(subj, check) := [[s, "a time"] | some s in [check.left, check.right]; v := _m_side_value(subj, s); not _m_time(v)] if check.op == "compare_time"
+_m_fault(subj, check) := fs if {
+	check.op == "compare_time"
+	fs := [[s, "a time"] | some s in [check.left, check.right]; v := _m_side_value(subj, s); not _m_time(v)]
+	fs != []
+}
 
 _m_fault(subj, check) := [[check.left, concat("", ["a time written like ", _m_print(r)])]] if {
 	check.op == "compare_time"
