@@ -913,9 +913,17 @@ impl For {
                         nested
                             .dead
                             .iter()
-                            .filter(|d| !(second && d.shared))
+                            .filter(|d| !(second && d.shared) && d.cause != Cause::Ambiguous)
                             .map(|d| self.dead_text(d)),
                     );
+                    let ties: Vec<&Dead> = nested
+                        .dead
+                        .iter()
+                        .filter(|d| d.cause == Cause::Ambiguous)
+                        .collect();
+                    if !ties.is_empty() && !second {
+                        parts.push(self.tie_text(&ties));
+                    }
                     (
                         Some(Outcome {
                             bare: false,
@@ -1321,6 +1329,39 @@ impl For {
         out
     }
 
+    fn tie_text(&self, ties: &[&Dead]) -> String {
+        let names: Vec<&str> = ties.iter().map(|d| d.name.as_str()).collect();
+        let split: Vec<Option<(&str, &str)>> = names
+            .iter()
+            .map(|n| {
+                n.strip_prefix("item ")
+                    .and_then(|rest| rest.split_once(" of "))
+            })
+            .collect();
+        let listed = match split.first().copied().flatten() {
+            Some((_, list))
+                if split
+                    .iter()
+                    .all(|part| part.is_some_and(|(_, other)| other == list)) =>
+            {
+                let numbers: Vec<&str> = split.iter().flatten().map(|(n, _)| *n).collect();
+                format!("item {} of {list}", numbers.join(" and item "))
+            }
+            _ => names.join(" and "),
+        };
+        let by = self.items.iter().find_map(|item| match &item.how {
+            How::Pick {
+                sorted: Some(sorted),
+                ..
+            } => Some(crate::name::name(&sorted.path)),
+            _ => None,
+        });
+        match by {
+            Some(by) => format!("{listed} tie on {by}"),
+            None => format!("{listed} tie"),
+        }
+    }
+
     fn dead_text(&self, dead: &Dead) -> String {
         let kind = if matches!(dead.value, Value::Object(_)) {
             "a list"
@@ -1352,8 +1393,17 @@ impl For {
         let mut said: Vec<(Vec<Seg>, String)> = level
             .dead
             .iter()
+            .filter(|d| d.cause != Cause::Ambiguous)
             .map(|d| (d.order.clone(), self.dead_text(d)))
             .collect();
+        let ties: Vec<&Dead> = level
+            .dead
+            .iter()
+            .filter(|d| d.cause == Cause::Ambiguous)
+            .collect();
+        if let Some(first) = ties.first() {
+            said.push((first.order.clone(), self.tie_text(&ties)));
+        }
         let mut failed: Vec<(Vec<Seg>, Value)> = level
             .dead
             .iter()
@@ -1413,8 +1463,17 @@ impl For {
             let inner = inner.iter().map(Dead::plain).collect();
             failed.push((order, entry.json(outcome.assertions, inner)));
         }
+        let hoisted_ties: Vec<&Dead> = hoisted
+            .iter()
+            .filter(|d| d.cause == Cause::Ambiguous)
+            .collect();
+        if let Some(first) = hoisted_ties.first() {
+            said.push((first.order.clone(), self.tie_text(&hoisted_ties)));
+        }
         for entry in hoisted {
-            said.push((entry.order.clone(), self.dead_text(&entry)));
+            if entry.cause != Cause::Ambiguous {
+                said.push((entry.order.clone(), self.dead_text(&entry)));
+            }
             failed.push((entry.order.clone(), entry.json(Vec::new(), Vec::new())));
         }
         failed.sort_by(|a, b| a.0.cmp(&b.0));
