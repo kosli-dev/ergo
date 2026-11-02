@@ -707,14 +707,18 @@ _from_unreadable(req) if {
 	not is_string(k)
 }
 
-_from_cause(req) := _worst_of(unread) if {
-	unread := _from_ref_states(req) - {"value"}
+_from_cause(req) := flaws[0] if {
+	flaws := _from_path_flaws(req)
+	count(flaws) > 0
+} else := _worst_of(unread) if {
+	unread := {_ref_state(r) | some r in _keys_refs(_each_step(req))} - {"value"}
 	count(unread) > 0
+} else := "unusable"
+
+_from_path_flaws(req) := [f | some seg in p; f := _ref_step_flaw(seg)] if {
+	p := _from_path(req)
+	is_array(p)
 }
-
-_from_cause(req) := "unusable" if _from_ref_states(req) - {"value"} == set()
-
-_from_ref_states(req) := {_ref_state(seg.ref) | some seg in _from_path(req); _is_ref(seg)} | {_ref_state(r) | some r in _keys_refs(_each_step(req))}
 
 _keys_refs(step) := {step.keys.ref} if _is_ref(step.keys)
 
