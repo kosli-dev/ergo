@@ -372,7 +372,7 @@ mod tests {
 
     fn read(subjects: Value, checks: Value) -> BTreeMap<String, CheckRead> {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": subjects,
             "requirements": {"r": {"subject": "t", "checks": checks}}
         }));
@@ -397,7 +397,7 @@ mod tests {
     #[test]
     fn a_part_that_clashes_with_its_parent_still_prints_the_dot_of_a_field_called_like_it() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items", "has": {"cov": "y"}}
@@ -412,7 +412,7 @@ mod tests {
     #[test]
     fn a_field_named_like_a_part_of_the_parent_only_prints_no_dot() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items"}

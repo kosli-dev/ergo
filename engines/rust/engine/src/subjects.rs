@@ -1116,7 +1116,7 @@ mod tests {
 
     fn policy(subjects: Value, min: Value) -> Value {
         json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": subjects,
             "requirements": {"s": {"subject": "thing", "min_subjects": min, "checks": {"c": "x exists"}}}
         })
@@ -1576,7 +1576,7 @@ mod tests {
     fn a_position_under_a_keyed_parent_the_object_lacks_fails_absent_and_not_unusable() {
         for from in ["p[0]", "first of p", "p[0].x"] {
             let policy = json!({
-                "ergo_spec": "v0.4",
+                "ergo_spec": "v0.5-dev",
                 "subjects": {"p": {"from": "m named by each of $params.ks"}, "k": {"from": from}},
                 "requirements": {"r": {"subject": "k", "checks": {"c": "x exists"}}}
             });
@@ -1605,7 +1605,7 @@ mod tests {
         ];
         for (check, passed, cause) in cases {
             let p = json!({
-                "ergo_spec": "v0.4",
+                "ergo_spec": "v0.5-dev",
                 "subjects": {"s": {"from": "things named by each of $params.k"}},
                 "requirements": {"r": {"subject": "s", "checks": {"c": check}}}
             });
@@ -1625,7 +1625,7 @@ mod tests {
     #[test]
     fn a_missing_key_fails_its_check_when_the_input_is_not_an_object() {
         let p = json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {"s": {"from": "$input named by each of $params.k"}},
             "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}
         });
@@ -1856,7 +1856,7 @@ mod tests {
         report(
             &input,
             &json!({
-                "ergo_spec": "v0.4",
+                "ergo_spec": "v0.5-dev",
                 "subjects": subjects,
                 "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}
             }),
@@ -1976,7 +1976,7 @@ mod tests {
     #[test]
     fn a_requirement_that_names_no_subject_gets_no_subjects() {
         let policy = json!({
-            "ergo_spec": "v0.4", "subjects": {"thing": {}},
+            "ergo_spec": "v0.5-dev", "subjects": {"thing": {}},
             "requirements": {"s": {"checks": {"c": "x exists"}}}
         });
         let r = report(&json!({}), &policy, &json!({}));
@@ -2039,7 +2039,7 @@ mod tests {
 
     fn with_checks(subjects: Value, checks: Value, input: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.4", "subjects": subjects,
+            "ergo_spec": "v0.5-dev", "subjects": subjects,
             "requirements": {"s": {"subject": "thing", "checks": checks}}
         });
         report(&input, &policy, &json!({}))

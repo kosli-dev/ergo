@@ -1,7 +1,7 @@
 [
   {
     "description": "a message says what was found",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 3"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 3"}}}},
     "cases": [
       {
         "description": "a passed row has no message",
@@ -55,7 +55,7 @@
   },
   {
     "description": "a message on two values joins them with and",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "approver is not author"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "approver is not author"}}}},
     "cases": [
       {
         "description": "both values are named",
@@ -77,7 +77,7 @@
   },
   {
     "description": "a message prints a value as JSON, cut when it is long",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 3"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 3"}}}},
     "cases": [
       {
         "description": "text over 60 characters keeps its first 60",
@@ -131,7 +131,7 @@
   },
   {
     "description": "a worked out value prints only what was compared",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of tests is 2", "d": "sum of items.n plus extra is 10"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of tests is 2", "d": "sum of items.n plus extra is 10"}}}},
     "cases": [
       {
         "description": "count and sum print their result",
@@ -146,21 +146,21 @@
   },
   {
     "description": "followed by prints the joined text",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "spec is \"v\" followed by version"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "spec is \"v\" followed by version"}}}},
     "cases": [
       {
         "description": "the joined text is printed as one value",
         "rules": ["message.followed_by"],
-        "input": {"things": [{"id": "t1", "spec": "v0.4", "version": "0.4.1"}]},
+        "input": {"things": [{"id": "t1", "spec": "v0.5-dev", "version": "0.4.1"}]},
         "results": [
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/spec"], "name": "spec", "value": "v0.4"}, {"locations": ["/things/0/version"], "name": "version", "value": "0.4.1"}], "message": "spec is \"v0.4\", and \"v\" followed by version is \"v0.4.1\"", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/spec"], "name": "spec", "value": "v0.5-dev"}, {"locations": ["/things/0/version"], "name": "version", "value": "0.4.1"}], "message": "spec is \"v0.5-dev\", and \"v\" followed by version is \"v0.4.1\"", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
   },
   {
     "description": "every lists the items that failed",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every tests.ok is true"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every tests.ok is true"}}}},
     "cases": [
       {
         "description": "each failed item is named, counted from 1",
@@ -182,7 +182,7 @@
   },
   {
     "description": "several sentences are joined in row order",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x is 1", "y is 2"]}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x is 1", "y is 2"]}}}}},
     "cases": [
       {
         "description": "each failed sentence says what it found",
@@ -196,7 +196,7 @@
   },
   {
     "description": "an any_of message names each option",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"any_of": {"one": "x is 1", "two": "y is 2"}}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"any_of": {"one": "x is 1", "two": "y is 2"}}}}}},
     "cases": [
       {
         "description": "each option's message starts with its name",
@@ -210,7 +210,7 @@
   },
   {
     "description": "a subject out of scope says what its filter found",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things whose env is \"prod\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1"}, "min_subjects": 0}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things whose env is \"prod\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1"}, "min_subjects": 0}}},
     "cases": [
       {
         "description": "the applies row says what the filter read",
@@ -224,7 +224,7 @@
   },
   {
     "description": "a for line that picks nothing prints the list it read",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "first of commits whose signed is true as commit", "assert": "commit.ok is true"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "first of commits whose signed is true as commit", "assert": "commit.ok is true"}}}}},
     "cases": [
       {
         "description": "a whose that leaves no item prints the list",
@@ -246,7 +246,7 @@
   },
   {
     "description": "for lines name the item of each list",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every commits as commit, every commit.reviews as review", "assert": "review.ok is true"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every commits as commit, every commit.reviews as review", "assert": "review.ok is true"}}}}},
     "cases": [
       {
         "description": "a list in a list names both items",
@@ -260,7 +260,7 @@
   },
   {
     "description": "ties name the items and the key",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "last of commits sorted by ts as commit", "assert": "commit.ok is true"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "last of commits sorted by ts as commit", "assert": "commit.ok is true"}}}}},
     "cases": [
       {
         "description": "items that tie are named",

@@ -4551,7 +4551,7 @@ _has_requirements(policy) if {
 	policy.requirements != null
 }
 
-version := "0.4.1-dev"
+version := "0.5.0-dev"
 
 _engine := {"name": "ergo-rego", "version": version}
 
@@ -4720,7 +4720,7 @@ else := {concat("", ["unsupported version ", v, ", expected ", _spec])} if v != 
 
 else := set()
 
-_spec := "v0.4"
+_spec := "v0.5-dev"
 
 _is_version(v) if regex.match(`^v[0-9]+\.[0-9]+(-dev)?$`, v)
 

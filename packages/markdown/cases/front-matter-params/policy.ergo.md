@@ -1,5 +1,5 @@
 ---
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 params:
   allowed_licenses: [MIT]
 ---
