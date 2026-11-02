@@ -9218,7 +9218,7 @@ _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of
 		cause := _for_cause(c, subj) with input as {"ergo/names": names}
 		cause != "satisfied"
 		read := _for_read(c, subj) with input as {"ergo/names": names}
-		m := _m_line(c, subj, cause, check.assertions[i]) with input as {"ergo/names": names}
+		m := _m_line(c, subj, cause) with input as {"ergo/names": names}
 	]
 }
 
@@ -10876,7 +10876,7 @@ _m_walk_leaf(e, leaf, cause) := concat(", and ", off) if {
 
 else := ""
 
-_m_line(c, subj, cause, _) := _m_sentence(c, subj, cause)
+_m_line(c, subj, cause) := _m_sentence(c, subj, cause)
 
 _m_aliases_blocked(check) := [_m_isnt(p[0], v, _m_holder(p[1])) |
 	some side in _m_sides(check)
@@ -10908,7 +10908,7 @@ _m_bare_item(f) if {
 
 _row_message(check, subj, raw) := concat("; ", ms) if {
 	_all_of_run(check)
-	ms := _once([_m_joined(_m_line(check.checks[i], subj, fa.cause, fa.assertion)) |
+	ms := _once([_m_joined(_m_line(check.checks[i], subj, fa.cause)) |
 		some fa in raw.failed_assertions
 		i := min({j | some j, a in check.assertions; a == fa.assertion})
 	])
@@ -10921,7 +10921,7 @@ _row_message(check, subj, _) := concat("; ", ms) if {
 	ms := [concat("", [nm, ": ", concat(", and ", lines)]) |
 		some k, nm in check.option_of
 		not nm in array.slice(check.option_of, 0, k)
-		lines := _once([_m_joined(_m_line(c, subj, causes[i], check.assertions[i])) |
+		lines := _once([_m_joined(_m_line(c, subj, causes[i])) |
 			some i, c in check.checks
 			check.option_of[i] == nm
 			causes[i] != "satisfied"
@@ -11018,12 +11018,12 @@ _m_from_ref_fits(v, "a list of text") if {
 
 _m_filter(_, _, row) := row if row.passed == true
 
-_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(check, subj, "value", _expression_of(check)))}) if {
+_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(check, subj, "value"))}) if {
 	row.passed == false
 	row.cause == "missing"
 }
 
-_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(check, subj, row.cause, _expression_of(check)))}) if {
+_m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(check, subj, row.cause))}) if {
 	row.passed == false
 	row.cause != "missing"
 }
