@@ -8,7 +8,7 @@ Ergo is still changing a lot before its first alpha, so the policy and report fo
 
 [Open an issue](https://github.com/kosli-dev/ergo/issues/new/choose) with the policy, the input and the report you got, and say what you expected instead. Cut them down to the smallest version that still shows the problem.
 
-If the bug lets a check pass when it should fail, or you think it's a security problem, email [security@kosli.com](mailto:security@kosli.com) instead of opening a public issue.
+If the bug lets a check pass when it should fail, or you think it's a security problem, don't open a public issue. Report it privately, as [`SECURITY.md`](SECURITY.md) says.
 
 ## Making a change
 
