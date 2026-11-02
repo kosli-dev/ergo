@@ -471,6 +471,7 @@ struct Applied {
     inputs: Vec<Value>,
     failed_assertions: Option<Value>,
     failed_items: Option<Value>,
+    message: Option<String>,
 }
 
 fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
@@ -480,15 +481,23 @@ fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
 
 fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let mut failed_items = None;
+    let mut said: Vec<String> = Vec::new();
     let verdicts: Vec<(&Filter, Verdict)> = filters
         .iter()
         .map(|filter| {
             let ran = ops::run_full(&filter.check, ctx);
             let mut verdict = ran.verdict;
             failed_items = ran.failed_items.map(Value::Array);
+            let mut own = ran.message;
             if unreadable {
                 verdict.cause = Cause::Unusable;
                 failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
+                own = None;
+            }
+            if !verdict.passed() {
+                said.push(
+                    own.unwrap_or_else(|| ops::message::message(&filter.check, ctx, &verdict)),
+                );
             }
             (filter, verdict)
         })
@@ -523,8 +532,22 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
             .flat_map(|(_, v)| v.inputs.iter().cloned())
             .collect(),
     );
+    let mut once: Vec<String> = Vec::new();
+    for text in said {
+        if !once.contains(&text) {
+            once.push(text);
+        }
+    }
+    let message = if matched {
+        None
+    } else if once.is_empty() {
+        Some("the subject doesn't match".to_string())
+    } else {
+        Some(once.join("; "))
+    };
     Applied {
         matched,
+        message,
         cause,
         inputs,
         failed_assertions,
@@ -648,6 +671,7 @@ fn applies_row(env: &Env, judged: &Judged, applied: &Applied, anc: &[Anc]) -> Ro
     row.subject_id = judged.id.clone();
     row.failed_assertions = applied.failed_assertions.clone();
     row.failed_items = applied.failed_items.clone();
+    row.message = applied.message.clone();
     with_in(row, anc)
 }
 
