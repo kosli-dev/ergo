@@ -37,6 +37,7 @@ struct Entry<'a> {
 }
 
 struct Broken {
+    msg: String,
     order: Vec<walk::Seg>,
     path: String,
     cause: Cause,
@@ -183,6 +184,7 @@ fn each_of_entries<'a>(
         .collect();
     let broken = unread
         .map(|cause| Broken {
+            msg: String::new(),
             order: Vec::new(),
             path: String::new(),
             cause,
@@ -196,6 +198,7 @@ fn each_of_entries<'a>(
 
 fn broken_from(failure: &walk::Failure) -> Broken {
     Broken {
+        msg: failure.msg.clone(),
         order: failure.order.clone(),
         path: failure.path.clone(),
         cause: failure.cause,
@@ -226,6 +229,7 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
         return Read::Entries {
             entries: Vec::new(),
             broken: vec![Broken {
+                msg: String::new(),
                 order: Vec::new(),
                 path: String::new(),
                 cause,
@@ -250,6 +254,12 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
                 key: None,
             }),
             _ => broken.push(Broken {
+                msg: ops::message::stated(
+                    &walked.item_name(&item.end_segs),
+                    item.miss,
+                    &item.shown(),
+                    "a list or an object",
+                ),
                 order: item.end_segs.clone(),
                 path: walked.name_of(&item.end_segs, false),
                 cause: item.miss,
@@ -390,6 +400,11 @@ fn from_message(
             }
             if !read.step_unreadable {
                 name = ops::message::resolved_name(path, &ctx);
+                if let Some(bare) = name.strip_prefix("$input.") {
+                    name = bare.to_string();
+                } else if name == "$input" {
+                    name = "it".to_string();
+                }
             }
             let word = if cause == Cause::Absent {
                 "missing"
@@ -758,6 +773,15 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
             Vec::new()
         };
         min.failed_items = Some(Value::Array(listed));
+        if env.unreadable.is_empty() && min.cause != Cause::Satisfied {
+            let mut sorted: Vec<&Broken> = broken.iter().filter(|b| !b.msg.is_empty()).collect();
+            sorted.sort_by(|a, b| a.order.cmp(&b.order));
+            if !sorted.is_empty() {
+                min.message = Some(ops::message::joined(
+                    sorted.iter().map(|b| b.msg.clone()).collect(),
+                ));
+            }
+        }
     }
     let unique = unique_ids_row(
         env.requirement_name,
