@@ -744,6 +744,7 @@ fn sort_failure(found: &Live, cause: Cause, value: Value, location: Option<Locat
 }
 
 struct Sfail {
+    text: String,
     idx: usize,
     cause: Cause,
     inputs: Vec<Value>,
@@ -757,6 +758,7 @@ struct Child {
 }
 
 struct Outcome {
+    said: String,
     cause: Cause,
     assertions: Vec<Value>,
     inner: Vec<Dead>,
@@ -882,6 +884,7 @@ impl For {
             let (outcome, sfails) = if into_non_object {
                 (
                     Some(Outcome {
+                        said: String::new(),
                         cause: Cause::NotAnObject,
                         assertions: Vec::new(),
                         inner: Vec::new(),
@@ -896,8 +899,15 @@ impl For {
                     (None, Vec::new())
                 } else {
                     let assertions = self.aggregate(&nested.children);
+                    let mut parts: Vec<String> = nested
+                        .children
+                        .iter()
+                        .filter_map(|c| self.child_text(c))
+                        .collect();
+                    parts.extend(nested.dead.iter().map(|d| self.dead_text(d)));
                     (
                         Some(Outcome {
+                            said: parts.join("; "),
                             cause: nested.cause,
                             assertions,
                             inner: nested.dead,
@@ -966,6 +976,7 @@ impl For {
             let verdict = run_check(&sentence.check, ctx);
             if !verdict.passed() {
                 sfails.push(Sfail {
+                    text: super::message::message(&sentence.check, ctx, &verdict),
                     idx,
                     cause: verdict.cause,
                     inputs: reading_order(&sentence.check, &verdict.inputs, &self.alias_names())
@@ -988,8 +999,14 @@ impl For {
                         })
                     })
                     .collect();
+                let said = sfails
+                    .iter()
+                    .map(|f| f.text.clone())
+                    .collect::<Vec<_>>()
+                    .join(", and ");
                 (
                     Some(Outcome {
+                        said,
                         cause,
                         assertions,
                         inner: Vec::new(),
@@ -1193,17 +1210,18 @@ impl For {
         } else {
             second.as_ref().map_or(level.cause, |(cause, _)| *cause)
         };
-        let failed = if let Some((_, listed)) = second {
-            listed
+        let (failed, said) = if let Some((_, listed)) = second {
+            (listed, Vec::new())
         } else if cause == Cause::Satisfied || flawed {
-            Vec::new()
+            (Vec::new(), Vec::new())
         } else {
             self.failed_items(level)
         };
+        let message = (!said.is_empty()).then(|| super::message::joined(said));
         Run {
             verdict: Verdict { cause, inputs },
             failed_items: failed,
-            message: None,
+            message,
         }
     }
 
@@ -1242,7 +1260,46 @@ impl For {
         ))
     }
 
-    fn failed_items(&self, level: Level) -> Vec<Value> {
+    fn strip(&self, text: &str) -> String {
+        let mut out = text.to_string();
+        for item in &self.items {
+            let alias = &item.alias;
+            out = out.replace(&format!(" of {alias}."), " of ");
+            out = out.replace(&format!("of {alias}["), "of [");
+            if let Some(rest) = out.strip_prefix(&format!("{alias}.")) {
+                out = rest.to_string();
+            }
+            out = out.replace(&format!(", and {alias}."), ", and ");
+            out = out.replace(&format!(": {alias}."), ": ");
+        }
+        out
+    }
+
+    fn dead_text(&self, dead: &Dead) -> String {
+        let kind = if matches!(dead.value, Value::Object(_)) {
+            "a list"
+        } else {
+            "a list or an object"
+        };
+        super::message::stated(&self.strip(&dead.name), dead.cause, &dead.value, kind)
+    }
+
+    fn child_text(&self, child: &Child) -> Option<String> {
+        let outcome = child.failed.as_ref()?;
+        let name = self.strip(&child.entry.name);
+        Some(if outcome.cause == Cause::NotAnObject {
+            super::message::isnt(&name, &child.entry.value, "an object")
+        } else {
+            format!("{name}: {}", self.strip(&outcome.said))
+        })
+    }
+
+    fn failed_items(&self, level: Level) -> (Vec<Value>, Vec<String>) {
+        let mut said: Vec<(Vec<Seg>, String)> = level
+            .dead
+            .iter()
+            .map(|d| (d.order.clone(), self.dead_text(d)))
+            .collect();
         let mut failed: Vec<(Vec<Seg>, Value)> = level
             .dead
             .iter()
@@ -1250,6 +1307,9 @@ impl For {
             .collect();
         let mut hoisted: Vec<Dead> = Vec::new();
         for child in level.children {
+            if let Some(text) = self.child_text(&child) {
+                said.push((child.order.clone(), text));
+            }
             let Child {
                 order,
                 mut entry,
@@ -1300,10 +1360,15 @@ impl For {
             failed.push((order, entry.json(outcome.assertions, inner)));
         }
         for entry in hoisted {
+            said.push((entry.order.clone(), self.dead_text(&entry)));
             failed.push((entry.order.clone(), entry.json(Vec::new(), Vec::new())));
         }
         failed.sort_by(|a, b| a.0.cmp(&b.0));
-        failed.into_iter().map(|(_, v)| v).collect()
+        said.sort_by(|a, b| a.0.cmp(&b.0));
+        (
+            failed.into_iter().map(|(_, v)| v).collect(),
+            said.into_iter().map(|(_, t)| t).collect(),
+        )
     }
 
     fn shared_second(&self) -> bool {
