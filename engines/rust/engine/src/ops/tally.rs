@@ -1088,21 +1088,19 @@ pub fn derived_value(derived: &Derived, ctx: &Ctx) -> Result<Number, Cause> {
     work_derived(derived, ctx).result
 }
 
-pub fn derived_operands(derived: &Derived) -> (Vec<&Path>, Vec<&Path>) {
+pub fn derived_operands(derived: &Derived) -> (Vec<&Path>, Vec<&Path>, Vec<(&Path, &Path)>) {
     let mut plain = Vec::new();
     let mut counted = Vec::new();
+    let mut elapsed = Vec::new();
     for term in &derived.terms {
         match term {
             Term::Path(path) => plain.push(path),
-            Term::Elapsed(elapsed) => {
-                plain.push(&elapsed.from);
-                plain.push(&elapsed.to);
-            }
+            Term::Elapsed(e) => elapsed.push((&e.from, &e.to)),
             Term::Counted(c) => counted.push(&c.path),
             Term::Number(_) => {}
         }
     }
-    (plain, counted)
+    (plain, counted, elapsed)
 }
 
 pub fn tally_sides(check: &Tally) -> Vec<&Side> {
@@ -1163,6 +1161,13 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
                 continue;
             }
             let rest = crate::name::name(&item.rest_path());
+            if item.miss == Cause::NotAnObject {
+                found.push((
+                    Cause::NotAnObject,
+                    super::message::isnt(&name, item.item.value, "an object"),
+                ));
+                continue;
+            }
             match item.end {
                 None => found.push((
                     item.miss,

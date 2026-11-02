@@ -192,6 +192,20 @@ fn side_paths(check: &Check) -> Vec<&Path> {
     match check {
         Check::Compare(c) => c.left.paths().into_iter().chain(c.right.paths()).collect(),
         Check::CompareTime(c) => c.left.paths().into_iter().chain(c.right.paths()).collect(),
+        Check::Tally(t) => tally::tally_sides(t)
+            .into_iter()
+            .flat_map(|side| match side {
+                TallySide::Plain(plain) => plain.paths(),
+                TallySide::Derived(derived) => {
+                    let (plain, counted, elapsed) = tally::derived_operands(derived);
+                    plain
+                        .into_iter()
+                        .chain(counted)
+                        .chain(elapsed.into_iter().flat_map(|(a, b)| [a, b]))
+                        .collect()
+                }
+            })
+            .collect(),
         _ => single_path(check).into_iter().collect(),
     }
 }
@@ -381,6 +395,19 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<String> {
             }
         }
     };
+    for (side, _) in &reads {
+        if let Side::Join(pieces) = side {
+            for piece in pieces {
+                if let Side::Path(_) = piece
+                    && let Some(first) = read_side(piece, ctx).inputs.into_iter().next()
+                    && first.state == Outcome::Found
+                    && !first.value.is_string()
+                {
+                    out.push(isnt(&first.name, &first.value, "text"));
+                }
+            }
+        }
+    }
     for (index, (side, read)) in reads.iter().enumerate() {
         let Side::Path(_) = side else { continue };
         let (Some(value), Some(first)) = (&read.value, read.inputs.first()) else {
@@ -392,7 +419,10 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<String> {
             continue;
         }
         let other = &reads[1 - index].1;
-        let want = wanted(other.value.as_ref().unwrap_or(&Value::Null));
+        let Some(other_value) = other.value.as_ref() else {
+            continue;
+        };
+        let want = wanted(other_value);
         if kind(value) != want {
             out.push(isnt(&first.name, value, want));
         }
@@ -477,7 +507,17 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         Cause::NotAnObject => {
             let subject = ctx.subject.value;
             if subject.is_object() {
-                Vec::new()
+                match check {
+                    Check::Tally(t) => tally::tally_sides(t)
+                        .into_iter()
+                        .filter_map(|side| match side {
+                            TallySide::Derived(d) => Some(d),
+                            TallySide::Plain(_) => None,
+                        })
+                        .flat_map(|d| tally::counted_texts(d, ctx, Cause::NotAnObject))
+                        .collect(),
+                    _ => Vec::new(),
+                }
             } else {
                 vec![isnt("it", subject, "an object")]
             }
@@ -570,7 +610,7 @@ fn tally_inputs(side: &TallySide, ctx: &Ctx, cause: Cause) -> Vec<Input> {
     match side {
         TallySide::Plain(plain) => plain_side_inputs(plain, ctx),
         TallySide::Derived(derived) => {
-            let (plain, counted) = tally::derived_operands(derived);
+            let (plain, counted, elapsed) = tally::derived_operands(derived);
             match (cause, tally::derived_value(derived, ctx)) {
                 (Cause::Value, Ok(number)) => vec![Input {
                     name: derived.text.clone(),
@@ -583,6 +623,7 @@ fn tally_inputs(side: &TallySide, ctx: &Ctx, cause: Cause) -> Vec<Input> {
                     let _ = counted;
                     plain
                         .into_iter()
+                        .chain(elapsed.into_iter().flat_map(|(a, b)| [a, b]))
                         .filter_map(|p| first_input(p, ctx))
                         .collect()
                 }
@@ -596,8 +637,35 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
     for side in tally::tally_sides(check) {
         match side {
             TallySide::Derived(derived) => {
-                let (plain, counted) = tally::derived_operands(derived);
+                let (plain, counted, elapsed) = tally::derived_operands(derived);
                 let mut any = false;
+                for (from, to) in elapsed {
+                    let (Some(a), Some(b)) = (first_input(from, ctx), first_input(to, ctx)) else {
+                        continue;
+                    };
+                    for part in [&a, &b] {
+                        if part.state == Outcome::Found
+                            && super::time::read_time(&part.value).is_none()
+                        {
+                            out.push(isnt(&part.name, &part.value, "a time"));
+                            any = true;
+                        }
+                    }
+                    if !any
+                        && let (Some(x), Some(y)) = (
+                            super::time::read_time(&a.value),
+                            super::time::read_time(&b.value),
+                        )
+                        && std::mem::discriminant(&x) != std::mem::discriminant(&y)
+                    {
+                        out.push(isnt(
+                            &a.name,
+                            &a.value,
+                            &format!("a time written like {}", print(&b.value)),
+                        ));
+                        any = true;
+                    }
+                }
                 for path in plain {
                     if let Some(input) = first_input(path, ctx)
                         && input.state == Outcome::Found

@@ -810,7 +810,14 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         with_fields(&mut inputs, &walked.name, &walk.path, ctx);
         let cause = outcome.cause().unwrap_or(Cause::Unusable);
         let said = if walked.failures.is_empty() {
+            let want = if cause == Cause::Absent {
+                Outcome::Absent
+            } else {
+                Outcome::Null
+            };
+            let keys = message::key_states_of(&walk.path, &outer, want).join(", and ");
             match cause {
+                Cause::Absent | Cause::Null if !keys.is_empty() => keys,
                 Cause::Absent => format!("{} is missing", walked.name),
                 Cause::Null => format!("{} is null", walked.name),
                 _ => {
@@ -904,7 +911,11 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
         row.verdict.cause = Cause::Unusable;
         row.failed_items = Vec::new();
         let outer_ctx = outer(ctx);
-        let checks: Vec<&Check> = walk.whose.iter().chain(std::iter::once(&*walk.check)).collect();
+        let checks: Vec<&Check> = walk
+            .whose
+            .iter()
+            .chain(std::iter::once(&*walk.check))
+            .collect();
         row.message = message::flawed_text(&checks, &outer_ctx);
     }
     row
