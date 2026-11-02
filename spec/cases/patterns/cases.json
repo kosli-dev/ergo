@@ -159,7 +159,7 @@
         "rules": ["patterns.list"],
         "input": {"things": [{"id": "t1", "x": "abc"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x matches $params.ps is false", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.ps is \"c\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "abc", "locations": ["/things/0/x"]}]}
         ]
       }
     ]

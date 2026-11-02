@@ -226,7 +226,7 @@
         "rules": ["present.other", "path.ref_step", "path.inputs", "name.ref_step"],
         "input": {"things": [{"id": "t1", "x": {"a": 1}}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x named by $params.key is missing, and $params.key is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x named by $params.key", "value": null, "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.key is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x named by $params.key", "value": null, "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -422,7 +422,7 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "x.y named by $params.i is missing, and $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -430,7 +430,7 @@
         "rules": ["present.other", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "x.y named by $params.i is missing, and $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {

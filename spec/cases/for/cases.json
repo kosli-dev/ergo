@@ -6931,7 +6931,7 @@
                 ]
               }
             ],
-            "message": "item 1 of dispatched: shas named by persona is \"x\"; item 2 of dispatched: shas named by persona is missing; item 3 of dispatched: the check is false",
+            "message": "item 1 of dispatched: shas named by persona is \"x\"; item 2 of dispatched: shas named by persona is missing; item 3 of dispatched: persona is 5, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13173,7 +13173,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "message": "item 1 of rs: r.x.y named by $params.i is missing, and $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "message": "item 1 of rs: $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13181,7 +13181,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{"x": null}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "message": "item 1 of rs: r.x.y named by $params.i is missing, and $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "message": "item 1 of rs: $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {

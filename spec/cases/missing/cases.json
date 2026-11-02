@@ -134,7 +134,7 @@
         "rules": ["missing.fail", "path.ref_step"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "x.y named by $params.i is missing, and $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -142,7 +142,7 @@
         "rules": ["missing.fail", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "x.y named by $params.i is missing, and $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {

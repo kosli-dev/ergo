@@ -275,7 +275,7 @@
         "results": [
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/values/k1"], "name": "values named by key", "value": 5}, {"locations": ["/things/0/key"], "name": "key", "value": "k1"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/1/values"], "name": "values named by key", "value": null}, {"locations": ["/things/1/key"], "name": "key", "value": "zz"}], "message": "values named by key is missing", "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/2/values"], "name": "values named by key", "value": null}, {"locations": ["/things/2"], "name": "key", "value": null}], "message": "values named by key is missing", "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/2/values"], "name": "values named by key", "value": null}, {"locations": ["/things/2"], "name": "key", "value": null}], "message": "key is missing", "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}}
         ]
       }
     ]

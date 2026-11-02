@@ -110,7 +110,7 @@
         "rules": ["in.values", "path.inputs"],
         "input": {"things": [{"id": "t1", "x": "a"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is in $params.allowed is false", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.allowed is \"a\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -125,8 +125,8 @@
         "rules": ["in.values", "path.inputs"],
         "input": {"things": [{"id": "t1", "x": "a"}, {"id": "t2"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\", which isn't a number or text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "message": "x is in $params.allowed is false", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null, "locations": ["/things/1"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is \"a\", which isn't a number or text, and $params.allowed is [\"a\", 1], which isn't a list of one kind of value", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": "a", "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "message": "$params.allowed is [\"a\", 1], which isn't a list of one kind of value", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null, "locations": ["/things/1"]}]}
         ]
       }
     ]

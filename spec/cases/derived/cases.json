@@ -764,7 +764,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings whose severity is \"high\" is 1 is false",
+            "message": "item 2 of findings: severity is 5, which isn't text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -829,7 +829,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings whose severity is \"high\" is 1 is false",
+            "message": "item 2 of findings: severity is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -894,7 +894,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings whose severity is \"high\" is 1 is false",
+            "message": "item 2 of findings: severity is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -2687,7 +2687,7 @@
                 "value": 100
               }
             ],
-            "message": "x plus y is at least 0 is false",
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2747,7 +2747,7 @@
                 "value": 1
               }
             ],
-            "message": "x plus y is at least 0 is false",
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2807,7 +2807,7 @@
                 "value": 1
               }
             ],
-            "message": "x plus y is at least 0 is false",
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2867,7 +2867,7 @@
                 "value": 0
               }
             ],
-            "message": "x plus y is at least 0 is false",
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2927,7 +2927,7 @@
                 "value": 1
               }
             ],
-            "message": "x plus y is at least 0 is false",
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2987,7 +2987,7 @@
                 "value": 0.2
               }
             ],
-            "message": "x plus y is at least 0 is false",
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3047,7 +3047,7 @@
                 "value": 100000000000000000000
               }
             ],
-            "message": "x plus y is at least 0 is false",
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3125,7 +3125,7 @@
                 ]
               }
             ],
-            "message": "sum of xs is at least 0 is false",
+            "message": "sum of xs needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3303,7 +3303,7 @@
                 ]
               }
             ],
-            "message": "sum of xs is at least 0 is false",
+            "message": "sum of xs needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3549,7 +3549,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "sum of items.usd whose kind is \"a\" is 10 is false",
+            "message": "item 2 of items: kind is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -10542,7 +10542,7 @@
                 ]
               }
             ],
-            "message": "count of xs whose k is in $params.missing is 1 is false",
+            "message": "$params.missing is missing; item 1 of xs: $params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10617,7 +10617,7 @@
                 ]
               }
             ],
-            "message": "count of xs whose k is in $params.missing is 0 is false",
+            "message": "$params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10648,7 +10648,7 @@
                 ]
               }
             ],
-            "message": "count of xs whose k is in $params.missing is 0 is false",
+            "message": "$params.missing is missing; item 1 of xs: $params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15059,7 +15059,7 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "count of xs whose days elapsed from started to ended is 1 is 2 is false",
+            "message": "item 2 of xs: ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -15229,7 +15229,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of prs whose count of reviews is at least 2 is 1 is false",
+            "message": "item 2 of prs: the check is false",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -16366,7 +16366,7 @@
                 ]
               }
             ],
-            "message": "sum of items.x whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16423,7 +16423,7 @@
                 ]
               }
             ],
-            "message": "sum of items.x whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16481,7 +16481,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: x is \"ab\", which isn't a number",
+            "message": "item 1 of items: k is 5, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16539,7 +16539,7 @@
                 ]
               }
             ],
-            "message": "sum of items.x whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16596,7 +16596,7 @@
                 ]
               }
             ],
-            "message": "sum of items.x whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16660,7 +16660,7 @@
                 ]
               }
             ],
-            "message": "sum of items.x whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16763,7 +16763,7 @@
               "id": "t"
             },
             "check": "c",
-            "message": "sum of items.x whose k is \"a\" is 1 is false",
+            "message": "item 2 of items: k is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -16819,7 +16819,7 @@
               "id": "t"
             },
             "check": "c",
-            "message": "sum of items.x whose k is \"a\" is 1 is false",
+            "message": "item 2 of items: k is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -16916,7 +16916,7 @@
                 ]
               }
             ],
-            "message": "sum of items.x.y whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16976,7 +16976,7 @@
                 ]
               }
             ],
-            "message": "sum of items.x.y whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17056,7 +17056,7 @@
                 ]
               }
             ],
-            "message": "count of items.x whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17113,7 +17113,7 @@
                 ]
               }
             ],
-            "message": "count of items.x whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17170,7 +17170,7 @@
                 ]
               }
             ],
-            "message": "count of items.x whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17250,7 +17250,7 @@
                 ]
               }
             ],
-            "message": "count of items.x.y whose k is \"a\" is 1 is false",
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {

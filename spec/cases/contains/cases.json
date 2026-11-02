@@ -220,7 +220,7 @@
         "rules": ["contains.value", "sentence.print.canonical"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x contains none of $params.banned is false", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.banned is [], which isn't a list with at least one value", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
         ],
         "expressions": {"s": {"c": "x contains none of $params.banned"}}
       }
@@ -236,7 +236,7 @@
         "rules": ["contains.value"],
         "input": {"things": [{"id": "t1", "x": ["a"]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x contains none of $params.banned is false", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "$params.banned is \"a\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["a"], "locations": ["/things/0/x"]}]}
         ]
       }
     ]
@@ -251,8 +251,8 @@
         "rules": ["contains.value"],
         "input": {"things": [{"id": "t1", "x": ["b"]}, {"id": "t2"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"b\"], which isn't a list of numbers or text", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "message": "x contains none of $params.banned is false", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null, "locations": ["/things/1"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is [\"b\"], which isn't a list of numbers or text, and $params.banned is [\"a\", 1], which isn't a list of one kind of value", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": ["b"], "locations": ["/things/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "message": "$params.banned is [\"a\", 1], which isn't a list of one kind of value", "passed": false, "cause": "unusable", "inputs": [{"name": "x", "value": null, "locations": ["/things/1"]}]}
         ]
       }
     ]
