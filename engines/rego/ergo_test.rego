@@ -1746,7 +1746,7 @@ test_an_engine_reads_only_the_version_it_follows_so_any_other_ergo_spec_is_writt
 }
 
 test_an_ergo_spec_that_is_not_shaped_like_a_version_is_written_wrong_and_the_row_shows_it if {
-	every v in ["0.1", "V0.1", "v0.1.0", " v0.2-dev", "v0.2-dev ", "v.1", "v1", "", "v0.2-beta", "v0.2-", "v0.2-dev-dev", "v0.2-DEV", "v0.2-dev2", "v0.4dev", "v-dev"] {
+	every v in ["0.1", "V0.1", "v0.1.0", " v0.2-dev", "v0.2-dev ", "v.1", "v1", "", "v0.2-beta", "v0.2-", "v0.2-dev-dev", "v0.2-DEV", "v0.2-dev2", "v0.4-devdev", "v-dev"] {
 		expected := concat("", ["not a version ", v])
 		_spec_rows(two_reqs_policy({"ergo_spec": v})) == [false, [
 			["s", false, [{"name": "policy ergo_spec", "value": [expected], "locations": []}]],

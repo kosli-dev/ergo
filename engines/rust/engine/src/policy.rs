@@ -841,7 +841,10 @@ mod tests {
             ["not a version v0.2-beta"]
         );
         assert_eq!(spec_problems(json!("v0.2-")), ["not a version v0.2-"]);
-        assert_eq!(spec_problems(json!("v0.4.1")), ["not a version v0.4.1"]);
+        assert_eq!(
+            spec_problems(json!("v0.4-dev.1")),
+            ["not a version v0.4-dev.1"]
+        );
         assert_eq!(spec_problems(json!("v.2")), ["not a version v.2"]);
         assert_eq!(spec_problems(json!("")), ["not a version "]);
         assert_eq!(
