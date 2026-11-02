@@ -305,6 +305,7 @@ struct Live<'a> {
 }
 
 struct Dead {
+    msg: Option<String>,
     shared: bool,
     order: Vec<Seg>,
     name: String,
@@ -317,6 +318,7 @@ struct Dead {
 impl Dead {
     fn of_failure(failure: &Failure) -> Dead {
         Dead {
+            msg: None,
             shared: false,
             order: failure.order.clone(),
             name: failure.item.clone(),
@@ -329,6 +331,7 @@ impl Dead {
 
     fn copy(&self) -> Dead {
         Dead {
+            msg: self.msg.clone(),
             shared: self.shared,
             order: self.order.clone(),
             name: self.name.clone(),
@@ -493,6 +496,7 @@ impl For {
                     .filter(|c| !matches!(c, Cause::Satisfied | Cause::Value)),
             );
             let dead_item = |cause: Cause| Dead {
+                msg: None,
                 shared: false,
                 order: w.item_segs.clone(),
                 name: name.clone(),
@@ -553,6 +557,7 @@ impl For {
             let nothing = through_first.then(|| {
                 let shown = crate::name::name(&item.path);
                 Dead {
+                    msg: None,
                     shared: false,
                     order: Vec::new(),
                     name: shown.clone(),
@@ -606,7 +611,8 @@ impl For {
         if let Some(sorted) = sorted {
             let mut failed: Vec<Dead> = Vec::new();
             let mut at = outer.clone();
-            let mut checks: Vec<(Live, Result<Value, Cause>, Option<Location>)> = Vec::new();
+            let mut checks: Vec<(Live, Result<Value, Cause>, Option<Location>, String)> =
+                Vec::new();
             for found in live {
                 let holder = walked
                     .items
@@ -622,16 +628,56 @@ impl For {
                     (None, Some(value)) => Ok(value.clone()),
                     (None, None) => Err(Cause::Unusable),
                 };
-                checks.push((found, result, location));
+                let key_name = crate::name::name(&sorted.path);
+                let text = match &result {
+                    Ok(value) => {
+                        let want = if sorted.alphabetically {
+                            "text"
+                        } else {
+                            "a number, a time or a date"
+                        };
+                        super::message::isnt(&key_name, value, want)
+                    }
+                    Err(cause) => {
+                        let present = Check::Present(super::present::Present {
+                            path: sorted.path.clone(),
+                            missing: false,
+                        });
+                        let verdict = Verdict {
+                            cause: *cause,
+                            inputs: Vec::new(),
+                        };
+                        let mut faults = if *cause == Cause::Unusable {
+                            let mut all = super::message::key_faults_of(&sorted.path, &at);
+                            all.extend(super::message::blocked_of(&sorted.path, &at));
+                            all
+                        } else {
+                            Vec::new()
+                        };
+                        if faults.is_empty() {
+                            faults.push(super::message::message(&present, &at, &verdict));
+                        }
+                        faults.join(", and ")
+                    }
+                };
+                checks.push((found, result, location, text));
             }
             let mut keys: Vec<(Live, Key, Value, Option<Location>)> = Vec::new();
-            for (found, result, location) in checks {
+            for (found, result, location, text) in checks {
                 match result {
                     Ok(value) => match sort_key(&value, sorted.alphabetically) {
                         Some(key) => keys.push((found, key, value, location)),
-                        None => failed.push(sort_failure(&found, Cause::Unusable, value, location)),
+                        None => failed.push(sort_failure(
+                            &found,
+                            Cause::Unusable,
+                            value,
+                            location,
+                            &text,
+                        )),
                     },
-                    Err(cause) => failed.push(sort_failure(&found, cause, Value::Null, location)),
+                    Err(cause) => {
+                        failed.push(sort_failure(&found, cause, Value::Null, location, &text))
+                    }
                 }
             }
             if let Some(first) = keys.iter().map(|(_, k, _, _)| kind(k)).min() {
@@ -640,7 +686,21 @@ impl For {
                     if kind(&entry.1) == first {
                         rest.push(entry);
                     } else {
-                        failed.push(sort_failure(&entry.0, Cause::Unusable, entry.2, entry.3));
+                        let word = match first {
+                            0 => "a number",
+                            1 => "a time",
+                            2 => "a date",
+                            _ => "text",
+                        };
+                        let text =
+                            super::message::isnt(&crate::name::name(&sorted.path), &entry.2, word);
+                        failed.push(sort_failure(
+                            &entry.0,
+                            Cause::Unusable,
+                            entry.2,
+                            entry.3,
+                            &text,
+                        ));
                     }
                 }
                 keys = rest;
@@ -674,6 +734,7 @@ impl For {
                 for i in tied {
                     let (found, _, value, location) = &keys[i];
                     cands.dead.push(Dead {
+                        msg: None,
                         shared: false,
                         order: found.order.clone(),
                         name: found.name.clone(),
@@ -731,8 +792,20 @@ impl For {
     }
 }
 
-fn sort_failure(found: &Live, cause: Cause, value: Value, location: Option<Location>) -> Dead {
+fn sort_failure(
+    found: &Live,
+    cause: Cause,
+    value: Value,
+    location: Option<Location>,
+    text: &str,
+) -> Dead {
+    let said = if text.starts_with('$') {
+        text.to_string()
+    } else {
+        super::message::prefixed(&found.name, text)
+    };
     Dead {
+        msg: Some(said),
         shared: false,
         order: found.order.clone(),
         name: found.name.clone(),
@@ -846,6 +919,7 @@ impl For {
                 );
                 let shown = crate::name::name(&item.path);
                 vec![Dead {
+                    msg: None,
                     shared: !reads_path(&item.path, &self.items[0].alias),
                     order: Vec::new(),
                     name: shown.clone(),
@@ -870,6 +944,7 @@ impl For {
             let mut bound = ctx.clone();
             bound.aliases.insert(item.alias.clone(), live.at.clone());
             let entry = Dead {
+                msg: None,
                 shared: false,
                 order: live.order.clone(),
                 name: live.name.clone(),
@@ -1363,6 +1438,9 @@ impl For {
     }
 
     fn dead_text(&self, dead: &Dead) -> String {
+        if let Some(text) = &dead.msg {
+            return text.clone();
+        }
         let kind = if matches!(dead.value, Value::Object(_)) {
             "a list"
         } else {
