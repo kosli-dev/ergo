@@ -459,7 +459,7 @@ jobs:
             --notes-file "$RUNNER_TEMP/notes.md" \
             --latest=false \
             --verify-tag
-      - name: Deploy the site, so CLI.md and the playground follow this release
+      - name: Start the site deploy, so the CLI page and the playground follow this release
         run: gh workflow run pages.yml --ref main
 
   bump-rust:
