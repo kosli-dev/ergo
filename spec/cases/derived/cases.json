@@ -383,7 +383,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is {\"id\": 1}, which isn't a list or an object",
+            "message": "findings is {\"id\": 1}, which isn't a list",
             "passed": false,
             "cause": "unusable",
             "inputs": [

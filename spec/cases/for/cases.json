@@ -769,7 +769,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "commits is {\"a\": 1}, which isn't a list or an object",
+            "message": "commits is {\"a\": 1}, which isn't a list",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -9014,7 +9014,7 @@
                 ]
               }
             ],
-            "message": "item 2 of approvers: item 1 of commits[0].files: approver.t is 0, and file.t is 1; commits[1].files is missing",
+            "message": "item 2 of approvers: item 1 of commits: item 1 of files: approver.t is 0, and file.t is 1; item 2 of commits: files is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12296,7 +12296,7 @@
                 ]
               }
             ],
-            "message": "item 2 of xs: item 1 of ys[0].zs: x.t is 0, and y.t is 1; ys[1].zs is missing",
+            "message": "item 2 of xs: item 1 of ys: item 1 of zs: x.t is 0, and y.t is 1; item 2 of ys: zs is missing",
             "passed": false,
             "requirement": "r",
             "subject": {

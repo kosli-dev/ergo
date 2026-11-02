@@ -9364,8 +9364,8 @@
         "rules": ["sentence.phrase.between", "tally.not_between", "tally.fail"],
         "input": {"things": [{"id": "t1", "l": "abc"}, {"id": "t1", "l": 3}, {"id": "t1", "l": {"k": 1}}]},
         "results": [
-          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is \"abc\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is 3, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is \"abc\", which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is 3, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
@@ -9689,8 +9689,8 @@
         "rules": ["sentence.phrase.within", "compare.within", "tally.fail"],
         "input": {"things": [{"id": "t1", "l": "abc"}, {"id": "t1", "l": 3}, {"id": "t1", "l": {"k": 1}}]},
         "results": [
-          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is \"abc\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is 3, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is \"abc\", which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is 3, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of l", "value": null}, {"locations": [], "name": "l", "value": []}], "message": "l is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }

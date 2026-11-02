@@ -874,7 +874,7 @@
         "rules": ["location.each"],
         "input": {"things": [{"id": "t1", "x": {"y": {"z": 1}}}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "x.y", "locations": ["/things/0/x/y"], "path": "x.y", "value": {"z": 1}}], "inputs": [{"locations": [], "name": "x.y", "value": []}], "message": "x.y is {\"z\": 1}, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "x.y", "locations": ["/things/0/x/y"], "path": "x.y", "value": {"z": 1}}], "inputs": [{"locations": [], "name": "x.y", "value": []}], "message": "x.y is {\"z\": 1}, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]

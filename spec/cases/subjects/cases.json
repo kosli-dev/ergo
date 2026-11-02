@@ -4799,7 +4799,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4835,7 +4835,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4896,7 +4896,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4932,7 +4932,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4993,7 +4993,7 @@
                 "value": 0
               }
             ],
-            "message": "the check is false",
+            "message": "it is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5054,7 +5054,7 @@
                 "value": 0
               }
             ],
-            "message": "the check is false",
+            "message": "it is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5117,7 +5117,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is [\"x\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5153,7 +5153,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is [\"x\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5214,7 +5214,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5253,7 +5253,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5310,7 +5310,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5345,7 +5345,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5405,7 +5405,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5440,7 +5440,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5502,7 +5502,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is [\"x\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5537,7 +5537,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is [\"x\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5597,7 +5597,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5635,7 +5635,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5700,7 +5700,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is 0, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5765,7 +5765,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope thing count is 0",
+            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6285,7 +6285,7 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "in-scope scan count is 0",
+            "message": "$params.required is [\"sast\", 1], which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6320,7 +6320,7 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "in-scope scan count is 0",
+            "message": "$params.required is [\"sast\", 1], which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6381,7 +6381,7 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "in-scope scan count is 0",
+            "message": "$params.required is [null], which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6444,7 +6444,7 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "in-scope scan count is 0",
+            "message": "$params.required is \"sast\", which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6505,7 +6505,7 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "the check is false",
+            "message": "$params.required is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6621,7 +6621,7 @@
               "type": "s"
             },
             "check": "$min_subjects",
-            "message": "in-scope s count is 1",
+            "message": "it is \"text\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6969,7 +6969,7 @@
               "type": "c"
             },
             "check": "$min_subjects",
-            "message": "in-scope c count is 1",
+            "message": "it is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -7265,7 +7265,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope scan count is 0",
+            "message": "$params.env is 5, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -12358,7 +12358,7 @@
                 ]
               }
             ],
-            "message": "artifacts[1].pull_requests is missing; artifacts[2].pull_requests is null; artifacts[3].pull_requests is \"none\", which isn't a list or an object",
+            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 4 of artifacts: pull_requests is \"none\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12473,7 +12473,7 @@
                 ]
               }
             ],
-            "message": "artifacts.pull_requests is {\"url\": \"pr/7\"}, which isn't a list or an object",
+            "message": "artifacts.pull_requests is {\"url\": \"pr/7\"}, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12722,7 +12722,7 @@
         "requirements": {"r": {"subjects": {"matching": 1, "total": 1}}},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "artifacts[0].releases is 5, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "item 1 of artifacts: releases is 5, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated k ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/artifacts/1/releases/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/1/releases/0/id"], "name": "id", "value": "r1"}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}}
@@ -12743,7 +12743,7 @@
         "requirements": {"r": {"subjects": {"matching": 1, "total": 1}}},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "artifacts[0].releases is 5, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "item 1 of artifacts: releases is 5, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated k ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/artifacts/1/releases/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/1/releases/0/id"], "name": "id", "value": "r1"}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}}
@@ -17644,7 +17644,7 @@
         "rules": ["location.failed_items"],
         "input": {"artifacts": [{"pull_requests": [{"url": "pr/7", "approvals": 2}]}, {}, {"pull_requests": null}, {"pull_requests": "none"}]},
         "results": [
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "absent", "item": "artifacts[1].pull_requests", "locations": ["/artifacts/1"], "path": "artifacts[1].pull_requests", "value": null}, {"cause": "null", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2/pull_requests"], "path": "artifacts[2].pull_requests", "value": null}, {"cause": "unusable", "item": "artifacts[3].pull_requests", "locations": ["/artifacts/3/pull_requests"], "path": "artifacts[3].pull_requests", "value": "none"}], "inputs": [{"locations": ["/artifacts/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "message": "artifacts[1].pull_requests is missing; artifacts[2].pull_requests is null; artifacts[3].pull_requests is \"none\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "absent", "item": "artifacts[1].pull_requests", "locations": ["/artifacts/1"], "path": "artifacts[1].pull_requests", "value": null}, {"cause": "null", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2/pull_requests"], "path": "artifacts[2].pull_requests", "value": null}, {"cause": "unusable", "item": "artifacts[3].pull_requests", "locations": ["/artifacts/3/pull_requests"], "path": "artifacts[3].pull_requests", "value": "none"}], "inputs": [{"locations": ["/artifacts/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 4 of artifacts: pull_requests is \"none\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "pull request"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/0/pull_requests/0/approvals"], "name": "approvals", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": "pr/7", "type": "pull request"}}
         ]
       }
@@ -17894,7 +17894,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't an object",
+            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -17933,7 +17933,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is 5, which isn't an object",
+            "message": "it is 5, which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -17976,7 +17976,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is [1], which isn't an object",
+            "message": "item 1 of $input: pulls is null, which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -18015,7 +18015,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is true, which isn't an object",
+            "message": "it is true, which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -18054,7 +18054,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null, which isn't an object",
+            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -18242,7 +18242,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "in-scope pull_request count is 0",
+            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -18281,7 +18281,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it[0].pulls is missing",
+            "message": "it is null",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -18343,7 +18343,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "item 1 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18463,7 +18463,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of it is missing",
+            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18525,7 +18525,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "item 2 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18649,7 +18649,7 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of it is missing",
+            "message": "item 2 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18715,7 +18715,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "item 1 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18835,7 +18835,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of it is missing",
+            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18897,7 +18897,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "item 2 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19021,7 +19021,7 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of it is missing",
+            "message": "item 2 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19117,7 +19117,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of it is missing",
+            "message": "it is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19233,7 +19233,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of it is missing",
+            "message": "it is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19451,7 +19451,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of it is missing",
+            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19559,7 +19559,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of it is missing",
+            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19667,7 +19667,7 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of it is missing",
+            "message": "item 2 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19780,7 +19780,7 @@
                 "value": 0
               }
             ],
-            "message": "it[0].y is missing",
+            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20011,7 +20011,7 @@
                 "value": 0
               }
             ],
-            "message": "it[0].c is missing",
+            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20050,7 +20050,7 @@
                 "value": 0
               }
             ],
-            "message": "it[0].c is missing",
+            "message": "it is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20089,7 +20089,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "it is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20387,7 +20387,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't an object",
+            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20409,7 +20409,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null, which isn't an object",
+            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20475,7 +20475,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't an object",
+            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20514,7 +20514,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null, which isn't an object",
+            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20583,7 +20583,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't an object",
+            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20622,7 +20622,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null, which isn't an object",
+            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20692,7 +20692,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't an object",
+            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20731,7 +20731,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null, which isn't an object",
+            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20803,7 +20803,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't an object",
+            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -21169,7 +21169,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "it is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21190,7 +21190,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "it is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21211,7 +21211,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "it is 5, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21255,7 +21255,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "it is true, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21321,7 +21321,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "in-scope k count is 0",
+            "message": "$params.k is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -21390,7 +21390,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "in-scope k count is 0",
+            "message": "$params.k is \"x\", which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -21459,7 +21459,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "in-scope k count is 0",
+            "message": "$params.k is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -21535,7 +21535,7 @@
                 "value": 0
               }
             ],
-            "message": "it is \"s\", which isn't an object",
+            "message": "it is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21556,7 +21556,7 @@
                 "value": 0
               }
             ],
-            "message": "it is null, which isn't an object",
+            "message": "it is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21577,7 +21577,7 @@
                 "value": 0
               }
             ],
-            "message": "it is 5, which isn't an object",
+            "message": "it is 5, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21598,7 +21598,7 @@
                 "value": 0
               }
             ],
-            "message": "it is [1], which isn't an object",
+            "message": "item 1 of $input: x is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21621,7 +21621,7 @@
                 "value": 0
               }
             ],
-            "message": "it is true, which isn't an object",
+            "message": "it is true, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21768,7 +21768,7 @@
                 "value": 2
               }
             ],
-            "message": "in-scope k count is 2",
+            "message": "it is {\"id\": \"a1\"}, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21792,7 +21792,7 @@
                 "value": 2
               }
             ],
-            "message": "in-scope k count is 2",
+            "message": "it is {\"id\": \"a2\"}, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -22256,7 +22256,7 @@
                 "value": 0
               }
             ],
-            "message": "items is missing",
+            "message": "it is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23091,7 +23091,7 @@
                 "value": 1
               }
             ],
-            "message": "in-scope k count is 1",
+            "message": "item 1 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23241,7 +23241,7 @@
                 "value": 1
               }
             ],
-            "message": "in-scope k count is 1",
+            "message": "item 1 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23391,7 +23391,7 @@
                 "value": 1
               }
             ],
-            "message": "in-scope k count is 1",
+            "message": "item 1 of x is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23713,7 +23713,7 @@
               "type": "k"
             },
             "check": "$min_subjects",
-            "message": "in-scope k count is 1",
+            "message": "it is \"text\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -23836,7 +23836,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "$params.k is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23857,7 +23857,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "$params.k is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23998,7 +23998,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "$params.k is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24019,7 +24019,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "$params.k is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24160,7 +24160,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "$params.k is \"x\", which isn't a list of text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24181,7 +24181,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "$params.k is \"x\", which isn't a list of text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24325,7 +24325,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "$params.k is [\"x\", 1], which isn't a list of text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24346,7 +24346,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "$params.k is [\"x\", 1], which isn't a list of text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24787,7 +24787,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope missing env, list keys count is 0",
+            "message": "$params.em is missing",
             "passed": false,
             "requirement": "missing env, list keys",
             "subject": {
@@ -24805,7 +24805,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope missing env, missing keys count is 0",
+            "message": "$params.em is missing; $params.km is missing",
             "passed": false,
             "requirement": "missing env, missing keys",
             "subject": {
@@ -24823,7 +24823,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope missing env, null keys count is 0",
+            "message": "$params.em is missing",
             "passed": false,
             "requirement": "missing env, null keys",
             "subject": {
@@ -24841,7 +24841,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope missing env, number keys count is 0",
+            "message": "$params.em is missing",
             "passed": false,
             "requirement": "missing env, number keys",
             "subject": {
@@ -24859,7 +24859,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope null env, list keys count is 0",
+            "message": "$params.ez is null",
             "passed": false,
             "requirement": "null env, list keys",
             "subject": {
@@ -24877,7 +24877,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope null env, missing keys count is 0",
+            "message": "$params.ez is null",
             "passed": false,
             "requirement": "null env, missing keys",
             "subject": {
@@ -24895,7 +24895,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope null env, null keys count is 0",
+            "message": "$params.ez is null; $params.kz is null",
             "passed": false,
             "requirement": "null env, null keys",
             "subject": {
@@ -24913,7 +24913,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope null env, number keys count is 0",
+            "message": "$params.ez is null",
             "passed": false,
             "requirement": "null env, number keys",
             "subject": {
@@ -24931,7 +24931,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope number env, list keys count is 0",
+            "message": "$params.en is 1, which isn't text",
             "passed": false,
             "requirement": "number env, list keys",
             "subject": {
@@ -24949,7 +24949,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope number env, missing keys count is 0",
+            "message": "$params.en is 1, which isn't text",
             "passed": false,
             "requirement": "number env, missing keys",
             "subject": {
@@ -24967,7 +24967,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope number env, null keys count is 0",
+            "message": "$params.en is 1, which isn't text",
             "passed": false,
             "requirement": "number env, null keys",
             "subject": {
@@ -24985,7 +24985,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope number env, number keys count is 0",
+            "message": "$params.en is 1, which isn't text; $params.kn is 1, which isn't a list of text",
             "passed": false,
             "requirement": "number env, number keys",
             "subject": {
@@ -25003,7 +25003,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope object env, list keys count is 0",
+            "message": "$params.eo is {\"x\": 1}, which isn't text",
             "passed": false,
             "requirement": "object env, list keys",
             "subject": {
@@ -25021,7 +25021,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope object env, missing keys count is 0",
+            "message": "$params.eo is {\"x\": 1}, which isn't text",
             "passed": false,
             "requirement": "object env, missing keys",
             "subject": {
@@ -25039,7 +25039,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope object env, null keys count is 0",
+            "message": "$params.eo is {\"x\": 1}, which isn't text",
             "passed": false,
             "requirement": "object env, null keys",
             "subject": {
@@ -25057,7 +25057,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope object env, number keys count is 0",
+            "message": "$params.eo is {\"x\": 1}, which isn't text; $params.kn is 1, which isn't a list of text",
             "passed": false,
             "requirement": "object env, number keys",
             "subject": {
@@ -25095,7 +25095,7 @@
                 "value": 0
               }
             ],
-            "message": "scans.nope is missing",
+            "message": "$params.km is missing",
             "passed": false,
             "requirement": "string env, missing keys",
             "subject": {
@@ -25113,7 +25113,7 @@
                 "value": 0
               }
             ],
-            "message": "the check is false",
+            "message": "$params.kz is null",
             "passed": false,
             "requirement": "string env, null keys",
             "subject": {
@@ -25131,7 +25131,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope string env, number keys count is 0",
+            "message": "$params.kn is 1, which isn't a list of text",
             "passed": false,
             "requirement": "string env, number keys",
             "subject": {
@@ -25322,7 +25322,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope brackets, boolean key count is 0",
+            "message": "$params.kt is true, which isn't text",
             "passed": false,
             "requirement": "brackets, boolean key",
             "subject": {
@@ -25340,7 +25340,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope brackets, list key count is 0",
+            "message": "$params.kl is [\"q\"], which isn't text",
             "passed": false,
             "requirement": "brackets, list key",
             "subject": {
@@ -25358,7 +25358,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope brackets, missing key count is 0",
+            "message": "$params.kx is missing",
             "passed": false,
             "requirement": "brackets, missing key",
             "subject": {
@@ -25376,7 +25376,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope brackets, null key count is 0",
+            "message": "$params.kn is null",
             "passed": false,
             "requirement": "brackets, null key",
             "subject": {
@@ -25394,7 +25394,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope brackets, object key count is 0",
+            "message": "$params.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "brackets, object key",
             "subject": {
@@ -25412,7 +25412,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope named by, boolean key count is 0",
+            "message": "$params.kt is true, which isn't text",
             "passed": false,
             "requirement": "named by, boolean key",
             "subject": {
@@ -25430,7 +25430,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope named by, list key count is 0",
+            "message": "$params.kl is [\"q\"], which isn't text",
             "passed": false,
             "requirement": "named by, list key",
             "subject": {
@@ -25448,7 +25448,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope named by, missing key count is 0",
+            "message": "$params.kx is missing",
             "passed": false,
             "requirement": "named by, missing key",
             "subject": {
@@ -25466,7 +25466,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope named by, null key count is 0",
+            "message": "$params.kn is null",
             "passed": false,
             "requirement": "named by, null key",
             "subject": {
@@ -25484,7 +25484,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope named by, object key count is 0",
+            "message": "$params.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "named by, object key",
             "subject": {
@@ -25652,7 +25652,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope brackets, missing key count is 0",
+            "message": "$input.kx is missing",
             "passed": false,
             "requirement": "brackets, missing key",
             "subject": {
@@ -25670,7 +25670,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope brackets, null key count is 0",
+            "message": "$input.kz is null",
             "passed": false,
             "requirement": "brackets, null key",
             "subject": {
@@ -25688,7 +25688,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope brackets, number key count is 0",
+            "message": "$input.kn is 1, which isn't text",
             "passed": false,
             "requirement": "brackets, number key",
             "subject": {
@@ -25706,7 +25706,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope brackets, object key count is 0",
+            "message": "$input.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "brackets, object key",
             "subject": {
@@ -25743,7 +25743,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope named by, missing key count is 0",
+            "message": "$input.kx is missing",
             "passed": false,
             "requirement": "named by, missing key",
             "subject": {
@@ -25761,7 +25761,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope named by, null key count is 0",
+            "message": "$input.kz is null",
             "passed": false,
             "requirement": "named by, null key",
             "subject": {
@@ -25779,7 +25779,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope named by, number key count is 0",
+            "message": "$input.kn is 1, which isn't text",
             "passed": false,
             "requirement": "named by, number key",
             "subject": {
@@ -25797,7 +25797,7 @@
                 "value": 0
               }
             ],
-            "message": "in-scope named by, object key count is 0",
+            "message": "$input.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "named by, object key",
             "subject": {

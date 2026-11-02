@@ -8836,7 +8836,27 @@ _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] 
 
 else := w.fails if w.fails != []
 
-else := [object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {}))]
+else := [object.union(object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {})), _m_unread_names(check.items[1].path))]
+
+_m_unread_text(f) := f.msg if is_array(object.get(f, "msg", null))
+
+else := []
+
+_m_inner_fail(x) := x.text if count(object.get(x, "text", [])) > 0
+
+else := [_m_named_fail(object.union(x, {"path": object.get(x, "msg", x.path)}))]
+
+_m_unread_names(path) := {"msg": ms} if {
+	is_array(path)
+	ms := [_m_name_state(seg.named_by, object.get(input, ["ergo/names", seg.named_by], _absent)) | some seg in path; _name_step(seg); not is_string(object.get(input, ["ergo/names", seg.named_by], _absent))]
+	ms != []
+} else := {}
+
+_m_name_state(n, v) := concat("", [n, " is missing"]) if v == _absent
+
+else := concat("", [n, " is null"]) if v == null
+
+else := _m_isnt(n, v, "text")
 
 _for_pick_fails(check, pre) := _for_unwalked(check, pre) if pre.walked == set()
 
@@ -9131,8 +9151,9 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 	"pick" in object.keys(check.items[1])
 	not _for_from_first(check)
 	w.walked != set()
-} else := {"passed": false, "cause": w.unread, "lines": [], "unchecked": _for_unwalked(check, w)} if {
+} else := {"passed": false, "cause": w.unread, "lines": [], "unchecked": u} if {
 	"unread" in object.keys(w)
+	u := _for_unwalked(check, w) with input as {"ergo/names": names}
 } else := {"passed": cause == "satisfied", "cause": cause, "lines": lines, "unchecked": [f | some f in fails; f.lines == []]} if {
 	item := check.items[1]
 	judged := [_for_judge_inner(check, subj, names, item, e, w) | some e in w.items]
@@ -9258,7 +9279,7 @@ _for_failed(check, cause, fails) := [object.union(object.union({"path": _failed_
 
 _for_unchecked(_, []) := {}
 
-_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_for_item_name(check, f.path)} |
+_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_for_item_name(check, f.path), "text": _m_unread_text(f)} |
 	some p in sort({f.path | some f in inner})
 	some f in inner
 	f.path == p
@@ -10243,7 +10264,11 @@ _walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
 	_m_walk_faults(subj, check) == []
 }
 
-_m_walk_faults(subj, check) := _once(array.concat(array.concat(_m_key_faults(subj, check), [f | some c in object.get(check, "whose", []); some f in _m_ref_faults_text(c)]), [f | is_object(object.get(check, "check", null)); some f in _m_ref_faults_text(check.check)]))
+_m_walk_faults(subj, check) := _once(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_walk_blocked(subj, check)), [f | some c in object.get(check, "whose", []); some f in _m_ref_faults_text(c)]), [f | is_object(object.get(check, "check", null)); some f in _m_ref_faults_text(check.check)]))
+
+_m_walk_blocked(subj, check) := _m_blocked(subj, {"op": "present", "path": check.path}) if is_array(check.path)
+
+else := []
 
 _walk_parts(check, subj, raw, r) := fs if {
 	r.failed == []
@@ -10483,7 +10508,7 @@ _m_strip(f) := object.union(object.remove(f, ["msg", "said"]), object.union({"fa
 
 else := object.remove(f, ["msg", "said"])
 
-_m_strip_items(f) := {"failed_items": [object.remove(x, ["msg"]) | some x in f.failed_items]} if "failed_items" in object.keys(f)
+_m_strip_items(f) := {"failed_items": [object.remove(x, ["msg", "text"]) | some x in f.failed_items]} if "failed_items" in object.keys(f)
 
 else := {}
 
@@ -10564,7 +10589,7 @@ _m_for_fail(f) := _once([concat("", [object.get(f, "said", f.item), ": ", p]) | 
 	count(ps) != 1
 }
 
-_m_for_fail(f) := [concat("", [object.get(f, "said", f.item), ": ", _m_named_fail(object.union(x, {"path": object.get(x, "msg", x.path)}))]) | some x in f.failed_items] if {
+_m_for_fail(f) := [concat("", [object.get(f, "said", f.item), ": ", t]) | some x in f.failed_items; some t in _m_inner_fail(x)] if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions == []
@@ -10752,7 +10777,9 @@ _m_from_ref_fits(v, "a list of text") if {
 
 _m_filter(_, _, true, _) := {}
 
-_m_filter(check, subj, false, cause) := {"message": _m_joined(_m_line(check, subj, _m_undecided(cause), _expression_of(check)))}
+_m_filter(check, subj, false, "missing") := {"message": _m_joined(_m_line(check, subj, "value", _expression_of(check)))}
+
+_m_filter(check, subj, false, cause) := {"message": _m_joined(_m_line(check, subj, cause, _expression_of(check)))} if cause != "missing"
 
 _m_filter_walk(_, _, true, _, _) := {}
 

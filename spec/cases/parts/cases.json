@@ -1742,7 +1742,7 @@
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "unusable", "check": "d", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "message": "cov is 1, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "message": "cov is 1, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
         ]
       }
     ]
@@ -1848,7 +1848,7 @@
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "message": "cov is 2", "passed": false, "requirement": "r2", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "message": "cov is 1, which isn't a list", "passed": false, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "message": "cov is 1, which isn't a list or an object", "passed": false, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "zz", "value": null}], "message": "zz is missing", "passed": false, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
         ]
       }
