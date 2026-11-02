@@ -886,23 +886,29 @@ else := evals if {
 	evals := {name: _filter_eval(req, check, subj, flaws[name]) | some name, check in _applies_to_of(req)} with input as s
 }
 
-_filter_eval(req, check, subj, flaw) := {
-	"passed": _filter_walk_passed(flaw, w),
-	"cause": _filter_walk_cause(flaw, w),
-	"assertion_cause": w.cause,
-	"inputs": _tagged(_with_key_fields(subj, check, w.inputs), check, req, subj),
-	"failed_items": w.failed,
-} if {
+_filter_eval(req, check, subj, flaw) := object.union(
+	{
+		"passed": _filter_walk_passed(flaw, w),
+		"cause": _filter_walk_cause(flaw, w),
+		"assertion_cause": w.cause,
+		"inputs": _tagged(_with_key_fields(subj, check, w.inputs), check, req, subj),
+		"failed_items": w.failed,
+	},
+	_m_filter_walk(check, subj, _filter_walk_passed(flaw, w), _filter_walk_cause(flaw, w), w),
+) if {
 	_walks(check)
 	w := _walk_row(check, subj)
 }
 
-_filter_eval(req, check, subj, flaw) := {
-	"passed": passed,
-	"cause": _filter_cause(check, subj, flaw),
-	"assertion_cause": _filter_assertion_cause(passed, check, subj, flaw),
-	"inputs": _tagged(_row_inputs(subj, check), check, req, subj),
-} if {
+_filter_eval(req, check, subj, flaw) := object.union(
+	{
+		"passed": passed,
+		"cause": _filter_cause(check, subj, flaw),
+		"assertion_cause": _filter_assertion_cause(passed, check, subj, flaw),
+		"inputs": _tagged(_row_inputs(subj, check), check, req, subj),
+	},
+	_m_filter(check, subj, passed, _filter_cause(check, subj, flaw)),
+) if {
 	not _walks(check)
 	passed := _check_passed(check, subj, flaw)
 }
@@ -4073,7 +4079,7 @@ _min_subjects_row(doc, req, req_name, matching, at) := object.union(
 		"passed": _enough_subjects(doc, req, matching),
 		"cause": _min_subjects_cause(doc, req, matching),
 	},
-	_every_failed_items(doc, req),
+	object.union(_every_failed_items(doc, req), _m_from_message(doc, req, _enough_subjects(doc, req, matching), _min_subjects_cause(doc, req, matching))),
 )
 
 _every_failed_items(doc, req) := {"failed_items": [{"path": _input_path_name(f.path), "item": _input_path_name(f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
@@ -4161,7 +4167,7 @@ _applies_row(ref, entry, evals, req, req_name) := object.union(
 		"passed": matched,
 		"cause": _applies_cause(evals, matched),
 	},
-	_applies_failures(evals, req, entry.at),
+	object.union(_applies_failures(evals, req, entry.at), _m_applies(evals, req, matched)),
 ) if {
 	matched := _subject_matches(evals, req)
 }
@@ -4328,10 +4334,10 @@ _policy_compliant(policy, evaluations) if {
 
 _results(policy, evaluations) := array.concat(
 	array.concat(
-		[evaluations[name].well_formed | some name in _names(policy)],
+		[_m_problems_row(evaluations[name].well_formed) | some name in _names(policy)],
 		array.concat(
-			[row | some name in _names(policy); some row in evaluations[name].min_subjects],
-			[row | some name in _names(policy); some row in evaluations[name].unique_ids],
+			[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].min_subjects],
+			[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].unique_ids],
 		),
 	),
 	array.concat(
@@ -4488,7 +4494,7 @@ _with_policy_row(report, _) := report if count(report.requirements) > 0
 
 _with_policy_row(report, policy) := object.union(report, {
 	"requirements": {"$policy": _policy_requirement},
-	"results": array.concat(report.results, [_policy_row(policy)]),
+	"results": array.concat(report.results, [_m_problems_row(_policy_row(policy))]),
 }) if count(report.requirements) == 0
 
 _policy_requirement := {
@@ -10306,3 +10312,76 @@ _m_bare_item(f) if {
 	f.cause == "not_an_object"
 	not is_object(f.value)
 }
+
+_row_message(check, subj, raw) := concat("; ", ms) if {
+	_all_of_run(check)
+	ms := _once([_m_joined(_m_line(check.checks[i], subj, fa.cause, fa.assertion)) |
+		some fa in raw.failed_assertions
+		i := min({j | some j, a in check.assertions; a == fa.assertion})
+	])
+	ms != []
+} else := _m_fallback(check) if _all_of_run(check)
+
+_row_message(check, subj, _) := concat("; ", ms) if {
+	_any_of_run(check)
+	causes := [_m_undecided(_option_line_cause(c, _assertion_cause(c, subj, ""), subj)) | some c in check.checks]
+	ms := [concat("", [nm, ": ", concat(", and ", lines)]) |
+		some k, nm in check.option_of
+		not nm in array.slice(check.option_of, 0, k)
+		lines := _once([_m_joined(_m_line(c, subj, causes[i], check.assertions[i])) |
+			some i, c in check.checks
+			check.option_of[i] == nm
+			causes[i] != "satisfied"
+		])
+		lines != []
+	]
+	ms != []
+} else := _m_fallback(check) if _any_of_run(check)
+
+_m_problems_row(row) := row if row.passed == true
+
+else := object.union(row, {"message": concat("; ", ms)}) if {
+	ms := [concat("", [i.name, ": ", p]) | some i in row.inputs; is_array(i.value); some p in i.value; is_string(p)]
+	ms != []
+}
+
+else := object.union(row, {"message": "the policy isn't written correctly"})
+
+_m_count_row(row) := row if row.passed == true
+
+else := row if "message" in object.keys(row)
+
+else := object.union(row, {"message": _m_joined([_m_named_fail(f) | some f in row.failed_items])}) if count(object.get(row, "failed_items", [])) > 0
+
+else := object.union(row, {"message": _m_is(row.inputs[0].name, row.inputs[0].value)})
+
+_m_from_message(_, _, true, _) := {}
+
+_m_from_message(doc, req, false, cause) := {"message": m} if {
+	cause in {"absent", "null", "not_an_object"}
+	keys := _from_keys(req)
+	count(keys) > 0
+	m := _message({"op": "present", "path": keys}, doc, cause)
+} else := {"message": _m_isnt(_path_name(keys), v, "a list or an object")} if {
+	cause == "unusable"
+	keys := _from_keys(req)
+	count(keys) > 0
+	v := _target(doc, req)
+	v != null
+	not _is_collection(v)
+} else := {}
+
+_m_filter(_, _, true, _) := {}
+
+_m_filter(check, subj, false, cause) := {"message": _m_joined(_m_line(check, subj, _m_undecided(cause), _expression_of(check)))}
+
+_m_filter_walk(_, _, true, _, _) := {}
+
+_m_filter_walk(check, subj, false, cause, w) := {"message": _m_joined(_walk_parts(check, subj, {"cause": cause}, w))}
+
+_m_applies(_, _, true) := {}
+
+_m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
+	ms := _once([evals[n].message | some n in _applies_to_names(req); not evals[n].passed])
+	ms != []
+} else := {"message": "the subject doesn't match"}
