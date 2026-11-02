@@ -121,7 +121,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings is 3",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -182,7 +181,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -231,7 +229,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -281,7 +278,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -331,7 +327,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is \"abc\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -383,7 +378,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is {\"id\": 1}, which isn't a list",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -500,7 +494,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -642,7 +635,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings whose severity is \"high\" is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -764,7 +756,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of findings: severity is 5, which isn't text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -829,7 +820,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of findings: severity is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -894,7 +884,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of findings: severity is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -952,7 +941,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -1273,7 +1261,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of pull_requests.commits is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1320,7 +1307,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of pull_requests.commits is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1379,7 +1365,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of pull_requests: commits is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -1444,7 +1429,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of pull_requests: commits is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -1509,7 +1493,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of pull_requests: commits is \"x\", which isn't a list",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -1562,7 +1545,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "pull_requests is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -1701,7 +1683,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "sum of items.usd is 35",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1753,7 +1734,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "sum of items.usd is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1808,7 +1788,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of items: usd is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -1870,7 +1849,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of items: usd is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -1932,7 +1910,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of items: usd is \"20\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -1994,7 +1971,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of items: usd is true, which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -2048,7 +2024,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "items is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -2098,7 +2073,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "items is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -2148,7 +2122,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "items is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -2206,7 +2179,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 3 of items: usd is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -2687,7 +2659,6 @@
                 "value": 100
               }
             ],
-            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2747,7 +2718,6 @@
                 "value": 1
               }
             ],
-            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2807,7 +2777,6 @@
                 "value": 1
               }
             ],
-            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2867,7 +2836,6 @@
                 "value": 0
               }
             ],
-            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2927,7 +2895,6 @@
                 "value": 1
               }
             ],
-            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2987,7 +2954,6 @@
                 "value": 0.2
               }
             ],
-            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3047,7 +3013,6 @@
                 "value": 100000000000000000000
               }
             ],
-            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3125,7 +3090,6 @@
                 ]
               }
             ],
-            "message": "sum of xs needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3303,7 +3267,6 @@
                 ]
               }
             ],
-            "message": "sum of xs needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3549,7 +3512,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of items: kind is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -3613,7 +3575,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of items: usd is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -3671,7 +3632,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "sum of items.usd whose kind is \"a\" is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -3888,7 +3848,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "sum of items.usd is 1.6",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -3947,7 +3906,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "sum of items.usd is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -4063,7 +4021,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 1 of items: usd is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -4209,7 +4166,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "sum of items.usd is 0.3, and total is 0.5",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -4277,7 +4233,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "total is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -4342,7 +4297,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "total is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -4466,7 +4420,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base plus 2 is 6",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -4513,7 +4466,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base is \"3\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -4559,7 +4511,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -4606,7 +4557,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -4799,7 +4749,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "extra is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -4854,7 +4803,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "extra is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -5091,7 +5039,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -5155,7 +5102,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -5687,7 +5633,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "total is 6, and base plus 2 is 5",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -5741,7 +5686,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6252,7 +6196,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "limit is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6317,7 +6260,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6474,7 +6416,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings is 2, which isn't text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6565,7 +6506,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6715,7 +6655,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6919,7 +6858,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings is 3",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7008,7 +6946,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7214,7 +7151,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of findings is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7359,7 +7295,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "sum of items.usd is 9",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7417,7 +7352,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 1 of items: usd is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -7567,7 +7501,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 1 of pull_requests: title is \"\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7629,7 +7562,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "pull_requests is [{\"reviews\": [{\"by\": \"a\"}], \"title\": \"x\"}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7751,7 +7683,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of pull_requests: reviews is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -7814,7 +7745,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 1 of pull_requests: reviews is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -7875,7 +7805,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 1 of pull_requests: reviews is \"none\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -8141,7 +8070,6 @@
                 ]
               }
             ],
-            "message": "item 2 of pull_requests: count of pr.reviews is 1",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8237,7 +8165,6 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: count of pr.reviews is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8347,7 +8274,6 @@
                 ]
               }
             ],
-            "message": "item 2 of pull_requests: pr.reviews is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8442,7 +8368,6 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: pr.reviews is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8537,7 +8462,6 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: pr.reviews is \"two\", which isn't a list or an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8685,7 +8609,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of $params.approvers is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -8760,7 +8683,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of $params.approvers is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -8833,7 +8755,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "$params.approvers is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -8908,7 +8829,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "$params.approvers is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -8983,7 +8903,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "$params.approvers is \"ann\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -9231,7 +9150,6 @@
               "id": null
             },
             "check": "$well_formed",
-            "message": "checks.c: is empty can't follow a count of, a sum of or a plus",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9485,7 +9403,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of x is 4",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9544,7 +9461,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "count of x is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9594,7 +9510,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "x is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -9644,7 +9559,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "x is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -9694,7 +9608,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "x is \"abc\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -9887,7 +9800,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "sum of items.usd is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9944,7 +9856,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of items: usd is \"2\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -10069,7 +9980,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base plus 2 is 7",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10117,7 +10027,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -10185,7 +10094,6 @@
               "id": null
             },
             "check": "$well_formed",
-            "message": "checks.c: is empty can't follow a count of, a sum of or a plus",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10262,7 +10170,6 @@
               "id": null
             },
             "check": "$well_formed",
-            "message": "checks.c: doesn't parse",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10348,7 +10255,6 @@
                 ]
               }
             ],
-            "message": "it is 5, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10375,7 +10281,6 @@
                 ]
               }
             ],
-            "message": "it is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10434,7 +10339,6 @@
                 ]
               }
             ],
-            "message": "item 1 of xs is 5, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10466,7 +10370,6 @@
                 ]
               }
             ],
-            "message": "count of xs.n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10542,7 +10445,6 @@
                 ]
               }
             ],
-            "message": "$params.missing is missing; item 1 of xs: $params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10617,7 +10519,6 @@
                 ]
               }
             ],
-            "message": "$params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10648,7 +10549,6 @@
                 ]
               }
             ],
-            "message": "$params.missing is missing; item 1 of xs: $params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10764,7 +10664,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "seconds elapsed from first_seen_ts to now_ts is 604800",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10905,7 +10804,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "minutes elapsed from first_seen_ts to now_ts is 10080",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11046,7 +10944,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "hours elapsed from first_seen_ts to now_ts is 168",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11187,7 +11084,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from first_seen_ts to now_ts is 7",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11328,7 +11224,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "weeks elapsed from first_seen_ts to now_ts is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11492,7 +11387,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from first_seen_ts to now_ts is 4, and $params.max_days named by severity is 4",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11568,7 +11462,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "$params.max_days named by severity is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -11722,7 +11615,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11943,7 +11835,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is \"2026-01-02T00:00:00Z\", and ended is \"2026-01-01T00:00:00Z\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -12003,7 +11894,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is 5, and ended is 4",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -12085,7 +11975,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -12145,7 +12034,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -12206,7 +12094,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -12267,7 +12154,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "ended is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -12328,7 +12214,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -12389,7 +12274,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is true, which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12452,7 +12336,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "ended is [1], which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12517,7 +12400,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is {\"a\": 1}, which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12581,7 +12463,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is \"yesterday\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12643,7 +12524,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is \"2026-01-01t00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12705,7 +12585,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "ended is \"2026-01-01T00:00:00z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12767,7 +12646,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is \"2026-02-30T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12829,7 +12707,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is \"1677-12-31T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12891,7 +12768,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "ended is \"2262-01-01T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12952,7 +12828,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is \"2026-10-01T00:00:00Z\", which isn't a time written like 5",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -13013,7 +12888,6 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "started is 5, which isn't a time written like \"2026-10-01T00:00:00Z\"",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -13244,7 +13118,6 @@
                 ]
               }
             ],
-            "message": "item 2 of pull_requests: days elapsed from pr.opened to pr.closed is 3",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13347,7 +13220,6 @@
                 ]
               }
             ],
-            "message": "item 1 of pull_requests: pr.closed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13503,7 +13375,6 @@
               "type": "vuln"
             },
             "check": "$well_formed",
-            "message": "checks.c: days is a word of the grammar: write .days",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -13799,7 +13670,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "days elapsed from started to ended plus 1 is 3",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -13863,7 +13733,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "started is 86400, and ended is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -13928,7 +13797,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -14083,7 +13951,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "started is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -14238,7 +14105,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "n is 2, and days elapsed from started to ended is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14303,7 +14169,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -14467,7 +14332,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "n is 2, and 1 plus days elapsed from started to ended is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14686,7 +14550,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "item 1 of xs: title is \"\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14747,7 +14610,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "xs is [{\"ended\": 172800, \"started\": 0, \"title\": \"x\"}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14908,7 +14770,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "count of xs whose days elapsed from started to ended is 1 is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15059,7 +14920,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "item 2 of xs: ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -15229,7 +15089,6 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of prs: reviews is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -15518,7 +15377,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is 3",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15574,7 +15432,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "started is 86400, and ended is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15631,7 +15488,6 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -15709,7 +15565,6 @@
               "type": "vuln"
             },
             "check": "$well_formed",
-            "message": "checks.c: is empty can't follow a count of, a sum of or a plus",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15792,7 +15647,6 @@
               "type": "vuln"
             },
             "check": "$well_formed",
-            "message": "checks.c: doesn't parse",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -16006,7 +15860,6 @@
                 ]
               }
             ],
-            "message": "started is \"2026-09-15\", which isn't a time written like \"2026-10-02T00:00:00Z\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16035,7 +15888,7 @@
         "rules": ["location.worked_out", "location.each"],
         "input": {"releases": [{"id": "r1", "findings": []}]},
         "results": [
-          {"cause": "value", "check": "c", "inputs": [{"locations": [], "name": "count of findings", "value": 0}, {"locations": [], "name": "findings[]", "value": []}], "message": "count of findings is 0", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+          {"cause": "value", "check": "c", "inputs": [{"locations": [], "name": "count of findings", "value": 0}, {"locations": [], "name": "findings[]", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]
@@ -16127,7 +15980,7 @@
         "rules": ["location.worked_out", "location.read"],
         "input": {"vulns": [{"id": "v1", "started": 100}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/vulns/0/started", "/vulns/0"], "name": "days elapsed from started to ended", "value": null}, {"locations": ["/vulns/0/started"], "name": "started", "value": 100}, {"locations": ["/vulns/0"], "name": "ended", "value": null}], "message": "ended is missing", "passed": false, "requirement": "s", "subject": {"id": "v1", "type": "vuln"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/vulns/0/started", "/vulns/0"], "name": "days elapsed from started to ended", "value": null}, {"locations": ["/vulns/0/started"], "name": "started", "value": 100}, {"locations": ["/vulns/0"], "name": "ended", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "v1", "type": "vuln"}}
         ]
       }
     ]
@@ -16217,7 +16070,6 @@
                 ]
               }
             ],
-            "message": "item 1 of xs is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16286,7 +16138,6 @@
                 ]
               }
             ],
-            "message": "item 1 of xs is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16366,7 +16217,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16423,7 +16273,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16481,7 +16330,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is 5, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16539,7 +16387,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16596,7 +16443,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16660,7 +16506,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16763,7 +16608,6 @@
               "id": "t"
             },
             "check": "c",
-            "message": "item 2 of items: k is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -16819,7 +16663,6 @@
               "id": "t"
             },
             "check": "c",
-            "message": "item 2 of items: k is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -16916,7 +16759,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16976,7 +16818,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17056,7 +16897,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17113,7 +16953,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17170,7 +17009,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17250,7 +17088,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {

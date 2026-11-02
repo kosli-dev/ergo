@@ -8836,7 +8836,7 @@ _for_unwalked(check, w) := [f | some f in array.concat(w.fails, _walk_stop(w))] 
 
 else := w.fails if w.fails != []
 
-else := [object.union(object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {})), _m_unread_names(check.items[1].path))]
+else := [object.union({"path": check.items[1].path, "item": check.items[1].path, "cause": w.unread, "value": null}, object.get(w, "unread_at", {}))]
 
 _m_unread_text(f) := f.msg if is_array(object.get(f, "msg", null))
 
@@ -8846,11 +8846,20 @@ _m_inner_fail(x) := x.text if count(object.get(x, "text", [])) > 0
 
 else := [_m_named_fail(object.union(x, {"path": object.get(x, "msg", x.path)}))]
 
-_m_unread_names(path) := {"msg": ms} if {
+_m_unread_names(path, subj, f) := {"msg": ms} if {
+	f.path == path
+	f.value == null
 	is_array(path)
-	ms := [_m_name_state(seg.named_by, object.get(input, ["ergo/names", seg.named_by], _absent)) | some seg in path; _name_step(seg); not is_string(object.get(input, ["ergo/names", seg.named_by], _absent))]
+	ms := [_m_name_state(n, v) | some seg in path; [n, v] := _m_step_name(seg, subj); not is_string(v)]
 	ms != []
 } else := {}
+
+_m_step_name(seg, _) := [seg.named_by, object.get(input, ["ergo/names", seg.named_by], _absent)] if _name_step(seg)
+
+_m_step_name(seg, subj) := [seg.named_by_field, object.get(subj, seg.named_by_field, _absent)] if {
+	_field_step(seg)
+	is_object(subj)
+}
 
 _m_name_state(n, v) := concat("", [n, " is missing"]) if v == _absent
 
@@ -8997,13 +9006,39 @@ _for_unsortable(item, _, _) := [] if not "by" in object.keys(item.pick)
 _for_unsortable(item, w, names) := array.concat(unread, mixed) if {
 	"by" in object.keys(item.pick)
 	items := w.items
-	unread := [{"path": e.i, "item": e.i, "cause": _for_sort_state(item, e, names), "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)} | some e in items; not _for_sort_key(item, e, names)]
+	unread := [object.union({"path": e.i, "item": e.i, "cause": _for_sort_state(item, e, names), "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)}, _m_sort_why(item, e, names)) | some e in items; not _for_sort_key(item, e, names)]
 	kinds := {_for_sort_key(item, e, names)[0] | some e in items}
 	mixed := [{"path": e.i, "item": e.i, "cause": "unusable", "value": _for_sort_shown(item, e, names), "at": _for_sort_at(item, w, e, names)} |
 		count(kinds) > 1
 		some e in items
 		_for_sort_key(item, e, names)[0] != _for_kept_kind(kinds)
 	]
+}
+
+_m_sort_why(item, e, names) := {"why": [m]} if {
+	is_object(e.iv)
+	state := _for_sort_state(item, e, names)
+	m := _m_sort_text(item, e, state) with input as {"ergo/names": names}
+	startswith(m, "$")
+} else := {"why": [_m_leaf(e.i, m)]} if {
+	is_object(e.iv)
+	state := _for_sort_state(item, e, names)
+	m := _m_sort_text(item, e, state) with input as {"ergo/names": names}
+} else := {}
+
+_m_sort_text(item, e, state) := _message({"op": "present", "path": item.pick.by}, e.iv, state) if state in {"absent", "null"}
+
+else := m if {
+	ms := _m_key_faults(e.iv, {"op": "present", "path": item.pick.by})
+	ms != []
+	m := concat(", and ", ms)
+} else := m if {
+	ms := _m_blocked(e.iv, {"op": "present", "path": item.pick.by})
+	ms != []
+	m := concat(", and ", ms)
+} else := _m_isnt(_input_name(item.pick.by), v, "a number, a time or text") if {
+	v := _resolved(e.iv, item.pick.by)
+	v != _absent
 }
 
 _for_sort_state(item, e, names) := s if {
@@ -9153,7 +9188,7 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 	w.walked != set()
 } else := {"passed": false, "cause": w.unread, "lines": [], "unchecked": u} if {
 	"unread" in object.keys(w)
-	u := _for_unwalked(check, w) with input as {"ergo/names": names}
+	u := [object.union(f, _m_unread_names(check.items[1].path, subj, f)) | some f in _for_unwalked(check, w)] with input as {"ergo/names": names}
 } else := {"passed": cause == "satisfied", "cause": cause, "lines": lines, "unchecked": [f | some f in fails; f.lines == []]} if {
 	item := check.items[1]
 	judged := [_for_judge_inner(check, subj, names, item, e, w) | some e in w.items]

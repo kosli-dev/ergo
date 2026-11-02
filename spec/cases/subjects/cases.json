@@ -197,7 +197,6 @@
               "id": null
             },
             "check": "$min_subjects",
-            "message": "data.deployments is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -451,7 +450,6 @@
               "id": null
             },
             "check": "$unique_ids",
-            "message": "repeated deployment ids is [null]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -788,7 +786,6 @@
               "id": "d2"
             },
             "check": "$applies",
-            "message": "environment is \"staging\"",
             "passed": false,
             "cause": "value",
             "failed_assertions": [
@@ -821,7 +818,6 @@
               "id": "d3"
             },
             "check": "$applies",
-            "message": "change_type is \"normal\"",
             "passed": false,
             "cause": "value",
             "failed_assertions": [
@@ -962,7 +958,6 @@
               "id": "d1"
             },
             "check": "$applies",
-            "message": "change_type is missing",
             "passed": false,
             "cause": "absent",
             "failed_assertions": [
@@ -1085,7 +1080,6 @@
               "id": "d1"
             },
             "check": "$applies",
-            "message": "change_type is true, which isn't text",
             "passed": false,
             "cause": "unusable",
             "failed_assertions": [
@@ -1202,7 +1196,6 @@
               "id": "d1"
             },
             "check": "$applies",
-            "message": "environment is missing; change_type is \"normal\"",
             "passed": false,
             "cause": "absent",
             "failed_assertions": [
@@ -1538,7 +1531,6 @@
               "id": "p2"
             },
             "check": "$applies",
-            "message": "count of reviews is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1667,7 +1659,6 @@
               "id": "p1"
             },
             "check": "$applies",
-            "message": "reviews is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -1863,7 +1854,6 @@
                 ]
               }
             ],
-            "message": "item 1 of files: path is \"docs/upgrade.md\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1892,7 +1882,6 @@
                 "locations": []
               }
             ],
-            "message": "files is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2049,7 +2038,6 @@
                 "locations": []
               }
             ],
-            "message": "files is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2078,7 +2066,6 @@
                 "locations": []
               }
             ],
-            "message": "files is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2107,7 +2094,6 @@
                 "locations": []
               }
             ],
-            "message": "files is \"docs/upgrade.md\", which isn't a list or an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2151,7 +2137,6 @@
                 ]
               }
             ],
-            "message": "item 1 of files: path is \"docs/upgrade.md\"; item 2 of files: path is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2195,7 +2180,6 @@
                 ]
               }
             ],
-            "message": "item 1 of files: path is \"docs/upgrade.md\"; item 2 of files: path is 5, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2357,7 +2341,6 @@
                 ]
               }
             ],
-            "message": "item 2 of files: path is \"src/api.go\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2408,7 +2391,6 @@
                 "locations": []
               }
             ],
-            "message": "files is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2565,7 +2547,6 @@
                 "locations": []
               }
             ],
-            "message": "files is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2594,7 +2575,6 @@
                 "locations": []
               }
             ],
-            "message": "files is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2623,7 +2603,6 @@
                 "locations": []
               }
             ],
-            "message": "files is \"docs/upgrade.md\", which isn't a list or an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2658,7 +2637,6 @@
                 ]
               }
             ],
-            "message": "item 2 of files: path is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2693,7 +2671,6 @@
                 ]
               }
             ],
-            "message": "item 2 of files: path is 5, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2856,7 +2833,6 @@
                 ]
               }
             ],
-            "message": "item 2 of files: path is \"src/api.go\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2998,7 +2974,6 @@
               "type": "release"
             },
             "check": "$applies",
-            "message": "files is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -3027,7 +3002,6 @@
               "type": "release"
             },
             "check": "$applies",
-            "message": "files is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -3056,7 +3030,6 @@
               "type": "release"
             },
             "check": "$applies",
-            "message": "files is \"docs/upgrade.md\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -3085,7 +3058,6 @@
               "type": "release"
             },
             "check": "$applies",
-            "message": "item 2 of files: path is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -3302,7 +3274,6 @@
                 ]
               }
             ],
-            "message": "item 1 of files: path is \"docs/upgrade.md\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3337,7 +3308,6 @@
                 ]
               }
             ],
-            "message": "ticket is \"no\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3565,7 +3535,6 @@
                 ]
               }
             ],
-            "message": "item 1 of files: owner is \"bob\", and artifact.owner is \"ann\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3888,7 +3857,6 @@
                 ]
               }
             ],
-            "message": "item 1 of files: path is \"docs/upgrade.md\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3917,7 +3885,6 @@
                 "locations": []
               }
             ],
-            "message": "files is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4118,7 +4085,6 @@
                 ]
               }
             ],
-            "message": "item 1 of files: path is \"docs/upgrade.md\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4373,7 +4339,6 @@
                 "locations": []
               }
             ],
-            "message": "subjects.release.from: if any can't go with some",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4452,7 +4417,6 @@
                 "locations": []
               }
             ],
-            "message": "subjects.release.from: a condition after whose can't have a whose of its own",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4531,7 +4495,6 @@
                 "locations": []
               }
             ],
-            "message": "subjects.release.from: a condition after whose can't have a whose of its own",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4717,7 +4680,6 @@
               "id": null
             },
             "check": "$min_subjects",
-            "message": "artifacts.web is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -4799,7 +4761,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4835,7 +4796,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4896,7 +4856,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4932,7 +4891,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4993,7 +4951,6 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5054,7 +5011,6 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5117,7 +5073,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is [\"x\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5153,7 +5108,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is [\"x\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5214,7 +5168,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5253,7 +5206,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5310,7 +5262,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5345,7 +5296,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5405,7 +5355,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5440,7 +5389,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5502,7 +5450,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is [\"x\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5537,7 +5484,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is [\"x\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5597,7 +5543,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5635,7 +5580,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5700,7 +5644,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is 0, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5765,7 +5708,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is 1, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5893,7 +5835,6 @@
               "id": "sca"
             },
             "check": "c",
-            "message": "x is missing",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -5913,7 +5854,6 @@
               "id": "secrets"
             },
             "check": "c",
-            "message": "x is missing",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -5973,7 +5913,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "scans is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6029,7 +5968,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "scans is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -6088,7 +6026,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "in-scope scan count is 1",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6143,7 +6080,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "scans is \"sast\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6198,7 +6134,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "scans is 5, which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6285,7 +6220,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "$params.required is [\"sast\", 1], which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6320,7 +6254,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "$params.required is [\"sast\", 1], which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6381,7 +6314,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "$params.required is [null], which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6444,7 +6376,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "$params.required is \"sast\", which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6505,7 +6436,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "$params.required is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6567,7 +6497,6 @@
               "type": "s"
             },
             "check": "$min_subjects",
-            "message": "in-scope s count is 1",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6587,7 +6516,6 @@
               "type": "s"
             },
             "check": "c",
-            "message": "it is missing",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6621,7 +6549,6 @@
               "type": "s"
             },
             "check": "$min_subjects",
-            "message": "it is \"text\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6641,7 +6568,6 @@
               "type": "s"
             },
             "check": "c",
-            "message": "it is missing",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6726,7 +6652,6 @@
               "type": "s"
             },
             "check": "c",
-            "message": "it is missing",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6895,7 +6820,6 @@
               "type": "s"
             },
             "check": "c",
-            "message": "it is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6969,7 +6893,6 @@
               "type": "c"
             },
             "check": "$min_subjects",
-            "message": "it is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6992,7 +6915,6 @@
               "type": "c"
             },
             "check": "c1",
-            "message": "it is missing",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7059,7 +6981,6 @@
               "type": "finding"
             },
             "check": "$min_subjects",
-            "message": "in-scope finding count is 0",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -7265,7 +7186,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.env is 5, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7342,7 +7262,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "scans.prod is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -7417,7 +7336,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "in-scope scan count is 1",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -7489,7 +7407,6 @@
               "type": "scan"
             },
             "check": "$min_subjects",
-            "message": "scans.prod is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -7668,7 +7585,6 @@
               "id": null
             },
             "check": "$well_formed",
-            "message": "subjects.suite.identified_by: not allowed with named by each of: the key is the id",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7753,7 +7669,6 @@
               "id": null
             },
             "check": "$well_formed",
-            "message": "subjects.suite.identified_by: not allowed with named by each of: the key is the id",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7983,7 +7898,6 @@
                 ]
               }
             ],
-            "message": "subjects.suite.identified_by: not allowed with named by each of: the key is the id",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8143,7 +8057,6 @@
                 ]
               }
             ],
-            "message": "subjects.suite.identified_by: not a string; subjects.suite.identified_by: not allowed with named by each of: the key is the id",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8226,7 +8139,6 @@
                 ]
               }
             ],
-            "message": "subjects.suite.identified_by: not a string; subjects.suite.identified_by: not allowed with named by each of: the key is the id",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8311,7 +8223,6 @@
                 ]
               }
             ],
-            "message": "subjects.suite.identified_by: not a string; subjects.suite.identified_by: not allowed with named by each of: the key is the id",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8457,7 +8368,6 @@
               "id": "b"
             },
             "check": "$applies",
-            "message": "status is \"PENDING\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -8910,7 +8820,6 @@
               "id": null
             },
             "check": "$min_subjects",
-            "message": "artifact is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -9119,7 +9028,6 @@
               "id": null
             },
             "check": "$well_formed",
-            "message": "subjects.deployment.from: unclosed quote at column 34",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9196,7 +9104,6 @@
               "id": null
             },
             "check": "$well_formed",
-            "message": "subjects.deployment.identified_by: identified_by is a path, like \"id\" or \"build.number\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9239,7 +9146,7 @@
         "input": {"deployments": [{"id": "d1", "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$well_formed", "message": "subjects.deployment.applies_to: unknown field", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.deployment.applies_to", "value": ["unknown field"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "deployment", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.deployment.applies_to", "value": ["unknown field"], "locations": []}]}
         ]
       }
     ]
@@ -9425,7 +9332,6 @@
                 ]
               }
             ],
-            "message": "x is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9528,7 +9434,6 @@
                 ]
               }
             ],
-            "message": "in-scope pull_request count is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9608,7 +9513,6 @@
                 ]
               }
             ],
-            "message": "artifact.name is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9675,7 +9579,6 @@
                 ]
               }
             ],
-            "message": "in-scope pull_request count is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9857,7 +9760,6 @@
                 ]
               }
             ],
-            "message": "repeated pull_request ids is [\"p1\"]",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10228,7 +10130,6 @@
                 ]
               }
             ],
-            "message": "in-scope pull_request count is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10358,7 +10259,6 @@
                 ]
               }
             ],
-            "message": "in-scope pull_request count is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10562,7 +10462,6 @@
                 ]
               }
             ],
-            "message": "v is 2, and b.x is 1",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10661,7 +10560,6 @@
                 ]
               }
             ],
-            "message": "in-scope kid count is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10713,7 +10611,6 @@
                 ]
               }
             ],
-            "message": "b.x is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10909,7 +10806,6 @@
                 ]
               }
             ],
-            "message": ".b.x is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11078,7 +10974,6 @@
                 ]
               }
             ],
-            "message": "in-scope commit count is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11206,7 +11101,6 @@
                 ]
               }
             ],
-            "message": "verified is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11477,7 +11371,6 @@
                 ]
               }
             ],
-            "message": "in-scope commit count is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11500,7 +11393,6 @@
                 ]
               }
             ],
-            "message": "in-scope commit count is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11574,7 +11466,6 @@
                 ]
               }
             ],
-            "message": "in-scope commit count is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11835,7 +11726,6 @@
                 ]
               }
             ],
-            "message": "subjects.review.from: a chain of more than three subjects isn't supported yet",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -12011,7 +11901,6 @@
                 ]
               }
             ],
-            "message": "approvals is 0",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12131,7 +12020,6 @@
                 ]
               }
             ],
-            "message": "repeated pull request ids is [\"pr/7\"]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12234,7 +12122,6 @@
                 ]
               }
             ],
-            "message": "in-scope pull request count is 0",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12358,7 +12245,6 @@
                 ]
               }
             ],
-            "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 4 of artifacts: pull_requests is \"none\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12473,7 +12359,6 @@
                 ]
               }
             ],
-            "message": "artifacts.pull_requests is {\"url\": \"pr/7\"}, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12577,7 +12462,6 @@
                 ]
               }
             ],
-            "message": "subjects.\"pull request\".from: every can't go with a from line that starts at another subject yet",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12662,7 +12546,7 @@
           {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/artifacts/0/releases/0"], "name": "in-scope k count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated k ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/artifacts/0/releases/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/artifacts/0/releases/1/n"], "name": "n", "value": 2}], "message": "n is 2", "passed": false, "requirement": "r", "subject": {"id": "r2", "type": "k"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/artifacts/0/releases/1/n"], "name": "n", "value": 2}], "passed": false, "requirement": "r", "subject": {"id": "r2", "type": "k"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/0/releases/0/id"], "name": "id", "value": "r1"}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}}
         ]
       }
@@ -12702,7 +12586,7 @@
         "results": [
           {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/artifacts/0/releases/1"], "name": "in-scope j count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "j"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated j ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "j"}},
-          {"cause": "value", "check": "$applies", "failed_assertions": [{"assertion": "n is 2", "cause": "value"}], "inputs": [{"locations": ["/artifacts/0/releases/0/n"], "name": "n", "value": 1}], "message": "n is 1", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "j"}},
+          {"cause": "value", "check": "$applies", "failed_assertions": [{"assertion": "n is 2", "cause": "value"}], "inputs": [{"locations": ["/artifacts/0/releases/0/n"], "name": "n", "value": 1}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "j"}},
           {"cause": "satisfied", "check": "$applies", "failed_assertions": [], "inputs": [{"locations": ["/artifacts/0/releases/1/n"], "name": "n", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": "r2", "type": "j"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/0/releases/1/id"], "name": "id", "value": "r2"}], "passed": true, "requirement": "r", "subject": {"id": "r2", "type": "j"}}
         ]
@@ -12722,7 +12606,7 @@
         "requirements": {"r": {"subjects": {"matching": 1, "total": 1}}},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "item 1 of artifacts: releases is 5, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated k ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/artifacts/1/releases/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/1/releases/0/id"], "name": "id", "value": "r1"}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}}
@@ -12743,7 +12627,7 @@
         "requirements": {"r": {"subjects": {"matching": 1, "total": 1}}},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "item 1 of artifacts: releases is 5, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated k ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/artifacts/1/releases/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/1/releases/0/id"], "name": "id", "value": "r1"}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}}
@@ -12822,7 +12706,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.mid.from: every can't go with a from line that starts at another subject yet",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -12921,7 +12804,6 @@
                 ]
               }
             ],
-            "message": "subjects.scan.from: every can't go with named by each of: start the from line at a subject to read its names one subject at a time",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -13113,7 +12995,6 @@
                 ]
               }
             ],
-            "message": "severity is \"low\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13372,7 +13253,6 @@
                 ]
               }
             ],
-            "message": "severity is \"low\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13405,7 +13285,6 @@
                 ]
               }
             ],
-            "message": "team is \"b\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13975,7 +13854,7 @@
         "input": {"arts": [{"id": "a1", "k": 2, "items": [{"id": "i1", "art": {"k": 1}}]}]},
         "results": [
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/arts/0/items/0/art/k"], "name": ".art.k", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "item"}},
-          {"cause": "value", "check": "d", "inputs": [{"locations": ["/arts/0/k"], "name": "art.k", "value": 2}], "message": "art.k is 2", "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "item"}}
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/arts/0/k"], "name": "art.k", "value": 2}], "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "item"}}
         ]
       }
     ]
@@ -14006,7 +13885,7 @@
         "input": {"arts": [{"id": "a1", "k": 5, "xs": [1, 2], "items": [{"id": "i1", "art": {"k": 1, "xs": [5, 6]}, "v": 5}]}]},
         "report": {"subjects": {"art": {"description": "", "from": "arts", "identified_by": "id", "parts": {}}, "thing": {"description": "", "from": "art.items whose v equals .art.k", "identified_by": "id", "parts": {}}}},
         "results": [
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/arts/0/items/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/v"], "name": "v", "value": 5}], "message": "v is 5, and .art.k is 1", "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}}
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/arts/0/items/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/v"], "name": "v", "value": 5}], "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}}
         ]
       }
     ]
@@ -14021,7 +13900,7 @@
         "input": {"arts": [{"id": "a1", "k": 5, "xs": [1, 2], "items": [{"id": "i1", "art": {"k": 1, "xs": [5, 6]}, "v": 5}]}]},
         "report": {"subjects": {"art": {"description": "", "from": "arts", "identified_by": "id", "parts": {}}, "thing": {"description": "", "from": "art.items whose every .art.xs is 5", "identified_by": "id", "parts": {}}}},
         "results": [
-          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 2 of .art.xs", "locations": ["/arts/0/items/0/art/xs/1"], "path": "item 2 of .art.xs", "value": 6}], "inputs": [{"locations": ["/arts/0/items/0/art/xs/0", "/arts/0/items/0/art/xs/1"], "name": ".art.xs[]", "value": [5, 6]}], "message": "item 2 of .art.xs is 6", "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}}
+          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 2 of .art.xs", "locations": ["/arts/0/items/0/art/xs/1"], "path": "item 2 of .art.xs", "value": 6}], "inputs": [{"locations": ["/arts/0/items/0/art/xs/0", "/arts/0/items/0/art/xs/1"], "name": ".art.xs[]", "value": [5, 6]}], "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}}
         ]
       }
     ]
@@ -14052,7 +13931,7 @@
         "input": {"arts": [{"id": "a1", "k": 1, "xs": [5], "items": [{"id": "i1", "art": {"k": 1, "xs": [5]}, "v": 1, "cov": {"k": 1}, "leaves": [{"id": "l1", "v": 1, "art": {"k": 1}}]}]}]},
         "report": {"subjects": {"art": {"description": "", "from": "arts", "identified_by": "id", "parts": {}}, "leaf": {"description": "", "from": "thing.leaves whose .art.k is 1 and thing.v is 1", "identified_by": "id", "parts": {}}, "thing": {"description": "", "from": "art.items", "identified_by": "id", "parts": {}}}},
         "results": [
-          {"cause": "absent", "check": "$applies", "failed_assertions": [{"assertion": ".thing.v is 1", "cause": "absent"}], "inputs": [{"locations": ["/arts/0/items/0/leaves/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/leaves/0"], "name": ".thing.v", "value": null}], "message": ".thing.v is missing", "passed": false, "requirement": "r", "subject": {"id": "l1", "in": {"art": "a1", "thing": "i1"}, "type": "leaf"}}
+          {"cause": "absent", "check": "$applies", "failed_assertions": [{"assertion": ".thing.v is 1", "cause": "absent"}], "inputs": [{"locations": ["/arts/0/items/0/leaves/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/leaves/0"], "name": ".thing.v", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "l1", "in": {"art": "a1", "thing": "i1"}, "type": "leaf"}}
         ]
       }
     ]
@@ -14152,7 +14031,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.$input: a name can't start with $",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14259,7 +14137,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.$input: a name can't start with $",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14366,7 +14243,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.$input: a name can't start with $",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14473,7 +14349,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.$input: a name can't start with $",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14580,7 +14455,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.$params: a name can't start with $",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14687,7 +14561,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.$params: a name can't start with $",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14794,7 +14667,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.$params: a name can't start with $",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14901,7 +14773,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.$params: a name can't start with $",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15020,7 +14891,6 @@
                 ]
               }
             ],
-            "message": "subjects.x.from: leads to a loop",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15095,7 +14965,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.kid.from: leads to a loop",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15207,7 +15076,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.from: unknown name $foo",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15268,7 +15136,6 @@
                 ]
               }
             ],
-            "message": "subjects.s.from: every and some over more than ten steps aren't supported yet",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15329,7 +15196,6 @@
                 ]
               }
             ],
-            "message": "subjects.s.from: every and some over more than ten steps aren't supported yet",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15427,7 +15293,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.from: unknown name $foo",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15524,7 +15389,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.from: unknown name $foo",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15620,7 +15484,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.from: unknown name $foo",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15717,7 +15580,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.from: unknown name $foo",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15808,7 +15670,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.from: doesn't parse",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15920,7 +15781,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.from: unknown name $foo",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -16011,7 +15871,6 @@
                 ]
               }
             ],
-            "message": "subjects.\"critical defect\".identified_by: not allowed on a subject that narrows another",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16091,7 +15950,6 @@
                 ]
               }
             ],
-            "message": "subjects.b.from: values of mixed types",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16255,7 +16113,6 @@
                 ]
               }
             ],
-            "message": "enabled is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16606,7 +16463,7 @@
         "input": {"things": [{"id": "t1", "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "subjects.thing.from: not a string; subjects.thing.identified_by: not a string", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.thing.from", "value": ["not a string"], "locations": []}, {"name": "subjects.thing.identified_by", "value": ["not a string"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.thing.from", "value": ["not a string"], "locations": []}, {"name": "subjects.thing.identified_by", "value": ["not a string"], "locations": []}]}
         ]
       }
     ]
@@ -16699,7 +16556,6 @@
                 ]
               }
             ],
-            "message": "subjects.b.from: \" \" isn't a subject name",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16804,7 +16660,6 @@
                 ]
               }
             ],
-            "message": "subjects.b.from: \" \" isn't a subject name",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16899,7 +16754,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.from: leads to a loop",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17003,7 +16857,6 @@
                 ]
               }
             ],
-            "message": "subjects.p.from: leads to a loop",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17098,7 +16951,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.from: leads to a loop",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17368,7 +17220,6 @@
                 ]
               }
             ],
-            "message": "subjects.pc.from: leads to a loop",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17470,7 +17321,6 @@
                 ]
               }
             ],
-            "message": "subjects.pc.from: leads to a loop",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17494,7 +17344,7 @@
         "results": [
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/scans/sast/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "sast", "type": "scan"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/scans/sca~1x/x"], "name": "x", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": "sca/x", "type": "scan"}},
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/scans"], "name": "x", "value": null}], "message": "x is missing", "passed": false, "requirement": "s", "subject": {"id": "secrets", "type": "scan"}}
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/scans"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "secrets", "type": "scan"}}
         ]
       }
     ]
@@ -17509,7 +17359,7 @@
         "input": {"trail": {"artifacts": [{"fingerprint": "a", "pull_requests": [{"url": "u1", "by": "x"}, {"url": "u2"}]}, {"fingerprint": "b", "pull_requests": [{"url": "u3", "by": "y"}]}]}},
         "results": [
           {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/trail/artifacts/0/fingerprint"], "name": "artifact.fingerprint", "value": "a"}, {"locations": ["/trail/artifacts/0/pull_requests/0/by"], "name": "by", "value": "x"}, {"locations": ["/trail/artifacts/0/pull_requests/0/url"], "name": "url", "value": "u1"}], "passed": true, "requirement": "s", "subject": {"id": "u1", "in": {"artifact": "a"}, "type": "pull request"}},
-          {"cause": "value", "check": "c", "failed_assertions": [{"assertion": "by exists", "cause": "value"}], "inputs": [{"locations": ["/trail/artifacts/0/fingerprint"], "name": "artifact.fingerprint", "value": "a"}, {"locations": ["/trail/artifacts/0/pull_requests/1"], "name": "by", "value": null}, {"locations": ["/trail/artifacts/0/pull_requests/1/url"], "name": "url", "value": "u2"}], "message": "by is missing", "passed": false, "requirement": "s", "subject": {"id": "u2", "in": {"artifact": "a"}, "type": "pull request"}},
+          {"cause": "value", "check": "c", "failed_assertions": [{"assertion": "by exists", "cause": "value"}], "inputs": [{"locations": ["/trail/artifacts/0/fingerprint"], "name": "artifact.fingerprint", "value": "a"}, {"locations": ["/trail/artifacts/0/pull_requests/1"], "name": "by", "value": null}, {"locations": ["/trail/artifacts/0/pull_requests/1/url"], "name": "url", "value": "u2"}], "passed": false, "requirement": "s", "subject": {"id": "u2", "in": {"artifact": "a"}, "type": "pull request"}},
           {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/trail/artifacts/1/fingerprint"], "name": "artifact.fingerprint", "value": "b"}, {"locations": ["/trail/artifacts/1/pull_requests/0/by"], "name": "by", "value": "y"}, {"locations": ["/trail/artifacts/1/pull_requests/0/url"], "name": "url", "value": "u3"}], "passed": true, "requirement": "s", "subject": {"id": "u3", "in": {"artifact": "b"}, "type": "pull request"}}
         ]
       }
@@ -17540,7 +17390,7 @@
         "input": {"things": [{"id": "t1", "state": "live", "x": 1}, {"id": "t2", "state": "old"}]},
         "results": [
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/0/state"], "name": "state", "value": "live"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}, "failed_assertions": []},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/1/state"], "name": "state", "value": "old"}], "message": "state is \"old\"", "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}, "failed_assertions": [{"assertion": "state is \"live\"", "cause": "value"}, {"assertion": "state is not \"old\"", "cause": "value"}]},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/1/state"], "name": "state", "value": "old"}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}, "failed_assertions": [{"assertion": "state is \"live\"", "cause": "value"}, {"assertion": "state is not \"old\"", "cause": "value"}]},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
@@ -17557,10 +17407,10 @@
         "results": [
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/0", "/things/2"], "name": "in-scope thing count", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/0/state"], "name": "state", "value": "live"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/1/state"], "name": "state", "value": "old"}], "message": "state is \"old\"", "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/1/state"], "name": "state", "value": "old"}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/2/state"], "name": "state", "value": "live"}], "passed": true, "requirement": "s", "subject": {"id": "t3", "type": "thing"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/2"], "name": "x", "value": null}], "message": "x is missing", "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}}
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/2"], "name": "x", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t3", "type": "thing"}}
         ]
       },
       {
@@ -17568,8 +17418,8 @@
         "rules": ["location.worked_out"],
         "input": {"things": [{"id": "t2", "state": "old"}]},
         "results": [
-          {"cause": "value", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope thing count", "value": 0}], "message": "in-scope thing count is 0", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/0/state"], "name": "state", "value": "old"}], "message": "state is \"old\"", "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}}
+          {"cause": "value", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope thing count", "value": 0}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/0/state"], "name": "state", "value": "old"}], "passed": false, "requirement": "s", "subject": {"id": "t2", "type": "thing"}}
         ]
       }
     ]
@@ -17583,7 +17433,7 @@
         "rules": ["location.worked_out"],
         "input": {"things": [{"id": 3}, {"id": "b"}, {"id": 10}, {"id": "a"}, {"id": 3}, {"id": "b"}, {"id": 10}, {"id": 10}]},
         "results": [
-          {"cause": "value", "check": "$unique_ids", "inputs": [{"locations": ["/things/1/id", "/things/5/id", "/things/2/id", "/things/6/id", "/things/7/id", "/things/0/id", "/things/4/id"], "name": "repeated thing ids", "value": ["b", 10, 3]}], "message": "repeated thing ids is [\"b\", 10, 3]", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "value", "check": "$unique_ids", "inputs": [{"locations": ["/things/1/id", "/things/5/id", "/things/2/id", "/things/6/id", "/things/7/id", "/things/0/id", "/things/4/id"], "name": "repeated thing ids", "value": ["b", 10, 3]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/id"], "name": "id", "value": 3}], "passed": true, "requirement": "s", "subject": {"id": 3, "type": "thing"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/1/id"], "name": "id", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/2/id"], "name": "id", "value": 10}], "passed": true, "requirement": "s", "subject": {"id": 10, "type": "thing"}},
@@ -17630,7 +17480,7 @@
         "rules": ["location.worked_out"],
         "input": {"things": [{"id": 1}]},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": ["neither every nor some"]}], "message": "require: neither every nor some", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": ["neither every nor some"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
         ]
       }
     ]
@@ -17644,7 +17494,7 @@
         "rules": ["location.failed_items"],
         "input": {"artifacts": [{"pull_requests": [{"url": "pr/7", "approvals": 2}]}, {}, {"pull_requests": null}, {"pull_requests": "none"}]},
         "results": [
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "absent", "item": "artifacts[1].pull_requests", "locations": ["/artifacts/1"], "path": "artifacts[1].pull_requests", "value": null}, {"cause": "null", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2/pull_requests"], "path": "artifacts[2].pull_requests", "value": null}, {"cause": "unusable", "item": "artifacts[3].pull_requests", "locations": ["/artifacts/3/pull_requests"], "path": "artifacts[3].pull_requests", "value": "none"}], "inputs": [{"locations": ["/artifacts/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; item 4 of artifacts: pull_requests is \"none\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "absent", "item": "artifacts[1].pull_requests", "locations": ["/artifacts/1"], "path": "artifacts[1].pull_requests", "value": null}, {"cause": "null", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2/pull_requests"], "path": "artifacts[2].pull_requests", "value": null}, {"cause": "unusable", "item": "artifacts[3].pull_requests", "locations": ["/artifacts/3/pull_requests"], "path": "artifacts[3].pull_requests", "value": "none"}], "inputs": [{"locations": ["/artifacts/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "pull request"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/0/pull_requests/0/approvals"], "name": "approvals", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": "pr/7", "type": "pull request"}}
         ]
       }
@@ -17675,12 +17525,12 @@
         "input": {"releases": [{"id": "r1", "files": [{"path": "docs/a.md"}, {"path": "src/x.go"}]}, {"id": "r2", "files": [{"path": "docs/a.md"}]}, {"id": "r3", "files": [{"path": "docs/a.md"}, {"name": "x"}]}], "modules": [{"id": "m1", "files": [{"path": "docs/a.md"}, {"path": "src/x.go"}]}, {"id": "m2", "files": [{"path": "docs/a.md"}, {"name": "x"}]}, {"id": "m3", "files": [{"path": "docs/a.md"}]}]},
         "requirements": {"m": {"status": "not_met"}, "r": {"status": "not_met"}},
         "results": [
-          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 2 of files", "locations": ["/modules/0/files/1/path"], "path": "files[1].path", "value": "src/x.go"}], "inputs": [{"locations": ["/modules/0/files/0/path", "/modules/0/files/1/path"], "name": "files[].path", "value": ["docs/a.md", "src/x.go"]}], "message": "item 2 of files: path is \"src/x.go\"", "passed": false, "requirement": "m", "subject": {"id": "m1", "type": "module"}},
-          {"cause": "absent", "check": "$applies", "failed_items": [{"cause": "absent", "item": "item 2 of files", "locations": ["/modules/1/files/1"], "path": "files[1].path", "value": null}], "inputs": [{"locations": ["/modules/1/files/0/path", "/modules/1/files/1"], "name": "files[].path", "value": ["docs/a.md", null]}], "message": "item 2 of files: path is missing", "passed": false, "requirement": "m", "subject": {"id": "m2", "type": "module"}},
+          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 2 of files", "locations": ["/modules/0/files/1/path"], "path": "files[1].path", "value": "src/x.go"}], "inputs": [{"locations": ["/modules/0/files/0/path", "/modules/0/files/1/path"], "name": "files[].path", "value": ["docs/a.md", "src/x.go"]}], "passed": false, "requirement": "m", "subject": {"id": "m1", "type": "module"}},
+          {"cause": "absent", "check": "$applies", "failed_items": [{"cause": "absent", "item": "item 2 of files", "locations": ["/modules/1/files/1"], "path": "files[1].path", "value": null}], "inputs": [{"locations": ["/modules/1/files/0/path", "/modules/1/files/1"], "name": "files[].path", "value": ["docs/a.md", null]}], "passed": false, "requirement": "m", "subject": {"id": "m2", "type": "module"}},
           {"cause": "satisfied", "check": "$applies", "failed_items": [], "inputs": [{"locations": ["/modules/2/files/0/path"], "name": "files[].path", "value": ["docs/a.md"]}], "passed": true, "requirement": "m", "subject": {"id": "m3", "type": "module"}},
           {"cause": "satisfied", "check": "$applies", "failed_items": [], "inputs": [{"locations": ["/releases/0/files/0/path", "/releases/0/files/1/path"], "name": "files[].path", "value": ["docs/a.md", "src/x.go"]}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "release"}},
-          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 1 of files", "locations": ["/releases/1/files/0/path"], "path": "files[0].path", "value": "docs/a.md"}], "inputs": [{"locations": ["/releases/1/files/0/path"], "name": "files[].path", "value": ["docs/a.md"]}], "message": "item 1 of files: path is \"docs/a.md\"", "passed": false, "requirement": "r", "subject": {"id": "r2", "type": "release"}},
-          {"cause": "absent", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 1 of files", "locations": ["/releases/2/files/0/path"], "path": "files[0].path", "value": "docs/a.md"}, {"cause": "absent", "item": "item 2 of files", "locations": ["/releases/2/files/1"], "path": "files[1].path", "value": null}], "inputs": [{"locations": ["/releases/2/files/0/path", "/releases/2/files/1"], "name": "files[].path", "value": ["docs/a.md", null]}], "message": "item 1 of files: path is \"docs/a.md\"; item 2 of files: path is missing", "passed": false, "requirement": "r", "subject": {"id": "r3", "type": "release"}},
+          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 1 of files", "locations": ["/releases/1/files/0/path"], "path": "files[0].path", "value": "docs/a.md"}], "inputs": [{"locations": ["/releases/1/files/0/path"], "name": "files[].path", "value": ["docs/a.md"]}], "passed": false, "requirement": "r", "subject": {"id": "r2", "type": "release"}},
+          {"cause": "absent", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 1 of files", "locations": ["/releases/2/files/0/path"], "path": "files[0].path", "value": "docs/a.md"}, {"cause": "absent", "item": "item 2 of files", "locations": ["/releases/2/files/1"], "path": "files[1].path", "value": null}], "inputs": [{"locations": ["/releases/2/files/0/path", "/releases/2/files/1"], "name": "files[].path", "value": ["docs/a.md", null]}], "passed": false, "requirement": "r", "subject": {"id": "r3", "type": "release"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/modules/2/id"], "name": "id", "value": "m3"}], "passed": true, "requirement": "m", "subject": {"id": "m3", "type": "module"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/releases/0/id"], "name": "id", "value": "r1"}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "release"}}
         ]
@@ -17696,7 +17546,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17704,7 +17554,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17712,7 +17562,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [[1]]},
         "results": [
-          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
         ]
       },
       {
@@ -17720,7 +17570,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": ["s"]},
         "results": [
-          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
         ]
       },
       {
@@ -17728,7 +17578,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [null]},
         "results": [
-          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
         ]
       }
     ]
@@ -17743,7 +17593,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17751,7 +17601,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17759,7 +17609,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [[1]]},
         "results": [
-          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
         ]
       },
       {
@@ -17767,7 +17617,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": ["s"]},
         "results": [
-          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
         ]
       },
       {
@@ -17775,7 +17625,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [null]},
         "results": [
-          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
         ]
       }
     ]
@@ -17790,7 +17640,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17798,7 +17648,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17806,7 +17656,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [[1]]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
         ]
       },
       {
@@ -17814,7 +17664,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": ["s"]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
         ]
       },
       {
@@ -17822,7 +17672,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [null]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
         ]
       }
     ]
@@ -17836,7 +17686,7 @@
         "rules": ["sentence.subject.from", "report.subjects", "sentence.subject.applies", "sentence.print.canonical"],
         "input": {"bs": [{"id": "b1", "x": 1, "kids": [{"id": "k1", "v": 1}]}]},
         "results": [
-          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/bs/0/kids/0"], "name": ".b.x", "value": null}, {"locations": ["/bs/0/kids/0/v"], "name": "v", "value": 1}], "message": ".b.x is missing", "passed": false, "requirement": "s", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}}
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/bs/0/kids/0"], "name": ".b.x", "value": null}, {"locations": ["/bs/0/kids/0/v"], "name": "v", "value": 1}], "passed": false, "requirement": "s", "subject": {"id": "k1", "in": {"b": "b1"}, "type": "kid"}}
         ],
         "expressions": {"s": {"$applies": ".b.x equals v"}},
         "report": {"subjects": {"b": {"description": "", "from": "bs", "identified_by": "id", "parts": {}}, "kid": {"description": "", "from": "b.kids whose b.x equals v", "identified_by": "id", "parts": {}}}}
@@ -17894,7 +17744,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -17933,7 +17782,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is 5, which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -17976,7 +17824,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "item 1 of $input: pulls is null, which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -18015,7 +17862,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is true, which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -18054,7 +17900,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -18094,7 +17939,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "pulls is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -18135,7 +17979,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "pulls is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -18176,7 +18019,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "pulls is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -18242,7 +18084,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -18281,7 +18122,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -18343,7 +18183,6 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18463,7 +18302,6 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18525,7 +18363,6 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18649,7 +18486,6 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18715,7 +18551,6 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18835,7 +18670,6 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18897,7 +18731,6 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19021,7 +18854,6 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19117,7 +18949,6 @@
                 "value": 0
               }
             ],
-            "message": "it is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19233,7 +19064,6 @@
                 "value": 0
               }
             ],
-            "message": "it is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19333,7 +19163,6 @@
                 ]
               }
             ],
-            "message": "subjects.k.from: last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\"",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19451,7 +19280,6 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19559,7 +19387,6 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19667,7 +19494,6 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19780,7 +19606,6 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20011,7 +19836,6 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20050,7 +19874,6 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20089,7 +19912,6 @@
                 "value": 0
               }
             ],
-            "message": "it is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20172,7 +19994,6 @@
               "type": "kid"
             },
             "check": "$well_formed",
-            "message": "subjects.kid.from: every can't go with a from line that starts at another subject yet",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -20387,7 +20208,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20409,7 +20229,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20475,7 +20294,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20514,7 +20332,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20583,7 +20400,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20622,7 +20438,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20692,7 +20507,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20731,7 +20545,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20803,7 +20616,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20904,7 +20716,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21093,7 +20904,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21169,7 +20979,6 @@
                 "value": 0
               }
             ],
-            "message": "it is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21190,7 +20999,6 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21211,7 +21019,6 @@
                 "value": 0
               }
             ],
-            "message": "it is 5, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21232,7 +21039,6 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21255,7 +21061,6 @@
                 "value": 0
               }
             ],
-            "message": "it is true, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21321,7 +21126,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "$params.k is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -21390,7 +21194,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "$params.k is \"x\", which isn't a list of text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -21459,7 +21262,6 @@
               }
             },
             "check": "$min_subjects",
-            "message": "$params.k is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -21535,7 +21337,6 @@
                 "value": 0
               }
             ],
-            "message": "it is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21556,7 +21357,6 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21577,7 +21377,6 @@
                 "value": 0
               }
             ],
-            "message": "it is 5, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21598,7 +21397,6 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input: x is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21621,7 +21419,6 @@
                 "value": 0
               }
             ],
-            "message": "it is true, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21664,7 +21461,6 @@
                 "value": 1
               }
             ],
-            "message": "x is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21687,7 +21483,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21768,7 +21563,6 @@
                 "value": 2
               }
             ],
-            "message": "it is {\"id\": \"a1\"}, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21792,7 +21586,6 @@
                 "value": 2
               }
             ],
-            "message": "it is {\"id\": \"a2\"}, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21855,7 +21648,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21878,7 +21670,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21901,7 +21692,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21924,7 +21714,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -22041,7 +21830,6 @@
                 "value": 2
               }
             ],
-            "message": "x is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -22086,7 +21874,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -22109,7 +21896,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -22132,7 +21918,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -22256,7 +22041,6 @@
                 "value": 0
               }
             ],
-            "message": "it is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -22396,7 +22180,6 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -22837,7 +22620,6 @@
                 ]
               }
             ],
-            "message": "subjects.p.from: every can't go with a from line that starts at another subject yet",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23091,7 +22873,6 @@
                 "value": 1
               }
             ],
-            "message": "item 1 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23134,7 +22915,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23241,7 +23021,6 @@
                 "value": 1
               }
             ],
-            "message": "item 1 of $input is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23284,7 +23063,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23391,7 +23169,6 @@
                 "value": 1
               }
             ],
-            "message": "item 1 of x is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23434,7 +23211,6 @@
                 "value": null
               }
             ],
-            "message": "ok is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23537,7 +23313,6 @@
               "type": "k"
             },
             "check": "c",
-            "message": "it is missing",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -23642,7 +23417,6 @@
               "type": "k"
             },
             "check": "c",
-            "message": "it is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -23713,7 +23487,6 @@
               "type": "k"
             },
             "check": "$min_subjects",
-            "message": "it is \"text\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -23736,7 +23509,6 @@
               "type": "k"
             },
             "check": "c",
-            "message": "it is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -23836,7 +23608,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23857,7 +23628,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23998,7 +23768,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24019,7 +23788,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24160,7 +23928,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is \"x\", which isn't a list of text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24181,7 +23948,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is \"x\", which isn't a list of text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24325,7 +24091,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is [\"x\", 1], which isn't a list of text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24346,7 +24111,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.k is [\"x\", 1], which isn't a list of text",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -24787,7 +24551,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.em is missing",
             "passed": false,
             "requirement": "missing env, list keys",
             "subject": {
@@ -24805,7 +24568,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.em is missing; $params.km is missing",
             "passed": false,
             "requirement": "missing env, missing keys",
             "subject": {
@@ -24823,7 +24585,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.em is missing",
             "passed": false,
             "requirement": "missing env, null keys",
             "subject": {
@@ -24841,7 +24602,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.em is missing",
             "passed": false,
             "requirement": "missing env, number keys",
             "subject": {
@@ -24859,7 +24619,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.ez is null",
             "passed": false,
             "requirement": "null env, list keys",
             "subject": {
@@ -24877,7 +24636,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.ez is null",
             "passed": false,
             "requirement": "null env, missing keys",
             "subject": {
@@ -24895,7 +24653,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.ez is null; $params.kz is null",
             "passed": false,
             "requirement": "null env, null keys",
             "subject": {
@@ -24913,7 +24670,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.ez is null",
             "passed": false,
             "requirement": "null env, number keys",
             "subject": {
@@ -24931,7 +24687,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.en is 1, which isn't text",
             "passed": false,
             "requirement": "number env, list keys",
             "subject": {
@@ -24949,7 +24704,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.en is 1, which isn't text",
             "passed": false,
             "requirement": "number env, missing keys",
             "subject": {
@@ -24967,7 +24721,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.en is 1, which isn't text",
             "passed": false,
             "requirement": "number env, null keys",
             "subject": {
@@ -24985,7 +24738,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.en is 1, which isn't text; $params.kn is 1, which isn't a list of text",
             "passed": false,
             "requirement": "number env, number keys",
             "subject": {
@@ -25003,7 +24755,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.eo is {\"x\": 1}, which isn't text",
             "passed": false,
             "requirement": "object env, list keys",
             "subject": {
@@ -25021,7 +24772,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.eo is {\"x\": 1}, which isn't text",
             "passed": false,
             "requirement": "object env, missing keys",
             "subject": {
@@ -25039,7 +24789,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.eo is {\"x\": 1}, which isn't text",
             "passed": false,
             "requirement": "object env, null keys",
             "subject": {
@@ -25057,7 +24806,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.eo is {\"x\": 1}, which isn't text; $params.kn is 1, which isn't a list of text",
             "passed": false,
             "requirement": "object env, number keys",
             "subject": {
@@ -25077,7 +24825,6 @@
                 "value": 1
               }
             ],
-            "message": "scans.nope is missing",
             "passed": false,
             "requirement": "string env, list keys",
             "subject": {
@@ -25095,7 +24842,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.km is missing",
             "passed": false,
             "requirement": "string env, missing keys",
             "subject": {
@@ -25113,7 +24859,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kz is null",
             "passed": false,
             "requirement": "string env, null keys",
             "subject": {
@@ -25131,7 +24876,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kn is 1, which isn't a list of text",
             "passed": false,
             "requirement": "string env, number keys",
             "subject": {
@@ -25151,7 +24895,6 @@
                 "value": null
               }
             ],
-            "message": "v is missing",
             "passed": false,
             "requirement": "string env, list keys",
             "subject": {
@@ -25322,7 +25065,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kt is true, which isn't text",
             "passed": false,
             "requirement": "brackets, boolean key",
             "subject": {
@@ -25340,7 +25082,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kl is [\"q\"], which isn't text",
             "passed": false,
             "requirement": "brackets, list key",
             "subject": {
@@ -25358,7 +25099,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kx is missing",
             "passed": false,
             "requirement": "brackets, missing key",
             "subject": {
@@ -25376,7 +25116,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kn is null",
             "passed": false,
             "requirement": "brackets, null key",
             "subject": {
@@ -25394,7 +25133,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "brackets, object key",
             "subject": {
@@ -25412,7 +25150,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kt is true, which isn't text",
             "passed": false,
             "requirement": "named by, boolean key",
             "subject": {
@@ -25430,7 +25167,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kl is [\"q\"], which isn't text",
             "passed": false,
             "requirement": "named by, list key",
             "subject": {
@@ -25448,7 +25184,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kx is missing",
             "passed": false,
             "requirement": "named by, missing key",
             "subject": {
@@ -25466,7 +25201,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.kn is null",
             "passed": false,
             "requirement": "named by, null key",
             "subject": {
@@ -25484,7 +25218,6 @@
                 "value": 0
               }
             ],
-            "message": "$params.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "named by, object key",
             "subject": {
@@ -25652,7 +25385,6 @@
                 "value": 0
               }
             ],
-            "message": "$input.kx is missing",
             "passed": false,
             "requirement": "brackets, missing key",
             "subject": {
@@ -25670,7 +25402,6 @@
                 "value": 0
               }
             ],
-            "message": "$input.kz is null",
             "passed": false,
             "requirement": "brackets, null key",
             "subject": {
@@ -25688,7 +25419,6 @@
                 "value": 0
               }
             ],
-            "message": "$input.kn is 1, which isn't text",
             "passed": false,
             "requirement": "brackets, number key",
             "subject": {
@@ -25706,7 +25436,6 @@
                 "value": 0
               }
             ],
-            "message": "$input.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "brackets, object key",
             "subject": {
@@ -25743,7 +25472,6 @@
                 "value": 0
               }
             ],
-            "message": "$input.kx is missing",
             "passed": false,
             "requirement": "named by, missing key",
             "subject": {
@@ -25761,7 +25489,6 @@
                 "value": 0
               }
             ],
-            "message": "$input.kz is null",
             "passed": false,
             "requirement": "named by, null key",
             "subject": {
@@ -25779,7 +25506,6 @@
                 "value": 0
               }
             ],
-            "message": "$input.kn is 1, which isn't text",
             "passed": false,
             "requirement": "named by, number key",
             "subject": {
@@ -25797,7 +25523,6 @@
                 "value": 0
               }
             ],
-            "message": "$input.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "named by, object key",
             "subject": {

@@ -96,7 +96,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-01-01T00:00:00Z\", which isn't a time written like 1",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-01-01T00:00:00Z", "locations": ["/things/0/a"]}, {"name": "b", "value": 1, "locations": ["/things/0/b"]}]
@@ -112,7 +111,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-01-01t00:00:00z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-01-01t00:00:00z", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-01T00:00:01Z", "locations": ["/things/0/b"]}]
@@ -128,7 +126,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-02-30T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-02-30T00:00:00Z", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-03-02T00:00:01Z", "locations": ["/things/0/b"]}]
@@ -144,7 +141,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"1900-02-29T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "1900-02-29T00:00:00Z", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-03-02T00:00:01Z", "locations": ["/things/0/b"]}]
@@ -160,7 +156,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"1677-12-31T23:59:59Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "1677-12-31T23:59:59Z", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-03-02T00:00:01Z", "locations": ["/things/0/b"]}]
@@ -176,7 +171,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": "b is \"2262-01-01T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-03-02T00:00:01Z", "locations": ["/things/0/a"]}, {"name": "b", "value": "2262-01-01T00:00:00Z", "locations": ["/things/0/b"]}]
@@ -207,7 +201,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-01-02\", and b is \"2024-01-01\"",
             "passed": false,
             "cause": "value",
             "inputs": [{"name": ".a", "value": "2024-01-02", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-01", "locations": ["/things/0/b"]}]
@@ -223,7 +216,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-01-01\", which isn't a time written like \"2024-01-02T00:00:00Z\"",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-01-01", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-02T00:00:00Z", "locations": ["/things/0/b"]}]
@@ -239,7 +231,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2023-02-29\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2023-02-29", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-01", "locations": ["/things/0/b"]}]
@@ -255,7 +246,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-01-01T00:00:00\", which isn't a time, and b is \"2024-01-02T00:00:00\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-01-01T00:00:00", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-02T00:00:00", "locations": ["/things/0/b"]}]
@@ -271,7 +261,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2016-12-31T23:59:60Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2016-12-31T23:59:60Z", "locations": ["/things/0/a"]}, {"name": "b", "value": "2017-01-02T00:00:00Z", "locations": ["/things/0/b"]}]
@@ -287,7 +276,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-01-01T24:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-01-01T24:00:00Z", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-03T00:00:00Z", "locations": ["/things/0/b"]}]
@@ -303,7 +291,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-01-01 00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-01-01 00:00:00Z", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-02T00:00:00Z", "locations": ["/things/0/b"]}]
@@ -319,7 +306,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-01-01T00:00:00+0100\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-01-01T00:00:00+0100", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-02T00:00:00Z", "locations": ["/things/0/b"]}]
@@ -335,7 +321,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is \"2024-01-01T00:00:00.Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [{"name": ".a", "value": "2024-01-01T00:00:00.Z", "locations": ["/things/0/a"]}, {"name": "b", "value": "2024-01-03T00:00:00Z", "locations": ["/things/0/b"]}]
@@ -351,7 +336,6 @@
             "requirement": "s",
             "subject": {"type": "thing", "id": "t1"},
             "check": "c",
-            "message": ".a is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [{"name": ".a", "value": null, "locations": ["/things/0"]}, {"name": "b", "value": "2017-01-02T00:00:00Z", "locations": ["/things/0/b"]}]

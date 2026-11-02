@@ -20,7 +20,7 @@
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 2, "locations": ["/t/0", "/t/1"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "message": "x is missing", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/1"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/1"]}]}
         ],
         "violations": [{"cause": "value", "check": "c", "description": "", "expression": "x exists", "inputs": [{"name": "x", "value": null, "locations": ["/t/1"]}], "requirement": "s", "subject": {"id": 1, "type": "subject"}}]
       },
@@ -31,7 +31,7 @@
         "compliant": false,
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 0}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 0", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ],
         "violations": [
           {
@@ -51,7 +51,7 @@
         "input": {},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "t is missing", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -59,7 +59,7 @@
         "rules": ["subjects.from"],
         "input": {"t": null},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "t is null", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -67,7 +67,7 @@
         "rules": ["subjects.from"],
         "input": {"t": "a"},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "t is \"a\", which isn't a list or an object", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -85,8 +85,8 @@
         "rules": ["subjects.not_an_object", "subjects.id"],
         "input": {"t": ["a", null]},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": "a"}, "check": "c", "message": "it is \"a\", which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "message": "it is null, which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/t/1"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": "a"}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/t/1"]}]}
         ]
       }
     ]
@@ -113,7 +113,7 @@
         "compliant": false,
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "t is missing", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -123,7 +123,7 @@
         "compliant": false,
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "message": "x is missing", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]}
         ]
       }
     ]
@@ -147,7 +147,7 @@
         "rules": ["subjects.from"],
         "input": null,
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "it is null", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "null", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -168,7 +168,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "message": "it is 1, which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/0"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/0"]}]}
         ]
       },
       {
@@ -176,7 +176,7 @@
         "rules": ["subjects.from", "min_subjects"],
         "input": [],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 0", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       }
     ]
@@ -204,7 +204,7 @@
         "results": [
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "failed_items": [], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "message": "it is 1, which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/0"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/0"]}]}
         ]
       },
       {
@@ -212,7 +212,7 @@
         "rules": ["subjects.from", "min_subjects"],
         "input": [],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 0", "passed": false, "cause": "value", "failed_items": [], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "failed_items": [], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
         ]
       },
       {
@@ -220,7 +220,7 @@
         "rules": ["subjects.every.broken"],
         "input": {"x": 1},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "it is {\"x\": 1}, which isn't a list", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input", "item": "$input", "cause": "unusable", "value": {"x": 1}, "locations": [""]}], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input", "item": "$input", "cause": "unusable", "value": {"x": 1}, "locations": [""]}], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ]
       },
@@ -229,7 +229,7 @@
         "rules": ["subjects.every.broken"],
         "input": null,
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "it is null", "passed": false, "cause": "null", "failed_items": [{"path": "$input", "item": "$input", "cause": "null", "value": null, "locations": [""]}], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "null", "failed_items": [{"path": "$input", "item": "$input", "cause": "null", "value": null, "locations": [""]}], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ]
       },
@@ -238,7 +238,7 @@
         "rules": ["subjects.every.broken"],
         "input": "x",
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "it is \"x\", which isn't a list or an object", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input", "item": "$input", "cause": "unusable", "value": "x", "locations": [""]}], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input", "item": "$input", "cause": "unusable", "value": "x", "locations": [""]}], "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ]
       }
@@ -313,7 +313,7 @@
         "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k.x)) >= 1", "$unique_ids": "count(repeated(ids(every $input named by $params.k.x))) == 0"}},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope s count", "value": 0}], "message": "$params.k is {\"x\": \"a\"}, which isn't text", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope s count", "value": 0}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
@@ -331,7 +331,7 @@
         "expressions": {"r": {"$min_subjects": "count(matching(item 1 of $input named by $params.k)) >= 1", "$unique_ids": "count(repeated(ids(item 1 of $input named by $params.k))) == 0"}},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
-          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope s count", "value": 0}], "message": "$params.k is [\"a\"], which isn't text", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope s count", "value": 0}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
@@ -356,7 +356,7 @@
         "rules": ["subjects.every.broken"],
         "input": [{"commits": [{"x": 1}]}, {"commits": 5}],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "item 2 of $input: commits is 5, which isn't a list or an object", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "unusable", "value": 5, "locations": ["/1/commits"]}], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0/commits/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "unusable", "value": 5, "locations": ["/1/commits"]}], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0/commits/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
         ]
@@ -382,7 +382,7 @@
         "rules": ["subjects.every.broken"],
         "input": [{"commits": [{"x": 1}]}, {"commits": 5}],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "item 2 of $input: commits is 5, which isn't a list or an object", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "unusable", "value": 5, "locations": ["/1/commits"]}], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0/commits/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "unusable", "value": 5, "locations": ["/1/commits"]}], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0/commits/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
         ]
@@ -408,7 +408,7 @@
         "rules": ["subjects.from", "path.absent"],
         "input": [],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "item 1 of $input is missing", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ]
       },
@@ -417,7 +417,7 @@
         "rules": ["added.text"],
         "input": [],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "item 1 of $input is missing", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ],
         "violations": [{"cause": "absent", "check": "$min_subjects", "description": "The in-scope subject count is at least 1", "expression": "count(matching(item 1 of $input)) >= 1", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}], "requirement": "s", "subject": {"type": "subject", "id": null}}]
@@ -433,7 +433,7 @@
         "rules": ["subjects.from", "path.absent"],
         "input": [{"x": 1}, {"y": 2}],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "item 6 of $input is missing", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ]
       }
@@ -451,7 +451,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "message": "requirements: missing", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -468,7 +468,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["empty"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["empty"]}], "message": "requirements: empty", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["empty"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -485,7 +485,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "message": "requirements: missing", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["missing"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -502,7 +502,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "message": "requirements: not an object", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -519,7 +519,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "message": "requirements: not an object", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -536,7 +536,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "message": "requirements: not an object", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["not an object"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -553,7 +553,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "policy", "value": ["not an object"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy", "value": ["not an object"]}], "message": "policy: not an object", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy", "value": ["not an object"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -570,7 +570,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.4"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.4"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "message": "policy ergo_spec: unsupported version v9.9, expected v0.4; requirements: missing", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.4"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -587,7 +587,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["missing"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["missing"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "message": "policy ergo_spec: missing; requirements: missing", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["missing"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -604,7 +604,7 @@
         "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "policy description", "value": ["not a string"]}, {"locations": [], "name": "policy meta", "value": ["not an object"]}, {"locations": [], "name": "requirements", "value": ["empty"]}], "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy description", "value": ["not a string"]}, {"locations": [], "name": "policy meta", "value": ["not an object"]}, {"locations": [], "name": "requirements", "value": ["empty"]}], "message": "policy description: not a string; policy meta: not an object; requirements: empty", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy description", "value": ["not a string"]}, {"locations": [], "name": "policy meta", "value": ["not an object"]}, {"locations": [], "name": "requirements", "value": ["empty"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -619,7 +619,7 @@
         "input": {"xs": [{"x": 1}]},
         "status": {"$policy": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start with $"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start with $", "passed": false, "requirement": "$policy", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start with $"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "$policy", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -643,7 +643,7 @@
         "rules": ["subjects.from", "path.absent"],
         "input": [],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "item 1 of $input is missing", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "absent", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ]
       }
@@ -658,7 +658,7 @@
         "rules": ["subjects.from", "path.unusable"],
         "input": [{"commits": [{"x": 1}]}],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 0", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ]
       }
@@ -676,7 +676,7 @@
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/x"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 2}}, "check": "$applies", "message": "x is 2", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2, "locations": ["/1/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 2}}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2, "locations": ["/1/x"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/x"]}]}
         ]
       }
@@ -694,7 +694,7 @@
           {"requirement": "s", "subject": {"type": "q", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope q count", "value": 1, "locations": ["/0"]}]},
           {"requirement": "s", "subject": {"type": "q", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated q ids", "value": [], "locations": []}]},
           {"requirement": "s", "subject": {"type": "q", "id": {"x": 1}}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/x"]}]},
-          {"requirement": "s", "subject": {"type": "q", "id": {"x": 2}}, "check": "$applies", "message": "x is 2", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2, "locations": ["/1/x"]}]},
+          {"requirement": "s", "subject": {"type": "q", "id": {"x": 2}}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2, "locations": ["/1/x"]}]},
           {"requirement": "s", "subject": {"type": "q", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/x"]}]}
         ]
       }
@@ -710,7 +710,7 @@
         "input": [{"commits": [{"x": 1}]}, 5],
         "results": [
           {"requirement": "s", "subject": {"type": "q", "id": null, "in": {"p": {"commits": [{"x": 1}]}}}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope q count", "value": 1, "locations": ["/0/commits/0"]}]},
-          {"requirement": "s", "subject": {"type": "q", "id": null, "in": {"p": 5}}, "check": "$min_subjects", "message": "it is 5, which isn't a list or an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "in-scope q count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "q", "id": null, "in": {"p": 5}}, "check": "$min_subjects", "passed": false, "cause": "not_an_object", "inputs": [{"name": "in-scope q count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "q", "id": null, "in": {"p": {"commits": [{"x": 1}]}}}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated q ids", "value": [], "locations": []}]},
           {"requirement": "s", "subject": {"type": "q", "id": null, "in": {"p": 5}}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated q ids", "value": [], "locations": []}]},
           {"requirement": "s", "subject": {"type": "q", "id": {"x": 1}, "in": {"p": {"commits": [{"x": 1}]}}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
@@ -728,7 +728,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 1", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
@@ -748,7 +748,6 @@
             "requirement": "s",
             "subject": {"type": "subject", "id": null},
             "check": "$unique_ids",
-            "message": "repeated subject ids is [\"b\", 10, 3]",
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "repeated subject ids", "value": ["b", 10, 3], "locations": ["/t/0/id", "/t/2/id", "/t/1/id", "/t/4/id", "/t/3/id", "/t/5/id"]}]
@@ -767,7 +766,7 @@
         "input": {"t": [{"x": 1}, {"x": 2}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "message": "repeated subject ids is [null]", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [null], "locations": ["/t/0", "/t/1"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [null], "locations": ["/t/0", "/t/1"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2, "locations": ["/t/1/x"]}]}
         ]
@@ -784,9 +783,9 @@
         "input": {"t": [{"e": "p", "id": 1, "x": 1}, {"e": "q", "id": 1}]},
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 1, "total": 2}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "message": "repeated subject ids is [1]", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [1], "locations": ["/t/0/id", "/t/1/id"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": false, "cause": "value", "inputs": [{"name": "repeated subject ids", "value": [1], "locations": ["/t/0/id", "/t/1/id"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": "p", "locations": ["/t/0/e"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "message": "e is \"q\"", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/1/e"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/1/e"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
@@ -939,8 +938,8 @@
         "requirements": {"s": {"require": "some", "status": "met"}},
         "results": [
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1, "locations": ["/t/0/a"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "message": "b is missing", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null, "locations": ["/t/0"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "message": ".a is missing", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null, "locations": ["/t/1"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null, "locations": ["/t/1"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1, "locations": ["/t/1/b"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1, "locations": ["/t/2/a"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1, "locations": ["/t/2/b"]}]}
@@ -954,8 +953,8 @@
         "requirements": {"s": {"status": "not_met"}},
         "results": [
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": ".a", "value": 1, "locations": ["/t/0/a"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "message": "b is missing", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null, "locations": ["/t/0"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "message": ".a is missing", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null, "locations": ["/t/1"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "b", "passed": false, "cause": "value", "inputs": [{"name": "b", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": ".a", "value": null, "locations": ["/t/1"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "b", "passed": true, "cause": "satisfied", "inputs": [{"name": "b", "value": 1, "locations": ["/t/1/b"]}]}
         ],
         "violations": [
@@ -976,8 +975,8 @@
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 1, "total": 3}}},
         "results": [
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "e", "value": "p", "locations": ["/t/0/e"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "message": "e is \"q\"", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/1/e"]}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "$applies", "message": "e is missing", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null, "locations": ["/t/2"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/1/e"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 3}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null, "locations": ["/t/2"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ],
         "violations": [
@@ -998,8 +997,8 @@
         "input": {"t": [{"e": "q", "id": 2}]},
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 1}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 0", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "message": "e is \"q\"", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/0/e"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/0/e"]}]}
         ]
       }
     ]
@@ -1015,7 +1014,7 @@
         "compliant": true,
         "requirements": {"s": {"status": "not_applicable", "subjects": {"matching": 0, "total": 1}}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "message": "e is \"q\"", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/0/e"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "value", "inputs": [{"name": "e", "value": "q", "locations": ["/t/0/e"]}]}
         ],
         "violations": []
       },
@@ -1026,7 +1025,7 @@
         "compliant": false,
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "message": "e is missing", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null, "locations": ["/t/0"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": null, "locations": ["/t/0"]}]}
         ]
       }
     ]
@@ -1056,7 +1055,7 @@
         "input": {"t": [{"e": "q", "id": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "message": "e is \"q\"; k is missing", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": "q", "locations": ["/t/0/e"]}, {"name": "k", "value": null, "locations": ["/t/0"]}], "failed_assertions": [{"assertion": "e is \"p\"", "cause": "value"}, {"assertion": "k is 1", "cause": "absent"}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": false, "cause": "absent", "inputs": [{"name": "e", "value": "q", "locations": ["/t/0/e"]}, {"name": "k", "value": null, "locations": ["/t/0"]}], "failed_assertions": [{"assertion": "e is \"p\"", "cause": "value"}, {"assertion": "k is 1", "cause": "absent"}]}
         ]
       }
     ]
@@ -1075,7 +1074,6 @@
             "requirement": "s",
             "subject": {"type": "subject", "id": null},
             "check": "$well_formed",
-            "message": "checks: empty",
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "count(checks)", "value": 0, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks", "value": ["empty"], "locations": []}]
@@ -1098,7 +1096,6 @@
             "requirement": "s",
             "subject": {"type": "subject", "id": null},
             "check": "$well_formed",
-            "message": "require: neither every nor some",
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": ["neither every nor some"], "locations": []}]
@@ -1121,7 +1118,6 @@
             "requirement": "s",
             "subject": {"type": "subject", "id": null},
             "check": "$well_formed",
-            "message": "requires: unknown field",
             "passed": false,
             "cause": "value",
             "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "requires", "value": ["unknown field"], "locations": []}]
@@ -1261,7 +1257,7 @@
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "compliant": false,
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["empty"]}], "message": "requirements: empty", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirements", "value": ["empty"]}], "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -1295,10 +1291,10 @@
           {"requirement": "a", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 1, "locations": ["/t/1/id"]}]},
           {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 2, "locations": ["/t/0/id"]}]},
           {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "$applies", "passed": true, "cause": "satisfied", "inputs": [{"name": "id", "value": 1, "locations": ["/t/1/id"]}]},
-          {"requirement": "a", "subject": {"type": "subject", "id": 2}, "check": "c", "message": "x is missing", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "a", "subject": {"type": "subject", "id": 2}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
           {"requirement": "a", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/1/x"]}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "a", "message": "x is missing", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
-          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "z", "message": "x is missing", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "a", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
+          {"requirement": "b", "subject": {"type": "subject", "id": 2}, "check": "z", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/t/0"]}]},
           {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/1/x"]}]},
           {"requirement": "b", "subject": {"type": "subject", "id": 1}, "check": "z", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/1/x"]}]}
         ],
@@ -1320,7 +1316,7 @@
         "rules": ["violations", "name.index"],
         "input": {"t": [{"cs": [{"v": "a"}, {"v": "z"}], "id": 1}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "message": "item 2 of cs: v is \"z\", and $params.ok is [\"a\", \"b\"]", "passed": false, "cause": "value", "inputs": [{"name": "cs[].v", "value": ["a", "z"], "locations": ["/t/0/cs/0/v", "/t/0/cs/1/v"]}], "failed_items": [{"cause": "value", "path": "cs[1].v", "item": "item 2 of cs", "value": "z", "locations": ["/t/0/cs/1/v"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "cs[].v", "value": ["a", "z"], "locations": ["/t/0/cs/0/v", "/t/0/cs/1/v"]}], "failed_items": [{"cause": "value", "path": "cs[1].v", "item": "item 2 of cs", "value": "z", "locations": ["/t/0/cs/1/v"]}]}
         ],
         "violations": [
           {"cause": "value", "check": "c", "description": "", "expression": "every cs.v is in $params.ok", "failed_items": [{"cause": "value", "path": "cs[1].v", "item": "item 2 of cs", "value": "z", "locations": ["/t/0/cs/1/v"]}], "inputs": [{"name": "cs[].v", "value": ["a", "z"], "locations": ["/t/0/cs/0/v", "/t/0/cs/1/v"]}, {"name": "$params.ok", "value": ["a", "b"], "locations": ["$params:/ok"]}], "requirement": "s", "subject": {"id": 1, "type": "subject"}}
@@ -1338,7 +1334,7 @@
         "input": {"t": [{"x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "message": "from: unknown field", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "from", "value": ["unknown field"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "from", "value": ["unknown field"], "locations": []}]}
         ]
       }
     ]
@@ -1353,7 +1349,7 @@
         "input": {"things": [{"id": "t1", "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "subjects.thing.id: unknown field", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.thing.id", "value": ["unknown field"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "subjects.thing.id", "value": ["unknown field"], "locations": []}]}
         ]
       }
     ]
@@ -1372,10 +1368,10 @@
         "input": {"things": [{"id": "t1"}, {"id": "t2", "x": 2}]},
         "requirements": {"s": {"causes": [{"cause": "absent", "rows": 1}, {"cause": "value", "rows": 2}]}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x is missing", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "message": "x is missing", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "d", "passed": false, "cause": "absent", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]},
           {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 2, "locations": ["/things/1/x"]}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "d", "message": "x is 2", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2, "locations": ["/things/1/x"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t2"}, "check": "d", "passed": false, "cause": "value", "inputs": [{"name": "x", "value": 2, "locations": ["/things/1/x"]}]}
         ]
       }
     ]
@@ -1534,7 +1530,6 @@
               "id": null
             },
             "check": "$well_formed",
-            "message": "policy description: not a string; policy meta: not an object",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1579,7 +1574,6 @@
               "id": null
             },
             "check": "$well_formed",
-            "message": "policy description: not a string; policy meta: not an object",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1690,7 +1684,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1726,7 +1719,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: missing",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -1808,7 +1800,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1844,7 +1835,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: missing",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -1926,7 +1916,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: not a string",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1962,7 +1951,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: not a string",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2044,7 +2032,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: unsupported version v9.9, expected v0.4",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2080,7 +2067,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: unsupported version v9.9, expected v0.4",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2156,7 +2142,6 @@
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: unsupported version v0.1, expected v0.4",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2186,7 +2171,6 @@
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: unsupported version v0.1, expected v0.4",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2262,7 +2246,6 @@
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: unsupported version v0.3-dev, expected v0.4",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2292,7 +2275,6 @@
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: unsupported version v0.3-dev, expected v0.4",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2368,7 +2350,6 @@
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: not a version v0.2-beta",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2398,7 +2379,6 @@
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: not a version v0.2-beta",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2474,7 +2454,6 @@
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: not a version v0.2-",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2504,7 +2483,6 @@
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: not a version v0.2-",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2786,7 +2764,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: not a version V0.1",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2822,7 +2799,6 @@
                 ]
               }
             ],
-            "message": "policy ergo_spec: not a version V0.1",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2924,7 +2900,6 @@
                 ]
               }
             ],
-            "message": "policy description: not a string; policy ergo_spec: not a string; policy meta: not an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2978,7 +2953,6 @@
                 ]
               }
             ],
-            "message": "policy description: not a string; policy ergo_spec: not a string; policy meta: not an object",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -3001,7 +2975,7 @@
         "requirements": {"s": {"status": "not_met"}},
         "expressions": {"s": {"c": "<missing assert>"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.c: missing assert; checks.c: unknown field op; checks.c: unknown field path", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["missing assert", "unknown field op", "unknown field path"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["missing assert", "unknown field op", "unknown field path"], "locations": []}]}
         ]
       }
     ]
@@ -3028,9 +3002,9 @@
           "worse": {"status": "not_met", "subjects": {"matching": 0, "total": 0}}
         },
         "results": [
-          {"requirement": "bad", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "require: neither every nor some", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": ["neither every nor some"], "locations": []}]},
+          {"requirement": "bad", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": ["neither every nor some"], "locations": []}]},
           {"requirement": "good", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}]},
-          {"requirement": "worse", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.c: doesn't parse", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["doesn't parse"], "locations": []}]},
+          {"requirement": "worse", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["doesn't parse"], "locations": []}]},
           {"requirement": "good", "subject": {"type": "thing", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope thing count", "value": 1, "locations": ["/things/0"]}]},
           {"requirement": "good", "subject": {"type": "thing", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated thing ids", "value": [], "locations": []}]},
           {"requirement": "good", "subject": {"type": "thing", "id": "t1"}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/things/0/x"]}]}
@@ -3049,7 +3023,7 @@
         "requirements": {"s": {"status": "not_met", "subjects": {"matching": 0, "total": 0}}},
         "expressions": {"s": {"$applies": "x exists", "$min_subjects": "count(matching(things)) >= 1", "$unique_ids": "count(repeated(ids(things))) == 0", "$well_formed": "count(problems) == 0", "c": "x is \"a"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.c: unclosed quote at column 6", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["unclosed quote at column 6"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["unclosed quote at column 6"], "locations": []}]}
         ]
       }
     ]
@@ -3157,7 +3131,6 @@
                 ]
               }
             ],
-            "message": "checks.$applies: a name can't start with $; checks.$min_subjects: a name can't start with $; checks.$unique_ids: a name can't start with $; checks.$well_formed: a name can't start with $",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3238,7 +3211,6 @@
                 ]
               }
             ],
-            "message": "checks.$unique_ids: a name can't start with $; checks.$unique_ids: doesn't parse",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3260,7 +3232,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2], "$x": {"k": 1}}], "$s": [{"id": "b"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.$s", "value": ["a name can't start with $"]}], "message": "subjects.$s: a name can't start with $", "passed": false, "requirement": "r", "subject": {"id": null, "type": "$s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.$s", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "$s"}}
         ]
       }
     ]
@@ -3276,7 +3248,7 @@
         "status": {"r": "not_met"},
         "report": {"subjects": {"$x": {"description": "", "from": "\"$x\"", "identified_by": "id", "parts": {}}}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.$x", "value": ["a name can't start with $"]}], "message": "subjects.$x: a name can't start with $", "passed": false, "requirement": "r", "subject": {"id": null, "type": "$x"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.$x", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "$x"}}
         ]
       }
     ]
@@ -3292,7 +3264,7 @@
         "status": {"r": "not_met"},
         "report": {"subjects": {"$x": {"description": "", "from": "\"$x\"", "identified_by": null, "parts": {}}}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.$x", "value": ["a name can't start with $"]}], "message": "subjects.$x: a name can't start with $", "passed": false, "requirement": "r", "subject": {"id": null, "type": "$x"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.$x", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "$x"}}
         ]
       }
     ]
@@ -3307,7 +3279,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2], "$x": {"k": 1}}], "$s": [{"id": "b"}]},
         "status": {"$r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start with $"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start with $", "passed": false, "requirement": "$r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start with $"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "$r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3322,7 +3294,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2], "$x": {"k": 1}}], "$s": [{"id": "b"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.$c", "value": ["a name can't start with $"]}], "message": "checks.$c: a name can't start with $", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.$c", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3337,7 +3309,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2], "$x": {"k": 1}}], "$s": [{"id": "b"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option $o: a name can't start with $"]}], "message": "checks.c: option $o: a name can't start with $", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option $o: a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3352,7 +3324,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2], "$x": {"k": 1}}], "$s": [{"id": "b"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.$p", "value": ["a name can't start with $"]}], "message": "subjects.s.has.$p: a name can't start with $", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.$p", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3367,7 +3339,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2], "$x": {"k": 1}}], "$s": [{"id": "b"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: doesn't parse"]}], "message": "checks.c: for: doesn't parse", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: doesn't parse"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3382,7 +3354,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2], "$x": {"k": 1}}], "$s": [{"id": "b"}]},
         "status": {"r$": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s$.has.p$", "value": ["invalid alias"]}], "message": "subjects.s$.has.p$: invalid alias", "passed": false, "requirement": "r$", "subject": {"id": null, "type": "s$"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s$.has.p$", "value": ["invalid alias"]}], "passed": false, "requirement": "r$", "subject": {"id": null, "type": "s$"}}
         ]
       }
     ]
@@ -3397,7 +3369,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 19}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\" $x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"$x \"", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}, {"locations": [], "name": "checks.\"\\tx\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\\t\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\u00a0\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\u200b\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\u200d\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\ufeff\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"\u00a0x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"\u200bx\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"\u2060x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"\ufeffx\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "checks.\" $x\": a name can't start or end with a space or an invisible character; checks.\" x\": a name can't start or end with a space or an invisible character; checks.\"$x \": a name can't start or end with a space or an invisible character; checks.\"$x \": a name can't start with $; checks.\"\\tx\": a name can't start or end with a space or an invisible character; checks.\"x \": a name can't start or end with a space or an invisible character; checks.\"x\\t\": a name can't start or end with a space or an invisible character; checks.\"x \": a name can't start or end with a space or an invisible character; checks.\"x​\": a name can't start or end with a space or an invisible character; checks.\"x‍\": a name can't start or end with a space or an invisible character; checks.\"x﻿\": a name can't start or end with a space or an invisible character; checks.\" x\": a name can't start or end with a space or an invisible character; checks.\"​x\": a name can't start or end with a space or an invisible character; checks.\"⁠x\": a name can't start or end with a space or an invisible character; checks.\"﻿x\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 19}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\" $x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"$x \"", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}, {"locations": [], "name": "checks.\"\\tx\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\\t\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\u00a0\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\u200b\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\u200d\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"x\ufeff\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"\u00a0x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"\u200bx\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"\u2060x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "checks.\"\ufeffx\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3411,24 +3383,24 @@
         "rules": ["names.edge", "names.dollar"],
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1]}]},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "\tx", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": " $x", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": " x", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character; requirement name: a name can't start with $", "passed": false, "requirement": "$x ", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "\tx", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": " $x", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": " x", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "$x ", "subject": {"id": null, "type": "s"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "a$b", "subject": {"id": null, "type": "s"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "ok", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "x\t", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "x ", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "x\t", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "x ", "subject": {"id": null, "type": "s"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "x y", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "x\u00a0", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "x\u200b", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "x\u200d", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "x\ufeff", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "x\u00a0", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "x\u200b", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "x\u200d", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "x\ufeff", "subject": {"id": null, "type": "s"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "x\ud83d\ude00", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "\u00a0x", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "\u200bx", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "\u2060x", "subject": {"id": null, "type": "s"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "\ufeffx", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "\u00a0x", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "\u200bx", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "\u2060x", "subject": {"id": null, "type": "s"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "\ufeffx", "subject": {"id": null, "type": "s"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "\uff04x", "subject": {"id": null, "type": "s"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "a$b", "subject": {"id": "a", "type": "s"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "ok", "subject": {"id": "a", "type": "s"}},
@@ -3448,25 +3420,25 @@
         "rules": ["names.edge", "names.dollar"],
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1]}]},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\" x\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q0", "subject": {"id": null, "type": " x"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"x \": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q1", "subject": {"id": null, "type": "x "}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\u2060x\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"⁠x\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q10", "subject": {"id": null, "type": "\u2060x"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\u200d\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"x‍\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q11", "subject": {"id": null, "type": "x\u200d"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\" $x\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\" $x\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q12", "subject": {"id": null, "type": " $x"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"$x \"", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}], "message": "subjects.\"$x \": a name can't start or end with a space or an invisible character; subjects.\"$x \": a name can't start with $", "passed": false, "requirement": "q13", "subject": {"id": null, "type": "$x "}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q0", "subject": {"id": null, "type": " x"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q1", "subject": {"id": null, "type": "x "}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\u2060x\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q10", "subject": {"id": null, "type": "\u2060x"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\u200d\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q11", "subject": {"id": null, "type": "x\u200d"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\" $x\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q12", "subject": {"id": null, "type": " $x"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"$x \"", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}], "passed": false, "requirement": "q13", "subject": {"id": null, "type": "$x "}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "q14", "subject": {"id": null, "type": "ok"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "q15", "subject": {"id": null, "type": "x y"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "q16", "subject": {"id": null, "type": "\uff04x"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "q17", "subject": {"id": null, "type": "a$b"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "q18", "subject": {"id": null, "type": "x\ud83d\ude00"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\\tx\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"\\tx\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q2", "subject": {"id": null, "type": "\tx"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\\t\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"x\\t\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q3", "subject": {"id": null, "type": "x\t"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\u00a0x\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\" x\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q4", "subject": {"id": null, "type": "\u00a0x"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\u00a0\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"x \": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q5", "subject": {"id": null, "type": "x\u00a0"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\u200bx\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"​x\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q6", "subject": {"id": null, "type": "\u200bx"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\u200b\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"x​\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q7", "subject": {"id": null, "type": "x\u200b"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\ufeffx\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"﻿x\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q8", "subject": {"id": null, "type": "\ufeffx"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\ufeff\"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.\"x﻿\": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "q9", "subject": {"id": null, "type": "x\ufeff"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\\tx\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q2", "subject": {"id": null, "type": "\tx"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\\t\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q3", "subject": {"id": null, "type": "x\t"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\u00a0x\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q4", "subject": {"id": null, "type": "\u00a0x"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\u00a0\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q5", "subject": {"id": null, "type": "x\u00a0"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\u200bx\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q6", "subject": {"id": null, "type": "\u200bx"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\u200b\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q7", "subject": {"id": null, "type": "x\u200b"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"\ufeffx\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q8", "subject": {"id": null, "type": "\ufeffx"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.\"x\ufeff\"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "q9", "subject": {"id": null, "type": "x\ufeff"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "q14", "subject": {"id": "a", "type": "ok"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "q15", "subject": {"id": "a", "type": "x y"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "q16", "subject": {"id": "a", "type": "\uff04x"}},
@@ -3486,7 +3458,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option \tx: a name can't start or end with a space or an invisible character", "option  $x: a name can't start or end with a space or an invisible character", "option  x: a name can't start or end with a space or an invisible character", "option $x : a name can't start or end with a space or an invisible character", "option $x : a name can't start with $", "option x\t: a name can't start or end with a space or an invisible character", "option x : a name can't start or end with a space or an invisible character", "option x\u00a0: a name can't start or end with a space or an invisible character", "option x\u200b: a name can't start or end with a space or an invisible character", "option x\u200d: a name can't start or end with a space or an invisible character", "option x\ufeff: a name can't start or end with a space or an invisible character", "option \u00a0x: a name can't start or end with a space or an invisible character", "option \u200bx: a name can't start or end with a space or an invisible character", "option \u2060x: a name can't start or end with a space or an invisible character", "option \ufeffx: a name can't start or end with a space or an invisible character"]}], "message": "checks.c: option \tx: a name can't start or end with a space or an invisible character; checks.c: option  $x: a name can't start or end with a space or an invisible character; checks.c: option  x: a name can't start or end with a space or an invisible character; checks.c: option $x : a name can't start or end with a space or an invisible character; checks.c: option $x : a name can't start with $; checks.c: option x\t: a name can't start or end with a space or an invisible character; checks.c: option x : a name can't start or end with a space or an invisible character; checks.c: option x : a name can't start or end with a space or an invisible character; checks.c: option x​: a name can't start or end with a space or an invisible character; checks.c: option x‍: a name can't start or end with a space or an invisible character; checks.c: option x﻿: a name can't start or end with a space or an invisible character; checks.c: option  x: a name can't start or end with a space or an invisible character; checks.c: option ​x: a name can't start or end with a space or an invisible character; checks.c: option ⁠x: a name can't start or end with a space or an invisible character; checks.c: option ﻿x: a name can't start or end with a space or an invisible character", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option \tx: a name can't start or end with a space or an invisible character", "option  $x: a name can't start or end with a space or an invisible character", "option  x: a name can't start or end with a space or an invisible character", "option $x : a name can't start or end with a space or an invisible character", "option $x : a name can't start with $", "option x\t: a name can't start or end with a space or an invisible character", "option x : a name can't start or end with a space or an invisible character", "option x\u00a0: a name can't start or end with a space or an invisible character", "option x\u200b: a name can't start or end with a space or an invisible character", "option x\u200d: a name can't start or end with a space or an invisible character", "option x\ufeff: a name can't start or end with a space or an invisible character", "option \u00a0x: a name can't start or end with a space or an invisible character", "option \u200bx: a name can't start or end with a space or an invisible character", "option \u2060x: a name can't start or end with a space or an invisible character", "option \ufeffx: a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3501,7 +3473,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\" $x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"$x \"", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}, {"locations": [], "name": "subjects.s.has.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x​\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x‍\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x﻿\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x😀\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"​x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"⁠x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"﻿x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"＄x\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.a$b", "value": ["invalid alias"]}], "message": "subjects.s.has.\" $x\": a name can't start or end with a space or an invisible character; subjects.s.has.\" x\": a name can't start or end with a space or an invisible character; subjects.s.has.\"$x \": a name can't start or end with a space or an invisible character; subjects.s.has.\"$x \": a name can't start with $; subjects.s.has.\"x \": a name can't start or end with a space or an invisible character; subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x \": a name can't start or end with a space or an invisible character; subjects.s.has.\"x​\": a name can't start or end with a space or an invisible character; subjects.s.has.\"x‍\": a name can't start or end with a space or an invisible character; subjects.s.has.\"x﻿\": a name can't start or end with a space or an invisible character; subjects.s.has.\"x😀\": invalid alias; subjects.s.has.\" x\": a name can't start or end with a space or an invisible character; subjects.s.has.\"​x\": a name can't start or end with a space or an invisible character; subjects.s.has.\"⁠x\": a name can't start or end with a space or an invisible character; subjects.s.has.\"﻿x\": a name can't start or end with a space or an invisible character; subjects.s.has.\"＄x\": invalid alias; subjects.s.has.a$b: invalid alias", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\" $x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"$x \"", "value": ["a name can't start or end with a space or an invisible character", "a name can't start with $"]}, {"locations": [], "name": "subjects.s.has.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x \"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x​\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x‍\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x﻿\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"x😀\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\" x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"​x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"⁠x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"﻿x\"", "value": ["a name can't start or end with a space or an invisible character"]}, {"locations": [], "name": "subjects.s.has.\"＄x\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.a$b", "value": ["invalid alias"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3516,7 +3488,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: an item ends with \"as\" and a name, like \"every pull_requests as pr\""]}], "message": "checks.c: for: an item ends with \"as\" and a name, like \"every pull_requests as pr\"", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: an item ends with \"as\" and a name, like \"every pull_requests as pr\""]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3531,7 +3503,7 @@
         "input": {"things": [{"id": "a"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 0}, {"locations": [], "name": "require", "value": ["neither every nor some"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "checks", "value": ["empty"]}, {"locations": [], "name": "min_subjects", "value": ["not a whole number from 0 to 1000000"]}, {"locations": [], "name": "zz", "value": ["unknown field"]}], "message": "require: neither every nor some; \"x y\": unknown field; checks: empty; min_subjects: not a whole number from 0 to 1000000; zz: unknown field", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 0}, {"locations": [], "name": "require", "value": ["neither every nor some"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "checks", "value": ["empty"]}, {"locations": [], "name": "min_subjects", "value": ["not a whole number from 0 to 1000000"]}, {"locations": [], "name": "zz", "value": ["unknown field"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3546,7 +3518,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
         "status": {"": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't be empty"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "message": "requirement name: a name can't be empty", "passed": false, "requirement": "", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "requirement name", "value": ["a name can't be empty"]}, {"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": false, "requirement": "", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3561,7 +3533,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"\"", "value": ["a name can't be empty"]}], "message": "checks.\"\": a name can't be empty", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"\"", "value": ["a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3576,7 +3548,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option : a name can't be empty"]}], "message": "checks.c: option : a name can't be empty", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option : a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3591,7 +3563,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"\"", "value": ["a name can't be empty"]}], "message": "subjects.s.has.\"\": a name can't be empty", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"\"", "value": ["a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3606,7 +3578,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"\"", "value": ["a name can't be empty"]}], "message": "subjects.s.has.\"\": a name can't be empty", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"\"", "value": ["a name can't be empty"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -3621,7 +3593,7 @@
         "input": {"xs": [{"id": "a", "x": 1, "ys": [1, 2]}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subject", "value": ["empty or not a string"]}], "message": "subject: empty or not a string", "passed": false, "requirement": "r", "subject": {"id": null, "type": ""}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subject", "value": ["empty or not a string"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": ""}}
         ]
       }
     ]
@@ -3658,11 +3630,11 @@
       }
     ]
   },
-  {"description": "checks with values of mixed types", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1.0, 'a'", "f": {"for": "every xs as x", "assert": "x.n is one of 'a', 1.0"}, "g": {"assert": ["x exists", "x is one of 1.0, 'a'"]}, "h": {"assert": ["x is one of 1, 'a'", "x is"]}, "q": {"any_of": {"o": "x is one of 1.0, 'a'"}}, "r": {"any_of": {"o": ["x exists", "x is one of 1.0, 'a'"], "p": "x exists"}}}}}}, "cases": [{"description": "a sentence with values of mixed types is printed as written and named by its check, with the line's number when the check has more than one line", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.any_of.written_wrong"], "input": {"things": [{"id": "t1", "x": 1}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.c: values of mixed types; checks.f: values of mixed types; checks.g: line 2: values of mixed types; checks.h: line 1: values of mixed types; checks.h: line 2: doesn't parse; checks.q: option o: values of mixed types; checks.r: option o: line 2: values of mixed types", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 6, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["values of mixed types"], "locations": []}, {"name": "checks.f", "value": ["values of mixed types"], "locations": []}, {"name": "checks.g", "value": ["line 2: values of mixed types"], "locations": []}, {"name": "checks.h", "value": ["line 1: values of mixed types", "line 2: doesn't parse"], "locations": []}, {"name": "checks.q", "value": ["option o: values of mixed types"], "locations": []}, {"name": "checks.r", "value": ["option o: line 2: values of mixed types"], "locations": []}]}], "status": {"s": "not_met"}, "expressions": {"s": {"c": "x is one of 1.0, 'a'", "f": "for every xs as x: x.n is one of 'a', 1.0", "g": "x exists and x is one of 1.0, 'a'", "h": "x is one of 1, 'a' and x is", "q": "one of: o(x is one of 1.0, 'a')", "r": "one of: o(x exists and x is one of 1.0, 'a') | p(x exists)"}}}]},
-  {"description": "a for line with values of mixed types in its whose", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"i": {"for": "every xs whose v is one of 1, 'a' as x", "assert": "x exists"}}}}}, "cases": [{"description": "is printed as written and named by its check, with for: in front of the problem", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.for.line"], "input": {"things": [{"id": "t1", "xs": [{"v": 1}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.i: for: values of mixed types", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.i", "value": ["for: values of mixed types"], "locations": []}]}], "status": {"s": "not_met"}, "expressions": {"s": {"i": "for every xs whose v is one of 1, 'a' as x: x exists"}}}]},
-  {"description": "a check with values of mixed types and a field compared with itself", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is one of 1, 'a' and y is at least y", "b": {"assert": ["x exists", "x is one of 1, 'a' and y is at least y"]}, "o": {"any_of": {"p": "x is one of 1, 'a' and y is at least y"}}, "f": {"for": "every xs as i", "assert": "i is one of 1, 'a' and y is at least y"}}}}}, "cases": [{"description": "lists both problems, on one line, in a list, in an any_of option and under a for line", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.written_wrong.self", "sentence.any_of.written_wrong"], "input": {"things": [{"id": "t1", "x": 1, "y": 1, "xs": [1]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.a: values of mixed types; checks.a: y is compared with itself; checks.b: line 2: values of mixed types; checks.b: line 2: y is compared with itself; checks.f: values of mixed types; checks.f: y is compared with itself; checks.o: option p: values of mixed types; checks.o: option p: y is compared with itself", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["values of mixed types", "y is compared with itself"]}, {"locations": [], "name": "checks.b", "value": ["line 2: values of mixed types", "line 2: y is compared with itself"]}, {"locations": [], "name": "checks.f", "value": ["values of mixed types", "y is compared with itself"]}, {"locations": [], "name": "checks.o", "value": ["option p: values of mixed types", "option p: y is compared with itself"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"a": "x is one of 1, 'a' and y is at least y", "b": "x exists and x is one of 1, 'a' and y is at least y", "f": "for every xs as i: i is one of 1, 'a' and y is at least y", "o": "one of: p(x is one of 1, 'a' and y is at least y)"}}}]},
-  {"description": "a check with values of mixed types and a field compared with itself in a whose", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs whose k is at least k is one of 1, 'a'", "l": {"assert": ["x exists", "every xs whose k is at least k is one of 1, 'a'"]}}}}}, "cases": [{"description": "lists both problems, on one line and in a list", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.written_wrong.self"], "input": {"things": [{"id": "t1", "x": 1, "xs": [{"k": 1}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.c: k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert; checks.c: values of mixed types; checks.l: line 2: k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert; checks.l: line 2: values of mixed types", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert", "values of mixed types"]}, {"locations": [], "name": "checks.l", "value": ["line 2: k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert", "line 2: values of mixed types"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"c": "every xs whose k is at least k is one of 1, 'a'", "l": "x exists and every xs whose k is at least k is one of 1, 'a'"}}}]},
-  {"description": "a for line with a form its whose can't take", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"i": {"for": "every xs whose name starts with count of ys as x", "assert": "x exists"}}}}}, "cases": [{"description": "is listed with for: in front of the problem, like every problem of the for line", "rules": ["sentence.for.line", "written_wrong.row", "sentence.print.written_wrong"], "input": {"things": [{"id": "t1", "xs": [{"name": "a"}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.i: for: \"starts with\" can't take a count of, a sum of or a plus", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.i", "value": ["for: \"starts with\" can't take a count of, a sum of or a plus"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"i": "for every xs whose name starts with count of ys as x: x exists"}}}]},
+  {"description": "checks with values of mixed types", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1.0, 'a'", "f": {"for": "every xs as x", "assert": "x.n is one of 'a', 1.0"}, "g": {"assert": ["x exists", "x is one of 1.0, 'a'"]}, "h": {"assert": ["x is one of 1, 'a'", "x is"]}, "q": {"any_of": {"o": "x is one of 1.0, 'a'"}}, "r": {"any_of": {"o": ["x exists", "x is one of 1.0, 'a'"], "p": "x exists"}}}}}}, "cases": [{"description": "a sentence with values of mixed types is printed as written and named by its check, with the line's number when the check has more than one line", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.any_of.written_wrong"], "input": {"things": [{"id": "t1", "x": 1}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 6, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["values of mixed types"], "locations": []}, {"name": "checks.f", "value": ["values of mixed types"], "locations": []}, {"name": "checks.g", "value": ["line 2: values of mixed types"], "locations": []}, {"name": "checks.h", "value": ["line 1: values of mixed types", "line 2: doesn't parse"], "locations": []}, {"name": "checks.q", "value": ["option o: values of mixed types"], "locations": []}, {"name": "checks.r", "value": ["option o: line 2: values of mixed types"], "locations": []}]}], "status": {"s": "not_met"}, "expressions": {"s": {"c": "x is one of 1.0, 'a'", "f": "for every xs as x: x.n is one of 'a', 1.0", "g": "x exists and x is one of 1.0, 'a'", "h": "x is one of 1, 'a' and x is", "q": "one of: o(x is one of 1.0, 'a')", "r": "one of: o(x exists and x is one of 1.0, 'a') | p(x exists)"}}}]},
+  {"description": "a for line with values of mixed types in its whose", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"i": {"for": "every xs whose v is one of 1, 'a' as x", "assert": "x exists"}}}}}, "cases": [{"description": "is printed as written and named by its check, with for: in front of the problem", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.for.line"], "input": {"things": [{"id": "t1", "xs": [{"v": 1}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.i", "value": ["for: values of mixed types"], "locations": []}]}], "status": {"s": "not_met"}, "expressions": {"s": {"i": "for every xs whose v is one of 1, 'a' as x: x exists"}}}]},
+  {"description": "a check with values of mixed types and a field compared with itself", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is one of 1, 'a' and y is at least y", "b": {"assert": ["x exists", "x is one of 1, 'a' and y is at least y"]}, "o": {"any_of": {"p": "x is one of 1, 'a' and y is at least y"}}, "f": {"for": "every xs as i", "assert": "i is one of 1, 'a' and y is at least y"}}}}}, "cases": [{"description": "lists both problems, on one line, in a list, in an any_of option and under a for line", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.written_wrong.self", "sentence.any_of.written_wrong"], "input": {"things": [{"id": "t1", "x": 1, "y": 1, "xs": [1]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["values of mixed types", "y is compared with itself"]}, {"locations": [], "name": "checks.b", "value": ["line 2: values of mixed types", "line 2: y is compared with itself"]}, {"locations": [], "name": "checks.f", "value": ["values of mixed types", "y is compared with itself"]}, {"locations": [], "name": "checks.o", "value": ["option p: values of mixed types", "option p: y is compared with itself"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"a": "x is one of 1, 'a' and y is at least y", "b": "x exists and x is one of 1, 'a' and y is at least y", "f": "for every xs as i: i is one of 1, 'a' and y is at least y", "o": "one of: p(x is one of 1, 'a' and y is at least y)"}}}]},
+  {"description": "a check with values of mixed types and a field compared with itself in a whose", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs whose k is at least k is one of 1, 'a'", "l": {"assert": ["x exists", "every xs whose k is at least k is one of 1, 'a'"]}}}}}, "cases": [{"description": "lists both problems, on one line and in a list", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.written_wrong.self"], "input": {"things": [{"id": "t1", "x": 1, "xs": [{"k": 1}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert", "values of mixed types"]}, {"locations": [], "name": "checks.l", "value": ["line 2: k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert", "line 2: values of mixed types"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"c": "every xs whose k is at least k is one of 1, 'a'", "l": "x exists and every xs whose k is at least k is one of 1, 'a'"}}}]},
+  {"description": "a for line with a form its whose can't take", "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"i": {"for": "every xs whose name starts with count of ys as x", "assert": "x exists"}}}}}, "cases": [{"description": "is listed with for: in front of the problem, like every problem of the for line", "rules": ["sentence.for.line", "written_wrong.row", "sentence.print.written_wrong"], "input": {"things": [{"id": "t1", "xs": [{"name": "a"}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.i", "value": ["for: \"starts with\" can't take a count of, a sum of or a plus"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"i": "for every xs whose name starts with count of ys as x: x exists"}}}]},
   {
     "description": "min_subjects 1000000",
     "policy": {"ergo_spec": "v0.4", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1000000, "checks": {"c": "x exists"}}}},
@@ -3673,7 +3645,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 1", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
@@ -3689,7 +3661,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 1", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
@@ -3705,7 +3677,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 1", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
@@ -3721,7 +3693,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 1", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": false, "cause": "value", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t/0"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": 1}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/t/0/x"]}]}
         ]
       }
@@ -3751,7 +3723,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "message": "min_subjects: not a whole number from 0 to 1000000", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
         ]
       }
     ]
@@ -3766,7 +3738,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "message": "min_subjects: not a whole number from 0 to 1000000", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
         ]
       }
     ]
@@ -3781,7 +3753,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "message": "min_subjects: not a whole number from 0 to 1000000", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
         ]
       }
     ]
@@ -3796,7 +3768,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "message": "min_subjects: not a whole number from 0 to 1000000", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
         ]
       }
     ]
@@ -3811,7 +3783,7 @@
         "input": {"t": [{"id": 1, "x": 1}]},
         "requirements": {"s": {"status": "not_met"}},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "message": "min_subjects: not a whole number from 0 to 1000000", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$well_formed", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "min_subjects", "value": ["not a whole number from 0 to 1000000"], "locations": []}]}
         ]
       }
     ]

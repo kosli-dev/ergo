@@ -260,7 +260,6 @@
                 ]
               }
             ],
-            "message": "findings.truncated is true",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -372,7 +371,6 @@
                 ]
               }
             ],
-            "message": "coverage.attestation_data.hunks_acknowledged is missing, and coverage.attestation_data.hunks_total is missing",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -417,7 +415,6 @@
                 ]
               }
             ],
-            "message": "findings.truncated is missing",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -452,7 +449,6 @@
                 ]
               }
             ],
-            "message": "coverage.attestation_data.hunks_acknowledged is missing, and coverage.attestation_data.hunks_total is missing",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -498,7 +494,6 @@
                 ]
               }
             ],
-            "message": "findings is \"truncated\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -533,7 +528,6 @@
                 ]
               }
             ],
-            "message": "coverage.attestation_data is \"done\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -569,7 +563,6 @@
                 ]
               }
             ],
-            "message": "findings is \"ok\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -604,7 +597,6 @@
                 ]
               }
             ],
-            "message": "coverage is \"ok\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -759,7 +751,6 @@
                 ]
               }
             ],
-            "message": "cov.x is 1, and cov.n is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -786,7 +777,6 @@
                 ]
               }
             ],
-            "message": "d.b.x is 1, and d.b.n is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -847,7 +837,6 @@
                 ]
               }
             ],
-            "message": "cov.x is missing, and cov.n is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -874,7 +863,6 @@
                 ]
               }
             ],
-            "message": "d.b.x is missing, and d.b.n is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -909,7 +897,6 @@
                 ]
               }
             ],
-            "message": "cov.x is missing, and cov.n is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -936,7 +923,6 @@
                 ]
               }
             ],
-            "message": "d.b.x is missing, and d.b.n is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -971,7 +957,6 @@
                 ]
               }
             ],
-            "message": "cov is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -998,7 +983,6 @@
                 ]
               }
             ],
-            "message": "d.b is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1046,7 +1030,6 @@
                 ]
               }
             ],
-            "message": "it is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1073,7 +1056,6 @@
                 ]
               }
             ],
-            "message": "it is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1108,7 +1090,6 @@
                 ]
               }
             ],
-            "message": "it is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1135,7 +1116,6 @@
                 ]
               }
             ],
-            "message": "it is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1170,7 +1150,6 @@
                 ]
               }
             ],
-            "message": "it is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1197,7 +1176,6 @@
                 ]
               }
             ],
-            "message": "it is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1330,7 +1308,6 @@
                 ]
               }
             ],
-            "message": "cov.x is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1350,7 +1327,6 @@
                 ]
               }
             ],
-            "message": ".cov.n is 9",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1460,7 +1436,6 @@
                 ]
               }
             ],
-            "message": "item 1 of lst: x is 1, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1655,7 +1630,6 @@
                 ]
               }
             ],
-            "message": "item 1 of lst: .cov is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1721,7 +1695,7 @@
         "expressions": {"r": {"$applies": ".cov is 1", "c": ".cov is 1"}},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
@@ -1742,7 +1716,7 @@
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "unusable", "check": "d", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "message": "cov is 1, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
         ]
       }
     ]
@@ -1758,7 +1732,7 @@
         "expressions": {"r": {"$applies": "cov is 1", "c": "cov is 1", "d": "count of cov is 1"}},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.\"cov \"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.item.has.\"cov \": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.\"cov \"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
@@ -1774,7 +1748,7 @@
         "expressions": {"r": {"$applies": ".cov is 1", "c": ".cov is 1", "d": "count of .cov is 1"}},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round", "not a string or an object"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round; subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round", "not a string or an object"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
@@ -1789,11 +1763,11 @@
         "input": {"rounds": [{"id": "r1", "y": {"k": 1}, "cov": {"k": 1, "xs": [1, 2]}, "d": {"b": {"k": 5, "xs": [1]}}, "items": [{"id": "i1", "n": 1, "cov": 1, "round": 1, "zs": [1], "y": {"k": 0}}, {"id": "i2", "n": 3, "cov": 2, "round": 2, "zs": [2], "y": {"k": 9}}], "rs": [{"cov": 1, "y": 3}]}]},
         "status": {"r0": "not_met", "r1": "not_met", "r2": "not_met", "r3": "not_met", "r4": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r0", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r1", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r2", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r3", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r4", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r0", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r1", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r2", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r3", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r4", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
@@ -1810,14 +1784,14 @@
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "message": "checks.c: doesn't parse", "passed": false, "requirement": "r2", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "message": "checks.c: doesn't parse", "passed": false, "requirement": "r3", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "passed": false, "requirement": "r2", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "passed": false, "requirement": "r3", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "message": "item 1 of cov.xs is 1", "passed": false, "requirement": "r0", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "message": "item 1 of cov.xs is 1; item 2 of cov.xs is 2", "passed": false, "requirement": "r1", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r0", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r1", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
@@ -1842,14 +1816,14 @@
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r1", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r2", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "message": "cov is 2", "passed": false, "requirement": "r0", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "passed": false, "requirement": "r0", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "message": "cov is 2", "passed": false, "requirement": "r1", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "passed": false, "requirement": "r1", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "message": "cov is 2", "passed": false, "requirement": "r2", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "passed": false, "requirement": "r2", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "message": "cov is 1, which isn't a list or an object", "passed": false, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "zz", "value": null}], "message": "zz is missing", "passed": false, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "passed": false, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "zz", "value": null}], "passed": false, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
         ]
       }
     ]
@@ -1864,11 +1838,11 @@
         "input": {"rounds": [{"id": "r1", "d": {"b": {"k": 5}}, "items": [{"id": "i1", "n": 1, "cov": 1, "y": {"k": 0}, "xs": [0]}, {"id": "i2", "n": 2, "cov": 2, "y": {"k": 9}, "xs": [3]}]}]},
         "status": {"r00": "not_met", "r01": "not_met", "r02": "not_met", "r03": "not_met", "r04": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r00", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r01", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r02", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r03", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r04", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r00", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r01", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r02", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r03", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r04", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
@@ -1886,8 +1860,8 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "own", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "message": "item 1 of cov.xs is 1", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "item": "item 1 of cov.xs", "locations": ["/rounds/0/d/b/xs/0"], "path": "item 1 of cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/d/b/xs/0"], "name": "cov.xs[]", "part": {"id": null, "name": "cov"}, "value": [1]}], "message": "item 1 of cov.xs is 1", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "value", "check": "own", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "item": "item 1 of cov.xs", "locations": ["/rounds/0/d/b/xs/0"], "path": "item 1 of cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/d/b/xs/0"], "name": "cov.xs[]", "part": {"id": null, "name": "cov"}, "value": [1]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
@@ -1902,12 +1876,12 @@
         "input": {"things": [{"id": "a", "p": {"z": [1]}, "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}]},
         "results": [
           {"cause": "satisfied", "check": "count_whose", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs whose n equals count of x.z", "value": 2}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
-          {"cause": "value", "check": "dot_right", "failed_items": [{"cause": "value", "item": "item 3 of xs", "locations": ["/things/0/xs/2/v"], "path": "xs[2].v", "value": 5}], "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "item 3 of xs: v is 5", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "dot_right", "failed_items": [{"cause": "value", "item": "item 3 of xs", "locations": ["/things/0/xs/2/v"], "path": "xs[2].v", "value": 5}], "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "every_sum", "failed_items": [], "inputs": [{"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "every_whose", "failed_items": [], "inputs": [{"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "for_whose", "failed_items": [], "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "left", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs whose count of x.z is 3", "value": 3}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
-          {"cause": "value", "check": "some_whose", "failed_items": [{"cause": "value", "item": "item 1 of xs", "locations": ["/things/0/xs/0/v"], "path": "xs[0].v", "value": 1}, {"cause": "value", "item": "item 2 of xs", "locations": ["/things/0/xs/1/v"], "path": "xs[1].v", "value": 1}], "inputs": [{"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "item 1 of xs: v is 1; item 2 of xs: v is 1", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "some_whose", "failed_items": [{"cause": "value", "item": "item 1 of xs", "locations": ["/things/0/xs/0/v"], "path": "xs[0].v", "value": 1}, {"cause": "value", "item": "item 2 of xs", "locations": ["/things/0/xs/1/v"], "path": "xs[1].v", "value": 1}], "inputs": [{"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "sum_whose", "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": 2}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}}
         ],
         "expressions": {"r": {"every_whose": "every xs.v whose n equals count of x.z is 1", "some_whose": "some xs.v whose n equals count of x.z is 5", "count_whose": "count of xs whose n equals count of x.z is 2", "sum_whose": "sum of xs.v whose n equals count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1", "for_whose": "for every xs whose n equals count of x.z as y: y.v is 1", "dot_right": "every xs.v whose n equals count of .x.z is 1", "left": "count of xs whose count of x.z is 3 is 3"}}
@@ -1923,24 +1897,24 @@
         "rules": ["parts.where", "sentence.path.start", "sentence.path.part"],
         "input": {"things": [{"id": "missing", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"id": "null", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}], "p": null}, {"id": "text", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}], "p": {"z": "abc"}}, {"id": "object", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}], "p": {"z": {"k": 1}}}, {"id": "list_of_text", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}], "p": {"z": ["a"]}}]},
         "results": [
-          {"cause": "absent", "check": "count_whose", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "message": "x is missing", "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
-          {"cause": "absent", "check": "every_sum", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 3 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x is missing", "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
-          {"cause": "absent", "check": "every_whose", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 3 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x is missing", "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
-          {"cause": "absent", "check": "sum_whose", "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "message": "x is missing", "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
-          {"cause": "null", "check": "count_whose", "inputs": [{"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "message": "x is null", "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
-          {"cause": "null", "check": "every_sum", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 3 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x is null", "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
-          {"cause": "null", "check": "every_whose", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 3 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x is null", "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
-          {"cause": "null", "check": "sum_whose", "inputs": [{"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "message": "x is null", "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
-          {"cause": "unusable", "check": "count_whose", "inputs": [{"locations": ["/things/2/xs/0", "/things/2/xs/1", "/things/2/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/2/xs/0", "/things/2/xs/1", "/things/2/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}], "message": "x.z is \"abc\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
-          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}], "inputs": [{"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x.z is \"abc\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
-          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}], "inputs": [{"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x.z is \"abc\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
-          {"cause": "unusable", "check": "sum_whose", "inputs": [{"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}], "message": "x.z is \"abc\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
-          {"cause": "unusable", "check": "count_whose", "inputs": [{"locations": ["/things/3/xs/0", "/things/3/xs/1", "/things/3/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/3/xs/0", "/things/3/xs/1", "/things/3/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}], "message": "x.z is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
-          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}], "inputs": [{"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x.z is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
-          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}], "inputs": [{"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x.z is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
-          {"cause": "unusable", "check": "sum_whose", "inputs": [{"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}], "message": "x.z is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "absent", "check": "count_whose", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
+          {"cause": "absent", "check": "every_sum", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 3 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
+          {"cause": "absent", "check": "every_whose", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 3 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
+          {"cause": "absent", "check": "sum_whose", "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
+          {"cause": "null", "check": "count_whose", "inputs": [{"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "null", "check": "every_sum", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 3 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "null", "check": "every_whose", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 3 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "null", "check": "sum_whose", "inputs": [{"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "unusable", "check": "count_whose", "inputs": [{"locations": ["/things/2/xs/0", "/things/2/xs/1", "/things/2/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/2/xs/0", "/things/2/xs/1", "/things/2/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}], "inputs": [{"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}], "inputs": [{"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "sum_whose", "inputs": [{"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "count_whose", "inputs": [{"locations": ["/things/3/xs/0", "/things/3/xs/1", "/things/3/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/3/xs/0", "/things/3/xs/1", "/things/3/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}], "inputs": [{"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}], "inputs": [{"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "unusable", "check": "sum_whose", "inputs": [{"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
           {"cause": "satisfied", "check": "count_whose", "inputs": [{"locations": ["/things/4/xs/0", "/things/4/xs/1", "/things/4/xs/2"], "name": "count of xs whose n equals count of x.z", "value": 2}, {"locations": ["/things/4/xs/0", "/things/4/xs/1", "/things/4/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}], "passed": true, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
-          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/4/xs/0/n"], "path": "xs[0].n", "value": 1}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/4/xs/1/n"], "path": "xs[1].n", "value": 1}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/4/xs/2/n"], "path": "xs[2].n", "value": 3}], "inputs": [{"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}, {"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "item 1 of xs: item 1 of $x.z is \"a\", which isn't a number; item 2 of xs: item 1 of $x.z is \"a\", which isn't a number; item 3 of xs: item 1 of $x.z is \"a\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
+          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/4/xs/0/n"], "path": "xs[0].n", "value": 1}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/4/xs/1/n"], "path": "xs[1].n", "value": 1}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/4/xs/2/n"], "path": "xs[2].n", "value": 3}], "inputs": [{"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}, {"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
           {"cause": "satisfied", "check": "every_whose", "failed_items": [], "inputs": [{"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}, {"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": true, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
           {"cause": "satisfied", "check": "sum_whose", "inputs": [{"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": 2}, {"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}], "passed": true, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}}
         ],
@@ -2041,7 +2015,6 @@
                 "value": null
               }
             ],
-            "message": "pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2085,7 +2058,6 @@
                 "value": null
               }
             ],
-            "message": "pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2129,7 +2101,6 @@
                 "value": null
               }
             ],
-            "message": "pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2173,7 +2144,6 @@
                 "value": null
               }
             ],
-            "message": "pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2221,7 +2191,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: $pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2513,7 +2482,6 @@
                 "value": null
               }
             ],
-            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2557,7 +2525,6 @@
                 "value": null
               }
             ],
-            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2601,7 +2568,6 @@
                 "value": null
               }
             ],
-            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2645,7 +2611,6 @@
                 "value": null
               }
             ],
-            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2689,7 +2654,6 @@
                 "value": null
               }
             ],
-            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2993,7 +2957,6 @@
                 ]
               }
             ],
-            "message": "fam.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3036,7 +2999,6 @@
                 ]
               }
             ],
-            "message": "fam.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3079,7 +3041,6 @@
                 ]
               }
             ],
-            "message": "fam.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3313,7 +3274,6 @@
                 "value": null
               }
             ],
-            "message": "fam.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3356,7 +3316,6 @@
                 ]
               }
             ],
-            "message": "fam.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3399,7 +3358,6 @@
                 ]
               }
             ],
-            "message": "fam.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3690,7 +3648,6 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: x.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3730,7 +3687,6 @@
                 ]
               }
             ],
-            "message": "item 1 of items: $input.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3899,7 +3855,6 @@
                 ]
               }
             ],
-            "message": "items is [{\"hi\": 1, \"lo\": 5, \"status\": \"ok\", \"w\": 1}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4061,7 +4016,6 @@
                 ]
               }
             ],
-            "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4105,7 +4059,6 @@
                 ]
               }
             ],
-            "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4149,7 +4102,6 @@
                 ]
               }
             ],
-            "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4343,8 +4295,8 @@
         "rules": ["parts.where", "sentence.subject.chain", "sentence.path.start", "sentence.derived.count", "sentence.whose.item", "tally.walk"],
         "input": {"fams": [{"id": "F", "kids": [{"id": "K", "items": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0"], "name": "fam.z", "value": null}], "message": "fam.z is missing", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
-          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0"], "name": "fam.z", "value": null}], "message": "fam.z is missing", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0"], "name": "fam.z", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0"], "name": "fam.z", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of .fam.z", "value": 2}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose count of fam.z is 1", "value": 3}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}}
         ]
@@ -4354,8 +4306,8 @@
         "rules": ["parts.where", "sentence.subject.chain", "sentence.path.start", "sentence.derived.count", "sentence.whose.item", "tally.walk"],
         "input": {"fams": [{"id": "F", "kids": [{"id": "K", "items": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "z": null}]},
         "results": [
-          {"cause": "null", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": null}], "message": "fam.z is null", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
-          {"cause": "null", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": null}], "message": "fam.z is null", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of .fam.z", "value": 2}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose count of fam.z is 1", "value": 3}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}}
         ]
@@ -4365,8 +4317,8 @@
         "rules": ["parts.where", "sentence.subject.chain", "sentence.path.start", "sentence.derived.count", "sentence.whose.item", "tally.walk"],
         "input": {"fams": [{"id": "F", "kids": [{"id": "K", "items": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "z": "ab"}]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": "ab"}], "message": "fam.z is \"ab\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
-          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": "ab"}], "message": "fam.z is \"ab\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": "ab"}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": "ab"}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of .fam.z", "value": 2}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose count of fam.z is 1", "value": 3}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}}
         ]
@@ -4448,7 +4400,6 @@
                 ]
               }
             ],
-            "message": "checks.c: cov can't be an alias: it's a part of round",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4531,7 +4482,6 @@
                 ]
               }
             ],
-            "message": "checks.c: named by cov reads a part, which isn't supported yet",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4669,7 +4619,6 @@
                 ]
               }
             ],
-            "message": "cov.x is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4793,7 +4742,6 @@
                 ]
               }
             ],
-            "message": "subjects.\"good round\".has.cov: cov can't be an alias: it's a part of round",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4921,7 +4869,6 @@
                 ]
               }
             ],
-            "message": "pra is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4996,7 +4943,6 @@
                 ]
               }
             ],
-            "message": "pra is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5023,7 +4969,6 @@
                 ]
               }
             ],
-            "message": "rev.count is 1",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5147,7 +5092,6 @@
                 ]
               }
             ],
-            "message": "subjects.\"pull request\".has.artifact: artifact can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5450,7 +5394,6 @@
                 ]
               }
             ],
-            "message": "subjects.round.has.\"with space\": invalid alias; subjects.round.has.$dollar: a name can't start with $; subjects.round.has.bare_by: from: unknown alias foo; subjects.round.has.blank: from: doesn't parse; subjects.round.has.each_of: from: a part is a path: whose and named by each of can't go in it; subjects.round.has.every: invalid alias; subjects.round.has.extra: unknown field other; subjects.round.has.fromnum: invalid from; subjects.round.has.idbad: identified_by: a part is a path: whose and named by each of can't go in it; subjects.round.has.idnum: invalid identified_by; subjects.round.has.in_input: from: a part reads inside its subject, so it can't start at $params or $input; subjects.round.has.in_params: from: a part reads inside its subject, so it can't start at $params or $input; subjects.round.has.nofrom: missing from; subjects.round.has.num: not a string or an object; subjects.round.has.who: from: a part is a path: whose and named by each of can't go in it",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5472,7 +5415,7 @@
         "input": {"things": [{"id": "a", "x": 1}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 5}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"$x y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\\"y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\ty\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$a-b", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$x", "value": ["a name can't start with $"]}], "message": "checks.\"$x y\": a name can't start with $; checks.\"$x\\\"y\": a name can't start with $; checks.\"$x\\ty\": a name can't start with $; checks.$a-b: a name can't start with $; checks.$x: a name can't start with $", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 5}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"$x y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\\"y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\ty\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$a-b", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$x", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -5487,7 +5430,7 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 27}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"0x\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x&y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x'y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x.y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x/y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x<y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x>y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\\"y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\\\y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\by\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\fy\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\ny\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\ty\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\u0001y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"xy\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x​y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x😀\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"é\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"éx\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.A", "value": ["invalid check"]}, {"locations": [], "name": "checks.a-b", "value": ["invalid check"]}, {"locations": [], "name": "checks.a1", "value": ["invalid check"]}, {"locations": [], "name": "checks.x", "value": ["invalid check"]}], "message": "checks.\"0x\": invalid check; checks.\"x y\": invalid check; checks.\"x&y\": invalid check; checks.\"x'y\": invalid check; checks.\"x.y\": invalid check; checks.\"x/y\": invalid check; checks.\"x<y\": invalid check; checks.\"x>y\": invalid check; checks.\"x\\\"y\": invalid check; checks.\"x\\\\y\": invalid check; checks.\"x\\by\": invalid check; checks.\"x\\fy\": invalid check; checks.\"x\\ny\": invalid check; checks.\"x\\ty\": invalid check; checks.\"x\\u0001y\": invalid check; checks.\"xy\": invalid check; checks.\"x y\": invalid check; checks.\"x​y\": invalid check; checks.\"x y\": invalid check; checks.\"x y\": invalid check; checks.\"x😀\": invalid check; checks.\"é\": invalid check; checks.\"éx\": invalid check; checks.A: invalid check; checks.a-b: invalid check; checks.a1: invalid check; checks.x: invalid check", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 27}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"0x\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x&y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x'y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x.y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x/y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x<y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x>y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\\"y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\\\y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\by\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\fy\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\ny\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\ty\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\u0001y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"xy\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x​y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x😀\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"é\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"éx\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.A", "value": ["invalid check"]}, {"locations": [], "name": "checks.a-b", "value": ["invalid check"]}, {"locations": [], "name": "checks.a1", "value": ["invalid check"]}, {"locations": [], "name": "checks.x", "value": ["invalid check"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -5502,7 +5445,7 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"0x\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x&y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x'y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x.y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x/y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x<y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x>y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\\"y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\\\y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\by\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\fy\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\ny\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\ty\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\u0001y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"xy\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x​y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x😀\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"é\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"éx\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.A", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.a-b", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.a1", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.x", "value": ["not a string or an object"]}], "message": "subjects.s.has.\"0x\": invalid alias; subjects.s.has.\"0x\": not a string or an object; subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x y\": not a string or an object; subjects.s.has.\"x&y\": invalid alias; subjects.s.has.\"x&y\": not a string or an object; subjects.s.has.\"x'y\": invalid alias; subjects.s.has.\"x'y\": not a string or an object; subjects.s.has.\"x.y\": invalid alias; subjects.s.has.\"x.y\": not a string or an object; subjects.s.has.\"x/y\": invalid alias; subjects.s.has.\"x/y\": not a string or an object; subjects.s.has.\"x<y\": invalid alias; subjects.s.has.\"x<y\": not a string or an object; subjects.s.has.\"x>y\": invalid alias; subjects.s.has.\"x>y\": not a string or an object; subjects.s.has.\"x\\\"y\": invalid alias; subjects.s.has.\"x\\\"y\": not a string or an object; subjects.s.has.\"x\\\\y\": invalid alias; subjects.s.has.\"x\\\\y\": not a string or an object; subjects.s.has.\"x\\by\": invalid alias; subjects.s.has.\"x\\by\": not a string or an object; subjects.s.has.\"x\\fy\": invalid alias; subjects.s.has.\"x\\fy\": not a string or an object; subjects.s.has.\"x\\ny\": invalid alias; subjects.s.has.\"x\\ny\": not a string or an object; subjects.s.has.\"x\\ty\": invalid alias; subjects.s.has.\"x\\ty\": not a string or an object; subjects.s.has.\"x\\u0001y\": invalid alias; subjects.s.has.\"x\\u0001y\": not a string or an object; subjects.s.has.\"xy\": invalid alias; subjects.s.has.\"xy\": not a string or an object; subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x y\": not a string or an object; subjects.s.has.\"x​y\": invalid alias; subjects.s.has.\"x​y\": not a string or an object; subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x y\": not a string or an object; subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x y\": not a string or an object; subjects.s.has.\"x😀\": invalid alias; subjects.s.has.\"x😀\": not a string or an object; subjects.s.has.\"é\": invalid alias; subjects.s.has.\"é\": not a string or an object; subjects.s.has.\"éx\": invalid alias; subjects.s.has.\"éx\": not a string or an object; subjects.s.has.A: not a string or an object; subjects.s.has.a-b: not a string or an object; subjects.s.has.a1: not a string or an object; subjects.s.has.x: not a string or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"0x\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x&y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x'y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x.y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x/y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x<y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x>y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\\"y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\\\y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\by\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\fy\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\ny\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\ty\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\u0001y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"xy\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x​y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x😀\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"é\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"éx\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.A", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.a-b", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.a1", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.x", "value": ["not a string or an object"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -5517,7 +5460,7 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": ["neither every nor some"]}, {"locations": [], "name": "\"0x\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x&y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x'y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x.y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x/y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x<y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x>y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\\"y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\\\y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\by\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\fy\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\ny\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\ty\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\u0001y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"xy\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x​y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x😀\"", "value": ["unknown field"]}, {"locations": [], "name": "\"é\"", "value": ["unknown field"]}, {"locations": [], "name": "\"éx\"", "value": ["unknown field"]}, {"locations": [], "name": "A", "value": ["unknown field"]}, {"locations": [], "name": "a-b", "value": ["unknown field"]}, {"locations": [], "name": "a1", "value": ["unknown field"]}, {"locations": [], "name": "x", "value": ["unknown field"]}], "message": "require: neither every nor some; \"0x\": unknown field; \"x y\": unknown field; \"x&y\": unknown field; \"x'y\": unknown field; \"x.y\": unknown field; \"x/y\": unknown field; \"x<y\": unknown field; \"x>y\": unknown field; \"x\\\"y\": unknown field; \"x\\\\y\": unknown field; \"x\\by\": unknown field; \"x\\fy\": unknown field; \"x\\ny\": unknown field; \"x\\ty\": unknown field; \"x\\u0001y\": unknown field; \"xy\": unknown field; \"x y\": unknown field; \"x​y\": unknown field; \"x y\": unknown field; \"x y\": unknown field; \"x😀\": unknown field; \"é\": unknown field; \"éx\": unknown field; A: unknown field; a-b: unknown field; a1: unknown field; x: unknown field", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": ["neither every nor some"]}, {"locations": [], "name": "\"0x\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x&y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x'y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x.y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x/y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x<y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x>y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\\"y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\\\y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\by\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\fy\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\ny\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\ty\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\u0001y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"xy\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x​y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x😀\"", "value": ["unknown field"]}, {"locations": [], "name": "\"é\"", "value": ["unknown field"]}, {"locations": [], "name": "\"éx\"", "value": ["unknown field"]}, {"locations": [], "name": "A", "value": ["unknown field"]}, {"locations": [], "name": "a-b", "value": ["unknown field"]}, {"locations": [], "name": "a1", "value": ["unknown field"]}, {"locations": [], "name": "x", "value": ["unknown field"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -5532,7 +5475,7 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.\"0x\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x&y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x'y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x.y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x/y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x<y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x>y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\\"y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\\\y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\by\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\fy\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\ny\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\ty\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\u0001y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"xy\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x​y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x😀\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"é\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"éx\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.A", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.a-b", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.a1", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.x", "value": ["unknown field"]}], "message": "subjects.s.\"0x\": unknown field; subjects.s.\"x y\": unknown field; subjects.s.\"x&y\": unknown field; subjects.s.\"x'y\": unknown field; subjects.s.\"x.y\": unknown field; subjects.s.\"x/y\": unknown field; subjects.s.\"x<y\": unknown field; subjects.s.\"x>y\": unknown field; subjects.s.\"x\\\"y\": unknown field; subjects.s.\"x\\\\y\": unknown field; subjects.s.\"x\\by\": unknown field; subjects.s.\"x\\fy\": unknown field; subjects.s.\"x\\ny\": unknown field; subjects.s.\"x\\ty\": unknown field; subjects.s.\"x\\u0001y\": unknown field; subjects.s.\"xy\": unknown field; subjects.s.\"x y\": unknown field; subjects.s.\"x​y\": unknown field; subjects.s.\"x y\": unknown field; subjects.s.\"x y\": unknown field; subjects.s.\"x😀\": unknown field; subjects.s.\"é\": unknown field; subjects.s.\"éx\": unknown field; subjects.s.A: unknown field; subjects.s.a-b: unknown field; subjects.s.a1: unknown field; subjects.s.x: unknown field", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.\"0x\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x&y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x'y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x.y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x/y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x<y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x>y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\\"y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\\\y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\by\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\fy\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\ny\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\ty\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\u0001y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"xy\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x​y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x😀\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"é\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"éx\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.A", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.a-b", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.a1", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.x", "value": ["unknown field"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -5547,7 +5490,7 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "a", "value": ["unknown field"]}, {"locations": [], "name": "zz", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.zq", "value": ["unknown field"]}], "message": "\"x y\": unknown field; a: unknown field; zz: unknown field; subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x y\": not a string or an object; subjects.s.zq: unknown field", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "a", "value": ["unknown field"]}, {"locations": [], "name": "zz", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.zq", "value": ["unknown field"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -5562,7 +5505,7 @@
         "input": {"things": [{"id": "a", "x": 1}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\\"y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\ty\"", "value": ["invalid alias"]}], "message": "subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x\\\"y\": invalid alias; subjects.s.has.\"x\\ty\": invalid alias", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\\"y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\ty\"", "value": ["invalid alias"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -5639,7 +5582,6 @@
                 ]
               }
             ],
-            "message": "subjects.round.has: not an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5845,7 +5787,6 @@
                 ]
               }
             ],
-            "message": "item 3 of pull_requests: item 1 of reviews: state is \"bad\"",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6045,7 +5986,6 @@
                 ]
               }
             ],
-            "message": ".att.id is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6391,7 +6331,6 @@
                 ]
               }
             ],
-            "message": "item 1 of lst: entry.x is 1, and cov.x is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6527,7 +6466,6 @@
                 ]
               }
             ],
-            "message": "checks.c: b can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6644,7 +6582,6 @@
                 ]
               }
             ],
-            "message": "checks.c: kid can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6765,7 +6702,6 @@
                 ]
               }
             ],
-            "message": "checks.c: other can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6882,7 +6818,6 @@
                 ]
               }
             ],
-            "message": "checks.c: x can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7009,7 +6944,6 @@
                 ]
               }
             ],
-            "message": "subjects.b.has.b: b can't be an alias: it's a subject's name; checks.c: b can't be an alias: it's a part of b; checks.c: b can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7259,7 +7193,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.has.kid: kid can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7357,7 +7290,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.has.other: other can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7451,7 +7383,6 @@
                 ]
               }
             ],
-            "message": "subjects.kid.has.x: x can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7560,7 +7491,6 @@
                 ]
               }
             ],
-            "message": "checks.c: cap can't be an alias: it's a part of gp",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7677,7 +7607,6 @@
                 ]
               }
             ],
-            "message": "checks.c: x can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7794,7 +7723,6 @@
                 ]
               }
             ],
-            "message": "checks.c: b can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7914,7 +7842,6 @@
                 ]
               }
             ],
-            "message": "checks.c: part can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8034,7 +7961,6 @@
                 ]
               }
             ],
-            "message": "checks.c: part can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8314,7 +8240,6 @@
                 ]
               }
             ],
-            "message": "checks.c: pull can't be an alias: it's a part of \"pull request\"",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8422,7 +8347,6 @@
                 ]
               }
             ],
-            "message": "subjects.leaf.has.cap: cap can't be an alias: it's a part of gp",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8541,7 +8465,6 @@
                 ]
               }
             ],
-            "message": "subjects.n.has.x: x can't be an alias: it's a part of base",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8635,7 +8558,6 @@
                 "locations": []
               }
             ],
-            "message": "subjects.m.has.x: x can't be an alias: it's a part of base; subjects.n.has.x: x can't be an alias: it's a part of base; subjects.n.has.x: x can't be an alias: it's a part of m",
             "passed": false,
             "requirement": "r",
             "subject": {
