@@ -11249,3 +11249,13 @@ test_message_names_an_item_by_the_part_of_the_subject_it_goes_through if {
 	ergo._m_off_item_path(["xs", marker])
 	not ergo._m_off_item_path(["xs", "z"])
 }
+
+test_message_of_a_check_with_no_value_to_show_repeats_its_expression if {
+	check := {"$sides": [], "op": "present", "path": ["x"], "expression": "x exists"}
+	ergo._m_message(check, {"x": 1}, "value") == "x exists is false"
+}
+
+test_message_kind_of_a_side_read_against_a_written_value_on_the_left if {
+	check := {"op": "compare", "cmp": "eq", "left": {"literal": "a"}, "right": ["x"]}
+	ergo._m_side_kind({}, check, ["x"]) == "text"
+}
