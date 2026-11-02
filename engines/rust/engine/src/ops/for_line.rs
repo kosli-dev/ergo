@@ -907,7 +907,14 @@ impl For {
                         .iter()
                         .filter_map(|c| self.child_text(c))
                         .collect();
-                    parts.extend(nested.dead.iter().map(|d| self.dead_text(d)));
+                    let second = self.shared_second();
+                    parts.extend(
+                        nested
+                            .dead
+                            .iter()
+                            .filter(|d| !(second && d.shared))
+                            .map(|d| self.dead_text(d)),
+                    );
                     (
                         Some(Outcome {
                             bare: false,
@@ -1316,7 +1323,11 @@ impl For {
         } else {
             "a list or an object"
         };
-        super::message::stated(&self.strip(&dead.name), dead.cause, &dead.value, kind)
+        let mut name = dead.name.clone();
+        for item in &self.items {
+            name = name.replace(&format!(" of {}.", item.alias), " of ");
+        }
+        super::message::stated(&name, dead.cause, &dead.value, kind)
     }
 
     fn child_text(&self, child: &Child) -> Option<String> {
