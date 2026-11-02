@@ -10305,9 +10305,11 @@ _m_fail_parts(cause, fails, roots) := [_m_fail(f, roots) |
 	f.path == p
 ] if cause != "satisfied"
 
-_m_joined(ms) := concat("; ", ms) if count(ms) <= 3
+_m_joined(all) := _m_joined_once(_once(all))
 
-_m_joined(ms) := concat("; ", array.concat(array.slice(ms, 0, 3), [concat("", ["and ", _literal_text(count(ms) - 3), " more"])])) if count(ms) > 3
+_m_joined_once(ms) := concat("; ", ms) if count(ms) <= 3
+
+_m_joined_once(ms) := concat("; ", array.concat(array.slice(ms, 0, 3), [concat("", ["and ", _literal_text(count(ms) - 3), " more"])])) if count(ms) > 3
 
 _m_tallies(subj, check, cause) := [c |
 	some side in _m_sides(check)
@@ -10353,8 +10355,16 @@ _m_undecided_text(subj, c, e, cause) := concat(", and ", off) if {
 	off != []
 } else := _m_leaf(e.i, _m_cond_message(c, e.iv, cause))
 
+_m_off_path(p) if _subject_part(p)
+
+_m_off_path(p) if {
+	_starts_at_name(p)
+	not _part_start(p)
+}
+
 _m_off_item(subj, c, "unusable") := _once([_m_isnt(_input_name(shown), v, "a list or an object") |
-	some side in {x | walk(c, [_, x]); _basic_form(x) in {"count_of", "sum_of"}; _subject_part(x[_basic_form(x)])}
+	some side in _m_tally_sides(c)
+	_m_off_path(side[_basic_form(side)])
 	shown := _as_subject_part(side[_basic_form(side)])
 	v := _value_at(subj, shown)
 	not is_array(v)
@@ -10363,7 +10373,7 @@ _m_off_item(subj, c, "unusable") := _once([_m_isnt(_input_name(shown), v, "a lis
 ])
 
 _m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ", _m_state_word(cause)]) |
-	some p in sort({x | walk(c, [_, x]); _subject_part(x)})
+	some p in sort({x | walk(c, [_, x]); _m_off_path(x)})
 	shown := _as_subject_part(p)
 	i := min({j | some j in numbers.range(1, count(shown)); _read_state(subj, array.slice(shown, 0, j)) == cause})
 	shown_at := array.slice(shown, 0, i)
@@ -10371,13 +10381,32 @@ _m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ",
 
 _m_cond_message(c, item, cause) := concat(", and ", cs) if {
 	cause in {"absent", "null"}
-	cs := array.concat(_m_key_states(item, c, cause), [concat("", [s.name, " is ", _m_state_word(cause)]) | some s in _m_sources(item, c); s.state == cause])
+	cs := _once(array.concat(array.concat(_m_key_states(item, c, cause), [concat("", [s.name, " is ", _m_state_word(cause)]) | some s in _m_sources(item, c); s.state == cause]), _m_item_tallies(item, c, cause)))
 	cs != []
 } else := concat(", and ", cs) if {
 	cause == "unusable"
-	cs := _once(array.concat(array.concat(_m_key_faults(item, c), _m_blocked(item, c)), _m_faults(item, c)))
+	cs := _once(array.concat(array.concat(array.concat(_m_key_faults(item, c), _m_blocked(item, c)), _m_faults(item, c)), _m_item_tallies(item, c, cause)))
 	cs != []
 } else := _m_fallback(c)
+
+_m_item_tallies(item, c, "unusable") := [_m_isnt(_input_name(p), v, "a list or an object") |
+	some side in _m_tally_sides(c)
+	p := side[_basic_form(side)]
+	not _m_off_path(p)
+	v := _value_at(item, p)
+	not is_array(v)
+	not is_object(v)
+	v != null
+]
+
+_m_item_tallies(item, c, cause) := [concat("", [_input_name(array.slice(p, 0, i)), " is ", _m_state_word(cause)]) |
+	some side in _m_tally_sides(c)
+	p := side[_basic_form(side)]
+	not _m_off_path(p)
+	i := min({j | some j in numbers.range(1, count(p)); _read_state(item, array.slice(p, 0, j)) == cause})
+] if cause in {"absent", "null"}
+
+_m_tally_sides(c) := sort({y | walk(c, [_, y]); _basic_form(y) in {"count_of", "sum_of"}})
 
 _m_tally_item(_, e) := [["not_an_object", _m_isnt(_m_item_name(e.i, set()), e.iv, "an object")]] if {
 	e.v == _absent
@@ -10518,7 +10547,7 @@ _m_listed(names) := concat("", ["item ", concat(" and item ", [m[1] | some m in 
 
 _m_walk_leaf(e, leaf, cause) := concat(", and ", off) if {
 	leaf != null
-	off := _m_off_item(input["ergo/names"]["ergo/subject"], leaf, cause)
+	off := _m_off_item(object.get(input, ["ergo/names", "ergo/subject"], null), leaf, cause)
 	off != []
 } else := _m_leaf(e.i, _message(leaf, e.iv, cause)) if leaf != null
 
