@@ -247,6 +247,7 @@ On this `input.json`:
     "description": "",
     "expression": "approved_by is not empty",
     "inputs": [{ "name": "approved_by", "value": "", "locations": ["/deployments/1/approved_by"] }],
+    "message": "approved_by is \"\"",
     "requirement": "approved_deploy",
     "subject": { "id": "d-2", "type": "deployment" }
   }

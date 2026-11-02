@@ -176,7 +176,7 @@
         ],
         "refs": {"s": {"c": [{"locations": ["$params:/allowed"], "name": "$params.allowed", "value": ["p", "q"]}]}},
         "violations": [
-          {"cause": "value", "check": "c", "description": "", "expression": "x is in $params.allowed", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "z"}, {"locations": ["$params:/allowed"], "name": "$params.allowed", "value": ["p", "q"]}], "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "value", "check": "c", "description": "", "expression": "x is in $params.allowed", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "z"}, {"locations": ["$params:/allowed"], "name": "$params.allowed", "value": ["p", "q"]}], "message": "x is \"z\", and $params.allowed is [\"p\", \"q\"]", "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]

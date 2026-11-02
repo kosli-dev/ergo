@@ -2339,6 +2339,12 @@ test_violations_keep_the_failing_rows_of_a_requirement_whose_status_is_not_met_m
 	kept == [1, 1, 1, 1, 1]
 }
 
+test_a_violation_keeps_its_row_message_and_a_row_without_one_is_still_a_violation if {
+	with_message := object.union(failing_row, {"message": "x is 4"})
+	vs := ergo.violations({"requirements": {"s": {}}, "results": [with_message, failing_row]})
+	[object.get(v, "message", "none") | some v in vs] == ["x is 4", "none"]
+}
+
 test_violations_drop_the_failing_rows_of_a_requirement_that_is_met_or_not_applicable if {
 	kept := [count(ergo.violations({"requirements": {"s": {"status": s}}, "results": [failing_row]})) |
 		some s in ["met", "not_applicable"]
@@ -2469,7 +2475,7 @@ test_violation_entry_carries_exactly_the_documented_keys if {
 	rep := report({"items": [{"id": "a"}]}, violating_req)
 	count(ergo.violations(rep)) == 2
 	every v in ergo.violations(rep) {
-		object.keys(v) == {"requirement", "subject", "check", "description", "expression", "inputs", "cause"}
+		object.keys(v) == {"requirement", "subject", "check", "description", "expression", "inputs", "cause", "message"}
 	}
 }
 
@@ -2483,6 +2489,7 @@ test_violations_join_the_definition_onto_the_row if {
 		"expression": "reviewed is true",
 		"inputs": [{"name": "reviewed", "value": null, "locations": ["/items/0"]}],
 		"cause": "absent",
+		"message": "reviewed is missing",
 	}]
 }
 
@@ -11003,6 +11010,7 @@ test_a_policy_with_no_requirements_has_a_violation_for_the_row_that_says_so if {
 		"expression": "count(problems) == 0",
 		"inputs": [{"name": "requirements", "value": ["missing"], "locations": []}],
 		"cause": "value",
+		"message": "requirements: missing",
 	}]
 }
 
