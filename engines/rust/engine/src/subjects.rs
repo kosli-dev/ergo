@@ -358,6 +358,32 @@ fn read_entries<'a>(
     }
 }
 
+fn from_message(
+    env: &Env,
+    empty: &Value,
+    lowered: &Lowered,
+    anc: &[Anc],
+    cause: Cause,
+) -> Option<String> {
+    let (Source::Root { path, .. } | Source::Child { path, .. }) = &lowered.source;
+    let ctx = context(env, input_root(env), anc);
+    let name = crate::name::name(path);
+    let read = path::read(path, &ctx);
+    let _ = empty;
+    match cause {
+        Cause::Absent => Some(format!("{name} is missing")),
+        Cause::Null => Some(format!("{name} is null")),
+        Cause::Unusable => {
+            let value = read.value?;
+            if value.is_object() || value.is_array() {
+                return None;
+            }
+            Some(crate::ops::message::isnt(&name, value, "a list or an object"))
+        }
+        _ => None,
+    }
+}
+
 fn order_rank(value: &Value) -> u8 {
     match value {
         Value::Null => 0,
@@ -646,6 +672,11 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
         Read::Entries { entries, broken } => (entries, broken),
         Read::Failed(cause) => {
             let mut level = failed_level(env, anc, cause, true);
+            if let Some(said) = from_message(env, empty, lowered, anc, cause) {
+                for row in &mut level.min_subjects {
+                    row.message = Some(said.clone());
+                }
+            }
             if matches!(&lowered.source, Source::Root { every: true, .. }) {
                 for row in &mut level.min_subjects {
                     row.failed_items = Some(Value::Array(Vec::new()));

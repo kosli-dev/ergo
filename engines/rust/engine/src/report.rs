@@ -120,13 +120,17 @@ pub fn min_subjects_row(
     };
     let mut inputs = vec![input(&label, json!(count), locations)];
     inputs.extend(extra_inputs);
-    row_of(
+    let mut row = row_of(
         requirement_name,
         requirement,
         "$min_subjects",
         cause,
         inputs,
-    )
+    );
+    if cause != Cause::Satisfied {
+        row.message = Some(crate::ops::message::is(&label, &json!(count)));
+    }
+    row
 }
 
 pub fn unique_ids_row(
@@ -141,13 +145,18 @@ pub fn unique_ids_row(
     } else {
         Cause::Value
     };
-    row_of(
+    let shown = Value::Array(repeated);
+    let mut row = row_of(
         requirement_name,
         requirement,
         "$unique_ids",
         cause,
-        vec![input(&label, Value::Array(repeated), locations)],
-    )
+        vec![input(&label, shown.clone(), locations)],
+    );
+    if cause != Cause::Satisfied {
+        row.message = Some(crate::ops::message::is(&label, &shown));
+    }
+    row
 }
 
 pub fn unreadable_params(params: &Value) -> Vec<Value> {
