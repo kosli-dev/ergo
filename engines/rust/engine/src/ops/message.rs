@@ -749,3 +749,23 @@ pub fn flawed_text(checks: &[&Check], ctx: &Ctx) -> Option<String> {
     }
     (!out.is_empty()).then(|| out.join(", and "))
 }
+
+pub fn read_names(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
+    let mut names = match check {
+        Check::Walk(walk) => {
+            let mut out = vec![name::name(&walk.path)];
+            out.extend(walk.refs().iter().map(name::name));
+            out
+        }
+        Check::For(_) | Check::AnyOf(_) => verdict.inputs.iter().map(|i| i.name.clone()).collect(),
+        _ => {
+            let mut out = shown_names(check, ctx, verdict);
+            for path in side_paths(check) {
+                out.extend(key_steps(path).map(name::name));
+            }
+            out
+        }
+    };
+    names.dedup();
+    names
+}

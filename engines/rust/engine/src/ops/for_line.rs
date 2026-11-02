@@ -744,6 +744,7 @@ fn sort_failure(found: &Live, cause: Cause, value: Value, location: Option<Locat
 }
 
 struct Sfail {
+    names: Vec<String>,
     own: bool,
     text: String,
     idx: usize,
@@ -991,10 +992,12 @@ impl For {
                     .last()
                     .map(|i| i.alias.as_str())
                     .unwrap_or_default();
-                let own = super::message::shown_names(&sentence.check, ctx, &verdict)
+                let names = super::message::read_names(&sentence.check, ctx, &verdict);
+                let own = names
                     .iter()
                     .all(|name| name == alias || name.starts_with(&format!("{alias}.")));
                 sfails.push(Sfail {
+                    names,
                     own,
                     text: super::message::message(&sentence.check, ctx, &verdict),
                     idx,
@@ -1031,8 +1034,9 @@ impl For {
                     .last()
                     .map(|i| i.alias.as_str())
                     .unwrap_or_default();
-                let (said, bare) = match said.strip_prefix(&format!("{alias} ")) {
-                    Some(rest) if all_own => (format!(" {rest}"), true),
+                let only_alias = sfails.len() == 1 && sfails[0].names == [alias.to_string()];
+                let (said, bare) = match said.strip_prefix(&format!("{alias} is ")) {
+                    Some(rest) if all_own && only_alias => (format!(" is {rest}"), true),
                     _ => (said, false),
                 };
                 (
