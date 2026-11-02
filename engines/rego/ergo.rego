@@ -8529,7 +8529,11 @@ _walk_cause(check, w, judged, fails) := _walk_verdict(check.op, check.if_any == 
 
 _walk_stop(w) := [] if w.walked != set()
 
-_walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v), "at": _walk_at(w, e), "msg": "a list or an object"} | e := _walk_stopped_at(w.trail)] if w.walked == set()
+_walk_stop(w) := [{"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v), "at": _walk_at(w, e), "msg": _m_walk_kind(e.v)} | e := _walk_stopped_at(w.trail)] if w.walked == set()
+
+_m_walk_kind(v) := "a list" if is_object(v)
+
+else := "a list or an object"
 
 _walk_stopped_at(trail) := [e | some e in trail; not _walk_container(e.v)][0] if {
 	some e in trail
@@ -9759,6 +9763,8 @@ _m_value_clauses(subj, side) := [c] if {
 	c := _m_value_clause(s)
 } else := [c | some p in [side.elapsed_from, side.elapsed_to]; c := _m_value_clause(_m_shown(subj, p))] if _side_form(side) == "elapsed"
 
+else := [c | some e in sort({x | walk(side, [_, x]); _side_form(x) == "elapsed"}); some p in [e.elapsed_from, e.elapsed_to]; c := _m_value_clause(_m_shown(subj, p))] if _side_form(side) == "add"
+
 else := []
 
 _m_value_clause(s) := _m_is(s.name, s.value) if s.state == "value"
@@ -10223,15 +10229,17 @@ _walk_parts(check, _, raw, r) := [concat("", [_path_name(check.path), " is ", _m
 _walk_parts(check, subj, raw, r) := fs if {
 	r.failed == []
 	raw.cause == "unusable"
-	fs := _m_key_faults(subj, check)
+	fs := _m_walk_faults(subj, check)
 	fs != []
 }
 
 _walk_parts(check, subj, raw, r) := [_m_fallback(check)] if {
 	r.failed == []
 	raw.cause == "unusable"
-	_m_key_faults(subj, check) == []
+	_m_walk_faults(subj, check) == []
 }
+
+_m_walk_faults(subj, check) := _once(array.concat(array.concat(_m_key_faults(subj, check), [f | some c in object.get(check, "whose", []); some f in _m_ref_faults_text(c)]), [f | is_object(object.get(check, "check", null)); some f in _m_ref_faults_text(check.check)]))
 
 _walk_parts(check, subj, raw, r) := fs if {
 	r.failed == []
@@ -10250,7 +10258,7 @@ _m_named_fail(f) := _m_is(f.path, f.value) if f.cause == "value"
 
 _m_named_fail(f) := concat("", [f.path, " is ", _m_state_word(f.cause)]) if f.cause in {"absent", "null"}
 
-_m_named_fail(f) := _m_isnt(f.path, f.value, "a list or an object") if f.cause == "unusable"
+_m_named_fail(f) := _m_isnt(f.path, f.value, _m_walk_kind(f.value)) if f.cause == "unusable"
 
 _m_undecided("missing") := "absent"
 
@@ -10300,7 +10308,7 @@ _m_fail(f, roots) := concat("", [_m_item_name(f.path, roots), " is ", _m_state_w
 	object.get(f, "msg", "") in {"", "a list", "a list or an object"}
 }
 
-_m_fail(f, roots) := _m_isnt(_m_item_name(f.path, roots), object.get(f, "raw", f.value), object.get(f, "msg", "a list or an object")) if {
+_m_fail(f, roots) := _m_isnt(_m_item_name(f.path, roots), object.get(f, "raw", f.value), object.get(f, "msg", _m_walk_kind(object.get(f, "raw", f.value)))) if {
 	f.cause == "unusable"
 	object.get(f, "msg", "") in {"a list", "a list or an object"}
 }
@@ -10370,13 +10378,12 @@ _m_off_path(p) if {
 	not _part_start(p)
 }
 
-_m_off_item(subj, c, "unusable") := _once([_m_isnt(_input_name(shown), v, "a list or an object") |
+_m_off_item(subj, c, "unusable") := _once([_m_isnt(_input_name(shown), v, "a list") |
 	some side in _m_tally_sides(c)
 	_m_off_path(side[_basic_form(side)])
 	shown := _as_subject_part(side[_basic_form(side)])
 	v := _value_at(subj, shown)
 	not is_array(v)
-	not is_object(v)
 	v != null
 ])
 
@@ -10397,13 +10404,12 @@ _m_cond_message(c, item, cause) := concat(", and ", cs) if {
 	cs != []
 } else := _m_fallback(c)
 
-_m_item_tallies(item, c, "unusable") := [_m_isnt(_input_name(p), v, "a list or an object") |
+_m_item_tallies(item, c, "unusable") := [_m_isnt(_input_name(p), v, "a list") |
 	some side in _m_tally_sides(c)
 	p := side[_basic_form(side)]
 	not _m_off_path(p)
 	v := _value_at(item, p)
 	not is_array(v)
-	not is_object(v)
 	v != null
 ]
 
@@ -10497,12 +10503,19 @@ _m_for_empty(check, subj, cause) := cs if {
 	cs != []
 } else := cs if {
 	cause == "unusable"
-	cs := _once([c | some item in check.items; some c in array.concat(_m_key_faults(subj, _m_for_item(item)), _m_ref_list_fault(subj, _m_for_item(item)))])
+	cs := _once([c | some item in check.items; some c in array.concat(_m_key_faults(subj, _m_for_item(item)), _m_whose_ref_faults(item))])
 	cs != []
 } else := cs if {
 	cs := _once([c | some item in check.items; some c in _m_list_found(subj, item.path)])
 	cs != []
 } else := [_m_fallback(check)]
+
+_m_whose_ref_faults(item) := [_m_isnt(_ref_name(f[0].ref), _ref_shown(f[0].ref), f[1]) |
+	some c in object.get(item, "whose", [])
+	some f in _m_ref_list_fault(null, c)
+]
+
+_m_ref_faults_text(check) := [_m_isnt(_ref_name(f[0].ref), _ref_shown(f[0].ref), f[1]) | some f in _m_ref_list_fault(null, check)]
 
 _m_for_item(item) := {"op": "present", "path": item.path, "whose": object.get(item, "whose", [])}
 
@@ -10567,7 +10580,7 @@ _m_named_item(f) := concat("", [f.item, " is ", _m_state_word(f.cause)]) if f.ca
 
 _m_named_item(f) := _m_isnt(f.item, f.value, "an object") if f.cause == "not_an_object"
 
-_m_named_item(f) := _m_isnt(f.item, f.value, "a list or an object") if f.cause == "unusable"
+_m_named_item(f) := _m_isnt(f.item, f.value, _m_walk_kind(f.value)) if f.cause == "unusable"
 
 _m_tie(failed) := concat("", [_m_listed([f.item | some f in failed; f.cause == "ambiguous"]), " tie"])
 
@@ -10668,7 +10681,7 @@ _m_from_message(doc, req, false, cause) := {"message": m} if {
 	keys := _from_keys(req)
 	count(keys) > 0
 	m := _message({"op": "present", "path": keys}, doc, cause)
-} else := {"message": _m_isnt(_path_name(keys), v, "a list or an object")} if {
+} else := {"message": _m_isnt(_path_name(keys), v, _m_walk_kind(v))} if {
 	cause == "unusable"
 	keys := _from_keys(req)
 	count(keys) > 0

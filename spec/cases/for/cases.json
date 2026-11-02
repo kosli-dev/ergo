@@ -1722,7 +1722,7 @@
               "id": "r1"
             },
             "check": "e",
-            "message": "for every commits whose kind is \"code\" as c: c.signed is true is false",
+            "message": "commits is [{\"kind\": \"doc\", \"signed\": true}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1773,7 +1773,7 @@
               "id": "r1"
             },
             "check": "s",
-            "message": "for some commits whose kind is \"code\" as c: c.signed is true is false",
+            "message": "commits is [{\"kind\": \"doc\", \"signed\": true}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -4807,7 +4807,7 @@
               "id": "p1"
             },
             "check": "c",
-            "message": "for some approvers whose state is \"APPROVED\" as approver, every commits as commit: approver.username does not equal author and approver.timestamp is after commit.timestamp is false",
+            "message": "approvers is [{\"state\": \"PENDING\", \"timestamp\": \"2026-10-05T00:00:00Z\", \"username\": \"bob\"}]; commits is [{\"timestamp\": \"2026-10-01T00:00:00Z\"}, {\"timestamp\": \"2026-10-02T00:00:00Z\"}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -5611,7 +5611,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "for every commits whose kind is in $params.kinds as c: c.signed is true is false",
+            "message": "$params.kinds is \"code\", which isn't a list",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -5799,7 +5799,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "for every shas named by $params.k as sha: sha.ok is true is false",
+            "message": "$params.k is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -7675,7 +7675,7 @@
                 ]
               }
             ],
-            "message": "for some approvers as approver, last of commits sorted by timestamp as last_commit: approver.username does not equal last_commit.author_username is false",
+            "message": "approvers is [{\"username\": \"grace\"}]; commits is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7910,7 +7910,7 @@
                 ]
               }
             ],
-            "message": "for item 2 from last of approvals whose state is \"APPROVED\" sorted by approved_at as approval: approval.by is \"ada\" is false",
+            "message": "approvals is [{\"approved_at\": 1, \"by\": \"ada\", \"state\": \"APPROVED\"}, {\"approved_at\": 3, \"by\": \"grace\", \"state\": \"CHANGES_REQUESTED\"}]",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9993,7 +9993,7 @@
               "id": "t"
             },
             "check": "c",
-            "message": "for every xs as p, first of ys as q: q.n is 1 is false",
+            "message": "xs is [{\"v\": 1}, {\"v\": 2}]; ys is []",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -14687,7 +14687,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: the check is false",
+            "message": "item 1 of xs: rows is [{\"n\": 1, \"z\": 2}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14826,7 +14826,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: the check is false",
+            "message": "item 1 of xs: rows is [{\"n\": 1, \"z\": 2}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14965,7 +14965,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: the check is false",
+            "message": "item 1 of xs: rows is [{\"n\": 1, \"z\": 2}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -16749,7 +16749,7 @@
                 "value": []
               }
             ],
-            "message": "for every xs as p, first of ys whose k equals p.k as q: q.n is 1 is false",
+            "message": "xs is [{\"k\": 1}, {\"k\": 2}]; ys is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16810,7 +16810,7 @@
                 ]
               }
             ],
-            "message": "for every xs as p, first of ys whose k equals p.k as q: q.n is 1 is false",
+            "message": "xs is [{\"k\": 3}]; ys is [{\"k\": 1, \"n\": 1}]",
             "passed": false,
             "requirement": "s",
             "subject": {

@@ -7629,7 +7629,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "every pull_requests.title whose count of reviews is at least 2 is not empty is false",
+            "message": "pull_requests is [{\"reviews\": [{\"by\": \"a\"}], \"title\": \"x\"}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -13863,7 +13863,7 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "days elapsed from started to ended plus 1 is 2 is false",
+            "message": "started is 86400, and ended is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14747,7 +14747,7 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "every xs.title whose days elapsed from started to ended is 1 is not empty is false",
+            "message": "xs is [{\"ended\": 172800, \"started\": 0, \"title\": \"x\"}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15229,7 +15229,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "item 2 of prs: the check is false",
+            "message": "item 2 of prs: reviews is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
