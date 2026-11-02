@@ -10091,7 +10091,7 @@ _m_faults(subj, check) := [_m_isnt(s.name, s.value, kind) |
 	kind := f[1]
 ]
 
-_m_ref_list_fault(_, check) := [[check[f], _m_right_kind(cmp, v)]] if {
+_m_ref_list_fault(check) := [[check[f], _m_right_kind(cmp, v)]] if {
 	some f in ["values", "patterns"]
 	_is_ref(check[f])
 	cmp := _m_ref_cmp(check.op, f)
@@ -10109,7 +10109,7 @@ _m_ref_cmp(op, f) := op if {
 	f in {"values", "patterns"}
 }
 
-_m_fault(subj, check) := [f | some g in [_m_fault_1(subj, check), _m_fault_2(subj, check), _m_fault_3(subj, check), _m_fault_4(subj, check), _m_fault_5(subj, check), _m_fault_6(subj, check), _m_fault_7(subj, check), _m_fault_8(subj, check), _m_fault_9(subj, check), _m_fault_10(subj, check), _m_fault_11(subj, check), _m_ref_list_fault(subj, check)]; some f in g]
+_m_fault(subj, check) := [f | some g in [_m_fault_1(subj, check), _m_fault_2(subj, check), _m_fault_3(subj, check), _m_fault_4(subj, check), _m_fault_5(subj, check), _m_fault_6(subj, check), _m_fault_7(subj, check), _m_fault_8(subj, check), _m_fault_9(subj, check), _m_fault_10(subj, check), _m_fault_11(subj, check), _m_ref_list_fault(check)]; some f in g]
 
 _m_fault_1(subj, check) := [[check.path, "a number"]] if {
 	check.op in {"range", "outside_range"}
@@ -10443,7 +10443,7 @@ _m_fail_parts(cause, fails, roots) := [_m_fail(f, roots) |
 	f.path == p
 ] if cause != "satisfied"
 
-_m_joined(all) := _m_joined_once(_once(all))
+_m_joined(parts) := _m_joined_once(_once(parts))
 
 _m_joined_once(ms) := concat("; ", ms) if count(ms) <= 3
 
@@ -10723,10 +10723,10 @@ _m_narrows(subj, item) if _value_at(subj, item.path) == []
 
 _m_whose_ref_faults(item) := [_m_isnt(_ref_name(f[0].ref), _ref_shown(f[0].ref), f[1]) |
 	some c in object.get(item, "whose", [])
-	some f in _m_ref_list_fault(null, c)
+	some f in _m_ref_list_fault(c)
 ]
 
-_m_ref_faults_text(check) := [_m_isnt(_ref_name(f[0].ref), _ref_shown(f[0].ref), f[1]) | some f in _m_ref_list_fault(null, check)]
+_m_ref_faults_text(check) := [_m_isnt(_ref_name(f[0].ref), _ref_shown(f[0].ref), f[1]) | some f in _m_ref_list_fault(check)]
 
 _m_for_item(item) := {"op": "present", "path": item.path, "whose": object.get(item, "whose", [])}
 
