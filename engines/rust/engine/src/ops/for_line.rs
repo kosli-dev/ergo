@@ -834,6 +834,7 @@ struct Child {
 }
 
 struct Outcome {
+    parts: Vec<String>,
     bare: bool,
     said: String,
     cause: Cause,
@@ -963,6 +964,7 @@ impl For {
             let (outcome, sfails) = if into_non_object {
                 (
                     Some(Outcome {
+                        parts: Vec::new(),
                         bare: false,
                         said: String::new(),
                         cause: Cause::NotAnObject,
@@ -982,7 +984,7 @@ impl For {
                     let mut parts: Vec<String> = nested
                         .children
                         .iter()
-                        .filter_map(|c| self.child_text(c))
+                        .flat_map(|c| self.child_texts(c))
                         .collect();
                     let second = self.shared_second();
                     parts.extend(
@@ -1002,6 +1004,7 @@ impl For {
                     }
                     (
                         Some(Outcome {
+                            parts: parts.clone(),
                             bare: false,
                             said: parts.join("; "),
                             cause: nested.cause,
@@ -1125,6 +1128,7 @@ impl For {
                 };
                 (
                     Some(Outcome {
+                        parts: Vec::new(),
                         bare,
                         said,
                         cause,
@@ -1454,13 +1458,31 @@ impl For {
         super::message::stated(&name, dead.cause, &dead.value, kind)
     }
 
+    fn child_texts(&self, child: &Child) -> Vec<String> {
+        match &child.failed {
+            Some(outcome) if !outcome.parts.is_empty() && outcome.cause != Cause::NotAnObject => {
+                let name = self.strip(&child.entry.name);
+                outcome
+                    .parts
+                    .iter()
+                    .map(|part| format!("{name}: {part}"))
+                    .collect()
+            }
+            _ => self.child_text(child).into_iter().collect(),
+        }
+    }
+
     fn child_text(&self, child: &Child) -> Option<String> {
         let outcome = child.failed.as_ref()?;
         let name = self.strip(&child.entry.name);
         Some(if outcome.cause == Cause::NotAnObject {
             super::message::isnt(&name, &child.entry.value, "an object")
         } else if outcome.said.is_empty() {
-            super::message::is(&name, &child.entry.value)
+            if outcome.assertions.is_empty() && outcome.inner.is_empty() {
+                super::message::is(&name, &child.entry.value)
+            } else {
+                return None;
+            }
         } else if outcome.bare {
             format!("{name}{}", outcome.said)
         } else {
@@ -1490,7 +1512,7 @@ impl For {
             .collect();
         let mut hoisted: Vec<Dead> = Vec::new();
         for child in level.children {
-            if let Some(text) = self.child_text(&child) {
+            for text in self.child_texts(&child) {
                 said.push((child.order.clone(), text));
             }
             let Child {
