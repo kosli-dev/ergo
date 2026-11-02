@@ -11259,3 +11259,12 @@ test_message_kind_of_a_side_read_against_a_written_value_on_the_left if {
 	check := {"op": "compare", "cmp": "eq", "left": {"literal": "a"}, "right": ["x"]}
 	ergo._m_side_kind({}, check, ["x"]) == "text"
 }
+
+test_message_names_a_param_that_isnt_a_time_on_the_right_of_a_time_comparison if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "opened is before $params.deadline"}}}}
+	r := ergo.report({"things": [{"id": "t", "opened": "2026-10-02T10:00:00Z"}]}, policy, {"deadline": "soon"})
+	some row in r.results
+	row.check == "c"
+	row.cause == "unusable"
+	row.message == "$params.deadline is \"soon\", which isn't a time"
+}
