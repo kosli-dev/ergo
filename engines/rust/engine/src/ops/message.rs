@@ -167,9 +167,13 @@ fn sources(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Input> {
         _ => match single_path(check) {
             Some(path) => {
                 let mut out: Vec<Input> = first_input(path, ctx).into_iter().collect();
-                for reference in sorted_refs(check) {
+                let mut own = path::step_refs(path);
+                own.sort_by_key(name::name);
+                own.dedup();
+                for reference in own {
                     out.extend(first_input(&reference, ctx));
                 }
+                out.extend(lists::right_inputs(check, ctx));
                 out
             }
             None => verdict.inputs.clone(),

@@ -493,6 +493,55 @@ pub fn lower_phrase(
     })
 }
 
+fn right_text(right: &Right) -> String {
+    match right {
+        Right::Written(value) => super::message::print(value),
+        Right::Ref(path) | Right::Field(path) => crate::name::name(path),
+        Right::Join(pieces) => pieces
+            .iter()
+            .map(right_text)
+            .collect::<Vec<_>>()
+            .join(" followed by "),
+    }
+}
+
+fn right_shown(right: &Right, ctx: &Ctx) -> Vec<Input> {
+    match right {
+        Right::Written(_) => Vec::new(),
+        Right::Ref(path) | Right::Field(path) => read_path(path, ctx)
+            .inputs
+            .into_iter()
+            .take(1)
+            .collect(),
+        Right::Join(pieces) => {
+            let read = read_right(right, ctx);
+            match (read.outcome, read.value) {
+                (Outcome::Found, Some(value)) => vec![Input {
+                    name: right_text(right),
+                    value,
+                    locations: Vec::new(),
+                    part: None,
+                    state: Outcome::Found,
+                }],
+                _ => pieces.iter().flat_map(|p| right_shown(p, ctx)).collect(),
+            }
+        }
+    }
+}
+
+pub fn right_inputs(check: &super::Check, ctx: &Ctx) -> Vec<Input> {
+    match check {
+        super::Check::In(c) => right_shown(&c.values, ctx),
+        super::Check::Contains(c) => match &c.wanted {
+            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => {
+                right_shown(right, ctx)
+            }
+        },
+        super::Check::Matches(c) => right_shown(&c.patterns, ctx),
+        _ => Vec::new(),
+    }
+}
+
 fn kind_word(value: &Value) -> &'static str {
     super::message::kind(value)
 }
