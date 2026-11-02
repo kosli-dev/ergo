@@ -4559,7 +4559,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base plus 2 is 5 is false",
+            "message": "base is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -4606,7 +4606,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base plus 2 is 5 is false",
+            "message": "base is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -4854,7 +4854,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base plus extra is 5 is false",
+            "message": "extra is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -5091,7 +5091,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base plus count of findings is 5 is false",
+            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -5741,7 +5741,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "total equals base plus 2 is false",
+            "message": "base is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -10117,7 +10117,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "base plus 2 is between 4 and 6 is false",
+            "message": "base is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -11943,7 +11943,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at most 5 is false",
+            "message": "started is \"2026-01-02T00:00:00Z\", and ended is \"2026-01-01T00:00:00Z\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -12003,7 +12003,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at most 5 is false",
+            "message": "started is 5, and ended is 4",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -12389,7 +12389,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "started is true, which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12452,7 +12452,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "ended is [1], which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12517,7 +12517,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "started is {\"a\": 1}, which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12581,7 +12581,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "started is \"yesterday\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12643,7 +12643,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "started is \"2026-01-01t00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12705,7 +12705,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "ended is \"2026-01-01T00:00:00z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12767,7 +12767,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "started is \"2026-02-30T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12829,7 +12829,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "started is \"1677-12-31T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12891,7 +12891,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "ended is \"2262-01-01T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12952,7 +12952,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "started is \"2026-10-01T00:00:00Z\", which isn't a time written like 5",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -13013,7 +13013,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is at least 0 is false",
+            "message": "started is 5, which isn't a time written like \"2026-10-01T00:00:00Z\"",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -13928,7 +13928,7 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "days elapsed from started to ended plus 1 is 2 is false",
+            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -14083,7 +14083,7 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "1 plus days elapsed from started to ended is 2 is false",
+            "message": "started is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -15574,7 +15574,7 @@
               "id": "v1"
             },
             "check": "c",
-            "message": "days elapsed from started to ended is between 1 and 2 is false",
+            "message": "started is 86400, and ended is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -16006,7 +16006,7 @@
                 ]
               }
             ],
-            "message": "days elapsed from started to ended is 17 is false",
+            "message": "started is \"2026-09-15\", which isn't a time written like \"2026-10-02T00:00:00Z\"",
             "passed": false,
             "requirement": "s",
             "subject": {

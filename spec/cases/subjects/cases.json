@@ -17790,7 +17790,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "x.y named by $params.i does not exist is false", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17798,7 +17798,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "x.y named by $params.i does not exist is false", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17806,7 +17806,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [[1]]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "x.y named by $params.i does not exist is false", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
         ]
       },
       {
@@ -17814,7 +17814,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": ["s"]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "x.y named by $params.i does not exist is false", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
         ]
       },
       {
@@ -17822,7 +17822,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [null]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "x.y named by $params.i does not exist is false", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
         ]
       }
     ]

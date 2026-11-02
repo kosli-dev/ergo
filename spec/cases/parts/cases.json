@@ -2041,7 +2041,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: $pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2129,7 +2129,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: $pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2173,7 +2173,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: $pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2221,7 +2221,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: $pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2601,7 +2601,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: $pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2645,7 +2645,7 @@
                 "value": null
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: $pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2993,7 +2993,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: fam.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3079,7 +3079,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: fam.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3399,7 +3399,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: fam.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3690,7 +3690,7 @@
                 ]
               }
             ],
-            "message": "item 1 of xs: item 1 of x.items: the check is false",
+            "message": "item 1 of xs: item 1 of x.items: x.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3730,7 +3730,7 @@
                 ]
               }
             ],
-            "message": "item 1 of items: the check is false",
+            "message": "item 1 of items: $input.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {

@@ -9754,6 +9754,13 @@ _m_shown(subj, side) := {"name": side.text, "state": "value", "value": v} if {
 	[v] := _side_eval(subj, side).v
 }
 
+_m_value_clauses(subj, side) := [c] if {
+	s := _m_shown(subj, side)
+	c := _m_value_clause(s)
+} else := [c | some p in [side.elapsed_from, side.elapsed_to]; c := _m_value_clause(_m_shown(subj, p))] if _side_form(side) == "elapsed"
+
+else := []
+
 _m_value_clause(s) := _m_is(s.name, s.value) if s.state == "value"
 
 _m_value_clause(s) := concat("", [s.name, " is ", _m_state_word(s.state)]) if s.state in {"absent", "null"}
@@ -9767,13 +9774,15 @@ _m_side_sources(subj, side) := [_m_shown(subj, side)] if is_array(side)
 _m_side_sources(subj, side) := [_m_shown(subj, p) | some p in _side_paths(side)] if {
 	not _is_ref(side)
 	not is_array(side)
-	not _basic_form(side) in {"count_of", "sum_of"}
+	not _m_tally_side(side)
 }
 
-_m_side_sources(_, side) := [] if _basic_form(side) in {"count_of", "sum_of"}
+_m_side_sources(_, side) := [] if _m_tally_side(side)
+
+_m_tally_side(side) if _basic_form(side) in {"count_of", "sum_of"}
 
 _message(check, subj, "value") := m if {
-	clauses := [c | some side in _m_sides(check); s := _m_shown(subj, side); c := _m_value_clause(s)]
+	clauses := [c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)]
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check)
@@ -9786,7 +9795,7 @@ _message(check, subj, cause) := m if {
 } else := _m_fallback(check) if cause in {"absent", "null"}
 
 _message(check, subj, "unusable") := m if {
-	clauses := _once(array.concat(array.concat(_m_blocked(subj, check), _m_faults(subj, check)), _m_tallies(subj, check, "unusable")))
+	clauses := _once(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_blocked(subj, check)), _m_faults(subj, check)), _m_tallies(subj, check, "unusable")))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check)
@@ -9804,6 +9813,30 @@ _m_fallback(check) := concat("", [check.expression, " is false"]) if _written_ex
 
 else := "the check is false"
 
+_m_key_faults(subj, check) := [c |
+	some side in _m_sides(check)
+	some p in _m_side_paths(side)
+	is_array(p)
+	some step in p
+	c := _m_key_fault(subj, step)
+]
+
+_m_key_fault(_, step) := _m_isnt(_ref_name(step.ref), v, "text") if {
+	_is_ref(step)
+	_ref_state(step.ref) == "value"
+	v := _ref_shown(step.ref)
+	not is_string(v)
+}
+
+_m_key_fault(subj, step) := _m_isnt(step.named_by_field, v, "text") if {
+	is_object(step)
+	is_string(step.named_by_field)
+	is_object(subj)
+	v := subj[step.named_by_field]
+	v != null
+	not is_string(v)
+}
+
 _m_blocked(subj, check) := [c |
 	some s in _m_sources(subj, check)
 	s.state == "unusable"
@@ -9817,8 +9850,9 @@ _m_parent_clause(subj, check, name) := [c |
 	v := _resolved(subj, array.slice(side, 0, i))
 	v != _absent
 	v != null
-	not _can_hold(v, side[i])
-	c := _m_isnt(_input_name(array.slice(side, 0, i)), v, _m_holder(side[i]))
+	k := _m_step_key(subj, side[i])
+	not _can_hold(v, k)
+	c := _m_isnt(_input_name(array.slice(side, 0, i)), v, _m_holder(k))
 ]
 
 _m_paths_named(check, name) := [p | some side in _m_sides(check); some p in _m_side_paths(side); is_array(p); _input_name(p) == name]
@@ -9826,6 +9860,23 @@ _m_paths_named(check, name) := [p | some side in _m_sides(check); some p in _m_s
 _m_side_paths(side) := [side] if is_array(side)
 
 _m_side_paths(side) := _side_paths(side) if not is_array(side)
+
+_m_step_key(_, step) := step if is_string(step)
+
+_m_step_key(_, step) := step if is_number(step)
+
+_m_step_key(_, step) := k if {
+	_is_ref(step)
+	k := _ref_shown(step.ref)
+	is_string(k)
+}
+
+_m_step_key(subj, step) := k if {
+	is_object(step)
+	is_object(subj)
+	k := subj[step.named_by_field]
+	is_string(k)
+}
 
 _m_holder(step) := "a list" if is_number(step)
 
@@ -9886,44 +9937,61 @@ _m_fault(subj, check) := [f | some s in [check.left, check.right]; some f in _m_
 	not _list_cmp(check)
 }
 
-_m_fault(subj, check) := [[check.left, _m_kinds(r)]] if {
+_m_fault(subj, check) := fs if {
 	_list_cmp(check)
+	fs := array.concat(_m_list_left(subj, check), _m_list_right(subj, check))
+	fs != []
+}
+
+_m_list_right(subj, check) := [[check.right, _m_right_kind(check.cmp, r)]] if {
+	_read_state(subj, check.right) == "value"
+	r := _value_at(subj, check.right)
+	not _list_right_usable(check.cmp, r)
+} else := []
+
+_m_right_kind(_, r) := "a list" if not is_array(r)
+
+_m_right_kind(cmp, r) := "a list of patterns" if {
+	is_array(r)
+	cmp in {"matches_any", "not_matches_any"}
+}
+
+_m_right_kind(cmp, r) := "a list with at least one value" if {
+	r == []
+	cmp in _all_cmps
+}
+
+_m_right_kind(cmp, r) := "a list of one kind of value" if {
+	_mixed_types(r)
+	cmp in ({"in", "not_in"} | _all_cmps)
+}
+
+_m_list_left(subj, check) := [[check.left, "text"]] if {
+	check.cmp in {"matches_any", "not_matches_any"}
+	not is_string(_found(subj, check.left))
+} else := [[check.left, "a list"]] if {
+	check.cmp in ({"includes", "excludes"} | _all_cmps)
+	not is_array(_found(subj, check.left))
+} else := [[check.left, _m_kinds(r)]] if {
 	check.cmp in {"in", "not_in"}
 	r := _found(subj, check.right)
 	is_array(r)
+	not _mixed_types(r)
 	not _fits_list(_found(subj, check.left), r)
-}
-
-_m_fault(subj, check) := [[check.left, "text"]] if {
-	_list_cmp(check)
-	check.cmp in {"matches_any", "not_matches_any"}
-	not is_string(_found(subj, check.left))
-}
-
-_m_fault(subj, check) := [[check.left, "a list"]] if {
-	_list_cmp(check)
-	check.cmp in ({"includes", "excludes"} | _all_cmps)
-	not is_array(_found(subj, check.left))
-}
-
-_m_fault(subj, check) := [[check.left, _m_list_of(r)]] if {
-	_list_cmp(check)
+} else := [[check.left, _m_list_of(r)]] if {
 	check.cmp in _all_cmps
 	l := _found(subj, check.left)
 	r := _found(subj, check.right)
 	is_array(l)
-	is_array(r)
+	_list_right_usable(check.cmp, r)
 	not _items_fit(l, r)
-}
-
-_m_fault(subj, check) := [[check.left, _m_list_of([r])]] if {
-	_list_cmp(check)
+} else := [[check.left, _m_list_of([r])]] if {
 	check.cmp in {"includes", "excludes"}
 	l := _found(subj, check.left)
 	r := _found(subj, check.right)
 	is_array(l)
 	not _items_fit(l, [r])
-}
+} else := []
 
 _m_fault(subj, check) := fs if {
 	check.op == "compare_time"
@@ -9970,6 +10038,17 @@ _m_side_fault(subj, check, side) := f if {
 	k := _m_side_kind(subj, check, side)
 	v := _m_side_value(subj, side)
 	not _m_fits_kind(v, k)
+}
+
+_m_parts_fault(subj, side) := fs if {
+	_side_form(side) == "elapsed"
+	fs := [[p, "a time"] | some p in [side.elapsed_from, side.elapsed_to]; v := _found(subj, p); not _m_time(v)]
+	fs != []
+} else := [[side.elapsed_from, concat("", ["a time written like ", _m_print(r)])]] if {
+	_side_form(side) == "elapsed"
+	l := _found(subj, side.elapsed_from)
+	r := _found(subj, side.elapsed_to)
+	not _elapsed_times(l, r)
 }
 
 _m_parts_fault(subj, side) := [[p, "a number"] | some p in side.add; v := _found(subj, p); not is_number(v)] if _side_form(side) == "add"
