@@ -142,6 +142,7 @@
         "inputs": {"type": "array", "items": {"$ref": "#/$defs/input"}},
         "passed": {"type": "boolean"},
         "cause": {"$ref": "#/$defs/cause"},
+        "message": {"type": "string", "minLength": 1, "description": "Only on failed rows: what Ergo found, in plain words, like approver is \"ana\", and author is \"ana\"."},
         "failed_items": {
           "type": "array",
           "description": "Only on rows of every, some and for checks, on the $applies row of a subject whose from line has one condition, a some or an every, and on the $min_subjects row of a subject whose from line has every.",
@@ -157,8 +158,8 @@
       "required": ["requirement", "subject", "check", "inputs", "passed", "cause"],
       "additionalProperties": false,
       "if": {"properties": {"passed": {"const": true}}},
-      "then": {"properties": {"cause": {"const": "satisfied"}}},
-      "else": {"properties": {"cause": {"not": {"const": "satisfied"}}}}
+      "then": {"properties": {"cause": {"const": "satisfied"}}, "not": {"required": ["message"]}},
+      "else": {"properties": {"cause": {"not": {"const": "satisfied"}}}, "required": ["message"]}
     },
     "for_failed_assertions": {
       "type": "array",

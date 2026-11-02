@@ -80,6 +80,28 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[row.inputs_once]** A row shows each entry of its `inputs` once. When a check reads the same value twice, like `count of approvals plus count of approvals is 4`, the second read gives no entry of its own when its name, its value and its locations all match the first's, as [location.merged](#where-a-value-was-read) says, and the rest keep their order.
 
+## Messages
+
+**[message.row]** Every failed row has a `message`, a line of plain text that says what Ergo found, never what the check expected, so someone who doesn't read policies can follow it. A row that passed has none. The message is worked out from the policy and the input only, so the same report gives the same messages.
+
+**[message.value]** A row that failed with cause `value` names each value it compared, as `<name> is <value>`, and joins them with `, and `, in the order of the row's `inputs`: `x is 4`, or `approver is "ana", and author is "ana"`. The name is the input's name as the row's `inputs` show it.
+
+**[message.cause]** A row that failed with any other cause names only the inputs in that state. `absent` reads `<name> is missing`, `null` reads `<name> is null`, `unusable` reads `<name> is <value>, which isn't <kind>`, like `x is "3", which isn't a number`, and `not_an_object` reads `<name> is <value>, which isn't an object`, where the name is `it` for the subject. `ambiguous` names the items that tie and the key they were sorted by: `item 1 and item 2 of commits tie on ts`.
+
+**[message.print]** A value is printed as JSON, with `, ` between items and `: ` after keys, and keys sorted. Text over 60 code points keeps its first 60 and ends with `…"`. A list over 3 items shows its first 3 and then `and N more`, as in `["a", "b", "c", and 2 more]`. An object whose JSON is over 80 characters prints as `an object with N keys`.
+
+**[message.worked_out]** A value Ergo works out, like a `count of`, a `sum of`, a `plus` or an elapsed time, is printed as the number it gave, under the name of that side, not as the values it came from: `count of tests is 1`, `sum of items.n plus extra is 12`.
+
+**[message.followed_by]** A side written with `followed by` is printed as the text it joins to: `spec is "v0.4", and "v" followed by version is "v0.4.1"`.
+
+**[message.items]** An `every` or `some`, and a `for` line, lists only the items that failed, each as `item N of <list>: ` and what was found there, counted from 1, and joined with `; `: `item 2 of tests: ok is false; item 3 of tests: ok is missing`. An item of a list in a list names both: `item 1 of commits: item 2 of commit.reviews: review.ok is false`. After three items, the message ends with `; and N more`. `failed_items` keeps its paths as they were.
+
+**[message.join]** A check with several sentences gives each failed sentence's message, joined with `; `, in the order of its sentences: `x is 2; y is missing`. In an `any_of`, each option's message starts with the option's name: `one: x is 2; two: y is missing`.
+
+**[message.applies]** An `$applies` row that rules a subject out says what its filter found, as a check would: `env is "staging"`.
+
+**[message.empty]** A `for` line that picks no item, because a `whose` leaves none or the list is empty, prints the list it read as found, naming only the lists that a `whose` or a position narrowed, or that are empty: `commits is [{"signed": false}]`, `commits is []`.
+
 ## Where a value was read
 
 **[location]** Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` has `locations`: a list of where Ergo read its value. A location is a JSON Pointer ([RFC 6901](https://www.rfc-editor.org/rfc/rfc6901)) from the root of the input, like `/deployments/3/approved`, or, for a value read from the params, `$params:` followed by a pointer from the root of the params, like `$params:/max_days/high`. List positions count from 0, and a key is escaped as RFC 6901 says, `~` as `~0` and `/` as `~1`. Locations never change `passed`, `cause` or a value. `[]` means no location could be given, like for a read that starts at a name nothing holds.
