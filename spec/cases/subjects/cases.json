@@ -25865,5 +25865,641 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line with named by each of a field of the parent",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "t": {
+          "from": "things"
+        },
+        "k": {
+          "from": "t named by each of t.keys"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and nothing is read from the parent's list",
+        "rules": [
+          "subjects.keyed.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "keys": [
+                "p",
+                "q"
+              ],
+              "p": {
+                "x": 1
+              },
+              "q": {}
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "message": "subjects.k.from: named by each of takes a list from $params or $input, so it can't start at a field or a subject",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.k.from",
+                "value": [
+                  "named by each of takes a list from $params or $input, so it can't start at a field or a subject"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "is written wrong when the parent has no such field",
+        "rules": [
+          "subjects.keyed.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a"
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "message": "subjects.k.from: named by each of takes a list from $params or $input, so it can't start at a field or a subject",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.k.from",
+                "value": [
+                  "named by each of takes a list from $params or $input, so it can't start at a field or a subject"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "is written wrong when the field is null",
+        "rules": [
+          "subjects.keyed.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "keys": null
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "message": "subjects.k.from: named by each of takes a list from $params or $input, so it can't start at a field or a subject",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.k.from",
+                "value": [
+                  "named by each of takes a list from $params or $input, so it can't start at a field or a subject"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "is written wrong when the field isn't a list",
+        "rules": [
+          "subjects.keyed.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "keys": 3
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "message": "subjects.k.from: named by each of takes a list from $params or $input, so it can't start at a field or a subject",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.k.from",
+                "value": [
+                  "named by each of takes a list from $params or $input, so it can't start at a field or a subject"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "is written wrong when there is no parent",
+        "rules": [
+          "subjects.keyed.list"
+        ],
+        "input": {
+          "things": []
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "message": "subjects.k.from: named by each of takes a list from $params or $input, so it can't start at a field or a subject",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.k.from",
+                "value": [
+                  "named by each of takes a list from $params or $input, so it can't start at a field or a subject"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a field written bare",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "t": {
+          "from": "things"
+        },
+        "k": {
+          "from": "t named by each of keys"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and nothing is read from the field",
+        "rules": [
+          "subjects.keyed.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "keys": [
+                "p",
+                "q"
+              ],
+              "p": {
+                "x": 1
+              },
+              "q": {}
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "message": "subjects.k.from: named by each of takes a list from $params or $input, so it can't start at a field or a subject",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.k.from",
+                "value": [
+                  "named by each of takes a list from $params or $input, so it can't start at a field or a subject"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a field written with a dot",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "t": {
+          "from": "things"
+        },
+        "k": {
+          "from": "t named by each of .keys"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and nothing is read from the field",
+        "rules": [
+          "subjects.keyed.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "keys": [
+                "p",
+                "q"
+              ],
+              "p": {
+                "x": 1
+              },
+              "q": {}
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "message": "subjects.k.from: named by each of takes a list from $params or $input, so it can't start at a field or a subject",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.k.from",
+                "value": [
+                  "named by each of takes a list from $params or $input, so it can't start at a field or a subject"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of the parent itself",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "t": {
+          "from": "things"
+        },
+        "k": {
+          "from": "t named by each of t"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is written wrong, and nothing is read from the parent",
+        "rules": [
+          "subjects.keyed.list"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "keys": [
+                "p",
+                "q"
+              ],
+              "p": {
+                "x": 1
+              },
+              "q": {}
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "k"
+            },
+            "check": "$well_formed",
+            "passed": false,
+            "cause": "value",
+            "message": "subjects.k.from: named by each of takes a list from $params or $input, so it can't start at a field or a subject",
+            "inputs": [
+              {
+                "name": "count(checks)",
+                "value": 1,
+                "locations": []
+              },
+              {
+                "name": "require",
+                "value": "every",
+                "locations": []
+              },
+              {
+                "name": "subjects.k.from",
+                "value": [
+                  "named by each of takes a list from $params or $input, so it can't start at a field or a subject"
+                ],
+                "locations": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line of a child subject with named by each of a list in the input",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "t": {
+          "from": "things"
+        },
+        "k": {
+          "from": "t named by each of $input.keys"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "k",
+          "checks": {
+            "c": "x exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "makes each listed key a subject of each parent, and the key whose object lacks the field fails its check",
+        "rules": [
+          "subjects.keyed.list",
+          "subjects.chain"
+        ],
+        "input": {
+          "keys": [
+            "p",
+            "q"
+          ],
+          "things": [
+            {
+              "id": "a",
+              "p": {
+                "x": 1
+              },
+              "q": {}
+            }
+          ]
+        },
+        "requirements": {
+          "r": {
+            "status": "not_met"
+          }
+        },
+        "results": [
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "p",
+              "in": {
+                "t": {
+                  "id": "a",
+                  "p": {
+                    "x": 1
+                  },
+                  "q": {}
+                }
+              },
+              "type": "k"
+            },
+            "check": "c",
+            "passed": true,
+            "cause": "satisfied",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/p/x"
+                ],
+                "name": "x",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "requirement": "r",
+            "subject": {
+              "id": "q",
+              "in": {
+                "t": {
+                  "id": "a",
+                  "p": {
+                    "x": 1
+                  },
+                  "q": {}
+                }
+              },
+              "type": "k"
+            },
+            "check": "c",
+            "passed": false,
+            "cause": "value",
+            "message": "x is missing",
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/q"
+                ],
+                "name": "x",
+                "value": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

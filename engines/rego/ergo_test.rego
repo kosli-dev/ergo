@@ -11610,3 +11610,22 @@ test_a_field_on_both_sides_of_a_phrase_is_said_once_in_the_message if {
 	_dot_plain_rows("tags contains none of .tags", {"repos": [{"id": "r", "tags": ["a"]}]})[0].message == "tags is [\"a\"]"
 	_dot_plain_rows("tags contains none of tags", {"repos": [{"id": "r", "tags": ["a"]}]})[0].message == "tags is [\"a\"]"
 }
+
+_each_start_report(doc, line) := ergo.report(doc, {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things"}, "k": {"from": line}}, "requirements": {"r": {"subject": "k", "checks": {"c": "x exists"}}}}, {"keys": ["p"]})
+
+test_named_by_each_of_a_field_or_a_subject_is_written_wrong_whatever_the_parent_holds if {
+	problem := [{"name": "subjects.k.from", "value": ["named by each of takes a list from $params or $input, so it can't start at a field or a subject"], "locations": []}]
+	some line in ["t named by each of t.keys", "t named by each of keys", "t named by each of .keys", "t named by each of t", "things named by each of t.keys", "t named by each of k.keys"]
+	some doc in [{"things": [{"id": "a", "keys": ["p"], "p": {"x": 1}}]}, {"things": [{"id": "a"}]}, {"things": [{"id": "a", "keys": null}]}, {"things": [{"id": "a", "keys": 3}]}, {"things": []}, {"things": null}, {}]
+	rep := _each_start_report(doc, line)
+	_from_problems(rep) == problem
+	[r.check | some r in rep.results] == ["$well_formed"]
+}
+
+test_named_by_each_of_params_or_input_is_still_read_in_a_child_from_line if {
+	doc := {"keys": ["p"], "things": [{"id": "a", "p": {"x": 1}}]}
+	_from_problems(_each_start_report(doc, "t named by each of $params.keys")) == []
+	_from_problems(_each_start_report(doc, "t named by each of $input.keys")) == []
+	rows := [[r.subject.id, r.cause] | some r in _each_start_report(doc, "t named by each of $input.keys").results; r.check == "c"]
+	rows == [["p", "satisfied"]]
+}

@@ -7383,7 +7383,12 @@ _s_plain_from_step(st) := st.literal if {
 	object.keys(st) == {"literal"}
 } else := st
 
-_s_from_start_problems(fl) := {"a from reads the input, so it can't start at $params" | object.get(fl.path, "start", "") == "params"}
+_s_from_start_problems(fl) := {"a from reads the input, so it can't start at $params" | object.get(fl.path, "start", "") == "params"} | {"named by each of takes a list from $params or $input, so it can't start at a field or a subject" | _s_each_starts_elsewhere(fl)}
+
+_s_each_starts_elsewhere(fl) if {
+	"named_by_each_of" in object.keys(fl)
+	not "start" in object.keys(fl.named_by_each_of)
+}
 
 _s_each_step(fl) := [{"each_as": "subject", "keys": {"ref": _s_model_path(fl.named_by_each_of)}}] if "named_by_each_of" in object.keys(fl)
 
