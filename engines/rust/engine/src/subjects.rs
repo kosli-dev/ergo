@@ -2830,4 +2830,23 @@ mod tests {
             ]
         );
     }
+
+    #[test]
+    fn a_child_blocked_by_an_unknown_grandparent_is_an_invalid_from_in_the_report() {
+        let r = report(
+            &json!({"ts": []}),
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {
+                    "t": {"from": "ts"},
+                    "w": {"from": "t.ws whose x is x"},
+                    "thing": {"from": "w.kids whose t.lo is more than t.lo"}
+                },
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
+            }),
+            &json!({}),
+        );
+        assert_eq!(r["subjects"]["thing"]["from"], json!("<invalid from>"));
+        assert_eq!(r["subjects"]["w"]["from"], json!("<invalid from>"));
+    }
 }

@@ -962,13 +962,21 @@ impl Reading {
                 let at = field_name(&["subjects", name, "from"]);
                 add_problem(&mut problems, format!("{LISTED_LAST}{at}"), text);
             }
-            let lowered = if ok {
+            let lowered = if ok && !chain_problems.contains_key(name) {
                 flatten(name, &raw, &owns, &mut Vec::new())
             } else {
                 None
             };
             let from_text = lowered.as_ref().map(|l: &Lowered| l.from_text.clone());
-            let entry = entry_of(name, found, &problems_by_subject, &raw, &effective, &names);
+            let entry = entry_of(
+                name,
+                found,
+                &problems_by_subject,
+                &raw,
+                &effective,
+                &names,
+                chain_problems.contains_key(name),
+            );
             infos.insert(
                 name.clone(),
                 Info {
@@ -1214,9 +1222,10 @@ fn entry_of(
     raw: &BTreeMap<String, Raw>,
     effective: &BTreeMap<String, BTreeMap<String, PartRead>>,
     names: &BTreeSet<String>,
+    blocked: bool,
 ) -> Value {
     let from_at = field_name(&["subjects", name, "from"]);
-    let invalid = problems.get(name).is_some_and(|p| p.contains_key(&from_at));
+    let invalid = blocked || problems.get(name).is_some_and(|p| p.contains_key(&from_at));
     let from = if invalid || found.def.says_how || matches!(found.from, FromState::NotText) {
         INVALID_FROM.to_string()
     } else {
