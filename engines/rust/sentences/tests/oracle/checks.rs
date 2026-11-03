@@ -4757,6 +4757,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "approver.username is not pr.author",
+        "approver.username does not equal pr.author",
+        &[],
+        &[],
+    ),
+    ("k.\"a\u{2028}b\" is 1", "k.\"a\u{2028}b\" is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

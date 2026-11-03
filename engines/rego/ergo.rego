@@ -4338,19 +4338,34 @@ _policy_compliant(policy, evaluations) if {
 	}
 }
 
-_results(policy, evaluations) := array.concat(
-	array.concat(
-		[_m_problems_row(evaluations[name].well_formed) | some name in _names(policy)],
+_results(policy, evaluations) := [_m_row_one_line(row) | some row in rows] if {
+	rows := array.concat(
 		array.concat(
-			[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].min_subjects],
-			[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].unique_ids],
+			[_m_problems_row(evaluations[name].well_formed) | some name in _names(policy)],
+			array.concat(
+				[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].min_subjects],
+				[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].unique_ids],
+			),
 		),
-	),
-	array.concat(
-		[_inputs_once(row) | some name in _names(policy); some row in evaluations[name].applies],
-		[_inputs_once(row) | some name in _names(policy); some group in evaluations[name].subject_rows; some row in group],
-	),
-)
+		array.concat(
+			[_inputs_once(row) | some name in _names(policy); some row in evaluations[name].applies],
+			[_inputs_once(row) | some name in _names(policy); some group in evaluations[name].subject_rows; some row in group],
+		),
+	)
+}
+
+_m_row_one_line(row) := object.union(row, {"message": _m_one_line(row.message)}) if {
+	is_string(object.get(row, "message", null))
+	_m_separator_in(row.message)
+}
+
+else := row
+
+_m_separator_in(m) if contains(m, "\u2028")
+
+_m_separator_in(m) if contains(m, "\u2029")
+
+_m_separator_in(m) if contains(m, "\u0085")
 
 _inputs_once(row) := object.union(row, {"inputs": _once(row.inputs)})
 
@@ -10772,7 +10787,28 @@ _m_list_found(subj, path) := [_m_is(_input_name(p), _value_at(subj, p))] if {
 	p := array.slice(path, 0, i)
 } else := []
 
-_for_message(check, _, r) := _m_joined([p | some i, f in r.failed; some p in _m_for_part(check, r.failed, i, f)]) if r.failed != []
+_for_message(check, _, r) := _m_for_joined([{"i": i, "t": p, "x": _m_extra_part(f, j)} | some i, f in r.failed; some j, p in _m_for_part(check, r.failed, i, f)]) if r.failed != []
+
+_m_for_joined(ents) := concat("; ", _once([e.t | some e in ents])) if count(_once([e.t | some e in ents; e.x == false])) <= 3
+
+_m_for_joined(ents) := concat("; ", array.concat(_once([e.t | some e in ents; _m_kept(e, shown, ents)]), [concat("", ["and ", _literal_text(count(counted) - 3), " more"])])) if {
+	counted := _once([e.t | some e in ents; e.x == false])
+	count(counted) > 3
+	shown := array.slice(counted, 0, 3)
+}
+
+_m_kept(e, shown, _) if {
+	e.x == false
+	e.t in shown
+}
+
+_m_kept(e, shown, ents) if {
+	e.x == true
+	some o in ents
+	o.i == e.i
+	o.x == false
+	o.t in shown
+}
 
 _m_for_part(_, _, _, f) := _m_for_fail(f) if f.cause != "ambiguous"
 
@@ -10813,11 +10849,25 @@ _m_for_fail(f) := [_m_isnt(object.get(f, "said", f.item), object.get(f, "raw", f
 	not is_object(object.get(f, "raw", f.value))
 }
 
-_m_for_fail(f) := [_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_groups(_once([p | some ps in lines; some p in ps]), _m_two_list(f))] if {
+_m_for_fail(f) := [_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_for_groups(f)] if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions != []
-	lines := [_m_line_msg(l, f) | some l in f.failed_assertions]
+}
+
+_m_for_groups(f) := _m_groups(_once([p | some ps in lines; some p in ps]), _m_two_list(f)) if lines := [_m_line_msg(l, f) | some l in f.failed_assertions]
+
+default _m_extra_part(_, _) := false
+
+_m_extra_part(f, j) if {
+	f.cause != "ambiguous"
+	not "msg" in object.keys(f)
+	not _m_bare_item(f)
+	f.failed_assertions != []
+	not _m_two_list(f)
+	gs := _m_for_groups(f)
+	count(gs) > 1
+	_m_lead_of(gs[j][0]) == ""
 }
 
 default _m_two_list(_) := false
@@ -10845,11 +10895,18 @@ else := _m_grouped(texts, [_m_lead_of(t) | some t in texts], two)
 
 _m_grouped(texts, ls, _) := [texts] if count(_m_leads(ls)) == 0
 
-_m_grouped(texts, ls, true) := [[texts[j] | some j, l in ls; _m_in_group(l, lead, k, true)] | some k, lead in _m_leads(ls)] if count(_m_leads(ls)) > 0
+_m_grouped(texts, ls, true) := [[texts[j] | some j, l in ls; _m_in_group(l, lead, k, true)] | some k, lead in _m_pair_leads(ls)] if count(_m_leads(ls)) > 0
 
 _m_grouped(texts, ls, false) := [[texts[j] | some j, l in ls; l == lead] | some lead in _m_all_leads(ls)] if count(_m_leads(ls)) > 0
 
 _m_leads(ls) := [l | some i, l in ls; l != ""; not l in array.slice(ls, 0, i)]
+
+_m_pair_leads(ls) := [x[2] | some x in sort([[_m_lead_n(l), i, l] | some i, l in ls; l != ""; not l in array.slice(ls, 0, i)])]
+
+_m_lead_n(l) := to_number(tok) if {
+	tok := split(substring(l, 5, -1), " ")[0]
+	regex.match(`^[0-9]+$`, tok)
+} else := 0
 
 _m_all_leads(ls) := [l | some i, l in ls; not l in array.slice(ls, 0, i)]
 

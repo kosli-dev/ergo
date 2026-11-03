@@ -20,8 +20,11 @@ fn quoted(text: &str) -> String {
     } else {
         format!("\"{text}\"")
     };
-    shown
-        .replace('\u{2028}', "\\u2028")
+    one_line(&shown)
+}
+
+pub fn one_line(text: &str) -> String {
+    text.replace('\u{2028}', "\\u2028")
         .replace('\u{2029}', "\\u2029")
         .replace('\u{85}', "\\u0085")
 }

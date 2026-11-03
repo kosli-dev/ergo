@@ -42,7 +42,10 @@ impl Row {
         row.insert("cause".to_string(), json!(self.cause.name()));
         row.insert("inputs".to_string(), Value::Array(self.inputs.clone()));
         if let Some(message) = &self.message {
-            row.insert("message".to_string(), json!(message));
+            row.insert(
+                "message".to_string(),
+                json!(crate::ops::message::one_line(message)),
+            );
         }
         if let Some(items) = &self.failed_items {
             row.insert("failed_items".to_string(), items.clone());

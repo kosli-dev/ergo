@@ -707,5 +707,63 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a one-list for line whose items fail a sentence that walks and one that doesn't",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": ["every c.reviews.ok is true", "c.a is 1"], "for": "every cs as c"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the part of a sentence that doesn't walk goes with its item and isn't counted",
+        "rules": ["message.items", "message.join"],
+        "input": {"things": [{"id": "t", "cs": [{"a": 2, "reviews": [{"ok": false}]}, {"a": 1, "reviews": [{"ok": true}]}, {"a": 3, "reviews": [{"ok": true}, {"ok": false}]}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "every c.reviews.ok is true", "cause": "value", "inputs": [{"locations": ["/things/0/cs/0/reviews/0/ok"], "name": "c.reviews[].ok", "value": [false]}]}, {"assertion": "c.a is 1", "cause": "value", "inputs": [{"locations": ["/things/0/cs/0/a"], "name": "c.a", "value": 2}]}], "item": "item 1 of cs", "locations": ["/things/0/cs/0"], "path": "item 1 of cs", "value": {"a": 2, "reviews": [{"ok": false}]}}, {"cause": "value", "failed_assertions": [{"assertion": "every c.reviews.ok is true", "cause": "value", "inputs": [{"locations": ["/things/0/cs/2/reviews/0/ok", "/things/0/cs/2/reviews/1/ok"], "name": "c.reviews[].ok", "value": [true, false]}]}, {"assertion": "c.a is 1", "cause": "value", "inputs": [{"locations": ["/things/0/cs/2/a"], "name": "c.a", "value": 3}]}], "item": "item 3 of cs", "locations": ["/things/0/cs/2"], "path": "item 3 of cs", "value": {"a": 3, "reviews": [{"ok": true}, {"ok": false}]}}], "inputs": [{"locations": ["/things/0/cs/0", "/things/0/cs/1", "/things/0/cs/2"], "name": "cs[]", "value": [{"a": 2, "reviews": [{"ok": false}]}, {"a": 1, "reviews": [{"ok": true}]}, {"a": 3, "reviews": [{"ok": true}, {"ok": false}]}]}], "message": "item 1 of cs: item 1 of reviews: ok is false; item 1 of cs: a is 2; item 3 of cs: item 2 of reviews: ok is false; item 3 of cs: a is 3", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "and N more counts the items that aren't shown",
+        "rules": ["message.items", "message.join"],
+        "input": {"things": [{"id": "t", "cs": [{"a": 2, "reviews": [{"ok": false}]}, {"a": 3, "reviews": [{"ok": false}]}, {"a": 4, "reviews": [{"ok": false}]}, {"a": 5, "reviews": [{"ok": false}]}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "every c.reviews.ok is true", "cause": "value", "inputs": [{"locations": ["/things/0/cs/0/reviews/0/ok"], "name": "c.reviews[].ok", "value": [false]}]}, {"assertion": "c.a is 1", "cause": "value", "inputs": [{"locations": ["/things/0/cs/0/a"], "name": "c.a", "value": 2}]}], "item": "item 1 of cs", "locations": ["/things/0/cs/0"], "path": "item 1 of cs", "value": {"a": 2, "reviews": [{"ok": false}]}}, {"cause": "value", "failed_assertions": [{"assertion": "every c.reviews.ok is true", "cause": "value", "inputs": [{"locations": ["/things/0/cs/1/reviews/0/ok"], "name": "c.reviews[].ok", "value": [false]}]}, {"assertion": "c.a is 1", "cause": "value", "inputs": [{"locations": ["/things/0/cs/1/a"], "name": "c.a", "value": 3}]}], "item": "item 2 of cs", "locations": ["/things/0/cs/1"], "path": "item 2 of cs", "value": {"a": 3, "reviews": [{"ok": false}]}}, {"cause": "value", "failed_assertions": [{"assertion": "every c.reviews.ok is true", "cause": "value", "inputs": [{"locations": ["/things/0/cs/2/reviews/0/ok"], "name": "c.reviews[].ok", "value": [false]}]}, {"assertion": "c.a is 1", "cause": "value", "inputs": [{"locations": ["/things/0/cs/2/a"], "name": "c.a", "value": 4}]}], "item": "item 3 of cs", "locations": ["/things/0/cs/2"], "path": "item 3 of cs", "value": {"a": 4, "reviews": [{"ok": false}]}}, {"cause": "value", "failed_assertions": [{"assertion": "every c.reviews.ok is true", "cause": "value", "inputs": [{"locations": ["/things/0/cs/3/reviews/0/ok"], "name": "c.reviews[].ok", "value": [false]}]}, {"assertion": "c.a is 1", "cause": "value", "inputs": [{"locations": ["/things/0/cs/3/a"], "name": "c.a", "value": 5}]}], "item": "item 4 of cs", "locations": ["/things/0/cs/3"], "path": "item 4 of cs", "value": {"a": 5, "reviews": [{"ok": false}]}}], "inputs": [{"locations": ["/things/0/cs/0", "/things/0/cs/1", "/things/0/cs/2", "/things/0/cs/3"], "name": "cs[]", "value": [{"a": 2, "reviews": [{"ok": false}]}, {"a": 3, "reviews": [{"ok": false}]}, {"a": 4, "reviews": [{"ok": false}]}, {"a": 5, "reviews": [{"ok": false}]}]}], "message": "item 1 of cs: item 1 of reviews: ok is false; item 1 of cs: a is 2; item 2 of cs: item 1 of reviews: ok is false; item 2 of cs: a is 3; item 3 of cs: item 1 of reviews: ok is false; item 3 of cs: a is 4; and 1 more", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over two lists whose sentences fail in the other order",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": ["approver.state is \"APPROVED\"", "approver.username is not pr.author"], "for": "every prs as pr, some pr.approvers as approver"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the pairs come in the order of the items, not of the sentences",
+        "rules": ["message.join"],
+        "input": {"things": [{"id": "t", "prs": [{"author": "ann", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "bob", "state": "X"}]}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/1/state"], "name": "approver.state", "value": "X"}], "item": "item 2 of pr.approvers"}]}, {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/0/username"], "name": "approver.username", "value": "ann"}, {"locations": ["/things/0/prs/0/author"], "name": "pr.author", "value": "ann"}], "item": "item 1 of pr.approvers"}]}], "item": "item 1 of prs", "locations": ["/things/0/prs/0"], "path": "item 1 of prs", "value": {"approvers": [{"state": "APPROVED", "username": "ann"}, {"state": "X", "username": "bob"}], "author": "ann"}}], "inputs": [{"locations": ["/things/0/prs/0/approvers/0", "/things/0/prs/0/approvers/1"], "name": "pr.approvers[]", "value": [{"state": "APPROVED", "username": "ann"}, {"state": "X", "username": "bob"}]}, {"locations": ["/things/0/prs/0"], "name": "prs[]", "value": [{"approvers": [{"state": "APPROVED", "username": "ann"}, {"state": "X", "username": "bob"}], "author": "ann"}]}], "message": "item 1 of prs: item 1 of approvers: approver.username is \"ann\", and pr.author is \"ann\"; item 1 of prs: item 2 of approvers: state is \"X\"", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "two prs come in order, and the cap counts pairs",
+        "rules": ["message.join", "message.items"],
+        "input": {"things": [{"id": "t", "prs": [{"author": "ann", "approvers": [{"username": "ann", "state": "APPROVED"}, {"username": "bob", "state": "X"}]}, {"author": "cy", "approvers": [{"username": "cy", "state": "APPROVED"}, {"username": "dee", "state": "X"}]}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/1/state"], "name": "approver.state", "value": "X"}], "item": "item 2 of pr.approvers"}]}, {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/0/username"], "name": "approver.username", "value": "ann"}, {"locations": ["/things/0/prs/0/author"], "name": "pr.author", "value": "ann"}], "item": "item 1 of pr.approvers"}]}], "item": "item 1 of prs", "locations": ["/things/0/prs/0"], "path": "item 1 of prs", "value": {"approvers": [{"state": "APPROVED", "username": "ann"}, {"state": "X", "username": "bob"}], "author": "ann"}}, {"cause": "value", "failed_assertions": [{"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/1/approvers/1/state"], "name": "approver.state", "value": "X"}], "item": "item 2 of pr.approvers"}]}, {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/1/approvers/0/username"], "name": "approver.username", "value": "cy"}, {"locations": ["/things/0/prs/1/author"], "name": "pr.author", "value": "cy"}], "item": "item 1 of pr.approvers"}]}], "item": "item 2 of prs", "locations": ["/things/0/prs/1"], "path": "item 2 of prs", "value": {"approvers": [{"state": "APPROVED", "username": "cy"}, {"state": "X", "username": "dee"}], "author": "cy"}}], "inputs": [{"locations": ["/things/0/prs/0/approvers/0", "/things/0/prs/0/approvers/1", "/things/0/prs/1/approvers/0", "/things/0/prs/1/approvers/1"], "name": "pr.approvers[]", "value": [{"state": "APPROVED", "username": "ann"}, {"state": "X", "username": "bob"}, {"state": "APPROVED", "username": "cy"}, {"state": "X", "username": "dee"}]}, {"locations": ["/things/0/prs/0", "/things/0/prs/1"], "name": "prs[]", "value": [{"approvers": [{"state": "APPROVED", "username": "ann"}, {"state": "X", "username": "bob"}], "author": "ann"}, {"approvers": [{"state": "APPROVED", "username": "cy"}, {"state": "X", "username": "dee"}], "author": "cy"}]}], "message": "item 1 of prs: item 1 of approvers: approver.username is \"ann\", and pr.author is \"ann\"; item 1 of prs: item 2 of approvers: state is \"X\"; item 2 of prs: item 1 of approvers: approver.username is \"cy\", and pr.author is \"cy\"; and 1 more", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a name that holds a line separator",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "k.\"a\u2028b\" is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the separator is written as an escape, like in a value",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "k": {"a\u2028b": 2}}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/k/a\u2028b"], "name": "k.\"a\u2028b\"", "value": 2}], "message": "k.\"a\\u2028b\" is 2", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

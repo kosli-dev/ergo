@@ -46,6 +46,8 @@ messages / a for line over two lists with a sentence that doesn't read the secon
 messages / a for line that picks nothing prints the list it read / a whose that leaves no item prints the list
 messages / a for line that picks nothing prints the list it read / an empty list prints as empty
 messages / a one-list for line over a key that holds a colon / two sentences that walk the same list give one part
+messages / a one-list for line whose items fail a sentence that walks and one that doesn't / and N more counts the items that aren't shown
+messages / a one-list for line whose items fail a sentence that walks and one that doesn't / the part of a sentence that doesn't walk goes with its item and isn't counted
 messages / a one-list for line with a sentence that walks a list and one that doesn't / the sentence that doesn't walk gets its own part
 messages / a some over a list inside a part / an item of the list is named with the part's name
 messages / a sum of a part that isn't an object / the part is named

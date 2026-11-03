@@ -10,7 +10,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### Changed
 
-- The engine follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.3.0-dev`, and each failed row and each violation has a `message`. 147 of the spec's cases still get another text from the Rust engine, and `known-failures.txt` lists them.
+- The engine follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.3.0-dev`, and each failed row and each violation has a `message`. 149 of the spec's cases still get another text from the Rust engine, and `known-failures.txt` lists them.
 
 ## 0.2.0
 

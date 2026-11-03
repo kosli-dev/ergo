@@ -11289,3 +11289,20 @@ test_message_of_exists_on_a_null_field_says_it_is_null_whatever_cause_the_line_h
 	check := {"$sides": [["x"]], "op": "present", "path": ["x"], "expression": "x exists"}
 	ergo._m_message(check, {"x": null}, "absent") == "x is null"
 }
+
+test_message_of_a_row_writes_every_line_separator_of_a_name_as_an_escape if {
+	every sep, esc in {"\u2028": "\\u2028", "\u2029": "\\u2029", "\u0085": "\\u0085"} {
+		ergo._m_row_one_line({"message": concat("", ["a", sep, "b"])}).message == concat("", ["a", esc, "b"])
+	}
+}
+
+test_message_of_a_row_without_a_line_separator_is_the_same_row if {
+	row := {"message": "a is 1", "passed": false}
+	ergo._m_row_one_line(row) == row
+	ergo._m_row_one_line({"passed": true}) == {"passed": true}
+}
+
+test_message_pairs_sort_by_the_number_of_their_item_and_a_lead_without_a_number_sorts_first if {
+	ergo._m_lead_n("item 12 of x") == 12
+	ergo._m_lead_n("item x of y") == 0
+}
