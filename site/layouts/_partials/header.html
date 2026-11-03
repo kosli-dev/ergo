@@ -3,6 +3,7 @@
     <a class="lockup" href="{{ "/" | relURL }}" aria-label="Ergo home">{{ partial "wordmark.html" . }}</a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu"><span></span><span></span><span></span></button>
     <nav class="site-nav" id="site-nav" aria-label="Main">
+      <a href="{{ "tutorial/" | relURL }}"{{ if eq .RelPermalink ("tutorial/" | relURL) }} aria-current="page"{{ end }}>Learn Ergo</a>
       <a href="{{ "docs/getting-started/" | relURL }}"{{ if eq .RelPermalink ("docs/getting-started/" | relURL) }} aria-current="page"{{ end }}>Get started</a>
       <a href="{{ "docs/reference/" | relURL }}"{{ if eq .RelPermalink ("docs/reference/" | relURL) }} aria-current="page"{{ end }}>Reference</a>
       <a href="{{ "playground/" | relURL }}" target="_blank" rel="noopener">Try Ergo <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
