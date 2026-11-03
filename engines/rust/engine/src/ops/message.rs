@@ -1,6 +1,6 @@
 use super::compare::{Cmp, Side, read_side};
 use super::tally::{self, Side as TallySide};
-use super::{Check, Input, Verdict, lists, read_path, run as run_check};
+use super::{Check, Input, Verdict, lists, read_path, run_full};
 use crate::cause::Cause;
 use crate::name;
 use crate::path::{self, Ctx, Outcome, Path, Resolved, Start, Step};
@@ -214,7 +214,11 @@ fn side_paths(check: &Check) -> Vec<&Path> {
                 }
             })
             .collect(),
-        _ => single_path(check).into_iter().collect(),
+        _ => {
+            let mut paths: Vec<&Path> = single_path(check).into_iter().collect();
+            paths.extend(lists::right_paths(check));
+            paths
+        }
     }
 }
 
@@ -294,11 +298,24 @@ pub fn key_faults_of(path: &Path, ctx: &Ctx) -> Vec<String> {
 }
 
 fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
-    if matches!(check, Check::Tally(_)) {
-        return Vec::new();
-    }
+    let paths: Vec<&Path> = match check {
+        Check::Tally(t) => tally::tally_sides(t)
+            .into_iter()
+            .flat_map(|side| match side {
+                TallySide::Plain(plain) => plain.paths(),
+                TallySide::Derived(derived) => {
+                    let (plain, _, elapsed) = tally::derived_operands(derived);
+                    plain
+                        .into_iter()
+                        .chain(elapsed.into_iter().flat_map(|(a, b)| [a, b]))
+                        .collect()
+                }
+            })
+            .collect(),
+        other => side_paths(other),
+    };
     once_of(
-        side_paths(check)
+        paths
             .into_iter()
             .flat_map(|path| blocked_of(path, ctx))
             .collect(),
@@ -468,14 +485,35 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<String> {
     out
 }
 
+fn unflawed_cause(line: &Check, ctx: &Ctx) -> Cause {
+    match single_path(line).and_then(|path| first_input(path, ctx)) {
+        Some(input) => match input.state {
+            Outcome::Absent => Cause::Absent,
+            Outcome::Null => Cause::Null,
+            _ => Cause::Value,
+        },
+        None => Cause::Value,
+    }
+}
+
 fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
     let mut parts = Vec::new();
     for (at, option) in any.options.iter().enumerate() {
         let lines: Vec<String> = option
             .iter()
             .filter_map(|line| {
-                let verdict = run_check(line, ctx);
-                (!verdict.passed()).then(|| message(line, ctx, &verdict))
+                let ran = run_full(line, ctx);
+                if ran.verdict.passed() {
+                    return None;
+                }
+                if let Some(said) = ran.message {
+                    return Some(said);
+                }
+                let mut verdict = ran.verdict;
+                if verdict.cause == Cause::Unusable && line.flawed(ctx) {
+                    verdict.cause = unflawed_cause(line, ctx);
+                }
+                Some(message(line, ctx, &verdict))
             })
             .collect();
         if lines.is_empty() {
@@ -518,10 +556,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 if let Check::Tally(tally_check) = check {
                     for side in tally::tally_sides(tally_check) {
                         if let TallySide::Derived(derived) = side {
-                            let said = tally::counted_texts(derived, ctx, verdict.cause);
-                            if !said.is_empty() {
-                                found.push(joined(said));
-                            }
+                            found.extend(tally::counted_texts(derived, ctx, verdict.cause));
                         }
                     }
                 }
@@ -616,7 +651,13 @@ pub fn joined(parts: Vec<String>) -> String {
 
 fn join_text(side: &Side) -> String {
     match side {
-        Side::Path(path) => name::name(path),
+        Side::Path(path) => {
+            let shown = name::name(path);
+            match shown.strip_prefix("item 1 of ") {
+                Some(rest) => format!("first of {rest}"),
+                None => shown,
+            }
+        }
         Side::Value(value) => print(value),
         Side::Join(pieces) => pieces
             .iter()
@@ -675,8 +716,78 @@ fn tally_inputs(side: &TallySide, ctx: &Ctx, cause: Cause) -> Vec<Input> {
     }
 }
 
-fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
+fn tally_side_value(side: &TallySide, ctx: &Ctx) -> Option<(String, Value, bool)> {
+    match side {
+        TallySide::Derived(derived) => tally::derived_value(derived, ctx)
+            .ok()
+            .map(|number| (derived.text.clone(), Value::Number(number), false)),
+        TallySide::Plain(plain) => {
+            let literal = matches!(plain, Side::Value(_));
+            let read = read_side(plain, ctx);
+            match (read.value, read.inputs.first()) {
+                (Some(value), Some(first)) if matches!(plain, Side::Path(_)) => {
+                    Some((first.name.clone(), value, false))
+                }
+                (Some(value), None) if literal => Some((String::new(), value, true)),
+                _ => None,
+            }
+        }
+    }
+}
+
+fn tally_side_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
+    let sides = tally::tally_sides(check);
+    let values: Vec<Option<(String, Value, bool)>> = sides
+        .iter()
+        .map(|side| tally_side_value(side, ctx))
+        .collect();
     let mut out = Vec::new();
+    for (at, found) in values.iter().enumerate() {
+        let Some((name, value, literal)) = found else {
+            continue;
+        };
+        if *literal {
+            continue;
+        }
+        let want: Option<&'static str> = match &check.test {
+            tally::Test::Between { .. } => Some("a number"),
+            tally::Test::Compare {
+                within: Some(_), ..
+            } => Some("a number"),
+            tally::Test::Compare { cmp, .. } => match cmp {
+                Cmp::Eq | Cmp::Ne => {
+                    let other = values.get(1 - at.min(1)).and_then(Option::as_ref);
+                    let left_literal = values
+                        .first()
+                        .and_then(Option::as_ref)
+                        .is_some_and(|(_, _, literal)| *literal);
+                    match other {
+                        Some((_, other, _)) if (at == 1) == left_literal => Some(kind(other)),
+                        _ => None,
+                    }
+                }
+                Cmp::StartsWith
+                | Cmp::EndsWith
+                | Cmp::NotStartsWith
+                | Cmp::NotEndsWith
+                | Cmp::AlphabeticallyBefore
+                | Cmp::AlphabeticallyAfter
+                | Cmp::AlphabeticallyOnOrBefore
+                | Cmp::AlphabeticallyOnOrAfter => Some("text"),
+                _ => Some("a number"),
+            },
+        };
+        if let Some(want) = want
+            && kind(value) != want
+        {
+            out.push(isnt(name, value, want));
+        }
+    }
+    out
+}
+
+fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
+    let mut out = tally_side_faults(check, ctx);
     for side in tally::tally_sides(check) {
         match side {
             TallySide::Derived(derived) => {
@@ -730,7 +841,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                 }
                 let counted_said = tally::counted_texts(derived, ctx, Cause::Unusable);
                 if !counted_said.is_empty() {
-                    out.push(joined(counted_said));
+                    out.extend(counted_said);
                     any = true;
                 }
                 if !any && tally::derived_value(derived, ctx).is_err() {
@@ -781,7 +892,7 @@ fn time_faults(check: &super::time::CompareTime, ctx: &Ctx) -> Vec<String> {
     out
 }
 
-pub fn flawed_text(checks: &[&Check], ctx: &Ctx) -> Option<String> {
+pub fn ref_fault_list(checks: &[&Check], ctx: &Ctx) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for check in checks {
         for fault in lists::ref_faults(check, ctx) {
@@ -790,6 +901,11 @@ pub fn flawed_text(checks: &[&Check], ctx: &Ctx) -> Option<String> {
             }
         }
     }
+    out
+}
+
+pub fn flawed_text(checks: &[&Check], ctx: &Ctx) -> Option<String> {
+    let out = ref_fault_list(checks, ctx);
     (!out.is_empty()).then(|| out.join(", and "))
 }
 
@@ -811,4 +927,166 @@ pub fn read_names(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
     };
     names.dedup();
     names
+}
+
+pub fn first_list_text(path: &Path, ctx: &Ctx) -> Option<String> {
+    (1..=path.steps.len()).find_map(|at| {
+        let prefix = Path {
+            start: path.start.clone(),
+            steps: path.steps[..at].to_vec(),
+        };
+        let read = path::read(&prefix, ctx);
+        read.value
+            .filter(|value| value.is_array())
+            .map(|value| is(&name::name(&prefix), value))
+    })
+}
+
+pub struct ForItem<'a> {
+    pub path: &'a Path,
+    pub whose: &'a [Check],
+    pub picks: bool,
+}
+
+pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> String {
+    let want = match cause {
+        Cause::Absent => Some(Outcome::Absent),
+        Cause::Null => Some(Outcome::Null),
+        _ => None,
+    };
+    let mut said: Vec<String> = Vec::new();
+    if let Some(want) = want {
+        said = once_of(
+            items
+                .iter()
+                .flat_map(|item| key_states_of(item.path, ctx, want))
+                .collect(),
+        );
+        if said.is_empty() {
+            let mut clauses = Vec::new();
+            for item in items {
+                let mut inputs: Vec<Input> = first_input(item.path, ctx).into_iter().collect();
+                let mut own = path::step_refs(item.path);
+                let checks: Vec<&Check> = item.whose.iter().collect();
+                own.extend(checks.iter().flat_map(|check| check.refs()));
+                own.sort_by_key(name::name);
+                own.dedup();
+                for reference in own {
+                    inputs.extend(first_input(&reference, ctx));
+                }
+                for input in inputs.iter().filter(|input| input.state == want) {
+                    clauses.push(format!("{} is {}", input.name, state_word(want)));
+                }
+            }
+            said = once_of(clauses);
+        }
+    } else if cause == Cause::Unusable {
+        let mut clauses = Vec::new();
+        for item in items {
+            clauses.extend(key_faults_of(item.path, ctx));
+            let checks: Vec<&Check> = item.whose.iter().collect();
+            clauses.extend(ref_fault_list(&checks, ctx));
+        }
+        said = once_of(clauses);
+    }
+    if said.is_empty() {
+        let narrows = |item: &&ForItem| {
+            !item.whose.is_empty()
+                || item.picks
+                || path::read(item.path, ctx)
+                    .value
+                    .is_some_and(|value| value.as_array().is_some_and(Vec::is_empty))
+        };
+        said = once_of(
+            items
+                .iter()
+                .filter(narrows)
+                .filter_map(|item| first_list_text(item.path, ctx))
+                .collect(),
+        );
+    }
+    if said.is_empty() {
+        said = once_of(
+            items
+                .iter()
+                .filter_map(|item| first_list_text(item.path, ctx))
+                .collect(),
+        );
+    }
+    if said.is_empty() {
+        "the check is false".to_string()
+    } else {
+        joined(said)
+    }
+}
+
+pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
+    let want = match cause {
+        Cause::Absent => Outcome::Absent,
+        Cause::Null => Outcome::Null,
+        Cause::Unusable => return off_item_lists(check, ctx),
+        _ => return Vec::new(),
+    };
+    let mut paths: Vec<&Path> = check
+        .paths()
+        .into_iter()
+        .filter(|path| matches!(path.start, Start::Alias(_) | Start::Part(_)))
+        .filter(|path| !path.steps.iter().any(|step| matches!(step, Step::Field(_))))
+        .collect();
+    paths.sort_by_key(|path| name::name(path));
+    paths.dedup();
+    let mut out: Vec<String> = Vec::new();
+    for path in paths {
+        for at in 0..=path.steps.len() {
+            let prefix = Path {
+                start: path.start.clone(),
+                steps: path.steps[..at].to_vec(),
+            };
+            if path::read(&prefix, ctx).outcome == want {
+                let clause = format!("{} is {}", name::name(&prefix), state_word(want));
+                if !out.contains(&clause) {
+                    out.push(clause);
+                }
+                break;
+            }
+        }
+    }
+    out
+}
+
+fn off_item_lists(check: &Check, ctx: &Ctx) -> Vec<String> {
+    let Check::Tally(tally_check) = check else {
+        return Vec::new();
+    };
+    let mut paths: Vec<&Path> = Vec::new();
+    for side in tally::tally_sides(tally_check) {
+        if let TallySide::Derived(derived) = side {
+            paths.extend(
+                derived
+                    .terms
+                    .iter()
+                    .filter_map(|term| match term {
+                        tally::Term::Counted(counted) => Some(&counted.path),
+                        _ => None,
+                    })
+                    .filter(|path| matches!(path.start, Start::Alias(_) | Start::Part(_))),
+            );
+        }
+    }
+    paths.sort_by_key(|path| name::name(path));
+    paths.dedup();
+    let mut out: Vec<String> = Vec::new();
+    for path in paths {
+        let read = path::read(path, ctx);
+        if let (Outcome::Found, Some(value)) = (read.outcome, read.value)
+            && !value.is_array()
+            && !value.is_null()
+        {
+            let clause = isnt(&name::name(path), value, "a list");
+            if !out.contains(&clause) {
+                out.push(clause);
+            }
+        }
+    }
+    out
 }

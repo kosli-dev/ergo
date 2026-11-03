@@ -122,6 +122,7 @@ fn plain_entries<'a>(read: &path::Read<'a>) -> Result<Vec<Entry<'a>>, Cause> {
 fn each_of_entries<'a>(
     env: &Env<'a>,
     empty: &'a Value,
+    source: &Source,
     path: &Path,
     each_of: &Path,
     anc: &[Anc<'a>],
@@ -182,26 +183,20 @@ fn each_of_entries<'a>(
             }
         })
         .collect();
-    let shown_name = crate::name::name(path);
-    let shown_name = shown_name
-        .strip_prefix("$input.")
-        .map_or(shown_name.clone(), str::to_string);
-    let shown_name = if shown_name == "$input" {
-        "it".to_string()
-    } else {
-        shown_name
-    };
+    let shown_name = from_name(path, source, anc, &ctx, true);
     let broken = unread
         .map(|cause| Broken {
             msg: if matches!(object.value, Some(Value::Array(_))) {
                 String::new()
             } else {
-                ops::message::stated(
-                    &shown_name,
-                    cause,
-                    object.value.unwrap_or(&Value::Null),
-                    "a list or an object",
-                )
+                target_message(env, empty, source, anc, cause).unwrap_or_else(|| {
+                    ops::message::stated(
+                        &shown_name,
+                        cause,
+                        object.value.unwrap_or(&Value::Null),
+                        "a list or an object",
+                    )
+                })
             },
             order: Vec::new(),
             path: String::new(),
@@ -319,6 +314,18 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
             }
         }
     }
+    if anc.is_empty() {
+        for each in &mut broken {
+            if let Some((number, tail)) = each
+                .msg
+                .strip_prefix("item ")
+                .and_then(|rest| rest.split_once(" of it"))
+                && (tail.is_empty() || tail.starts_with([':', ' ']))
+            {
+                each.msg = format!("item {number} of $input{tail}");
+            }
+        }
+    }
     broken.sort_by(|a, b| a.order.cmp(&b.order));
     Read::Entries { entries, broken }
 }
@@ -365,11 +372,11 @@ fn read_entries<'a>(
             path,
             each_of: Some(each_of),
             ..
-        } => each_of_entries(env, empty, path, each_of, anc),
+        } => each_of_entries(env, empty, &lowered.source, path, each_of, anc),
         Source::Child {
             path,
             each_of: Some(each_of),
-        } => each_of_entries(env, empty, path, each_of, anc),
+        } => each_of_entries(env, empty, &lowered.source, path, each_of, anc),
         Source::Root { path, .. } | Source::Child { path, .. } => {
             if matches!(&lowered.source, Source::Child { .. })
                 && matches!(path.steps.first(), Some(Step::Index(_)))
@@ -395,46 +402,174 @@ fn read_entries<'a>(
     }
 }
 
-fn from_message(
-    env: &Env,
-    empty: &Value,
-    lowered: &Lowered,
-    anc: &[Anc],
-    cause: Cause,
-) -> Option<String> {
-    let (Source::Root { path, each_of, .. } | Source::Child { path, each_of }) = &lowered.source;
-    let ctx = context(env, input_root(env), anc);
-    if let Some(keys) = each_of {
-        let read = path::read(keys, &ctx);
-        let named = crate::name::name(keys);
-        match (read.outcome, read.value) {
-            (Outcome::Absent, _) => return Some(format!("{named} is missing")),
-            (Outcome::Null, _) => return Some(format!("{named} is null")),
-            (Outcome::Found, Some(value)) if !matches!(value, Value::Array(items) if items.iter().all(Value::is_string)) =>
-            {
-                return Some(ops::message::isnt(&named, value, "a list of text"));
-            }
-            _ => {}
-        }
-    }
-    let mut name = crate::name::name(path);
+fn from_name(path: &Path, source: &Source, anc: &[Anc], ctx: &Ctx, resolved: bool) -> String {
+    let mut name = if resolved {
+        ops::message::resolved_name(path, ctx)
+    } else {
+        crate::name::name(path)
+    };
     if let Some(bare) = name.strip_prefix("$input.") {
         name = bare.to_string();
     } else if name == "$input" {
         name = "it".to_string();
     }
-    if let (Source::Child { .. }, Some(parent)) = (&lowered.source, anc.last())
-        && let Some(rest) = name.strip_prefix(&format!("{}.", parent.name))
-    {
-        name = rest.to_string();
+    if let (Source::Child { .. }, Some(parent)) = (source, anc.last()) {
+        if name == parent.name {
+            name = "it".to_string();
+        } else if let Some(rest) = name.strip_prefix(&format!("{}.", parent.name)) {
+            name = rest.to_string();
+        }
     }
     if name.is_empty() {
-        name = "it".to_string();
+        "it".to_string()
+    } else {
+        name
     }
-    let every = matches!(&lowered.source, Source::Root { every: true, .. });
+}
+
+fn ref_fits(value: &Value, kind: &str) -> bool {
+    match kind {
+        "text" => value.is_string(),
+        _ => matches!(value, Value::Array(items) if items.iter().all(Value::is_string)),
+    }
+}
+
+fn ref_message(env: &Env, lowered: &Lowered, anc: &[Anc], cause: Cause) -> Option<String> {
+    let (Source::Root { path, each_of, .. } | Source::Child { path, each_of }) = &lowered.source;
+    let ctx = context(env, input_root(env), anc);
+    let mut refs: Vec<Path> = path::step_refs(path);
+    refs.sort_by_key(crate::name::name);
+    refs.dedup();
+    let mut listed: Vec<(Path, &str)> = refs.into_iter().map(|r| (r, "text")).collect();
+    if let Some(keys) = each_of {
+        listed.push((keys.clone(), "a list of text"));
+    }
+    let states: Vec<(String, Outcome, Option<Value>, &str)> = listed
+        .iter()
+        .map(|(reference, kind)| {
+            let read = path::read(reference, &ctx);
+            (
+                crate::name::name(reference),
+                read.outcome,
+                read.value.cloned(),
+                *kind,
+            )
+        })
+        .collect();
+    let says =
+        |name: &str, outcome: Outcome, value: &Option<Value>, kind: &str, want: Option<Cause>| {
+            match (outcome, value) {
+                (Outcome::Absent, _) if want.is_none_or(|c| c == Cause::Absent) => {
+                    Some(format!("{name} is missing"))
+                }
+                (Outcome::Null, _) if want.is_none_or(|c| c == Cause::Null) => {
+                    Some(format!("{name} is null"))
+                }
+                (Outcome::Found, Some(value))
+                    if want.is_none_or(|c| c == Cause::Unusable) && !ref_fits(value, kind) =>
+                {
+                    Some(ops::message::isnt(name, value, kind))
+                }
+                _ => None,
+            }
+        };
+    let mut said: Vec<String> = states
+        .iter()
+        .filter_map(|(name, outcome, value, kind)| says(name, *outcome, value, kind, Some(cause)))
+        .collect();
+    if said.is_empty() {
+        said = states
+            .iter()
+            .filter_map(|(name, outcome, value, kind)| says(name, *outcome, value, kind, None))
+            .collect();
+    }
+    (!said.is_empty()).then(|| ops::message::joined(said))
+}
+
+fn target_message(
+    env: &Env,
+    empty: &Value,
+    source: &Source,
+    anc: &[Anc],
+    cause: Cause,
+) -> Option<String> {
+    let (Source::Root { path, .. } | Source::Child { path, .. }) = source;
+    let child = matches!(source, Source::Child { .. });
+    let doc: &Value = if child {
+        anc.last()?.at.value
+    } else {
+        env.input
+    };
+    if child {
+        if std::ptr::eq(doc, empty) {
+            return Some("it is missing".to_string());
+        }
+        match doc {
+            Value::Null => return Some("it is null".to_string()),
+            Value::Object(_) | Value::Array(_) => {}
+            _ => return Some(ops::message::isnt("it", doc, "a list or an object")),
+        }
+    }
+    let ctx = context(env, input_root(env), anc);
+    match (doc, path.steps.first()) {
+        (Value::Array(items), Some(Step::Index(at)))
+            if usize::try_from(*at).is_ok_and(|at| at >= items.len()) =>
+        {
+            return Some(format!("item {} of $input is missing", at + 1));
+        }
+        (Value::Array(items), Some(Step::Key(key))) if cause == Cause::NotAnObject => {
+            let said: Vec<String> = items
+                .iter()
+                .enumerate()
+                .filter(|(_, item)| !item.is_object())
+                .map(|(at, _)| {
+                    format!(
+                        "item {} of $input: {}",
+                        at + 1,
+                        ops::message::isnt(
+                            &crate::name::key_text(key),
+                            &Value::Null,
+                            "a list or an object"
+                        )
+                    )
+                })
+                .collect();
+            if !said.is_empty() {
+                return Some(ops::message::joined(said));
+            }
+        }
+        (Value::Object(_), _) if cause == Cause::Unusable => {
+            if let Some(k) = path
+                .steps
+                .iter()
+                .position(|step| matches!(step, Step::Index(_)))
+            {
+                let Some(Step::Index(at)) = path.steps.get(k) else {
+                    return None;
+                };
+                let prefix = Path {
+                    start: path.start.clone(),
+                    steps: path.steps[..k].to_vec(),
+                };
+                let read = path::read(&prefix, &ctx);
+                if read.outcome == Outcome::Found && read.value.is_some_and(Value::is_object) {
+                    let shown = if k == 0 {
+                        "$input".to_string()
+                    } else {
+                        from_name(&prefix, source, anc, &ctx, true)
+                    };
+                    return Some(ops::message::isnt(
+                        &format!("item {} of {shown}", at + 1),
+                        &Value::Null,
+                        "a list or an object",
+                    ));
+                }
+            }
+        }
+        _ => {}
+    }
     let read = path::read(path, &ctx);
-    let _ = empty;
-    let state = |want| ops::message::key_states_of(path, &ctx, want).join(", and ");
+    let name = from_name(path, source, anc, &ctx, !read.step_unreadable);
     match cause {
         Cause::Absent | Cause::Null => {
             let want = if cause == Cause::Absent {
@@ -442,22 +577,9 @@ fn from_message(
             } else {
                 Outcome::Null
             };
-            let keys = state(want);
+            let keys = ops::message::key_states_of(path, &ctx, want).join(", and ");
             if !keys.is_empty() {
                 return Some(keys);
-            }
-            if !read.step_unreadable {
-                name = ops::message::resolved_name(path, &ctx);
-                if let Some(bare) = name.strip_prefix("$input.") {
-                    name = bare.to_string();
-                } else if name == "$input" {
-                    name = "it".to_string();
-                }
-                if let (Source::Child { .. }, Some(parent)) = (&lowered.source, anc.last())
-                    && let Some(rest) = name.strip_prefix(&format!("{}.", parent.name))
-                {
-                    name = rest.to_string();
-                }
             }
             let word = if cause == Cause::Absent {
                 "missing"
@@ -474,15 +596,41 @@ fn from_message(
             let value = read.value?;
             let kind = match value {
                 Value::Array(_) => return None,
-                Value::Object(_) if every => "a list",
-                Value::Object(_) => return None,
+                Value::Object(_) => "a list",
                 _ => "a list or an object",
             };
-            Some(crate::ops::message::isnt(&name, value, kind))
+            Some(ops::message::isnt(&name, value, kind))
         }
         Cause::NotAnObject => {
             let parent = anc.last()?.at.value;
+            if parent.is_array() || parent.is_object() {
+                return None;
+            }
             Some(ops::message::isnt("it", parent, "a list or an object"))
+        }
+        _ => None,
+    }
+}
+
+fn from_message(
+    env: &Env,
+    empty: &Value,
+    lowered: &Lowered,
+    anc: &[Anc],
+    cause: Cause,
+) -> Option<String> {
+    ref_message(env, lowered, anc, cause)
+        .or_else(|| target_message(env, empty, &lowered.source, anc, cause))
+}
+
+fn object_target_message(env: &Env, lowered: &Lowered, anc: &[Anc]) -> Option<String> {
+    let (Source::Root { path, .. } | Source::Child { path, .. }) = &lowered.source;
+    let ctx = context(env, input_root(env), anc);
+    let read = path::read(path, &ctx);
+    match (read.outcome, read.value) {
+        (Outcome::Found, Some(value @ Value::Object(_))) => {
+            let name = from_name(path, &lowered.source, anc, &ctx, true);
+            Some(ops::message::isnt(&name, value, "a list"))
         }
         _ => None,
     }
@@ -823,6 +971,7 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     let every = matches!(&lowered.source, Source::Root { every: true, .. });
     let read = Cause::worst(broken.iter().map(|b| b.cause));
     let mut min = min_row(env, in_scope.len() as u64, &locations, read);
+    let mut explained = false;
     if !every && env.unreadable.is_empty() && read.is_some() && min.cause != Cause::Satisfied {
         let said: Vec<String> = broken
             .iter()
@@ -831,7 +980,16 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
             .collect();
         if !said.is_empty() {
             min.message = Some(ops::message::joined(said));
+            explained = true;
         }
+    }
+    if !every
+        && env.unreadable.is_empty()
+        && min.cause != Cause::Satisfied
+        && !explained
+        && let Some(said) = object_target_message(env, lowered, anc)
+    {
+        min.message = Some(said);
     }
     if every {
         let listed = if env.unreadable.is_empty() {

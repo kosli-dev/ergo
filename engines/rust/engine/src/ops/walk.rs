@@ -65,6 +65,7 @@ pub struct Failure {
     pub order: Vec<Seg>,
     pub path: String,
     pub item: String,
+    pub said: String,
     pub cause: Cause,
     pub value: Value,
     pub location: Option<Location>,
@@ -118,6 +119,7 @@ pub struct Walked<'a> {
     pub name: String,
     pub unreadable: Option<Outcome>,
     start: Start,
+    keeps_dot: bool,
 }
 
 impl Walked<'_> {
@@ -130,6 +132,14 @@ impl Walked<'_> {
     }
 
     pub fn item_name(&self, segs: &[Seg]) -> String {
+        self.item_name_with(segs, self.keeps_dot)
+    }
+
+    pub fn item_name_dotted(&self, segs: &[Seg]) -> String {
+        self.item_name_with(segs, true)
+    }
+
+    fn item_name_with(&self, segs: &[Seg], own_dot: bool) -> String {
         let indexes: Vec<usize> = segs
             .iter()
             .enumerate()
@@ -142,7 +152,7 @@ impl Walked<'_> {
             {
                 return format!("{} can't be read: {}", part.name, self.name_of(segs, true));
             }
-            return self.name_of(segs, true);
+            return self.said_name(segs, own_dot);
         };
         let plain = |segs: &[Seg]| {
             name::name(&Path {
@@ -150,7 +160,7 @@ impl Walked<'_> {
                 steps: segs.iter().map(Seg::to_step).collect(),
             })
         };
-        let mut parts = vec![self.name_of(&segs[..=*first], true)];
+        let mut parts = vec![self.said_name(&segs[..=*first], own_dot)];
         for pair in indexes.windows(2) {
             let Seg::Index(at) = &segs[pair[1]] else {
                 continue;
@@ -166,6 +176,25 @@ impl Walked<'_> {
             parts.push(plain(tail));
         }
         parts.join(": ")
+    }
+
+    fn said_name(&self, segs: &[Seg], own_dot: bool) -> String {
+        let steps: Vec<Step> = segs.iter().map(Seg::to_step).collect();
+        match &self.start {
+            Start::Part(part)
+                if steps.len() >= part.steps.len()
+                    && !steps[..part.steps.len()]
+                        .iter()
+                        .any(|step| matches!(step, Step::Index(_))) =>
+            {
+                name::name(&named(&self.start, steps, false))
+            }
+            Start::Own if !own_dot => name::name(&Path {
+                start: Start::Subject,
+                steps,
+            }),
+            _ => name::name(&named(&self.start, steps, true)),
+        }
     }
 
     pub fn name_of_steps(&self, steps: Vec<Step>, unaliased: bool) -> String {
@@ -336,6 +365,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
                     name: name::name(path),
                     unreadable: Some(outcome),
                     start: path.start.clone(),
+                    keeps_dot: false,
                 };
             }
         }
@@ -503,12 +533,15 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
         name: shown_name,
         unreadable: None,
         start: path.start.clone(),
+        keeps_dot: path.start == Start::Own
+            && matches!(path.steps.first(), Some(Step::Key(key)) if ctx.aliases.contains_key(key)),
     };
     let mut failures: Vec<Failure> = raws
         .into_iter()
         .map(|raw| Failure {
             path: walked_all.name_of(&raw.segs, raw.unaliased),
             item: walked_all.name_of(&raw.segs, raw.unaliased),
+            said: walked_all.item_name_dotted(&raw.segs),
             msg: message::stated(
                 &walked_all.item_name(&raw.segs),
                 raw.cause,
@@ -531,6 +564,7 @@ pub struct Run {
     pub verdict: Verdict,
     pub failed_items: Vec<Value>,
     pub message: Option<String>,
+    pub parts: Vec<String>,
 }
 
 fn outer<'a>(ctx: &Ctx<'a>) -> Ctx<'a> {
@@ -718,14 +752,20 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     walked.name_of_steps(named_steps, item.unaliased)
                 };
                 let read = named.map(|(_, read)| read);
-                let said = message::prefixed(
-                    &walked.item_name(&item.item_segs),
-                    &message::message(check, &at, verdict),
-                );
+                let off = message::off_item(check, ctx, verdict.cause);
+                let said = if off.is_empty() {
+                    message::prefixed(
+                        &walked.item_name(&item.item_segs),
+                        &message::message(check, &at, verdict),
+                    )
+                } else {
+                    off.join(", and ")
+                };
                 Some(Failure {
                     msg: said,
                     order,
                     path: name,
+                    said: walked.item_name_dotted(&item.item_segs),
                     item: walked.name_of(&item.item_segs, item.unaliased),
                     cause: verdict.cause,
                     value: read
@@ -735,13 +775,19 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     location: read.and_then(|r| r.location),
                 })
             } else if kept && !passed {
-                let said = message::prefixed(
-                    &walked.item_name(&item.item_segs),
-                    &message::message(&leaf_check, &at, &leaf),
-                );
+                let off = message::off_item(&leaf_check, ctx, leaf.cause);
+                let said = if off.is_empty() {
+                    message::prefixed(
+                        &walked.item_name(&item.item_segs),
+                        &message::message(&leaf_check, &at, &leaf),
+                    )
+                } else {
+                    off.join(", and ")
+                };
                 Some(Failure {
                     msg: said,
                     order: item.end_segs.clone(),
+                    said: walked.item_name_dotted(&item.end_segs),
                     path: walked.name_of(&item.end_segs, item.unaliased),
                     item: walked.name_of(&item.item_segs, item.unaliased),
                     cause: leaf.cause,
@@ -814,30 +860,20 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         inputs.dedup();
         with_fields(&mut inputs, &walked.name, &walk.path, ctx);
         let cause = outcome.cause().unwrap_or(Cause::Unusable);
-        let said = if walked.failures.is_empty() {
-            let want = if cause == Cause::Absent {
-                Outcome::Absent
-            } else {
-                Outcome::Null
-            };
-            let keys = message::key_states_of(&walk.path, &outer, want).join(", and ");
+        let parts: Vec<String> = if walked.failures.is_empty() {
             match cause {
-                Cause::Absent | Cause::Null if !keys.is_empty() => keys,
-                Cause::Absent => format!("{} is missing", walked.name),
-                Cause::Null => format!("{} is null", walked.name),
-                _ => {
-                    let mut faults = message::key_faults_of(&walk.path, &outer);
-                    faults.extend(message::blocked_of(&walk.path, &outer));
-                    faults.join(", and ")
-                }
+                Cause::Absent => vec![format!("{} is missing", walked.name)],
+                Cause::Null => vec![format!("{} is null", walked.name)],
+                _ => walk_faults(walk, &outer),
             }
         } else {
-            message::joined(walked.failures.iter().map(|f| f.msg.clone()).collect())
+            walked.failures.iter().map(|f| f.msg.clone()).collect()
         };
         return Run {
             verdict: Verdict { cause, inputs },
             failed_items: walked.failures.iter().map(Failure::to_json).collect(),
-            message: Some(said),
+            message: Some(message::joined(parts.clone())),
+            parts,
         };
     }
     let judged = judge(walk, &walked, &outer);
@@ -869,34 +905,23 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     inputs.sort_by(|a, b| a.name.cmp(&b.name));
     inputs.dedup();
     with_fields(&mut inputs, &walked.name, &walk.path, ctx);
-    let said = if cause == Cause::Satisfied {
-        None
+    let parts: Vec<String> = if cause == Cause::Satisfied {
+        Vec::new()
     } else if sorted_msgs.is_empty() {
-        Some(first_list(&walk.path, &outer))
+        vec![first_list(&walk.path, &outer)]
     } else {
-        Some(message::joined(sorted_msgs))
+        sorted_msgs
     };
     Run {
         verdict: Verdict { cause, inputs },
         failed_items,
-        message: said,
+        message: (!parts.is_empty()).then(|| message::joined(parts.clone())),
+        parts,
     }
 }
 
 fn first_list(path: &Path, ctx: &Ctx) -> String {
-    for at in 1..=path.steps.len() {
-        let prefix = Path {
-            start: path.start.clone(),
-            steps: path.steps[..at].to_vec(),
-        };
-        let read = path::read(&prefix, ctx);
-        if let Some(value) = read.value
-            && value.is_array()
-        {
-            return message::is(&name::name(&prefix), value);
-        }
-    }
-    "the check is false".to_string()
+    message::first_list_text(path, ctx).unwrap_or_else(|| "the check is false".to_string())
 }
 
 pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
@@ -909,21 +934,33 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
             },
             failed_items: Vec::new(),
             message: Some(message::isnt("it", ctx.subject.value, "an object")),
+            parts: vec![message::isnt("it", ctx.subject.value, "an object")],
         };
     }
     let mut row = read_row(walk, ctx);
     if flawed {
         row.verdict.cause = Cause::Unusable;
         row.failed_items = Vec::new();
-        let outer_ctx = outer(ctx);
-        let checks: Vec<&Check> = walk
-            .whose
-            .iter()
-            .chain(std::iter::once(&*walk.check))
-            .collect();
-        row.message = message::flawed_text(&checks, &outer_ctx);
+        row.parts = walk_faults(walk, &outer(ctx));
+        row.message = Some(message::joined(row.parts.clone()));
     }
     row
+}
+
+fn walk_faults(walk: &Walk, outer_ctx: &Ctx) -> Vec<String> {
+    let checks: Vec<&Check> = walk
+        .whose
+        .iter()
+        .chain(std::iter::once(&*walk.check))
+        .collect();
+    let mut faults = message::key_faults_of(&walk.path, outer_ctx);
+    faults.extend(message::blocked_of(&walk.path, outer_ctx));
+    faults.extend(message::ref_fault_list(&checks, outer_ctx));
+    if faults.is_empty() {
+        vec!["the check is false".to_string()]
+    } else {
+        faults
+    }
 }
 
 #[cfg(test)]

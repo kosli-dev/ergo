@@ -1,7 +1,7 @@
 use super::tally::{Side, Tally, Term};
 use super::time::{self, Time};
 use super::walk::{self, Failure, Options, Seg, WalkItem};
-use super::{Check, Input, Part, Verdict, run as run_check};
+use super::{Check, Input, Part, Verdict, run as run_check, run_full};
 use crate::cause::Cause;
 use crate::lower::{self, Scope};
 use crate::path::{self, Ctx, Located, Location, OUTER, Path, Start, Step};
@@ -299,6 +299,7 @@ pub fn lower_for(
 struct Live<'a> {
     at: Located<'a>,
     name: String,
+    said: String,
     order: Vec<Seg>,
     shown: Value,
     location: Location,
@@ -309,6 +310,7 @@ struct Dead {
     shared: bool,
     order: Vec<Seg>,
     name: String,
+    said: String,
     path: String,
     cause: Cause,
     value: Value,
@@ -316,12 +318,21 @@ struct Dead {
 }
 
 impl Dead {
+    fn shown(&self) -> &str {
+        if self.said.is_empty() {
+            &self.name
+        } else {
+            &self.said
+        }
+    }
+
     fn of_failure(failure: &Failure) -> Dead {
         Dead {
             msg: None,
             shared: false,
             order: failure.order.clone(),
             name: failure.item.clone(),
+            said: failure.said.clone(),
             path: failure.path.clone(),
             cause: failure.cause,
             value: failure.value.clone(),
@@ -335,6 +346,7 @@ impl Dead {
             shared: self.shared,
             order: self.order.clone(),
             name: self.name.clone(),
+            said: self.said.clone(),
             path: self.path.clone(),
             cause: self.cause,
             value: self.value.clone(),
@@ -483,11 +495,12 @@ impl For {
         let mut at = outer.clone();
         for w in &walked.items {
             at.subject = w.item.clone();
-            let causes: Vec<Cause> = item
+            let verdicts: Vec<Verdict> = item
                 .whose
                 .iter()
-                .map(|check| run_check(check, &at).cause)
+                .map(|check| run_check(check, &at))
                 .collect();
+            let causes: Vec<Cause> = verdicts.iter().map(|v| v.cause).collect();
             let name = walked.name_of(&w.item_segs, w.unaliased);
             let undecided = Cause::worst(
                 causes
@@ -495,11 +508,27 @@ impl For {
                     .copied()
                     .filter(|c| !matches!(c, Cause::Satisfied | Cause::Value)),
             );
+            let why = item
+                .whose
+                .iter()
+                .zip(&verdicts)
+                .find(|(_, verdict)| !matches!(verdict.cause, Cause::Satisfied | Cause::Value))
+                .map(|(check, verdict)| {
+                    super::message::prefixed(
+                        &walked.item_name_dotted(&w.item_segs),
+                        &super::message::message(check, &at, verdict),
+                    )
+                });
             let dead_item = |cause: Cause| Dead {
-                msg: None,
+                msg: if undecided.is_some() && depth == 0 && !matches!(item.how, How::Pick { .. }) {
+                    why.clone()
+                } else {
+                    None
+                },
                 shared: false,
                 order: w.item_segs.clone(),
                 name: name.clone(),
+                said: walked.item_name_dotted(&w.item_segs),
                 path: name.clone(),
                 cause,
                 value: w.shown(),
@@ -519,6 +548,7 @@ impl For {
                         value: end,
                         location: w.end_location.clone(),
                     },
+                    said: walked.item_name_dotted(&w.item_segs),
                     name,
                     order: w.item_segs.clone(),
                     shown: end.clone(),
@@ -561,6 +591,7 @@ impl For {
                     shared: false,
                     order: Vec::new(),
                     name: shown.clone(),
+                    said: String::new(),
                     path: shown,
                     cause: Cause::Absent,
                     value: Value::Null,
@@ -737,6 +768,7 @@ impl For {
                         shared: false,
                         order: found.order.clone(),
                         name: found.name.clone(),
+                        said: found.said.clone(),
                         path: found.name.clone(),
                         cause: Cause::Ambiguous,
                         value: value.clone(),
@@ -808,6 +840,7 @@ fn sort_failure(
         shared: false,
         order: found.order.clone(),
         name: found.name.clone(),
+        said: found.said.clone(),
         path: found.name.clone(),
         cause,
         value,
@@ -821,10 +854,15 @@ struct Sfail {
     names: Vec<String>,
     own: bool,
     text: String,
+    parts: Vec<String>,
+    walks: bool,
+    reads_last: bool,
     idx: usize,
     cause: Cause,
     inputs: Vec<Value>,
 }
+
+type Said = (Vec<Seg>, String, bool);
 
 struct Child {
     order: Vec<Seg>,
@@ -835,6 +873,7 @@ struct Child {
 
 struct Outcome {
     parts: Vec<String>,
+    leaf: Vec<(String, bool)>,
     bare: bool,
     said: String,
     cause: Cause,
@@ -920,11 +959,34 @@ impl For {
                     ctx,
                 );
                 let shown = crate::name::name(&item.path);
+                let outer = outer_ctx(ctx);
+                let named_by_a_field = item.path.steps.iter().any(|step| {
+                    matches!(step, Step::Ref(key) | Step::Field(key) if key.start != Start::Params)
+                });
+                let keyed = if !named_by_a_field {
+                    Vec::new()
+                } else {
+                    match cause {
+                        Cause::Absent => super::message::key_states_of(
+                            &item.path,
+                            &outer,
+                            crate::path::Outcome::Absent,
+                        ),
+                        Cause::Null => super::message::key_states_of(
+                            &item.path,
+                            &outer,
+                            crate::path::Outcome::Null,
+                        ),
+                        Cause::Unusable => super::message::key_faults_of(&item.path, &outer),
+                        _ => Vec::new(),
+                    }
+                };
                 vec![Dead {
-                    msg: None,
+                    msg: (!keyed.is_empty()).then(|| keyed.join(", and ")),
                     shared: !reads_path(&item.path, &self.items[0].alias),
                     order: Vec::new(),
                     name: shown.clone(),
+                    said: String::new(),
                     path: shown,
                     cause,
                     value: Value::Null,
@@ -950,6 +1012,7 @@ impl For {
                 shared: false,
                 order: live.order.clone(),
                 name: live.name.clone(),
+                said: live.said.clone(),
                 path: live.name.clone(),
                 cause: Cause::Satisfied,
                 value: live.shown.clone(),
@@ -965,6 +1028,7 @@ impl For {
                 (
                     Some(Outcome {
                         parts: Vec::new(),
+                        leaf: Vec::new(),
                         bare: false,
                         said: String::new(),
                         cause: Cause::NotAnObject,
@@ -981,11 +1045,15 @@ impl For {
                     (None, Vec::new())
                 } else {
                     let assertions = self.aggregate(&nested.children);
-                    let mut parts: Vec<String> = nested
-                        .children
-                        .iter()
-                        .flat_map(|c| self.child_texts(c))
-                        .collect();
+                    let mut parts: Vec<String> = match self.two_list_parts(&nested.children) {
+                        Some(grouped) => grouped,
+                        None => nested
+                            .children
+                            .iter()
+                            .flat_map(|c| self.child_texts(c))
+                            .map(|(text, _)| text)
+                            .collect(),
+                    };
                     let second = self.shared_second();
                     parts.extend(
                         nested
@@ -1005,6 +1073,7 @@ impl For {
                     (
                         Some(Outcome {
                             parts: parts.clone(),
+                            leaf: Vec::new(),
                             bare: false,
                             said: parts.join("; "),
                             cause: nested.cause,
@@ -1072,7 +1141,8 @@ impl For {
     fn try_sentences(&self, ctx: &Ctx) -> (Option<Outcome>, Vec<Sfail>) {
         let mut sfails = Vec::new();
         for (idx, sentence) in self.sentences.iter().enumerate() {
-            let verdict = run_check(&sentence.check, ctx);
+            let ran = run_full(&sentence.check, ctx);
+            let verdict = ran.verdict.clone();
             if !verdict.passed() {
                 let alias = self
                     .items
@@ -1080,13 +1150,40 @@ impl For {
                     .map(|i| i.alias.as_str())
                     .unwrap_or_default();
                 let names = super::message::read_names(&sentence.check, ctx, &verdict);
-                let own = names
-                    .iter()
-                    .all(|name| name == alias || name.starts_with(&format!("{alias}.")));
+                let own = names.iter().all(|name| {
+                    let bare = match name
+                        .strip_prefix("item ")
+                        .and_then(|r| r.split_once(" of "))
+                    {
+                        Some((_, rest)) => rest,
+                        None => name.as_str(),
+                    };
+                    bare == alias || bare.starts_with(&format!("{alias}."))
+                }) && !reads_worked_out(&sentence.check);
+                let walks = matches!(sentence.check, Check::Walk(_));
+                let text = match (&ran.message, walks) {
+                    (Some(said), true) => said.clone(),
+                    _ => super::message::message(&sentence.check, ctx, &verdict),
+                };
+                let parts = match ran.parts {
+                    Some(parts) if walks && !parts.is_empty() => {
+                        let mut once: Vec<String> = Vec::new();
+                        for part in parts {
+                            if !once.contains(&part) {
+                                once.push(part);
+                            }
+                        }
+                        once
+                    }
+                    _ => vec![text.clone()],
+                };
                 sfails.push(Sfail {
                     names,
                     own,
-                    text: super::message::message(&sentence.check, ctx, &verdict),
+                    text,
+                    parts,
+                    walks,
+                    reads_last: sentence.reads_last,
                     idx,
                     cause: verdict.cause,
                     inputs: reading_order(&sentence.check, &verdict.inputs, &self.alias_names())
@@ -1110,18 +1207,72 @@ impl For {
                     })
                     .collect();
                 let all_own = sfails.iter().all(|f| f.own);
-                let said = sfails
-                    .iter()
-                    .map(|f| f.text.clone())
-                    .collect::<Vec<_>>()
-                    .join(", and ");
-                let said = if all_own { self.strip(&said) } else { said };
+                let walked = sfails.iter().any(|f| f.walks);
+                let two = self.items.len() > 1 && sfails.iter().any(|f| f.reads_last);
+                let mut texts: Vec<String> = Vec::new();
+                if walked && !two {
+                    for text in sfails.iter().flat_map(|f| f.parts.iter()) {
+                        let text = if all_own {
+                            self.strip(text)
+                        } else {
+                            text.clone()
+                        };
+                        if !texts.contains(&text) {
+                            texts.push(text);
+                        }
+                    }
+                }
+                let groups = if texts.len() > 1 {
+                    group_by_lead(&texts)
+                } else {
+                    Vec::new()
+                };
+                if groups.len() > 1 {
+                    let leaf: Vec<(String, bool)> = groups
+                        .iter()
+                        .map(|group| (group_text(group), lead_of(&group[0]).is_empty()))
+                        .collect();
+                    return (
+                        Some(Outcome {
+                            parts: Vec::new(),
+                            leaf,
+                            bare: false,
+                            said: String::new(),
+                            cause,
+                            assertions,
+                            inner: Vec::new(),
+                        }),
+                        sfails,
+                    );
+                }
+                let said = if groups.len() == 1 {
+                    group_text(&groups[0])
+                } else {
+                    sfails
+                        .iter()
+                        .map(|f| {
+                            if walked && !two {
+                                f.parts.join("; ")
+                            } else {
+                                f.text.clone()
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                        .join(", and ")
+                };
+                let said = if all_own && groups.is_empty() {
+                    self.strip(&said)
+                } else {
+                    said
+                };
                 let alias = self
                     .items
                     .last()
                     .map(|i| i.alias.as_str())
                     .unwrap_or_default();
-                let only_alias = sfails.len() == 1 && sfails[0].names == [alias.to_string()];
+                let only_alias = sfails.len() == 1
+                    && (sfails[0].names == [alias.to_string()]
+                        || (sfails[0].walks && said.starts_with(&format!("{alias} is "))));
                 let (said, bare) = match said.strip_prefix(&format!("{alias} is ")) {
                     Some(rest) if all_own && only_alias => (format!(" is {rest}"), true),
                     _ => (said, false),
@@ -1129,6 +1280,7 @@ impl For {
                 (
                     Some(Outcome {
                         parts: Vec::new(),
+                        leaf: Vec::new(),
                         bare,
                         said,
                         cause,
@@ -1349,8 +1501,22 @@ impl For {
                 .chain(self.sentences.iter().map(|s| &s.check))
                 .collect();
             super::message::flawed_text(&checks, &outer)
+        } else if said.is_empty()
+            && failed.is_empty()
+            && !matches!(cause, Cause::Satisfied | Cause::NotAnObject)
+        {
+            let listed: Vec<super::message::ForItem> = self
+                .items
+                .iter()
+                .map(|item| super::message::ForItem {
+                    path: &item.path,
+                    whose: &item.whose,
+                    picks: matches!(item.how, How::Pick { .. }),
+                })
+                .collect();
+            Some(super::message::for_empty(&listed, &outer, cause))
         } else {
-            (!said.is_empty()).then(|| super::message::joined(said))
+            (!said.is_empty()).then(|| for_joined(said))
         };
         Run {
             verdict: Verdict { cause, inputs },
@@ -1451,34 +1617,128 @@ impl For {
         } else {
             "a list or an object"
         };
-        let mut name = dead.name.clone();
+        let mut name = dead.shown().to_string();
         for item in &self.items {
             name = name.replace(&format!(" of {}.", item.alias), " of ");
+        }
+        if name.contains(" named by ") {
+            name = self.strip(&name);
         }
         super::message::stated(&name, dead.cause, &dead.value, kind)
     }
 
-    fn child_texts(&self, child: &Child) -> Vec<String> {
+    fn two_list_parts(&self, children: &[Child]) -> Option<Vec<String>> {
+        let failing: Vec<&Child> = children.iter().filter(|c| c.failed.is_some()).collect();
+        if self.items.len() != 2
+            || failing.is_empty()
+            || failing.iter().any(|c| c.sfails.is_empty())
+        {
+            return None;
+        }
+        let mut texts: Vec<String> = Vec::new();
+        for (idx, sentence) in self.sentences.iter().enumerate() {
+            for child in &failing {
+                let Some(fail) = child.sfails.iter().find(|f| f.idx == idx) else {
+                    continue;
+                };
+                if child.failed.as_ref().is_some_and(|o| o.bare) {
+                    if let Some(text) = self.child_text(child)
+                        && !texts.contains(&text)
+                    {
+                        texts.push(text);
+                    }
+                    continue;
+                }
+                let own = child.sfails.iter().all(|f| f.own);
+                let said = if own {
+                    self.strip(&fail.text)
+                } else {
+                    fail.text.clone()
+                };
+                let text = if sentence.reads_last {
+                    super::message::prefixed(&self.strip(child.entry.shown()), &said)
+                } else {
+                    said
+                };
+                if !texts.contains(&text) {
+                    texts.push(text);
+                }
+                if !sentence.reads_last {
+                    break;
+                }
+            }
+        }
+        let leads: Vec<String> = texts.iter().map(|text| lead_of(text)).collect();
+        if texts.len() < 2 || leads.iter().all(String::is_empty) {
+            return Some(vec![texts.join(", and ")]);
+        }
+        let mut numbered: Vec<(u64, String)> = Vec::new();
+        for lead in leads.iter().filter(|lead| !lead.is_empty()) {
+            let number = lead
+                .strip_prefix("item ")
+                .and_then(|rest| rest.split(' ').next())
+                .and_then(|n| n.parse::<u64>().ok())
+                .unwrap_or(0);
+            if !numbered.iter().any(|(_, other)| other == lead) {
+                numbered.push((number, lead.clone()));
+            }
+        }
+        numbered.sort();
+        Some(
+            numbered
+                .iter()
+                .enumerate()
+                .map(|(k, (_, lead))| {
+                    let group: Vec<String> = texts
+                        .iter()
+                        .zip(&leads)
+                        .filter(|(_, l)| *l == lead || (k == 0 && l.is_empty()))
+                        .map(|(text, _)| text.clone())
+                        .collect();
+                    group_text(&group)
+                })
+                .collect(),
+        )
+    }
+
+    fn child_texts(&self, child: &Child) -> Vec<(String, bool)> {
         match &child.failed {
+            Some(outcome) if !outcome.leaf.is_empty() && outcome.cause != Cause::NotAnObject => {
+                let name = self.strip(child.entry.shown());
+                outcome
+                    .leaf
+                    .iter()
+                    .map(|(part, extra)| (format!("{name}: {part}"), *extra))
+                    .collect()
+            }
             Some(outcome) if !outcome.parts.is_empty() && outcome.cause != Cause::NotAnObject => {
-                let name = self.strip(&child.entry.name);
+                let name = self.strip(child.entry.shown());
                 outcome
                     .parts
                     .iter()
-                    .map(|part| format!("{name}: {part}"))
+                    .map(|part| (format!("{name}: {part}"), false))
                     .collect()
             }
-            _ => self.child_text(child).into_iter().collect(),
+            _ => self
+                .child_text(child)
+                .into_iter()
+                .map(|text| (text, false))
+                .collect(),
         }
     }
 
     fn child_text(&self, child: &Child) -> Option<String> {
         let outcome = child.failed.as_ref()?;
-        let name = self.strip(&child.entry.name);
+        let name = self.strip(child.entry.shown());
         Some(if outcome.cause == Cause::NotAnObject {
             super::message::isnt(&name, &child.entry.value, "an object")
         } else if outcome.said.is_empty() {
             if outcome.assertions.is_empty() && outcome.inner.is_empty() {
+                if self.items.len() > 1
+                    && matches!(self.items.get(1), Some(item) if matches!(item.how, How::Pick { .. }))
+                {
+                    return None;
+                }
                 super::message::is(&name, &child.entry.value)
             } else {
                 return None;
@@ -1490,12 +1750,12 @@ impl For {
         })
     }
 
-    fn failed_items(&self, level: Level) -> (Vec<Value>, Vec<String>) {
-        let mut said: Vec<(Vec<Seg>, String)> = level
+    fn failed_items(&self, level: Level) -> (Vec<Value>, Vec<Said>) {
+        let mut said: Vec<Said> = level
             .dead
             .iter()
             .filter(|d| d.cause != Cause::Ambiguous)
-            .map(|d| (d.order.clone(), self.dead_text(d)))
+            .map(|d| (d.order.clone(), self.dead_text(d), false))
             .collect();
         let ties: Vec<&Dead> = level
             .dead
@@ -1503,7 +1763,7 @@ impl For {
             .filter(|d| d.cause == Cause::Ambiguous)
             .collect();
         if let Some(first) = ties.first() {
-            said.push((first.order.clone(), self.tie_text(&ties)));
+            said.push((first.order.clone(), self.tie_text(&ties), false));
         }
         let mut failed: Vec<(Vec<Seg>, Value)> = level
             .dead
@@ -1512,8 +1772,8 @@ impl For {
             .collect();
         let mut hoisted: Vec<Dead> = Vec::new();
         for child in level.children {
-            for text in self.child_texts(&child) {
-                said.push((child.order.clone(), text));
+            for (text, extra) in self.child_texts(&child) {
+                said.push((child.order.clone(), text, extra));
             }
             let Child {
                 order,
@@ -1569,25 +1829,136 @@ impl For {
             .filter(|d| d.cause == Cause::Ambiguous)
             .collect();
         if let Some(first) = hoisted_ties.first() {
-            said.push((first.order.clone(), self.tie_text(&hoisted_ties)));
+            said.push((first.order.clone(), self.tie_text(&hoisted_ties), false));
         }
         for entry in hoisted {
             if entry.cause != Cause::Ambiguous {
-                said.push((entry.order.clone(), self.dead_text(&entry)));
+                said.push((entry.order.clone(), self.dead_text(&entry), false));
             }
             failed.push((entry.order.clone(), entry.json(Vec::new(), Vec::new())));
         }
         failed.sort_by(|a, b| a.0.cmp(&b.0));
         said.sort_by(|a, b| a.0.cmp(&b.0));
-        (
-            failed.into_iter().map(|(_, v)| v).collect(),
-            said.into_iter().map(|(_, t)| t).collect(),
-        )
+        (failed.into_iter().map(|(_, v)| v).collect(), said)
     }
 
     fn shared_second(&self) -> bool {
         self.items.len() == 2 && !reads_path(&self.items[1].path, &self.items[0].alias)
     }
+}
+
+fn reads_worked_out(check: &Check) -> bool {
+    match check {
+        Check::Tally(tally) => super::tally::tally_sides(tally)
+            .into_iter()
+            .any(|side| matches!(side, Side::Derived(_))),
+        Check::Compare(compare) => [&compare.left, &compare.right]
+            .into_iter()
+            .any(|side| matches!(side, super::compare::Side::Join(_))),
+        _ => false,
+    }
+}
+
+fn for_joined(said: Vec<Said>) -> String {
+    let mut once: Vec<&Said> = Vec::new();
+    for entry in &said {
+        if !once.iter().any(|o| o.1 == entry.1) {
+            once.push(entry);
+        }
+    }
+    let mut counted: Vec<&str> = Vec::new();
+    for entry in once.iter().filter(|e| !e.2) {
+        if !counted.contains(&entry.1.as_str()) {
+            counted.push(&entry.1);
+        }
+    }
+    if counted.len() <= 3 {
+        return once
+            .iter()
+            .map(|e| e.1.as_str())
+            .collect::<Vec<_>>()
+            .join("; ");
+    }
+    let shown: Vec<&str> = counted.iter().take(3).copied().collect();
+    let mut kept: Vec<String> = once
+        .iter()
+        .filter(|e| {
+            if e.2 {
+                said.iter()
+                    .any(|o| o.0 == e.0 && !o.2 && shown.contains(&o.1.as_str()))
+            } else {
+                shown.contains(&e.1.as_str())
+            }
+        })
+        .map(|e| e.1.clone())
+        .collect();
+    kept.push(format!("and {} more", counted.len() - 3));
+    kept.join("; ")
+}
+
+fn outside_quotes(text: &str) -> bool {
+    text.replace("\\\\", "")
+        .replace("\\\"", "")
+        .matches('"')
+        .count()
+        .is_multiple_of(2)
+}
+
+fn lead_of(text: &str) -> String {
+    if !text.starts_with("item ") {
+        return String::new();
+    }
+    let cuts = text
+        .match_indices(": ")
+        .chain(text.match_indices(" is "))
+        .map(|(at, _)| at)
+        .filter(|at| *at > 0 && outside_quotes(&text[..*at]));
+    match cuts.min() {
+        Some(at) if text[..at].contains(" of ") => text[..at].to_string(),
+        _ => String::new(),
+    }
+}
+
+fn group_by_lead(texts: &[String]) -> Vec<Vec<String>> {
+    let leads: Vec<String> = texts.iter().map(|text| lead_of(text)).collect();
+    if leads.iter().all(String::is_empty) {
+        return vec![texts.to_vec()];
+    }
+    let mut order: Vec<&String> = Vec::new();
+    for lead in &leads {
+        if !order.contains(&lead) {
+            order.push(lead);
+        }
+    }
+    order
+        .into_iter()
+        .map(|lead| {
+            texts
+                .iter()
+                .zip(&leads)
+                .filter(|(_, other)| *other == lead)
+                .map(|(text, _)| text.clone())
+                .collect()
+        })
+        .collect()
+}
+
+fn group_text(group: &[String]) -> String {
+    let [first, rest @ ..] = group else {
+        return String::new();
+    };
+    let lead = lead_of(first);
+    let mut out = first.clone();
+    for text in rest {
+        let after = if lead.is_empty() {
+            text.as_str()
+        } else {
+            text.strip_prefix(&format!("{lead}: ")).unwrap_or(text)
+        };
+        out.push_str(", and ");
+        out.push_str(after);
+    }
+    out
 }
 
 fn cause_named(name: &str) -> Option<Cause> {
