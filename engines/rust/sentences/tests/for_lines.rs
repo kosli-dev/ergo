@@ -19,7 +19,7 @@ fn a_walk_item_has_a_quantifier_a_path_and_an_alias() {
 
 #[test]
 fn a_walk_item_keeps_its_whose_and_if_any() {
-    let read = for_line("some items whose k is 1 and j exists, if any, as it_1");
+    let read = for_line("some items whose k is 1 and whose j exists, if any, as it_1");
     match &read.items[0] {
         ForItem::Walk {
             quantifier,
@@ -54,7 +54,8 @@ fn a_pick_item_has_a_position_a_path_whose_and_sorted_by() {
                     not: false,
                     operand: value(number("1")),
                     within: None
-                }
+                },
+                that: false
             }],
             sorted_by: Some(SortedBy {
                 path: key("created"),
@@ -188,7 +189,7 @@ fn a_for_line_otherwise_fails_as_a_check_does() {
 fn a_for_line_prints_its_items_joined_by_a_comma() {
     for line in [
         "every items as i",
-        "some items whose k is 1 and j exists, if any, as i",
+        "some items whose k is 1 and whose j exists, if any, as i",
         "last of items as l",
         "item 3 of items.x whose k is 1 as t",
         "item 2 from last of items sorted by created as t",
@@ -263,7 +264,7 @@ fn a_long_for_line_does_not_make_the_reader_slow() {
     let whose: Vec<String> = (0..60).map(|n| format!("k{n} is {n}")).collect();
     let line = format!(
         "every items whose {} as i, last of other as j",
-        whose.join(" and ")
+        whose.join(" and whose ")
     );
     assert_eq!(for_line(&line).items.len(), 2);
     assert_eq!(

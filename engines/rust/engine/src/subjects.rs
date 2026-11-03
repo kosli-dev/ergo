@@ -760,17 +760,20 @@ pub(crate) fn merge_inputs(mut inputs: Vec<Input>) -> Vec<Input> {
 }
 
 fn merged_inputs(inputs: Vec<Input>) -> Vec<Value> {
-    merge_inputs(inputs).iter().map(Input::to_json).collect()
+    let mut entries: Vec<Value> = merge_inputs(inputs).iter().map(Input::to_json).collect();
+    entries.dedup();
+    entries
 }
 
 fn inputs_in_order(inputs: Vec<Input>) -> Vec<Value> {
-    let mut kept: Vec<Input> = Vec::new();
+    let mut kept: Vec<Value> = Vec::new();
     for input in inputs {
-        if !kept.contains(&input) {
-            kept.push(input);
+        let entry = input.to_json();
+        if !kept.contains(&entry) {
+            kept.push(entry);
         }
     }
-    kept.iter().map(Input::to_json).collect()
+    kept
 }
 
 struct Applied {
@@ -1560,7 +1563,7 @@ mod tests {
     fn a_present_filter_that_finds_its_field_missing_rules_the_subject_out_whatever_the_others_say()
     {
         let r = run(
-            json!({"thing": {"from": "ds whose keep exists and b.c exists"}}),
+            json!({"thing": {"from": "ds whose keep exists and whose b.c exists"}}),
             json!({"ds": [{"b": 1}]}),
         );
         let applies = rows(&r, "$applies");
@@ -1578,7 +1581,7 @@ mod tests {
     #[test]
     fn several_filters_give_failed_assertions_and_one_filter_gives_none() {
         let r = run(
-            json!({"thing": {"from": "ds whose fa exists and fb exists"}}),
+            json!({"thing": {"from": "ds whose fa exists and whose fb exists"}}),
             json!({"ds": [{"fa": 1, "fb": 1}]}),
         );
         assert_eq!(rows(&r, "$applies")[0]["failed_assertions"], json!([]));
@@ -1592,7 +1595,7 @@ mod tests {
     #[test]
     fn an_applies_row_lists_a_field_read_twice_once_sorted_by_name() {
         let r = run(
-            json!({"thing": {"from": "ds whose fb exists and fa exists and fb does not exist"}}),
+            json!({"thing": {"from": "ds whose fb exists and whose fa exists and whose fb does not exist"}}),
             json!({"ds": [{"fa": 1, "fb": 1}]}),
         );
         let row = &rows(&r, "$applies")[0];

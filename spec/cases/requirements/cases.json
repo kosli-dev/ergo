@@ -1037,7 +1037,7 @@
       "ergo_spec": "v0.5-dev",
       "subjects": {
         "subject": {
-          "from": "t whose e is \"p\" and k is 1",
+          "from": "t whose e is \"p\" and whose k is 1",
           "identified_by": "id"
           }
       },

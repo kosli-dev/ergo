@@ -154,7 +154,7 @@ fn a_grammar_word_as_a_first_key_says_to_write_a_dot() {
 #[test]
 fn several_grammar_words_are_listed_sorted_and_once() {
     assert_eq!(
-        failure("x whose some of is 1 and count of every is 2 and of is 3"),
+        failure("x whose some of is 1 and whose count of every is 2 and whose of is 3"),
         vec![
             "every is a word of the grammar: write .every",
             "of is a word of the grammar: write .of",
@@ -217,7 +217,7 @@ fn it_as_the_path_of_a_from_line_can_only_start_an_assertion() {
 #[test]
 fn it_problems_are_listed_with_word_problems_in_order() {
     assert_eq!(
-        failure("empty whose it.name is 1 and y equals it"),
+        failure("empty whose it.name is 1 and whose y equals it"),
         vec![
             "empty is a word of the grammar: write .empty",
             "it can only start an assertion: write it first, like it is not empty",
@@ -254,7 +254,7 @@ fn a_dollar_name_that_is_not_params_or_input_is_read_and_unknown() {
 #[test]
 fn unknown_names_are_sorted_and_listed_once() {
     assert_eq!(
-        names_of("x whose y equals $b and z equals $a and w equals $b"),
+        names_of("x whose y equals $b and whose z equals $a and whose w equals $b"),
         vec!["unknown name $a", "unknown name $b"]
     );
 }
@@ -263,7 +263,7 @@ fn unknown_names_are_sorted_and_listed_once() {
 fn a_dollar_name_inside_a_string_is_not_a_name() {
     assert!(names_of("x whose y is \"$z\"").is_empty());
     assert_eq!(
-        names_of("x whose y is \"$z\" and w is $v"),
+        names_of("x whose y is \"$z\" and whose w is $v"),
         vec!["unknown name $v"]
     );
 }
@@ -373,7 +373,7 @@ fn a_whose_inside_a_condition_says_a_condition_cannot_have_one() {
         vec![message]
     );
     assert_eq!(
-        failure("x whose y is 1 and every l whose m is 1 is 2"),
+        failure("x whose y is 1 and whose every l whose m is 1 is 2"),
         vec![message]
     );
     assert_eq!(failure("x whose sum of l whose m is 1 is 2"), vec![message]);

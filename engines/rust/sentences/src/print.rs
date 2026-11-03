@@ -87,6 +87,9 @@ fn from_condition_text(
     own: bool,
 ) -> String {
     match condition {
+        FromCondition::Condition(condition) if condition.that => {
+            phrase_text(&condition.phrase, aliases)
+        }
         FromCondition::Condition(condition) => {
             let left = match &condition.left {
                 Left::Path(path) => left_of_whose(path, aliases, parents, own),
@@ -139,11 +142,17 @@ pub fn print_from(line: &FromLine, aliases: &[&str], parents: &[&str]) -> String
         out.push_str(&path_text(each, Side::Right, aliases, false));
     }
     if !line.whose.is_empty() {
-        out.push_str(" whose ");
+        out.push(' ');
         let parts: Vec<String> = line
             .whose
             .iter()
-            .map(|c| from_condition_text(c, aliases, parents, false, false))
+            .map(|c| {
+                let body = from_condition_text(c, aliases, parents, false, false);
+                match c {
+                    FromCondition::Condition(condition) => with_word(condition, body),
+                    FromCondition::Quantified { .. } => format!("whose {body}"),
+                }
+            })
             .collect();
         out.push_str(&parts.join(" and "));
     }
@@ -378,8 +387,11 @@ fn whose_text(whose: &[Condition], aliases: &[&str]) -> String {
     if whose.is_empty() {
         return String::new();
     }
-    let parts: Vec<String> = whose.iter().map(|c| condition_text(c, aliases)).collect();
-    format!(" whose {}", parts.join(" and "))
+    let parts: Vec<String> = whose
+        .iter()
+        .map(|c| with_word(c, condition_text(c, aliases)))
+        .collect();
+    format!(" {}", parts.join(" and "))
 }
 
 fn elapsed_text(elapsed: &Elapsed, aliases: &[&str], own: bool) -> String {
@@ -434,12 +446,23 @@ fn list_text(list: &List, aliases: &[&str]) -> String {
 }
 
 fn condition_text(condition: &Condition, aliases: &[&str]) -> String {
+    if condition.that {
+        return phrase_text(&condition.phrase, aliases);
+    }
     let left = match &condition.left {
         Left::Path(path) => path_text(path, Side::Left, aliases, true),
         Left::Derived(derived) => derived_text(derived, aliases, true),
         Left::Elapsed(elapsed) => elapsed_text(elapsed, aliases, true),
     };
     format!("{left} {}", phrase_text(&condition.phrase, aliases))
+}
+
+fn with_word(condition: &Condition, body: String) -> String {
+    if condition.that {
+        format!("that {body}")
+    } else {
+        format!("whose {body}")
+    }
 }
 
 fn phrase_text(phrase: &Phrase, aliases: &[&str]) -> String {

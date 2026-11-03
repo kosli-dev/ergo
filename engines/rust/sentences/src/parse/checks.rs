@@ -9,6 +9,14 @@ pub(crate) enum Note {
 pub(crate) type Notes = Vec<Note>;
 
 pub(crate) const WHOSE_PLACE: &str = "a whose goes after every, some, count of or sum of";
+pub(crate) const THAT_PLACE: &str = "a that goes after every, some, count of or sum of";
+
+fn place_note(whose: &Chain<Condition>) -> Note {
+    match chain_items(whose).first() {
+        Some(first) if first.that => Note::Text(THAT_PLACE),
+        _ => Note::Text(WHOSE_PLACE),
+    }
+}
 pub(crate) const ITEM_START: &str =
     r#"an item starts with "every", "some" or a position, like "last of""#;
 pub(crate) const SORTED_AFTER: &str =
@@ -30,14 +38,14 @@ impl Parser {
         chain_reads(
             i,
             usize::MAX,
-            |at| heads_at(&self.condition_memo, at, || self.condition(at)),
+            |at| heads_at(&self.condition_memo, at, || self.word_condition(at)),
             |end| self.ws(end).and_then(|m| self.lead(m, "and")),
         )
     }
 
     fn whose_opt(&self, i: usize) -> Reads<Chain<Condition>> {
         let mut out = Vec::new();
-        if let Some(k) = self.ws(i).and_then(|m| self.lead(m, "whose")) {
+        if let Some(k) = self.ws(i) {
             out.extend(self.conditions(k));
         }
         out.push((None, i));
@@ -79,7 +87,7 @@ impl Parser {
                         match with.last_mut() {
                             Some(Term::Derived(derived)) => derived.whose = chain_items(&whose),
                             _ => {
-                                notes.push(Note::Text(WHOSE_PLACE));
+                                notes.push(place_note(&whose));
                                 notes.push(Note::Hidden(whose));
                             }
                         }
@@ -120,10 +128,7 @@ impl Parser {
             if self.lenient {
                 for (whose, w) in self.whose_opt(j) {
                     if whose.is_some() {
-                        starts.push((
-                            w,
-                            vec![Note::Text(WHOSE_PLACE), Note::Hidden(whose.clone())],
-                        ));
+                        starts.push((w, vec![place_note(&whose), Note::Hidden(whose.clone())]));
                     }
                 }
             }

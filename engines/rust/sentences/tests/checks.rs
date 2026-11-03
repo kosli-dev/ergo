@@ -46,7 +46,8 @@ fn a_quantified_assertion_keeps_its_whose_and_if_any() {
             path: with_steps(key("items"), vec![dot("x")]),
             whose: vec![Condition {
                 left: Left::Path(key("k")),
-                phrase: is(number("1"))
+                phrase: is(number("1")),
+                that: false
             }],
             if_any: true,
             phrase: Phrase::Empty { not: false }
@@ -72,7 +73,7 @@ fn every_is_a_quantifier_not_a_key() {
 #[test]
 fn a_whose_takes_every_condition_before_the_phrase() {
     let whole = check(
-        "every items.price whose kind is \"a\" and qty is 1 is at least 2 and owner is \"x\"",
+        "every items.price whose kind is \"a\" and whose qty is 1 is at least 2 and owner is \"x\"",
     );
     assert_eq!(whole.assertions.len(), 2);
     match &whole.assertions[0] {
@@ -108,7 +109,7 @@ fn the_and_of_between_is_not_the_and_of_the_check() {
     let whole = check("x is between 1 and 2 and y is between 3 and 4");
     assert_eq!(whole.assertions.len(), 2);
     assert_eq!(
-        check("every items whose k is between 1 and 2 and j is 3 is empty")
+        check("every items whose k is between 1 and 2 and whose j is 3 is empty")
             .assertions
             .len(),
         1
@@ -145,7 +146,8 @@ fn a_count_with_a_whose_is_a_derived_assertion() {
                 path: key("items"),
                 whose: vec![Condition {
                     left: Left::Path(key("k")),
-                    phrase: is(number("1"))
+                    phrase: is(number("1")),
+                    that: false
                 }]
             })],
             phrase: Phrase::Order {
@@ -253,7 +255,9 @@ fn a_byte_order_mark_or_a_zero_width_space_is_not_white_space() {
 #[test]
 fn a_long_check_does_not_make_the_reader_slow() {
     let parts: Vec<String> = (0..100)
-        .map(|n| format!("every items_{n} whose k is 1 and j is between 1 and 2 is at least {n}"))
+        .map(|n| {
+            format!("every items_{n} whose k is 1 and whose j is between 1 and 2 is at least {n}")
+        })
         .collect();
     let line = parts.join(" and ");
     assert_eq!(check(&line).assertions.len(), 100);
@@ -300,7 +304,7 @@ fn the_check_errors_have_the_same_order_as_a_from_line() {
 fn checks_print_every_form() {
     for line in [
         "x is 1",
-        "every items.x whose k is 1 and j exists, if any, is empty",
+        "every items.x whose k is 1 and whose j exists, if any, is empty",
         "some items whose count of k is 2 matches \"a\"",
         "count of items whose k is 1 is at least 2",
         "1 plus count of items whose k equals 1 plus 2 is 3",

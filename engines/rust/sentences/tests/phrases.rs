@@ -219,7 +219,7 @@ fn between_keeps_both_numbers_as_written() {
 
 #[test]
 fn between_does_not_swallow_the_and_of_the_next_condition() {
-    let line = from("x whose y is between 1 and 2 and z is 3");
+    let line = from("x whose y is between 1 and 2 and whose z is 3");
     assert_eq!(line.whose.len(), 2);
 }
 
@@ -293,7 +293,7 @@ fn is_not_between_keeps_both_numbers_as_written() {
     );
     assert!(parse_from("x whose y is not between 1").is_err());
     assert!(parse_from("x whose y is not between k and 2").is_err());
-    let line = from("x whose y is not between 1 and 2 and z is 3");
+    let line = from("x whose y is not between 1 and 2 and whose z is 3");
     assert_eq!(line.whose.len(), 2);
 }
 
@@ -528,20 +528,22 @@ fn a_quantified_condition_has_no_whose_of_its_own() {
 
 #[test]
 fn conditions_are_joined_by_and_in_order() {
-    let line = from("x whose a1 is 1 and b1 exists and some c1 is 2 and count of d1 is 3");
+    let line = from(
+        "x whose a1 is 1 and whose b1 exists and whose some c1 is 2 and whose count of d1 is 3",
+    );
     assert_eq!(line.whose.len(), 4);
     assert!(matches!(line.whose[2], FromCondition::Quantified { .. }));
 }
 
 #[test]
 fn a_condition_word_after_and_is_not_swallowed_by_the_operand() {
-    let line = from("x whose a1 equals b1 and c1 equals d1 plus 1 and e1 exists");
+    let line = from("x whose a1 equals b1 and whose c1 equals d1 plus 1 and whose e1 exists");
     assert_eq!(line.whose.len(), 3);
 }
 
 #[test]
 fn a_string_operand_holding_and_does_not_split_the_condition() {
-    let line = from("x whose a1 is \"p and q is 1\" and b1 exists");
+    let line = from("x whose a1 is \"p and q is 1\" and whose b1 exists");
     assert_eq!(line.whose.len(), 2);
 }
 

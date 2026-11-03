@@ -187,10 +187,12 @@ fn a_bare_name_that_is_an_alias_prints_without_a_dot() {
 
 #[test]
 fn the_left_of_a_condition_keeps_the_dot_it_was_written_with_when_the_name_is_an_alias() {
-    let read = from("x whose .pr is 1 and count of .pr is 2 and days elapsed from .pr to .pr is 1");
+    let read = from(
+        "x whose .pr is 1 and whose count of .pr is 2 and whose days elapsed from .pr to .pr is 1",
+    );
     assert_eq!(
         print_from(&read, &["pr"], &[]),
-        "x whose .pr is 1 and count of .pr is 2 and days elapsed from .pr to .pr is 1"
+        "x whose .pr is 1 and whose count of .pr is 2 and whose days elapsed from .pr to .pr is 1"
     );
 }
 
@@ -229,7 +231,7 @@ fn print_term_and_print_path_follow_the_side() {
 
 #[test]
 fn print_condition_and_print_from_condition_print_one_condition() {
-    let line = from("x whose some y.z, if any, is empty and count of w is 3");
+    let line = from("x whose some y.z, if any, is empty and whose count of w is 3");
     assert_eq!(
         print_from_condition(&line.whose[0], &[], &[]),
         "some y.z, if any, is empty"
@@ -247,8 +249,8 @@ fn print_condition_and_print_from_condition_print_one_condition() {
 #[test]
 fn print_from_joins_the_conditions_with_and() {
     assert_eq!(
-        printed("every x named by each of $params.l whose p is 1 and q exists"),
-        "every x named by each of $params.l whose p is 1 and q exists"
+        printed("every x named by each of $params.l whose p is 1 and whose q exists"),
+        "every x named by each of $params.l whose p is 1 and whose q exists"
     );
 }
 
@@ -413,9 +415,9 @@ fn terms_print_joined_by_plus() {
 fn conditions_print_every_left_form() {
     assert_eq!(
         printed(
-            "x whose some l, if any, is 1 and every m exists and sum of n is at least 1 and weeks elapsed from p1 to q1 is 1"
+            "x whose some l, if any, is 1 and whose every m exists and whose sum of n is at least 1 and whose weeks elapsed from p1 to q1 is 1"
         ),
-        "x whose some l, if any, is 1 and every m exists and sum of n is at least 1 and weeks elapsed from p1 to q1 is 1"
+        "x whose some l, if any, is 1 and whose every m exists and whose sum of n is at least 1 and whose weeks elapsed from p1 to q1 is 1"
     );
 }
 
@@ -438,14 +440,14 @@ fn params_and_input_print_with_their_dollar() {
 
 #[test]
 fn a_parent_name_on_the_left_of_a_whose_is_the_items_field_and_prints_with_a_dot() {
-    let read = from("b.kids whose b.x equals v and some b.ls is empty");
+    let read = from("b.kids whose b.x equals v and whose some b.ls is empty");
     assert_eq!(
         print_from(&read, &["b"], &["b"]),
-        "b.kids whose .b.x equals v and some .b.ls is empty"
+        "b.kids whose .b.x equals v and whose some .b.ls is empty"
     );
     assert_eq!(
         print_from(&read, &["b"], &[]),
-        "b.kids whose b.x equals v and some b.ls is empty"
+        "b.kids whose b.x equals v and whose some b.ls is empty"
     );
 }
 
@@ -494,14 +496,16 @@ fn a_parent_name_on_the_left_of_a_from_condition_prints_with_a_dot() {
 
 #[test]
 fn a_dot_written_on_the_left_of_a_from_condition_stays_when_the_name_is_an_alias() {
-    let read = from("art.items whose art.k is 1 and .art.xs[0] is 5 and count of .art.xs is 1");
+    let read = from(
+        "art.items whose art.k is 1 and whose .art.xs[0] is 5 and whose count of .art.xs is 1",
+    );
     assert_eq!(
         print_from(&read, &["art"], &[]),
-        "art.items whose art.k is 1 and item 1 of .art.xs is 5 and count of .art.xs is 1"
+        "art.items whose art.k is 1 and whose item 1 of .art.xs is 5 and whose count of .art.xs is 1"
     );
     assert_eq!(
         print_from(&read, &[], &[]),
-        "art.items whose art.k is 1 and item 1 of art.xs is 5 and count of art.xs is 1"
+        "art.items whose art.k is 1 and whose item 1 of art.xs is 5 and whose count of art.xs is 1"
     );
 }
 

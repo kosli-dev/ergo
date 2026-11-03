@@ -233,6 +233,9 @@ pub fn part_tag(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
     let Start::Part(part) = &path.start else {
         return None;
     };
+    if part.steps.is_empty() {
+        return None;
+    }
     let id = match &part.id {
         None => Value::Null,
         Some(steps) => {

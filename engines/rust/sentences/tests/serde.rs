@@ -8,7 +8,7 @@ use support::*;
 #[test]
 fn a_from_line_survives_a_trip_through_json() {
     let line = from(
-        "every a1.b named by each of $params.l whose some c1, if any, matches \"x\" and count of d1 is at least 2",
+        "every a1.b named by each of $params.l whose some c1, if any, matches \"x\" and whose count of d1 is at least 2",
     );
     let json = serde_json::to_string(&line).unwrap();
     let back: FromLine = serde_json::from_str(&json).unwrap();
@@ -200,7 +200,7 @@ fn every_part_of_a_check_survives_a_trip_through_json() {
 #[test]
 fn every_part_of_a_from_line_survives_a_trip_through_json() {
     let line = from(
-        "every p named by each of q whose y is 1 and every c, if any, exists and count of d is 2 and days elapsed from e to f is 1",
+        "every p named by each of q whose y is 1 and whose every c, if any, exists and whose count of d is 2 and whose days elapsed from e to f is 1",
     );
     trip(&line);
     for condition in &line.whose {

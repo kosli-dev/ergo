@@ -41795,7 +41795,7 @@
       },
       "subjects": {
         "d": {
-          "from": "items whose env is \"prod\" and x is 1"
+          "from": "items whose env is \"prod\" and whose x is 1"
         }
       }
     },
@@ -42013,7 +42013,7 @@
       "subjects": {
         "d": {
           "description": "",
-          "from": "items whose env is \"prod\" and x is 1",
+          "from": "items whose env is \"prod\" and whose x is 1",
           "identified_by": null,
           "parts": {}
         }

@@ -39,6 +39,7 @@ const WORDS: &[&str] = &[
     "some",
     "sorted",
     "sum",
+    "that",
     "to",
     "true",
     "weeks",

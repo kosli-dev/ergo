@@ -5063,7 +5063,7 @@
       },
       "subjects": {
         "thing": {
-          "from": "things whose m exists and n equals count of items plus 1",
+          "from": "things whose m exists and whose n equals count of items plus 1",
           "identified_by": "id"
         }
       }
@@ -5350,7 +5350,7 @@
       "subjects": {
         "thing": {
           "description": "",
-          "from": "things whose m exists and n equals count of items plus 1",
+          "from": "things whose m exists and whose n equals count of items plus 1",
           "identified_by": "id",
           "parts": {}
         }

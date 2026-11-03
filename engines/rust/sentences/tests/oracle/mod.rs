@@ -3,6 +3,7 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("every ws that is not empty", "every ws that is not empty"),
     ("round.items whose .cov is 1", "round.items whose cov is 1"),
     ("y", "y"),
     ("t.ws whose t is t", "t.ws whose t equals t"),
@@ -186,8 +187,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "\"$s\" whose \"a.b\" is not empty",
     ),
     (
-        "\"$s\" whose count of first of .it equals days elapsed from k1 to zz.\"w v\".z and $input.i.y.\"w v\" starts with \"s\" and some .empty is sum of .\"a.b\"",
-        "\"$s\" whose count of first of .it equals days elapsed from k1 to zz.\"w v\".z and $input.i.y.\"w v\" starts with \"s\" and some .empty equals sum of \"a.b\"",
+        "\"$s\" whose count of first of .it equals days elapsed from k1 to zz.\"w v\".z and whose $input.i.y.\"w v\" starts with \"s\" and whose some .empty is sum of .\"a.b\"",
+        "\"$s\" whose count of first of .it equals days elapsed from k1 to zz.\"w v\".z and whose $input.i.y.\"w v\" starts with \"s\" and whose some .empty equals sum of \"a.b\"",
     ),
     (
         "\"$s\" whose sum of \"$s\".q.z is between 1 and 3",
@@ -279,24 +280,24 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "$params.p named by each of $params.p",
     ),
     (
-        "$params.p whose $input.i.q.\"\" is -2.50 and y equals \"a\\u00e9\" and x is between 2.5 and 3",
-        "$params.p whose $input.i.q.\"\" is -2.5 and y is \"aé\" and x is between 2.5 and 3",
+        "$params.p whose $input.i.q.\"\" is -2.50 and whose y equals \"a\\u00e9\" and whose x is between 2.5 and 3",
+        "$params.p whose $input.i.q.\"\" is -2.5 and whose y is \"aé\" and whose x is between 2.5 and 3",
     ),
     (
-        "$params.p whose .empty.z.\"é\" is not one of 0.10, \"a\\u00e9\", 'b\\c' and days elapsed from \"$s\" named by k[3] to \"$s\" is 'b\\c'",
-        "$params.p whose .empty.z.\"é\" is not one of 0.1, \"aé\", 'b\\c' and days elapsed from item 4 of \"$s\" named by k to \"$s\" is 'b\\c'",
+        "$params.p whose .empty.z.\"é\" is not one of 0.10, \"a\\u00e9\", 'b\\c' and whose days elapsed from \"$s\" named by k[3] to \"$s\" is 'b\\c'",
+        "$params.p whose .empty.z.\"é\" is not one of 0.1, \"aé\", 'b\\c' and whose days elapsed from item 4 of \"$s\" named by k to \"$s\" is 'b\\c'",
     ),
     (
-        "$params.p whose .it is a non-empty string and some x.q.\"é\" is .empty",
-        "$params.p whose .it is a non-empty string and some x.q.\"é\" equals .empty",
+        "$params.p whose .it is a non-empty string and whose some x.q.\"é\" is .empty",
+        "$params.p whose .it is a non-empty string and whose some x.q.\"é\" equals .empty",
     ),
     (
         "$params.p whose every .true, if any, is not hours elapsed from last of $input.i to item 3 of y",
         "$params.p whose every .true, if any, does not equal hours elapsed from last of $input.i to item 3 of y",
     ),
     (
-        "$params.p whose every k1._k, if any, is $input.i and some y starts with hours elapsed from y named by k.\"é\" to y[0] plus 5 and weeks elapsed from item 2 from last of .it.q.q to y equals 5",
-        "$params.p whose every k1._k, if any, equals $input.i and some y starts with hours elapsed from y named by k.\"é\" to item 1 of y plus 5 and weeks elapsed from item 2 from last of .it.q.q to y is 5",
+        "$params.p whose every k1._k, if any, is $input.i and whose some y starts with hours elapsed from y named by k.\"é\" to y[0] plus 5 and whose weeks elapsed from item 2 from last of .it.q.q to y equals 5",
+        "$params.p whose every k1._k, if any, equals $input.i and whose some y starts with hours elapsed from y named by k.\"é\" to item 1 of y plus 5 and whose weeks elapsed from item 2 from last of .it.q.q to y is 5",
     ),
     ("$params.p.\"w v\"", "$params.p.\"w v\""),
     ("$params.x", "$params.x"),
@@ -305,40 +306,40 @@ pub const FROM_OK: &[(&str, &str)] = &[
     (".\"$schema\"", "\"$schema\""),
     (".\"a b\"", "\"a b\""),
     (
-        ".\"a.b\" named by kk.q named by each of zz.y whose last of $input.i is a list and .empty equals null",
-        "\"a.b\" named by kk.q named by each of zz.y whose last of $input.i is a list and .empty is null",
+        ".\"a.b\" named by kk.q named by each of zz.y whose last of $input.i is a list and whose .empty equals null",
+        "\"a.b\" named by kk.q named by each of zz.y whose last of $input.i is a list and whose .empty is null",
     ),
     (
-        ".\"a.b\" whose \"$s\".\"\" is between 2.5 and 3 and count of ._x-1 is \"s\" and days elapsed from .true to \"$s\" is equal to 'b\\c'",
-        "\"a.b\" whose \"$s\".\"\" is between 2.5 and 3 and count of _x-1 is \"s\" and days elapsed from .true to \"$s\" is 'b\\c'",
+        ".\"a.b\" whose \"$s\".\"\" is between 2.5 and 3 and whose count of ._x-1 is \"s\" and whose days elapsed from .true to \"$s\" is equal to 'b\\c'",
+        "\"a.b\" whose \"$s\".\"\" is between 2.5 and 3 and whose count of _x-1 is \"s\" and whose days elapsed from .true to \"$s\" is 'b\\c'",
     ),
     (
         ".\"a.b\" whose \"q r\".\"w v\".y is first of $input.i._k",
         "\"a.b\" whose \"q r\".\"w v\".y equals first of $input.i._k",
     ),
     (
-        ".\"a.b\" whose $params.p starts with zz plus count of .true named by $params.\"x y\" plus item 3 of y and some $params.p[0]._k equals ._x-1",
-        "\"a.b\" whose $params.p starts with zz plus count of .true named by $params.\"x y\" plus item 3 of y and some $params.p[0]._k equals _x-1",
+        ".\"a.b\" whose $params.p starts with zz plus count of .true named by $params.\"x y\" plus item 3 of y and whose some $params.p[0]._k equals ._x-1",
+        "\"a.b\" whose $params.p starts with zz plus count of .true named by $params.\"x y\" plus item 3 of y and whose some $params.p[0]._k equals _x-1",
     ),
     (
-        ".\"a.b\" whose $params.p[3].\"é\" equals 0.10 and weeks elapsed from ._x-1._k.\"é\" to $params.p is equal to null",
-        "\"a.b\" whose $params.p[3].\"é\" is 0.1 and weeks elapsed from _x-1._k.\"é\" to $params.p is null",
+        ".\"a.b\" whose $params.p[3].\"é\" equals 0.10 and whose weeks elapsed from ._x-1._k.\"é\" to $params.p is equal to null",
+        "\"a.b\" whose $params.p[3].\"é\" is 0.1 and whose weeks elapsed from _x-1._k.\"é\" to $params.p is null",
     ),
     (
         ".\"a.b\" whose days elapsed from item 3 of .true to .\"a.b\" is null",
         "\"a.b\" whose days elapsed from item 3 of .true to \"a.b\" is null",
     ),
     (
-        ".\"a.b\" whose k1 named by kk._k ends with \"s\" and count of \"q r\" equals 0.10",
-        "\"a.b\" whose k1 named by kk._k ends with \"s\" and count of \"q r\" is 0.1",
+        ".\"a.b\" whose k1 named by kk._k ends with \"s\" and whose count of \"q r\" equals 0.10",
+        "\"a.b\" whose k1 named by kk._k ends with \"s\" and whose count of \"q r\" is 0.1",
     ),
     (
         ".\"a.b\" whose weeks elapsed from ._x-1 to ._x-1[0] is 0.10",
         "\"a.b\" whose weeks elapsed from _x-1 to item 1 of _x-1 is 0.1",
     ),
     (
-        ".\"a.b\" whose y is 1e2 and every .\"a.b\" equals count of $params.p.z plus count of .\"a.b\" plus $input.i and .empty.q.\"é\" is null",
-        "\"a.b\" whose y is 100 and every \"a.b\" equals count of $params.p.z plus count of \"a.b\" plus $input.i and .empty.q.\"é\" is null",
+        ".\"a.b\" whose y is 1e2 and whose every .\"a.b\" equals count of $params.p.z plus count of .\"a.b\" plus $input.i and whose .empty.q.\"é\" is null",
+        "\"a.b\" whose y is 100 and whose every \"a.b\" equals count of $params.p.z plus count of \"a.b\" plus $input.i and whose .empty.q.\"é\" is null",
     ),
     (
         ".\"a.b\".q named by $input.q whose k1 is $input.i[\"s t\"] plus .true plus days elapsed from $input.i to x.q named by kk",
@@ -357,8 +358,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "_x-1 whose days elapsed from \"a.b\" to .true named by $params.\"x y\" is between 1 and 3",
     ),
     (
-        "._x-1 whose some $input.i is equal to null and x.q is alphabetically after .true",
-        "_x-1 whose some $input.i is null and x.q is alphabetically after .true",
+        "._x-1 whose some $input.i is equal to null and whose x.q is alphabetically after .true",
+        "_x-1 whose some $input.i is null and whose x.q is alphabetically after .true",
     ),
     (".aa", "aa"),
     (".aa.b", "aa.b"),
@@ -392,8 +393,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         ".empty whose every .it named by $params.k.y is at least sum of $params.p",
     ),
     (
-        ".empty whose item 3 of x.\"é\".\"w v\" is \"s\" and ._x-1 is true",
-        ".empty whose item 3 of x.\"é\".\"w v\" is \"s\" and _x-1 is true",
+        ".empty whose item 3 of x.\"é\".\"w v\" is \"s\" and whose ._x-1 is true",
+        ".empty whose item 3 of x.\"é\".\"w v\" is \"s\" and whose _x-1 is true",
     ),
     (
         ".empty._k whose zz.q is less than .empty named by $params.\"x y\"",
@@ -402,12 +403,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
     (".empty.b", ".empty.b"),
     (".empty.it[0]", "item 1 of .empty.it"),
     (
-        ".empty.q named by $params.\"x y\" whose k1 equals -2.50 and sum of .it equals \"a\\u00e9\" and x.y is between -1 and 4e2",
-        ".empty.q named by $params.\"x y\" whose k1 is -2.5 and sum of .it is \"aé\" and x.y is between -1 and 400",
+        ".empty.q named by $params.\"x y\" whose k1 equals -2.50 and whose sum of .it equals \"a\\u00e9\" and whose x.y is between -1 and 4e2",
+        ".empty.q named by $params.\"x y\" whose k1 is -2.5 and whose sum of .it is \"aé\" and whose x.y is between -1 and 400",
     ),
     (
-        ".empty[3] whose .true equals 1e2 and .true named by $params.k.z is 1",
-        "item 4 of .empty whose .true is 100 and .true named by $params.k.z is 1",
+        ".empty[3] whose .true equals 1e2 and whose .true named by $params.k.z is 1",
+        "item 4 of .empty whose .true is 100 and whose .true named by $params.k.z is 1",
     ),
     (".it", ".it"),
     (
@@ -423,24 +424,24 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "item 4 of .it named by k whose some k1 is between -1 and 3",
     ),
     (
-        ".it whose \"$s\" equals 1 and .empty is one of 1",
-        ".it whose \"$s\" is 1 and .empty is one of 1",
+        ".it whose \"$s\" equals 1 and whose .empty is one of 1",
+        ".it whose \"$s\" is 1 and whose .empty is one of 1",
     ),
     (
-        ".it whose \"$s\" is a string and y is days elapsed from $params.p to k1 within 2",
-        ".it whose \"$s\" is a string and y equals days elapsed from $params.p to k1 within 2",
+        ".it whose \"$s\" is a string and whose y is days elapsed from $params.p to k1 within 2",
+        ".it whose \"$s\" is a string and whose y equals days elapsed from $params.p to k1 within 2",
     ),
     (
         ".it whose $params.p is more than 1",
         ".it whose $params.p is more than 1",
     ),
     (
-        ".it whose .\"a.b\" is true and \"$s\" does not contain 1",
-        ".it whose \"a.b\" is true and \"$s\" does not contain 1",
+        ".it whose .\"a.b\" is true and whose \"$s\" does not contain 1",
+        ".it whose \"a.b\" is true and whose \"$s\" does not contain 1",
     ),
     (
-        ".it.\"é\" whose zz is not empty and days elapsed from last of $params.p to $params.p is more than -2.50",
-        ".it.\"é\" whose zz is not empty and days elapsed from last of $params.p to $params.p is more than -2.5",
+        ".it.\"é\" whose zz is not empty and whose days elapsed from last of $params.p to $params.p is more than -2.50",
+        ".it.\"é\" whose zz is not empty and whose days elapsed from last of $params.p to $params.p is more than -2.5",
     ),
     (
         ".it.q whose some .\"a.b\" named by $params.k is true",
@@ -465,8 +466,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         ".true whose $input.i is a string",
     ),
     (
-        ".true whose .empty equals null and weeks elapsed from .empty._k.q to $params.p is 'b\\c' and $input.i is between 1 and 4e2",
-        ".true whose .empty is null and weeks elapsed from .empty._k.q to $params.p is 'b\\c' and $input.i is between 1 and 400",
+        ".true whose .empty equals null and whose weeks elapsed from .empty._k.q to $params.p is 'b\\c' and whose $input.i is between 1 and 4e2",
+        ".true whose .empty is null and whose weeks elapsed from .empty._k.q to $params.p is 'b\\c' and whose $input.i is between 1 and 400",
     ),
     (
         ".true.\"w v\".q whose ._x-1.\"\" equals 1",
@@ -545,12 +546,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("defects whose status exists", "defects whose status exists"),
     ("deployments", "deployments"),
     (
-        "deployments whose change_type is \"emergency\" and environment is \"prod\"",
-        "deployments whose change_type is \"emergency\" and environment is \"prod\"",
+        "deployments whose change_type is \"emergency\" and whose environment is \"prod\"",
+        "deployments whose change_type is \"emergency\" and whose environment is \"prod\"",
     ),
     (
-        "deployments whose environment is \"prod\" and change_type is \"emergency\"",
-        "deployments whose environment is \"prod\" and change_type is \"emergency\"",
+        "deployments whose environment is \"prod\" and whose change_type is \"emergency\"",
+        "deployments whose environment is \"prod\" and whose change_type is \"emergency\"",
     ),
     ("every  x", "every x"),
     (
@@ -567,24 +568,24 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("every \"q r\".\"w v\"", "every \"q r\".\"w v\""),
     (
-        "every \"q r\".\"w v\"[$params.k] whose count of .empty is hours elapsed from \"q r\" to \"$s\".\"w v\".z plus days elapsed from .\"a.b\" to item 3 of .true plus .empty and $params.p equals \"s\" and .true equals count of .it",
-        "every \"q r\".\"w v\" named by $params.k whose count of .empty equals hours elapsed from \"q r\" to \"$s\".\"w v\".z plus days elapsed from \"a.b\" to item 3 of .true plus .empty and $params.p is \"s\" and .true equals count of .it",
+        "every \"q r\".\"w v\"[$params.k] whose count of .empty is hours elapsed from \"q r\" to \"$s\".\"w v\".z plus days elapsed from .\"a.b\" to item 3 of .true plus .empty and whose $params.p equals \"s\" and whose .true equals count of .it",
+        "every \"q r\".\"w v\" named by $params.k whose count of .empty equals hours elapsed from \"q r\" to \"$s\".\"w v\".z plus days elapsed from \"a.b\" to item 3 of .true plus .empty and whose $params.p is \"s\" and whose .true equals count of .it",
     ),
     (
         "every \"q r\".\"é\" whose last of .true.\"w v\" named by $params.\"x y\" is alphabetically after \"a\\u00e9\"",
         "every \"q r\".\"é\" whose last of .true.\"w v\" named by $params.\"x y\" is alphabetically after \"aé\"",
     ),
     (
-        "every \"q r\".z.q whose .empty named by $input.q.\"w v\" is 1 and .empty is not in 1e2, true",
-        "every \"q r\".z.q whose .empty named by $input.q.\"w v\" is 1 and .empty is not one of 100, true",
+        "every \"q r\".z.q whose .empty named by $input.q.\"w v\" is 1 and whose .empty is not in 1e2, true",
+        "every \"q r\".z.q whose .empty named by $input.q.\"w v\" is 1 and whose .empty is not one of 100, true",
     ),
     (
         "every $input.i named by $input.q whose item 3 of \"$s\" matches \"a\\u00e9\"",
         "every $input.i named by $input.q whose item 3 of \"$s\" matches \"aé\"",
     ),
     (
-        "every $input.i named by kk whose zz is sum of $params.p.z plus 5 plus y and $input.i equals -2.50 and days elapsed from .empty.\"w v\" named by k to k1 is $params.p",
-        "every $input.i named by kk whose zz equals sum of $params.p.z plus 5 plus y and $input.i is -2.5 and days elapsed from .empty.\"w v\" named by k to k1 equals $params.p",
+        "every $input.i named by kk whose zz is sum of $params.p.z plus 5 plus y and whose $input.i equals -2.50 and whose days elapsed from .empty.\"w v\" named by k to k1 is $params.p",
+        "every $input.i named by kk whose zz equals sum of $params.p.z plus 5 plus y and whose $input.i is -2.5 and whose days elapsed from .empty.\"w v\" named by k to k1 equals $params.p",
     ),
     ("every $input.i.a", "every $input.i.a"),
     (
@@ -600,28 +601,28 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every $input.k1.k2.k3.k4.k5.k6.k7.k8.k9.k10.k11",
     ),
     (
-        "every $params.p.\"w v\"._k whose \"q r\" equals 5 plus count of .empty and .it is 'b\\c'",
-        "every $params.p.\"w v\"._k whose \"q r\" equals 5 plus count of .empty and .it is 'b\\c'",
+        "every $params.p.\"w v\"._k whose \"q r\" equals 5 plus count of .empty and whose .it is 'b\\c'",
+        "every $params.p.\"w v\"._k whose \"q r\" equals 5 plus count of .empty and whose .it is 'b\\c'",
     ),
     (
-        "every $params.p.\"é\".\"\" whose count of item 2 from last of $params.p named by kk is between 2.5 and 4e2 and x equals -2.50",
-        "every $params.p.\"é\".\"\" whose count of item 2 from last of $params.p named by kk is between 2.5 and 400 and x is -2.5",
+        "every $params.p.\"é\".\"\" whose count of item 2 from last of $params.p named by kk is between 2.5 and 4e2 and whose x equals -2.50",
+        "every $params.p.\"é\".\"\" whose count of item 2 from last of $params.p named by kk is between 2.5 and 400 and whose x is -2.5",
     ),
     (
         "every .\"a.b\" whose count of .empty equals null",
         "every \"a.b\" whose count of .empty is null",
     ),
     (
-        "every .\"a.b\" whose some y._k is between 1 and 4e2 and k1 is true and sum of ._x-1[k] does not equal 5",
-        "every \"a.b\" whose some y._k is between 1 and 400 and k1 is true and sum of _x-1 named by k is not 5",
+        "every .\"a.b\" whose some y._k is between 1 and 4e2 and whose k1 is true and whose sum of ._x-1[k] does not equal 5",
+        "every \"a.b\" whose some y._k is between 1 and 400 and whose k1 is true and whose sum of _x-1 named by k is not 5",
     ),
     (
         "every ._x-1 named by k whose .empty is 'b\\c'",
         "every _x-1 named by k whose .empty is 'b\\c'",
     ),
     (
-        "every .empty whose sum of ._x-1 is \"a\\u00e9\" and zz.\"\" is between 2.5 and 4e2",
-        "every .empty whose sum of _x-1 is \"aé\" and zz.\"\" is between 2.5 and 400",
+        "every .empty whose sum of ._x-1 is \"a\\u00e9\" and whose zz.\"\" is between 2.5 and 4e2",
+        "every .empty whose sum of _x-1 is \"aé\" and whose zz.\"\" is between 2.5 and 400",
     ),
     ("every .it.\"w v\"", "every .it.\"w v\""),
     ("every .true", "every .true"),
@@ -655,20 +656,20 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every first of $params.p.it.q",
     ),
     (
-        "every item 2 from last of .it whose zz named by $params.k does not equal 0.10 and ._x-1 matches zz and every zz, if any, is not one of first of k1",
-        "every item 2 from last of .it whose zz named by $params.k is not 0.1 and _x-1 matches zz and every zz, if any, is not in first of k1",
+        "every item 2 from last of .it whose zz named by $params.k does not equal 0.10 and whose ._x-1 matches zz and whose every zz, if any, is not one of first of k1",
+        "every item 2 from last of .it whose zz named by $params.k is not 0.1 and whose _x-1 matches zz and whose every zz, if any, is not in first of k1",
     ),
     (
         "every item 2 from last of x named by each of .it named by kk[k] whose some $input.i is a list",
         "every item 2 from last of x named by each of .it named by kk named by k whose some $input.i is a list",
     ),
     (
-        "every last of ._x-1.\"é\" whose every $input.i, if any, is alphabetically after .\"a.b\" and days elapsed from $params.p to .\"a.b\".q equals \"s\" and ._x-1 is not \"$s\"",
-        "every last of _x-1.\"é\" whose every $input.i, if any, is alphabetically after .\"a.b\" and days elapsed from $params.p to \"a.b\".q is \"s\" and _x-1 is not \"$s\"",
+        "every last of ._x-1.\"é\" whose every $input.i, if any, is alphabetically after .\"a.b\" and whose days elapsed from $params.p to .\"a.b\".q equals \"s\" and whose ._x-1 is not \"$s\"",
+        "every last of _x-1.\"é\" whose every $input.i, if any, is alphabetically after .\"a.b\" and whose days elapsed from $params.p to \"a.b\".q is \"s\" and whose _x-1 is not \"$s\"",
     ),
     (
-        "every last of x whose $input.i._k.\"é\" is between 2.5 and 3 and last of zz.\"\" named by k is at least .\"a.b\" and weeks elapsed from $params.p to \"$s\" equals hours elapsed from .empty to y",
-        "every last of x whose $input.i._k.\"é\" is between 2.5 and 3 and last of zz.\"\" named by k is at least .\"a.b\" and weeks elapsed from $params.p to \"$s\" equals hours elapsed from .empty to y",
+        "every last of x whose $input.i._k.\"é\" is between 2.5 and 3 and whose last of zz.\"\" named by k is at least .\"a.b\" and whose weeks elapsed from $params.p to \"$s\" equals hours elapsed from .empty to y",
+        "every last of x whose $input.i._k.\"é\" is between 2.5 and 3 and whose last of zz.\"\" named by k is at least .\"a.b\" and whose weeks elapsed from $params.p to \"$s\" equals hours elapsed from .empty to y",
     ),
     ("every lists", "every lists"),
     ("every orgs.repos", "every orgs.repos"),
@@ -683,8 +684,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("every things.xs", "every things.xs"),
     ("every values", "every values"),
     (
-        "every ws whose it is a string and it starts with 'b'",
-        "every ws whose it is a string and it starts with \"b\"",
+        "every ws whose it is a string and whose it starts with 'b'",
+        "every ws whose it is a string and whose it starts with \"b\"",
     ),
     ("every x", "every x"),
     ("every x named by each of y", "every x named by each of y"),
@@ -694,8 +695,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("every x whose aa is 1", "every x whose aa is 1"),
     (
-        "every x.\"\".\"w v\" whose days elapsed from ._x-1 to .true is \"a\\u00e9\" and .empty is at least zz",
-        "every x.\"\".\"w v\" whose days elapsed from _x-1 to .true is \"aé\" and .empty is at least zz",
+        "every x.\"\".\"w v\" whose days elapsed from ._x-1 to .true is \"a\\u00e9\" and whose .empty is at least zz",
+        "every x.\"\".\"w v\" whose days elapsed from _x-1 to .true is \"aé\" and whose .empty is at least zz",
     ),
     ("every x.y", "every x.y"),
     ("every xs", "every xs"),
@@ -704,16 +705,16 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every xs whose count of it is at least 2",
     ),
     (
-        "every y whose every .empty.y[\"s t\"], if any, is a list and ._x-1 is equal to zz",
-        "every y whose every .empty.y.\"s t\", if any, is a list and _x-1 equals zz",
+        "every y whose every .empty.y[\"s t\"], if any, is a list and whose ._x-1 is equal to zz",
+        "every y whose every .empty.y.\"s t\", if any, is a list and whose _x-1 equals zz",
     ),
     (
         "every y._k whose $params.p named by $params.\"x y\" is between 2.5 and 3",
         "every y._k whose $params.p named by $params.\"x y\" is between 2.5 and 3",
     ),
     (
-        "every zz named by each of ._x-1.\"é\" whose zz._k is equal to 'b\\c' and y is -2.50",
-        "every zz named by each of _x-1.\"é\" whose zz._k is 'b\\c' and y is -2.5",
+        "every zz named by each of ._x-1.\"é\" whose zz._k is equal to 'b\\c' and whose y is -2.50",
+        "every zz named by each of _x-1.\"é\" whose zz._k is 'b\\c' and whose y is -2.5",
     ),
     ("everything", "everything"),
     (
@@ -727,8 +728,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("gps", "gps"),
     ("info.who", "info.who"),
     (
-        "is.\"w v\" whose is equals 1 and some $params.p named by k is in 'b\\c'",
-        "is.\"w v\" whose is is 1 and some $params.p named by k is one of 'b\\c'",
+        "is.\"w v\" whose is equals 1 and whose some $params.p named by k is in 'b\\c'",
+        "is.\"w v\" whose is is 1 and whose some $params.p named by k is one of 'b\\c'",
     ),
     ("is.empty", "is.empty"),
     ("is.q.empty", "is.q.empty"),
@@ -761,8 +762,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("item 3 of .it", "item 3 of .it"),
     ("item 3 of d.items", "item 3 of d.items"),
     (
-        "item 3 of k1 whose $input.i equals 0.10 and k1 equals -2.50",
-        "item 3 of k1 whose $input.i is 0.1 and k1 is -2.5",
+        "item 3 of k1 whose $input.i equals 0.10 and whose k1 equals -2.50",
+        "item 3 of k1 whose $input.i is 0.1 and whose k1 is -2.5",
     ),
     (
         "item 3 of k1 whose some ._x-1 is between 1 and 4e2",
@@ -799,8 +800,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("k1 whose zz is \"s\"", "k1 whose zz is \"s\""),
     ("k1 whose zz is empty", "k1 whose zz is empty"),
     (
-        "k1._k named by each of item 3 of k1 whose $params.p[0].z is last of .it and $input.i is a list and weeks elapsed from .true to zz equals \"a\\u00e9\"",
-        "k1._k named by each of item 3 of k1 whose $params.p[0].z equals last of .it and $input.i is a list and weeks elapsed from .true to zz is \"aé\"",
+        "k1._k named by each of item 3 of k1 whose $params.p[0].z is last of .it and whose $input.i is a list and whose weeks elapsed from .true to zz equals \"a\\u00e9\"",
+        "k1._k named by each of item 3 of k1 whose $params.p[0].z equals last of .it and whose $input.i is a list and whose weeks elapsed from .true to zz is \"aé\"",
     ),
     ("k1.k2.k3", "k1.k2.k3"),
     ("k1.k2.k3.k4.k5.k6.k7.k8.k9", "k1.k2.k3.k4.k5.k6.k7.k8.k9"),
@@ -816,8 +817,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("kid.x", "kid.x"),
     ("kids whose .att.id is 1", "kids whose att.id is 1"),
     (
-        "last of $input.i named by each of .empty._k[k] whose .empty.q[$params.k] is ._x-1 and sum of .true is sum of .\"a.b\"[k].q",
-        "last of $input.i named by each of .empty._k named by k whose .empty.q named by $params.k equals _x-1 and sum of .true equals sum of \"a.b\" named by k.q",
+        "last of $input.i named by each of .empty._k[k] whose .empty.q[$params.k] is ._x-1 and whose sum of .true is sum of .\"a.b\"[k].q",
+        "last of $input.i named by each of .empty._k named by k whose .empty.q named by $params.k equals _x-1 and whose sum of .true equals sum of \"a.b\" named by k.q",
     ),
     (
         "last of $params.p.\"w v\" whose weeks elapsed from \"$s\" named by k[$params.k] to $input.i is not \"s\"",
@@ -825,8 +826,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("last of x", "last of x"),
     (
-        "last of x whose $params.p[k] is not \"a\\u00e9\" and sum of first of .true named by k.y does not equal sum of $params.p._k plus days elapsed from x to x plus sum of x named by $input.q",
-        "last of x whose $params.p named by k is not \"aé\" and sum of first of .true named by k.y does not equal sum of $params.p._k plus days elapsed from x to x plus sum of x named by $input.q",
+        "last of x whose $params.p[k] is not \"a\\u00e9\" and whose sum of first of .true named by k.y does not equal sum of $params.p._k plus days elapsed from x to x plus sum of x named by $input.q",
+        "last of x whose $params.p named by k is not \"aé\" and whose sum of first of .true named by k.y does not equal sum of $params.p._k plus days elapsed from x to x plus sum of x named by $input.q",
     ),
     ("last of x[2]", "last of x[2]"),
     (
@@ -875,8 +876,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "releases whose some files.path does not match \"^docs/\"",
     ),
     (
-        "releases whose ticket is \"ok\" and some files.path does not match \"^docs/\"",
-        "releases whose ticket is \"ok\" and some files.path does not match \"^docs/\"",
+        "releases whose ticket is \"ok\" and whose some files.path does not match \"^docs/\"",
+        "releases whose ticket is \"ok\" and whose some files.path does not match \"^docs/\"",
     ),
     ("repos", "repos"),
     ("reviews", "reviews"),
@@ -905,8 +906,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("t whose e exists", "t whose e exists"),
     ("t whose e is \"p\"", "t whose e is \"p\""),
     (
-        "t whose e is \"p\" and k is 1",
-        "t whose e is \"p\" and k is 1",
+        "t whose e is \"p\" and whose k is 1",
+        "t whose e is \"p\" and whose k is 1",
     ),
     ("t whose id exists", "t whose id exists"),
     ("t.kids", "t.kids"),
@@ -925,12 +926,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "things whose state is \"live\"",
     ),
     (
-        "things whose state is \"live\" and state is not \"old\"",
-        "things whose state is \"live\" and state is not \"old\"",
+        "things whose state is \"live\" and whose state is not \"old\"",
+        "things whose state is \"live\" and whose state is not \"old\"",
     ),
     (
-        "things whose status is \"COMPLETE\" and status exists",
-        "things whose status is \"COMPLETE\" and status exists",
+        "things whose status is \"COMPLETE\" and whose status exists",
+        "things whose status is \"COMPLETE\" and whose status exists",
     ),
     (
         "things whose x does not exist",
@@ -938,8 +939,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("things whose x exists", "things whose x exists"),
     (
-        "things whose x is one of 1, \"a\" and y exists",
-        "things whose x is one of 1, \"a\" and y exists",
+        "things whose x is one of 1, \"a\" and whose y exists",
+        "things whose x is one of 1, \"a\" and whose y exists",
     ),
     ("trail", "trail"),
     ("trail.artifacts", "trail.artifacts"),
@@ -1076,8 +1077,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("x whose aa equals 1 plus y", "x whose aa equals 1 plus y"),
     (
-        "x whose aa equals b plus c and d exists",
-        "x whose aa equals b plus c and d exists",
+        "x whose aa equals b plus c and whose d exists",
+        "x whose aa equals b plus c and whose d exists",
     ),
     ("x whose aa equals b[3]", "x whose aa equals item 4 of b"),
     ("x whose aa equals b[3].c", "x whose aa equals b[3].c"),
@@ -1143,8 +1144,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "x whose aa equals y within 0.5",
     ),
     (
-        "x whose aa equals y within 2 and b is 1",
-        "x whose aa equals y within 2 and b is 1",
+        "x whose aa equals y within 2 and whose b is 1",
+        "x whose aa equals y within 2 and whose b is 1",
     ),
     ("x whose aa equals y.z", "x whose aa equals y.z"),
     (
@@ -1178,8 +1179,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose aa is \"a\\\\b\"", "x whose aa is 'a\\b'"),
     ("x whose aa is \"it's\"", "x whose aa is \"it's\""),
     (
-        "x whose aa is \"x\" and b is \"y\" and c is \"z\" and d is \"w\" and e is \"v\" and f is \"u\" and g is \"t\" and h is \"s\" and i is \"r\" and j is \"q\" and k is \"p\"",
-        "x whose aa is \"x\" and b is \"y\" and c is \"z\" and d is \"w\" and e is \"v\" and f is \"u\" and g is \"t\" and h is \"s\" and i is \"r\" and j is \"q\" and k is \"p\"",
+        "x whose aa is \"x\" and whose b is \"y\" and whose c is \"z\" and whose d is \"w\" and whose e is \"v\" and whose f is \"u\" and whose g is \"t\" and whose h is \"s\" and whose i is \"r\" and whose j is \"q\" and whose k is \"p\"",
+        "x whose aa is \"x\" and whose b is \"y\" and whose c is \"z\" and whose d is \"w\" and whose e is \"v\" and whose f is \"u\" and whose g is \"t\" and whose h is \"s\" and whose i is \"r\" and whose j is \"q\" and whose k is \"p\"",
     ),
     ("x whose aa is \"é\"", "x whose aa is \"é\""),
     ("x whose aa is \"\u{2028}\"", "x whose aa is \"\u{2028}\""),
@@ -1205,10 +1206,13 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose aa is 0e5", "x whose aa is 0"),
     ("x whose aa is 1", "x whose aa is 1"),
     ("x whose aa is 1 ", "x whose aa is 1"),
-    ("x whose aa is 1 and b is 2", "x whose aa is 1 and b is 2"),
     (
-        "x whose aa is 1 and b is 2 and c exists",
-        "x whose aa is 1 and b is 2 and c exists",
+        "x whose aa is 1 and whose b is 2",
+        "x whose aa is 1 and whose b is 2",
+    ),
+    (
+        "x whose aa is 1 and whose b is 2 and whose c exists",
+        "x whose aa is 1 and whose b is 2 and whose c exists",
     ),
     ("x whose aa is 1 plus 2", "x whose aa equals 1 plus 2"),
     (
@@ -1218,8 +1222,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose aa is 1 within 0", "x whose aa is 1 within 0"),
     ("x whose aa is 1 within 2", "x whose aa is 1 within 2"),
     (
-        "x whose aa is 1 within 2 and b is 1",
-        "x whose aa is 1 within 2 and b is 1",
+        "x whose aa is 1 within 2 and whose b is 1",
+        "x whose aa is 1 within 2 and whose b is 1",
     ),
     ("x whose aa is 1.0", "x whose aa is 1"),
     ("x whose aa is 1.50", "x whose aa is 1.5"),
@@ -1270,8 +1274,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("x whose aa is before y", "x whose aa is before y"),
     (
-        "x whose aa is before y and b is after z and c is on or before w and d is on or after v",
-        "x whose aa is before y and b is after z and c is on or before w and d is on or after v",
+        "x whose aa is before y and whose b is after z and whose c is on or before w and whose d is on or after v",
+        "x whose aa is before y and whose b is after z and whose c is on or before w and whose d is on or after v",
     ),
     (
         "x whose aa is between -1.5 and 2e3",
@@ -1282,12 +1286,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "x whose aa is between 1 and 2",
     ),
     (
-        "x whose aa is between 1 and 2 and b exists",
-        "x whose aa is between 1 and 2 and b exists",
+        "x whose aa is between 1 and 2 and whose b exists",
+        "x whose aa is between 1 and 2 and whose b exists",
     ),
     (
-        "x whose aa is between 1 and 2 and b is 3",
-        "x whose aa is between 1 and 2 and b is 3",
+        "x whose aa is between 1 and 2 and whose b is 3",
+        "x whose aa is between 1 and 2 and whose b is 3",
     ),
     ("x whose aa is count of b", "x whose aa equals count of b"),
     ("x whose aa is empty", "x whose aa is empty"),
@@ -1300,8 +1304,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose aa is in true", "x whose aa is one of true"),
     ("x whose aa is less than 4", "x whose aa is less than 4"),
     (
-        "x whose aa is more than 1 and b is less than 2 and c is at least 3 and d is at most 4",
-        "x whose aa is more than 1 and b is less than 2 and c is at least 3 and d is at most 4",
+        "x whose aa is more than 1 and whose b is less than 2 and whose c is at least 3 and whose d is at most 4",
+        "x whose aa is more than 1 and whose b is less than 2 and whose c is at least 3 and whose d is at most 4",
     ),
     ("x whose aa is more than 3", "x whose aa is more than 3"),
     (
@@ -1350,8 +1354,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("x whose aa is one of 1, 2", "x whose aa is one of 1, 2"),
     (
-        "x whose aa is one of 1, 2 and b is 3",
-        "x whose aa is one of 1, 2 and b is 3",
+        "x whose aa is one of 1, 2 and whose b is 3",
+        "x whose aa is one of 1, 2 and whose b is 3",
     ),
     ("x whose aa is one of 1,2,3", "x whose aa is one of 1, 2, 3"),
     (
@@ -1439,8 +1443,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose some \"a b\" is 1", "x whose some \"a b\" is 1"),
     ("x whose some .empty is 1", "x whose some .empty is 1"),
     (
-        "x whose some aa exists and every b.c is not empty",
-        "x whose some aa exists and every b.c is not empty",
+        "x whose some aa exists and whose every b.c is not empty",
+        "x whose some aa exists and whose every b.c is not empty",
     ),
     ("x whose some aa is 1", "x whose some aa is 1"),
     (
@@ -1480,8 +1484,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x.\"a b\".c", "x.\"a b\".c"),
     ("x.\"w v\"", "x.\"w v\""),
     (
-        "x.\"é\" whose $input.i[$params.k] is between 1 and 3 and \"q r\" is between 2.5 and 3 and .it.y.y is between 2.5 and 3",
-        "x.\"é\" whose $input.i named by $params.k is between 1 and 3 and \"q r\" is between 2.5 and 3 and .it.y.y is between 2.5 and 3",
+        "x.\"é\" whose $input.i[$params.k] is between 1 and 3 and whose \"q r\" is between 2.5 and 3 and whose .it.y.y is between 2.5 and 3",
+        "x.\"é\" whose $input.i named by $params.k is between 1 and 3 and whose \"q r\" is between 2.5 and 3 and whose .it.y.y is between 2.5 and 3",
     ),
     ("x.empty", "x.empty"),
     ("x.every", "x.every"),
@@ -1492,8 +1496,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("x.y.z", "x.y.z"),
     (
-        "x.z.q whose \"$s\" named by k[$params.k] is \"a\\u00e9\" and .\"a.b\" equals 1e2 and $input.i is not one of ._x-1",
-        "x.z.q whose \"$s\" named by k named by $params.k is \"aé\" and \"a.b\" is 100 and $input.i is not in _x-1",
+        "x.z.q whose \"$s\" named by k[$params.k] is \"a\\u00e9\" and whose .\"a.b\" equals 1e2 and whose $input.i is not one of ._x-1",
+        "x.z.q whose \"$s\" named by k named by $params.k is \"aé\" and whose \"a.b\" is 100 and whose $input.i is not in _x-1",
     ),
     ("x[\"\"]", "x.\"\""),
     ("x[\"a b\"]", "x.\"a b\""),
@@ -1522,12 +1526,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("y whose id exists", "y whose id exists"),
     ("y.\"w v\".\"é\"", "y.\"w v\".\"é\""),
     (
-        "y.\"w v\".z named by each of y whose \"q r\" named by $params.k does not equal 1 and y.q.\"\" is \"$s\" and count of .empty named by k is sum of .\"a.b\"",
-        "y.\"w v\".z named by each of y whose \"q r\" named by $params.k is not 1 and y.q.\"\" is \"$s\" and count of .empty named by k equals sum of \"a.b\"",
+        "y.\"w v\".z named by each of y whose \"q r\" named by $params.k does not equal 1 and whose y.q.\"\" is \"$s\" and whose count of .empty named by k is sum of .\"a.b\"",
+        "y.\"w v\".z named by each of y whose \"q r\" named by $params.k is not 1 and whose y.q.\"\" is \"$s\" and whose count of .empty named by k equals sum of \"a.b\"",
     ),
     (
-        "y._k whose .it is at least 1 and k1.y._k is 5",
-        "y._k whose .it is at least 1 and k1.y._k is 5",
+        "y._k whose .it is at least 1 and whose k1.y._k is 5",
+        "y._k whose .it is at least 1 and whose k1.y._k is 5",
     ),
     ("y.q whose \"q r\" is -2.50", "y.q whose \"q r\" is -2.5"),
     (
@@ -1538,8 +1542,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("ys", "ys"),
     ("zart.releases", "zart.releases"),
     (
-        "zz whose last of ._x-1._k named by $params.\"x y\" is 0.10 and every k1 equals \"s\" and $input.i.\"w v\" named by $params.\"x y\" is in \"s\", 0.10, 0.10",
-        "zz whose last of _x-1._k named by $params.\"x y\" is 0.1 and every k1 is \"s\" and $input.i.\"w v\" named by $params.\"x y\" is one of \"s\", 0.1, 0.1",
+        "zz whose last of ._x-1._k named by $params.\"x y\" is 0.10 and whose every k1 equals \"s\" and whose $input.i.\"w v\" named by $params.\"x y\" is in \"s\", 0.10, 0.10",
+        "zz whose last of _x-1._k named by $params.\"x y\" is 0.1 and whose every k1 is \"s\" and whose $input.i.\"w v\" named by $params.\"x y\" is one of \"s\", 0.1, 0.1",
     ),
     ("zz.empty", "zz.empty"),
     ("zz[0].y", "zz[0].y"),
@@ -1589,17 +1593,17 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("art.items whose .cov.k is 1", "art.items whose cov.k is 1"),
     (
-        "art.items whose art.k is 1 and .art.xs[0] is 5",
-        "art.items whose art.k is 1 and item 1 of art.xs is 5",
+        "art.items whose art.k is 1 and whose .art.xs[0] is 5",
+        "art.items whose art.k is 1 and whose item 1 of art.xs is 5",
     ),
     (
-        "art.items whose count of .art.xs is 1 and .art.k is at most 2",
-        "art.items whose count of art.xs is 1 and art.k is at most 2",
+        "art.items whose count of .art.xs is 1 and whose .art.k is at most 2",
+        "art.items whose count of art.xs is 1 and whose art.k is at most 2",
     ),
     ("cov", "cov"),
     (
-        "thing.leaves whose .art.k is 1 and thing.v is 1",
-        "thing.leaves whose art.k is 1 and thing.v is 1",
+        "thing.leaves whose .art.k is 1 and whose thing.v is 1",
+        "thing.leaves whose art.k is 1 and whose thing.v is 1",
     ),
     ("\"x y\".items", "\"x y\".items"),
     ("\"x y\".pa.items", "\"x y\".pa.items"),
@@ -1608,8 +1612,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "$params.p named by k whose .empty.z does not equal count of \"$s\" within 2",
     ),
     (
-        "every item 3 of zz whose item 2 from last of \"$s\" is between 2.5 and 3 and sum of k1 is not 1e2 within 2",
-        "every item 3 of zz whose item 2 from last of \"$s\" is between 2.5 and 3 and sum of k1 is not 100 within 2",
+        "every item 3 of zz whose item 2 from last of \"$s\" is between 2.5 and 3 and whose sum of k1 is not 1e2 within 2",
+        "every item 3 of zz whose item 2 from last of \"$s\" is between 2.5 and 3 and whose sum of k1 is not 100 within 2",
     ),
     (
         "x whose aa is not 1 within 2",
@@ -1731,6 +1735,27 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("dep.files", "dep.files"),
     ("lockfile", "lockfile"),
     ("repo.deps", "repo.deps"),
+    (
+        "every items whose .that is \"x\"",
+        "every items whose .that is \"x\"",
+    ),
+    (
+        "every ws that starts with \"b\"",
+        "every ws that starts with \"b\"",
+    ),
+    (
+        "every ws that starts with \"b\" and that ends with \"y\"",
+        "every ws that starts with \"b\" and that ends with \"y\"",
+    ),
+    (
+        "every ws whose it starts with \"b\" and that ends with \"y\"",
+        "every ws whose it starts with \"b\" and that ends with \"y\"",
+    ),
+    ("ws that starts with \"b\"", "ws that starts with \"b\""),
+    (
+        "items whose kind is \"a\" and that is not empty",
+        "items whose kind is \"a\" and that is not empty",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -1747,7 +1772,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "\"q r\".q.y whose item[0] equals 0.10 and of named not by empty named by $params.k equals it and count of every matches 1e2",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "\"q r\".z whose 2 from last of $input.i does not exist",
@@ -1777,11 +1802,11 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     (".", &["doesn't parse"]),
     (".\"\",\"\".x", &["doesn't parse"]),
     (
-        "._x-1.q.q whose count of .true is in 0.10, true, true and days elapsed from .true to \"$s\" is 1",
+        "._x-1.q.q whose count of .true is in 0.10, true, true and whose days elapsed from .true to \"$s\" is 1",
         &["is one of can't follow a count of, a sum of or a plus"],
     ),
     (
-        "._x-1[3] whose .true is equal to hours elapsed from \"q r\" to .true plus item 3 of .\"a.b\" named by $params.k plus count of y and count of $input.i does not match x",
+        "._x-1[3] whose .true is equal to hours elapsed from \"q r\" to .true plus item 3 of .\"a.b\" named by $params.k plus count of y and whose count of $input.i does not match x",
         &["does not match can't follow a count of, a sum of or a plus"],
     ),
     (".aa.", &["doesn't parse"]),
@@ -1799,15 +1824,15 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         ".it.empty named by each of item 3 of k1 whose every every is between 1 and 4e2 and named is at least 5 plus $params.p plus sum of in and some item 0 of item.q is alphabetically after 'b\\c'",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         ".true[0].\"é\" whose item 0 of $input.i.\"\".z is 1e2 and item 2 from last of y is not in .empty and y is before 'b\\c'",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("1a", &["doesn't parse"]),
     (
-        "a named by each of x whose is.empty.y is empty and item is alphabetically after count of plus plus first named by empty named by $input.q plus zz and days elapsed from item.it to plus.z does not match item 3 of k1",
+        "a named by each of x whose is.empty.y is empty and whose item is alphabetically after count of plus plus first named by empty named by $input.q plus zz and whose days elapsed from item.it to plus.z does not match item 3 of k1",
         &[
             "a is a word of the grammar: write .a",
             "does not match can't follow a count of, a sum of or a plus",
@@ -1818,7 +1843,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "a whose .empty.y.q equals plus.it[$params.k] plus .it.it plus null and last is count plus sum of $input.i.z",
+        "a whose .empty.y.q equals plus.it[$params.k] plus .it.it plus null and whose last is count plus sum of $input.i.z",
         &[
             "a is a word of the grammar: write .a",
             "count is a word of the grammar: write .count",
@@ -1829,10 +1854,13 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "a whose plus[k].q is between 1 and 3 and it 0.10",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("aa b", &["doesn't parse"]),
-    ("aa whose b is 1 and c whose d is 2", &["doesn't parse"]),
+    (
+        "aa whose b is 1 and c whose d is 2",
+        &["a condition after and starts with whose or that"],
+    ),
     ("aa.", &["doesn't parse"]),
     ("aa..b", &["doesn't parse"]),
     ("aa.b.", &["doesn't parse"]),
@@ -1864,7 +1892,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         &["doesn't parse"],
     ),
     (
-        "every count named by each of first of .empty.q.empty whose k1 equals count of some and it.empty is at least 0.10",
+        "every count named by each of first of .empty.q.empty whose k1 equals count of some and whose it.empty is at least 0.10",
         &[
             "count is a word of the grammar: write .count",
             "it is the whole subject: write empty, not it.empty",
@@ -1889,7 +1917,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "every in.q named by k whose some is is at least true and every count.y.q, if any, is more than item 2 from last of \"q r\" and days elapsed from a to first of $params.p.q equals in.z plus count of plus named by $params.k plus empty",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "every it",
@@ -1921,7 +1949,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     ("every x by each of $params.p", &["doesn't parse"]),
     (
-        "every x whose aa is 1 and some b whose c",
+        "every x whose aa is 1 and whose some b whose c",
         &["a condition after whose can't have a whose of its own"],
     ),
     (
@@ -1945,7 +1973,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("item 0 of x", &["doesn't parse"]),
     (
         "item 0 of x whose in 1 plus count of y.y.empty and every.it.y is less than \"s\"",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "item 0 of y[$params.k] named by $params.\"x y\" whose sum of last of \"q r\" is between 2.5 and 4e2",
@@ -1954,7 +1982,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("item 01 of x", &["doesn't parse"]),
     ("item 1 of", &["doesn't parse"]),
     (
-        "item 2 from last of .it[$params.k] whose every is between -1 and 4e2 and \"q r\" does not match item and some y[0] named by $input.q equals null",
+        "item 2 from last of .it[$params.k] whose every is between -1 and 4e2 and whose \"q r\" does not match item and whose some y[0] named by $input.q equals null",
         &[
             "every is a word of the grammar: write .every",
             "item is a word of the grammar: write .item",
@@ -1962,7 +1990,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     ("item 3 of item 2 of x", &["doesn't parse"]),
     (
-        "item 3 of x whose plus named by $input.q.q is between 1 and 3 and $params.p.\"w v\".empty equals first.a.z plus in.q",
+        "item 3 of x whose plus named by $input.q.q is between 1 and 3 and whose $params.p.\"w v\".empty equals first.a.z plus in.q",
         &[
             "first is a word of the grammar: write .first",
             "in is a word of the grammar: write .in",
@@ -1977,7 +2005,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         &["doesn't parse"],
     ),
     (
-        "k1 whose days elapsed from item 2 from last of it to item 2 from last of first is not count of every and every $params.p does not equal sum of item 3 of \"q r\"[$params.k] plus it plus .it",
+        "k1 whose days elapsed from item 2 from last of it to item 2 from last of first is not count of every and whose every $params.p does not equal sum of item 3 of \"q r\"[$params.k] plus it plus .it",
         &[
             "every is a word of the grammar: write .every",
             "first is a word of the grammar: write .first",
@@ -2033,7 +2061,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "plus[3] named by empty whose days elapsed from count to \"q r\" named by $params.k is at least sum of item and k1 starts with sum of it plus days elapsed from first of \"q r\".a to first of not",
+        "plus[3] named by empty whose days elapsed from count to \"q r\" named by $params.k is at least sum of item and whose k1 starts with sum of it plus days elapsed from first of \"q r\".a to first of not",
         &[
             "count is a word of the grammar: write .count",
             "empty can't be an alias",
@@ -2066,7 +2094,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("whose aa is 1", &["doesn't parse"]),
     (
         "whose some equals item 3 of one and named is equal to \"s\" within 2 and some is hours elapsed from .it to of",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("x $aa", &["doesn't parse"]),
     ("x WHOSE aa is 1", &["doesn't parse"]),
@@ -2097,7 +2125,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("x named by each of y whose", &["doesn't parse"]),
     ("x named by each of y z", &["doesn't parse"]),
     (
-        "x named by it whose weeks elapsed from .empty named by $params.k.a to a.z.q is not in count and days elapsed from named.it.\"w v\" to last of it named by empty is 1e2 and count.empty is first",
+        "x named by it whose weeks elapsed from .empty named by $params.k.a to a.z.q is not in count and whose days elapsed from named.it.\"w v\" to last of it named by empty is 1e2 and whose count.empty is first",
         &[
             "a is a word of the grammar: write .a",
             "count is a word of the grammar: write .count",
@@ -2192,22 +2220,28 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("x whose aa is 007", &["doesn't parse"]),
     ("x whose aa is 1 AND b is 2", &["doesn't parse"]),
     ("x whose aa is 1 and", &["doesn't parse"]),
-    ("x whose aa is 1 and (b is 2)", &["doesn't parse"]),
-    ("x whose aa is 1 and and b is 2", &["doesn't parse"]),
+    (
+        "x whose aa is 1 and (b is 2)",
+        &["a condition after and starts with whose or that"],
+    ),
+    (
+        "x whose aa is 1 and and b is 2",
+        &["a condition after and starts with whose or that"],
+    ),
     (
         "x whose aa is 1 and b is 1 and c is 1 and d is 1 and e is 1 and f is 1 and g is 1 and h is 1 and i is 1 and j is 1 and k is",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "x whose aa is 1 and b is 1 and c is 1 and d is 1 and e is 1 and f is 1 and g is 1 and h is 1 and i is 1 and j is 1 and k is 1 and l is \"unclosed",
         &["unclosed quote at column 136"],
     ),
     (
-        "x whose aa is 1 and some b whose c is 1",
+        "x whose aa is 1 and whose some b whose c is 1",
         &["a condition after whose can't have a whose of its own"],
     ),
     (
-        "x whose aa is 1 and some b whose c is 1 and d is 2",
+        "x whose aa is 1 and whose some b whose c is 1 and d is 2",
         &["a condition after whose can't have a whose of its own"],
     ),
     ("x whose aa is 1 named by each of y", &["doesn't parse"]),
@@ -2427,7 +2461,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
         &["it can only start an assertion: write it first, like it is not empty"],
     ),
     (
-        "zz.q.\"w v\" whose days elapsed from $params.p to k1.y named by k is empty and count[3].y is not one of last and count of empty is empty",
+        "zz.q.\"w v\" whose days elapsed from $params.p to k1.y named by k is empty and whose count[3].y is not one of last and whose count of empty is empty",
         &[
             "count is a word of the grammar: write .count",
             "empty is a word of the grammar: write .empty",
@@ -2435,20 +2469,37 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
             "last is a word of the grammar: write .last",
         ],
     ),
+    (
+        "every things whose a is 1 and b is 2",
+        &["a condition after and starts with whose or that"],
+    ),
+    ("every ws that", &["doesn't parse"]),
+    (
+        "every ws that starts with \"b\" and ends with \"y\"",
+        &["a condition after and starts with whose or that"],
+    ),
+    (
+        "every ws that starts with \"b\" that ends with \"y\"",
+        &["doesn't parse"],
+    ),
+    (
+        "every ws that starts with \"b\" whose it ends with \"y\"",
+        &["doesn't parse"],
+    ),
 ];
 
 pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ("x[$other.k]", &["unknown name $other"]),
     ("x[$aa]", &["unknown name $aa"]),
-    ("x whose aa is 1 and $b exists", &["unknown name $b"]),
+    ("x whose aa is 1 and whose $b exists", &["unknown name $b"]),
     (
-        "x whose aa is $b and c is $d",
+        "x whose aa is $b and whose c is $d",
         &["unknown name $b", "unknown name $d"],
     ),
     ("x whose aa is $b", &["unknown name $b"]),
     ("x whose aa equals $paramsx", &["unknown name $paramsx"]),
     (
-        "x whose aa equals $params.c and d equals $e",
+        "x whose aa equals $params.c and whose d equals $e",
         &["unknown name $e"],
     ),
     ("x whose aa equals $other", &["unknown name $other"]),
@@ -2472,7 +2523,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["unknown name $foo"],
     ),
     (
-        "\"$s\" whose x does not match \"s\", -2.50, 1e2 and last of .it contains all of 0.10",
+        "\"$s\" whose x does not match \"s\", -2.50, 1e2 and whose last of .it contains all of 0.10",
         &["invalid pattern -2.5", "invalid pattern 100"],
     ),
     (
@@ -2480,7 +2531,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["\"is at most\" takes a number"],
     ),
     (
-        "$input.i whose some y[3], if any, is less than x plus hours elapsed from .it.\"é\" to first of $params.p.z.z plus $input.i.z and every zz contains none of 0.10, -2.50",
+        "$input.i whose some y[3], if any, is less than x plus hours elapsed from .it.\"é\" to first of $params.p.z.z plus $input.i.z and whose every zz contains none of 0.10, -2.50",
         &[
             "\"contains none of\" after every or some would check each item of the last list, not the list: put the walk on a for line",
             "if any can't go with some",
@@ -2491,7 +2542,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["if any can't go with some"],
     ),
     (
-        "$params.p named by each of k1 whose ._x-1.\"é\".\"\" is equal to 1 and weeks elapsed from $input.i to k1 is at most 'b\\c' and $input.i.\"\" contains 0.10",
+        "$params.p named by each of k1 whose ._x-1.\"é\".\"\" is equal to 1 and whose weeks elapsed from $input.i to k1 is at most 'b\\c' and whose $input.i.\"\" contains 0.10",
         &["\"is at most\" takes a number"],
     ),
     (
@@ -2506,11 +2557,11 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["\"is at most\" takes a number"],
     ),
     (
-        ".empty.\"é\".\"w v\" whose item 2 from last of ._x-1 is zz[$params.k][0] and \"$s\".q is less than true",
+        ".empty.\"é\".\"w v\" whose item 2 from last of ._x-1 is zz[$params.k][0] and whose \"$s\".q is less than true",
         &["\"is less than\" takes a number"],
     ),
     (
-        ".it whose item 2 from last of $params.p is true and \"$s\" is not one of -2.50 and .it is at most 'b\\c'",
+        ".it whose item 2 from last of $params.p is true and whose \"$s\" is not one of -2.50 and whose .it is at most 'b\\c'",
         &["\"is at most\" takes a number"],
     ),
     (
@@ -2522,7 +2573,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["if any can't go with some"],
     ),
     (
-        "every first of zz whose some .\"a.b\" equals true and some y, if any, equals true within 2",
+        "every first of zz whose some .\"a.b\" equals true and whose some y, if any, equals true within 2",
         &[
             "\"within\" only compares numbers",
             "if any can't go with some",
@@ -2537,7 +2588,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["invalid pattern 0.1"],
     ),
     (
-        "first of .\"a.b\" whose \"q r\" is .true.y plus $params.p and some .it[k].\"w v\", if any, is not one of \"a\\u00e9\" and weeks elapsed from $params.p[3]._k to x does not equal 0.10",
+        "first of .\"a.b\" whose \"q r\" is .true.y plus $params.p and whose some .it[k].\"w v\", if any, is not one of \"a\\u00e9\" and whose weeks elapsed from $params.p[3]._k to x does not equal 0.10",
         &["if any can't go with some"],
     ),
     (
@@ -2545,7 +2596,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["\"is at most\" takes a number"],
     ),
     (
-        "item 3 of y._k whose every \"$s\", if any, is \"s\" and .it is between 2.5 and 3 and .it is not null",
+        "item 3 of y._k whose every \"$s\", if any, is \"s\" and whose .it is between 2.5 and 3 and whose .it is not null",
         &["\"is not null\" is written \"exists\""],
     ),
     (
@@ -2553,7 +2604,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["9007199254740992 can't be a list position"],
     ),
     (
-        "k1 named by each of .empty named by $params.k[k] whose some ._x-1, if any, does not match true and .true named by $params.k is not 5",
+        "k1 named by each of .empty named by $params.k[k] whose some ._x-1, if any, does not match true and whose .true named by $params.k is not 5",
         &["if any can't go with some", "invalid pattern true"],
     ),
     (
@@ -2564,7 +2615,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ("x named by input", &["input can't be an alias"]),
     ("x named by it", &["it can't name a key"]),
     (
-        "x named by it whose .it is equal to -2.50 and some x contains none of true and count of $params.p is \"a\\u00e9\"",
+        "x named by it whose .it is equal to -2.50 and whose some x contains none of true and whose count of $params.p is \"a\\u00e9\"",
         &[
             "\"contains none of\" after every or some would check each item of the last list, not the list: put the walk on a for line",
             "it can't name a key",
@@ -2572,7 +2623,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ),
     ("x named by params", &["params can't be an alias"]),
     (
-        "x whose .true is on or after \"s\" and weeks elapsed from $params.p to item 3 of $params.p is equal to 0.10",
+        "x whose .true is on or after \"s\" and whose weeks elapsed from $params.p to item 3 of $params.p is equal to 0.10",
         &["\"is on or after\" takes a time or a number"],
     ),
     (
@@ -2612,11 +2663,11 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["if any can't go with some"],
     ),
     (
-        "x whose zz.\"w v\" is at most \"s\" and some .empty named by $input.q[0], if any, equals count of k1",
+        "x whose zz.\"w v\" is at most \"s\" and whose some .empty named by $input.q[0], if any, equals count of k1",
         &["\"is at most\" takes a number", "if any can't go with some"],
     ),
     (
-        "x[3] named by k whose $input.i.y.\"\" is equal to true and some $params.p, if any, starts with \"a\\u00e9\"",
+        "x[3] named by k whose $input.i.y.\"\" is equal to true and whose some $params.p, if any, starts with \"a\\u00e9\"",
         &["if any can't go with some"],
     ),
     (
@@ -2626,11 +2677,11 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ("x[empty]", &["empty can't be an alias"]),
     ("x[it]", &["it can't name a key"]),
     (
-        "y named by k named by $params.\"x y\" whose zz does not equal 1e2 plus .it named by $params.\"x y\" and sum of $params.p is equal to $params.p and every first of ._x-1.\"é\".q is before null",
+        "y named by k named by $params.\"x y\" whose zz does not equal 1e2 plus .it named by $params.\"x y\" and whose sum of $params.p is equal to $params.p and whose every first of ._x-1.\"é\".q is before null",
         &["\"is before\" takes a time or a number"],
     ),
     (
-        "y.q._k whose \"q r\" is count of .empty.q._k plus last of .\"a.b\" plus x.\"\" and every x is on or after \"a\\u00e9\"",
+        "y.q._k whose \"q r\" is count of .empty.q._k plus last of .\"a.b\" plus x.\"\" and whose every x is on or after \"a\\u00e9\"",
         &["\"is on or after\" takes a time or a number"],
     ),
     (
@@ -2641,7 +2692,7 @@ pub const FROM_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 
 pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
     (
-        "\"q r\" whose some $input.i.it.a, if any, contains none of \"s\", 1e2, 1e2 and some first of empty, if any, does not match \"s\", 0.10, 1",
+        "\"q r\" whose some $input.i.it.a, if any, contains none of \"s\", 1e2, 1e2 and whose some first of empty, if any, does not match \"s\", 0.10, 1",
         &[
             "\"contains none of\" after every or some would check each item of the last list, not the list: put the walk on a for line",
             "empty is a word of the grammar: write .empty",
@@ -2651,7 +2702,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "\"q r\" whose some plus is one of first of first.it and some is, if any, is less than .empty plus $input.i and plus is \"s\"",
+        "\"q r\" whose some plus is one of first of first.it and whose some is, if any, is less than .empty plus $input.i and whose plus is \"s\"",
         &[
             "first is a word of the grammar: write .first",
             "if any can't go with some",
@@ -2659,7 +2710,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "$input.i.\"w v\" whose plus is at most count of is.it and sum of zz.q.q is more than \"s\" and days elapsed from zz to one is an object",
+        "$input.i.\"w v\" whose plus is at most count of is.it and whose sum of zz.q.q is more than \"s\" and whose days elapsed from zz to one is an object",
         &[
             "\"is more than\" takes a number",
             "is a can't follow a count of, a sum of or a plus",
@@ -2707,7 +2758,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "every named whose plus.empty.a does not match every.q[3] and y equals some named by empty.q plus is plus first of $input.i and .empty.q named by empty is not null",
+        "every named whose plus.empty.a does not match every.q[3] and whose y equals some named by empty.q plus is plus first of $input.i and whose .empty.q named by empty is not null",
         &[
             "\"is not null\" is written \"exists\"",
             "empty can't be an alias",
@@ -2718,7 +2769,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "first of count named by $params.k whose every last of it.q.q, if any, is equal to -2.50 within 2 and weeks elapsed from plus to a is equal to null within 2",
+        "first of count named by $params.k whose every last of it.q.q, if any, is equal to -2.50 within 2 and whose weeks elapsed from plus to a is equal to null within 2",
         &[
             "\"within\" only compares numbers",
             "a is a word of the grammar: write .a",
@@ -2728,7 +2779,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "first of some.a named by each of empty whose \"q r\" named by empty named by $input.q is between 2.5 and 3 and count of .empty is at most \"s\" and some y, if any, is equal to 1e2",
+        "first of some.a named by each of empty whose \"q r\" named by empty named by $input.q is between 2.5 and 3 and whose count of .empty is at most \"s\" and whose some y, if any, is equal to 1e2",
         &[
             "\"is at most\" takes a number",
             "empty can't be an alias",
@@ -2753,7 +2804,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "is.empty named by it named by each of .it.\"w v\" named by $params.k whose sum of named named by it.empty contains sum of empty and some empty is days elapsed from count.empty to $input.i and some a.y.q, if any, is between 2.5 and 3",
+        "is.empty named by it named by each of .it.\"w v\" named by $params.k whose sum of named named by it.empty contains sum of empty and whose some empty is days elapsed from count.empty to $input.i and whose some a.y.q, if any, is between 2.5 and 3",
         &[
             "a is a word of the grammar: write .a",
             "contains can't follow a count of, a sum of or a plus",
@@ -2772,7 +2823,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "last.q.q whose .empty.it.it contains 'b\\c' and last of every.z is between -1 and 3 and every .it, if any, matches 'b\\c', true",
+        "last.q.q whose .empty.it.it contains 'b\\c' and whose last of every.z is between -1 and 3 and whose every .it, if any, matches 'b\\c', true",
         &[
             "every is a word of the grammar: write .every",
             "invalid pattern \"b\\\\c\"",
@@ -2781,7 +2832,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "not named by it[0] whose empty does not equal 1e2 and some not.z, if any, is null plus days elapsed from first of every.a to last",
+        "not named by it[0] whose empty does not equal 1e2 and whose some not.z, if any, is null plus days elapsed from first of every.a to last",
         &[
             "empty is a word of the grammar: write .empty",
             "every is a word of the grammar: write .every",
@@ -2793,21 +2844,21 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "x whose $input.i is 'b\\c' and some .it, if any, is between 1 and 3 and days elapsed from ._x-1 to \"$s\" is not in first of $params.p",
+        "x whose $input.i is 'b\\c' and whose some .it, if any, is between 1 and 3 and whose days elapsed from ._x-1 to \"$s\" is not in first of $params.p",
         &[
             "if any can't go with some",
             "is not one of can't follow a count of, a sum of or a plus",
         ],
     ),
     (
-        "x whose empty equals 5 and zz.\"w v\" named by k does not match true",
+        "x whose empty equals 5 and whose zz.\"w v\" named by k does not match true",
         &[
             "empty is a word of the grammar: write .empty",
             "invalid pattern true",
         ],
     ),
     (
-        "y whose days elapsed from empty named by k.q to $input.i is not last plus days elapsed from in to first of not plus hours elapsed from not.z to empty and some of named by k, if any, does not exist",
+        "y whose days elapsed from empty named by k.q to $input.i is not last plus days elapsed from in to first of not plus hours elapsed from not.z to empty and whose some of named by k, if any, does not exist",
         &[
             "empty is a word of the grammar: write .empty",
             "if any can't go with some",
