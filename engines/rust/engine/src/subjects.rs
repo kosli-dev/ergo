@@ -230,7 +230,11 @@ fn broken_from(failure: &walk::Failure) -> Broken {
 }
 
 fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
-    let ctx = context(env, input_root(env), anc);
+    walk_from(env, path, anc, input_root(env))
+}
+
+fn walk_from<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>], base: Located<'a>) -> Read<'a> {
+    let ctx = context(env, base.clone(), anc);
     let from = Path {
         start: Start::Subject,
         steps: path.steps.clone(),
@@ -256,10 +260,10 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
                 path: String::new(),
                 cause,
                 value: match cause {
-                    Cause::Unusable => env.input.clone(),
+                    Cause::Unusable => base.value.clone(),
                     _ => Value::Null,
                 },
-                location: Some(Location::input_root().render()),
+                location: Some(base.location.render()),
             }],
         };
     }
@@ -275,19 +279,30 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
                 },
                 key: None,
             }),
-            _ => broken.push(Broken {
-                msg: ops::message::stated(
-                    &walked.item_name(&item.end_segs),
-                    item.miss,
-                    &item.shown(),
-                    "a list or an object",
-                ),
-                order: item.end_segs.clone(),
-                path: walked.name_of(&item.end_segs, false),
-                cause: item.miss,
-                value: item.shown(),
-                location: Some(item.end_location.render()),
-            }),
+            _ => {
+                let miss = if item.miss == Cause::NotAnObject {
+                    let null = env
+                        .input
+                        .pointer(&item.end_location.render())
+                        .is_some_and(Value::is_null);
+                    if null { Cause::Absent } else { Cause::Unusable }
+                } else {
+                    item.miss
+                };
+                broken.push(Broken {
+                    msg: ops::message::stated(
+                        &walked.item_name(&item.end_segs),
+                        miss,
+                        &item.shown(),
+                        "a list or an object",
+                    ),
+                    order: item.end_segs.clone(),
+                    path: walked.name_of(&item.end_segs, false),
+                    cause: item.miss,
+                    value: item.shown(),
+                    location: Some(item.end_location.render()),
+                });
+            }
         }
     }
     for each in &mut broken {
@@ -314,16 +329,14 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
             }
         }
     }
-    if anc.is_empty() {
-        for each in &mut broken {
-            if let Some((number, tail)) = each
-                .msg
-                .strip_prefix("item ")
-                .and_then(|rest| rest.split_once(" of it"))
-                && (tail.is_empty() || tail.starts_with([':', ' ']))
-            {
-                each.msg = format!("item {number} of $input{tail}");
-            }
+    for each in &mut broken {
+        if let Some((number, tail)) = each
+            .msg
+            .strip_prefix("item ")
+            .and_then(|rest| rest.split_once(" of it"))
+            && (tail.is_empty() || tail.starts_with([':', ' ']))
+        {
+            each.msg = format!("item {number} of $input{tail}");
         }
     }
     broken.sort_by(|a, b| a.order.cmp(&b.order));
@@ -419,6 +432,10 @@ fn from_name(path: &Path, source: &Source, anc: &[Anc], ctx: &Ctx, resolved: boo
         } else if let Some(rest) = name.strip_prefix(&format!("{}.", parent.name)) {
             name = rest.to_string();
         }
+    }
+    name = name.replace(" of $input.", " of ");
+    if let (Source::Child { .. }, Some(parent)) = (source, anc.last()) {
+        name = name.replace(&format!(" of {}.", parent.name), " of ");
     }
     if name.is_empty() {
         "it".to_string()
@@ -612,6 +629,43 @@ fn target_message(
     }
 }
 
+fn walk_message(env: &Env, empty: &Value, lowered: &Lowered, anc: &[Anc]) -> Option<String> {
+    let (Source::Root { path, .. } | Source::Child { path, .. }) = &lowered.source;
+    match &lowered.source {
+        Source::Root { every: true, .. }
+        | Source::Root {
+            each_of: Some(_), ..
+        }
+        | Source::Child {
+            each_of: Some(_), ..
+        } => return None,
+        _ => {}
+    }
+    let base = match (&lowered.source, anc.last()) {
+        (Source::Child { .. }, Some(parent)) => {
+            if std::ptr::eq(parent.at.value, empty)
+                || !matches!(parent.at.value, Value::Object(_) | Value::Array(_))
+            {
+                return None;
+            }
+            parent.at.clone()
+        }
+        (Source::Child { .. }, None) => return None,
+        _ => input_root(env),
+    };
+    let Read::Entries { broken, .. } = walk_from(env, path, anc, base) else {
+        return None;
+    };
+    let mut said: Vec<&Broken> = broken.iter().filter(|b| !b.msg.is_empty()).collect();
+    said.sort_by(|a, b| a.order.cmp(&b.order));
+    if said.is_empty() {
+        return None;
+    }
+    Some(ops::message::joined(
+        said.iter().map(|b| b.msg.clone()).collect(),
+    ))
+}
+
 fn from_message(
     env: &Env,
     empty: &Value,
@@ -620,6 +674,7 @@ fn from_message(
     cause: Cause,
 ) -> Option<String> {
     ref_message(env, lowered, anc, cause)
+        .or_else(|| walk_message(env, empty, lowered, anc))
         .or_else(|| target_message(env, empty, &lowered.source, anc, cause))
 }
 
@@ -2477,5 +2532,321 @@ mod tests {
                 json!("<invalid identified_by>")
             );
         }
+    }
+
+    fn min_message(subjects: Value, input: Value) -> Value {
+        rows(&run(subjects, input), "$min_subjects")[0]["message"].clone()
+    }
+
+    fn deep_message(subjects: Value, input: Value) -> Value {
+        let r = report(
+            &input,
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": subjects,
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
+            }),
+            &json!({}),
+        );
+        rows(&r, "$min_subjects")[0]["message"].clone()
+    }
+
+    #[test]
+    fn a_position_on_the_input_names_the_list_without_dollar_input() {
+        assert_eq!(
+            min_message(
+                json!({"thing": {"from": "item 2 of things"}}),
+                json!({"things": [{"x": 1}]})
+            ),
+            json!("item 2 of things is missing")
+        );
+        assert_eq!(
+            min_message(
+                json!({"thing": {"from": "item 2 of things"}}),
+                json!({"things": [{"x": 1}, 3]})
+            ),
+            json!("item 2 of things is 3, which isn't a list or an object")
+        );
+        assert_eq!(
+            min_message(
+                json!({"thing": {"from": "first of things"}}),
+                json!({"things": []})
+            ),
+            json!("item 1 of things is missing")
+        );
+    }
+
+    #[test]
+    fn a_child_names_the_path_it_walks_in_its_parent_without_the_parent() {
+        let subjects = |from: &str| json!({"p": {"from": "ps"}, "thing": {"from": from}});
+        let said =
+            |from: &str, parent: Value| deep_message(subjects(from), json!({"ps": [parent]}));
+        assert_eq!(said("p.ws", json!({"id": 1})), json!("ws is missing"));
+        assert_eq!(said("p.ws", json!({"ws": null})), json!("ws is null"));
+        assert_eq!(
+            said("p.ws", json!({"ws": 5})),
+            json!("ws is 5, which isn't a list or an object")
+        );
+        assert_eq!(
+            said("first of p.ws", json!({"ws": []})),
+            json!("item 1 of ws is missing")
+        );
+        assert_eq!(
+            said("item 2 of p.ws", json!({"ws": [{"x": 1}]})),
+            json!("item 2 of ws is missing")
+        );
+        assert_eq!(
+            said("p.meta.owner", json!({"meta": {}})),
+            json!("meta.owner is missing")
+        );
+        assert_eq!(
+            said("p.meta.owner", json!({"meta": 5})),
+            json!("meta is 5, which isn't a list or an object")
+        );
+    }
+
+    #[test]
+    fn a_grandchild_names_the_path_in_its_nearest_parent() {
+        assert_eq!(
+            deep_message(
+                json!({
+                    "t": {"from": "ts"},
+                    "w": {"from": "t.ws"},
+                    "thing": {"from": "w.kids"}
+                }),
+                json!({"ts": [{"ws": [{"id": 1}]}]})
+            ),
+            json!("kids is missing")
+        );
+    }
+
+    #[test]
+    fn a_name_in_a_child_filter_that_reads_a_grandparent_is_unknown_when_the_parent_is_written_wrong()
+     {
+        let r = report(
+            &json!({"ts": []}),
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {
+                    "t": {"from": "ts"},
+                    "w": {"from": "t.ws named by zz"},
+                    "thing": {"from": "w.kids whose lo is at least t.cov.x"}
+                },
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
+            }),
+            &json!({}),
+        );
+        let inputs = rows(&r, "$well_formed")[0]["inputs"].clone();
+        let listed: Vec<(String, Value)> = inputs
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|input| {
+                input["name"]
+                    .as_str()
+                    .is_some_and(|n| n.starts_with("subjects."))
+            })
+            .map(|input| {
+                (
+                    input["name"].as_str().unwrap().to_string(),
+                    input["value"].clone(),
+                )
+            })
+            .collect();
+        assert_eq!(
+            listed,
+            [
+                ("subjects.w.from".to_string(), json!(["unknown alias zz"])),
+                (
+                    "subjects.thing.from".to_string(),
+                    json!(["unknown alias $t"])
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_name_in_a_child_filter_that_reads_a_grandparent_is_known_when_the_parent_is_fine() {
+        let r = report(
+            &json!({"ts": []}),
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {
+                    "t": {"from": "ts"},
+                    "w": {"from": "t.ws"},
+                    "thing": {"from": "w.kids whose lo is at least t.cov.x"}
+                },
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
+            }),
+            &json!({}),
+        );
+        assert_eq!(rows(&r, "$well_formed")[0]["passed"], json!(true));
+    }
+
+    #[test]
+    fn a_filter_comparing_two_unusable_sides_names_both() {
+        let r = report(
+            &json!({"ts": [{"cov": 5, "ws": [{"lo": true}]}]}),
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {
+                    "t": {"from": "ts"},
+                    "thing": {"from": "t.ws whose lo is at least t.cov.x"}
+                },
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
+            }),
+            &json!({}),
+        );
+        assert_eq!(
+            rows(&r, "$applies")[0]["message"],
+            json!("t.cov is 5, which isn't an object, and lo is true, which isn't a number")
+        );
+    }
+
+    #[test]
+    fn an_any_of_tags_an_input_with_the_part_that_reads_the_same_path() {
+        let r = report(
+            &json!({"things": [{"id": "a", "name": 1}]}),
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {"thing": {"from": "things", "has": {"cv": "name"}}},
+                "requirements": {"s": {"subject": "thing", "checks": {
+                    "c": {"any_of": {"a": "name is 2", "b": "cv is 2"}}
+                }}}
+            }),
+            &json!({}),
+        );
+        let inputs = rows(&r, "c")[0]["inputs"].clone();
+        assert_eq!(
+            inputs,
+            json!([
+                {"name": "cv", "value": 1, "locations": ["/things/0/name"], "part": {"name": "cv", "id": null}},
+                {"name": "name", "value": 1, "locations": ["/things/0/name"], "part": {"name": "cv", "id": null}}
+            ])
+        );
+    }
+
+    #[test]
+    fn a_from_name_that_is_a_word_of_the_grammar_gets_one_problem() {
+        let r = run(
+            json!({"p": {"from": "ps"}, "thing": {"from": "p.ws named by one"}}),
+            json!({}),
+        );
+        let texts: Vec<Value> = rows(&r, "$well_formed")[0]["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|input| input["name"] == json!("subjects.thing.from"))
+            .map(|input| input["value"].clone())
+            .collect();
+        assert_eq!(texts, [json!(["one can't be an alias"])]);
+    }
+
+    fn from_problems_of(from: &str, parent: &str) -> Vec<Value> {
+        let r = report(
+            &json!({"ts": []}),
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {
+                    "t": {"from": "ts"},
+                    "w": {"from": parent},
+                    "thing": {"from": from}
+                },
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
+            }),
+            &json!({}),
+        );
+        rows(&r, "$well_formed")[0]["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|input| {
+                input["name"]
+                    .as_str()
+                    .is_some_and(|n| n.starts_with("subjects."))
+            })
+            .map(|input| json!([input["name"], input["value"]]))
+            .collect()
+    }
+
+    #[test]
+    fn a_dotted_right_side_reads_the_input_field_so_it_never_names_a_grandparent() {
+        let listed = from_problems_of("w.kids whose lo is at least .t.cov.x", "t.ws named by zz");
+        assert_eq!(listed, [json!(["subjects.w.from", ["unknown alias zz"]])]);
+    }
+
+    #[test]
+    fn a_from_line_whose_that_compares_a_field_with_itself_is_written_wrong() {
+        assert_eq!(
+            from_problems_of("w.kids whose lo is at least lo", "t.ws"),
+            [json!([
+                "subjects.thing.from",
+                ["whose: lo is compared with itself"]
+            ])]
+        );
+    }
+
+    #[test]
+    fn a_from_whose_that_reads_the_parent_on_both_sides_is_accepted() {
+        for whose in ["t.lo is at least t.lo", "t is t", "t.lo is not t.lo"] {
+            assert_eq!(
+                from_problems_of(&format!("t.ws whose {whose}"), "t.ws"),
+                Vec::<Value>::new(),
+                "{whose}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_from_whose_that_reads_the_item_field_on_both_sides_is_written_wrong() {
+        for (whose, said) in [
+            ("t.lo is at most .t.lo", ".t.lo"),
+            ("t is .t", ".t"),
+            (".t.lo ends with .t.lo", ".t.lo"),
+            ("x is x", "x"),
+        ] {
+            assert_eq!(
+                from_problems_of(&format!("t.ws whose {whose}"), "t.ws"),
+                [json!([
+                    "subjects.thing.from",
+                    [format!("whose: {said} is compared with itself")]
+                ])],
+                "{whose}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_parent_written_wrong_by_comparing_with_itself_blocks_the_grandparent_for_its_child() {
+        let listed = from_problems_of(
+            "w.kids whose lo is at least t.cov.x",
+            "t.ws whose lo is at least lo",
+        );
+        assert_eq!(
+            listed,
+            [
+                json!(["subjects.w.from", ["whose: lo is compared with itself"]]),
+                json!(["subjects.thing.from", ["unknown alias $t"]])
+            ]
+        );
+    }
+
+    #[test]
+    fn a_child_blocked_by_an_unknown_grandparent_is_an_invalid_from_in_the_report() {
+        let r = report(
+            &json!({"ts": []}),
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {
+                    "t": {"from": "ts"},
+                    "w": {"from": "t.ws whose x is x"},
+                    "thing": {"from": "w.kids whose t.lo is more than t.lo"}
+                },
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
+            }),
+            &json!({}),
+        );
+        assert_eq!(r["subjects"]["thing"]["from"], json!("<invalid from>"));
+        assert_eq!(r["subjects"]["w"]["from"], json!("<invalid from>"));
     }
 }

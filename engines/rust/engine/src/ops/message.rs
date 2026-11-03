@@ -508,10 +508,11 @@ fn compare_faults(compare: &super::compare::Compare, ctx: &Ctx) -> Vec<String> {
             continue;
         }
         let other = &reads[1 - index].1;
-        let Some(other_value) = other.value.as_ref() else {
-            continue;
+        let want = match other.value.as_ref() {
+            Some(other_value) => wanted(other_value),
+            None if !eq_like && !value.is_null() => wanted(&Value::Null),
+            None => continue,
         };
-        let want = wanted(other_value);
         if kind(value) != want {
             out.push(isnt(&first.name, value, want));
         }

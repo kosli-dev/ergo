@@ -10420,5 +10420,77 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line whose compares a field of the subject with itself",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things whose x is x"}}, "requirements": {"s": {"subject": "t", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "a", "lo": 1, "x": 1, "t": {"x": 1}, "ws": [{"id": "b", "lo": 1, "x": 1, "t": {"x": 1}, "kids": [{"id": "c", "lo": 1, "x": 1}]}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.t.from", "value": ["whose: x is compared with itself"]}], "message": "subjects.t.from: whose: x is compared with itself", "passed": false, "requirement": "s", "subject": {"id": null, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child from line whose compares a field of the parent with itself",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "t.ws whose t.lo is at most .t.lo"}}, "requirements": {"s": {"subject": "w", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, because the dot reads the field of the item, not the parent",
+        "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "a", "lo": 1, "x": 1, "t": {"x": 1}, "ws": [{"id": "b", "lo": 1, "x": 1, "t": {"x": 1}, "kids": [{"id": "c", "lo": 1, "x": 1}]}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.w.from", "value": ["whose: .t.lo is compared with itself"]}], "message": "subjects.w.from: whose: .t.lo is compared with itself", "passed": false, "requirement": "s", "subject": {"id": null, "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child from line whose compares a parent's field with the same field of the parent",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "t.ws whose t.lo is at least t.lo"}}, "requirements": {"s": {"subject": "w", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is accepted, because both sides read the parent",
+        "rules": ["sentence.written_wrong.self"],
+        "input": {"things": [{"id": "a", "lo": 1, "x": 1, "t": {"x": 1}, "ws": [{"id": "b", "lo": 1, "x": 1, "t": {"x": 1}, "kids": [{"id": "c", "lo": 1, "x": 1}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "w"}},
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/0/t"], "name": ".t.lo", "value": null}, {"locations": ["/things/0/lo"], "name": "t.lo", "value": 1}], "message": ".t.lo is missing", "passed": false, "requirement": "s", "subject": {"id": {"id": "b", "kids": [{"id": "c", "lo": 1, "x": 1}], "lo": 1, "t": {"x": 1}, "x": 1}, "in": {"t": {"id": "a", "lo": 1, "t": {"x": 1}, "ws": [{"id": "b", "kids": [{"id": "c", "lo": 1, "x": 1}], "lo": 1, "t": {"x": 1}, "x": 1}], "x": 1}}, "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child from line whose compares the parent with itself",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "t.ws whose t is t"}}, "requirements": {"s": {"subject": "w", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is accepted, because both sides read the parent",
+        "rules": ["sentence.written_wrong.self"],
+        "input": {"things": [{"id": "a", "lo": 1, "x": 1, "t": {"x": 1}, "ws": [{"id": "b", "lo": 1, "x": 1, "t": {"x": 1}, "kids": [{"id": "c", "lo": 1, "x": 1}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "w"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/0/t"], "name": ".t", "value": {"x": 1}}, {"locations": ["/things/0"], "name": "t", "value": {"id": "a", "lo": 1, "t": {"x": 1}, "ws": [{"id": "b", "kids": [{"id": "c", "lo": 1, "x": 1}], "lo": 1, "t": {"x": 1}, "x": 1}], "x": 1}}], "message": ".t is {\"x\": 1}, and t is an object with 5 keys", "passed": false, "requirement": "s", "subject": {"id": {"id": "b", "kids": [{"id": "c", "lo": 1, "x": 1}], "lo": 1, "t": {"x": 1}, "x": 1}, "in": {"t": {"id": "a", "lo": 1, "t": {"x": 1}, "ws": [{"id": "b", "kids": [{"id": "c", "lo": 1, "x": 1}], "lo": 1, "t": {"x": 1}, "x": 1}], "x": 1}}, "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a grandchild from line whose compares a field of its parent with itself",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "t.ws"}, "g": {"from": "w.kids whose .w.lo is not .w.lo"}}, "requirements": {"s": {"subject": "g", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "is written wrong",
+        "rules": ["sentence.written_wrong.self", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"things": [{"id": "a", "lo": 1, "x": 1, "t": {"x": 1}, "ws": [{"id": "b", "lo": 1, "x": 1, "t": {"x": 1}, "kids": [{"id": "c", "lo": 1, "x": 1}]}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.g.from", "value": ["whose: .w.lo is compared with itself"]}], "message": "subjects.g.from: whose: .w.lo is compared with itself", "passed": false, "requirement": "s", "subject": {"id": null, "type": "g"}}
+        ]
+      }
+    ]
   }
 ]

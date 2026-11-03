@@ -130,21 +130,37 @@ _part_passes(topic, n, parts) if _failures(topic, _part(topic, n, parts)) == kno
 	some c in group.cases
 }
 
-test_the_sentences_cases_pass_part_1_of_4 if _part_passes("sentences", 0, 4)
+test_the_sentences_cases_pass_part_1_of_8 if _part_passes("sentences", 0, 8)
 
-test_the_sentences_cases_pass_part_2_of_4 if _part_passes("sentences", 1, 4)
+test_the_sentences_cases_pass_part_2_of_8 if _part_passes("sentences", 1, 8)
 
-test_the_sentences_cases_pass_part_3_of_4 if _part_passes("sentences", 2, 4)
+test_the_sentences_cases_pass_part_3_of_8 if _part_passes("sentences", 2, 8)
 
-test_the_sentences_cases_pass_part_4_of_4 if _part_passes("sentences", 3, 4)
+test_the_sentences_cases_pass_part_4_of_8 if _part_passes("sentences", 3, 8)
 
-test_the_sentences_cases_pass_compiled_part_1_of_4 if _differences_compiled("sentences", _part("sentences", 0, 4)) == set()
+test_the_sentences_cases_pass_part_5_of_8 if _part_passes("sentences", 4, 8)
 
-test_the_sentences_cases_pass_compiled_part_2_of_4 if _differences_compiled("sentences", _part("sentences", 1, 4)) == set()
+test_the_sentences_cases_pass_part_6_of_8 if _part_passes("sentences", 5, 8)
 
-test_the_sentences_cases_pass_compiled_part_3_of_4 if _differences_compiled("sentences", _part("sentences", 2, 4)) == set()
+test_the_sentences_cases_pass_part_7_of_8 if _part_passes("sentences", 6, 8)
 
-test_the_sentences_cases_pass_compiled_part_4_of_4 if _differences_compiled("sentences", _part("sentences", 3, 4)) == set()
+test_the_sentences_cases_pass_part_8_of_8 if _part_passes("sentences", 7, 8)
+
+test_the_sentences_cases_pass_compiled_part_1_of_8 if _differences_compiled("sentences", _part("sentences", 0, 8)) == set()
+
+test_the_sentences_cases_pass_compiled_part_2_of_8 if _differences_compiled("sentences", _part("sentences", 1, 8)) == set()
+
+test_the_sentences_cases_pass_compiled_part_3_of_8 if _differences_compiled("sentences", _part("sentences", 2, 8)) == set()
+
+test_the_sentences_cases_pass_compiled_part_4_of_8 if _differences_compiled("sentences", _part("sentences", 3, 8)) == set()
+
+test_the_sentences_cases_pass_compiled_part_5_of_8 if _differences_compiled("sentences", _part("sentences", 4, 8)) == set()
+
+test_the_sentences_cases_pass_compiled_part_6_of_8 if _differences_compiled("sentences", _part("sentences", 5, 8)) == set()
+
+test_the_sentences_cases_pass_compiled_part_7_of_8 if _differences_compiled("sentences", _part("sentences", 6, 8)) == set()
+
+test_the_sentences_cases_pass_compiled_part_8_of_8 if _differences_compiled("sentences", _part("sentences", 7, 8)) == set()
 
 test_the_subjects_cases_pass_part_1_of_6 if _part_passes("subjects", 0, 6)
 

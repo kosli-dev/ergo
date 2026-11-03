@@ -1,6 +1,7 @@
 use super::{Check, Input, Verdict, run_full};
 use crate::cause::Cause;
-use crate::path::{Ctx, Path};
+use crate::path::{self, Ctx, Path, Start};
+use serde_json::Value;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct AnyOf {
@@ -55,10 +56,46 @@ pub fn run(check: &AnyOf, ctx: &Ctx) -> Verdict {
     } else {
         Cause::worst(options).unwrap_or(Cause::Value)
     };
-    Verdict {
-        cause,
-        inputs: crate::subjects::merge_inputs(inputs),
+    let inputs = tag_like_parts(check, ctx, crate::subjects::merge_inputs(inputs));
+    Verdict { cause, inputs }
+}
+
+fn tag_like_parts(check: &AnyOf, ctx: &Ctx, mut inputs: Vec<Input>) -> Vec<Input> {
+    let mut parts: Vec<(String, String, Value)> = Vec::new();
+    for path in check.checks().flat_map(Check::paths) {
+        if let Start::Part(part) = &path.start
+            && let Some((name, id)) = path::part_tag(path, ctx)
+        {
+            let own = crate::name::name(&Path {
+                start: Start::Subject,
+                steps: part.steps.clone(),
+            });
+            if !parts.iter().any(|found| found.0 == name && found.2 == id) {
+                parts.push((name, own, id));
+            }
+        }
     }
+    for input in &mut inputs {
+        if input.part.is_some() {
+            continue;
+        }
+        let matching: Vec<&(String, String, Value)> = parts
+            .iter()
+            .filter(|(_, own, _)| {
+                input
+                    .name
+                    .strip_prefix(own.as_str())
+                    .is_some_and(|rest| rest.is_empty() || rest.starts_with(['.', '[']))
+            })
+            .collect();
+        if let [(name, _, id)] = matching.as_slice() {
+            input.part = Some(super::Part {
+                name: name.clone(),
+                id: id.clone(),
+            });
+        }
+    }
+    inputs
 }
 
 #[cfg(test)]

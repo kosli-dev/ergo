@@ -8,6 +8,8 @@ pub use crate::names::written_name_problems;
 
 pub type Problems = BTreeMap<String, BTreeSet<String>>;
 
+pub const LISTED_LAST: char = '\u{1}';
+
 pub fn add_problem(problems: &mut Problems, name: String, text: impl Into<String>) {
     problems.entry(name).or_default().insert(text.into());
 }

@@ -388,6 +388,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   - Without `every`, a path through a list reads nothing, and `$min_subjects` fails as `unusable`.
   - `every` can't go with a path that starts at another subject's name or with `named by each of`. Both are written wrong. A path that starts with a dot, like `every .artifact.p`, reads the input field and is fine. A child subject reads names one parent at a time.
 - A `from` or `identified_by` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"], "locations": []}`.
+- A `from` that can't be read fails `$min_subjects`, and its `message` says where the read stopped: `item 2 of things is missing`, or `things is 5, which isn't a list or an object`. A child subject names the path inside its parent, without the parent's name, like `ws is missing` or `item 1 of ws is missing`.
 
 ### A subject built on another
 
