@@ -2785,4 +2785,49 @@ mod tests {
             ])]
         );
     }
+
+    #[test]
+    fn a_from_whose_that_reads_the_parent_on_both_sides_is_accepted() {
+        for whose in ["t.lo is at least t.lo", "t is t", "t.lo is not t.lo"] {
+            assert_eq!(
+                from_problems_of(&format!("t.ws whose {whose}"), "t.ws"),
+                Vec::<Value>::new(),
+                "{whose}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_from_whose_that_reads_the_item_field_on_both_sides_is_written_wrong() {
+        for (whose, said) in [
+            ("t.lo is at most .t.lo", ".t.lo"),
+            ("t is .t", ".t"),
+            (".t.lo ends with .t.lo", ".t.lo"),
+            ("x is x", "x"),
+        ] {
+            assert_eq!(
+                from_problems_of(&format!("t.ws whose {whose}"), "t.ws"),
+                [json!([
+                    "subjects.thing.from",
+                    [format!("whose: {said} is compared with itself")]
+                ])],
+                "{whose}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_parent_written_wrong_by_comparing_with_itself_blocks_the_grandparent_for_its_child() {
+        let listed = from_problems_of(
+            "w.kids whose lo is at least t.cov.x",
+            "t.ws whose lo is at least lo",
+        );
+        assert_eq!(
+            listed,
+            [
+                json!(["subjects.w.from", ["whose: lo is compared with itself"]]),
+                json!(["subjects.thing.from", ["unknown alias $t"]])
+            ]
+        );
+    }
 }

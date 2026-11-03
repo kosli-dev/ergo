@@ -328,13 +328,29 @@ fn child_parent(name: &str, raw: &BTreeMap<String, Raw>) -> Option<String> {
     }
 }
 
+fn parent_is_self_compared(name: &str, raw: &BTreeMap<String, Raw>) -> bool {
+    let Some(parent) = child_parent(name, raw) else {
+        return false;
+    };
+    let above = ancestors_of(&parent, raw);
+    let above: Vec<&str> = above.iter().map(String::as_str).collect();
+    matches!(
+        raw.get(&parent).map(|r| &r.from),
+        Some(FromState::Parsed(line))
+            if s::from_problems(line).is_empty() && !s::from_self_problems(line, &above).is_empty()
+    )
+}
+
 fn blocked_ancestors(name: &str, raw: &BTreeMap<String, Raw>) -> Vec<String> {
     let Some(parent) = child_parent(name, raw) else {
         return Vec::new();
     };
     let broken = match raw.get(&parent).map(|r| &r.from) {
         Some(FromState::Parsed(line)) if s::from_problems(line).is_empty() => {
-            lower::keyed_steps(&line.path).is_err()
+            let above = ancestors_of(&parent, raw);
+            let above: Vec<&str> = above.iter().map(String::as_str).collect();
+            !s::from_self_problems(line, &above).is_empty()
+                || lower::keyed_steps(&line.path).is_err()
                 || line
                     .named_by_each_of
                     .as_ref()
@@ -358,7 +374,7 @@ fn reads_alias(text: &str, ancestor: &str) -> bool {
     })
 }
 
-fn right_side_text(condition: &s::FromCondition, scope: &Scope) -> String {
+fn right_side_text(condition: &s::FromCondition, scope: &Scope, wide: bool) -> String {
     let s::FromCondition::Condition(condition) = condition else {
         return String::new();
     };
@@ -366,6 +382,7 @@ fn right_side_text(condition: &s::FromCondition, scope: &Scope) -> String {
         Ok(Check::Compare(check)) => format!("{:?}", check.right),
         Ok(Check::CompareTime(check)) => format!("{:?}", check.right),
         Ok(Check::In(check)) => format!("{:?}", check.values),
+        Ok(Check::Contains(check)) if wide => format!("{:?}", check.wanted),
         other => format!("{:?}", other.map(|_| ())),
     }
 }
@@ -797,11 +814,12 @@ impl Reading {
                     for condition in line.whose.iter().filter(|_| reads) {
                         for ancestor in &blocked {
                             let reduced = scope.clone().without_parent(ancestor);
+                            let wide = parent_is_self_compared(name, &raw);
                             if reads_alias(
                                 &s::print_from_condition(condition, &alias_refs, &parent_refs),
                                 ancestor,
-                            ) && right_side_text(condition, &reduced)
-                                != right_side_text(condition, &scope)
+                            ) && right_side_text(condition, &reduced, wide)
+                                != right_side_text(condition, &scope, wide)
                             {
                                 chain_problems
                                     .entry(name.clone())

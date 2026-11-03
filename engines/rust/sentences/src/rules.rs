@@ -46,11 +46,11 @@ pub fn from_self_problems(line: &FromLine, aliases: &[&str]) -> Vec<String> {
             continue;
         };
         if let Some(term) = self_term(&condition.phrase)
-            && same_path(path, term, aliases, false)
+            && same_path(path, term, aliases, true)
         {
             out.insert(format!(
                 "whose: {} is compared with itself",
-                print_path(path, Side::Left, aliases)
+                print_path(term, Side::Left, aliases)
             ));
         }
     }

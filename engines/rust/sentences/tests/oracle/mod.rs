@@ -5,6 +5,20 @@ pub mod checks;
 pub const FROM_OK: &[(&str, &str)] = &[
     ("round.items whose .cov is 1", "round.items whose cov is 1"),
     ("y", "y"),
+    ("t.ws whose t is t", "t.ws whose t equals t"),
+    (
+        "t.ws whose t.lo is at least t.lo",
+        "t.ws whose t.lo is at least t.lo",
+    ),
+    (
+        "t.ws whose t.lo is at most .t.lo",
+        "t.ws whose t.lo is at most t.lo",
+    ),
+    ("things whose x is x", "things whose x equals x"),
+    (
+        "w.kids whose .w.lo is not .w.lo",
+        "w.kids whose w.lo does not equal w.lo",
+    ),
     ("t.ws whose lo is at least 1", "t.ws whose lo is at least 1"),
     ("things named by $params.k", "things named by $params.k"),
     ("things whose k is 1", "things whose k is 1"),
