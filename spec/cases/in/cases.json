@@ -539,5 +539,20 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a leading dot on a right side that walks reads the field and not the part",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name", "part": "x is in lock.pkgs.name"}}}},
+    "cases": [
+      {
+        "description": "reads the field after a dot and the part without one",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.plain"],
+        "input": {"repos": [{"id": "r", "x": "a.py", "lockfile": {"pkgs": [{"name": "a.py"}]}, "lock": {"pkgs": [{"name": "nope"}]}}]},
+        "results": [
+          {"cause": "value", "check": "dot", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a.py"}, {"locations": ["/repos/0/lock/pkgs/0/name"], "name": ".lock.pkgs[].name", "value": ["nope"]}], "message": "x is \"a.py\", and .lock.pkgs[].name is [\"nope\"]", "passed": false, "requirement": "s", "subject": {"id": "r", "type": "repo"}},
+          {"cause": "satisfied", "check": "part", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a.py"}, {"locations": ["/repos/0/lockfile/pkgs/0/name"], "name": "lock.pkgs[].name", "part": {"id": null, "name": "lock"}, "value": ["a.py"]}], "passed": true, "requirement": "s", "subject": {"id": "r", "type": "repo"}}
+        ]
+      }
+    ]
   }
 ]

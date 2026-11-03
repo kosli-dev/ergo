@@ -11401,22 +11401,64 @@ test_a_field_that_walks_a_list_of_objects_lists_what_it_reads_in_the_rows_inputs
 	rows == [["c", true, "satisfied", [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "deps[].name", "value": ["a", "b"], "locations": ["/things/0/deps/0/name", "/things/0/deps/1/name"]}]]]
 }
 
-test_a_list_phrase_with_a_field_that_walks_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
-	every _, words in _list_phrases {
-		every right in [
-			{"v": [{"z": "a"}]},
-			{"v": [{"z": "a"}, {"z": "b"}]},
-			{"v": [{"z": "a"}, {}]},
-			{"v": [{"z": null}]},
-			{"v": [{"z": ["a"]}]},
-			{"v": [{"z": "^a"}]},
-			{"v": [{"y": 1}]},
-			{"v": ["s"]},
-			{"v": [null]},
-			{"v": [[{"z": "a"}]]},
-		] {
-			_list_same_as_params(words, ".z", right)
-		}
+_walk_rights := [
+	{"v": [{"z": "a"}]},
+	{"v": [{"z": "a"}, {"z": "b"}]},
+	{"v": [{"z": "a"}, {}]},
+	{"v": [{"z": null}]},
+	{"v": [{"z": ["a"]}]},
+	{"v": [{"z": "^a"}]},
+	{"v": [{"y": 1}]},
+	{"v": ["s"]},
+	{"v": [null]},
+	{"v": [[{"z": "a"}]]},
+]
+
+test_a_field_that_walks_after_is_in_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("is in", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_is_not_in_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("is not in", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_contains_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("contains", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_does_not_contain_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("does not contain", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_contains_all_of_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("contains all of", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_contains_none_of_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("contains none of", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_matches_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("matches", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_does_not_match_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("does not match", ".z", right)
 	}
 }
 
@@ -11477,4 +11519,14 @@ test_a_path_that_starts_at_a_part_walks_and_names_the_part if {
 	}
 	rows := [r | some r in ergo.report({"repos": [{"id": "click", "lockfile": {"pkgs": [{"name": "click"}]}}]}, policy, {}).results; r.check == "c"]
 	rows[0].inputs[1] == {"name": "lock.pkgs[].name", "value": ["click"], "locations": ["/repos/0/lockfile/pkgs/0/name"], "part": {"id": null, "name": "lock"}}
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_reads_the_field_and_not_the_part if {
+	policy := {
+		"ergo_spec": "v0.5-dev",
+		"subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}},
+		"requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name", "part": "x is in lock.pkgs.name"}}},
+	}
+	doc := {"repos": [{"id": "r", "x": "a.py", "lockfile": {"pkgs": [{"name": "a.py"}]}, "lock": {"pkgs": [{"name": "nope"}]}}]}
+	[[r.check, r.cause] | some r in ergo.report(doc, policy, {}).results; not startswith(r.check, "$")] == [["dot", "value"], ["part", "satisfied"]]
 }

@@ -4959,6 +4959,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "x is in .lock.pkgs.name",
+        "x is in lock.pkgs.name",
+        &[],
+        &[],
+    ),
+    ("x is in lock.pkgs.name", "x is in lock.pkgs.name", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

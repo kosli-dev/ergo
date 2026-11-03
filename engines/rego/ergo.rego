@@ -1802,6 +1802,21 @@ _rstart(_, path) := _start_of(null, path) if _builtin(path)
 
 _rstart(x, path) := _start_of(x, path) if _named_walk_path(path)
 
+_rstart(x, path) := x if {
+	_literal_walk_path(path)
+	is_object(x)
+}
+
+_literal_walk_path(path) if {
+	is_array(path)
+	_is_literal(path[0])
+	every seg in array.slice(path, 1, count(path)) {
+		not is_object(seg)
+	}
+}
+
+_rkeys(path) := array.concat([_key(path[0].literal)], [_key(seg) | some seg in array.slice(path, 1, count(path))]) if _literal_walk_path(path)
+
 _named_walk_path(path) if {
 	_named(path)
 	not _builtin(path)
@@ -8319,7 +8334,12 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 	not _s_field_arg(a.phrase)
 }
 
-_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))}, _s_shown_inputs(a)) if _s_field_arg(a.phrase)
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_dot_field(_s_list_path(a.phrase)))}, _s_shown_inputs(a)) if _s_field_arg(a.phrase)
+
+_s_dot_field(p) := object.union(p, {"field": true}) if {
+	object.get(p, "dot", false) == true
+	not "start" in object.keys(p)
+} else := p
 
 _s_shown_inputs(a) := {"inputs": [_s_model_path(a.path)]} if _s_named_arg(a.phrase)
 
