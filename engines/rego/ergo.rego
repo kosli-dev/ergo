@@ -1011,9 +1011,14 @@ _id_path(read) := path if {
 	path := read.identified_by.path
 }
 
-_value_source(name) := substring(name, 0, indexof(name, " whose ")) if {
+_value_source(name) := substring(name, 0, min(cuts)) if {
 	regex.match(`^(count|sum) of `, name)
-	indexof(name, " whose ") > 0
+	cuts := [i |
+		some word in [" whose ", " that "]
+		i := indexof(name, word)
+		i > 0
+	]
+	count(cuts) > 0
 } else := name
 
 _mentions(name, patterns) if {
@@ -4213,6 +4218,10 @@ _from_names(req, here) := ({n |
 	_from_well_formed(req)
 	n := _each_step(req).each_as
 } | {a | _chained(req); here; some a in _s_ancestors(req.subject, data.ergo_subject_sentences.chains)}) | {a |
+	here
+	_resolves(req)
+	some a in data.ergo_resolved[req.subject].members
+} | {a |
 	is_string(object.get(req, "subject", null))
 	some a, _ in object.get(object.get(data.ergo_subject_sentences, "parts", {}), req.subject, {})
 }
@@ -5869,14 +5878,14 @@ _assertion_kinds(kinds) if {
 
 _s_patterns := {
 	"assertions": concat("", [`(`, assertion, `)(?: +and +|$)`]),
-	"assertion": concat("", [`^(?:(every|some) +(`, path, `)|(`, left, `))(?: +whose +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
+	"assertion": concat("", [`^(?:(every|some) +(`, path, `)|(`, left, `))(?: +(`, conds, `))?(, +if +any,)? +(`, phrase, `)$`]),
 	"for_items": concat("", [`(`, for_item, `)(?:, +|$)`]),
-	"for_item": concat("", [`^(?:(every|some) +)?(`, path, `)(?: +whose +(`, conds, `))?(?: +sorted +by +(`, path, `)( +alphabetically)?)?(, +if +any,)? +as +(`, key, `)$`]),
-	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +whose +(`, from_conds, `))?$`]),
+	"for_item": concat("", [`^(?:(every|some) +)?(`, path, `)(?: +(`, conds, `))?(?: +sorted +by +(`, path, `)( +alphabetically)?)?(, +if +any,)? +as +(`, key, `)$`]),
+	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +(`, from_conds, `))?$`]),
 	"from_conds": concat("", [`(`, from_cond, `)(?: +and +|$)`]),
-	"from_cond": concat("", [`^(?:(every|some) +(`, path, `)(, +if +any,)?|(`, left, `)) +(`, phrase, `)$`]),
+	"from_cond": concat("", [`^(?:whose +(?:(every|some) +(`, path, `)(, +if +any,)?|(`, left, `)) +(`, phrase, `)|that +(`, phrase, `))$`]),
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
-	"cond": concat("", [`^(`, left, `) +(`, phrase, `)$`]),
+	"cond": concat("", [`^(?:whose +(`, left, `) +(`, phrase, `)|that +(`, phrase, `))$`]),
 	"phrases": phrases,
 	"kinds": object.union({kind[0]: concat("", [`^(?:`, kind[1], `)$`]) | some kind in kinds}, {"operand": concat("", [`^(?:`, joined, `)$`]), "operand_within": concat("", [`^(?:`, joined, `(?: +within +`, num, `)?)$`])}),
 	"plain": concat("", [`^(`, path, `) +(\S.*)$`]),
@@ -5968,15 +5977,15 @@ _s_patterns := {
 		["operand_within", concat("", [operand, `(?:`, roughly, `)*(?: +within +`, num, `)?`])],
 	]
 	phrase := concat("", [`(?:`, concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds]), `)(?:`, roughly, `)*`])
-	cond := concat("", [`(?:`, derived, `|`, path, `) +(?:`, phrase, `)`])
+	cond := concat("", [`(?:whose +(?:`, derived, `|`, path, `) +(?:`, phrase, `)|that +(?:`, phrase, `))`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
-	from_cond := concat("", [`(?:(?:every|some) +`, path, `(?:, +if +any,)?|(?:`, derived, `|`, path, `)) +(?:`, phrase, `)`])
+	from_cond := concat("", [`(?:whose +(?:(?:every|some) +`, path, `(?:, +if +any,)?|(?:`, derived, `|`, path, `)) +(?:`, phrase, `)|that +(?:`, phrase, `))`])
 	from_conds := concat("", [from_cond, `(?: +and +`, from_cond, `)*`])
-	assertion := concat("", [`(?:(?:every|some) +`, path, `|`, left, `)(?: +whose +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
-	for_item := concat("", [`(?:(?:every|some) +)?`, path, `(?: +whose +`, conds, `)?(?: +sorted +by +`, path, `(?: +alphabetically)?)?(?:, +if +any,)? +as +`, key])
+	assertion := concat("", [`(?:(?:every|some) +`, path, `|`, left, `)(?: +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
+	for_item := concat("", [`(?:(?:every|some) +)?`, path, `(?: +`, conds, `)?(?: +sorted +by +`, path, `(?: +alphabetically)?)?(?:, +if +any,)? +as +`, key])
 }
 
-_s_words := {"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every", "false", "first", "hours", "in", "it", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted", "sum", "to", "true", "weeks", "whose", "within"}
+_s_words := {"a", "after", "alphabetically", "an", "and", "as", "at", "before", "between", "count", "days", "each", "empty", "equal", "every", "false", "first", "hours", "in", "it", "item", "last", "less", "minutes", "more", "named", "not", "null", "of", "on", "one", "or", "plus", "seconds", "some", "sorted", "sum", "that", "to", "true", "weeks", "whose", "within"}
 
 _s_pieces(pattern, text) := [m[1] | some m in matches] if {
 	matches := regex.find_all_string_submatch_n(pattern, text, -1)
@@ -6167,10 +6176,24 @@ _s_from_cond_of(text, pat) := object.union({m[1]: _s_path_of(m[2], pat), "phrase
 _s_from_cond_of(text, pat) := object.union(_s_left_of(m[4], pat), {"phrase": _s_phrase_of(m[5], pat)}) if {
 	m := regex.find_all_string_submatch_n(pat.from_cond, text, 1)[0]
 	m[1] == ""
+	m[4] != ""
 }
+
+_s_from_cond_of(text, pat) := {"path": _s_that_path, "phrase": _s_phrase_of(m[6], pat)} if {
+	m := regex.find_all_string_submatch_n(pat.from_cond, text, 1)[0]
+	m[6] != ""
+}
+
+_s_that_path := {"steps": ["that"], "that": true}
 
 _s_cond_of(text, pat) := object.union(_s_left_of(m[1], pat), {"phrase": _s_phrase_of(m[2], pat)}) if {
 	m := regex.find_all_string_submatch_n(pat.cond, text, 1)[0]
+	m[1] != ""
+}
+
+_s_cond_of(text, pat) := {"path": _s_that_path, "phrase": _s_phrase_of(m[3], pat)} if {
+	m := regex.find_all_string_submatch_n(pat.cond, text, 1)[0]
+	m[3] != ""
 }
 
 _s_left_of(text, pat) := {"path": _s_path_of(text, pat)} if {
@@ -6199,7 +6222,7 @@ _s_unlifted_path_of(text, pat) := object.union(_s_position_of(m[1], m[2], m[3]),
 
 _s_lifted(path) := object.union(object.union(object.remove(path, ["steps"]), object.remove(last, ["index"])), {"position": last.index + 1, "steps": array.slice(path.steps, 0, count(path.steps) - 1)}) if {
 	not "position" in object.keys(path)
-	object.get(path, "it", false) != true
+	not _s_itself(path)
 	last := path.steps[count(path.steps) - 1]
 	is_object(last)
 	"index" in object.keys(last)
@@ -6701,7 +6724,7 @@ _s_marked(p, names, own) := object.union(p, {"field": true, "own": own}) if {
 
 _s_markable(p, keys) if {
 	is_object(p)
-	object.get(p, "it", false) != true
+	not _s_itself(p)
 	is_array(p.steps)
 	not "start" in object.keys(p)
 	p.steps[0] in keys
@@ -6831,13 +6854,23 @@ _s_if_any_text(a) := ", if any," if object.get(a, "if_any", false) == true
 
 _s_if_any_text(a) := "" if not object.get(a, "if_any", false)
 
-_s_where_text(a) := concat("", [" whose ", concat(" and ", [_s_cond_text(c) | some c in a.where])]) if "where" in object.keys(a)
+_s_where_text(a) := concat("", [" ", concat(" and ", [_s_cond_text(c) | some c in a.where])]) if "where" in object.keys(a)
 
 _s_where_text(a) := "" if not "where" in object.keys(a)
 
-_s_cond_text(c) := concat(" ", [_s_left_text(c), _s_phrase_text(c.phrase)])
+_s_cond_text(c) := concat(" ", ["that", _s_phrase_text(c.phrase)]) if _s_that(c)
 
-_s_cond_text(c) := concat(" ", [concat("", [_s_quantifier_of(c), " ", _s_path_text(c[_s_quantifier_of(c)], "left"), _s_if_any_text(c)]), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) in {"every", "some"}
+_s_cond_text(c) := concat(" ", ["whose", _s_cond_body(c)]) if not _s_that(c)
+
+_s_that(c) if object.get(object.get(c, "path", {}), "that", false) == true
+
+_s_itself(p) if object.get(p, "it", false) == true
+
+_s_itself(p) if object.get(p, "that", false) == true
+
+_s_cond_body(c) := concat(" ", [_s_left_text(c), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) == ""
+
+_s_cond_body(c) := concat(" ", [concat("", [_s_quantifier_of(c), " ", _s_path_text(c[_s_quantifier_of(c)], "left"), _s_if_any_text(c)]), _s_phrase_text(c.phrase)]) if _s_quantifier_of(c) in {"every", "some"}
 
 _s_left_text(c) := _s_path_text(c.path, "left") if "path" in object.keys(c)
 
@@ -6899,7 +6932,7 @@ _s_quoted_start(p) if {
 	p.steps[0] in _s_words
 	object.get(p, "dot", false) != true
 	object.get(p, "field", false) != true
-	object.get(p, "it", false) != true
+	not _s_itself(p)
 	object.get(p, "part", false) == true
 }
 
@@ -6916,7 +6949,7 @@ _s_start_dot(p, side) := "." if {
 
 else := "." if object.get(p, "kept_dot", false) == true
 
-else := "" if object.get(p, "it", false) == true
+else := "" if _s_itself(p)
 
 else := "" if _s_quoted_start(p)
 
@@ -7255,11 +7288,23 @@ _s_from_read_of(name, fl, subjects, chains) := object.union(object.union({"probl
 	names := {a | some a in _s_ancestors(name, chains.descend)}
 	keep := names | object.keys(object.get(chains.parts, name, {}))
 	pc := {"own": _p_steps_of(object.get(chains.parts, name, {})), "ancestors": {a: _p_steps_of(object.get(chains.parts, a, {})) | some a in names}}
-	conds := [_p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc), keep), names), pc) | some c in object.get(fl, "where", []); t := _s_cond_text(_s_from_cond(c, names, keep))]
+	conds := [_s_from_filter(name, c, names, keep, pc) | some c in object.get(fl, "where", [])]
 	problems := sort((((((((((_s_chain_unsupported(name, fl, subjects, chains) | _s_loop(name, fl, subjects, chains)) | _s_blank_start(fl, subjects)) | _s_every_unsupported(name, fl, subjects)) | _s_from_start_problems(fl)) | _s_from_paths_unsupported({"path": fl.path})) | _s_elapsed_flaw({"where": object.get(fl, "where", [])})) | {_whose_problem(p) | some c in conds; some p in object.get(c, "$sentence", [])}) | {"whose: a condition can't be read" | count(conds) != count(object.get(fl, "where", []))}) | _s_join_unsupported({"where": object.get(fl, "where", [])})))
 	fields := object.union(_s_source(name, fl, subjects, chains.parts), _s_whose_filters(_s_filter_prefix(name, chains.narrow), conds))
 	parent := _s_descend_parent(name, fl, subjects)
 	every_list := object.get(fl, "every", false) == true
+}
+
+_s_from_filter(_, c, names, keep, pc) := _p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc), keep), names), pc) if {
+	not _s_that(c)
+	t := _s_cond_body(_s_from_cond(c, names, keep))
+}
+
+_s_from_filter(name, c, names, keep, pc) := _p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc_named), keep_named), names), pc_named) if {
+	_s_that(c)
+	keep_named := keep | {name}
+	pc_named := object.union(pc, {"own": object.union(pc.own, {name: []})})
+	t := concat(" ", [_s_path_text({"steps": [name], "quoted": true}, "left"), _s_phrase_text(c.phrase)])
 }
 
 _whose_problem(p) := p if p == "every and some over more than ten steps aren't supported yet"
@@ -8465,25 +8510,25 @@ _s_model_start(p) := [concat("", ["$$", p.start])] if "start" in object.keys(p)
 
 _s_model_start(p) := [] if {
 	not "start" in object.keys(p)
-	object.get(p, "it", false) == true
+	_s_itself(p)
 }
 
 _s_model_start(p) := [concat("", ["$", p.steps[0]])] if {
 	not "start" in object.keys(p)
-	object.get(p, "it", false) != true
+	not _s_itself(p)
 	object.get(p, "alias", false) == true
 }
 
 _s_model_start(p) := [{"literal": p.steps[0]}] if {
 	not "start" in object.keys(p)
-	object.get(p, "it", false) != true
+	not _s_itself(p)
 	object.get(p, "alias", false) != true
 	_s_literal_start(p)
 }
 
 _s_model_start(p) := [p.steps[0]] if {
 	not "start" in object.keys(p)
-	object.get(p, "it", false) != true
+	not _s_itself(p)
 	object.get(p, "alias", false) != true
 	not _s_literal_start(p)
 }
@@ -9974,7 +10019,7 @@ _c_from_line(name, def, subjects) := concat("", [parent, _c_whose(conds)]) if {
 
 _c_whose([]) := ""
 
-_c_whose(conds) := concat("", [" whose ", concat(" and ", conds)]) if conds != []
+_c_whose(conds) := concat("", [" ", concat(" and ", [concat(" ", ["whose", c]) | some c in conds])]) if conds != []
 
 _c_conditions(def) := [] if not "applies_to" in object.keys(def)
 
