@@ -969,5 +969,69 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line with an alias named subject",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "subject.k is 1", "for": "every zs as subject"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the alias is named as the policy wrote it",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "zs": [{"k": 2}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "subject.k is 1", "cause": "value", "inputs": [{"locations": ["/things/0/zs/0/k"], "name": "subject.k", "value": 2}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": {"k": 2}}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [{"k": 2}]}], "message": "item 1 of zs: k is 2", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an item that isn't an object is named after the list",
+        "rules": ["message.alias", "message.items"],
+        "input": {"things": [{"id": "t", "zs": [null]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "subject.k is 1", "cause": "not_an_object", "inputs": [{"locations": ["/things/0/zs/0"], "name": "subject.k", "value": null}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": null}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [null]}], "message": "item 1 of zs is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with an alias named subject that is read whole",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "subject is 9", "for": "every zs as subject"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the item is named after the list",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "zs": [{"k": 5}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "subject is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0"], "name": "subject", "value": {"k": 5}}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": {"k": 5}}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [{"k": 5}]}], "message": "item 1 of zs is {\"k\": 5}, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with a second item that isn't an object",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "y.k is 1", "for": "every xs as x, every ys as y"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the second item is named after its list, without a dollar sign",
+        "rules": ["message.alias", "message.items"],
+        "input": {"things": [{"id": "t", "xs": [{"k": 1}], "ys": [null]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "y.k is 1", "cause": "not_an_object", "items": [{"cause": "not_an_object", "inputs": [{"locations": ["/things/0/ys/0"], "name": "y.k", "value": null}], "item": "item 1 of ys"}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": {"k": 1}}], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"k": 1}]}, {"locations": ["/things/0/ys/0"], "name": "ys[]", "value": [null]}], "message": "item 1 of xs: item 1 of ys is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over a list inside the first item",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "z.k is 1", "for": "every xs as x, every x.zs as z"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "items that aren't objects are named after the list, without a dollar sign",
+        "rules": ["message.alias", "message.items"],
+        "input": {"things": [{"id": "t", "xs": [{"zs": [null, 5, {"k": 2}]}]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "z.k is 1", "cause": "not_an_object", "items": [{"cause": "not_an_object", "inputs": [{"locations": ["/things/0/xs/0/zs/0"], "name": "z.k", "value": null}], "item": "item 1 of x.zs"}, {"cause": "not_an_object", "inputs": [{"locations": ["/things/0/xs/0/zs/1"], "name": "z.k", "value": null}], "item": "item 2 of x.zs"}, {"cause": "value", "inputs": [{"locations": ["/things/0/xs/0/zs/2/k"], "name": "z.k", "value": 2}], "item": "item 3 of x.zs"}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": {"zs": [null, 5, {"k": 2}]}}], "inputs": [{"locations": ["/things/0/xs/0/zs/0", "/things/0/xs/0/zs/1", "/things/0/xs/0/zs/2"], "name": "x.zs[]", "value": [null, 5, {"k": 2}]}, {"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"zs": [null, 5, {"k": 2}]}]}], "message": "item 1 of xs: item 1 of zs is null, which isn't an object; item 1 of xs: item 2 of zs is 5, which isn't an object; item 1 of xs: item 3 of zs: k is 2", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

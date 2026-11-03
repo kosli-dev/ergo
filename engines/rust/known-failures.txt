@@ -45,6 +45,7 @@ messages / a count of a list of lists with a whose that counts / a list is named
 messages / a count of a list that holds items that aren't objects / an item that isn't an object is named with its value
 messages / a count of a list whose items are compared with a part / the part is named without a dollar sign
 messages / a count of a part's list that holds items that aren't objects / the items are named after the part
+messages / a for line over a list inside the first item / items that aren't objects are named after the list, without a dollar sign
 messages / a for line over a list of lists whose values spell the alias / a list that holds the alias in its items is printed as the input had it
 messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a colon is printed as the input had it
 messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a comma is printed as the input had it
@@ -59,6 +60,7 @@ messages / a for line over two lists with a sentence that doesn't read the secon
 messages / a for line that picks nothing prints the list it read / a whose that leaves no item prints the list
 messages / a for line that picks nothing prints the list it read / an empty list prints as empty
 messages / a for line whose alias is named applies and whose value spells it / a value that holds the alias is printed as the input had it
+messages / a for line with a second item that isn't an object / the second item is named after its list, without a dollar sign
 messages / a one-list for line over a key that holds a colon / two sentences that walk the same list give one part
 messages / a one-list for line whose items fail a sentence that walks and one that doesn't / and N more counts the items that aren't shown
 messages / a one-list for line whose items fail a sentence that walks and one that doesn't / the part of a sentence that doesn't walk goes with its item and isn't counted

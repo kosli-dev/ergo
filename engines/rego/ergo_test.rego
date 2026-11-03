@@ -11202,6 +11202,11 @@ test_message_a_for_alias_loses_its_marker_and_a_value_that_spells_the_alias_stay
 	ergo._m_aliased("x is 1") == "x is 1"
 }
 
+test_message_a_name_that_is_not_a_for_alias_keeps_its_dollar_sign if {
+	ergo._m_marked_alias("$q") == "$q" with input as {"ergo/names": {"$at": {"names": {}}}}
+	ergo._m_marked_alias("$q") == "\u0002q" with input as {"ergo/names": {"$at": {"names": {"q": "/x"}}, "q": 1}}
+}
+
 test_message_a_key_named_by_another_name_is_another_name if {
 	ergo._m_other_name({"named_by": "z"}, "c")
 	ergo._m_other_name({"named_by_field": "z"}, "c")

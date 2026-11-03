@@ -1876,7 +1876,6 @@ _plain_step_name(0, step) := concat("", ["\u0002", substring(step, 1, -1)]) if {
 _for_alias_step(step) if {
 	startswith(step, "$")
 	input["ergo/names"]["$at"].names[substring(step, 1, -1)]
-	step != "$subject"
 }
 
 _plain_step_name(0, step) := _s_parent_key(substring(step, 1, -1)) if _parent_name(step)
@@ -11042,7 +11041,7 @@ else := ""
 
 _m_line(c, subj, cause) := _m_sentence(c, subj, cause)
 
-_m_aliases_blocked(check) := [_m_isnt(p[0], v, _m_holder(p[1])) |
+_m_aliases_blocked(check) := [_m_isnt(_m_marked_alias(p[0]), v, _m_holder(p[1])) |
 	some side in _m_sides(check)
 	some p in _m_side_paths(side)
 	is_array(p)
@@ -11054,6 +11053,10 @@ _m_aliases_blocked(check) := [_m_isnt(p[0], v, _m_holder(p[1])) |
 	v := input["ergo/names"][nm]
 	not _m_holds(v, p[1])
 ]
+
+_m_marked_alias(step) := concat("", ["\u0002", substring(step, 1, -1)]) if _for_alias_step(step)
+
+else := step
 
 _m_holds(v, step) if {
 	is_number(step)

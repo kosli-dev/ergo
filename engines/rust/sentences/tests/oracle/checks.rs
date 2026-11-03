@@ -4798,6 +4798,10 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("y.k is 9", "y.k is 9", &[], &[]),
     ("every applies.k is 9", "every applies.k is 9", &[], &[]),
+    ("subject is 9", "subject is 9", &[], &[]),
+    ("subject.k is 1", "subject.k is 1", &[], &[]),
+    ("y.k is 1", "y.k is 1", &[], &[]),
+    ("z.k is 1", "z.k is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8171,6 +8175,19 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every zs as applies", "every zs as applies", &[], &[]),
+    (
+        "every xs as x, every x.zs as z",
+        "every xs as x, every x.zs as z",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as x, every ys as y",
+        "every xs as x, every ys as y",
+        &[],
+        &[],
+    ),
+    ("every zs as subject", "every zs as subject", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
