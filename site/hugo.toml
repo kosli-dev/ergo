@@ -6,6 +6,7 @@ disableKinds = ["taxonomy", "term", "rss"]
 [params]
   description = "Ergo is an open source language for writing explainable policies. Instead of a binary result, every decision returns an audit report of what was checked, and why it passed or failed."
   repo = "https://github.com/kosli-dev/ergo"
+  googleAnalytics = "G-X7TDK06DC3"
   fork = "https://github.com/kosli-dev/ergo/fork"
   opaVersion = "1.20"
 

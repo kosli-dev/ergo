@@ -127,6 +127,8 @@ if [ "$mode" = release ]; then
   mkdir -p "$prepared/reference"
   cp "$dir/tag/site/assets/css/ergo.css" "$prepared/reference/"
   cp "$dir/tag/site/layouts/tutorial.html" "$prepared/layouts/"
+  grep -q 'partial "analytics.html"' "$prepared/layouts/tutorial.html" || sed -i.bak 's|</head>|  {{ partial "analytics.html" . }}\n</head>|' "$prepared/layouts/tutorial.html"
+  rm -f "$prepared/layouts/tutorial.html.bak"
   cp "$dir/tag/site/content/tutorial.md" "$prepared/content/"
   if [ -f "$dir/tag/site/data/examples.yaml" ]; then
     cp "$dir/tag/site/data/examples.yaml" "$prepared/data/"
