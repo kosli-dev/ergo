@@ -1621,19 +1621,12 @@ _visible(path) := path if not _part_start(path)
 
 _visible_root(m) := [m.alias] if {
 	m.of == null
-	m.old == false
 	m.n >= 0
 }
 
 _visible_root(m) := [] if {
 	m.of == null
 	m.n < 0
-}
-
-_visible_root(m) := [concat("", ["$", m.alias])] if {
-	m.of == null
-	m.old == true
-	m.n >= 0
 }
 
 _visible_root(m) := [concat("", ["$", m.of]), m.alias] if {
@@ -10540,7 +10533,10 @@ _m_whose_undecided(subj, side, e, flaws) := [[cause, _m_undecided_text(subj, c, 
 	not cause in {"satisfied", "value", "missing"}
 ]
 
-_m_undecided_text(subj, c, e, cause) := concat(", and ", off) if {
+_m_undecided_text(subj, c, e, cause) := _m_isnt(_m_item_name(e.i, set()), e.iv, "an object") if {
+	cause == "not_an_object"
+	not is_object(e.iv)
+} else := concat(", and ", off) if {
 	off := _m_off_item(subj, c, cause)
 	off != []
 } else := _m_leaf(e.i, _m_cond_message(c, e.iv, cause))
@@ -10699,7 +10695,7 @@ _m_first_marked(xs) := array.concat([xs[0]], [_m_unmarked(x) | some x in array.s
 
 _m_unmarked(x) := strings.replace_n({"\u0001": ""}, x)
 
-_m_aliased(check, m) := _m_alias_end(check, strings.replace_n({concat("", ["$", item.as, c]): concat("", [item.as, c]) | some item in check.items; some c in [".", "[", " ", ","]}, m))
+_m_aliased(check, m) := _m_alias_end(check, strings.replace_n({concat("", ["$", item.as, c]): concat("", [item.as, c]) | some item in check.items; some c in [".", "[", " ", ",", ":", ";"]}, m))
 
 _m_alias_end(check, m) := concat("", [trim_suffix(m, concat("", ["$", a])), a]) if {
 	some a in {item.as | some item in check.items}

@@ -4764,6 +4764,39 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("k.\"a\u{2028}b\" is 1", "k.\"a\u{2028}b\" is 1", &[], &[]),
+    (
+        "count of commits whose signed is true is 3",
+        "count of commits whose signed is true is 3",
+        &[],
+        &[],
+    ),
+    (
+        "count of lst whose x is 5 is 2",
+        "count of lst whose x is 5 is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of lst whose x is cov.x is 9",
+        "count of lst whose x equals cov.x is 9",
+        &[],
+        &[],
+    ),
+    (
+        "count of zs whose count of k is 2 is 5",
+        "count of zs whose count of k is 2 is 5",
+        &[],
+        &[],
+    ),
+    ("every lst.x is cov.x", "every lst.x equals cov.x", &[], &[]),
+    ("every z.k is 9", "every z.k is 9", &[], &[]),
+    (
+        "sum of commits.n whose kind is \"code\" is 5",
+        "sum of commits.n whose kind is \"code\" is 5",
+        &[],
+        &[],
+    ),
+    ("y.k is 9", "y.k is 9", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8126,6 +8159,13 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every prs as pr, some pr.\"a: b\" as ap",
         "every prs as pr, some pr.\"a: b\" as ap",
+        &[],
+        &[],
+    ),
+    ("every zs as z", "every zs as z", &[], &[]),
+    (
+        "every zs as z, every z as y",
+        "every zs as z, every z as y",
         &[],
         &[],
     ),

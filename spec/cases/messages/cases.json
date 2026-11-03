@@ -765,5 +765,125 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count of a list that holds items that aren't objects",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of commits whose signed is true is 3"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "an item that isn't an object is named with its value",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t", "commits": [null, {"signed": true}, 5]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/commits/0", "/things/0/commits/1", "/things/0/commits/2"], "name": "count of commits whose signed is true", "value": null}, {"locations": ["/things/0/commits/0", "/things/0/commits/1", "/things/0/commits/2"], "name": "commits[]", "value": [null, {"signed": true}, 5]}], "message": "item 1 of commits is null, which isn't an object; item 3 of commits is 5, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sum of a list that holds items that aren't objects",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "sum of commits.n whose kind is \"code\" is 5"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "an item that isn't an object is named with its value",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t", "commits": [{"kind": "code", "n": 2}, "s", null]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/commits/0/n", "/things/0/commits/1", "/things/0/commits/2"], "name": "sum of commits.n whose kind is \"code\"", "value": null}, {"locations": ["/things/0/commits/0/n", "/things/0/commits/1", "/things/0/commits/2"], "name": "commits[].n", "value": [2, null, null]}], "message": "item 2 of commits is \"s\", which isn't an object; item 3 of commits is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a list of lists with a whose that counts",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of zs whose count of k is 2 is 5"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a list is named as an item that isn't an object",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": 1}, {"k": 2}], [{"k": 3}]]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/zs/0", "/things/0/zs/1"], "name": "count of zs whose count of k is 2", "value": null}, {"locations": ["/things/0/zs/0", "/things/0/zs/1"], "name": "zs[]", "value": [[{"k": 1}, {"k": 2}], [{"k": 3}]]}], "message": "item 1 of zs is [{\"k\": 1}, {\"k\": 2}], which isn't an object; item 2 of zs is [{\"k\": 3}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a part's list that holds items that aren't objects",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of lst whose x is 5 is 2"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"lst": "d.items"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the items are named after the part",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t", "d": {"items": [null, 5, {"x": 5}]}}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/d/items/0", "/things/0/d/items/1", "/things/0/d/items/2"], "name": "count of lst whose x is 5", "part": {"id": null, "name": "lst"}, "value": null}, {"locations": ["/things/0/d/items/0", "/things/0/d/items/1", "/things/0/d/items/2"], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": [null, 5, {"x": 5}]}], "message": "item 1 of lst is null, which isn't an object; item 2 of lst is 5, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over two lists",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "every z.k is 9", "for": "every zs as z"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the inner items are named without a dollar sign before the alias",
+        "rules": ["message.items", "message.alias"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": 1}, {"k": 2}], [{"k": 3}]]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "value", "inputs": [{"locations": ["/things/0/zs/0/0/k", "/things/0/zs/0/1/k"], "name": "z[].k", "value": [1, 2]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": 1}, {"k": 2}]}, {"cause": "value", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "value", "inputs": [{"locations": ["/things/0/zs/1/0/k"], "name": "z[].k", "value": [3]}]}], "item": "item 2 of zs", "locations": ["/things/0/zs/1"], "path": "item 2 of zs", "value": [{"k": 3}]}], "inputs": [{"locations": ["/things/0/zs/0", "/things/0/zs/1"], "name": "zs[]", "value": [[{"k": 1}, {"k": 2}], [{"k": 3}]]}], "message": "item 1 of zs: item 1 of z: k is 1; item 1 of zs: item 2 of z: k is 2; item 2 of zs: item 1 of z: k is 3", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over two lists with the alias of the second list",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "y.k is 9", "for": "every zs as z, every z as y"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the alias is named without a dollar sign",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": 1}], [{"k": 3}]]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "y.k is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "y.k", "value": 1}], "item": "item 1 of z"}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": 1}]}, {"cause": "value", "failed_assertions": [{"assertion": "y.k is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/zs/1/0/k"], "name": "y.k", "value": 3}], "item": "item 1 of z"}]}], "item": "item 2 of zs", "locations": ["/things/0/zs/1"], "path": "item 2 of zs", "value": [{"k": 3}]}], "inputs": [{"locations": ["/things/0/zs/0/0", "/things/0/zs/1/0"], "name": "z[]", "value": [{"k": 1}, {"k": 3}]}, {"locations": ["/things/0/zs/0", "/things/0/zs/1"], "name": "zs[]", "value": [[{"k": 1}], [{"k": 3}]]}], "message": "item 1 of zs: item 1 of z: k is 1; item 2 of zs: item 1 of z: k is 3", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an every that compares with a part",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "every lst.x is cov.x"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"cov": "d.b", "lst": "d.items"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the part on the right is named without a dollar sign",
+        "rules": ["message.alias", "message.items"],
+        "input": {"things": [{"id": "t", "d": {"b": {"x": 1}, "items": [{"x": 1}, {"x": 2}]}}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 2 of lst", "locations": ["/things/0/d/items/1/x"], "path": "lst[1].x", "value": 2}], "inputs": [{"locations": ["/things/0/d/b/x"], "name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 1}, {"locations": ["/things/0/d/items/0/x", "/things/0/d/items/1/x"], "name": "lst[].x", "part": {"id": null, "name": "lst"}, "value": [1, 2]}], "message": "item 2 of lst: x is 2, and cov.x is 1", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a part that isn't an object is named without a dollar sign",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "d": {"b": "no", "items": [{"x": 1}]}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "item 1 of lst", "locations": ["/things/0/d/items/0/x"], "path": "lst[0].x", "value": 1}], "inputs": [{"locations": ["/things/0/d/b"], "name": "cov.x", "part": {"id": null, "name": "cov"}, "value": null}, {"locations": ["/things/0/d/items/0/x"], "name": "lst[].x", "part": {"id": null, "name": "lst"}, "value": [1]}], "message": "item 1 of lst: cov is \"no\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a list whose items are compared with a part",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of lst whose x is cov.x is 9"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"cov": "d.b", "lst": "d.items"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the part is named without a dollar sign",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "d": {"b": "no", "items": [{"x": 1}]}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/d/items/0"], "name": "count of lst whose x equals cov.x", "part": {"id": null, "name": "lst"}, "value": null}, {"locations": ["/things/0/d/items/0"], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": [{"x": 1}]}, {"locations": ["/things/0/d/b"], "name": "cov.x", "part": {"id": null, "name": "cov"}, "value": null}], "message": "item 1 of lst: cov is \"no\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

@@ -1603,6 +1603,18 @@ item 2 of items: ok is false; item 3 of items: ok is false; item 4 of items: ok 
 
 In a `for` line, the item's fields are named without its alias when everything the item's sentences read belongs to that item. With `for: every commits as c` and `c.signed is true`, the message is `item 1 of commits: signed is false`, and when the item itself is `null` it's `item 1 of commits is null`. When a sentence also reads something else, like a field of the subject, a param or a second item, every name stays as the policy wrote it, like `item 1 of approvers: approver.username is "ann", and author is "ann"`. A list inside an item is named without the alias, like `item 1 of commits: item 2 of reviews: ok is false`.
 
+An alias or a part is named as the policy calls it, never with a `$` before it: `item 1 of z: k is 1`, or `item 2 of lst: x is 2, and cov.x is 1` for a part on the right of an `every`. Names the policy writes with a `$`, like `$params.limit`, keep it. A `count of`, a `sum of` or a `whose` that reads an item that isn't an object names it. With the check `count of commits whose signed is true is 3` and this input:
+
+```json
+{"things": [{"id": "t", "commits": [null, {"signed": true}, 5]}]}
+```
+
+the message is:
+
+```text
+item 1 of commits is null, which isn't an object; item 3 of commits is 5, which isn't an object
+```
+
 A check written as several sentences gives the message of each sentence that failed, joined with `; `, like `x is 4; y is missing`. In an `any_of`, each option's message starts with its name, like `one: x is 4; two: y is missing`.
 
 The `$applies` row of a subject that is out of scope says what the condition found, like `env is "staging"`.
