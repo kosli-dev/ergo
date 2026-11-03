@@ -169,7 +169,7 @@ test_applies_to_narrows_matching_but_leaves_total_intact if {
 }
 
 test_applies_to_checks_are_conjunctive if {
-	both := concat(" and ", [merged_only, "base_ref is \"main\""])
+	both := concat(" and whose ", [merged_only, "base_ref is \"main\""])
 	doc := {"items": [
 		{"id": "a", "state": "MERGED", "base_ref": "main"},
 		{"id": "b", "state": "MERGED", "base_ref": "topic"},
@@ -211,7 +211,7 @@ test_applies_definition_renders_the_filter_expression if {
 }
 
 test_applies_definition_conjoins_multiple_filter_checks if {
-	both := concat(" and ", [merged_only, "base_ref is \"main\""])
+	both := concat(" and whose ", [merged_only, "base_ref is \"main\""])
 	rep := report(two_states, scoped_req(both))
 
 	rep.requirements.s.checks["$applies"].expression == `state is "MERGED" and base_ref is "main"`
@@ -2095,10 +2095,10 @@ lockfile_scope(item, conditions) := [rep.requirements.s.status, [r.cause | some 
 }
 
 test_a_present_filter_that_finds_its_field_missing_rules_the_subject_out_whatever_the_other_filters_read if {
-	filters := "status exists and status is \"COMPLETE\""
+	filters := "status exists and whose status is \"COMPLETE\""
 	lockfile_scope({"id": 1}, filters) == ["not_applicable", ["value"]]
 	lockfile_scope({"id": 1, "status": null}, filters) == ["not_applicable", ["value"]]
-	lockfile_scope({"id": 1}, concat(" and ", [filters, "owner is \"me\""])) == ["not_applicable", ["value"]]
+	lockfile_scope({"id": 1}, concat(" and whose ", [filters, "owner is \"me\""])) == ["not_applicable", ["value"]]
 	lockfile_scope({"id": 1, "status": "PENDING"}, filters) == ["not_applicable", ["value"]]
 	lockfile_scope({"id": 1, "status": "COMPLETE", "hashed": true}, filters) == ["met", ["satisfied"]]
 }
@@ -2854,7 +2854,7 @@ test_a_filter_value_of_the_wrong_type_fails_the_requirement_instead_of_leaving_t
 }
 
 test_a_subject_ruled_out_by_one_filter_still_fails_the_requirement_when_another_filter_cannot_be_read if {
-	req := degraded_req_whose("every", concat(" and ", [degraded_only, merged_only]))
+	req := degraded_req_whose("every", concat(" and whose ", [degraded_only, merged_only]))
 	rep := report({"rounds": [{"id": "r1", "state": "CLOSED"}]}, req)
 	rep.requirements.s.status == "not_met"
 	rows_for(rep, "s", "$applies")[0].cause == "absent"
@@ -2862,14 +2862,14 @@ test_a_subject_ruled_out_by_one_filter_still_fails_the_requirement_when_another_
 }
 
 test_a_subject_is_out_of_scope_when_every_failing_filter_reads_sound_values if {
-	req := degraded_req_whose("every", concat(" and ", [degraded_only, merged_only]))
+	req := degraded_req_whose("every", concat(" and whose ", [degraded_only, merged_only]))
 	rep := report({"rounds": [{"id": "r1", "state": "CLOSED", "degraded": false}]}, req)
 	rep.requirements.s.status == "not_applicable"
 	rows_for(rep, "s", "$applies")[0].cause == "value"
 }
 
 test_a_subject_whose_filter_fails_on_an_unreadable_field_is_not_ruled_out_by_a_passing_filter if {
-	req := degraded_req_whose("every", concat(" and ", [degraded_only, merged_only]))
+	req := degraded_req_whose("every", concat(" and whose ", [degraded_only, merged_only]))
 	rep := report({"rounds": [{"id": "r1", "state": "MERGED"}]}, req)
 	rep.requirements.s.status == "not_met"
 	rows_for(rep, "s", "$applies")[0].cause == "absent"
@@ -3005,7 +3005,7 @@ test_a_present_filter_on_a_param_fails_the_requirement_with_no_params_or_params_
 
 test_the_applies_row_lists_each_field_its_filters_read_once_in_name_order if {
 	req := {"s": {
-		"from": "items whose status exists and status is \"open\" and kind exists",
+		"from": "items whose status exists and whose status is \"open\" and whose kind exists",
 		"identified_by": "id",
 		"checks": {"c": "id exists"},
 	}}
@@ -3275,7 +3275,7 @@ test_a_badly_written_filter_on_a_parent_or_a_grandparent_stops_the_child_at_well
 }
 
 test_a_badly_written_filter_stops_the_requirement_even_when_another_condition_rules_the_subject_out if {
-	rep := ergo.report({"things": [{"x": 1}]}, filter_policy({"b": {"from": `things whose x is one of 1, "a" and y exists`}}), {})
+	rep := ergo.report({"things": [{"x": 1}]}, filter_policy({"b": {"from": `things whose x is one of 1, "a" and whose y exists`}}), {})
 	stopped(rep)
 	rep.requirements.s.status == "not_met"
 	[v.check | some v in ergo.violations(rep)] == ["$well_formed"]
@@ -3428,7 +3428,7 @@ test_an_identified_by_with_an_index_that_cannot_be_a_key_is_written_wrong if {
 test_a_problem_inside_a_sentence_is_named_by_its_check_and_the_check_prints_as_written if {
 	rep := ergo.report(
 		{"things": [{"items": [1]}]}, {"ergo_spec": "v0.5-dev", "subjects": {"b": {"from": "things"}}, "requirements": {"s": {"subject": "b", "checks": {
-			"k": `count of items whose x is one of 1, "a" and y is one of true, 2 is 0`,
+			"k": `count of items whose x is one of 1, "a" and whose y is one of true, 2 is 0`,
 			"e": {"for": `every items whose x is one of 1, "a" as i`, "assert": "i.y exists"},
 		}}}},
 		{},
@@ -3437,7 +3437,7 @@ test_a_problem_inside_a_sentence_is_named_by_its_check_and_the_check_prints_as_w
 		{"name": "checks.e", "value": ["for: values of mixed types"], "locations": []},
 		{"name": "checks.k", "value": ["values of mixed types"], "locations": []},
 	]
-	rep.requirements.s.checks.k.expression == "count of items whose x is one of 1, \"a\" and y is one of true, 2 is 0"
+	rep.requirements.s.checks.k.expression == "count of items whose x is one of 1, \"a\" and whose y is one of true, 2 is 0"
 	rep.requirements.s.checks.e.expression == "for every items whose x is one of 1, \"a\" as i: i.y exists"
 }
 
@@ -3897,7 +3897,7 @@ _prints_back(text) if ergo._s_for_line_text(ergo._for_line(text)) == text
 _prints_back(text) if ergo._s_from_line_text(ergo._from_line(text)) == text
 
 test_a_whose_belongs_to_the_quantifier_and_an_and_after_the_phrase_starts_a_new_assertion if {
-	_read(`every items.price whose kind is "a" and qty is 1 is at least 2 and owner is "x"`) == {"assertions": [
+	_read(`every items.price whose kind is "a" and whose qty is 1 is at least 2 and owner is "x"`) == {"assertions": [
 		{
 			"every": {"steps": ["items", "price"]},
 			"where": [
@@ -4667,7 +4667,7 @@ test_a_walk_that_reads_no_list_stops_at_the_end_when_every_value_along_the_path_
 
 test_an_item_a_whose_condition_cant_decide_is_undecided_even_when_another_condition_leaves_it_out if {
 	doc := {"things": [{"id": "a", "xs": [{"kind": "b"}]}]}
-	_walk_rows({"e": `every xs whose kind is "a" and state is "open" is not empty`}, doc, {}) == [["a", "e", "absent", [{"path": "xs[0].state", "item": "item 1 of xs", "cause": "absent", "value": null, "locations": ["/things/0/xs/0"]}]]]
+	_walk_rows({"e": `every xs whose kind is "a" and whose state is "open" is not empty`}, doc, {}) == [["a", "e", "absent", [{"path": "xs[0].state", "item": "item 1 of xs", "cause": "absent", "value": null, "locations": ["/things/0/xs/0"]}]]]
 }
 
 test_a_walk_whose_param_cant_be_used_fails_as_unusable_even_with_if_any if {
@@ -5575,7 +5575,7 @@ _deployments := {"deployments": [
 ]}
 
 test_a_from_written_as_a_sentence_reads_its_path_and_keeps_the_subjects_whose_conditions_hold if {
-	rep := _from_report(_deployments, {"emergency change": {"from": `deployments whose environment is "prod" and change_type is "emergency"`, "identified_by": "id"}}, {"c": "id exists"}, {})
+	rep := _from_report(_deployments, {"emergency change": {"from": `deployments whose environment is "prod" and whose change_type is "emergency"`, "identified_by": "id"}}, {"c": "id exists"}, {})
 	_from_rows(rep) == [
 		[1, "$applies", "satisfied", [{"name": "change_type", "value": "emergency", "locations": ["/deployments/0/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/0/environment"]}]],
 		[2, "$applies", "absent", [{"name": "change_type", "value": null, "locations": ["/deployments/1"]}, {"name": "environment", "value": "dev", "locations": ["/deployments/1/environment"]}]],
@@ -5586,9 +5586,9 @@ test_a_from_written_as_a_sentence_reads_its_path_and_keeps_the_subjects_whose_co
 }
 
 test_the_conditions_of_a_from_keep_the_order_they_were_written_in_past_ten if {
-	conds := concat(" and ", [concat("", ["k", format_int(i, 10), " exists"]) | some i in numbers.range(1, 11)])
-	rep := _from_report({"xs": [{"id": 1}]}, {"x": {"from": concat("", ["xs whose ", conds])}}, {"c": "id exists"}, {})
-	rep.requirements.r.checks["$applies"].expression == conds
+	pieces := [concat("", ["k", format_int(i, 10), " exists"]) | some i in numbers.range(1, 11)]
+	rep := _from_report({"xs": [{"id": 1}]}, {"x": {"from": concat("", ["xs whose ", concat(" and whose ", pieces)])}}, {"c": "id exists"}, {})
+	rep.requirements.r.checks["$applies"].expression == concat(" and ", pieces)
 }
 
 test_a_subject_with_no_from_reads_the_input_field_named_like_it if {
@@ -5609,7 +5609,7 @@ test_a_from_named_by_a_param_or_by_each_of_a_param_list if {
 
 test_conditions_of_a_from_can_use_phrases_only_sentences_have if {
 	doc := {"xs": [{"id": 1, "tags": [], "cs": [1]}, {"id": 2, "tags": ["a"], "cs": [1]}]}
-	rep := _from_report(doc, {"x": {"from": "xs whose tags is empty and count of cs is at least 1", "identified_by": "id"}}, {"c": "id exists"}, {})
+	rep := _from_report(doc, {"x": {"from": "xs whose tags is empty and whose count of cs is at least 1", "identified_by": "id"}}, {"c": "id exists"}, {})
 	[[r[0], r[1], r[2]] | some r in _from_rows(rep)] == [[1, "$applies", "satisfied"], [2, "$applies", "value"], [1, "c", "satisfied"]]
 }
 
@@ -5686,7 +5686,7 @@ _applies_failures_of(rep) := {r.subject.id: object.filter(r, ["failed_items", "f
 _check_failures_of(rep) := {r.subject.id: object.filter(r, ["failed_items", "failed_assertions"]) | some r in rep.results; r.check == "c"}
 
 _as_condition_and_as_check(sentences) := [
-	_from_report(_releases, {"release": {"from": concat(" whose ", ["releases", concat(" and ", sentences)]), "identified_by": "id"}}, {"c": "ticket exists"}, {}),
+	_from_report(_releases, {"release": {"from": concat(" whose ", ["releases", concat(" and whose ", sentences)]), "identified_by": "id"}}, {"c": "ticket exists"}, {}),
 	_from_report(_releases, {"release": {"from": "releases", "identified_by": "id"}}, {"c": {"assert": sentences}}, {}),
 ]
 
@@ -5714,7 +5714,7 @@ test_the_applies_row_of_several_conditions_lists_the_failed_assertions_its_check
 			object.keys(row) == {"failed_assertions"}
 		}
 	}
-	rows := _applies_failures_of(_from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and every files.path matches "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {}))
+	rows := _applies_failures_of(_from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and whose every files.path matches "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {}))
 	rows.docs == {"failed_assertions": []}
 	rows.mixed.failed_assertions == [{"assertion": `every files.path matches "^docs/"`, "cause": "value"}]
 	rows.unset.failed_assertions == [{"assertion": `every files.path matches "^docs/"`, "cause": "absent"}]
@@ -5748,7 +5748,7 @@ test_an_applies_row_that_fails_with_a_cause_other_than_value_is_a_violation_with
 	some_violations.null.failed_items[0].cause == "null"
 	not "mixed" in object.keys(some_violations)
 	not "docs" in object.keys(some_violations)
-	many_rep := _from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and every files.path matches "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
+	many_rep := _from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and whose every files.path matches "^docs/"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
 	many_violations := {v.subject.id: object.filter(v, ["failed_items", "failed_assertions"]) | some v in ergo.violations(many_rep); v.check == "$applies"}
 	many_violations.unset == {"failed_assertions": [{"assertion": `every files.path matches "^docs/"`, "cause": "absent"}]}
 	not "mixed" in object.keys(many_violations)
@@ -5781,7 +5781,7 @@ test_a_failed_item_of_an_applies_row_says_where_its_value_was_read_in_the_input_
 
 test_an_applies_row_of_a_child_subject_and_of_a_subject_that_reads_its_parent_has_the_same_fields if {
 	doc := {"artifact": {"id": "sha", "owner": "ann", "releases": [{"id": 1, "files": [{"owner": "ann"}]}, {"id": 2, "files": [{"owner": "bob"}]}]}}
-	subjects := {"artifact": {"identified_by": "id"}, "release": {"from": "artifact.releases whose some files.owner is artifact.owner and id exists", "identified_by": "id"}}
+	subjects := {"artifact": {"identified_by": "id"}, "release": {"from": "artifact.releases whose some files.owner is artifact.owner and whose id exists", "identified_by": "id"}}
 	rep := ergo.report(doc, {"ergo_spec": "v0.5-dev", "subjects": subjects, "requirements": {"r": {"subject": "release", "checks": {"c": "id exists"}}}}, {})
 	{r.subject.id: r.failed_assertions | some r in rep.results; r.check == "$applies"} == {1: [], 2: [{"assertion": "some files.owner equals artifact.owner", "cause": "value"}]}
 	single := {"artifact": {"identified_by": "id"}, "release": {"from": "artifact.releases whose some files.owner is artifact.owner", "identified_by": "id"}}
@@ -5794,7 +5794,7 @@ test_an_applies_row_of_a_child_subject_and_of_a_subject_that_reads_its_parent_ha
 }
 
 test_a_from_condition_written_with_some_prints_in_the_spelling_of_the_report_and_joins_with_and if {
-	rep := _from_report(_releases, {"release": {"from": `releases whose some  files.path   matches "x" and ticket   is "ok" and every files.path, if any, does not match "y"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
+	rep := _from_report(_releases, {"release": {"from": `releases whose some  files.path   matches "x" and whose ticket   is "ok" and whose every files.path, if any, does not match "y"`, "identified_by": "id"}}, {"c": "ticket exists"}, {})
 	rep.requirements.r.checks["$applies"].expression == `some files.path matches "x" and ticket is "ok" and every files.path, if any, does not match "y"`
 }
 
@@ -5835,12 +5835,36 @@ test_a_from_condition_with_some_walks_every_list_along_its_path if {
 test_a_from_condition_with_if_any_after_some_or_a_whose_of_its_own_is_written_wrong if {
 	_from_problems(_from_report(_releases, {"release": {"from": `releases whose some files.path, if any, matches "x"`}}, {"c": "ticket exists"}, {})) == [{"name": "subjects.release.from", "value": ["if any can't go with some"], "locations": []}]
 	_from_problems(_from_report(_releases, {"release": {"from": `releases whose some files whose kind is "src" matches "x"`}}, {"c": "ticket exists"}, {})) == [{"name": "subjects.release.from", "value": ["a condition after whose can't have a whose of its own"], "locations": []}]
-	_from_problems(_from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and every files whose kind is "src" matches "x"`}}, {"c": "ticket exists"}, {})) == [{"name": "subjects.release.from", "value": ["a condition after whose can't have a whose of its own"], "locations": []}]
-	every line in [`releases whose count of files whose path is "x" is at least 1`, `releases whose sum of files.size whose path is "x" is at least 1`, `releases whose ticket is "ok" and count of files whose path is "x" is at least 1`] {
+	_from_problems(_from_report(_releases, {"release": {"from": `releases whose ticket is "ok" and whose every files whose kind is "src" matches "x"`}}, {"c": "ticket exists"}, {})) == [{"name": "subjects.release.from", "value": ["a condition after whose can't have a whose of its own"], "locations": []}]
+	every line in [`releases whose count of files whose path is "x" is at least 1`, `releases whose sum of files.size whose path is "x" is at least 1`, `releases whose ticket is "ok" and whose count of files whose path is "x" is at least 1`] {
 		_from_problems(_from_report(_releases, {"release": {"from": line}}, {"c": "ticket exists"}, {})) == [{"name": "subjects.release.from", "value": ["a condition after whose can't have a whose of its own"], "locations": []}]
 	}
 	_read(`count of files whose path is "x" is at least 1`).assertions[0].where != []
 	_from_problems(_from_report(_releases, {"release": {"from": `releases whose some files.path`}}, {"c": "ticket exists"}, {})) != []
+}
+
+test_that_on_a_from_line_keeps_items_by_their_value_and_names_each_by_the_subject if {
+	rep := _from_report({"ws": ["bay", "apple"]}, {"w": {"from": `every ws that starts with "b"`}}, {"c": "it is not empty"}, {})
+	apply_rows := [r | some r in rep.results; r.check == "$applies"]
+	sort([r.subject.id | some r in apply_rows]) == ["apple", "bay"]
+	apple := [r | some r in apply_rows; r.subject.id == "apple"][0]
+	apple.cause == "value"
+	apple.inputs == [{"name": "w", "value": "apple", "locations": ["/ws/1"]}]
+	apple.message == `w is "apple"`
+}
+
+test_every_condition_of_a_from_line_needs_its_own_word_after_an_and if {
+	doc := {"ws": ["bay", "bee"]}
+	every line in [`every ws that starts with "b" and ends with "y"`, `every ws whose it starts with "b" and ends with "y"`, `every ws that starts with "b" that ends with "y"`, `every ws that`] {
+		_from_problems(_from_report(doc, {"w": {"from": line}}, {"c": "it is not empty"}, {})) == [{"name": "subjects.w.from", "value": ["doesn't parse"], "locations": []}]
+	}
+	rep := _from_report(doc, {"w": {"from": `every ws that starts with "b" and that ends with "y"`}}, {"c": "it is not empty"}, {})
+	[r.subject.id | some r in rep.results; r.check == "c"] == ["bay"]
+}
+
+test_a_field_called_that_is_read_with_a_dot if {
+	rep := _from_report({"xs": [{"that": "x"}, {"that": "y"}]}, {"s": {"from": `every xs whose .that is "x"`}}, {"c": "it is not empty"}, {})
+	count([r | some r in rep.results; r.check == "c"]) == 1
 }
 
 test_a_whose_in_a_check_or_a_for_line_still_takes_no_some_or_every_condition if {
@@ -6148,8 +6172,8 @@ test_a_count_under_a_for_line_still_lists_the_parent_it_reads if {
 test_a_count_whose_parents_are_written_in_either_order_lists_them_in_the_same_order if {
 	rows := _atts_rows(
 		{
-			"a": "count of commits whose author is artifact.team.lead and author is artifact.owner is 1",
-			"b": "count of commits whose author is artifact.owner and author is artifact.team.lead is 1",
+			"a": "count of commits whose author is artifact.team.lead and whose author is artifact.owner is 1",
+			"b": "count of commits whose author is artifact.owner and whose author is artifact.team.lead is 1",
 		},
 		{},
 	)
@@ -6230,7 +6254,7 @@ test_a_whose_in_the_from_lines_of_a_chain_of_three_subjects_reads_every_ancestor
 	subjects := {
 		"top": {"from": "tops", "identified_by": "id"},
 		"b": {"from": "top.bs whose x is less than top.y", "identified_by": "id"},
-		"kid": {"from": "b.kids whose w equals top.y and v equals b.x", "identified_by": "id"},
+		"kid": {"from": "b.kids whose w equals top.y and whose v equals b.x", "identified_by": "id"},
 	}
 	rep := ergo.report(doc, {"ergo_spec": "v0.5-dev", "subjects": subjects, "requirements": {"r": {"subject": "kid", "checks": {"c": "v exists"}}}}, {})
 	[[r.subject.id, r.subject.in, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"] == [
@@ -6404,7 +6428,7 @@ test_a_from_line_that_starts_at_input_reads_the_input_and_one_at_params_is_writt
 }
 
 test_a_from_line_keeps_every_condition_past_a_hundred if {
-	conds := concat(" and ", array.concat([`id is 1` | some _ in numbers.range(1, 100)], [`env is "prod"`]))
+	conds := concat(" and whose ", array.concat([`id is 1` | some _ in numbers.range(1, 100)], [`env is "prod"`]))
 	rep := _from_report({"ds": [{"id": 1, "env": "dev"}]}, {"d": {"from": concat("", ["ds whose ", conds]), "identified_by": "id"}}, {"c": "id exists"}, {})
 	rep.requirements.r.status == "not_met"
 	[r.cause | some r in rep.results; r.check == "$applies"] == ["value"]
@@ -6427,7 +6451,7 @@ _narrow_report(subjects, name) := ergo.report(_defects, {"ergo_spec": "v0.5-dev"
 _kept(rep) := [r.subject.id | some r in rep.results; r.check == "c"]
 
 test_a_from_line_that_names_another_subject_narrows_it if {
-	subjects := {"defect": {"from": "defects", "identified_by": "id"}, "critical defect": {"from": `defect whose severity is "critical" and status is one of "open", "in_progress"`}}
+	subjects := {"defect": {"from": "defects", "identified_by": "id"}, "critical defect": {"from": `defect whose severity is "critical" and whose status is one of "open", "in_progress"`}}
 	rep := _narrow_report(subjects, "critical defect")
 	_kept(rep) == [1, 4]
 	rep.requirements.r.checks["$applies"].expression == `severity is "critical" and status is one of "open", "in_progress"`
@@ -6765,7 +6789,7 @@ test_as_sentences_writes_naming_and_whole_input_and_narrowing_as_from_lines if {
 		"one": {"from": "build.runs named by $params.kind"},
 		"named": policy.subjects.named,
 		"$x": {"from": `"$x"`},
-		"narrow": {"from": "run whose .a exists and b exists"},
+		"narrow": {"from": "run whose .a exists and whose b exists"},
 		"filtered": policy.subjects.filtered,
 	}
 }
@@ -7255,8 +7279,8 @@ test_a_listed_subject_carries_exactly_the_documented_keys if {
 }
 
 test_a_from_line_is_printed_the_canonical_way if {
-	subjects := {"d": {"from": `  deployments   whose environment is   "prod"  and approved_by exists `}}
-	_listed(subjects, "d").d.from == `deployments whose environment is "prod" and approved_by exists`
+	subjects := {"d": {"from": `  deployments   whose environment is   "prod"  and whose approved_by exists `}}
+	_listed(subjects, "d").d.from == `deployments whose environment is "prod" and whose approved_by exists`
 }
 
 test_a_from_line_that_names_each_key_is_printed_with_it if {
@@ -7396,12 +7420,12 @@ test_a_requirement_that_names_a_subject_written_wrong_still_reports_its_name if 
 }
 
 test_the_subjects_section_is_independent_of_the_order_the_policy_is_written_in if {
-	first := {"round": {"from": "rounds", "identified_by": "id"}, "done": {"from": `round whose state is "done"`}, "old": {"from": "ds whose .a exists and b exists"}}
+	first := {"round": {"from": "rounds", "identified_by": "id"}, "done": {"from": `round whose state is "done"`}, "old": {"from": "ds whose .a exists and whose b exists"}}
 	reqs := {"x": {"subject": "done", "checks": {"c": "id exists"}}, "y": {"subject": "old", "checks": {"c": "id exists"}}}
 	one := ergo.report({}, {"ergo_spec": "v0.5-dev", "subjects": first, "requirements": reqs}, {})
-	two := ergo.report({}, {"ergo_spec": "v0.5-dev", "requirements": {"y": reqs.y, "x": reqs.x}, "subjects": {"old": {"from": "ds whose .a exists and b exists"}, "done": first.done, "round": first.round}}, {})
+	two := ergo.report({}, {"ergo_spec": "v0.5-dev", "requirements": {"y": reqs.y, "x": reqs.x}, "subjects": {"old": {"from": "ds whose .a exists and whose b exists"}, "done": first.done, "round": first.round}}, {})
 	json.marshal(one) == json.marshal(two)
-	one.subjects.old.from == "ds whose .a exists and b exists"
+	one.subjects.old.from == "ds whose .a exists and whose b exists"
 }
 
 test_a_from_that_cannot_be_printed_is_invalid_even_when_nothing_flagged_it if {
@@ -7719,7 +7743,7 @@ test_a_for_line_alias_that_is_also_a_part_alias_is_written_wrong if {
 test_a_whose_of_two_conditions_in_the_from_line_keeps_the_part_of_each_input if {
 	policy := {
 		"ergo_spec": "v0.5-dev",
-		"subjects": {"round": {"from": "rounds whose cov.x is 1 and cov.n is 2", "identified_by": "id", "has": {"cov": "dd.b"}}},
+		"subjects": {"round": {"from": "rounds whose cov.x is 1 and whose cov.n is 2", "identified_by": "id", "has": {"cov": "dd.b"}}},
 		"requirements": {"r": {"subject": "round", "checks": {"c": "cov.n is 2"}}},
 	}
 	rep := ergo.report({"rounds": [{"id": "a", "dd": {"b": {"x": 1, "n": 2}}}]}, policy, {})
@@ -10019,7 +10043,7 @@ test_an_input_read_by_two_assertions_is_listed_once_with_its_location if {
 }
 
 test_an_applies_row_lists_an_input_read_by_two_conditions_once_with_its_location if {
-	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things whose state is \"live\" and state is not \"old\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}}
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things whose state is \"live\" and whose state is not \"old\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}}
 	rep := ergo.report({"things": [{"id": "t1", "state": "live", "x": 1}, {"id": "t2", "state": "old"}]}, policy, {})
 	[[r.subject.id, r.inputs] | some r in rep.results; r.check == "$applies"] == [
 		["t1", [{"name": "state", "value": "live", "locations": ["/things/0/state"]}]],
@@ -10283,7 +10307,7 @@ test_it_after_a_for_line_is_still_the_subject_and_not_the_item if {
 }
 
 test_it_in_a_from_line_whose_reads_each_item_and_names_it_in_the_applies_row if {
-	rep := _it_report({"ws": ["a", "bb", null, 3, "cc"]}, "every ws whose it is a string and it starts with 'b'", {"c": "it is a string"}, {})
+	rep := _it_report({"ws": ["a", "bb", null, 3, "cc"]}, "every ws whose it is a string and whose it starts with 'b'", {"c": "it is a string"}, {})
 	applies := [[r.subject.id, r.passed, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"]
 	applies == [
 		["a", false, "value", [{"name": "it", "value": "a", "locations": ["/ws/0"]}]],
@@ -10846,7 +10870,7 @@ test_identified_by_is_written_wrong_on_every_form_of_a_from_line_listed_by_named
 		"top named by $params.g named by each of $params.names",
 		"top[$params.g].suites named by each of $params.names",
 		"artifact.suites named by each of $params.names",
-		"artifact.suites named by each of $params.names whose id exists and id is 1",
+		"artifact.suites named by each of $params.names whose id exists and whose id is 1",
 	] {
 		subjects := {"artifact": {"from": "artifacts", "identified_by": "id"}, "suite": {"from": from, "identified_by": "id"}}
 		rep := ergo.report({"suites": {"a": {"id": 1}}, "top": {"g": {"a": {"id": 1}}}, "artifacts": [{"id": 9, "suites": {"a": {"id": 1}}}]}, {"ergo_spec": "v0.5-dev", "subjects": subjects, "requirements": {"r": {"subject": "suite", "checks": {"c": "id exists"}}}}, {"names": ["a"], "g": "g"})

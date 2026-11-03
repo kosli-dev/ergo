@@ -151,13 +151,13 @@ A few details:
 
 ### From lines
 
-A `from` line is a path, and `whose` with conditions joined by `and` keeps the subjects they hold for. Paths and conditions are written as in [checks](#checks). `identified_by` is a path written the same way:
+A `from` line is a path, and `whose` or `that` with conditions joined by `and` keeps the subjects they hold for. Each condition starts with its own `whose` or `that`, so a second one is `and whose` or `and that`, and `and` followed by a bare condition is written wrong. Paths and conditions are written as in [checks](#checks). `identified_by` is a path written the same way:
 
 ```yaml
 ergo_spec: v0.5-dev
 subjects:
   emergency change:
-    from: deployments whose environment is "prod" and change_type is "emergency"
+    from: deployments whose environment is "prod" and whose change_type is "emergency"
     identified_by: id
   artifact:
     identified_by: fingerprint
@@ -1477,6 +1477,10 @@ A position is written in words, as for a field. With the input `{"releases": {"t
 | `x is it`                    | `it can only start an assertion: write it first, like it is not empty` |
 | `$params.m named by it is 1` | `it can't name a key`                                                  |
 
+`that` picks items by the value itself, where `whose` picks them by a field: `from: every ws that starts with "b"` keeps the values of `ws` that start with `b`, and means what `from: every ws whose it starts with "b"` does. It works wherever `whose` does, on a `from` line, after `every`, `some`, `count of` and `sum of` in a check, and in an item of a `for` line, and the two mix in one chain, like `ws that starts with "b" and whose it ends with "y"`. What follows `that` is a phrase about the item, and a field called `that` is written `.that`, like `every items whose .that is "x"`.
+
+On a `from` line, the `$applies` row names an item by the subject's name. With `from: every ws that starts with "b"`, a subject called `w` and the input `{"ws": ["bay", "apple"]}`, the row for `apple` has the input `{"name": "w", "value": "apple", "locations": ["/ws/1"]}` and the message `w is "apple"`. In a check, `count of ws that starts with "b" is 2` lists `count of ws that starts with "b"` and `ws[]` in its inputs, as `whose` does.
+
 A subject can't be called `it`. A requirement that uses one is written wrong, and `$well_formed` says `it is a word of the grammar, so a subject can't be called it` under `subjects.it`.
 
 Reading the subject from the right side of a phrase, like `x equals it`, is left out for now.
@@ -1902,7 +1906,7 @@ With several conditions, the subject is only out of scope when every condition t
 {"lockfiles": [{"name": "a", "status": "COMPLETE"}, {"name": "b"}, {"name": "c", "status": "PENDING"}]}
 ```
 
-`from: lockfiles whose status exists and status is "COMPLETE"` keeps `a`, and leaves out `b` and `c`, both with cause `value`, although `status is "COMPLETE"` can't read `b`'s status.
+`from: lockfiles whose status exists and whose status is "COMPLETE"` keeps `a`, and leaves out `b` and `c`, both with cause `value`, although `status is "COMPLETE"` can't read `b`'s status.
 
 A condition that's written wrong still fails the requirement.
 

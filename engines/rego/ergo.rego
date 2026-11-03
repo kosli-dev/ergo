@@ -4214,14 +4214,14 @@ _problem_at(req, "applies_to", n, _) := ["subjects", _resolution_of(req).filter_
 
 _problem_at(_, "checks", n, at) := array.concat(["checks", n], at)
 
-_from_names(req, here) := ({n |
+_from_names(req, here) := (({n |
 	_from_well_formed(req)
 	n := _each_step(req).each_as
 } | {a | _chained(req); here; some a in _s_ancestors(req.subject, data.ergo_subject_sentences.chains)}) | {a |
 	here
 	_resolves(req)
 	some a in data.ergo_resolved[req.subject].members
-} | {a |
+}) | {a |
 	is_string(object.get(req, "subject", null))
 	some a, _ in object.get(object.get(data.ergo_subject_sentences, "parts", {}), req.subject, {})
 }

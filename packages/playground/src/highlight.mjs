@@ -5,7 +5,7 @@ export const GRAMMAR_WORDS = new Set([
   "every", "exist", "exists", "false", "first", "followed", "from", "hours", "if", "in", "is", "it", "item", "last",
   "least", "less", "list", "match", "matches", "minutes", "more", "most", "named", "non-empty", "none",
   "not", "null", "number", "object", "of", "on", "one", "or", "plus", "seconds", "some", "sorted",
-  "start", "starts", "string", "sum", "than", "to", "true", "weeks", "whose", "with", "within",
+  "start", "starts", "string", "sum", "than", "that", "to", "true", "weeks", "whose", "with", "within",
 ]);
 
 const SENTENCE = /("(?:[^"\\]|\\.)*"?)|(\$(?:params|input)(?:\.[A-Za-z_][\w-]*)*)|((?<![\w.])-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(?![\w.]))|(\.?[A-Za-z_][\w-]*)|(\s+|.)/gy;
