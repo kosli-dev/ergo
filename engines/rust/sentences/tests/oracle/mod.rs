@@ -5,6 +5,13 @@ pub mod checks;
 pub const FROM_OK: &[(&str, &str)] = &[
     ("round.items whose .cov is 1", "round.items whose cov is 1"),
     ("y", "y"),
+    ("first of t.ws", "first of t.ws"),
+    ("first of things", "first of things"),
+    ("item 2 of t.ws", "item 2 of t.ws"),
+    ("item 2 of things", "item 2 of things"),
+    ("t.ws", "t.ws"),
+    ("w.kids", "w.kids"),
+    ("w.meta.owner", "w.meta.owner"),
     ("\"empty\".items", ".empty.items"),
     ("\"empty\".pa.items", ".empty.pa.items"),
     (".empty.items", ".empty.items"),

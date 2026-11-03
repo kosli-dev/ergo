@@ -1,7 +1,7 @@
 use crate::cause::Cause;
 use crate::policy::{
-    Check, Form, OptionLines, Policy, Problems, Requirement, SPEC, SubjectName, field_name,
-    merge_problems,
+    Check, Form, LISTED_LAST, OptionLines, Policy, Problems, Requirement, SPEC, SubjectName,
+    field_name, merge_problems,
 };
 use crate::reading::{INVALID_FROM, Reading, Source};
 use crate::value::{Decimal, json_text};
@@ -459,7 +459,9 @@ pub fn well_formed_row(
     }
     let mut listed: Vec<(&String, &std::collections::BTreeSet<String>)> = problems.iter().collect();
     listed.sort_by_key(|(name, _)| {
-        let group = if name.starts_with("checks.") {
+        let group = if name.starts_with(LISTED_LAST) {
+            3
+        } else if name.starts_with("checks.") {
             2
         } else {
             u8::from(name.starts_with("subjects."))
@@ -470,7 +472,11 @@ pub fn well_formed_row(
         if name == "require" {
             continue;
         }
-        inputs.push(input(name, json!(texts), &[]));
+        inputs.push(input(
+            name.trim_start_matches(LISTED_LAST),
+            json!(texts),
+            &[],
+        ));
     }
     for (name, texts) in &policy.problems {
         inputs.push(input(name, json!(texts), &[]));

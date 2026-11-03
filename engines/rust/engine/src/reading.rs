@@ -3,8 +3,8 @@ use crate::name;
 use crate::ops::Check;
 use crate::path::{self, Start, Step};
 use crate::policy::{
-    Has, Policy, Problems, Requirement, SubjectDef, SubjectName, Subjects, Text, add_problem,
-    field_name, merge_problems,
+    Has, LISTED_LAST, Policy, Problems, Requirement, SubjectDef, SubjectName, Subjects, Text,
+    add_problem, field_name, merge_problems,
 };
 use ergo_policy_sentences as s;
 use serde_json::{Map, Value, json};
@@ -325,6 +325,39 @@ fn child_parent(name: &str, raw: &BTreeMap<String, Raw>) -> Option<String> {
     match raw.get(name).map(|r| &r.relation) {
         Some(Relation::Child(parent)) => Some(parent.clone()),
         _ => None,
+    }
+}
+
+fn blocked_ancestors(name: &str, raw: &BTreeMap<String, Raw>) -> Vec<String> {
+    let Some(parent) = child_parent(name, raw) else {
+        return Vec::new();
+    };
+    let broken = match raw.get(&parent).map(|r| &r.from) {
+        Some(FromState::Parsed(line)) if s::from_problems(line).is_empty() => {
+            lower::keyed_steps(&line.path).is_err()
+                || line
+                    .named_by_each_of
+                    .as_ref()
+                    .is_some_and(|each| lower::keyed_steps(each).is_err())
+        }
+        _ => false,
+    };
+    if broken {
+        ancestors_of(&parent, raw)
+    } else {
+        Vec::new()
+    }
+}
+
+fn right_side_text(condition: &s::FromCondition, scope: &Scope) -> String {
+    let s::FromCondition::Condition(condition) = condition else {
+        return String::new();
+    };
+    match lower::lower_condition(condition, scope) {
+        Ok(Check::Compare(check)) => format!("{:?}", check.right),
+        Ok(Check::CompareTime(check)) => format!("{:?}", check.right),
+        Ok(Check::In(check)) => format!("{:?}", check.values),
+        other => format!("{:?}", other.map(|_| ())),
     }
 }
 
@@ -717,6 +750,7 @@ impl Reading {
         let mut owns: BTreeMap<String, Own> = BTreeMap::new();
         let mut unsupported: BTreeSet<String> = BTreeSet::new();
         let mut narrowing_a_child: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        let mut chain_problems: BTreeMap<String, Vec<String>> = BTreeMap::new();
         let mut problems_by_subject: BTreeMap<String, Problems> = BTreeMap::new();
         for (name, found) in &raw {
             let mut problems = found.own_problems.clone();
@@ -740,9 +774,26 @@ impl Reading {
                     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
                     let syntax_problems = s::from_problems(line);
                     let reads = syntax_problems.is_empty();
+                    found_problems.retain(|found| {
+                        found.strip_prefix("unknown alias ").is_none_or(|name| {
+                            !syntax_problems.contains(&format!("{name} can't be an alias"))
+                        })
+                    });
                     found_problems.extend(syntax_problems);
                     let mut filters = Vec::new();
+                    let blocked = blocked_ancestors(name, &raw);
                     for condition in line.whose.iter().filter(|_| reads) {
+                        for ancestor in &blocked {
+                            let reduced = scope.clone().without_parent(ancestor);
+                            if right_side_text(condition, &reduced)
+                                != right_side_text(condition, &scope)
+                            {
+                                chain_problems
+                                    .entry(name.clone())
+                                    .or_default()
+                                    .push(format!("unknown alias ${ancestor}"));
+                            }
+                        }
                         let text = s::print_from_condition(condition, &alias_refs, &parent_refs);
                         match condition {
                             s::FromCondition::Condition(condition) => {
@@ -872,8 +923,12 @@ impl Reading {
         }
         let mut infos = BTreeMap::new();
         for (name, found) in &raw {
-            let problems = problems_by_subject.get(name).cloned().unwrap_or_default();
+            let mut problems = problems_by_subject.get(name).cloned().unwrap_or_default();
             let ok = !problems.contains_key(&field_name(&["subjects", name, "from"]));
+            for text in chain_problems.get(name).into_iter().flatten() {
+                let at = field_name(&["subjects", name, "from"]);
+                add_problem(&mut problems, format!("{LISTED_LAST}{at}"), text);
+            }
             let lowered = if ok {
                 flatten(name, &raw, &owns, &mut Vec::new())
             } else {
