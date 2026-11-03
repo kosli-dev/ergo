@@ -16,6 +16,7 @@ pub const NARROWING_A_CHILD_PROBLEM: &str =
 
 pub const INVALID_IDENTIFIED_BY: &str = "<invalid identified_by>";
 pub const KEYED_ID_PROBLEM: &str = "not allowed with named by each of: the key is the id";
+pub const EACH_START_PROBLEM: &str = "named by each of takes a list from $params or $input, so it can't start at a field or a subject";
 const MAX_WALK_STEPS: usize = 10;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -531,6 +532,11 @@ fn from_problems(
     }
     if line.path.start == s::Start::Params {
         problems.push("a from reads the input, so it can't start at $params".to_string());
+    }
+    if let Some(each) = &line.named_by_each_of
+        && matches!(each.start, s::Start::Field { .. } | s::Start::Quoted(_))
+    {
+        problems.push(EACH_START_PROBLEM.to_string());
     }
     match lower::keyed_steps(&line.path) {
         Ok(steps) => {
@@ -1527,6 +1533,40 @@ mod tests {
                 "every can't go with named by each of: start the from line at a subject to read its names one subject at a time"
             ]
         );
+    }
+
+    #[test]
+    fn named_by_each_of_a_field_or_a_subject_is_written_wrong() {
+        for line in [
+            "t named by each of t.keys",
+            "t named by each of keys",
+            "t named by each of .keys",
+            "things named by each of t.keys",
+            "t named by each of k.keys",
+            "t named by each of t",
+        ] {
+            let (_, r) = reading(json!({"t": {"from": "things"}, "k": {"from": line}}));
+            assert_eq!(
+                texts(&r, "k", "subjects.k.from"),
+                [EACH_START_PROBLEM],
+                "{line}"
+            );
+        }
+    }
+
+    #[test]
+    fn named_by_each_of_params_or_input_is_read() {
+        for line in [
+            "t named by each of $params.keys",
+            "t named by each of $input.keys",
+            "things named by each of $params.keys",
+        ] {
+            let (_, r) = reading(json!({"t": {"from": "things"}, "k": {"from": line}}));
+            assert!(
+                !r.infos["k"].problems.contains_key("subjects.k.from"),
+                "{line}"
+            );
+        }
     }
 
     #[test]

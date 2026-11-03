@@ -55,6 +55,14 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     (".artifact.p", "artifact.p"),
     (
+        "t named by each of $input.keys",
+        "t named by each of $input.keys",
+    ),
+    ("t named by each of .keys", "t named by each of keys"),
+    ("t named by each of keys", "t named by each of keys"),
+    ("t named by each of t", "t named by each of t"),
+    ("t named by each of t.keys", "t named by each of t.keys"),
+    (
         "artifact.suites named by each of $params.names",
         "artifact.suites named by each of $params.names",
     ),
