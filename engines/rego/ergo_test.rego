@@ -11197,9 +11197,14 @@ test_message_names_a_param_that_isnt_a_number_on_the_right_of_a_comparison if {
 	row.message == "$params.max is \"5\", which isn't a number"
 }
 
-test_message_a_for_alias_that_ends_a_message_loses_its_marker if {
-	ergo._m_alias_end({"items": [{"as": "c"}]}, "x is $c") == "x is c"
-	ergo._m_alias_end({"items": [{"as": "c"}]}, "x is 1") == "x is 1"
+test_message_a_for_alias_loses_its_marker_and_a_value_that_spells_the_alias_stays if {
+	ergo._m_aliased("x is \u0002c, and \"$c: y\"") == "x is c, and \"$c: y\""
+	ergo._m_aliased("x is 1") == "x is 1"
+}
+
+test_message_a_name_that_is_not_a_for_alias_keeps_its_dollar_sign if {
+	ergo._m_marked_alias("$q") == "$q" with input as {"ergo/names": {"$at": {"names": {}}}}
+	ergo._m_marked_alias("$q") == "\u0002q" with input as {"ergo/names": {"$at": {"names": {"q": "/x"}}, "q": 1}}
 }
 
 test_message_a_key_named_by_another_name_is_another_name if {

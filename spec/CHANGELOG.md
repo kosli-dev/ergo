@@ -8,6 +8,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
 - Every failed row has a `message`, a line of plain text that says what Ergo found, never what the check expected: `approver is "ana", and author is "ana"`, `item 2 of tests: ok is false` or `signed: signature is missing; reviewed: reviewer is missing`. [message.row](semantics.md#messages) and the rules after it say how each cause, value, list, `for` line and `any_of` option is written, and how a `for` item is named, with or without its alias ([message.alias](semantics.md#messages)). A row that passed has none.
 - A violation carries the `message` of its row.
+- A `count of`, a `sum of` or a `whose` that reads an item that isn't an object names it, `item 2 of commits is null, which isn't an object`, and an alias or a part is named without a `$` ([message.items](semantics.md#messages), [message.alias](semantics.md#messages)). A value or a key that spells an alias, like `"$z: x"`, prints as the input had it.
 
 ### Changed
 

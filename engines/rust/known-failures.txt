@@ -41,17 +41,36 @@ for / whose on a for item / an item whose kind is missing is undecided: every fa
 for / whose on a for item / an item whose kind is null is undecided, and fails as null
 for / whose on a for item / under some, an undecided item and a failed item give the first cause, absent
 for / whose on a for item / when whose leaves no item in, every and some fail as value and if any passes
+messages / a count of a list of lists with a whose that counts / a list is named as an item that isn't an object
+messages / a count of a list that holds items that aren't objects / an item that isn't an object is named with its value
+messages / a count of a list whose items are compared with a part / the part is named without a dollar sign
+messages / a count of a part's list that holds items that aren't objects / the items are named after the part
+messages / a for line over a list inside the first item / items that aren't objects are named after the list, without a dollar sign
+messages / a for line over a list of lists whose values spell the alias / a list that holds the alias in its items is printed as the input had it
+messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a colon is printed as the input had it
+messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a comma is printed as the input had it
+messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a dot is printed as the input had it
+messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a semicolon is printed as the input had it
+messages / a for line over a list of lists whose values spell the alias / a value that holds the alias before a space is printed as the input had it
+messages / a for line over a list of lists whose values spell the alias / an object that holds the alias in a key is printed as the input had it
+messages / a for line over a list of lists whose values spell the alias / an object that holds the alias in a value is printed as the input had it
 messages / a for line over a part that can't be reached / the part is named, and the kind is a list or an object
+messages / a for line over two lists / the inner items are named without a dollar sign before the alias
 messages / a for line over two lists with a sentence that doesn't read the second item / the sentence joins the first part only
 messages / a for line that picks nothing prints the list it read / a whose that leaves no item prints the list
 messages / a for line that picks nothing prints the list it read / an empty list prints as empty
+messages / a for line whose alias is named applies and whose value spells it / a value that holds the alias is printed as the input had it
+messages / a for line with a second item that isn't an object / the second item is named after its list, without a dollar sign
 messages / a one-list for line over a key that holds a colon / two sentences that walk the same list give one part
 messages / a one-list for line whose items fail a sentence that walks and one that doesn't / and N more counts the items that aren't shown
 messages / a one-list for line whose items fail a sentence that walks and one that doesn't / the part of a sentence that doesn't walk goes with its item and isn't counted
 messages / a one-list for line with a sentence that walks a list and one that doesn't / the sentence that doesn't walk gets its own part
 messages / a some over a list inside a part / an item of the list is named with the part's name
+messages / a sum of a list that holds items that aren't objects / an item that isn't an object is named with its value
 messages / a sum of a part that isn't an object / the part is named
 messages / an any_of with an every over items that fail differently / each option gives its failed items
+messages / an every that compares with a part / a part that isn't an object is named without a dollar sign
+messages / an every that compares with a part / the part on the right is named without a dollar sign
 messages / two worked-out values that can't be used / the values are joined with a comma and and
 parts / a for alias and the input on the right side of a whose with plus / reads the alias and the input, and not the item's own field of the same name
 parts / a parent's name in an elapsed time on the right side of a whose / reads the parent when the parent lacks the field, and not the item's own field of the same name

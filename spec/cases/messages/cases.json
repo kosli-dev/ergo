@@ -765,5 +765,273 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count of a list that holds items that aren't objects",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of commits whose signed is true is 3"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "an item that isn't an object is named with its value",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t", "commits": [null, {"signed": true}, 5]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/commits/0", "/things/0/commits/1", "/things/0/commits/2"], "name": "count of commits whose signed is true", "value": null}, {"locations": ["/things/0/commits/0", "/things/0/commits/1", "/things/0/commits/2"], "name": "commits[]", "value": [null, {"signed": true}, 5]}], "message": "item 1 of commits is null, which isn't an object; item 3 of commits is 5, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sum of a list that holds items that aren't objects",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "sum of commits.n whose kind is \"code\" is 5"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "an item that isn't an object is named with its value",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t", "commits": [{"kind": "code", "n": 2}, "s", null]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/commits/0/n", "/things/0/commits/1", "/things/0/commits/2"], "name": "sum of commits.n whose kind is \"code\"", "value": null}, {"locations": ["/things/0/commits/0/n", "/things/0/commits/1", "/things/0/commits/2"], "name": "commits[].n", "value": [2, null, null]}], "message": "item 2 of commits is \"s\", which isn't an object; item 3 of commits is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a list of lists with a whose that counts",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of zs whose count of k is 2 is 5"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a list is named as an item that isn't an object",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": 1}, {"k": 2}], [{"k": 3}]]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/zs/0", "/things/0/zs/1"], "name": "count of zs whose count of k is 2", "value": null}, {"locations": ["/things/0/zs/0", "/things/0/zs/1"], "name": "zs[]", "value": [[{"k": 1}, {"k": 2}], [{"k": 3}]]}], "message": "item 1 of zs is [{\"k\": 1}, {\"k\": 2}], which isn't an object; item 2 of zs is [{\"k\": 3}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a part's list that holds items that aren't objects",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of lst whose x is 5 is 2"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"lst": "d.items"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the items are named after the part",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t", "d": {"items": [null, 5, {"x": 5}]}}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/d/items/0", "/things/0/d/items/1", "/things/0/d/items/2"], "name": "count of lst whose x is 5", "part": {"id": null, "name": "lst"}, "value": null}, {"locations": ["/things/0/d/items/0", "/things/0/d/items/1", "/things/0/d/items/2"], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": [null, 5, {"x": 5}]}], "message": "item 1 of lst is null, which isn't an object; item 2 of lst is 5, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over two lists",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "every z.k is 9", "for": "every zs as z"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the inner items are named without a dollar sign before the alias",
+        "rules": ["message.items", "message.alias"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": 1}, {"k": 2}], [{"k": 3}]]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "value", "inputs": [{"locations": ["/things/0/zs/0/0/k", "/things/0/zs/0/1/k"], "name": "z[].k", "value": [1, 2]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": 1}, {"k": 2}]}, {"cause": "value", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "value", "inputs": [{"locations": ["/things/0/zs/1/0/k"], "name": "z[].k", "value": [3]}]}], "item": "item 2 of zs", "locations": ["/things/0/zs/1"], "path": "item 2 of zs", "value": [{"k": 3}]}], "inputs": [{"locations": ["/things/0/zs/0", "/things/0/zs/1"], "name": "zs[]", "value": [[{"k": 1}, {"k": 2}], [{"k": 3}]]}], "message": "item 1 of zs: item 1 of z: k is 1; item 1 of zs: item 2 of z: k is 2; item 2 of zs: item 1 of z: k is 3", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over two lists with the alias of the second list",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "y.k is 9", "for": "every zs as z, every z as y"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the alias is named without a dollar sign",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": 1}], [{"k": 3}]]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "y.k is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "y.k", "value": 1}], "item": "item 1 of z"}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": 1}]}, {"cause": "value", "failed_assertions": [{"assertion": "y.k is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/zs/1/0/k"], "name": "y.k", "value": 3}], "item": "item 1 of z"}]}], "item": "item 2 of zs", "locations": ["/things/0/zs/1"], "path": "item 2 of zs", "value": [{"k": 3}]}], "inputs": [{"locations": ["/things/0/zs/0/0", "/things/0/zs/1/0"], "name": "z[]", "value": [{"k": 1}, {"k": 3}]}, {"locations": ["/things/0/zs/0", "/things/0/zs/1"], "name": "zs[]", "value": [[{"k": 1}], [{"k": 3}]]}], "message": "item 1 of zs: item 1 of z: k is 1; item 2 of zs: item 1 of z: k is 3", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an every that compares with a part",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "every lst.x is cov.x"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"cov": "d.b", "lst": "d.items"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the part on the right is named without a dollar sign",
+        "rules": ["message.alias", "message.items"],
+        "input": {"things": [{"id": "t", "d": {"b": {"x": 1}, "items": [{"x": 1}, {"x": 2}]}}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 2 of lst", "locations": ["/things/0/d/items/1/x"], "path": "lst[1].x", "value": 2}], "inputs": [{"locations": ["/things/0/d/b/x"], "name": "cov.x", "part": {"id": null, "name": "cov"}, "value": 1}, {"locations": ["/things/0/d/items/0/x", "/things/0/d/items/1/x"], "name": "lst[].x", "part": {"id": null, "name": "lst"}, "value": [1, 2]}], "message": "item 2 of lst: x is 2, and cov.x is 1", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a part that isn't an object is named without a dollar sign",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "d": {"b": "no", "items": [{"x": 1}]}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "item 1 of lst", "locations": ["/things/0/d/items/0/x"], "path": "lst[0].x", "value": 1}], "inputs": [{"locations": ["/things/0/d/b"], "name": "cov.x", "part": {"id": null, "name": "cov"}, "value": null}, {"locations": ["/things/0/d/items/0/x"], "name": "lst[].x", "part": {"id": null, "name": "lst"}, "value": [1]}], "message": "item 1 of lst: cov is \"no\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a list whose items are compared with a part",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of lst whose x is cov.x is 9"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"cov": "d.b", "lst": "d.items"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the part is named without a dollar sign",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "d": {"b": "no", "items": [{"x": 1}]}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/d/items/0"], "name": "count of lst whose x equals cov.x", "part": {"id": null, "name": "lst"}, "value": null}, {"locations": ["/things/0/d/items/0"], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": [{"x": 1}]}, {"locations": ["/things/0/d/b"], "name": "cov.x", "part": {"id": null, "name": "cov"}, "value": null}], "message": "item 1 of lst: cov is \"no\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over a list of lists whose values spell the alias",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "every z.k is 9", "for": "every zs as z"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a value that holds the alias before a colon is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "$z: x"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["$z: x"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "$z: x"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "$z: x"}]]}], "message": "item 1 of zs: item 1 of z: k is \"$z: x\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a value that holds the alias before a semicolon is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "a$z; x"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["a$z; x"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "a$z; x"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "a$z; x"}]]}], "message": "item 1 of zs: item 1 of z: k is \"a$z; x\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a value that holds the alias before a space is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "$z "}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["$z "]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "$z "}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "$z "}]]}], "message": "item 1 of zs: item 1 of z: k is \"$z \", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a value that holds the alias before a comma is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "cost $z, ok"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["cost $z, ok"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "cost $z, ok"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "cost $z, ok"}]]}], "message": "item 1 of zs: item 1 of z: k is \"cost $z, ok\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a value that holds the alias before a dot is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "$z.x"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["$z.x"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "$z.x"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "$z.x"}]]}], "message": "item 1 of zs: item 1 of z: k is \"$z.x\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an object that holds the alias in a value is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": {"a": "$z: b"}}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": [{"a": "$z: b"}]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": {"a": "$z: b"}}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": {"a": "$z: b"}}]]}], "message": "item 1 of zs: item 1 of z: k is {\"a\": \"$z: b\"}, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an object that holds the alias in a key is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": {"$z ": 1}}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": [{"$z ": 1}]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": {"$z ": 1}}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": {"$z ": 1}}]]}], "message": "item 1 of zs: item 1 of z: k is {\"$z \": 1}, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a list that holds the alias in its items is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": ["$z ", "$z,"]}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k/0", "/things/0/zs/0/0/k/1"], "name": "z[].k[]", "value": ["$z ", "$z,"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": ["$z ", "$z,"]}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": ["$z ", "$z,"]}]]}], "message": "item 1 of zs: item 1 of z: item 1 of k is \"$z \", which isn't a number, and item 2 of k is \"$z,\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose alias is named applies and whose value spells it",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "every applies.k is 9", "for": "every zs as applies"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a value that holds the alias is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "$applies: $applies;"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every applies.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "applies[].k", "value": ["$applies: $applies;"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "$applies: $applies;"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "$applies: $applies;"}]]}], "message": "item 1 of zs: item 1 of applies: k is \"$applies: $applies;\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with an alias named subject",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "subject.k is 1", "for": "every zs as subject"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the alias is named as the policy wrote it",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "zs": [{"k": 2}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "subject.k is 1", "cause": "value", "inputs": [{"locations": ["/things/0/zs/0/k"], "name": "subject.k", "value": 2}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": {"k": 2}}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [{"k": 2}]}], "message": "item 1 of zs: k is 2", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an item that isn't an object is named after the list",
+        "rules": ["message.alias", "message.items"],
+        "input": {"things": [{"id": "t", "zs": [null]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "subject.k is 1", "cause": "not_an_object", "inputs": [{"locations": ["/things/0/zs/0"], "name": "subject.k", "value": null}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": null}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [null]}], "message": "item 1 of zs is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with an alias named subject that is read whole",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "subject is 9", "for": "every zs as subject"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the item is named after the list",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t", "zs": [{"k": 5}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "subject is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0"], "name": "subject", "value": {"k": 5}}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": {"k": 5}}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [{"k": 5}]}], "message": "item 1 of zs is {\"k\": 5}, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with a second item that isn't an object",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "y.k is 1", "for": "every xs as x, every ys as y"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the second item is named after its list, without a dollar sign",
+        "rules": ["message.alias", "message.items"],
+        "input": {"things": [{"id": "t", "xs": [{"k": 1}], "ys": [null]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "y.k is 1", "cause": "not_an_object", "items": [{"cause": "not_an_object", "inputs": [{"locations": ["/things/0/ys/0"], "name": "y.k", "value": null}], "item": "item 1 of ys"}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": {"k": 1}}], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"k": 1}]}, {"locations": ["/things/0/ys/0"], "name": "ys[]", "value": [null]}], "message": "item 1 of xs: item 1 of ys is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over a list inside the first item",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "z.k is 1", "for": "every xs as x, every x.zs as z"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "items that aren't objects are named after the list, without a dollar sign",
+        "rules": ["message.alias", "message.items"],
+        "input": {"things": [{"id": "t", "xs": [{"zs": [null, 5, {"k": 2}]}]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [{"assertion": "z.k is 1", "cause": "not_an_object", "items": [{"cause": "not_an_object", "inputs": [{"locations": ["/things/0/xs/0/zs/0"], "name": "z.k", "value": null}], "item": "item 1 of x.zs"}, {"cause": "not_an_object", "inputs": [{"locations": ["/things/0/xs/0/zs/1"], "name": "z.k", "value": null}], "item": "item 2 of x.zs"}, {"cause": "value", "inputs": [{"locations": ["/things/0/xs/0/zs/2/k"], "name": "z.k", "value": 2}], "item": "item 3 of x.zs"}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": {"zs": [null, 5, {"k": 2}]}}], "inputs": [{"locations": ["/things/0/xs/0/zs/0", "/things/0/xs/0/zs/1", "/things/0/xs/0/zs/2"], "name": "x.zs[]", "value": [null, 5, {"k": 2}]}, {"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"zs": [null, 5, {"k": 2}]}]}], "message": "item 1 of xs: item 1 of zs is null, which isn't an object; item 1 of xs: item 2 of zs is 5, which isn't an object; item 1 of xs: item 3 of zs: k is 2", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

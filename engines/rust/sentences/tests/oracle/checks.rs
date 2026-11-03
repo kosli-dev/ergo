@@ -4764,6 +4764,44 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("k.\"a\u{2028}b\" is 1", "k.\"a\u{2028}b\" is 1", &[], &[]),
+    (
+        "count of commits whose signed is true is 3",
+        "count of commits whose signed is true is 3",
+        &[],
+        &[],
+    ),
+    (
+        "count of lst whose x is 5 is 2",
+        "count of lst whose x is 5 is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of lst whose x is cov.x is 9",
+        "count of lst whose x equals cov.x is 9",
+        &[],
+        &[],
+    ),
+    (
+        "count of zs whose count of k is 2 is 5",
+        "count of zs whose count of k is 2 is 5",
+        &[],
+        &[],
+    ),
+    ("every lst.x is cov.x", "every lst.x equals cov.x", &[], &[]),
+    ("every z.k is 9", "every z.k is 9", &[], &[]),
+    (
+        "sum of commits.n whose kind is \"code\" is 5",
+        "sum of commits.n whose kind is \"code\" is 5",
+        &[],
+        &[],
+    ),
+    ("y.k is 9", "y.k is 9", &[], &[]),
+    ("every applies.k is 9", "every applies.k is 9", &[], &[]),
+    ("subject is 9", "subject is 9", &[], &[]),
+    ("subject.k is 1", "subject.k is 1", &[], &[]),
+    ("y.k is 1", "y.k is 1", &[], &[]),
+    ("z.k is 1", "z.k is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8129,6 +8167,27 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every zs as z", "every zs as z", &[], &[]),
+    (
+        "every zs as z, every z as y",
+        "every zs as z, every z as y",
+        &[],
+        &[],
+    ),
+    ("every zs as applies", "every zs as applies", &[], &[]),
+    (
+        "every xs as x, every x.zs as z",
+        "every xs as x, every x.zs as z",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as x, every ys as y",
+        "every xs as x, every ys as y",
+        &[],
+        &[],
+    ),
+    ("every zs as subject", "every zs as subject", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
