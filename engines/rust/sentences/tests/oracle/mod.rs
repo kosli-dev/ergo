@@ -3,6 +3,7 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("every ws that is not empty", "every ws that is not empty"),
     ("round.items whose .cov is 1", "round.items whose cov is 1"),
     ("y", "y"),
     ("t.ws whose t is t", "t.ws whose t equals t"),
@@ -1743,6 +1744,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every ws whose it starts with \"b\" and that ends with \"y\"",
     ),
     ("ws that starts with \"b\"", "ws that starts with \"b\""),
+    (
+        "items whose kind is \"a\" and that is not empty",
+        "items whose kind is \"a\" and that is not empty",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -1759,7 +1764,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "\"q r\".q.y whose item[0] equals 0.10 and of named not by empty named by $params.k equals it and count of every matches 1e2",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "\"q r\".z whose 2 from last of $input.i does not exist",
@@ -1811,11 +1816,11 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         ".it.empty named by each of item 3 of k1 whose every every is between 1 and 4e2 and named is at least 5 plus $params.p plus sum of in and some item 0 of item.q is alphabetically after 'b\\c'",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         ".true[0].\"é\" whose item 0 of $input.i.\"\".z is 1e2 and item 2 from last of y is not in .empty and y is before 'b\\c'",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("1a", &["doesn't parse"]),
     (
@@ -1841,10 +1846,13 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "a whose plus[k].q is between 1 and 3 and it 0.10",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("aa b", &["doesn't parse"]),
-    ("aa whose b is 1 and c whose d is 2", &["doesn't parse"]),
+    (
+        "aa whose b is 1 and c whose d is 2",
+        &["a condition after and starts with whose or that"],
+    ),
     ("aa.", &["doesn't parse"]),
     ("aa..b", &["doesn't parse"]),
     ("aa.b.", &["doesn't parse"]),
@@ -1901,7 +1909,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "every in.q named by k whose some is is at least true and every count.y.q, if any, is more than item 2 from last of \"q r\" and days elapsed from a to first of $params.p.q equals in.z plus count of plus named by $params.k plus empty",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "every it",
@@ -1957,7 +1965,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("item 0 of x", &["doesn't parse"]),
     (
         "item 0 of x whose in 1 plus count of y.y.empty and every.it.y is less than \"s\"",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "item 0 of y[$params.k] named by $params.\"x y\" whose sum of last of \"q r\" is between 2.5 and 4e2",
@@ -2078,7 +2086,7 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("whose aa is 1", &["doesn't parse"]),
     (
         "whose some equals item 3 of one and named is equal to \"s\" within 2 and some is hours elapsed from .it to of",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("x $aa", &["doesn't parse"]),
     ("x WHOSE aa is 1", &["doesn't parse"]),
@@ -2204,11 +2212,17 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
     ("x whose aa is 007", &["doesn't parse"]),
     ("x whose aa is 1 AND b is 2", &["doesn't parse"]),
     ("x whose aa is 1 and", &["doesn't parse"]),
-    ("x whose aa is 1 and (b is 2)", &["doesn't parse"]),
-    ("x whose aa is 1 and and b is 2", &["doesn't parse"]),
+    (
+        "x whose aa is 1 and (b is 2)",
+        &["a condition after and starts with whose or that"],
+    ),
+    (
+        "x whose aa is 1 and and b is 2",
+        &["a condition after and starts with whose or that"],
+    ),
     (
         "x whose aa is 1 and b is 1 and c is 1 and d is 1 and e is 1 and f is 1 and g is 1 and h is 1 and i is 1 and j is 1 and k is",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "x whose aa is 1 and b is 1 and c is 1 and d is 1 and e is 1 and f is 1 and g is 1 and h is 1 and i is 1 and j is 1 and k is 1 and l is \"unclosed",
@@ -2447,11 +2461,14 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
             "last is a word of the grammar: write .last",
         ],
     ),
-    ("every things whose a is 1 and b is 2", &["doesn't parse"]),
+    (
+        "every things whose a is 1 and b is 2",
+        &["a condition after and starts with whose or that"],
+    ),
     ("every ws that", &["doesn't parse"]),
     (
         "every ws that starts with \"b\" and ends with \"y\"",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "every ws that starts with \"b\" that ends with \"y\"",

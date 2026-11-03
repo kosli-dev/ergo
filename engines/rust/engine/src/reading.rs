@@ -844,7 +844,7 @@ impl Reading {
                                         }),
                                         ..condition.clone()
                                     };
-                                    text = format!("{} {text}", crate::name::key_text(name));
+                                    text = format!("{} {text}", crate::name::parent_key_text(name));
                                     lower::lower_condition(
                                         &named,
                                         &scope.clone().with_part(

@@ -69,7 +69,56 @@ fn messages(text: &str, kind: Kind) -> Vec<String> {
     if kind == Kind::From && whose_inside_whose(&c) {
         return vec!["a condition after whose can't have a whose of its own".to_string()];
     }
+    if bare_and(&c) {
+        return vec![BARE_AND.to_string()];
+    }
     vec!["doesn't parse".to_string()]
+}
+
+const BARE_AND: &str = "a condition after and starts with whose or that";
+
+fn bare_and(c: &[char]) -> bool {
+    let mut blanked = String::new();
+    let mut i = 0;
+    while i < c.len() {
+        match string_end(c, i) {
+            Some(Some(end)) => {
+                blanked.push_str("\"\"");
+                i = end;
+            }
+            _ => {
+                blanked.push(c[i]);
+                i += 1;
+            }
+        }
+    }
+    let tokens: Vec<&str> = blanked.split_whitespace().collect();
+    let mut started = false;
+    let mut betweens = 0;
+    let mut ands = 0;
+    for (j, token) in tokens.iter().enumerate() {
+        match *token {
+            "whose" | "that" => started = true,
+            "between" => betweens += 1,
+            "and" => {
+                if started
+                    && betweens <= ands
+                    && let Some(next) = tokens.get(j + 1)
+                    && ![
+                        "whose", "that", "every", "some", "count", "sum", "first", "last", "item",
+                    ]
+                    .contains(next)
+                    && !next.starts_with(['"', '$', '-'])
+                    && !next.starts_with(|ch: char| ch.is_ascii_digit())
+                {
+                    return true;
+                }
+                ands += 1;
+            }
+            _ => {}
+        }
+    }
+    false
 }
 
 fn closed_length(c: &[char]) -> usize {

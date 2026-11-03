@@ -30,10 +30,13 @@ fn every_condition_after_an_and_needs_its_own_word() {
 
 #[test]
 fn a_condition_after_and_without_a_word_is_written_wrong() {
-    assert_eq!(failure("ws whose p is 1 and q is 2"), vec!["doesn't parse"]);
+    assert_eq!(
+        failure("ws whose p is 1 and q is 2"),
+        vec!["a condition after and starts with whose or that"]
+    );
     assert_eq!(
         failure("ws that starts with \"b\" and ends with \"y\""),
-        vec!["doesn't parse"]
+        vec!["a condition after and starts with whose or that"]
     );
     assert_eq!(
         failure("ws that starts with \"b\" that ends with \"y\""),
@@ -62,7 +65,7 @@ fn that_works_in_checks_and_for_lines() {
     );
     assert_eq!(
         check_failure("every items whose p is 1 and q is 2 is not empty"),
-        vec!["doesn't parse"]
+        vec!["a condition after and starts with whose or that"]
     );
 }
 

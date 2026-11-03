@@ -5853,13 +5853,32 @@ test_that_on_a_from_line_keeps_items_by_their_value_and_names_each_by_the_subjec
 	apple.message == `w is "apple"`
 }
 
+test_that_names_the_item_by_the_plain_subject_name_and_writes_the_expression_the_way_a_check_must if {
+	every name, written in {"w": "w", "my w": `"my w"`, "item": `"item"`, "that": `"that"`} {
+		rep := _from_report({"ws": ["bay", "apple"]}, {name: {"from": `every ws that starts with "b"`}}, {"c": "it is not empty"}, {})
+		apple := [r | some r in rep.results; r.check == "$applies"; r.subject.id == "apple"][0]
+		apple.inputs == [{"name": name, "value": "apple", "locations": ["/ws/1"]}]
+		apple.message == sprintf("%s is \"apple\"", [name])
+		rep.requirements.r.checks["$applies"].expression == sprintf("%s starts with \"b\"", [written])
+	}
+}
+
 test_every_condition_of_a_from_line_needs_its_own_word_after_an_and if {
 	doc := {"ws": ["bay", "bee"]}
-	every line in [`every ws that starts with "b" and ends with "y"`, `every ws whose it starts with "b" and ends with "y"`, `every ws that starts with "b" that ends with "y"`, `every ws that`] {
+	every line in [`every ws that starts with "b" and ends with "y"`, `every ws whose it starts with "b" and ends with "y"`] {
+		_from_problems(_from_report(doc, {"w": {"from": line}}, {"c": "it is not empty"}, {})) == [{"name": "subjects.w.from", "value": ["a condition after and starts with whose or that"], "locations": []}]
+	}
+	every line in [`every ws that starts with "b" that ends with "y"`, `every ws that`] {
 		_from_problems(_from_report(doc, {"w": {"from": line}}, {"c": "it is not empty"}, {})) == [{"name": "subjects.w.from", "value": ["doesn't parse"], "locations": []}]
 	}
 	rep := _from_report(doc, {"w": {"from": `every ws that starts with "b" and that ends with "y"`}}, {"c": "it is not empty"}, {})
 	[r.subject.id | some r in rep.results; r.check == "c"] == ["bay"]
+}
+
+test_a_between_does_not_make_an_and_a_bare_condition if {
+	_read(`every ws that is between 1 and 3 ends with`) == {"problems": ["doesn't parse"]}
+	_read(`every ws that is between 1 and 3 and ends with ends with`) == {"problems": ["a condition after and starts with whose or that"]}
+	_read(`every ws that is "a and b" ends`) == {"problems": ["doesn't parse"]}
 }
 
 test_a_field_called_that_is_read_with_a_dot if {

@@ -1626,7 +1626,12 @@ _visible(path) := path if not _part_start(path)
 
 _visible_root(m) := [m.alias] if {
 	m.of == null
-	m.n >= 0
+	m.n > 0
+}
+
+_visible_root(m) := [{"plain": m.alias}] if {
+	m.of == null
+	m.n == 0
 }
 
 _visible_root(m) := [] if {
@@ -2035,6 +2040,8 @@ _nameable_step(p) if _index_step(p)
 
 _nameable_step(p) if _parent_step_form(p)
 
+_nameable_step(p) if _plain_step_form(p)
+
 _nameable_step(p) if {
 	_is_literal(p)
 	is_string(p.literal)
@@ -2064,6 +2071,14 @@ _for_alias_step(step) if {
 }
 
 _plain_step_name(0, step) := _s_parent_key(substring(step, 1, -1)) if _parent_name(step)
+
+_plain_step_name(0, step) := step.plain if _plain_step_form(step)
+
+_plain_step_form(p) if {
+	is_object(p)
+	object.keys(p) == {"plain"}
+	is_string(p.plain)
+}
 
 _s_parent_key(key) := _json_text(key) if key in _s_words
 
@@ -6077,7 +6092,7 @@ _from_line(raw) := line if {
 } else := {"problems": _from_problems(_s_after_every(trim_space(raw)), _s_patterns)}
 
 _from_problems(text, pat) := ["a condition after whose can't have a whose of its own"] if {
-	_s_problems(text, pat) == ["doesn't parse"]
+	_s_problems(text, pat) in [["doesn't parse"], [_s_bare_and]]
 	regex.match(` +whose +(?:.* +and +whose +)?(?:(?:every|some) +|(?:count|sum) +of +)\S+ +whose +`, text)
 } else := _s_problems(text, pat)
 
@@ -6204,6 +6219,10 @@ _s_from_cond_of(text, pat) := {"path": _s_that_path, "phrase": _s_phrase_of(m[5]
 }
 
 _s_that_path := {"steps": ["that"], "that": true}
+
+_s_place_word(node) := "that" if object.get(node.where[0], ["path", "that"], false) == true
+
+else := "whose"
 
 _s_cond_of(text, pat) := object.union(_s_left_of(m[1], pat), {"phrase": _s_phrase_of(m[2], pat)}) if {
 	m := regex.find_all_string_submatch_n(pat.cond, text, 1)[0]
@@ -6594,7 +6613,7 @@ _s_base_problems(parsed) := ((((((((((((((((({concat("", [node.bare_word, " is a
 	is_object(node)
 	"some" in object.keys(node)
 	object.get(node, "if_any", false) == true
-}) | {"a whose goes after every, some, count of or sum of" |
+}) | {concat("", ["a ", _s_place_word(node), " goes after every, some, count of or sum of"]) |
 	some node in _s_nodes(parsed)
 	node != parsed
 	is_object(node)
@@ -6815,7 +6834,25 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 	regex.match(`(?: named +by +|\[)\$(?:params|input)(?:[^.A-Za-z0-9_]|$)`, text)
 } else := [concat("", ["nothing after the path at column ", _json_text(count(text) + 1), `: expected a phrase, like "is" or "exists"`])] if {
 	regex.match(pat.quantified_path, text)
+} else := [_s_bare_and] if {
+	_s_bare_and_in(text, pat)
 } else := ["doesn't parse"]
+
+_s_bare_and := "a condition after and starts with whose or that"
+
+_s_bare_and_in(text, pat) if {
+	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [`(?:`, pat.strings, `|\S)+`]), trim_space(text), -1)]
+	some i, word in tokens
+	word in {"whose", "that"}
+	some j, token in tokens
+	j > i
+	token == "and"
+	before := array.slice(tokens, 0, j)
+	count([1 | some t in before; t == "between"]) <= count([1 | some t in before; t == "and"])
+	next := tokens[j + 1]
+	not next in {"whose", "that", "every", "some", "count", "sum", "first", "last", "item"}
+	not regex.match(`^["$0-9-]`, next)
+}
 
 _s_parsed_anyway(text, pat) := {"assertions": assertions} if {
 	pieces := _s_pieces(pat.assertions, text)
@@ -9485,9 +9522,11 @@ _for_whose(item, e, names) := {"undecided": _for_undecided(undecided, kept, e), 
 	kept := count([c | some c in causes; c == "value"]) == 0
 }
 
-_for_undecided(undecided, true, e) := array.concat(undecided, _for_mark_cause(e))
+_for_undecided(undecided, true, e) := _for_worst_first(array.concat(undecided, _for_mark_cause(e)))
 
-_for_undecided(undecided, false, _) := undecided
+_for_undecided(undecided, false, _) := _for_worst_first(undecided)
+
+_for_worst_first(causes) := array.concat([c | some p in _cause_precedence; some c in causes; c == p], [c | some c in causes; not c in _cause_precedence])
 
 _for_mark_cause(e) := ["not_an_object"] if {
 	_walk_marked(e.v)

@@ -1,4 +1,5 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("i.qty is 1", "i.qty is 1", &[], &[]),
     ("w is not empty", "w is not empty", &[], &[]),
     (".y.k is 9", "y.k is 9", &[], &[]),
     (".zz is 1", "zz is 1", &[], &[]),
@@ -5072,6 +5073,14 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "every ws that is \"a\" and is \"b\"",
+        &["a condition after and starts with whose or that"],
+    ),
+    (
+        "ws that is \"a\" is \"a\"",
+        &["a that goes after every, some, count of or sum of"],
+    ),
     ("a is 9", &["a is a word of the grammar: write .a"]),
     ("a is at least 2", &["a is a word of the grammar: write .a"]),
     ("every items whose cov is 2 has n is 1", &["doesn't parse"]),
@@ -5125,7 +5134,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "$params.p is a list and count of \"$s\"._k.\"é\" whose some ._x-1 named by $params.\"x y\", if any, is not sum of x plus count of k1 within 2 and y contains none of true is between 1 and 3 and count of .it.z does not equal \"a\\u00e9\" plus 5",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "$params.p whose sum of ._x-1[$params.k] is one of item 2 from last of \"$s\" is empty",
@@ -5141,7 +5150,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         ".\"a.b\".y named by $params.\"x y\" plus $input.i is less than 'b\\c' and sum of \"q r\" whose every item 3 of $params.p[\"s t\"].q, if any, is k1 plus null and weeks elapsed from $params.p to .it is x plus $params.p plus sum of \"$s\" is between 2.5 and 3 and count of .\"a.b\"[\"s t\"].\"\" whose every x[$params.k] is at most .empty.q.\"w v\" and $params.p.\"é\".\"\" ends with hours elapsed from .it to k1.\"é\".\"\" is null",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("._x-1 is between and 3", &["doesn't parse"]),
     (
@@ -5178,7 +5187,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         ".true plus hours elapsed from .true.\"é\"._k to item 0 of y[$params.k] plus count of zz named by $params.k is between -1 and 4e2 and some x whose .empty is in 1 and x equals days elapsed from .empty to item 2 from last of $input.i is at most .\"a.b\" plus 5 and sum of item 3 of zz does not contain null",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "1 plus y contains 1",
@@ -5290,11 +5299,11 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "count of first of named by $params.\"x y\".\"\" whose \"q r\" is 5 plus .empty.\"w v\"._k and days elapsed from \"$s\"[0] named by kk to ._x-1 equals 'b\\c' is \"s\"",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "count of item 2 from last of \"q r\"._k.\"é\" whose every $input.i.\"\" named by kk equals days elapsed from $input.i to item 0 of $input.i and weeks elapsed from ._x-1.\"é\" to .\"a.b\" named by $params.k equals count of \"q r\" plus sum of .empty plus item 2 from last of ._x-1[$params.k].\"\" is empty",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "count of items contains 1e999",
@@ -5433,7 +5442,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "count of last of $input.i whose some $input.i is 'b\\c' and k1 is not -2.50 plus count of x.q.\"é\" plus 5 within 2 is at most -2.50 and sum of .it.y whose every .true is true is on or after sum of $params.p named by kk.z and some item 0 of zz whose count of .\"a.b\" equals .it, if any, is true",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "count of name is 1 plus it",
@@ -5530,7 +5539,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "every $params.p whose .it._k.\"w v\" equals .it and .true is .it plus sum of k1 plus item 2 from last of .true, if any, equals count of k1 named by $input.q._k and ._x-1 equals 5 x",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("every .empty equals", &["doesn't parse"]),
     (
@@ -5920,7 +5929,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "k1 equals count of zz and some zz.q whose sum of $params.p is between 2.5 and 4e2 and weeks elapsed from item 3 of $params.p to $input.i equals \"q r\"[0] named by $input.q equals \"$s\"",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "k1 equals true and some .true whose ._x-1 named by $params.\"x y\" named by $input.q is first of zz and item 2 from last of x is y plus \"q r\".z plus 'b\\c' and $params.p[$params.k].\"\" equals 'b\\c', if any, matches k1",
@@ -5953,7 +5962,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ("of .\"a.b\".z equals 1", &["doesn't parse"]),
     (
         "some $input.i whose weeks elapsed from k1 to k1 is count of .\"a.b\" named by $input.q plus 5 plus item 0 of y and k1.z.\"w v\" is not empty, if any, is empty",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "some .\"a.b\" whose .empty named of by kk is equal to \"a\\u00e9\" within 2 and $input.i does not equal 0.10 is -2.50 and sum of zz is not in .empty",
@@ -6009,7 +6018,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "sum of $params.p whose item 3 of x named by kk.q is count of $params.p named by $params.\"x y\" and .empty is equal to first of \"q r\" is at least \"s\" and some .true named by k equals sum of y.q plus days elapsed from \"q r\" to item 0 of y",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "sum of $params.p[k].y whose days elapsed from item 0 of \"$s\" named by $params.\"x y\" to .true is more than true and sum of zz.\"\" is at least x plus 5 is 1",
@@ -6198,7 +6207,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ("v matches \"x\" followed by t", &["doesn't parse"]),
     (
         "every items whose a is 1 and b is 2 is not empty",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("every ws that is not empty", &["doesn't parse"]),
     (
@@ -7328,6 +7337,24 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every items that is not empty and whose kind is \"a\" as i",
+        "every items that is not empty and whose kind is \"a\" as i",
+        &[],
+        &[],
+    ),
+    (
+        "every items whose kind is \"a\" and that is not empty as i",
+        "every items whose kind is \"a\" and that is not empty as i",
+        &[],
+        &[],
+    ),
+    (
+        "every ws that is not empty as w",
+        "every ws that is not empty as w",
+        &[],
+        &[],
+    ),
     (
         "every ws that is one of \"bay\", \"bee\" as w",
         "every ws that is one of \"bay\", \"bee\" as w",
@@ -8617,7 +8644,7 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "every item 3 of k1, if any, as j, some .\"a.b\", if any, as every first of $params.p.\"w v\" whose \"$s\" is in -2.50, 1, -2.50 and .\"a.b\" is between -1 and 3 as i",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "every items as",
@@ -8698,7 +8725,7 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "every x whose every ._x-1, if any, equals 'b\\c' and .true is not \"s\" within 2, if any, as k1, some k1 named by $params.k.\"\" whose sum of zz is \"s\" plus .\"a.b\".q and sum of zz is more than 5 as params",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     ("every x.$params as i", &["doesn't parse"]),
     (
@@ -8711,7 +8738,7 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
     ),
     (
         "every y whose .\"a.b\" is y plus \"q r\" named by kk.y plus .\"a.b\" and .it._k is not in \"q r\"[\"s t\"] as it, some $input.i.\"é\" as k1",
-        &["doesn't parse"],
+        &["a condition after and starts with whose or that"],
     ),
     (
         "every y, if any, as j, item 0 of item 3 of ._x-1 sorted by i as i, item 2 from last of $input.i sorted by x as l",
