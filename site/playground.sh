@@ -3,12 +3,19 @@ set -eu
 [ $# -eq 2 ] || { echo "usage: site/playground.sh <playground.html> <public folder>" >&2; exit 2; }
 [ -f "$1" ] || { echo "$1 isn't a file" >&2; exit 1; }
 mkdir -p "$2/playground" "$2/editor"
-python3 - "$1" "$2/playground/index.html" <<'PY'
+python3 - "$1" "$2/playground/index.html" "$(dirname "$0")/hugo.toml" <<'PY'
 import re
 import sys
 
 page = open(sys.argv[1], encoding="utf-8").read()
-page, n = re.subn(r"<head(\s[^>]*)?>", lambda m: m.group(0) + '<meta name="robots" content="noindex">', page, count=1, flags=re.I)
+tag = re.search(r'^\s*googleAnalytics\s*=\s*"([^"]+)"', open(sys.argv[3], encoding="utf-8").read(), re.M)
+analytics = ""
+if tag:
+    analytics = (
+        f'<script async src="https://www.googletagmanager.com/gtag/js?id={tag.group(1)}"></script>'
+        f"<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{tag.group(1)}');</script>"
+    )
+page, n = re.subn(r"<head(\s[^>]*)?>", lambda m: m.group(0) + '<meta name="robots" content="noindex">' + analytics, page, count=1, flags=re.I)
 if n == 0:
     sys.exit(f"{sys.argv[1]} has no <head>")
 open(sys.argv[2], "w", encoding="utf-8").write(page)
