@@ -1696,6 +1696,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("reports.a.b.coverage", "reports.a.b.coverage"),
     ("reports.coverage", "reports.coverage"),
     ("ws", "ws"),
+    ("t named by each of t.keys", "t named by each of t.keys"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

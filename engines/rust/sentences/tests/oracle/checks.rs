@@ -4836,6 +4836,9 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("i.k is 1", "i.k is 1", &[], &[]),
     ("w.k is 1", "w.k is 1", &[], &[]),
     ("x.k is in $params.l", "x.k is in $params.l", &[], &[]),
+    ("q.lo is 9", "q.lo is 9", &[], &[]),
+    ("w named by zz is 1", "w named by zz is 1", &[], &[]),
+    ("w.k named by zz is 1", "w.k named by zz is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8242,6 +8245,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("first of lst as w", "first of lst as w", &[], &[]),
+    (
+        "first of ws sorted by w as p, first of p.items sorted by hi as q",
+        "first of ws sorted by w as p, first of p.items sorted by hi as q",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

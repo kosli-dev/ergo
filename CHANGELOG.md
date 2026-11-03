@@ -12,6 +12,10 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 - This version follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.5.0-dev`, and each failed row and each violation has a `message`.
 
+### Fixed
+
+- A `for` item that isn't an object no longer stops the report with `eval_conflict_error` when a path reads inside it and names its key by a field, like `w.k named by zz` with `w` a list: the check fails as `not_an_object`. A `named by each of` list that is a field, like `t.keys`, is named in the message of `$min_subjects` instead of `<invalid ref>`.
+
 ## 0.4.0
 
 ### New

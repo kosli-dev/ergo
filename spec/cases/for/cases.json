@@ -18525,5 +18525,1081 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for item that isn't an object, with a path that reads inside it and a key that comes from a field",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ws as w",
+              "assert": "w.k named by zz is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as not_an_object whatever the key field holds: text",
+        "rules": [
+          "path.field_step",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ],
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [
+                  {
+                    "assertion": "w.k named by zz is 1",
+                    "cause": "not_an_object",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w.k named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "item 1 of ws is [1], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as not_an_object whatever the key field holds: missing",
+        "rules": [
+          "path.field_step",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [
+                  {
+                    "assertion": "w.k named by zz is 1",
+                    "cause": "not_an_object",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w.k named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "zz",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "zz",
+                "value": null
+              }
+            ],
+            "message": "item 1 of ws is [1], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as not_an_object whatever the key field holds: null",
+        "rules": [
+          "path.field_step",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ],
+              "zz": null
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [
+                  {
+                    "assertion": "w.k named by zz is 1",
+                    "cause": "not_an_object",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w.k named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": null
+              }
+            ],
+            "message": "item 1 of ws is [1], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as not_an_object whatever the key field holds: a number",
+        "rules": [
+          "path.field_step",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ],
+              "zz": 3
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [
+                  {
+                    "assertion": "w.k named by zz is 1",
+                    "cause": "not_an_object",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w.k named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": 3
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": 3
+              }
+            ],
+            "message": "item 1 of ws is 3, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for item that isn't an object, named by a field",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ws as w",
+              "assert": "w named by zz is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as not_an_object when the key field is text",
+        "rules": [
+          "path.field_step",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ],
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "not_an_object",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [
+                  {
+                    "assertion": "w named by zz is 1",
+                    "cause": "not_an_object",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "item 1 of ws is 3, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the key field is missing",
+        "rules": [
+          "path.field_step",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "w named by zz is 1",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "zz",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "zz",
+                "value": null
+              }
+            ],
+            "message": "item 1 of ws: zz is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as null when the key field is null",
+        "rules": [
+          "path.field_step",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ],
+              "zz": null
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "w named by zz is 1",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": null
+              }
+            ],
+            "message": "item 1 of ws: zz is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the key field is a number",
+        "rules": [
+          "path.field_step",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ],
+              "zz": 3
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w named by zz is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": 3
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": 3
+              }
+            ],
+            "message": "item 1 of ws: zz is 3, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the key field is an object",
+        "rules": [
+          "path.field_step",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ],
+              "zz": {
+                "a": 1
+              }
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w named by zz is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": {
+                          "a": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": {
+                  "a": 1
+                }
+              }
+            ],
+            "message": "item 1 of ws: zz is {\"a\": 1}, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a second for item that picks with sorted by, under a first item that sorts by another key",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "first of ws sorted by w as p, first of p.items sorted by hi as q",
+              "assert": "q.lo is 9"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the second item's key when its items tie",
+        "rules": [
+          "for.pick",
+          "for.failed_items",
+          "message.items"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "name": "n1",
+                  "w": 1,
+                  "items": [
+                    {
+                      "hi": 5,
+                      "lo": 1
+                    },
+                    {
+                      "hi": 5,
+                      "lo": 2
+                    }
+                  ]
+                },
+                {
+                  "name": "n2",
+                  "w": 2,
+                  "items": [
+                    {
+                      "hi": 1,
+                      "lo": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of p.items",
+                    "locations": [
+                      "/things/0/ws/0/items/0/hi"
+                    ],
+                    "path": "item 1 of p.items",
+                    "value": 5
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of p.items",
+                    "locations": [
+                      "/things/0/ws/0/items/1/hi"
+                    ],
+                    "path": "item 2 of p.items",
+                    "value": 5
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": {
+                  "items": [
+                    {
+                      "hi": 5,
+                      "lo": 1
+                    },
+                    {
+                      "hi": 5,
+                      "lo": 2
+                    }
+                  ],
+                  "name": "n1",
+                  "w": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "item 1 of ws",
+                "value": {
+                  "items": [
+                    {
+                      "hi": 5,
+                      "lo": 1
+                    },
+                    {
+                      "hi": 5,
+                      "lo": 2
+                    }
+                  ],
+                  "name": "n1",
+                  "w": 1
+                }
+              },
+              {
+                "locations": [],
+                "name": "p.items[]",
+                "value": []
+              }
+            ],
+            "message": "item 1 of ws: item 1 and item 2 of p.items tie on hi",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "names the first item's key when the first items tie",
+        "rules": [
+          "for.pick",
+          "for.failed_items",
+          "message.items"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                {
+                  "w": 1,
+                  "items": [
+                    {
+                      "hi": 1,
+                      "lo": 1
+                    }
+                  ]
+                },
+                {
+                  "w": 1,
+                  "items": [
+                    {
+                      "hi": 2,
+                      "lo": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0/w"
+                ],
+                "path": "item 1 of ws",
+                "value": 1
+              },
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "item": "item 2 of ws",
+                "locations": [
+                  "/things/0/ws/1/w"
+                ],
+                "path": "item 2 of ws",
+                "value": 1
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "p.items",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/things/0/ws/0",
+                  "/things/0/ws/1"
+                ],
+                "name": "ws[]",
+                "value": [
+                  {
+                    "items": [
+                      {
+                        "hi": 1,
+                        "lo": 1
+                      }
+                    ],
+                    "w": 1
+                  },
+                  {
+                    "items": [
+                      {
+                        "hi": 2,
+                        "lo": 1
+                      }
+                    ],
+                    "w": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 and item 2 of ws tie on w",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
