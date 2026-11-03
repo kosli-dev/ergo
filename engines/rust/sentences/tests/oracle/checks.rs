@@ -5025,6 +5025,26 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("q.name is in .q.name", "q.name is in q.name", &[], &[]),
     ("x contains all of .x", "x contains all of x", &[], &[]),
     ("x is one of .tags", "x is in tags", &[], &[]),
+    (".that is \"x\"", ".that is \"x\"", &[], &[]),
+    (
+        "count of ws that starts with \"b\" and that ends with \"y\" is 1",
+        "count of ws that starts with \"b\" and that ends with \"y\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every ws that starts with \"b\" ends with \"y\"",
+        "every ws that starts with \"b\" ends with \"y\"",
+        &[],
+        &[],
+    ),
+    (
+        "some ws that starts with \"b\" is alphabetically after \"bb\"",
+        "some ws that starts with \"b\" is alphabetically after \"bb\"",
+        &[],
+        &[],
+    ),
+    ("w ends with \"y\"", "w ends with \"y\"", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6152,6 +6172,11 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ("v is between 1 followed by 2 and 3", &["doesn't parse"]),
     ("v is one of \"x\" followed by t", &["doesn't parse"]),
     ("v matches \"x\" followed by t", &["doesn't parse"]),
+    (
+        "every items whose a is 1 and b is 2 is not empty",
+        &["doesn't parse"],
+    ),
+    ("every ws that is not empty", &["doesn't parse"]),
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
@@ -8435,6 +8460,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("every items as p", "every items as p", &[], &[]),
     ("every items as q", "every items as q", &[], &[]),
     ("some items as q", "some items as q", &[], &[]),
+    (
+        "every ws that starts with \"b\" as w",
+        "every ws that starts with \"b\" as w",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

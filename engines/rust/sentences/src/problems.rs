@@ -221,17 +221,6 @@ fn whose_inside_whose(c: &[char]) -> bool {
         if quantified_whose(c, after) {
             return true;
         }
-        for k in after..c.len() {
-            if let Some(next) = spaces(c, k)
-                .and_then(|i| word_at(c, i, "and"))
-                .and_then(|i| spaces(c, i))
-                .and_then(|i| word_at(c, i, "whose"))
-                .and_then(|i| spaces(c, i))
-                && quantified_whose(c, next)
-            {
-                return true;
-            }
-        }
     }
     false
 }

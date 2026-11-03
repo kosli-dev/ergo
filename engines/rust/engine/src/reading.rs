@@ -827,11 +827,38 @@ impl Reading {
                                     .push(format!("unknown alias ${ancestor}"));
                             }
                         }
-                        let text = s::print_from_condition(condition, &alias_refs, &parent_refs);
+                        let mut text =
+                            s::print_from_condition(condition, &alias_refs, &parent_refs);
                         match condition {
                             s::FromCondition::Condition(condition) => {
                                 found_problems.extend(lower::condition_elapsed_problems(condition));
-                                match lower::lower_condition(condition, &scope) {
+                                let lowered = if condition.that {
+                                    let named = s::Condition {
+                                        left: s::Left::Path(s::Path {
+                                            position: None,
+                                            start: s::Start::Field {
+                                                key: name.clone(),
+                                                dot: false,
+                                            },
+                                            steps: Vec::new(),
+                                        }),
+                                        ..condition.clone()
+                                    };
+                                    text = format!("{} {text}", crate::name::key_text(name));
+                                    lower::lower_condition(
+                                        &named,
+                                        &scope.clone().with_part(
+                                            name,
+                                            lower::PartDef {
+                                                steps: Vec::new(),
+                                                id: None,
+                                            },
+                                        ),
+                                    )
+                                } else {
+                                    lower::lower_condition(condition, &scope)
+                                };
+                                match lowered {
                                     Ok(check) => filters.push(Filter { text, check }),
                                     Err(found) => {
                                         found_problems.extend(lower::in_from_line(found));
@@ -1599,7 +1626,7 @@ mod tests {
     fn identified_by_on_a_child_listed_by_named_by_each_of_is_written_wrong() {
         for from in [
             "art.suites named by each of $params.names",
-            "art.suites named by each of $params.names whose id exists and id is 1",
+            "art.suites named by each of $params.names whose id exists and whose id is 1",
         ] {
             let (_, r) = reading(
                 json!({"art": {"from": "arts"}, "c": {"from": from, "identified_by": "id"}}),

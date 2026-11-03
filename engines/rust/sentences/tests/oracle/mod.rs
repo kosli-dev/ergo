@@ -1197,7 +1197,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose aa is 0e5", "x whose aa is 0"),
     ("x whose aa is 1", "x whose aa is 1"),
     ("x whose aa is 1 ", "x whose aa is 1"),
-    ("x whose aa is 1 and whose b is 2", "x whose aa is 1 and whose b is 2"),
+    (
+        "x whose aa is 1 and whose b is 2",
+        "x whose aa is 1 and whose b is 2",
+    ),
     (
         "x whose aa is 1 and whose b is 2 and whose c exists",
         "x whose aa is 1 and whose b is 2 and whose c exists",
@@ -1723,6 +1726,23 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("dep.files", "dep.files"),
     ("lockfile", "lockfile"),
     ("repo.deps", "repo.deps"),
+    (
+        "every items whose .that is \"x\"",
+        "every items whose .that is \"x\"",
+    ),
+    (
+        "every ws that starts with \"b\"",
+        "every ws that starts with \"b\"",
+    ),
+    (
+        "every ws that starts with \"b\" and that ends with \"y\"",
+        "every ws that starts with \"b\" and that ends with \"y\"",
+    ),
+    (
+        "every ws whose it starts with \"b\" and that ends with \"y\"",
+        "every ws whose it starts with \"b\" and that ends with \"y\"",
+    ),
+    ("ws that starts with \"b\"", "ws that starts with \"b\""),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2426,6 +2446,20 @@ pub const FROM_ERRORS: &[(&str, &[&str])] = &[
             "is empty can't follow a count of, a sum of or a plus",
             "last is a word of the grammar: write .last",
         ],
+    ),
+    ("every things whose a is 1 and b is 2", &["doesn't parse"]),
+    ("every ws that", &["doesn't parse"]),
+    (
+        "every ws that starts with \"b\" and ends with \"y\"",
+        &["doesn't parse"],
+    ),
+    (
+        "every ws that starts with \"b\" that ends with \"y\"",
+        &["doesn't parse"],
+    ),
+    (
+        "every ws that starts with \"b\" whose it ends with \"y\"",
+        &["doesn't parse"],
     ),
 ];
 

@@ -6,7 +6,7 @@ use support::*;
 fn long_line(conditions: usize) -> String {
     let mut line = String::from("things");
     for n in 0..conditions {
-        line.push_str(if n == 0 { " whose " } else { " and " });
+        line.push_str(if n == 0 { " whose " } else { " and whose " });
         line.push_str(&format!("field_{n} is one of {n}, 2, 3"));
     }
     line
@@ -22,10 +22,10 @@ fn a_line_of_three_hundred_characters_with_ten_ands_parses() {
 #[test]
 fn the_same_line_ending_in_an_error_is_rejected_within_five_seconds() {
     let mut line = long_line(11);
-    line.push_str(" and last is");
+    line.push_str(" and whose last is");
     assert_eq!(within_seconds(5, || failure(&line)), vec!["doesn't parse"]);
     let mut line = long_line(11);
-    line.push_str(" and empty is 1");
+    line.push_str(" and whose empty is 1");
     assert_eq!(
         within_seconds(5, || failure(&line)),
         vec!["empty is a word of the grammar: write .empty"]
@@ -40,8 +40,8 @@ fn a_hundred_conditions_parse() {
 #[test]
 fn a_hundred_conditions_ending_in_an_error_are_rejected_within_five_seconds() {
     let mut line = long_line(100);
-    let column = line.chars().count() + " and x is ".len() + 1;
-    line.push_str(" and x is \"a");
+    let column = line.chars().count() + " and whose x is ".len() + 1;
+    line.push_str(" and whose x is \"a");
     assert_eq!(
         within_seconds(5, || failure(&line)),
         vec![format!("unclosed quote at column {column}")]
@@ -76,7 +76,7 @@ fn a_long_path_parses() {
 fn many_and_words_that_could_be_values_parse_within_five_seconds() {
     let mut line = String::from("x whose y equals z");
     for _ in 0..40 {
-        line.push_str(" and y equals z plus 1 plus 2 plus 3");
+        line.push_str(" and whose y equals z plus 1 plus 2 plus 3");
     }
     assert_eq!(within_seconds(5, || from(&line)).whose.len(), 41);
     line.push_str(" and");
@@ -235,7 +235,7 @@ fn a_whose_of_a_check_with_many_ands_is_read_in_time_that_grows_in_proportion() 
     assert_grows_in_proportion(300, |n| {
         let line = format!(
             "every items whose size is 1{} is empty",
-            " and size is 1".repeat(n)
+            " and whose size is 1".repeat(n)
         );
         match &parse_check(&line).unwrap().assertions[0] {
             Assertion::Quantified { whose, .. } => assert_eq!(whose.len(), n + 1),
@@ -247,7 +247,7 @@ fn a_whose_of_a_check_with_many_ands_is_read_in_time_that_grows_in_proportion() 
 #[test]
 fn a_whose_of_a_from_line_with_many_ands_is_read_in_time_that_grows_in_proportion() {
     assert_grows_in_proportion(300, |n| {
-        let line = format!("items whose size is 1{}", " and size is 1".repeat(n));
+        let line = format!("items whose size is 1{}", " and whose size is 1".repeat(n));
         assert_eq!(from(&line).whose.len(), n + 1);
     });
 }
@@ -255,7 +255,10 @@ fn a_whose_of_a_from_line_with_many_ands_is_read_in_time_that_grows_in_proportio
 #[test]
 fn a_from_line_that_does_not_read_is_rejected_in_time_that_grows_in_proportion() {
     assert_grows_in_proportion(300, |n| {
-        let line = format!("items whose size is 1{} and", " and size is 1".repeat(n));
+        let line = format!(
+            "items whose size is 1{} and",
+            " and whose size is 1".repeat(n)
+        );
         assert_eq!(failure(&line), vec!["doesn't parse"]);
     });
 }

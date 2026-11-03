@@ -2202,7 +2202,7 @@ mod tests {
     #[test]
     fn the_paths_a_whose_reads_outside_the_item_come_after_the_list_sorted_by_name() {
         let verdict = run_on(
-            "count of xs whose k is $input.b and k is $input.a is 1",
+            "count of xs whose k is $input.b and whose k is $input.a is 1",
             json!({"xs": [{"k": 1}]}),
             json!({"a": 1, "b": 1}),
             json!({}),
@@ -2211,7 +2211,7 @@ mod tests {
         assert_eq!(
             names,
             [
-                "count of xs whose k equals $input.b and k equals $input.a",
+                "count of xs whose k equals $input.b and whose k equals $input.a",
                 "xs[]",
                 "$input.a",
                 "$input.b"
