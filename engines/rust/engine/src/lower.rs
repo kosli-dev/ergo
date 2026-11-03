@@ -153,6 +153,11 @@ impl Scope {
         self
     }
 
+    pub fn without_parent(mut self, name: &str) -> Scope {
+        self.parents.remove(name);
+        self
+    }
+
     pub fn with_pending<'a>(mut self, names: impl IntoIterator<Item = &'a str>) -> Scope {
         self.pending = names.into_iter().map(str::to_string).collect();
         self

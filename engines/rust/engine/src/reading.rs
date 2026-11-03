@@ -3,8 +3,8 @@ use crate::name;
 use crate::ops::Check;
 use crate::path::{self, Start, Step};
 use crate::policy::{
-    Has, Policy, Problems, Requirement, SubjectDef, SubjectName, Subjects, Text, add_problem,
-    field_name, merge_problems,
+    Has, LISTED_LAST, Policy, Problems, Requirement, SubjectDef, SubjectName, Subjects, Text,
+    add_problem, field_name, merge_problems,
 };
 use ergo_policy_sentences as s;
 use serde_json::{Map, Value, json};
@@ -325,6 +325,65 @@ fn child_parent(name: &str, raw: &BTreeMap<String, Raw>) -> Option<String> {
     match raw.get(name).map(|r| &r.relation) {
         Some(Relation::Child(parent)) => Some(parent.clone()),
         _ => None,
+    }
+}
+
+fn parent_is_self_compared(name: &str, raw: &BTreeMap<String, Raw>) -> bool {
+    let Some(parent) = child_parent(name, raw) else {
+        return false;
+    };
+    let above = ancestors_of(&parent, raw);
+    let above: Vec<&str> = above.iter().map(String::as_str).collect();
+    matches!(
+        raw.get(&parent).map(|r| &r.from),
+        Some(FromState::Parsed(line))
+            if s::from_problems(line).is_empty() && !s::from_self_problems(line, &above).is_empty()
+    )
+}
+
+fn blocked_ancestors(name: &str, raw: &BTreeMap<String, Raw>) -> Vec<String> {
+    let Some(parent) = child_parent(name, raw) else {
+        return Vec::new();
+    };
+    let broken = match raw.get(&parent).map(|r| &r.from) {
+        Some(FromState::Parsed(line)) if s::from_problems(line).is_empty() => {
+            let above = ancestors_of(&parent, raw);
+            let above: Vec<&str> = above.iter().map(String::as_str).collect();
+            !s::from_self_problems(line, &above).is_empty()
+                || lower::keyed_steps(&line.path).is_err()
+                || line
+                    .named_by_each_of
+                    .as_ref()
+                    .is_some_and(|each| lower::keyed_steps(each).is_err())
+        }
+        _ => false,
+    };
+    if broken {
+        ancestors_of(&parent, raw)
+    } else {
+        Vec::new()
+    }
+}
+
+fn reads_alias(text: &str, ancestor: &str) -> bool {
+    text.match_indices(ancestor).any(|(at, _)| {
+        let before = text[..at].chars().next_back();
+        let after = text[at + ancestor.len()..].chars().next();
+        before.is_none_or(|c| !(c.is_alphanumeric() || c == '_' || c == '.' || c == '$'))
+            && after.is_none_or(|c| c == '.' || c.is_whitespace())
+    })
+}
+
+fn right_side_text(condition: &s::FromCondition, scope: &Scope, wide: bool) -> String {
+    let s::FromCondition::Condition(condition) = condition else {
+        return String::new();
+    };
+    match lower::lower_condition(condition, scope) {
+        Ok(Check::Compare(check)) => format!("{:?}", check.right),
+        Ok(Check::CompareTime(check)) => format!("{:?}", check.right),
+        Ok(Check::In(check)) => format!("{:?}", check.values),
+        Ok(Check::Contains(check)) if wide => format!("{:?}", check.wanted),
+        other => format!("{:?}", other.map(|_| ())),
     }
 }
 
@@ -717,6 +776,7 @@ impl Reading {
         let mut owns: BTreeMap<String, Own> = BTreeMap::new();
         let mut unsupported: BTreeSet<String> = BTreeSet::new();
         let mut narrowing_a_child: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        let mut chain_problems: BTreeMap<String, Vec<String>> = BTreeMap::new();
         let mut problems_by_subject: BTreeMap<String, Problems> = BTreeMap::new();
         for (name, found) in &raw {
             let mut problems = found.own_problems.clone();
@@ -740,9 +800,33 @@ impl Reading {
                     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
                     let syntax_problems = s::from_problems(line);
                     let reads = syntax_problems.is_empty();
+                    found_problems.retain(|found| {
+                        found.strip_prefix("unknown alias ").is_none_or(|name| {
+                            !syntax_problems.contains(&format!("{name} can't be an alias"))
+                        })
+                    });
                     found_problems.extend(syntax_problems);
+                    if reads {
+                        found_problems.extend(s::from_self_problems(line, &alias_refs));
+                    }
                     let mut filters = Vec::new();
+                    let blocked = blocked_ancestors(name, &raw);
                     for condition in line.whose.iter().filter(|_| reads) {
+                        for ancestor in &blocked {
+                            let reduced = scope.clone().without_parent(ancestor);
+                            let wide = parent_is_self_compared(name, &raw);
+                            if reads_alias(
+                                &s::print_from_condition(condition, &alias_refs, &parent_refs),
+                                ancestor,
+                            ) && right_side_text(condition, &reduced, wide)
+                                != right_side_text(condition, &scope, wide)
+                            {
+                                chain_problems
+                                    .entry(name.clone())
+                                    .or_default()
+                                    .push(format!("unknown alias ${ancestor}"));
+                            }
+                        }
                         let text = s::print_from_condition(condition, &alias_refs, &parent_refs);
                         match condition {
                             s::FromCondition::Condition(condition) => {
@@ -872,15 +956,27 @@ impl Reading {
         }
         let mut infos = BTreeMap::new();
         for (name, found) in &raw {
-            let problems = problems_by_subject.get(name).cloned().unwrap_or_default();
+            let mut problems = problems_by_subject.get(name).cloned().unwrap_or_default();
             let ok = !problems.contains_key(&field_name(&["subjects", name, "from"]));
-            let lowered = if ok {
+            for text in chain_problems.get(name).into_iter().flatten() {
+                let at = field_name(&["subjects", name, "from"]);
+                add_problem(&mut problems, format!("{LISTED_LAST}{at}"), text);
+            }
+            let lowered = if ok && !chain_problems.contains_key(name) {
                 flatten(name, &raw, &owns, &mut Vec::new())
             } else {
                 None
             };
             let from_text = lowered.as_ref().map(|l: &Lowered| l.from_text.clone());
-            let entry = entry_of(name, found, &problems_by_subject, &raw, &effective, &names);
+            let entry = entry_of(
+                name,
+                found,
+                &problems_by_subject,
+                &raw,
+                &effective,
+                &names,
+                chain_problems.contains_key(name),
+            );
             infos.insert(
                 name.clone(),
                 Info {
@@ -1126,9 +1222,10 @@ fn entry_of(
     raw: &BTreeMap<String, Raw>,
     effective: &BTreeMap<String, BTreeMap<String, PartRead>>,
     names: &BTreeSet<String>,
+    blocked: bool,
 ) -> Value {
     let from_at = field_name(&["subjects", name, "from"]);
-    let invalid = problems.get(name).is_some_and(|p| p.contains_key(&from_at));
+    let invalid = blocked || problems.get(name).is_some_and(|p| p.contains_key(&from_at));
     let from = if invalid || found.def.says_how || matches!(found.from, FromState::NotText) {
         INVALID_FROM.to_string()
     } else {

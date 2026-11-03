@@ -10,6 +10,7 @@ Each version says whether reports changed, so that anyone who only stores report
 - A violation carries the `message` of its row.
 - A message that repeats an earlier one in its row is left out, a `for` line over a part whose `whose` leaves no item prints the part's list, a `for` item that isn't an object reads `item 2 of commits: it is null, which isn't an object`, within an item, the items of a list under it come before a part that couldn't be read, a sentence on a `for` line over two lists that walks another list gives each of that list's items its own part, and a `for` line whose sentence reads a param that isn't a list prints the list it read, or the check followed by `is false` ([message.join](semantics.md#messages), [message.empty](semantics.md#messages), [message.items](semantics.md#messages)).
 - A `count of`, a `sum of` or a `whose` that reads an item that isn't an object names it, `item 2 of commits is null, which isn't an object`, and an alias or a part is named without a `$` ([message.items](semantics.md#messages), [message.alias](semantics.md#messages)). A value or a key that spells an alias, like `"$z: x"`, prints as the input had it.
+- A `$min_subjects` row that failed because a `from` line couldn't be read names where the read stopped, `item 2 of things is missing` or `ws is missing` for a child subject, without the parent's name ([message.from](semantics.md#messages)).
 
 ### Changed
 
