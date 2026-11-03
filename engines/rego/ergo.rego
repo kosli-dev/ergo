@@ -10829,11 +10829,13 @@ _m_two_list(f) if {
 
 _m_lead_of(t) := substring(t, 0, k) if {
 	startswith(t, "item ")
-	cuts := [i | some i in array.concat(indexof_n(t, ": "), indexof_n(t, " is ")); i > 0; _m_outside_quotes(substring(t, 0, i))]
+	cuts := [i | some i in array.concat(_m_cuts(t, ": "), _m_cuts(t, " is ")); i > 0; _m_outside_quotes(substring(t, 0, i))]
 	count(cuts) > 0
 	k := min(cuts)
 	contains(substring(t, 0, k), " of ")
 } else := ""
+
+_m_cuts(t, sep) := [count(concat(sep, array.slice(ps, 0, k))) | some k in numbers.range(1, count(ps) - 1)] if ps := split(t, sep)
 
 _m_outside_quotes(p) if count(split(replace(replace(p, "\\\\", ""), "\\\"", ""), "\"")) % 2 == 1
 
