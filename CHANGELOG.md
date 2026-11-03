@@ -8,7 +8,7 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 - Every failed row has a `message`, a line of plain text that says what Ergo found, as spec 0.5 says: `approver is "ana", and author is "ana"`, `item 2 of tests: ok is false` or `signed: signature is missing; reviewed: reviewer is missing`. A row that passed has none. Each violation carries the message of its row.
 
-- A path on the right side of `is one of`, `contains`, `matches` and the other phrases that take a list walks lists, as spec 0.5 says: `pin is in $input.sbom.components.name` compares `pin` with the names of the components. It works from `$input`, `$params` and the subject's fields. A list it can't read from every item fails every row, with the cause and words `every` uses, and the right side is in `$refs` or the row's `inputs` as `$input.sbom.components[].name`.
+- A path on the right side of `is one of`, `contains`, `matches` and the other phrases that take a list walks lists, as spec 0.5 says: `pin is in $input.sbom.components.name` compares `pin` with the names of the components. It works from `$input`, `$params`, the subject's fields, a parent, a part or an alias, and inside `whose`, `count of`, `sum of` and `for` lines. A list it can't read from every item fails every row, with the cause and words `every` uses, and the right side is in `$refs` or the row's `inputs` as `$input.sbom.components[].name`.
 
 ### Changed
 
