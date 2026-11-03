@@ -5028,6 +5028,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("q.lo is 9", "q.lo is 9", &[], &[]),
     ("w named by zz is 1", "w named by zz is 1", &[], &[]),
     ("w.k named by zz is 1", "w.k named by zz is 1", &[], &[]),
+    ("w[0].a does not exist", "w[0].a does not exist", &[], &[]),
+    (
+        "w[0].a named by zz exists",
+        "w[0].a named by zz exists",
+        &[],
+        &[],
+    ),
     (
         "w[0] named by zz does not exist",
         "w[0] named by zz does not exist",
