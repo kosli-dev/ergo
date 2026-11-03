@@ -250,6 +250,7 @@ fn read_one(
         Form::AnyOf(Some(options)) => {
             let mut parts = Vec::new();
             let mut lowered_options = Vec::new();
+            let mut lowered_names: Vec<String> = Vec::new();
             let mut ok = !options.is_empty();
             for (option, read) in options {
                 match read {
@@ -273,6 +274,7 @@ fn read_one(
                             &aliases,
                             &mut problems,
                         ) {
+                            lowered_names.push(option.to_string());
                             lowered_options.push(plan.items.into_iter().map(|i| i.check).collect());
                         }
                         parts.push(format!(
@@ -291,6 +293,7 @@ fn read_one(
                 items: vec![Item {
                     text: expression.clone(),
                     check: Check::AnyOf(AnyOf {
+                        names: lowered_names,
                         options: lowered_options,
                     }),
                 }],
@@ -369,7 +372,7 @@ mod tests {
 
     fn read(subjects: Value, checks: Value) -> BTreeMap<String, CheckRead> {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": subjects,
             "requirements": {"r": {"subject": "t", "checks": checks}}
         }));
@@ -394,7 +397,7 @@ mod tests {
     #[test]
     fn a_part_that_clashes_with_its_parent_still_prints_the_dot_of_a_field_called_like_it() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items", "has": {"cov": "y"}}
@@ -409,7 +412,7 @@ mod tests {
     #[test]
     fn a_field_named_like_a_part_of_the_parent_only_prints_no_dot() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items"}

@@ -150,7 +150,7 @@ Params are the third argument to `ergo.report`. Ergo doesn't look for them anywh
 `ergo.rego` compares numbers with OPA, and OPA can treat two decimals as the same when they only differ after the 15th significant digit. Whole numbers are always compared exactly. With this policy and this input:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   row:
     from: rows
@@ -193,7 +193,7 @@ const policy = await loadPolicy(wasm, undefined, { "time.parse_rfc3339_ns": pars
 Treat a compiled policy like a compiler's object file. Make it in the build that uses it, don't commit it, and make it again whenever the policy or your copy of `ergo.rego` changes. Its shape is Ergo's own and changes between versions. A compiled policy holds the `engine` that compiled it, the same name and version a report gives. When it's missing or isn't the one running, `ergo.report` reads the policy the compiled one came from and fails every requirement's `$well_formed` row with an input like:
 
 ```json
-{"name": "ergo/compiled engine", "value": ["compiled by another engine, expected ergo-rego 0.4.1-dev"], "locations": []}
+{"name": "ergo/compiled engine", "value": ["compiled by another engine, expected ergo-rego 0.5.0-dev"], "locations": []}
 ```
 
 or `["missing"]` when the compiled policy has no `engine`. That only tells released versions apart: every copy of `ergo.rego` between two releases has the same `-dev` version, so a compiled policy from an older copy of the same version still runs and can give a wrong report. Ergo doesn't check that nobody edited it either, so don't edit it. One with a field missing or of the wrong type fails like a policy Ergo can't read, and compiling a compiled policy gives it back unchanged, even one from another engine.
@@ -201,7 +201,7 @@ or `["missing"]` when the compiled policy has no `engine`. That only tells relea
 A `make` rule keeps it fresh, since it runs again when either file changes. With this `policy.yaml`:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   deployment:
     from: deployments
@@ -247,6 +247,7 @@ On this `input.json`:
     "description": "",
     "expression": "approved_by is not empty",
     "inputs": [{ "name": "approved_by", "value": "", "locations": ["/deployments/1/approved_by"] }],
+    "message": "approved_by is \"\"",
     "requirement": "approved_deploy",
     "subject": { "id": "d-2", "type": "deployment" }
   }
@@ -269,7 +270,7 @@ The [reference](REFERENCE.md#policies-written-before-01) says what spec 0.1 stop
 
 ### Moving a policy to sentences
 
-`ergo.as_sentences(policy)` rewrites a policy written the old way into sentences, wherever a sentence reads back as exactly what was written. It always sets `ergo_spec: v0.4` on what it returns. Anything it can't rewrite stays as it was, and under 0.1 that is written wrong, so you rewrite those parts by hand. With this `policy.yaml`:
+`ergo.as_sentences(policy)` rewrites a policy written the old way into sentences, wherever a sentence reads back as exactly what was written. It always sets `ergo_spec: v0.5-dev` on what it returns. Anything it can't rewrite stays as it was, and under 0.1 that is written wrong, so you rewrite those parts by hand. With this `policy.yaml`:
 
 ```yaml
 subjects:
@@ -300,7 +301,7 @@ opa eval -d ergo.rego -d policy.yaml --format raw \
 prints:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 requirements:
   approved:
     checks:

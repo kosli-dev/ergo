@@ -37,6 +37,7 @@ struct Entry<'a> {
 }
 
 struct Broken {
+    msg: String,
     order: Vec<walk::Seg>,
     path: String,
     cause: Cause,
@@ -181,8 +182,27 @@ fn each_of_entries<'a>(
             }
         })
         .collect();
+    let shown_name = crate::name::name(path);
+    let shown_name = shown_name
+        .strip_prefix("$input.")
+        .map_or(shown_name.clone(), str::to_string);
+    let shown_name = if shown_name == "$input" {
+        "it".to_string()
+    } else {
+        shown_name
+    };
     let broken = unread
         .map(|cause| Broken {
+            msg: if matches!(object.value, Some(Value::Array(_))) {
+                String::new()
+            } else {
+                ops::message::stated(
+                    &shown_name,
+                    cause,
+                    object.value.unwrap_or(&Value::Null),
+                    "a list or an object",
+                )
+            },
             order: Vec::new(),
             path: String::new(),
             cause,
@@ -195,7 +215,17 @@ fn each_of_entries<'a>(
 }
 
 fn broken_from(failure: &walk::Failure) -> Broken {
+    let head = failure
+        .msg
+        .strip_suffix("which isn't a list or an object")
+        .or_else(|| failure.msg.strip_suffix("which isn't a list"));
+    let msg = match head {
+        Some(head) if failure.value.is_object() => format!("{head}which isn't a list"),
+        Some(head) => format!("{head}which isn't a list or an object"),
+        None => failure.msg.clone(),
+    };
     Broken {
+        msg,
         order: failure.order.clone(),
         path: failure.path.clone(),
         cause: failure.cause,
@@ -226,6 +256,7 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
         return Read::Entries {
             entries: Vec::new(),
             broken: vec![Broken {
+                msg: String::new(),
                 order: Vec::new(),
                 path: String::new(),
                 cause,
@@ -250,6 +281,12 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
                 key: None,
             }),
             _ => broken.push(Broken {
+                msg: ops::message::stated(
+                    &walked.item_name(&item.end_segs),
+                    item.miss,
+                    &item.shown(),
+                    "a list or an object",
+                ),
                 order: item.end_segs.clone(),
                 path: walked.name_of(&item.end_segs, false),
                 cause: item.miss,
@@ -358,6 +395,99 @@ fn read_entries<'a>(
     }
 }
 
+fn from_message(
+    env: &Env,
+    empty: &Value,
+    lowered: &Lowered,
+    anc: &[Anc],
+    cause: Cause,
+) -> Option<String> {
+    let (Source::Root { path, each_of, .. } | Source::Child { path, each_of }) = &lowered.source;
+    let ctx = context(env, input_root(env), anc);
+    if let Some(keys) = each_of {
+        let read = path::read(keys, &ctx);
+        let named = crate::name::name(keys);
+        match (read.outcome, read.value) {
+            (Outcome::Absent, _) => return Some(format!("{named} is missing")),
+            (Outcome::Null, _) => return Some(format!("{named} is null")),
+            (Outcome::Found, Some(value)) if !matches!(value, Value::Array(items) if items.iter().all(Value::is_string)) =>
+            {
+                return Some(ops::message::isnt(&named, value, "a list of text"));
+            }
+            _ => {}
+        }
+    }
+    let mut name = crate::name::name(path);
+    if let Some(bare) = name.strip_prefix("$input.") {
+        name = bare.to_string();
+    } else if name == "$input" {
+        name = "it".to_string();
+    }
+    if let (Source::Child { .. }, Some(parent)) = (&lowered.source, anc.last())
+        && let Some(rest) = name.strip_prefix(&format!("{}.", parent.name))
+    {
+        name = rest.to_string();
+    }
+    if name.is_empty() {
+        name = "it".to_string();
+    }
+    let every = matches!(&lowered.source, Source::Root { every: true, .. });
+    let read = path::read(path, &ctx);
+    let _ = empty;
+    let state = |want| ops::message::key_states_of(path, &ctx, want).join(", and ");
+    match cause {
+        Cause::Absent | Cause::Null => {
+            let want = if cause == Cause::Absent {
+                Outcome::Absent
+            } else {
+                Outcome::Null
+            };
+            let keys = state(want);
+            if !keys.is_empty() {
+                return Some(keys);
+            }
+            if !read.step_unreadable {
+                name = ops::message::resolved_name(path, &ctx);
+                if let Some(bare) = name.strip_prefix("$input.") {
+                    name = bare.to_string();
+                } else if name == "$input" {
+                    name = "it".to_string();
+                }
+                if let (Source::Child { .. }, Some(parent)) = (&lowered.source, anc.last())
+                    && let Some(rest) = name.strip_prefix(&format!("{}.", parent.name))
+                {
+                    name = rest.to_string();
+                }
+            }
+            let word = if cause == Cause::Absent {
+                "missing"
+            } else {
+                "null"
+            };
+            Some(format!("{name} is {word}"))
+        }
+        Cause::Unusable => {
+            let faults = ops::message::key_faults_of(path, &ctx);
+            if !faults.is_empty() {
+                return Some(faults.join(", and "));
+            }
+            let value = read.value?;
+            let kind = match value {
+                Value::Array(_) => return None,
+                Value::Object(_) if every => "a list",
+                Value::Object(_) => return None,
+                _ => "a list or an object",
+            };
+            Some(crate::ops::message::isnt(&name, value, kind))
+        }
+        Cause::NotAnObject => {
+            let parent = anc.last()?.at.value;
+            Some(ops::message::isnt("it", parent, "a list or an object"))
+        }
+        _ => None,
+    }
+}
+
 fn order_rank(value: &Value) -> u8 {
     match value {
         Value::Null => 0,
@@ -445,6 +575,7 @@ struct Applied {
     inputs: Vec<Value>,
     failed_assertions: Option<Value>,
     failed_items: Option<Value>,
+    message: Option<String>,
 }
 
 fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
@@ -454,15 +585,23 @@ fn answers_presence(filter: &Filter, verdict: &Verdict) -> bool {
 
 fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let mut failed_items = None;
+    let mut said: Vec<String> = Vec::new();
     let verdicts: Vec<(&Filter, Verdict)> = filters
         .iter()
         .map(|filter| {
             let ran = ops::run_full(&filter.check, ctx);
             let mut verdict = ran.verdict;
             failed_items = ran.failed_items.map(Value::Array);
+            let mut own = ran.message;
             if unreadable {
                 verdict.cause = Cause::Unusable;
                 failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
+                own = None;
+            }
+            if !verdict.passed() {
+                said.push(
+                    own.unwrap_or_else(|| ops::message::message(&filter.check, ctx, &verdict)),
+                );
             }
             (filter, verdict)
         })
@@ -497,8 +636,22 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
             .flat_map(|(_, v)| v.inputs.iter().cloned())
             .collect(),
     );
+    let mut once: Vec<String> = Vec::new();
+    for text in said {
+        if !once.contains(&text) {
+            once.push(text);
+        }
+    }
+    let message = if matched {
+        None
+    } else if once.is_empty() {
+        Some("the subject doesn't match".to_string())
+    } else {
+        Some(once.join("; "))
+    };
     Applied {
         matched,
+        message,
         cause,
         inputs,
         failed_assertions,
@@ -622,6 +775,7 @@ fn applies_row(env: &Env, judged: &Judged, applied: &Applied, anc: &[Anc]) -> Ro
     row.subject_id = judged.id.clone();
     row.failed_assertions = applied.failed_assertions.clone();
     row.failed_items = applied.failed_items.clone();
+    row.message = applied.message.clone();
     with_in(row, anc)
 }
 
@@ -646,6 +800,11 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
         Read::Entries { entries, broken } => (entries, broken),
         Read::Failed(cause) => {
             let mut level = failed_level(env, anc, cause, true);
+            if let Some(said) = from_message(env, empty, lowered, anc, cause) {
+                for row in &mut level.min_subjects {
+                    row.message = Some(said.clone());
+                }
+            }
             if matches!(&lowered.source, Source::Root { every: true, .. }) {
                 for row in &mut level.min_subjects {
                     row.failed_items = Some(Value::Array(Vec::new()));
@@ -664,6 +823,16 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     let every = matches!(&lowered.source, Source::Root { every: true, .. });
     let read = Cause::worst(broken.iter().map(|b| b.cause));
     let mut min = min_row(env, in_scope.len() as u64, &locations, read);
+    if !every && env.unreadable.is_empty() && read.is_some() && min.cause != Cause::Satisfied {
+        let said: Vec<String> = broken
+            .iter()
+            .filter(|b| !b.msg.is_empty())
+            .map(|b| b.msg.clone())
+            .collect();
+        if !said.is_empty() {
+            min.message = Some(ops::message::joined(said));
+        }
+    }
     if every {
         let listed = if env.unreadable.is_empty() {
             broken.iter().map(Broken::to_json).collect()
@@ -671,6 +840,15 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
             Vec::new()
         };
         min.failed_items = Some(Value::Array(listed));
+        if env.unreadable.is_empty() && min.cause != Cause::Satisfied {
+            let mut sorted: Vec<&Broken> = broken.iter().filter(|b| !b.msg.is_empty()).collect();
+            sorted.sort_by(|a, b| a.order.cmp(&b.order));
+            if !sorted.is_empty() {
+                min.message = Some(ops::message::joined(
+                    sorted.iter().map(|b| b.msg.clone()).collect(),
+                ));
+            }
+        }
     }
     let unique = unique_ids_row(
         env.requirement_name,
@@ -712,6 +890,7 @@ fn check_rows(env: &Env, judged: &Judged, anc: &[Anc]) -> Vec<Row> {
 
 fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
     let mut failed_items = None;
+    let mut said: Vec<Option<String>> = Vec::new();
     let verdicts: Vec<Verdict> = plan
         .items
         .iter()
@@ -719,10 +898,13 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             let ran = ops::run_full(&item.check, ctx);
             failed_items = ran.failed_items.map(Value::Array);
             let mut verdict = ran.verdict;
+            let mut own = ran.message;
             if !env.unreadable.is_empty() {
                 verdict.cause = Cause::Unusable;
                 failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
+                own = None;
             }
+            said.push(own);
             verdict
         })
         .collect();
@@ -738,6 +920,20 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
     };
     let mut row = row_of(env.requirement_name, env.requirement, name, cause, inputs);
     row.subject_id = judged.id.clone();
+    if cause != Cause::Satisfied {
+        let messages: Vec<String> = plan
+            .items
+            .iter()
+            .zip(&verdicts)
+            .zip(&said)
+            .filter(|((_, v), _)| !v.passed())
+            .map(|((item, v), own)| match own {
+                Some(text) => text.clone(),
+                None => ops::message::message(&item.check, ctx, v),
+            })
+            .collect();
+        row.message = Some(messages.join("; "));
+    }
     if plan.items.len() == 1 {
         row.failed_items = failed_items;
     }
@@ -920,7 +1116,7 @@ mod tests {
 
     fn policy(subjects: Value, min: Value) -> Value {
         json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": subjects,
             "requirements": {"s": {"subject": "thing", "min_subjects": min, "checks": {"c": "x exists"}}}
         })
@@ -1380,7 +1576,7 @@ mod tests {
     fn a_position_under_a_keyed_parent_the_object_lacks_fails_absent_and_not_unusable() {
         for from in ["p[0]", "first of p", "p[0].x"] {
             let policy = json!({
-                "ergo_spec": "v0.4",
+                "ergo_spec": "v0.5-dev",
                 "subjects": {"p": {"from": "m named by each of $params.ks"}, "k": {"from": from}},
                 "requirements": {"r": {"subject": "k", "checks": {"c": "x exists"}}}
             });
@@ -1409,7 +1605,7 @@ mod tests {
         ];
         for (check, passed, cause) in cases {
             let p = json!({
-                "ergo_spec": "v0.4",
+                "ergo_spec": "v0.5-dev",
                 "subjects": {"s": {"from": "things named by each of $params.k"}},
                 "requirements": {"r": {"subject": "s", "checks": {"c": check}}}
             });
@@ -1429,7 +1625,7 @@ mod tests {
     #[test]
     fn a_missing_key_fails_its_check_when_the_input_is_not_an_object() {
         let p = json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {"s": {"from": "$input named by each of $params.k"}},
             "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}
         });
@@ -1660,7 +1856,7 @@ mod tests {
         report(
             &input,
             &json!({
-                "ergo_spec": "v0.4",
+                "ergo_spec": "v0.5-dev",
                 "subjects": subjects,
                 "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}
             }),
@@ -1780,7 +1976,7 @@ mod tests {
     #[test]
     fn a_requirement_that_names_no_subject_gets_no_subjects() {
         let policy = json!({
-            "ergo_spec": "v0.4", "subjects": {"thing": {}},
+            "ergo_spec": "v0.5-dev", "subjects": {"thing": {}},
             "requirements": {"s": {"checks": {"c": "x exists"}}}
         });
         let r = report(&json!({}), &policy, &json!({}));
@@ -1843,7 +2039,7 @@ mod tests {
 
     fn with_checks(subjects: Value, checks: Value, input: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.4", "subjects": subjects,
+            "ergo_spec": "v0.5-dev", "subjects": subjects,
             "requirements": {"s": {"subject": "thing", "checks": checks}}
         });
         report(&input, &policy, &json!({}))

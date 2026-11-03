@@ -2,7 +2,7 @@
   {
     "description": "count of a list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -121,6 +121,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of findings is 3",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -181,6 +182,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of findings is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -229,6 +231,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -278,6 +281,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "findings is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -327,6 +331,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "findings is \"abc\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -378,6 +383,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "findings is {\"id\": 1}, which isn't a list",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -404,7 +410,7 @@
   {
     "description": "count of an empty list is 0",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -494,6 +500,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -520,7 +527,7 @@
   {
     "description": "count of a list with whose",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -635,6 +642,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of findings whose severity is \"high\" is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -756,6 +764,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of findings: severity is 5, which isn't text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -820,6 +829,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of findings: severity is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -884,6 +894,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of findings: severity is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -941,6 +952,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -967,7 +979,7 @@
   {
     "description": "count of a list whose a field exists",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -1057,7 +1069,7 @@
   {
     "description": "count of two lists",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -1261,6 +1273,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of pull_requests.commits is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1307,6 +1320,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of pull_requests.commits is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1365,6 +1379,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of pull_requests: commits is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -1429,6 +1444,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of pull_requests: commits is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -1493,6 +1509,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of pull_requests: commits is \"x\", which isn't a list",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -1545,6 +1562,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "pull_requests is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -1571,7 +1589,7 @@
   {
     "description": "sum of a field",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -1683,6 +1701,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "sum of items.usd is 35",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1734,6 +1753,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "sum of items.usd is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1788,6 +1808,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of items: usd is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -1849,6 +1870,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of items: usd is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -1910,6 +1932,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of items: usd is \"20\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -1971,6 +1994,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of items: usd is true, which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -2024,6 +2048,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "items is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -2073,6 +2098,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "items is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -2122,6 +2148,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "items is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -2179,6 +2206,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 3 of items: usd is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -2213,7 +2241,7 @@
   {
     "description": "sum over no items is 0",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2339,7 +2367,7 @@
   {
     "description": "sum of decimals",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2419,7 +2447,7 @@
   {
     "description": "a plus that needs more than 15 digits at a common scale",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2659,6 +2687,7 @@
                 "value": 100
               }
             ],
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2718,6 +2747,7 @@
                 "value": 1
               }
             ],
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2777,6 +2807,7 @@
                 "value": 1
               }
             ],
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2836,6 +2867,7 @@
                 "value": 0
               }
             ],
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2895,6 +2927,7 @@
                 "value": 1
               }
             ],
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2954,6 +2987,7 @@
                 "value": 0.2
               }
             ],
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3013,6 +3047,7 @@
                 "value": 100000000000000000000
               }
             ],
+            "message": "x plus y needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3031,7 +3066,7 @@
   {
     "description": "a sum that needs more than 15 digits at a common scale",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3090,6 +3125,7 @@
                 ]
               }
             ],
+            "message": "sum of xs needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3267,6 +3303,7 @@
                 ]
               }
             ],
+            "message": "sum of xs needs more than 15 digits",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3332,7 +3369,7 @@
   {
     "description": "sum of a field with whose",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3512,6 +3549,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of items: kind is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -3575,6 +3613,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of items: usd is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -3632,6 +3671,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "sum of items.usd whose kind is \"a\" is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -3660,7 +3700,7 @@
   {
     "description": "sum with whose over no items is 0",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3736,7 +3776,7 @@
   {
     "description": "sum within a distance",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3848,6 +3888,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "sum of items.usd is 1.6",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -3906,6 +3947,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "sum of items.usd is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -4021,6 +4063,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 1 of items: usd is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -4049,7 +4092,7 @@
   {
     "description": "sum within a distance of a field",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4166,6 +4209,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "sum of items.usd is 0.3, and total is 0.5",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -4233,6 +4277,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "total is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -4297,6 +4342,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "total is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -4332,7 +4378,7 @@
   {
     "description": "a path plus a number on the left",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4420,6 +4466,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "base plus 2 is 6",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -4466,6 +4513,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "base is \"3\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -4511,6 +4559,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "base is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -4557,6 +4606,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "base is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -4583,7 +4633,7 @@
   {
     "description": "a number plus a path on the left",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4651,7 +4701,7 @@
   {
     "description": "two paths on the left",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4749,6 +4799,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "extra is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -4803,6 +4854,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "extra is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -4837,7 +4889,7 @@
   {
     "description": "decimals added from paths",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4914,7 +4966,7 @@
   {
     "description": "a path plus a count on the left",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5039,6 +5091,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -5102,6 +5155,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "base is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -5142,7 +5196,7 @@
   {
     "description": "a count plus a path on the left",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5245,7 +5299,7 @@
   {
     "description": "a count plus a number on the left",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5339,7 +5393,7 @@
   {
     "description": "a path plus a sum on the left",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5431,7 +5485,7 @@
   {
     "description": "a number plus a count with whose",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5535,7 +5589,7 @@
   {
     "description": "a path on the left and a path plus a number on the right",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5633,6 +5687,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "total is 6, and base plus 2 is 5",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -5686,6 +5741,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "base is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -5719,7 +5775,7 @@
   {
     "description": "a path and a count plus a path on the right",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5830,7 +5886,7 @@
   {
     "description": "a path on the left and a path plus a count on the right",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5941,7 +5997,7 @@
   {
     "description": "a count on the left and a count plus a number on the right",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6074,7 +6130,7 @@
   {
     "description": "a count on the left and a field on the right",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6196,6 +6252,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "limit is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6260,6 +6317,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6293,7 +6351,7 @@
   {
     "description": "a count does not equal a field",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6416,6 +6474,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of findings is 2, which isn't text",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6458,7 +6517,7 @@
   {
     "description": "count of findings is not 2",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6506,6 +6565,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of findings is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6610,7 +6670,7 @@
   {
     "description": "count of findings is at least 2",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6655,6 +6715,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of findings is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6746,7 +6807,7 @@
   {
     "description": "count of findings is at most 2",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6858,6 +6919,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of findings is 3",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6898,7 +6960,7 @@
   {
     "description": "count of findings is more than 2",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6946,6 +7008,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of findings is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7050,7 +7113,7 @@
   {
     "description": "count of findings is less than 2",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7151,6 +7214,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of findings is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7186,7 +7250,7 @@
   {
     "description": "a sum is at least a number",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7295,6 +7359,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "sum of items.usd is 9",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7352,6 +7417,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 1 of items: usd is \"x\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -7380,7 +7446,7 @@
   {
     "description": "a count in the whose of an every",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7501,6 +7567,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 1 of pull_requests: title is \"\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7562,6 +7629,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "pull_requests is [{\"reviews\": [{\"by\": \"a\"}], \"title\": \"x\"}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7683,6 +7751,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of pull_requests: reviews is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -7745,6 +7814,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 1 of pull_requests: reviews is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -7805,6 +7875,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 1 of pull_requests: reviews is \"none\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -7837,7 +7908,7 @@
   {
     "description": "a count under a for line reading the line's name",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8070,6 +8141,7 @@
                 ]
               }
             ],
+            "message": "item 2 of pull_requests: count of pr.reviews is 1",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8165,6 +8237,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests: count of pr.reviews is 0",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8274,6 +8347,7 @@
                 ]
               }
             ],
+            "message": "item 2 of pull_requests: pr.reviews is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8368,6 +8442,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests: pr.reviews is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8462,6 +8537,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests: pr.reviews is \"two\", which isn't a list or an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8476,7 +8552,7 @@
   {
     "description": "count of a params list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8561,7 +8637,7 @@
   {
     "description": "count of a params list with too few items",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8609,6 +8685,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of $params.approvers is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -8637,7 +8714,7 @@
   {
     "description": "count of an empty params list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8683,6 +8760,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of $params.approvers is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -8709,7 +8787,7 @@
   {
     "description": "count of a params list that is missing",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8755,6 +8833,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "$params.approvers is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -8781,7 +8860,7 @@
   {
     "description": "count of a params list that is null",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8829,6 +8908,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "$params.approvers is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -8855,7 +8935,7 @@
   {
     "description": "count of a params value that is not a list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -8903,6 +8983,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "$params.approvers is \"ann\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -8929,7 +9010,7 @@
   {
     "description": "sum of a params list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9012,7 +9093,7 @@
   {
     "description": "a count of a list in the subject against a params number",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9109,7 +9190,7 @@
   {
     "description": "a count with is empty",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9150,6 +9231,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: is empty can't follow a count of, a sum of or a plus",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9185,7 +9267,7 @@
   {
     "description": "a count with is between",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9403,6 +9485,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of x is 4",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9461,6 +9544,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "count of x is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9510,6 +9594,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "x is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -9559,6 +9644,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "x is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -9608,6 +9694,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "x is \"abc\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -9634,7 +9721,7 @@
   {
     "description": "a sum with is between",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9800,6 +9887,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "sum of items.usd is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -9856,6 +9944,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of items: usd is \"2\", which isn't a number",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -9887,7 +9976,7 @@
   {
     "description": "a plus with is between",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9980,6 +10069,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "base plus 2 is 7",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10027,6 +10117,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "base is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -10053,7 +10144,7 @@
   {
     "description": "a sum with is empty",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -10094,6 +10185,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: is empty can't follow a count of, a sum of or a plus",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10129,7 +10221,7 @@
   {
     "description": "a count with whose on the right",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -10170,6 +10262,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: doesn't parse",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10205,7 +10298,7 @@
   {
     "description": "count of on subjects and items that aren't objects",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -10255,6 +10348,7 @@
                 ]
               }
             ],
+            "message": "it is 5, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10281,6 +10375,7 @@
                 ]
               }
             ],
+            "message": "it is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10339,6 +10434,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs is 5, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10370,6 +10466,7 @@
                 ]
               }
             ],
+            "message": "count of xs.n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10384,7 +10481,7 @@
   {
     "description": "a count whose whose reads a param that's missing",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -10445,6 +10542,7 @@
                 ]
               }
             ],
+            "message": "$params.missing is missing; item 1 of xs: $params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10459,7 +10557,7 @@
   {
     "description": "a count of zero whose whose reads a param that's missing",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -10519,6 +10617,7 @@
                 ]
               }
             ],
+            "message": "$params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10549,6 +10648,7 @@
                 ]
               }
             ],
+            "message": "$params.missing is missing; item 1 of xs: $params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10563,7 +10663,7 @@
   {
     "description": "seconds elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10664,6 +10764,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "seconds elapsed from first_seen_ts to now_ts is 604800",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10703,7 +10804,7 @@
   {
     "description": "minutes elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10804,6 +10905,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "minutes elapsed from first_seen_ts to now_ts is 10080",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10843,7 +10945,7 @@
   {
     "description": "hours elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -10944,6 +11046,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "hours elapsed from first_seen_ts to now_ts is 168",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -10983,7 +11086,7 @@
   {
     "description": "days elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11084,6 +11187,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "days elapsed from first_seen_ts to now_ts is 7",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11123,7 +11227,7 @@
   {
     "description": "weeks elapsed between two times",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11224,6 +11328,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "weeks elapsed from first_seen_ts to now_ts is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11263,7 +11368,7 @@
   {
     "description": "days elapsed against a limit by severity",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11387,6 +11492,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "days elapsed from first_seen_ts to now_ts is 4, and $params.max_days named by severity is 4",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11462,6 +11568,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "$params.max_days named by severity is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -11515,7 +11622,7 @@
   {
     "description": "days elapsed between two numbers",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11615,6 +11722,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "days elapsed from started to ended is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11654,7 +11762,7 @@
   {
     "description": "days elapsed between equal times",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11793,7 +11901,7 @@
   {
     "description": "days elapsed with the end before the start",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11835,6 +11943,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is \"2026-01-02T00:00:00Z\", and ended is \"2026-01-01T00:00:00Z\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11894,6 +12003,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is 5, and ended is 4",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -11933,7 +12043,7 @@
   {
     "description": "days elapsed that cannot be read",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -11975,6 +12085,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -12034,6 +12145,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -12094,6 +12206,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -12154,6 +12267,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "ended is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -12214,6 +12328,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -12274,6 +12389,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is true, which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12336,6 +12452,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "ended is [1], which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12400,6 +12517,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is {\"a\": 1}, which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12463,6 +12581,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is \"yesterday\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12524,6 +12643,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is \"2026-01-01t00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12585,6 +12705,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "ended is \"2026-01-01T00:00:00z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12646,6 +12767,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is \"2026-02-30T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12707,6 +12829,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is \"1677-12-31T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12768,6 +12891,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "ended is \"2262-01-01T00:00:00Z\", which isn't a time",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12828,6 +12952,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is \"2026-10-01T00:00:00Z\", which isn't a time written like 5",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12888,6 +13013,7 @@
               "type": "vuln"
             },
             "check": "c",
+            "message": "started is 5, which isn't a time written like \"2026-10-01T00:00:00Z\"",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -12927,7 +13053,7 @@
   {
     "description": "days elapsed under a for line reading the line's name",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13118,6 +13244,7 @@
                 ]
               }
             ],
+            "message": "item 2 of pull_requests: days elapsed from pr.opened to pr.closed is 3",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13220,6 +13347,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests: pr.closed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13239,7 +13367,7 @@
   {
     "description": "days elapsed in a list of assertions",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13334,7 +13462,7 @@
   {
     "description": "a field called days",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13375,6 +13503,7 @@
               "type": "vuln"
             },
             "check": "$well_formed",
+            "message": "checks.c: days is a word of the grammar: write .days",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -13415,7 +13544,7 @@
   {
     "description": "a field called days with a dot",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13478,7 +13607,7 @@
   {
     "description": "a field called to",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13559,7 +13688,7 @@
   {
     "description": "days elapsed added to another term",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13670,6 +13799,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "days elapsed from started to ended plus 1 is 3",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -13733,6 +13863,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "started is 86400, and ended is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -13797,6 +13928,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -13839,7 +13971,7 @@
   {
     "description": "days elapsed added to another term, first",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -13951,6 +14083,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "started is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -13993,7 +14126,7 @@
   {
     "description": "days elapsed on the right side of a phrase",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -14105,6 +14238,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "n is 2, and days elapsed from started to ended is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14169,6 +14303,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -14210,7 +14345,7 @@
   {
     "description": "days elapsed in a plus on the right side",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -14332,6 +14467,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "n is 2, and 1 plus days elapsed from started to ended is 2",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14381,7 +14517,7 @@
   {
     "description": "days elapsed in the whose of an every",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -14550,6 +14686,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "item 1 of xs: title is \"\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14610,6 +14747,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "xs is [{\"ended\": 172800, \"started\": 0, \"title\": \"x\"}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14632,7 +14770,7 @@
   {
     "description": "days elapsed in the whose of a count",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -14770,6 +14908,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "count of xs whose days elapsed from started to ended is 1 is 1",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14920,6 +15059,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "item 2 of xs: ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -14956,7 +15096,7 @@
   {
     "description": "a count in the whose of a count",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -15089,6 +15229,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "item 2 of prs: reviews is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -15125,7 +15266,7 @@
   {
     "description": "a count in the whose of a sum",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -15219,7 +15360,7 @@
   {
     "description": "days elapsed with is between",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -15377,6 +15518,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "days elapsed from started to ended is 3",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15432,6 +15574,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "started is 86400, and ended is 0",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15488,6 +15631,7 @@
               "id": "v1"
             },
             "check": "c",
+            "message": "ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -15522,7 +15666,7 @@
   {
     "description": "days elapsed with a phrase that takes no number",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -15565,6 +15709,7 @@
               "type": "vuln"
             },
             "check": "$well_formed",
+            "message": "checks.c: is empty can't follow a count of, a sum of or a plus",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15605,7 +15750,7 @@
   {
     "description": "days elapsed with a unit that has no fixed length",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -15647,6 +15792,7 @@
               "type": "vuln"
             },
             "check": "$well_formed",
+            "message": "checks.c: doesn't parse",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -15687,7 +15833,7 @@
   {
     "description": "days elapsed between two dates",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "vuln": {
           "from": "vulns",
@@ -15860,6 +16006,7 @@
                 ]
               }
             ],
+            "message": "started is \"2026-09-15\", which isn't a time written like \"2026-10-02T00:00:00Z\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15873,7 +16020,7 @@
   },
   {
     "description": "count of a list",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is 2"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings is 2"}}}},
     "cases": [
       {
         "description": "gives the count the locations of the items it counted",
@@ -15888,14 +16035,14 @@
         "rules": ["location.worked_out", "location.each"],
         "input": {"releases": [{"id": "r1", "findings": []}]},
         "results": [
-          {"cause": "value", "check": "c", "inputs": [{"locations": [], "name": "count of findings", "value": 0}, {"locations": [], "name": "findings[]", "value": []}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+          {"cause": "value", "check": "c", "inputs": [{"locations": [], "name": "count of findings", "value": 0}, {"locations": [], "name": "findings[]", "value": []}], "message": "count of findings is 0", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]
   },
   {
     "description": "count of a list with whose",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is 1"}}}},
     "cases": [
       {
         "description": "gives the count the locations of every item read, kept or not",
@@ -15909,7 +16056,7 @@
   },
   {
     "description": "count of lists inside lists",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of pull_requests.commits is 3"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of pull_requests.commits is 3"}}}},
     "cases": [
       {
         "description": "gives the count one location per item of every inner list",
@@ -15923,7 +16070,7 @@
   },
   {
     "description": "sum of a field",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is 30"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "sum of items.usd is 30"}}}},
     "cases": [
       {
         "description": "gives the sum the locations of the values it added",
@@ -15937,7 +16084,7 @@
   },
   {
     "description": "a path plus a count",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "base plus count of findings is 5"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "base plus count of findings is 5"}}}},
     "cases": [
       {
         "description": "gives the plus the locations of the entries after it, once each, in their order",
@@ -15951,7 +16098,7 @@
   },
   {
     "description": "a path plus a sum",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "fee plus sum of items.usd is 40"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "fee plus sum of items.usd is 40"}}}},
     "cases": [
       {
         "description": "gives the plus the location of the path and then of every value summed",
@@ -15965,7 +16112,7 @@
   },
   {
     "description": "days elapsed between two numbers",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"vuln": {"from": "vulns", "identified_by": "id"}}, "requirements": {"s": {"subject": "vuln", "checks": {"c": "days elapsed from started to ended is 1.5"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"vuln": {"from": "vulns", "identified_by": "id"}}, "requirements": {"s": {"subject": "vuln", "checks": {"c": "days elapsed from started to ended is 1.5"}}}},
     "cases": [
       {
         "description": "gives the elapsed time the locations of both ends",
@@ -15980,14 +16127,14 @@
         "rules": ["location.worked_out", "location.read"],
         "input": {"vulns": [{"id": "v1", "started": 100}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/vulns/0/started", "/vulns/0"], "name": "days elapsed from started to ended", "value": null}, {"locations": ["/vulns/0/started"], "name": "started", "value": 100}, {"locations": ["/vulns/0"], "name": "ended", "value": null}], "passed": false, "requirement": "s", "subject": {"id": "v1", "type": "vuln"}}
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/vulns/0/started", "/vulns/0"], "name": "days elapsed from started to ended", "value": null}, {"locations": ["/vulns/0/started"], "name": "started", "value": 100}, {"locations": ["/vulns/0"], "name": "ended", "value": null}], "message": "ended is missing", "passed": false, "requirement": "s", "subject": {"id": "v1", "type": "vuln"}}
         ]
       }
     ]
   },
   {
     "description": "a plus that reads the same list twice",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"deployment": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "deployment", "checks": {"c": "count of approvals plus count of approvals is 4"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"deployment": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "deployment", "checks": {"c": "count of approvals plus count of approvals is 4"}}}},
     "cases": [
       {
         "description": "shows the number and the list once each",
@@ -16001,7 +16148,7 @@
   },
   {
     "description": "a count compared with a count of the same list",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is at most count of findings"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": "count of findings whose severity is \"high\" is at most count of findings"}}}},
     "cases": [
       {
         "description": "shows the list once, after the left side's number, and the right side's number",
@@ -16016,7 +16163,7 @@
   {
     "description": "count of a field over a null item",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -16070,6 +16217,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16084,7 +16232,7 @@
   {
     "description": "sum of a field over a null item",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -16138,6 +16286,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16152,7 +16301,7 @@
   {
     "description": "sum of a field with whose, over items it cannot decide",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -16217,6 +16366,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16273,6 +16423,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16330,6 +16481,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is 5, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16387,6 +16539,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16443,6 +16596,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16506,6 +16660,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16608,6 +16763,7 @@
               "id": "t"
             },
             "check": "c",
+            "message": "item 2 of items: k is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -16663,6 +16819,7 @@
               "id": "t"
             },
             "check": "c",
+            "message": "item 2 of items: k is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -16694,7 +16851,7 @@
   {
     "description": "sum of a path that goes on, with whose, over items it cannot decide",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -16759,6 +16916,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16818,6 +16976,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16832,7 +16991,7 @@
   {
     "description": "count of a path with whose, over items it cannot decide",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -16897,6 +17056,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16953,6 +17113,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17009,6 +17170,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17023,7 +17185,7 @@
   {
     "description": "count of a path that goes on, with whose, over items it cannot decide",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -17088,6 +17250,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: k is null",
             "passed": false,
             "requirement": "s",
             "subject": {

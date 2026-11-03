@@ -4,6 +4,7 @@ use crate::path::{Ctx, Path};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct AnyOf {
+    pub names: Vec<String>,
     pub options: Vec<Vec<Check>>,
 }
 
@@ -100,7 +101,13 @@ mod tests {
             params: None,
             aliases: BTreeMap::new(),
         };
-        run(&AnyOf { options }, &ctx)
+        run(
+            &AnyOf {
+                names: Vec::new(),
+                options,
+            },
+            &ctx,
+        )
     }
 
     #[test]
@@ -152,6 +159,7 @@ mod tests {
     #[test]
     fn it_has_no_left_path_of_its_own_and_gives_the_paths_of_all_its_checks() {
         let check = Check::AnyOf(AnyOf {
+            names: Vec::new(),
             options: vec![vec![exists("x")], vec![is("y", json!(1))]],
         });
         assert!(check.left_path().is_none());

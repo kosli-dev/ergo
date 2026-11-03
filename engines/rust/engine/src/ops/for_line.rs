@@ -70,6 +70,7 @@ impl For {
 pub struct Run {
     pub verdict: Verdict,
     pub failed_items: Vec<Value>,
+    pub message: Option<String>,
 }
 
 fn all_paths(check: &Check) -> Vec<&Path> {
@@ -304,6 +305,7 @@ struct Live<'a> {
 }
 
 struct Dead {
+    msg: Option<String>,
     shared: bool,
     order: Vec<Seg>,
     name: String,
@@ -316,6 +318,7 @@ struct Dead {
 impl Dead {
     fn of_failure(failure: &Failure) -> Dead {
         Dead {
+            msg: None,
             shared: false,
             order: failure.order.clone(),
             name: failure.item.clone(),
@@ -328,6 +331,7 @@ impl Dead {
 
     fn copy(&self) -> Dead {
         Dead {
+            msg: self.msg.clone(),
             shared: self.shared,
             order: self.order.clone(),
             name: self.name.clone(),
@@ -389,6 +393,7 @@ fn empty_list(name: String) -> Input {
         value: Value::Array(Vec::new()),
         locations: Vec::new(),
         part: None,
+        state: crate::path::Outcome::Found,
     }
 }
 
@@ -469,6 +474,7 @@ impl For {
                 .map(|w| w.end_location.render())
                 .collect(),
             part: path::part_tag(&item.path, &outer).map(|(name, id)| Part { name, id }),
+            state: crate::path::Outcome::Found,
         };
         let mut dead: Vec<Dead> = walked.failures.iter().map(Dead::of_failure).collect();
         let from_list = walked.failures.len();
@@ -490,6 +496,7 @@ impl For {
                     .filter(|c| !matches!(c, Cause::Satisfied | Cause::Value)),
             );
             let dead_item = |cause: Cause| Dead {
+                msg: None,
                 shared: false,
                 order: w.item_segs.clone(),
                 name: name.clone(),
@@ -550,6 +557,7 @@ impl For {
             let nothing = through_first.then(|| {
                 let shown = crate::name::name(&item.path);
                 Dead {
+                    msg: None,
                     shared: false,
                     order: Vec::new(),
                     name: shown.clone(),
@@ -603,7 +611,7 @@ impl For {
         if let Some(sorted) = sorted {
             let mut failed: Vec<Dead> = Vec::new();
             let mut at = outer.clone();
-            let mut checks: Vec<(Live, Result<Value, Cause>, Option<Location>)> = Vec::new();
+            let mut checks: Vec<SortRead> = Vec::new();
             for found in live {
                 let holder = walked
                     .items
@@ -619,16 +627,56 @@ impl For {
                     (None, Some(value)) => Ok(value.clone()),
                     (None, None) => Err(Cause::Unusable),
                 };
-                checks.push((found, result, location));
+                let key_name = crate::name::name(&sorted.path);
+                let text = match &result {
+                    Ok(value) => {
+                        let want = if sorted.alphabetically {
+                            "text"
+                        } else {
+                            "a number, a time or a date"
+                        };
+                        super::message::isnt(&key_name, value, want)
+                    }
+                    Err(cause) => {
+                        let present = Check::Present(super::present::Present {
+                            path: sorted.path.clone(),
+                            missing: false,
+                        });
+                        let verdict = Verdict {
+                            cause: *cause,
+                            inputs: Vec::new(),
+                        };
+                        let mut faults = if *cause == Cause::Unusable {
+                            let mut all = super::message::key_faults_of(&sorted.path, &at);
+                            all.extend(super::message::blocked_of(&sorted.path, &at));
+                            all
+                        } else {
+                            Vec::new()
+                        };
+                        if faults.is_empty() {
+                            faults.push(super::message::message(&present, &at, &verdict));
+                        }
+                        faults.join(", and ")
+                    }
+                };
+                checks.push((found, result, location, text));
             }
             let mut keys: Vec<(Live, Key, Value, Option<Location>)> = Vec::new();
-            for (found, result, location) in checks {
+            for (found, result, location, text) in checks {
                 match result {
                     Ok(value) => match sort_key(&value, sorted.alphabetically) {
                         Some(key) => keys.push((found, key, value, location)),
-                        None => failed.push(sort_failure(&found, Cause::Unusable, value, location)),
+                        None => failed.push(sort_failure(
+                            &found,
+                            Cause::Unusable,
+                            value,
+                            location,
+                            &text,
+                        )),
                     },
-                    Err(cause) => failed.push(sort_failure(&found, cause, Value::Null, location)),
+                    Err(cause) => {
+                        failed.push(sort_failure(&found, cause, Value::Null, location, &text))
+                    }
                 }
             }
             if let Some(first) = keys.iter().map(|(_, k, _, _)| kind(k)).min() {
@@ -637,7 +685,21 @@ impl For {
                     if kind(&entry.1) == first {
                         rest.push(entry);
                     } else {
-                        failed.push(sort_failure(&entry.0, Cause::Unusable, entry.2, entry.3));
+                        let word = match first {
+                            0 => "a number",
+                            1 => "a time",
+                            2 => "a date",
+                            _ => "text",
+                        };
+                        let text =
+                            super::message::isnt(&crate::name::name(&sorted.path), &entry.2, word);
+                        failed.push(sort_failure(
+                            &entry.0,
+                            Cause::Unusable,
+                            entry.2,
+                            entry.3,
+                            &text,
+                        ));
                     }
                 }
                 keys = rest;
@@ -671,6 +733,7 @@ impl For {
                 for i in tied {
                     let (found, _, value, location) = &keys[i];
                     cands.dead.push(Dead {
+                        msg: None,
                         shared: false,
                         order: found.order.clone(),
                         name: found.name.clone(),
@@ -712,6 +775,7 @@ impl For {
                 value: Value::Array(vec![found.shown.clone()]),
                 locations: vec![found.location.render()],
                 part: cands.list.part.clone(),
+                state: crate::path::Outcome::Found,
             }
         } else {
             Input {
@@ -719,6 +783,7 @@ impl For {
                 value: found.shown.clone(),
                 locations: vec![found.location.render()],
                 part: None,
+                state: crate::path::Outcome::Found,
             }
         };
         cands.picked = true;
@@ -726,8 +791,20 @@ impl For {
     }
 }
 
-fn sort_failure(found: &Live, cause: Cause, value: Value, location: Option<Location>) -> Dead {
+fn sort_failure(
+    found: &Live,
+    cause: Cause,
+    value: Value,
+    location: Option<Location>,
+    text: &str,
+) -> Dead {
+    let said = if text.starts_with('$') {
+        text.to_string()
+    } else {
+        super::message::prefixed(&found.name, text)
+    };
     Dead {
+        msg: Some(said),
         shared: false,
         order: found.order.clone(),
         name: found.name.clone(),
@@ -738,7 +815,12 @@ fn sort_failure(found: &Live, cause: Cause, value: Value, location: Option<Locat
     }
 }
 
+type SortRead<'a> = (Live<'a>, Result<Value, Cause>, Option<Location>, String);
+
 struct Sfail {
+    names: Vec<String>,
+    own: bool,
+    text: String,
     idx: usize,
     cause: Cause,
     inputs: Vec<Value>,
@@ -752,6 +834,9 @@ struct Child {
 }
 
 struct Outcome {
+    parts: Vec<String>,
+    bare: bool,
+    said: String,
     cause: Cause,
     assertions: Vec<Value>,
     inner: Vec<Dead>,
@@ -836,6 +921,7 @@ impl For {
                 );
                 let shown = crate::name::name(&item.path);
                 vec![Dead {
+                    msg: None,
                     shared: !reads_path(&item.path, &self.items[0].alias),
                     order: Vec::new(),
                     name: shown.clone(),
@@ -860,6 +946,7 @@ impl For {
             let mut bound = ctx.clone();
             bound.aliases.insert(item.alias.clone(), live.at.clone());
             let entry = Dead {
+                msg: None,
                 shared: false,
                 order: live.order.clone(),
                 name: live.name.clone(),
@@ -877,6 +964,9 @@ impl For {
             let (outcome, sfails) = if into_non_object {
                 (
                     Some(Outcome {
+                        parts: Vec::new(),
+                        bare: false,
+                        said: String::new(),
                         cause: Cause::NotAnObject,
                         assertions: Vec::new(),
                         inner: Vec::new(),
@@ -891,8 +981,32 @@ impl For {
                     (None, Vec::new())
                 } else {
                     let assertions = self.aggregate(&nested.children);
+                    let mut parts: Vec<String> = nested
+                        .children
+                        .iter()
+                        .flat_map(|c| self.child_texts(c))
+                        .collect();
+                    let second = self.shared_second();
+                    parts.extend(
+                        nested
+                            .dead
+                            .iter()
+                            .filter(|d| !(second && d.shared) && d.cause != Cause::Ambiguous)
+                            .map(|d| self.dead_text(d)),
+                    );
+                    let ties: Vec<&Dead> = nested
+                        .dead
+                        .iter()
+                        .filter(|d| d.cause == Cause::Ambiguous)
+                        .collect();
+                    if !ties.is_empty() && !second {
+                        parts.push(self.tie_text(&ties));
+                    }
                     (
                         Some(Outcome {
+                            parts: parts.clone(),
+                            bare: false,
+                            said: parts.join("; "),
                             cause: nested.cause,
                             assertions,
                             inner: nested.dead,
@@ -960,7 +1074,19 @@ impl For {
         for (idx, sentence) in self.sentences.iter().enumerate() {
             let verdict = run_check(&sentence.check, ctx);
             if !verdict.passed() {
+                let alias = self
+                    .items
+                    .last()
+                    .map(|i| i.alias.as_str())
+                    .unwrap_or_default();
+                let names = super::message::read_names(&sentence.check, ctx, &verdict);
+                let own = names
+                    .iter()
+                    .all(|name| name == alias || name.starts_with(&format!("{alias}.")));
                 sfails.push(Sfail {
+                    names,
+                    own,
+                    text: super::message::message(&sentence.check, ctx, &verdict),
                     idx,
                     cause: verdict.cause,
                     inputs: reading_order(&sentence.check, &verdict.inputs, &self.alias_names())
@@ -983,8 +1109,28 @@ impl For {
                         })
                     })
                     .collect();
+                let all_own = sfails.iter().all(|f| f.own);
+                let said = sfails
+                    .iter()
+                    .map(|f| f.text.clone())
+                    .collect::<Vec<_>>()
+                    .join(", and ");
+                let said = if all_own { self.strip(&said) } else { said };
+                let alias = self
+                    .items
+                    .last()
+                    .map(|i| i.alias.as_str())
+                    .unwrap_or_default();
+                let only_alias = sfails.len() == 1 && sfails[0].names == [alias.to_string()];
+                let (said, bare) = match said.strip_prefix(&format!("{alias} is ")) {
+                    Some(rest) if all_own && only_alias => (format!(" is {rest}"), true),
+                    _ => (said, false),
+                };
                 (
                     Some(Outcome {
+                        parts: Vec::new(),
+                        bare,
+                        said,
                         cause,
                         assertions,
                         inner: Vec::new(),
@@ -1053,6 +1199,7 @@ impl For {
                 .map(|w| w.end_location.render())
                 .collect(),
             part: path::part_tag(path, &outer).map(|(name, id)| Part { name, id }),
+            state: crate::path::Outcome::Found,
         }
     }
 
@@ -1129,6 +1276,7 @@ impl For {
                     inputs: Vec::new(),
                 },
                 failed_items: Vec::new(),
+                message: None,
             };
         }
         let mut collect = Collect {
@@ -1186,16 +1334,28 @@ impl For {
         } else {
             second.as_ref().map_or(level.cause, |(cause, _)| *cause)
         };
-        let failed = if let Some((_, listed)) = second {
-            listed
+        let (failed, said) = if let Some((_, listed)) = second {
+            (listed, Vec::new())
         } else if cause == Cause::Satisfied || flawed {
-            Vec::new()
+            (Vec::new(), Vec::new())
         } else {
             self.failed_items(level)
+        };
+        let message = if flawed {
+            let checks: Vec<&Check> = self
+                .items
+                .iter()
+                .flat_map(|item| item.whose.iter())
+                .chain(self.sentences.iter().map(|s| &s.check))
+                .collect();
+            super::message::flawed_text(&checks, &outer)
+        } else {
+            (!said.is_empty()).then(|| super::message::joined(said))
         };
         Run {
             verdict: Verdict { cause, inputs },
             failed_items: failed,
+            message,
         }
     }
 
@@ -1234,7 +1394,117 @@ impl For {
         ))
     }
 
-    fn failed_items(&self, level: Level) -> Vec<Value> {
+    fn strip(&self, text: &str) -> String {
+        let mut out = text.to_string();
+        for item in &self.items {
+            let alias = &item.alias;
+            out = out.replace(&format!(" of {alias}."), " of ");
+            out = out.replace(&format!("of {alias}["), "of [");
+            if let Some(rest) = out.strip_prefix(&format!("{alias}.")) {
+                out = rest.to_string();
+            }
+            out = out.replace(&format!(", and {alias}."), ", and ");
+            out = out.replace(&format!(": {alias}."), ": ");
+        }
+        out
+    }
+
+    fn tie_text(&self, ties: &[&Dead]) -> String {
+        let names: Vec<&str> = ties.iter().map(|d| d.name.as_str()).collect();
+        let split: Vec<Option<(&str, &str)>> = names
+            .iter()
+            .map(|n| {
+                n.strip_prefix("item ")
+                    .and_then(|rest| rest.split_once(" of "))
+            })
+            .collect();
+        let listed = match split.first().copied().flatten() {
+            Some((_, list))
+                if split
+                    .iter()
+                    .all(|part| part.is_some_and(|(_, other)| other == list)) =>
+            {
+                let numbers: Vec<&str> = split.iter().flatten().map(|(n, _)| *n).collect();
+                format!("item {} of {list}", numbers.join(" and item "))
+            }
+            _ => names.join(" and "),
+        };
+        let by = self.items.iter().find_map(|item| match &item.how {
+            How::Pick {
+                sorted: Some(sorted),
+                ..
+            } => Some(crate::name::name(&sorted.path)),
+            _ => None,
+        });
+        match by {
+            Some(by) => format!("{listed} tie on {by}"),
+            None => format!("{listed} tie"),
+        }
+    }
+
+    fn dead_text(&self, dead: &Dead) -> String {
+        if let Some(text) = &dead.msg {
+            return text.clone();
+        }
+        let kind = if matches!(dead.value, Value::Object(_)) {
+            "a list"
+        } else {
+            "a list or an object"
+        };
+        let mut name = dead.name.clone();
+        for item in &self.items {
+            name = name.replace(&format!(" of {}.", item.alias), " of ");
+        }
+        super::message::stated(&name, dead.cause, &dead.value, kind)
+    }
+
+    fn child_texts(&self, child: &Child) -> Vec<String> {
+        match &child.failed {
+            Some(outcome) if !outcome.parts.is_empty() && outcome.cause != Cause::NotAnObject => {
+                let name = self.strip(&child.entry.name);
+                outcome
+                    .parts
+                    .iter()
+                    .map(|part| format!("{name}: {part}"))
+                    .collect()
+            }
+            _ => self.child_text(child).into_iter().collect(),
+        }
+    }
+
+    fn child_text(&self, child: &Child) -> Option<String> {
+        let outcome = child.failed.as_ref()?;
+        let name = self.strip(&child.entry.name);
+        Some(if outcome.cause == Cause::NotAnObject {
+            super::message::isnt(&name, &child.entry.value, "an object")
+        } else if outcome.said.is_empty() {
+            if outcome.assertions.is_empty() && outcome.inner.is_empty() {
+                super::message::is(&name, &child.entry.value)
+            } else {
+                return None;
+            }
+        } else if outcome.bare {
+            format!("{name}{}", outcome.said)
+        } else {
+            format!("{name}: {}", outcome.said)
+        })
+    }
+
+    fn failed_items(&self, level: Level) -> (Vec<Value>, Vec<String>) {
+        let mut said: Vec<(Vec<Seg>, String)> = level
+            .dead
+            .iter()
+            .filter(|d| d.cause != Cause::Ambiguous)
+            .map(|d| (d.order.clone(), self.dead_text(d)))
+            .collect();
+        let ties: Vec<&Dead> = level
+            .dead
+            .iter()
+            .filter(|d| d.cause == Cause::Ambiguous)
+            .collect();
+        if let Some(first) = ties.first() {
+            said.push((first.order.clone(), self.tie_text(&ties)));
+        }
         let mut failed: Vec<(Vec<Seg>, Value)> = level
             .dead
             .iter()
@@ -1242,6 +1512,9 @@ impl For {
             .collect();
         let mut hoisted: Vec<Dead> = Vec::new();
         for child in level.children {
+            for text in self.child_texts(&child) {
+                said.push((child.order.clone(), text));
+            }
             let Child {
                 order,
                 mut entry,
@@ -1291,11 +1564,25 @@ impl For {
             let inner = inner.iter().map(Dead::plain).collect();
             failed.push((order, entry.json(outcome.assertions, inner)));
         }
+        let hoisted_ties: Vec<&Dead> = hoisted
+            .iter()
+            .filter(|d| d.cause == Cause::Ambiguous)
+            .collect();
+        if let Some(first) = hoisted_ties.first() {
+            said.push((first.order.clone(), self.tie_text(&hoisted_ties)));
+        }
         for entry in hoisted {
+            if entry.cause != Cause::Ambiguous {
+                said.push((entry.order.clone(), self.dead_text(&entry)));
+            }
             failed.push((entry.order.clone(), entry.json(Vec::new(), Vec::new())));
         }
         failed.sort_by(|a, b| a.0.cmp(&b.0));
-        failed.into_iter().map(|(_, v)| v).collect()
+        said.sort_by(|a, b| a.0.cmp(&b.0));
+        (
+            failed.into_iter().map(|(_, v)| v).collect(),
+            said.into_iter().map(|(_, t)| t).collect(),
+        )
     }
 
     fn shared_second(&self) -> bool {
@@ -1355,7 +1642,7 @@ mod tests {
 
     fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertions}}}}
         });
@@ -1385,7 +1672,7 @@ mod tests {
 
     fn problems(for_line: &str) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": "x exists"}}}}
         });
@@ -1548,7 +1835,7 @@ mod tests {
     #[test]
     fn a_subject_that_is_not_an_object_fails_as_not_an_object_with_nothing_listed() {
         let policy = json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": "x is 1"}}}}
         });
@@ -1675,7 +1962,7 @@ mod tests {
     #[test]
     fn a_failed_count_whose_whose_reads_a_part_lists_the_parts_value_with_its_location() {
         let policy = json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {
                 "for": "every groups as g",

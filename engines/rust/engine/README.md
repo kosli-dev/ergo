@@ -9,7 +9,7 @@ use ergo_policy_engine::{report, violations};
 use serde_json::json;
 
 let policy = json!({
-    "ergo_spec": "v0.4",
+    "ergo_spec": "v0.5-dev",
     "subjects": {"deployment": {"from": "deployments"}},
     "requirements": {
         "approved": {

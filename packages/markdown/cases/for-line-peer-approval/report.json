@@ -5,7 +5,7 @@
     "name": "ergo-rego",
     "version": "ergo.rego's version"
   },
-  "ergo": "v0.4",
+  "ergo": "v0.5-dev",
   "meta": {},
   "requirements": {
     "release": {
@@ -244,6 +244,7 @@
           ]
         }
       ],
+      "message": "item 2 of pull_requests: item 1 of approvers: approver.state is \"COMMENTED\", and approver.username is \"bob\", and pr.author is \"bob\"",
       "passed": false,
       "requirement": "release",
       "subject": {
@@ -287,6 +288,7 @@
           ]
         }
       ],
+      "message": "item 1 of pull_requests: item 2 of commits: signed is false; item 2 of pull_requests: commits is missing",
       "passed": false,
       "requirement": "release",
       "subject": {

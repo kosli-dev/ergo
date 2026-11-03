@@ -2,7 +2,7 @@
   {
     "description": "every over one list on a for line",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -83,6 +83,7 @@
       {
         "description": "fails as value when an item fails, and lists the item with the sentence that failed",
         "rules": [
+          "message.alias",
           "for.walk",
           "for.try",
           "for.pass",
@@ -156,6 +157,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -272,6 +274,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: signed is false; item 3 of commits: signed is 1, which isn't true or false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -349,6 +352,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -384,6 +388,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "commits is []",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -435,6 +440,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "commits is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -487,6 +493,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "commits is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -539,6 +546,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "commits is \"abc\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -570,7 +578,7 @@
   {
     "description": "every with if any on a for line",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -656,6 +664,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "commits is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -707,6 +716,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "commits is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -760,6 +770,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "commits is {\"a\": 1}, which isn't a list",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -856,6 +867,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -870,7 +882,7 @@
   {
     "description": "some over one list on a for line",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -1047,6 +1059,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: signed is false; item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1082,6 +1095,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "commits is []",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1133,6 +1147,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "commits is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -1253,6 +1268,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: signed is false; item 2 of commits: signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1318,7 +1334,7 @@
   {
     "description": "whose on a for item",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -1547,6 +1563,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1605,6 +1622,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1663,6 +1681,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1704,6 +1723,7 @@
               "id": "r1"
             },
             "check": "e",
+            "message": "commits is [{\"kind\": \"doc\", \"signed\": true}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1754,6 +1774,7 @@
               "id": "r1"
             },
             "check": "s",
+            "message": "commits is [{\"kind\": \"doc\", \"signed\": true}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -1837,6 +1858,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -1879,6 +1901,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2008,6 +2031,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is missing; item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2079,6 +2103,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is missing; item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2150,6 +2175,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is missing; item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2215,6 +2241,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2254,6 +2281,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2293,6 +2321,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2365,6 +2394,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is [\"code\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2408,6 +2438,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is [\"code\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2451,6 +2482,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: kind is [\"code\"], which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2465,7 +2497,7 @@
   {
     "description": "a second item whose whose leaves nothing in",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "s": {
           "from": "things",
@@ -2547,6 +2579,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs is {\"v\": 1}",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2562,7 +2595,7 @@
   {
     "description": "a name that hides a field of the subject",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2699,6 +2732,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: signed is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2713,7 +2747,7 @@
   {
     "description": "a bare key in assert is a field of the subject",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -2799,6 +2833,7 @@
       {
         "description": "fails when an item has the owner as author",
         "rules": [
+          "message.alias",
           "sentence.for.scope",
           "for.failed_items",
           "for.inputs",
@@ -2883,6 +2918,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: c.author is \"ann\", and owner is \"ann\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2971,6 +3007,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits: owner is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2985,7 +3022,7 @@
   {
     "description": "a bare key in an item's whose is a field of the item",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3165,6 +3202,7 @@
                 ]
               }
             ],
+            "message": "item 2 of approvals: approval.approved_at is \"2026-10-01T00:00:00Z\", and started_at is \"2026-09-05T00:00:00Z\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3179,7 +3217,7 @@
   {
     "description": "two items, the second walking a list inside the first",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -3448,6 +3486,7 @@
                 ]
               }
             ],
+            "message": "item 2 of pull_requests: item 1 of approvers: approver.username is \"eve\", and pr.author is \"eve\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3566,6 +3605,7 @@
                 ]
               }
             ],
+            "message": "item 2 of pull_requests is {\"approvers\": [{\"state\": \"PENDING\", \"username\": \"gus\"}], \"author\": \"fay\"}",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3672,6 +3712,7 @@
                 ]
               }
             ],
+            "message": "item 2 of pull_requests: pr.approvers is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3757,6 +3798,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests: pr.approvers is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3874,6 +3916,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests: item 1 of approvers: approver.username is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3977,6 +4020,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests: item 1 of approvers is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4012,6 +4056,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "pull_requests is []",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -4050,7 +4095,7 @@
   {
     "description": "an outer some and an inner every",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -4243,6 +4288,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests: item 1 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4257,7 +4303,7 @@
   {
     "description": "two items over sibling lists, with two assertions",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pr": {
           "from": "prs",
@@ -4558,6 +4604,7 @@
                 ]
               }
             ],
+            "message": "item 2 of approvers: approver.username is \"ann\", and author is \"ann\"; item 3 of approvers: item 2 of commits: approver.timestamp is \"2026-10-01T12:00:00Z\", and commit.timestamp is \"2026-10-02T00:00:00Z\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4708,6 +4755,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: approver.username is \"ann\", and author is \"ann\", and item 2 of commits: approver.timestamp is \"2026-10-01T12:00:00Z\", and commit.timestamp is \"2026-10-02T00:00:00Z\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -4761,6 +4809,7 @@
               "id": "p1"
             },
             "check": "c",
+            "message": "approvers is [{\"state\": \"PENDING\", \"timestamp\": \"2026-10-05T00:00:00Z\", \"username\": \"bob\"}]",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -4918,6 +4967,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: item 1 of commits: commit.timestamp is \"yesterday\", which isn't a time",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5001,6 +5051,7 @@
                 ]
               }
             ],
+            "message": "commits is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5084,6 +5135,7 @@
                 ]
               }
             ],
+            "message": "commits is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5098,7 +5150,7 @@
   {
     "description": "a whose value that is a comma list, before a second item",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pr": {
           "from": "prs",
@@ -5307,6 +5359,7 @@
                 ]
               }
             ],
+            "message": "item 2 of approvals: item 1 of commits: approval.at is \"2026-09-30T00:00:00Z\", and commit.at is \"2026-10-01T00:00:00Z\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5321,7 +5374,7 @@
   {
     "description": "a whose that reads a $params list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5495,6 +5548,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: signed is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5509,7 +5563,7 @@
   {
     "description": "a whose that reads a $params list that isn't a list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5559,6 +5613,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "$params.kinds is \"code\", which isn't a list",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -5584,7 +5639,7 @@
   {
     "description": "an assertion that reads a $params list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5613,6 +5668,7 @@
       {
         "description": "fails an item whose field isn't in the list",
         "rules": [
+          "message.alias",
           "for.walk",
           "for.try",
           "for.pass",
@@ -5684,6 +5740,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: c.author is \"zed\", and $params.staff is [\"ann\", \"bob\"]",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5698,7 +5755,7 @@
   {
     "description": "a path that is named by a param",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5745,6 +5802,7 @@
               "id": "r1"
             },
             "check": "c",
+            "message": "$params.k is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -5765,7 +5823,7 @@
   {
     "description": "a second item whose path is named by a param",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5873,6 +5931,7 @@
                 ]
               }
             ],
+            "message": "item 1 of groups: shas named by $params.k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5887,7 +5946,7 @@
   {
     "description": "a for line on a subject that isn't an object",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things"
@@ -5925,6 +5984,7 @@
               "id": "text"
             },
             "check": "c",
+            "message": "it is \"text\", which isn't an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [],
@@ -5937,7 +5997,7 @@
   {
     "description": "a for line with three items",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -5989,6 +6049,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: for: a for line holds two items at most",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6024,7 +6085,7 @@
   {
     "description": "a for line that gives a name twice",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6076,6 +6137,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: for: x is given twice",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6111,7 +6173,7 @@
   {
     "description": "a for line that names an item params",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6163,6 +6225,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: for: params can't be an alias",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6198,7 +6261,7 @@
   {
     "description": "a for line that names an item with a word of the grammar",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6250,6 +6313,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: for: empty can't be an alias",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6285,7 +6349,7 @@
   {
     "description": "a for line that names an item input",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6337,6 +6401,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: for: input can't be an alias",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -6372,7 +6437,7 @@
   {
     "description": "a name whose path goes on past its list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6492,6 +6557,7 @@
                 ]
               }
             ],
+            "message": "item 2 of pull_requests is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6544,6 +6610,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6558,7 +6625,7 @@
   {
     "description": "a second item that reads into a first item that isn't an object",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -6662,6 +6729,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests is 1, which isn't an object; item 2 of pull_requests is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6676,7 +6744,7 @@
   {
     "description": "named by a name from the for line",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -6866,6 +6934,7 @@
                 ]
               }
             ],
+            "message": "item 1 of dispatched: shas named by persona is \"x\"; item 2 of dispatched: shas named by persona is missing; item 3 of dispatched: persona is 5, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6880,7 +6949,7 @@
   {
     "description": "the latest commit picked on a for line",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull_request": {
           "from": "pull_requests",
@@ -7077,6 +7146,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: item 1 of commits: approver.username is \"ada\", and last_commit.author_username is \"ada\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7187,6 +7257,7 @@
                 ]
               }
             ],
+            "message": "item 1 and item 2 of commits tie on timestamp",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7303,6 +7374,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: item 3 of commits: approver.username is \"linus\", and last_commit.author_username is \"linus\"",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7390,6 +7462,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: timestamp is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7479,6 +7552,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits: timestamp is \"yesterday\", which isn't a number, a time or a date",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7604,6 +7678,7 @@
                 ]
               }
             ],
+            "message": "commits is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7618,7 +7693,7 @@
   {
     "description": "the second latest approval, filtered before it is sorted",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull_request": {
           "from": "pull_requests",
@@ -7774,6 +7849,7 @@
                 ]
               }
             ],
+            "message": "item 2 of approvals is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7837,6 +7913,7 @@
                 ]
               }
             ],
+            "message": "approvals is [{\"approved_at\": 1, \"by\": \"ada\", \"state\": \"APPROVED\"}, {\"approved_at\": 3, \"by\": \"grace\", \"state\": \"CHANGES_REQUESTED\"}]",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7851,7 +7928,7 @@
   {
     "description": "the last tag as written",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -7919,7 +7996,7 @@
   {
     "description": "sorted by after every",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull_request": {
           "from": "pull_requests",
@@ -7981,6 +8058,7 @@
                 ]
               }
             ],
+            "message": "checks.c: for: \"sorted by\" goes after a position, like \"last of\", not after every or some",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -7995,7 +8073,7 @@
   {
     "description": "the first owner alphabetically",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "team": {
           "from": "teams",
@@ -8128,6 +8206,7 @@
                 ]
               }
             ],
+            "message": "item 2 of owners: name is 7, which isn't text",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8210,6 +8289,7 @@
                 ]
               }
             ],
+            "message": "item 1 and item 2 of owners tie on name",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8224,7 +8304,7 @@
   {
     "description": "the second last owner alphabetically",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "team": {
           "from": "teams",
@@ -8302,7 +8382,7 @@
   {
     "description": "the latest audit by date",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "site": {
           "from": "sites",
@@ -8436,6 +8516,7 @@
                 ]
               }
             ],
+            "message": "item 1 of audits: held_on is \"2026-10-02\", which isn't a time",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8506,6 +8587,7 @@
                 ]
               }
             ],
+            "message": "item 1 of audits: held_on is \"2026-02-29\", which isn't a number, a time or a date",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -8520,7 +8602,7 @@
   {
     "description": "a list beside the first that fails before any sentence, with a whose that doesn't read the first item",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull request": {
           "from": "pull_requests",
@@ -8622,6 +8704,7 @@
                 ]
               }
             ],
+            "message": "item 2 of commits is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8636,7 +8719,7 @@
   {
     "description": "a list beside the first that fails before any sentence, with a whose that reads the first item",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull request": {
           "from": "pull_requests",
@@ -8782,6 +8865,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: item 2 of commits is missing; item 2 of approvers: item 2 of commits is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8796,7 +8880,7 @@
   {
     "description": "a list beside the first with a broken list inside it",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull request": {
           "from": "pull_requests",
@@ -8933,6 +9017,7 @@
                 ]
               }
             ],
+            "message": "item 2 of approvers: item 1 of commits: item 1 of files: approver.t is 0, and file.t is 1; item 2 of commits: files is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8947,7 +9032,7 @@
   {
     "description": "a sentence that fails for second-list items with different causes",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull request": {
           "from": "pull_requests",
@@ -9089,6 +9174,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: item 2 of commits: approver.t is 5, and commit.t is 9; item 1 of approvers: item 3 of commits: commit.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -9103,7 +9189,7 @@
   {
     "description": "a for line on a child subject whose assertion reads the parent",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "t": {
           "from": "ts",
@@ -9277,7 +9363,7 @@
   {
     "description": "a walk that starts at a for alias holding null",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9300,6 +9386,7 @@
       {
         "description": "fails as null, as a walk from a field holding null does",
         "rules": [
+          "message.alias",
           "walk.lists",
           "for.walk",
           "for.failed_items"
@@ -9357,6 +9444,7 @@
                 ]
               }
             ],
+            "message": "item 1 of commits is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9370,7 +9458,7 @@
   },
   {
     "description": "two items over lists of different lengths",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests as pr, every pr.commits as commit", "assert": "commit.signed is true"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests as pr, every pr.commits as commit", "assert": "commit.signed is true"}}}}},
     "cases": [
       {
         "description": "has one location per item in each list, the second list across the items of the first",
@@ -9385,7 +9473,7 @@
   {
     "description": "a for alias read by a key",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9502,6 +9590,7 @@
                 "value": "k1"
               }
             ],
+            "message": "item 2 of batches: b named by key is [1, 2], which isn't a number",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9516,7 +9605,7 @@
   {
     "description": "a position at the start of a path that starts at a for alias holding a list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -9608,6 +9697,7 @@
                 ]
               }
             ],
+            "message": "item 2 of batches: item 1 of b is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9621,7 +9711,7 @@
   },
   {
     "description": "a picked item",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"pull_request": {"from": "pull_requests", "identified_by": "id"}}, "requirements": {"s": {"subject": "pull_request", "checks": {"c": {"for": "some approvers as approver, last of commits sorted by timestamp as last_commit", "assert": "approver.username does not equal last_commit.author_username"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"pull_request": {"from": "pull_requests", "identified_by": "id"}}, "requirements": {"s": {"subject": "pull_request", "checks": {"c": {"for": "some approvers as approver, last of commits sorted by timestamp as last_commit", "assert": "approver.username does not equal last_commit.author_username"}}}}},
     "cases": [
       {
         "description": "has the location of the item it picked, not of the list",
@@ -9635,14 +9725,14 @@
   },
   {
     "description": "a second item that fails for an item of the first",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"pull request": {"from": "pull_requests", "identified_by": "id"}}, "requirements": {"r": {"subject": "pull request", "checks": {"c": {"for": "some approvers as approver, every commits whose author does not equal approver.u as commit", "assert": "approver.t is more than commit.t"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"pull request": {"from": "pull_requests", "identified_by": "id"}}, "requirements": {"r": {"subject": "pull request", "checks": {"c": {"for": "some approvers as approver, every commits whose author does not equal approver.u as commit", "assert": "approver.t is more than commit.t"}}}}},
     "cases": [
       {
         "description": "has a location for the failed item and for each of its nested failed_items",
         "rules": ["location.failed_items"],
         "input": {"pull_requests": [{"id": "p1", "approvers": [{"u": "bob", "t": 5}], "commits": [{"t": 1, "author": "ann"}, {"t": 2}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 2 of commits", "locations": ["/pull_requests/0/commits/1"], "path": "item 2 of commits", "value": {"t": 2}}], "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers", "value": {"t": 5, "u": "bob"}}], "inputs": [{"locations": ["/pull_requests/0/approvers/0"], "name": "approvers[]", "value": [{"t": 5, "u": "bob"}]}, {"locations": ["/pull_requests/0/commits/0", "/pull_requests/0/commits/1"], "name": "commits[]", "value": [{"author": "ann", "t": 1}, {"t": 2}]}], "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pull request"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "item 2 of commits", "locations": ["/pull_requests/0/commits/1"], "path": "item 2 of commits", "value": {"t": 2}}], "item": "item 1 of approvers", "locations": ["/pull_requests/0/approvers/0"], "path": "item 1 of approvers", "value": {"t": 5, "u": "bob"}}], "inputs": [{"locations": ["/pull_requests/0/approvers/0"], "name": "approvers[]", "value": [{"t": 5, "u": "bob"}]}, {"locations": ["/pull_requests/0/commits/0", "/pull_requests/0/commits/1"], "name": "commits[]", "value": [{"author": "ann", "t": 1}, {"t": 2}]}], "message": "item 1 of approvers: item 2 of commits is missing", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pull request"}}
         ]
       }
     ]
@@ -9650,7 +9740,7 @@
   {
     "description": "a second item with a position lists its failed list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -9695,6 +9785,7 @@
               "id": "t"
             },
             "check": "c",
+            "message": "ys is \"s\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -9764,6 +9855,7 @@
               "id": "t"
             },
             "check": "c",
+            "message": "ys is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -9834,6 +9926,7 @@
               "id": "t"
             },
             "check": "c",
+            "message": "ys is null",
             "passed": false,
             "cause": "null",
             "inputs": [
@@ -9904,6 +9997,7 @@
               "id": "t"
             },
             "check": "c",
+            "message": "ys is []",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -9943,7 +10037,7 @@
   {
     "description": "a second item with a some first item lists its failed list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -9988,6 +10082,7 @@
               "id": "t"
             },
             "check": "c",
+            "message": "ys is \"s\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -10038,7 +10133,7 @@
   {
     "description": "a second item picking the last of a sorted list lists its failed list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -10083,6 +10178,7 @@
               "id": "t"
             },
             "check": "c",
+            "message": "ys is \"s\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -10132,28 +10228,28 @@
   },
   {
     "description": "a list that can't be read",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests as pr, every pr.commits as commit", "assert": "commit.signed is true"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests as pr, every pr.commits as commit", "assert": "commit.signed is true"}}}}},
     "cases": [
       {
         "description": "has a location for the failed item where its read stopped",
         "rules": ["location.failed_items"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"commits": [{"signed": true}]}, {"id": 2}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "pr.commits", "locations": ["/releases/0/pull_requests/1"], "path": "pr.commits", "value": null}], "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1"], "path": "item 2 of pull_requests", "value": {"id": 2}}], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0"], "name": "pr.commits[]", "value": [{"signed": true}]}, {"locations": ["/releases/0/pull_requests/0", "/releases/0/pull_requests/1"], "name": "pull_requests[]", "value": [{"commits": [{"signed": true}]}, {"id": 2}]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "pr.commits", "locations": ["/releases/0/pull_requests/1"], "path": "pr.commits", "value": null}], "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1"], "path": "item 2 of pull_requests", "value": {"id": 2}}], "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0"], "name": "pr.commits[]", "value": [{"signed": true}]}, {"locations": ["/releases/0/pull_requests/0", "/releases/0/pull_requests/1"], "name": "pull_requests[]", "value": [{"commits": [{"signed": true}]}, {"id": 2}]}], "message": "item 2 of pull_requests: pr.commits is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]
   },
   {
     "description": "a for line whose second item is read from the first",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests.meta as m, every m.commits as c", "assert": "c.signed is true"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"release": {"from": "releases", "identified_by": "id"}}, "requirements": {"s": {"subject": "release", "checks": {"c": {"for": "every pull_requests.meta as m, every m.commits as c", "assert": "c.signed is true"}}}}},
     "cases": [
       {
         "description": "points a failed item at the value it read, and the alias m at the meta it stands for",
         "rules": ["location.failed_items", "location.start"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"meta": {"commits": "zz"}, "commits": [{"signed": true}]}]}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "m.commits", "locations": ["/releases/0/pull_requests/0/meta/commits"], "path": "m.commits", "value": "zz"}], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0/meta"], "path": "item 1 of pull_requests", "value": {"commits": "zz"}}], "inputs": [{"locations": [], "name": "m.commits", "value": []}, {"locations": ["/releases/0/pull_requests/0/meta"], "name": "pull_requests[].meta", "value": [{"commits": "zz"}]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "m.commits", "locations": ["/releases/0/pull_requests/0/meta/commits"], "path": "m.commits", "value": "zz"}], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0/meta"], "path": "item 1 of pull_requests", "value": {"commits": "zz"}}], "inputs": [{"locations": [], "name": "m.commits", "value": []}, {"locations": ["/releases/0/pull_requests/0/meta"], "name": "pull_requests[].meta", "value": [{"commits": "zz"}]}], "message": "item 1 of pull_requests: m.commits is \"zz\", which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       },
       {
@@ -10161,7 +10257,7 @@
         "rules": ["location.failed_items", "location.read"],
         "input": {"releases": [{"id": "r1", "pull_requests": [{"meta": {"n": 1}, "commits": [{"signed": true}]}, {"meta": {"commits": []}}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "m.commits", "locations": ["/releases/0/pull_requests/0/meta"], "path": "m.commits", "value": null}], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0/meta"], "path": "item 1 of pull_requests", "value": {"n": 1}}, {"cause": "value", "failed_assertions": [], "failed_items": [{"cause": "value", "item": "m.commits", "locations": ["/releases/0/pull_requests/1/meta/commits"], "path": "m.commits", "value": []}], "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1/meta"], "path": "item 2 of pull_requests", "value": {"commits": []}}], "inputs": [{"locations": [], "name": "m.commits[]", "value": []}, {"locations": ["/releases/0/pull_requests/0/meta", "/releases/0/pull_requests/1/meta"], "name": "pull_requests[].meta", "value": [{"n": 1}, {"commits": []}]}], "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "failed_items": [{"cause": "absent", "item": "m.commits", "locations": ["/releases/0/pull_requests/0/meta"], "path": "m.commits", "value": null}], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0/meta"], "path": "item 1 of pull_requests", "value": {"n": 1}}, {"cause": "value", "failed_assertions": [], "failed_items": [{"cause": "value", "item": "m.commits", "locations": ["/releases/0/pull_requests/1/meta/commits"], "path": "m.commits", "value": []}], "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1/meta"], "path": "item 2 of pull_requests", "value": {"commits": []}}], "inputs": [{"locations": [], "name": "m.commits[]", "value": []}, {"locations": ["/releases/0/pull_requests/0/meta", "/releases/0/pull_requests/1/meta"], "name": "pull_requests[].meta", "value": [{"n": 1}, {"commits": []}]}], "message": "item 1 of pull_requests: m.commits is missing; item 2 of pull_requests: m.commits is []", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]
@@ -10169,7 +10265,7 @@
   {
     "description": "a failed sentence on a for line lists the values it compared",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull request": {
           "from": "pr"
@@ -10362,6 +10458,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: item 2 of commits: approver.timestamp is 1792655359, and commit.timestamp is 1792656245; item 2 of approvers: item 2 of commits: approver.timestamp is 1792655761, and commit.timestamp is 1792656245",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -10530,6 +10627,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: approver.state is \"COMMENTED\"; item 2 of approvers: approver.state is \"CHANGES_REQUESTED\"",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -10662,6 +10760,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: approver.username is \"ann\", and author is \"ann\"",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -10802,6 +10901,7 @@
                 ]
               }
             ],
+            "message": "item 1 of approvers: item 2 of commits: commit.timestamp is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -10834,7 +10934,7 @@
   {
     "description": "every over the subs of the first item that whose kept",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -11021,6 +11121,7 @@
                 ]
               }
             ],
+            "message": "item 2 of items: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11035,7 +11136,7 @@
   {
     "description": "every over the subs of the first item that whose kept, failing",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -11158,6 +11259,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: item 1 of subs is 1",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11172,7 +11274,7 @@
   {
     "description": "every over the subs of the first item that whose kept, with every leaf checked",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -11350,6 +11452,7 @@
                 ]
               }
             ],
+            "message": "item 1 of deep: item 2 of subs: item 1 of leaves is 9",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -11364,7 +11467,7 @@
   {
     "description": "every over the subs of the first item that whose kept, with a whose of its own",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -11507,7 +11610,7 @@
   {
     "description": "some over the subs of the first item that whose kept",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -11608,7 +11711,7 @@
   {
     "description": "a for line whose first item has no whose, over a list where one value is missing",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -11696,6 +11799,7 @@
                 ]
               }
             ],
+            "message": "item 2 of items is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -11710,7 +11814,7 @@
   {
     "description": "a failed sentence that counts through an alias lists the count and what it counted",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull request": {
           "from": "pr"
@@ -11841,6 +11945,7 @@
                 ]
               }
             ],
+            "message": "item 3 of commits: count of commit.files is 0",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -11876,28 +11981,28 @@
   },
   {
     "description": "a failed sentence that counts items whose a part matches lists the part's value",
-    "policy": {"ergo_spec": "v0.4", "requirements": {"r": {"checks": {"c": {"assert": "count of items whose w is pa.w is 5", "for": "every groups as g"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"pa": "meta"}, "identified_by": "id"}}},
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "count of items whose w is pa.w is 5", "for": "every groups as g"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"pa": "meta"}, "identified_by": "id"}}},
     "cases": [
       {
         "description": "lists the part's value and its location, with the part, beside the count",
         "rules": ["for.failure_inputs", "parts.tag", "location.failed_items"],
         "input": {"things": [{"groups": [1], "id": "t", "items": [{"w": 1}, {"w": 2}], "meta": {"w": 2}}]},
         "results": [
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of items whose w equals pa.w is 5", "cause": "value", "inputs": [{"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "count of items whose w equals pa.w", "value": 1}, {"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}, {"locations": ["/things/0/meta/w"], "name": "pa.w", "part": {"id": null, "name": "pa"}, "value": 2}]}], "item": "item 1 of groups", "locations": ["/things/0/groups/0"], "path": "item 1 of groups", "value": 1}], "inputs": [{"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "count of items whose w equals pa.w", "value": 1}, {"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [1]}, {"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}, {"locations": ["/things/0/meta/w"], "name": "pa.w", "part": {"id": null, "name": "pa"}, "value": 2}], "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of items whose w equals pa.w is 5", "cause": "value", "inputs": [{"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "count of items whose w equals pa.w", "value": 1}, {"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}, {"locations": ["/things/0/meta/w"], "name": "pa.w", "part": {"id": null, "name": "pa"}, "value": 2}]}], "item": "item 1 of groups", "locations": ["/things/0/groups/0"], "path": "item 1 of groups", "value": 1}], "inputs": [{"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "count of items whose w equals pa.w", "value": 1}, {"locations": ["/things/0/groups/0"], "name": "groups[]", "value": [1]}, {"locations": ["/things/0/items/0", "/things/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}, {"locations": ["/things/0/meta/w"], "name": "pa.w", "part": {"id": null, "name": "pa"}, "value": 2}], "message": "item 1 of groups: count of items whose w equals pa.w is 1", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "thing"}}
         ]
       }
     ]
   },
   {
     "description": "a failed sentence that counts items whose a parent's field matches lists the parent's value",
-    "policy": {"ergo_spec": "v0.4", "requirements": {"r": {"checks": {"c": {"assert": "count of items whose w is artifact.w is 5", "for": "every groups as g"}}, "subject": "pr"}}, "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "count of items whose w is artifact.w is 5", "for": "every groups as g"}}, "subject": "pr"}}, "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}},
     "cases": [
       {
         "description": "lists the parent's value and its location beside the count",
         "rules": ["for.failure_inputs", "subjects.chain", "location.failed_items"],
         "input": {"artifacts": [{"id": "a", "prs": [{"groups": [1], "id": "p", "items": [{"w": 1}, {"w": 2}]}], "w": 2}]},
         "results": [
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of items whose w equals artifact.w is 5", "cause": "value", "inputs": [{"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "count of items whose w equals artifact.w", "value": 1}, {"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}, {"locations": ["/artifacts/0/w"], "name": "artifact.w", "value": 2}]}], "item": "item 1 of groups", "locations": ["/artifacts/0/prs/0/groups/0"], "path": "item 1 of groups", "value": 1}], "inputs": [{"locations": ["/artifacts/0/w"], "name": "artifact.w", "value": 2}, {"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "count of items whose w equals artifact.w", "value": 1}, {"locations": ["/artifacts/0/prs/0/groups/0"], "name": "groups[]", "value": [1]}, {"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}], "passed": false, "requirement": "r", "subject": {"id": "p", "in": {"artifact": "a"}, "type": "pr"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of items whose w equals artifact.w is 5", "cause": "value", "inputs": [{"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "count of items whose w equals artifact.w", "value": 1}, {"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}, {"locations": ["/artifacts/0/w"], "name": "artifact.w", "value": 2}]}], "item": "item 1 of groups", "locations": ["/artifacts/0/prs/0/groups/0"], "path": "item 1 of groups", "value": 1}], "inputs": [{"locations": ["/artifacts/0/w"], "name": "artifact.w", "value": 2}, {"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "count of items whose w equals artifact.w", "value": 1}, {"locations": ["/artifacts/0/prs/0/groups/0"], "name": "groups[]", "value": [1]}, {"locations": ["/artifacts/0/prs/0/items/0", "/artifacts/0/prs/0/items/1"], "name": "items[]", "value": [{"w": 1}, {"w": 2}]}], "message": "item 1 of groups: count of items whose w equals artifact.w is 1", "passed": false, "requirement": "r", "subject": {"id": "p", "in": {"artifact": "a"}, "type": "pr"}}
         ]
       }
     ]
@@ -11905,7 +12010,7 @@
   {
     "description": "a failed sentence on a picked item lists the values it compared",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull request": {
           "from": "pr"
@@ -12029,6 +12134,7 @@
                 }
               }
             ],
+            "message": "item 2 of commits: commit.signed is false, and commit.timestamp is 1792655000, and author_date is 1792656000",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12057,7 +12163,7 @@
   {
     "description": "the failed items of a list beside the first keep the values only on the sentences",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull request": {
           "from": "pr"
@@ -12194,6 +12300,7 @@
                 ]
               }
             ],
+            "message": "item 2 of xs: item 1 of ys: item 1 of zs: x.t is 0, and y.t is 1; item 2 of ys: zs is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12226,63 +12333,63 @@
   },
   {
     "description": "a for line that reads its alias as a list",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every batches as b", "assert": "count of b is at least 3"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every batches as b", "assert": "count of b is at least 3"}}}}},
     "cases": [
       {
         "description": "names the alias as the sentence writes it, with no $ in front",
         "rules": ["for.failure_inputs", "for.walk"],
         "input": {"items": [{"id": "t1", "batches": [["x", "y"], []]}]},
         "results": [
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of b is at least 3", "cause": "value", "inputs": [{"locations": ["/items/0/batches/0/0", "/items/0/batches/0/1"], "name": "count of b", "value": 2}, {"locations": ["/items/0/batches/0/0", "/items/0/batches/0/1"], "name": "b[]", "value": ["x", "y"]}]}], "item": "item 1 of batches", "locations": ["/items/0/batches/0"], "path": "item 1 of batches", "value": ["x", "y"]}, {"cause": "value", "failed_assertions": [{"assertion": "count of b is at least 3", "cause": "value", "inputs": [{"locations": [], "name": "count of b", "value": 0}, {"locations": [], "name": "b[]", "value": []}]}], "item": "item 2 of batches", "locations": ["/items/0/batches/1"], "path": "item 2 of batches", "value": []}], "inputs": [{"locations": ["/items/0/batches/0", "/items/0/batches/1"], "name": "batches[]", "value": [["x", "y"], []]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "item"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "count of b is at least 3", "cause": "value", "inputs": [{"locations": ["/items/0/batches/0/0", "/items/0/batches/0/1"], "name": "count of b", "value": 2}, {"locations": ["/items/0/batches/0/0", "/items/0/batches/0/1"], "name": "b[]", "value": ["x", "y"]}]}], "item": "item 1 of batches", "locations": ["/items/0/batches/0"], "path": "item 1 of batches", "value": ["x", "y"]}, {"cause": "value", "failed_assertions": [{"assertion": "count of b is at least 3", "cause": "value", "inputs": [{"locations": [], "name": "count of b", "value": 0}, {"locations": [], "name": "b[]", "value": []}]}], "item": "item 2 of batches", "locations": ["/items/0/batches/1"], "path": "item 2 of batches", "value": []}], "inputs": [{"locations": ["/items/0/batches/0", "/items/0/batches/1"], "name": "batches[]", "value": [["x", "y"], []]}], "message": "item 1 of batches: count of b is 2; item 2 of batches: count of b is 0", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a for line that reads a position of a field of its alias",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every m as x", "assert": "item 3 of x.q is 1"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every m as x", "assert": "item 3 of x.q is 1"}}}}},
     "cases": [
       {
         "description": "names the position with the alias as the sentence writes it",
         "rules": ["for.failure_inputs", "location.read"],
         "input": {"items": [{"id": "t1", "m": [{"q": [{"z": 1}]}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "item 3 of x.q is 1", "cause": "absent", "inputs": [{"locations": ["/items/0/m/0/q"], "name": "item 3 of x.q", "value": null}]}], "item": "item 1 of m", "locations": ["/items/0/m/0"], "path": "item 1 of m", "value": {"q": [{"z": 1}]}}], "inputs": [{"locations": ["/items/0/m/0"], "name": "m[]", "value": [{"q": [{"z": 1}]}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "item"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "item 3 of x.q is 1", "cause": "absent", "inputs": [{"locations": ["/items/0/m/0/q"], "name": "item 3 of x.q", "value": null}]}], "item": "item 1 of m", "locations": ["/items/0/m/0"], "path": "item 1 of m", "value": {"q": [{"z": 1}]}}], "inputs": [{"locations": ["/items/0/m/0"], "name": "m[]", "value": [{"q": [{"z": 1}]}]}], "message": "item 1 of m: item 3 of q is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a for line whose sentence reads the same value twice",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c", "assert": ["c.ts is at least c.ts plus 1", "count of c.files is at least count of c.files plus 1"]}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c", "assert": ["c.ts is at least c.ts plus 1", "count of c.files is at least count of c.files plus 1"]}}}}},
     "cases": [
       {
         "description": "lists the value once in the inputs of each failed sentence",
         "rules": ["for.failure_inputs", "row.inputs_once"],
         "input": {"items": [{"id": "p1", "commits": [{"ts": 5, "files": ["a"]}]}]},
         "results": [
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.ts is at least c.ts plus 1", "cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/commits/0/ts"], "name": "c.ts plus 1", "value": 6}]}, {"assertion": "count of c.files is at least count of c.files plus 1", "cause": "value", "inputs": [{"locations": ["/items/0/commits/0/files/0"], "name": "count of c.files", "value": 1}, {"locations": ["/items/0/commits/0/files/0"], "name": "c.files[]", "value": ["a"]}, {"locations": ["/items/0/commits/0/files/0"], "name": "count of c.files plus 1", "value": 2}]}], "item": "item 1 of commits", "locations": ["/items/0/commits/0"], "path": "item 1 of commits", "value": {"files": ["a"], "ts": 5}}], "inputs": [{"locations": ["/items/0/commits/0"], "name": "commits[]", "value": [{"files": ["a"], "ts": 5}]}], "passed": false, "requirement": "s", "subject": {"id": "p1", "type": "item"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.ts is at least c.ts plus 1", "cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/commits/0/ts"], "name": "c.ts plus 1", "value": 6}]}, {"assertion": "count of c.files is at least count of c.files plus 1", "cause": "value", "inputs": [{"locations": ["/items/0/commits/0/files/0"], "name": "count of c.files", "value": 1}, {"locations": ["/items/0/commits/0/files/0"], "name": "c.files[]", "value": ["a"]}, {"locations": ["/items/0/commits/0/files/0"], "name": "count of c.files plus 1", "value": 2}]}], "item": "item 1 of commits", "locations": ["/items/0/commits/0"], "path": "item 1 of commits", "value": {"files": ["a"], "ts": 5}}], "inputs": [{"locations": ["/items/0/commits/0"], "name": "commits[]", "value": [{"files": ["a"], "ts": 5}]}], "message": "item 1 of commits: c.ts is 5, and c.ts plus 1 is 6, and count of c.files is 1, and count of c.files plus 1 is 2", "passed": false, "requirement": "s", "subject": {"id": "p1", "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a for line with two items whose sentence reads the first alias twice",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c, every ap as ap", "assert": "c.ts is at least c.ts plus ap.ts"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c, every ap as ap", "assert": "c.ts is at least c.ts plus ap.ts"}}}}},
     "cases": [
       {
         "description": "lists each value once in the inputs of each item",
         "rules": ["for.failure_inputs", "row.inputs_once"],
         "input": {"items": [{"id": "p1", "commits": [{"ts": 5}], "ap": [{"ts": 9}, {"ts": 1}]}]},
         "results": [
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.ts is at least c.ts plus ap.ts", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/commits/0/ts", "/items/0/ap/0/ts"], "name": "c.ts plus ap.ts", "value": 14}, {"locations": ["/items/0/ap/0/ts"], "name": "ap.ts", "value": 9}], "item": "item 1 of ap"}, {"cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/commits/0/ts", "/items/0/ap/1/ts"], "name": "c.ts plus ap.ts", "value": 6}, {"locations": ["/items/0/ap/1/ts"], "name": "ap.ts", "value": 1}], "item": "item 2 of ap"}]}], "item": "item 1 of commits", "locations": ["/items/0/commits/0"], "path": "item 1 of commits", "value": {"ts": 5}}], "inputs": [{"locations": ["/items/0/ap/0", "/items/0/ap/1"], "name": "ap[]", "value": [{"ts": 9}, {"ts": 1}]}, {"locations": ["/items/0/commits/0"], "name": "commits[]", "value": [{"ts": 5}]}], "passed": false, "requirement": "s", "subject": {"id": "p1", "type": "item"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.ts is at least c.ts plus ap.ts", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/commits/0/ts", "/items/0/ap/0/ts"], "name": "c.ts plus ap.ts", "value": 14}, {"locations": ["/items/0/ap/0/ts"], "name": "ap.ts", "value": 9}], "item": "item 1 of ap"}, {"cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/commits/0/ts", "/items/0/ap/1/ts"], "name": "c.ts plus ap.ts", "value": 6}, {"locations": ["/items/0/ap/1/ts"], "name": "ap.ts", "value": 1}], "item": "item 2 of ap"}]}], "item": "item 1 of commits", "locations": ["/items/0/commits/0"], "path": "item 1 of commits", "value": {"ts": 5}}], "inputs": [{"locations": ["/items/0/ap/0", "/items/0/ap/1"], "name": "ap[]", "value": [{"ts": 9}, {"ts": 1}]}, {"locations": ["/items/0/commits/0"], "name": "commits[]", "value": [{"ts": 5}]}], "message": "item 1 of commits: item 1 of ap: c.ts is 5, and c.ts plus ap.ts is 14; item 1 of commits: item 2 of ap: c.ts is 5, and c.ts plus ap.ts is 6", "passed": false, "requirement": "s", "subject": {"id": "p1", "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a for line on a child subject whose sentence reads the parent and its own field of the same name",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": {"for": "every cs as c", "assert": "c.ts is at least b.x plus .b.x"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": {"for": "every cs as c", "assert": "c.ts is at least b.x plus .b.x"}}}}},
     "cases": [
       {
         "description": "lists the parent's field and the child's own field of the same name in the order they were read",
@@ -12377,6 +12484,7 @@
                 ]
               }
             ],
+            "message": "item 1 of cs: c.ts is 1, and b.x plus .b.x is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -12393,7 +12501,7 @@
   },
   {
     "description": "a for line on a child subject that reads the parent's field named like the parent and its own",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "item": {"from": "art.items", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"f": {"for": "every .art.xs as x", "assert": "x is at least .art.k"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "item": {"from": "art.items", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"f": {"for": "every .art.xs as x", "assert": "x is at least .art.k"}}}}},
     "cases": [
       {
         "description": "keeps the dot in the name of the child's own field",
@@ -12410,42 +12518,42 @@
   },
   {
     "description": "a for line whose assert joins sentences with and",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c, every ap as ap", "assert": "c.ts is at least ap.ts and c.v is 2 and ap.ts is at least c.ts plus 1"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c, every ap as ap", "assert": "c.ts is at least ap.ts and c.v is 2 and ap.ts is at least c.ts plus 1"}}}}},
     "cases": [
       {
         "description": "gives each sentence its own failure and inputs, as a list under assert does",
         "rules": ["for.failure_inputs", "sentence.for.assert", "sentence.assert.and"],
         "input": {"items": [{"id": "p1", "commits": [{"ts": 5, "v": 1}], "ap": [{"ts": 9}]}]},
         "results": [
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.ts is at least ap.ts", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/ap/0/ts"], "name": "ap.ts", "value": 9}], "item": "item 1 of ap"}]}, {"assertion": "c.v is 2", "cause": "value", "inputs": [{"locations": ["/items/0/commits/0/v"], "name": "c.v", "value": 1}]}], "item": "item 1 of commits", "locations": ["/items/0/commits/0"], "path": "item 1 of commits", "value": {"ts": 5, "v": 1}}], "inputs": [{"locations": ["/items/0/ap/0"], "name": "ap[]", "value": [{"ts": 9}]}, {"locations": ["/items/0/commits/0"], "name": "commits[]", "value": [{"ts": 5, "v": 1}]}], "passed": false, "requirement": "s", "subject": {"id": "p1", "type": "item"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.ts is at least ap.ts", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/items/0/commits/0/ts"], "name": "c.ts", "value": 5}, {"locations": ["/items/0/ap/0/ts"], "name": "ap.ts", "value": 9}], "item": "item 1 of ap"}]}, {"assertion": "c.v is 2", "cause": "value", "inputs": [{"locations": ["/items/0/commits/0/v"], "name": "c.v", "value": 1}]}], "item": "item 1 of commits", "locations": ["/items/0/commits/0"], "path": "item 1 of commits", "value": {"ts": 5, "v": 1}}], "inputs": [{"locations": ["/items/0/ap/0"], "name": "ap[]", "value": [{"ts": 9}]}, {"locations": ["/items/0/commits/0"], "name": "commits[]", "value": [{"ts": 5, "v": 1}]}], "message": "item 1 of commits: item 1 of ap: c.ts is 5, and ap.ts is 9, and c.v is 1", "passed": false, "requirement": "s", "subject": {"id": "p1", "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a for line whose assert holds an or",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c", "assert": "c.ts is 1 or c.v is 2"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c", "assert": "c.ts is 1 or c.v is 2"}}}}},
     "cases": [
       {
         "description": "is written wrong, because a sentence has no or",
         "rules": ["sentence.flat"],
         "input": {"items": [{"id": "p1", "commits": [{"ts": 5, "v": 1}]}]},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "message": "checks.c: doesn't parse", "passed": false, "requirement": "s", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a for line next to an any_of",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c", "any_of": {"a": "c.ts is 1", "b": "c.v is 2"}}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"item": {"from": "items", "identified_by": "id"}}, "requirements": {"s": {"subject": "item", "checks": {"c": {"for": "every commits as c", "any_of": {"a": "c.ts is 1", "b": "c.v is 2"}}}}}},
     "cases": [
       {
         "description": "is written wrong, because an any_of takes no for",
         "rules": ["sentence.any_of.written_wrong"],
         "input": {"items": [{"id": "p1", "commits": [{"ts": 5, "v": 1}]}]},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["unknown field for"]}], "passed": false, "requirement": "s", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["unknown field for"]}], "message": "checks.c: unknown field for", "passed": false, "requirement": "s", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
@@ -12453,7 +12561,7 @@
   {
     "description": "a second item that starts at a parent and is named by the first",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -12563,7 +12671,7 @@
   {
     "description": "a second item that starts at $input or $params",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "artifact": {
           "from": "artifacts",
@@ -12676,6 +12784,7 @@
                 ]
               }
             ],
+            "message": "item 1 of keys: item 1 of $input.top is 11",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -12741,6 +12850,7 @@
                 ]
               }
             ],
+            "message": "item 1 of keys: item 1 of $params.l is 12",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -12764,7 +12874,7 @@
   {
     "description": "a second item that starts at a parent's part, read with a whose",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -12885,6 +12995,7 @@
                 ]
               }
             ],
+            "message": "item 1 of keys: item 3 of artifact.ap.w is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -12907,7 +13018,7 @@
   {
     "description": "a second item that starts at a parent's part, read with a whose and a sentence that fails on its items",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts",
@@ -13037,6 +13148,7 @@
                 ]
               }
             ],
+            "message": "item 1 of keys: item 2 of artifact.ap.w: ok is false",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13058,14 +13170,14 @@
   },
   {
     "description": "a for line with a ref step after a field, and the param is missing",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}},
     "cases": [
       {
         "description": "fails with the ref's cause when the parent field is missing",
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "message": "item 1 of rs: $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13073,7 +13185,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{"x": null}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "message": "item 1 of rs: $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13081,14 +13193,14 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [[1]]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "message": "item 1 of rs: $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
   },
   {
     "description": "a for line with a ref step after a field, and the param is null",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}},
     "params": {"i": null},
     "cases": [
       {
@@ -13096,7 +13208,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{}]}]},
         "results": [
-          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "message": "item 1 of rs: $params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13104,7 +13216,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{"x": null}]}]},
         "results": [
-          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "message": "item 1 of rs: $params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13112,14 +13224,14 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [[1]]}]},
         "results": [
-          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "message": "item 1 of rs: $params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
   },
   {
     "description": "a for line with a ref step after a field, and the param is a list",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}},
     "params": {"i": [1]},
     "cases": [
       {
@@ -13127,7 +13239,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{}]}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "message": "item 1 of rs: $params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13135,7 +13247,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{"x": null}]}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "message": "item 1 of rs: $params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13143,28 +13255,28 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [[1]]}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "unusable", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "message": "item 1 of rs: $params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
   },
   {
     "description": "a for line whose two reads share a name",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some approvals.approver as approver", "assert": ".approver equals approver"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "some approvals.approver as approver", "assert": ".approver equals approver"}}}}},
     "cases": [
       {
         "description": "lists the inputs by name, so the own field's .approver comes before the alias's approver",
         "rules": ["for.failure_inputs", "location.merged"],
         "input": {"things": [{"id": "t1", "approver": "", "approvals": [{"approver": "grace"}]}]},
         "results": [
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": ".approver equals approver", "cause": "value", "inputs": [{"locations": ["/things/0/approver"], "name": ".approver", "value": ""}, {"locations": ["/things/0/approvals/0/approver"], "name": "approver", "value": "grace"}]}], "item": "item 1 of approvals", "locations": ["/things/0/approvals/0/approver"], "path": "item 1 of approvals", "value": "grace"}], "inputs": [{"locations": ["/things/0/approver"], "name": ".approver", "value": ""}, {"locations": ["/things/0/approvals/0/approver"], "name": "approvals[].approver", "value": ["grace"]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": ".approver equals approver", "cause": "value", "inputs": [{"locations": ["/things/0/approver"], "name": ".approver", "value": ""}, {"locations": ["/things/0/approvals/0/approver"], "name": "approver", "value": "grace"}]}], "item": "item 1 of approvals", "locations": ["/things/0/approvals/0/approver"], "path": "item 1 of approvals", "value": "grace"}], "inputs": [{"locations": ["/things/0/approver"], "name": ".approver", "value": ""}, {"locations": ["/things/0/approvals/0/approver"], "name": "approvals[].approver", "value": ["grace"]}], "message": "item 1 of approvals: .approver is \"\", and approver is \"grace\"", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
   },
   {
     "description": "a for line whose alias is named like a field of the subject",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"own": {"for": "every commits as c", "assert": ".c.signed is true"}, "alias": {"for": "every commits as c", "assert": "c.signed is true"}, "own_list": {"for": "every commits as c", "assert": "count of .c.xs is 1"}, "plain": {"for": "every commits as c", "assert": ".k is 1"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"own": {"for": "every commits as c", "assert": ".c.signed is true"}, "alias": {"for": "every commits as c", "assert": "c.signed is true"}, "own_list": {"for": "every commits as c", "assert": "count of .c.xs is 1"}, "plain": {"for": "every commits as c", "assert": ".k is 1"}}}}},
     "cases": [
       {
         "description": "names the own field and its list with the dot, and the alias and a field no alias is called without it",
@@ -13174,7 +13286,7 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/0"], "name": "in-scope thing count", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated thing ids", "value": []}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
-          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.signed is true", "cause": "value", "inputs": [{"locations": ["/things/0/commits/0/signed"], "name": "c.signed", "value": false}]}], "item": "item 1 of commits", "locations": ["/things/0/commits/0"], "path": "item 1 of commits", "value": {"signed": false}}], "inputs": [{"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}], "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "c.signed is true", "cause": "value", "inputs": [{"locations": ["/things/0/commits/0/signed"], "name": "c.signed", "value": false}]}], "item": "item 1 of commits", "locations": ["/things/0/commits/0"], "path": "item 1 of commits", "value": {"signed": false}}], "inputs": [{"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}], "message": "item 1 of commits: signed is false", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "satisfied", "check": "own", "failed_items": [], "inputs": [{"locations": ["/things/0/c/signed"], "name": ".c.signed", "value": true}, {"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "satisfied", "check": "own_list", "failed_items": [], "inputs": [{"locations": ["/things/0/c/xs/0"], "name": ".c.xs[]", "value": [1]}, {"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}, {"locations": ["/things/0/c/xs/0"], "name": "count of .c.xs", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
           {"cause": "satisfied", "check": "plain", "failed_items": [], "inputs": [{"locations": ["/things/0/commits/0"], "name": "commits[]", "value": [{"signed": false}]}, {"locations": ["/things/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
@@ -13184,7 +13296,7 @@
   },
   {
     "description": "a check whose for isn't a string, with an own field read after the dot",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id"}}, "requirements": {"r": {"subject": "round", "checks": {"c": {"for": ["every items as y"], "assert": "y.n is at least .y.k"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id"}}, "requirements": {"r": {"subject": "round", "checks": {"c": {"for": ["every items as y"], "assert": "y.n is at least .y.k"}}}}},
     "cases": [
       {
         "description": "is written wrong and its expression keeps the dot as written",
@@ -13193,14 +13305,14 @@
         "expressions": {"r": {"c": "y.n is at least .y.k"}},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["invalid for"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "round"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["invalid for"]}], "message": "checks.c: invalid for", "passed": false, "requirement": "r", "subject": {"id": null, "type": "round"}}
         ]
       }
     ]
   },
   {
     "description": "a for line whose alias is named like a field of the subject, read by a failing walk",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id"}}, "requirements": {"r": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is 1"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id"}}, "requirements": {"r": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is 1"}}}}},
     "cases": [
       {
         "description": "names the failed item of the own field with the dot",
@@ -13211,14 +13323,14 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": ".y.zs", "locations": ["/rounds/0/y"], "path": ".y.zs", "value": null}], "inputs": [{"locations": [], "name": ".y.zs", "value": []}, {"locations": ["/rounds/0/items/0"], "name": "items[]", "value": [{"id": "i1", "zs": [1, 2]}]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": ".y.zs", "locations": ["/rounds/0/y"], "path": ".y.zs", "value": null}], "inputs": [{"locations": [], "name": ".y.zs", "value": []}, {"locations": ["/rounds/0/items/0"], "name": "items[]", "value": [{"id": "i1", "zs": [1, 2]}]}], "message": ".y.zs is missing", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
   },
   {
     "description": "a second for line that reads an own field named like the first alias or a part",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"alias": {"for": "every items as y, every .y.zs as z", "assert": "z is at least 1"}, "some": {"for": "every items as y, some .y.zs as z", "assert": "z is 9"}, "part": {"for": "every items as y, every .cov.zs as z", "assert": "z is at least 1"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"alias": {"for": "every items as y, every .y.zs as z", "assert": "z is at least 1"}, "some": {"for": "every items as y, some .y.zs as z", "assert": "z is 9"}, "part": {"for": "every items as y, every .cov.zs as z", "assert": "z is at least 1"}}}}},
     "cases": [
       {
         "description": "names the items of the own field with the dot, in the failed items and in the failed assertions",
@@ -13229,16 +13341,16 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 3}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": ".cov.zs[]", "value": [0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "some", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "message": "item 1 of items: item 2 of .y.zs is 0; item 2 of items: item 2 of .y.zs is 0", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": ".cov.zs[]", "value": [0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "message": "item 1 of items: item 1 of .cov.zs is 0; item 2 of items: item 1 of .cov.zs is 0", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "some", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"id": "i1", "n": 1}}, {"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"id": "i2", "n": 3}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"id": "i1", "n": 1}, {"id": "i2", "n": 3}]}], "message": "item 1 of items: item 1 of .y.zs is 5; item 1 of items: item 2 of .y.zs is 0; item 2 of items: item 1 of .y.zs is 5; and 1 more", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
   },
   {
     "description": "for lines with two aliases, one named like a field of the subject",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id"}}, "requirements": {"r0": {"subject": "round", "checks": {"c": {"for": ["every items as y", "every rs as cov"], "assert": "y.n is at least .y.k"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id"}}, "requirements": {"r0": {"subject": "round", "checks": {"c": {"for": ["every items as y", "every rs as cov"], "assert": "y.n is at least .y.k"}}}}},
     "cases": [
       {
         "description": "names the own field with the dot and each alias without it",
@@ -13246,14 +13358,14 @@
         "input": {"rounds": [{"id": "r1", "name": "r1", "empty": {"x": 1}, "it": {"x": 1}, "free": {"x": 1}, "a b": {"x": 1}, "cov": {"k": 1, "xs": [1, 2], "t": "2026-01-01T00:00:00Z", "n": 3}, "d": {"b": {"k": 5, "xs": [1], "t": "2026-01-02T00:00:00Z", "n": 3}}, "items": [{"n": 1, "cov": 1, "v": 2}, {"n": 3, "cov": 2, "v": 3}], "rs": [{"cov": 1}], "y": {"k": 1}}]},
         "status": {"r0": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["invalid for"]}], "passed": false, "requirement": "r0", "subject": {"id": null, "type": "round"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["invalid for"]}], "message": "checks.c: invalid for", "passed": false, "requirement": "r0", "subject": {"id": null, "type": "round"}}
         ]
       }
     ]
   },
   {
     "description": "a second for line that reads a field named like the first alias, a part or an earlier alias",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r00": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is at least 1"}}}, "r01": {"subject": "round", "checks": {"c": {"for": "every items as y, every y.zs as z", "assert": "z is at least 2"}}}, "r02": {"subject": "round", "checks": {"c": {"for": "every items as y, every .cov.zs as z", "assert": "z is at least 1"}}}, "r03": {"subject": "round", "checks": {"c": {"for": "every items as y, every cov.zs as z", "assert": "z is at least 9"}}}, "r04": {"subject": "round", "checks": {"c": {"for": "every items as y, every rs as z", "assert": "z.y is 0"}}}, "r05": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as a, every items as y", "assert": "a is at least 2"}}}, "r06": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as a, every cov.xs as b", "assert": "a is at least 2"}}}, "r07": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z, every .cov.xs as w", "assert": "w is at least 2"}}}, "r08": {"subject": "round", "checks": {"c": {"for": "some .cov.xs as a", "assert": "a is 9"}}}, "r09": {"subject": "round", "checks": {"c": {"for": "every items whose .cov is 1 as i", "assert": "i.n is 9"}}}, "r10": {"subject": "round", "checks": {"c": {"for": "every items as i", "assert": "i.n is at least .cov.k"}}}, "r11": {"subject": "round", "checks": {"c": {"for": "every .y.zs as z", "assert": "z is at least 1"}}}, "r12": {"subject": "round", "checks": {"c": {"for": "every items as cov, every .cov.zs as z", "assert": "z is at least 1"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r00": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z", "assert": "z is at least 1"}}}, "r01": {"subject": "round", "checks": {"c": {"for": "every items as y, every y.zs as z", "assert": "z is at least 2"}}}, "r02": {"subject": "round", "checks": {"c": {"for": "every items as y, every .cov.zs as z", "assert": "z is at least 1"}}}, "r03": {"subject": "round", "checks": {"c": {"for": "every items as y, every cov.zs as z", "assert": "z is at least 9"}}}, "r04": {"subject": "round", "checks": {"c": {"for": "every items as y, every rs as z", "assert": "z.y is 0"}}}, "r05": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as a, every items as y", "assert": "a is at least 2"}}}, "r06": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as a, every cov.xs as b", "assert": "a is at least 2"}}}, "r07": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs as z, every .cov.xs as w", "assert": "w is at least 2"}}}, "r08": {"subject": "round", "checks": {"c": {"for": "some .cov.xs as a", "assert": "a is 9"}}}, "r09": {"subject": "round", "checks": {"c": {"for": "every items whose .cov is 1 as i", "assert": "i.n is 9"}}}, "r10": {"subject": "round", "checks": {"c": {"for": "every items as i", "assert": "i.n is at least .cov.k"}}}, "r11": {"subject": "round", "checks": {"c": {"for": "every .y.zs as z", "assert": "z is at least 1"}}}, "r12": {"subject": "round", "checks": {"c": {"for": "every items as cov, every .cov.zs as z", "assert": "z is at least 1"}}}}},
     "cases": [
       {
         "description": "names the nested failed items and the inputs with the dot",
@@ -13266,14 +13378,14 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r02", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r03", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r04", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["a is a word of the grammar: write .a", "for: a can't be an alias"]}], "passed": false, "requirement": "r05", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["a is a word of the grammar: write .a", "for: a can't be an alias"]}], "passed": false, "requirement": "r06", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: a for line holds two items at most"]}], "passed": false, "requirement": "r07", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["a is a word of the grammar: write .a", "for: a can't be an alias"]}], "passed": false, "requirement": "r08", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["a is a word of the grammar: write .a", "for: a can't be an alias"]}], "message": "checks.c: a is a word of the grammar: write .a; checks.c: for: a can't be an alias", "passed": false, "requirement": "r05", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["a is a word of the grammar: write .a", "for: a can't be an alias"]}], "message": "checks.c: a is a word of the grammar: write .a; checks.c: for: a can't be an alias", "passed": false, "requirement": "r06", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: a for line holds two items at most"]}], "message": "checks.c: for: a for line holds two items at most", "passed": false, "requirement": "r07", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["a is a word of the grammar: write .a", "for: a can't be an alias"]}], "message": "checks.c: a is a word of the grammar: write .a; checks.c: for: a can't be an alias", "passed": false, "requirement": "r08", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r09", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r10", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r11", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r12", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["cov can't be an alias: it's a part of round"]}], "message": "checks.c: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r12", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r00", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r01", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r02", "subject": {"id": null, "type": "round"}},
@@ -13290,21 +13402,21 @@
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r09", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r10", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r11", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "passed": false, "requirement": "r00", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 2", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/zs/0"], "name": "z", "value": 1}], "item": "item 1 of y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/items/0/zs/0", "/rounds/0/items/1/zs/0"], "name": "y.zs[]", "value": [1, 2]}], "passed": false, "requirement": "r01", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": ".cov.zs[]", "value": [0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "passed": false, "requirement": "r02", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "z", "value": 7}], "item": "item 1 of cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "z", "value": 7}], "item": "item 1 of cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "cov.zs[]", "part": {"id": null, "name": "cov"}, "value": [7]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "passed": false, "requirement": "r03", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z.y is 0", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/rs/0/y"], "name": "z.y", "value": 3}], "item": "item 1 of rs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z.y is 0", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/rs/0/y"], "name": "z.y", "value": 3}], "item": "item 1 of rs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/rs/0"], "name": "rs[]", "value": [{"cov": 1, "y": 3}]}], "passed": false, "requirement": "r04", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "i.n is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/n"], "name": "i.n", "value": 1}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "passed": false, "requirement": "r09", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 2 of .y.zs is 0; item 2 of items: item 2 of .y.zs is 0", "passed": false, "requirement": "r00", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 2", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/zs/0"], "name": "z", "value": 1}], "item": "item 1 of y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/items/0/zs/0", "/rounds/0/items/1/zs/0"], "name": "y.zs[]", "value": [1, 2]}], "message": "item 1 of items: item 1 of zs is 1", "passed": false, "requirement": "r01", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": "z", "value": 0}], "item": "item 1 of .cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/cov/zs/0"], "name": ".cov.zs[]", "value": [0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 1 of .cov.zs is 0; item 2 of items: item 1 of .cov.zs is 0", "passed": false, "requirement": "r02", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "z", "value": 7}], "item": "item 1 of cov.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is at least 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "z", "value": 7}], "item": "item 1 of cov.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/d/b/zs/0"], "name": "cov.zs[]", "part": {"id": null, "name": "cov"}, "value": [7]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 1 of cov.zs is 7; item 2 of items: item 1 of cov.zs is 7", "passed": false, "requirement": "r03", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z.y is 0", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/rs/0/y"], "name": "z.y", "value": 3}], "item": "item 1 of rs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z.y is 0", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/rs/0/y"], "name": "z.y", "value": 3}], "item": "item 1 of rs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/rs/0"], "name": "rs[]", "value": [{"cov": 1, "y": 3}]}], "message": "item 1 of items: item 1 of rs: y is 3; item 2 of items: item 1 of rs: y is 3", "passed": false, "requirement": "r04", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "i.n is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/n"], "name": "i.n", "value": 1}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}], "inputs": [{"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: n is 1", "passed": false, "requirement": "r09", "subject": {"id": "r1", "type": "round"}},
           {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/rounds/0/cov/k"], "name": ".cov.k", "value": 1}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "passed": true, "requirement": "r10", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}]}], "item": "item 2 of y.zs", "locations": ["/rounds/0/y/zs/1"], "path": "item 2 of y.zs", "value": 0}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": "y.zs[]", "value": [5, 0]}], "passed": false, "requirement": "r11", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is at least 1", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}]}], "item": "item 2 of y.zs", "locations": ["/rounds/0/y/zs/1"], "path": "item 2 of y.zs", "value": 0}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": "y.zs[]", "value": [5, 0]}], "message": "item 2 of y.zs is 0", "passed": false, "requirement": "r11", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
   },
   {
     "description": "more for lines that read own fields named like aliases or parts",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r00": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every items as y", "assert": "p is at least 2"}}}, "r01": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every cov.xs as q", "assert": "p is at least 2"}}}, "r02": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every items whose n is p as q", "assert": "q.n is 9"}}}, "r03": {"subject": "round", "checks": {"c": {"for": "some .cov.xs as p", "assert": "p is 9"}}}, "r04": {"subject": "round", "checks": {"c": {"for": "every items as cov, every .cov.zs as z", "assert": "z is at least 1"}}}, "r05": {"subject": "round", "checks": {"c": {"for": "every items as y, some .y.zs as z", "assert": "z is 9"}}}, "r06": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs whose it is 0 as z", "assert": "z is 9"}}}, "r07": {"subject": "round", "checks": {"c": {"for": "every items as y, every y.zs as z", "assert": ".y.k is 9"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r00": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every items as y", "assert": "p is at least 2"}}}, "r01": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every cov.xs as q", "assert": "p is at least 2"}}}, "r02": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every items whose n is p as q", "assert": "q.n is 9"}}}, "r03": {"subject": "round", "checks": {"c": {"for": "some .cov.xs as p", "assert": "p is 9"}}}, "r04": {"subject": "round", "checks": {"c": {"for": "every items as cov, every .cov.zs as z", "assert": "z is at least 1"}}}, "r05": {"subject": "round", "checks": {"c": {"for": "every items as y, some .y.zs as z", "assert": "z is 9"}}}, "r06": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs whose it is 0 as z", "assert": "z is 9"}}}, "r07": {"subject": "round", "checks": {"c": {"for": "every items as y, every y.zs as z", "assert": ".y.k is 9"}}}}},
     "cases": [
       {
         "description": "names the own fields with the dot in the failed items, inputs and assertions",
@@ -13316,9 +13428,9 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r01", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r02", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r03", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r04", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["cov can't be an alias: it's a part of round"]}], "message": "checks.c: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r04", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r05", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: it can only start an assertion: write it first, like it is not empty"]}], "passed": false, "requirement": "r06", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: it can only start an assertion: write it first, like it is not empty"]}], "message": "checks.c: for: it can only start an assertion: write it first, like it is not empty", "passed": false, "requirement": "r06", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r07", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r00", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r01", "subject": {"id": null, "type": "round"}},
@@ -13332,29 +13444,29 @@
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r03", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r05", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r07", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is at least 2", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "passed": false, "requirement": "r00", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is at least 2", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/d/b/xs/0"], "name": "cov.xs[]", "part": {"id": null, "name": "cov"}, "value": [1]}], "passed": false, "requirement": "r01", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "q.n is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/n"], "name": "q.n", "value": 1}], "item": "item 1 of items"}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "failed_assertions": [], "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "passed": false, "requirement": "r02", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "failed_assertions": [{"assertion": "p is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/1"], "name": "p", "value": 2}]}], "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r03", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "passed": false, "requirement": "r05", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": ".y.k is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/k"], "name": ".y.k", "value": 1}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": ".y.k is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/k"], "name": ".y.k", "value": 1}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/k"], "name": ".y.k", "value": 1}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/items/0/zs/0", "/rounds/0/items/1/zs/0"], "name": "y.zs[]", "value": [1, 2]}], "passed": false, "requirement": "r07", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is at least 2", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of .cov.xs: p is 1", "passed": false, "requirement": "r00", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is at least 2", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/d/b/xs/0"], "name": "cov.xs[]", "part": {"id": null, "name": "cov"}, "value": [1]}], "message": "item 1 of .cov.xs: p is 1", "passed": false, "requirement": "r01", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "q.n is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/items/0/n"], "name": "q.n", "value": 1}], "item": "item 1 of items"}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "failed_assertions": [], "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of .cov.xs: item 1 of items: n is 1; item 2 of .cov.xs is 2", "passed": false, "requirement": "r02", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/0"], "name": "p", "value": 1}]}], "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "failed_assertions": [{"assertion": "p is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/cov/xs/1"], "name": "p", "value": 2}]}], "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "message": "item 1 of .cov.xs is 1; item 2 of .cov.xs is 2", "passed": false, "requirement": "r03", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": "z is 9", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/0"], "name": "z", "value": 5}], "item": "item 1 of .y.zs"}, {"cause": "value", "inputs": [{"locations": ["/rounds/0/y/zs/1"], "name": "z", "value": 0}], "item": "item 2 of .y.zs"}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/zs/0", "/rounds/0/y/zs/1"], "name": ".y.zs[]", "value": [5, 0]}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}], "message": "item 1 of items: item 1 of .y.zs is 5; item 1 of items: item 2 of .y.zs is 0; item 2 of items: item 1 of .y.zs is 5; and 1 more", "passed": false, "requirement": "r05", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": ".y.k is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/k"], "name": ".y.k", "value": 1}]}], "item": "item 1 of items", "locations": ["/rounds/0/items/0"], "path": "item 1 of items", "value": {"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}}, {"cause": "value", "failed_assertions": [{"assertion": ".y.k is 9", "cause": "value", "inputs": [{"locations": ["/rounds/0/y/k"], "name": ".y.k", "value": 1}]}], "item": "item 2 of items", "locations": ["/rounds/0/items/1"], "path": "item 2 of items", "value": {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}}], "inputs": [{"locations": ["/rounds/0/y/k"], "name": ".y.k", "value": 1}, {"locations": ["/rounds/0/items/0", "/rounds/0/items/1"], "name": "items[]", "value": [{"cov": 1, "id": "i1", "n": 1, "ws": [0], "y": {"k": 0}, "zs": [1]}, {"cov": 2, "id": "i2", "n": 3, "ws": [4], "y": {"k": 9}, "zs": [2]}]}, {"locations": ["/rounds/0/items/0/zs/0", "/rounds/0/items/1/zs/0"], "name": "y.zs[]", "value": [1, 2]}], "message": "item 1 of items: .y.k is 1; item 2 of items: .y.k is 1", "passed": false, "requirement": "r07", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
   },
   {
     "description": "a failed sentence on a for line lists its inputs in the order of its kind",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"walk": {"for": "every xs as x", "assert": "some rows.n is at least x.v"}, "aliases": {"for": "every xs as x", "assert": "some x.tags is in x.nums"}, "compare": {"for": "every xs as x", "assert": "x.v is at most m"}, "count": {"for": "every xs as x", "assert": "count of rows is at least m"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"walk": {"for": "every xs as x", "assert": "some rows.n is at least x.v"}, "aliases": {"for": "every xs as x", "assert": "some x.tags is in x.nums"}, "compare": {"for": "every xs as x", "assert": "x.v is at most m"}, "count": {"for": "every xs as x", "assert": "count of rows is at least m"}}}}},
     "cases": [
       {
         "description": "a walk lists what starts at an alias first, both in name order, and a comparison or a count lists its left side and then its right side",
         "rules": ["for.failure_inputs"],
         "input": {"things": [{"id": "t1", "m": 3, "rows": [{"n": 1}], "xs": [{"v": 5, "tags": ["t"], "nums": ["u"]}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "aliases", "passed": false, "cause": "value", "inputs": [{"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.nums", "value": ["u"], "locations": ["/things/0/xs/0/nums"]}, {"name": "x.tags[]", "value": ["t"], "locations": ["/things/0/xs/0/tags/0"]}], "assertion": "some x.tags is in x.nums"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "compare", "passed": false, "cause": "value", "inputs": [{"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "x.v is at most m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "count", "passed": false, "cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "count of rows is at least m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "walk", "passed": false, "cause": "value", "inputs": [{"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}], "assertion": "some rows.n is at least x.v"}], "item": "item 1 of xs", "path": "item 1 of xs"}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "aliases", "message": "item 1 of xs: item 1 of tags is \"t\", and nums is [\"u\"]", "passed": false, "cause": "value", "inputs": [{"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.nums", "value": ["u"], "locations": ["/things/0/xs/0/nums"]}, {"name": "x.tags[]", "value": ["t"], "locations": ["/things/0/xs/0/tags/0"]}], "assertion": "some x.tags is in x.nums"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "compare", "message": "item 1 of xs: x.v is 5, and m is 3", "passed": false, "cause": "value", "inputs": [{"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "x.v is at most m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "count", "message": "item 1 of xs: count of rows is 1, and m is 3", "passed": false, "cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "count of rows", "value": 1, "locations": ["/things/0/rows/0"]}, {"name": "rows[]", "value": [{"n": 1}], "locations": ["/things/0/rows/0"]}, {"name": "m", "value": 3, "locations": ["/things/0/m"]}], "assertion": "count of rows is at least m"}], "item": "item 1 of xs", "path": "item 1 of xs"}]},
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "walk", "message": "item 1 of xs: item 1 of rows: n is 1, and x.v is 5", "passed": false, "cause": "value", "inputs": [{"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}, {"name": "xs[]", "value": [{"nums": ["u"], "tags": ["t"], "v": 5}], "locations": ["/things/0/xs/0"]}], "failed_items": [{"cause": "value", "value": {"nums": ["u"], "tags": ["t"], "v": 5}, "locations": ["/things/0/xs/0"], "failed_assertions": [{"cause": "value", "inputs": [{"name": "x.v", "value": 5, "locations": ["/things/0/xs/0/v"]}, {"name": "rows[].n", "value": [1], "locations": ["/things/0/rows/0/n"]}], "assertion": "some rows.n is at least x.v"}], "item": "item 1 of xs", "path": "item 1 of xs"}]}
         ]
       }
     ]
@@ -13362,7 +13474,7 @@
   {
     "description": "a name whose path goes on past a null or a number",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -13425,6 +13537,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13477,6 +13590,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13534,6 +13648,7 @@
                 ]
               }
             ],
+            "message": "item 2 of pull_requests is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13548,7 +13663,7 @@
   {
     "description": "some over a name whose path goes on past its list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -13611,6 +13726,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13671,7 +13787,7 @@
   {
     "description": "first of over a name whose path goes on past its list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -13734,6 +13850,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13748,7 +13865,7 @@
   {
     "description": "a name whose path goes on past a field that isn't an object",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -13813,6 +13930,7 @@
                 ]
               }
             ],
+            "message": "item 1 of pull_requests is null, which isn't a list or an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13827,7 +13945,7 @@
   {
     "description": "a for item that picks with brackets: t[0] as i",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -13884,6 +14002,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: for: an item starts with \"every\", \"some\" or a position, like \"last of\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -13913,7 +14032,7 @@
   {
     "description": "a for item that picks with brackets: t.u[1] as i",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -13970,6 +14089,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: for: an item starts with \"every\", \"some\" or a position, like \"last of\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -13999,7 +14119,7 @@
   {
     "description": "a for item that picks with brackets: every t as x, t[0] as i",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -14056,6 +14176,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: for: an item starts with \"every\", \"some\" or a position, like \"last of\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14085,7 +14206,7 @@
   {
     "description": "a for item that picks with brackets: every t as x, t.u[1] as i",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -14142,6 +14263,7 @@
               "id": null
             },
             "check": "$well_formed",
+            "message": "checks.c: for: an item starts with \"every\", \"some\" or a position, like \"last of\"",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -14171,7 +14293,7 @@
   {
     "description": "a for item that is read as before: first of t as i",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -14250,7 +14372,7 @@
   {
     "description": "a for item that is read as before: every t[0].u as i",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -14430,6 +14552,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: item 1 of rows: n is 1, and x.v is 5",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14443,7 +14566,7 @@
     ],
     "description": "a walk on a for line whose whose reads $input after the item's alias",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "requirements": {
         "r": {
           "checks": {
@@ -14568,6 +14691,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: rows is [{\"n\": 1, \"z\": 2}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14581,7 +14705,7 @@
     ],
     "description": "a some walk on a for line whose whose reads $input",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "requirements": {
         "r": {
           "checks": {
@@ -14706,6 +14830,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: rows is [{\"n\": 1, \"z\": 2}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14719,7 +14844,7 @@
     ],
     "description": "a walk on a for line whose assertion reads $input and whose whose reads the alias",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "requirements": {
         "r": {
           "checks": {
@@ -14844,6 +14969,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: rows is [{\"n\": 1, \"z\": 2}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -14857,7 +14983,7 @@
     ],
     "description": "a walk on a for line whose whose reads $input on its left",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "requirements": {
         "r": {
           "checks": {
@@ -14994,6 +15120,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: item 1 of ys: w is 1, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15007,7 +15134,7 @@
     ],
     "description": "a walk over the second item of a for line whose whose reads $input",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "requirements": {
         "r": {
           "checks": {
@@ -15132,6 +15259,7 @@
                 "value": 1
               }
             ],
+            "message": "item 1 of rs: item 1 of rows: n is 1, and r.v is 5",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15148,7 +15276,7 @@
     ],
     "description": "a walk on a for line of a child subject whose whose reads the parent",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "requirements": {
         "s": {
           "checks": {
@@ -15175,7 +15303,7 @@
   {
     "description": "a walk on a for line whose path is named with a character that sorts before $",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -15287,6 +15415,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: item 1 of \"#rows\": n is 1, and x.v is 5",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -15301,7 +15430,7 @@
   {
     "description": "a for item picking the first of a list whose condition reads the first alias",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -15477,6 +15606,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: item 1 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15692,6 +15822,7 @@
                 ]
               }
             ],
+            "message": "item 2 of xs: item 1 of ys: n is 5",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -15706,7 +15837,7 @@
   {
     "description": "a for item picking the last of a list sorted by a field, whose condition reads the first alias",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -15898,6 +16029,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: item 2 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16125,6 +16257,7 @@
                 ]
               }
             ],
+            "message": "item 2 of xs: item 2 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16139,7 +16272,7 @@
   {
     "description": "a for item picking the second of a list whose condition reads the first alias",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -16323,6 +16456,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: item 2 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16538,6 +16672,7 @@
                 ]
               }
             ],
+            "message": "item 2 of xs: item 3 of ys: n is 3",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16552,7 +16687,7 @@
   {
     "description": "a second for item picking after the first alias lists nothing when it picks nothing",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -16618,6 +16753,7 @@
                 "value": []
               }
             ],
+            "message": "ys is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16678,6 +16814,7 @@
                 ]
               }
             ],
+            "message": "ys is [{\"k\": 1, \"n\": 1}]",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16788,6 +16925,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: item 1 of ys: n is 2",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16849,6 +16987,7 @@
                 ]
               }
             ],
+            "message": "xs is []",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -16863,7 +17002,7 @@
   {
     "description": "a second for item picking after the first alias, whose list can't be walked, lists that list once",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -16939,6 +17078,7 @@
                 "value": []
               }
             ],
+            "message": "ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17005,6 +17145,7 @@
                 "value": []
               }
             ],
+            "message": "ys is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17071,6 +17212,7 @@
                 "value": []
               }
             ],
+            "message": "ys is \"zz\", which isn't a list or an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17085,7 +17227,7 @@
   {
     "description": "a second for item picking after the first alias, whose list can't be walked, still lists a first item that failed for another reason",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -17173,6 +17315,7 @@
                 "value": []
               }
             ],
+            "message": "item 1 of xs: k is missing; ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17187,7 +17330,7 @@
   {
     "description": "a second for item picking with sorted by after the first alias, whose list can't be walked, lists that list once",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -17263,6 +17406,7 @@
                 "value": []
               }
             ],
+            "message": "ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17277,7 +17421,7 @@
   {
     "description": "a second for item picking from a list read through the first alias, which ties for one first item and is missing for another",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -17422,6 +17566,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: item 1 and item 2 of p.ys tie on n; item 2 of xs: p.ys is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17436,7 +17581,7 @@
   {
     "description": "a for line with an unknown name and a syntax error",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -17495,6 +17640,7 @@
                 ]
               }
             ],
+            "message": "checks.c: for: doesn't parse",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -17509,7 +17655,7 @@
   {
     "description": "a for line with an unknown name",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
           "from": "things",
@@ -17568,6 +17714,7 @@
                 ]
               }
             ],
+            "message": "checks.c: for: unknown name $foo",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -17582,7 +17729,7 @@
   {
     "description": "a for item that reads its own alias in its path",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -17644,6 +17791,7 @@
                 ]
               }
             ],
+            "message": "checks.c: for: unknown alias x",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17658,7 +17806,7 @@
   {
     "description": "a for item that reads the alias of a later item in its path",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -17724,6 +17872,7 @@
                 ]
               }
             ],
+            "message": "checks.c: for: unknown alias q",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17738,7 +17887,7 @@
   {
     "description": "a for item whose condition reads its own alias in its path",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "release": {
           "from": "releases",
@@ -17804,6 +17953,7 @@
                 ]
               }
             ],
+            "message": "checks.c: for: unknown alias o",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -17818,7 +17968,7 @@
   {
     "description": "a for line sorted by a path named by a key from $params",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "requirements": {
         "a missing key": {
           "checks": {
@@ -17971,6 +18121,7 @@
                 ]
               }
             ],
+            "message": "$params.km is missing",
             "passed": false,
             "requirement": "a missing key",
             "subject": {
@@ -18010,6 +18161,7 @@
                 ]
               }
             ],
+            "message": "$params.km is missing",
             "passed": false,
             "requirement": "a missing key",
             "subject": {
@@ -18065,6 +18217,7 @@
                 ]
               }
             ],
+            "message": "$params.kz is null",
             "passed": false,
             "requirement": "a null key",
             "subject": {
@@ -18104,6 +18257,7 @@
                 ]
               }
             ],
+            "message": "$params.kz is null",
             "passed": false,
             "requirement": "a null key",
             "subject": {
@@ -18159,6 +18313,7 @@
                 ]
               }
             ],
+            "message": "$params.kn is 1, which isn't text",
             "passed": false,
             "requirement": "a number key",
             "subject": {
@@ -18198,6 +18353,7 @@
                 ]
               }
             ],
+            "message": "$params.kn is 1, which isn't text",
             "passed": false,
             "requirement": "a number key",
             "subject": {
@@ -18262,6 +18418,7 @@
                 ]
               }
             ],
+            "message": "item 1 of rows: m is [5, 1], which isn't an object",
             "passed": false,
             "requirement": "a string key",
             "subject": {
@@ -18317,6 +18474,7 @@
                 ]
               }
             ],
+            "message": "$params.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "an object key",
             "subject": {
@@ -18356,6 +18514,7 @@
                 ]
               }
             ],
+            "message": "$params.ko is {\"a\": 1}, which isn't text",
             "passed": false,
             "requirement": "an object key",
             "subject": {

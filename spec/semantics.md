@@ -80,6 +80,32 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[row.inputs_once]** A row shows each entry of its `inputs` once. When a check reads the same value twice, like `count of approvals plus count of approvals is 4`, the second read gives no entry of its own when its name, its value and its locations all match the first's, as [location.merged](#where-a-value-was-read) says, and the rest keep their order.
 
+## Messages
+
+**[message.row]** Every failed row has a `message`, a line of plain text that says what Ergo found, never what the check expected, so someone who doesn't read policies can follow it. A row that passed has none. The message is worked out from the policy and the input only, so the same report gives the same messages.
+
+**[message.value]** A row that failed with cause `value` names each value it compared, as `<name> is <value>`, and joins them with `, and `, in the order of the row's `inputs`: `x is 4`, or `approver is "ana", and author is "ana"`. The name is the input's name as the row's `inputs` show it.
+
+**[message.cause]** A row that failed with any other cause names only the inputs in that state. `absent` reads `<name> is missing`, `null` reads `<name> is null`, `unusable` reads `<name> is <value>, which isn't <kind>`, like `x is "3", which isn't a number`, and `not_an_object` reads `<name> is <value>, which isn't an object`, where the name is `it` for the subject. `ambiguous` names the items that tie and the key they were sorted by: `item 1 and item 2 of commits tie on ts`.
+
+**[message.print]** A value is printed as JSON, with `, ` between items and `: ` after keys, and keys sorted. Text over 60 code points keeps its first 60 and ends with `…"`. A list over 3 items shows its first 3 and then `and N more`, as in `["a", "b", "c", and 2 more]`. An object whose JSON is over 80 characters prints as `an object with N keys`, or `an object with 1 key`. A line separator (U+2028, U+2029 or U+0085) inside text, or inside a name, is written as `\u2028`, `\u2029` or `\u0085`, so a message stays on one line.
+
+**[message.worked_out]** A value Ergo works out, like a `count of`, a `sum of`, a `plus` or an elapsed time, is printed as the number it gave, under the name of that side, not as the values it came from: `count of tests is 1`, `sum of items.n plus extra is 12`.
+
+**[message.followed_by]** A side written with `followed by` is printed as the text it joins to: `spec is "v0.4", and "v" followed by version is "v0.4.1"`.
+
+**[message.items]** An `every` or `some`, and a `for` line, lists only the items that failed, each as `item N of <list>: ` and what was found there, counted from 1, and joined with `; `: `item 2 of tests: ok is false; item 3 of tests: ok is missing`. An item of a list in a list names both, and names the inner list without the outer item's alias: `item 1 of commits: item 2 of reviews: ok is false`. After three items, the message ends with `; and N more`, where N counts items, or pairs of items on a `for` line with two items, and never sentences. On a `for` line over one list, the part of a sentence that doesn't walk a list goes with its item, whenever the item is shown, and isn't counted. `failed_items` keeps its paths as they were.
+
+**[message.part]** A path through a part that breaks before the part is reached says so, naming the part and the value that stopped the read: `cov can't be read: reports is "none", which isn't an object`, or `which isn't a list or an object` under an `every`, `some` or `count of`. When the part is reached and what it holds can't take the next step, the part is named as the value, as `cov is "x", which isn't an object` says.
+
+**[message.alias]** In a `for` line, an item's names drop its alias when every name its sentences read belongs to that item, the last one the line picks: `item 2 of commits: signed is false`. The alias on its own becomes the item, when it's the only thing a sentence read: `item 1 of commits is null`. When a sentence of that item also reads anything else, like a subject's field, a param, `$input`, a name in `named by`, a worked-out value or another item, every name of that item stays as the policy wrote it: `item 2 of commits: c.author is "ann", and owner is "ann"`.
+
+**[message.join]** A check with several sentences gives each failed sentence's message, joined with `; `, in the order of its sentences: `x is 2; y is missing`. In an `any_of`, each option's message starts with the option's name: `one: x is 2; two: y is missing`. On a `for` line, an item is named once, and the sentences that failed for it follow, joined with `, and`: `item 2 of prs: item 1 of approvers: approver.state is "COMMENTED", and approver.username is "bob"`. A sentence that fails for several items of the second list gives each pair of items its own part, joined with `; `, and a sentence that doesn't read the second item joins the first part. The pairs come in the order of the items, the first list's item and then the second's, not in the order of the sentences. On a line with one list, a sentence that walks a list under the item has its own part, and so does one that doesn't: `item 1 of cs: item 2 of reviews: ok is false; item 1 of cs: a is 2`.
+
+**[message.applies]** An `$applies` row that rules a subject out says what its filter found, as a check would: `env is "staging"`.
+
+**[message.empty]** A `for` line that picks no item, because a `whose` leaves none or the list is empty, prints the list it read as found, naming only the lists that a `whose` or a position narrowed, or that are empty: `commits is [{"signed": false}]`, `commits is []`.
+
 ## Where a value was read
 
 **[location]** Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` has `locations`: a list of where Ergo read its value. A location is a JSON Pointer ([RFC 6901](https://www.rfc-editor.org/rfc/rfc6901)) from the root of the input, like `/deployments/3/approved`, or, for a value read from the params, `$params:` followed by a pointer from the root of the params, like `$params:/max_days/high`. List positions count from 0, and a key is escaped as RFC 6901 says, `~` as `~0` and `/` as `~1`. Locations never change `passed`, `cause` or a value. `[]` means no location could be given, like for a read that starts at a name nothing holds.
@@ -456,7 +482,7 @@ A subject can have parts: named paths inside itself, each with an alias, written
 
 **[report.keys]** Every object in the report, `meta` and values copied from the input included, has its keys sorted by code point, whatever order the policy or the input wrote them in.
 
-**[report.version]** The report has `ergo` at its top, the version of the spec it follows, like `"ergo": "v0.4"`. That's the version the implementation follows, even when the policy names another or none.
+**[report.version]** The report has `ergo` at its top, the version of the spec it follows, like `"ergo": "v0.5-dev"`. That's the version the implementation follows, even when the policy names another or none.
 
 **[report.engine]** The report has `engine` at its top, saying which implementation made it: its `name` and `version`, both strings, like `{"name": "ergo-rego", "version": "0.1.0"}`, and nothing else. A name is `ergo-` and the engine, like `ergo-rego` or `ergo-rust`, so the name and version match the engine's release tag, like `rego-v0.3.0` or `rust-v0.1.0`. Apart from `engine`, a report depends only on the policy, the input and the params, so it says nothing about the machine that made it, like the version of OPA, and an implementation reads nothing from that machine: no clock, randomness, network or environment variables.
 
@@ -486,4 +512,4 @@ Names are sorted by code point.
 
 ## Violations
 
-**[violations]** The violations of a report are its rows that are real problems, in the order of `results`, each with its check's `description` and `expression` added and its `$refs` added at the end of its `inputs`. A row of an `every` or `some` check keeps its `failed_items`, and a row of an `all_of` check its `failed_assertions`, and so does an `$applies` row that has them ([scope.failures](#scope)). The violations leave out rows that passed, `$applies` rows that failed with `value`, and every row of a requirement that's `met` or `not_applicable`, so under `require: some` the subjects that failed aren't violations when another one passed. They're worked out from the report alone.
+**[violations]** The violations of a report are its rows that are real problems, in the order of `results`, each with its check's `description` and `expression` added and its `$refs` added at the end of its `inputs`. Each keeps its row's `message` ([messages](#messages)). A row of an `every` or `some` check keeps its `failed_items`, and a row of an `all_of` check its `failed_assertions`, and so does an `$applies` row that has them ([scope.failures](#scope)). The violations leave out rows that passed, `$applies` rows that failed with `value`, and every row of a requirement that's `met` or `not_applicable`, so under `require: some` the subjects that failed aren't violations when another one passed. They're worked out from the report alone.

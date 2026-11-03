@@ -2,6 +2,16 @@
 
 This file is about `ergo.rego` only. The Rust engine's changes are in [engines/rust/CHANGELOG.md](engines/rust/CHANGELOG.md), and the spec's in [spec/CHANGELOG.md](spec/CHANGELOG.md). Each release names the version of the spec it follows.
 
+## 0.5.0
+
+### New
+
+- Every failed row has a `message`, a line of plain text that says what Ergo found, as spec 0.5 says: `approver is "ana", and author is "ana"`, `item 2 of tests: ok is false` or `signed: signature is missing; reviewed: reviewer is missing`. A row that passed has none. Each violation carries the message of its row.
+
+### Changed
+
+- This version follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.5.0-dev`, and each failed row and each violation has a `message`.
+
 ## 0.4.0
 
 ### New

@@ -2,7 +2,7 @@
   {
     "description": "a subject with two parts, one written as a line and one with an id",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "trail",
@@ -260,6 +260,7 @@
                 ]
               }
             ],
+            "message": "findings.truncated is true",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -371,6 +372,7 @@
                 ]
               }
             ],
+            "message": "coverage.attestation_data.hunks_acknowledged is missing, and coverage.attestation_data.hunks_total is missing",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -415,6 +417,7 @@
                 ]
               }
             ],
+            "message": "findings.truncated is missing",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -449,6 +452,7 @@
                 ]
               }
             ],
+            "message": "coverage.attestation_data.hunks_acknowledged is missing, and coverage.attestation_data.hunks_total is missing",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -494,6 +498,7 @@
                 ]
               }
             ],
+            "message": "findings is \"truncated\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -528,6 +533,7 @@
                 ]
               }
             ],
+            "message": "coverage.attestation_data is \"done\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -563,6 +569,7 @@
                 ]
               }
             ],
+            "message": "findings can't be read: compliance_status is \"ok\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -597,6 +604,7 @@
                 ]
               }
             ],
+            "message": "coverage can't be read: compliance_status is \"ok\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -611,7 +619,7 @@
   {
     "description": "the same check written with an alias and with the path it stands for",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "s": {
           "from": "items",
@@ -751,6 +759,7 @@
                 ]
               }
             ],
+            "message": "cov.x is 1, and cov.n is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -777,6 +786,7 @@
                 ]
               }
             ],
+            "message": "d.b.x is 1, and d.b.n is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -837,6 +847,7 @@
                 ]
               }
             ],
+            "message": "cov.x is missing, and cov.n is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -863,6 +874,7 @@
                 ]
               }
             ],
+            "message": "d.b.x is missing, and d.b.n is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -897,6 +909,7 @@
                 ]
               }
             ],
+            "message": "cov.x is missing, and cov.n is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -923,6 +936,7 @@
                 ]
               }
             ],
+            "message": "d.b.x is missing, and d.b.n is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -957,6 +971,7 @@
                 ]
               }
             ],
+            "message": "cov is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -983,6 +998,7 @@
                 ]
               }
             ],
+            "message": "d.b is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1030,6 +1046,7 @@
                 ]
               }
             ],
+            "message": "it is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1056,6 +1073,7 @@
                 ]
               }
             ],
+            "message": "it is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1090,6 +1108,7 @@
                 ]
               }
             ],
+            "message": "it is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1116,6 +1135,7 @@
                 ]
               }
             ],
+            "message": "it is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1150,6 +1170,7 @@
                 ]
               }
             ],
+            "message": "it is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1176,6 +1197,7 @@
                 ]
               }
             ],
+            "message": "it is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1190,7 +1212,7 @@
   {
     "description": "where a part's alias is read",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "rounds whose cov.x is 1",
@@ -1308,6 +1330,7 @@
                 ]
               }
             ],
+            "message": "cov.x is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1327,6 +1350,7 @@
                 ]
               }
             ],
+            "message": ".cov.n is 9",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1436,6 +1460,7 @@
                 ]
               }
             ],
+            "message": "item 1 of lst: x is 1, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1630,6 +1655,7 @@
                 ]
               }
             ],
+            "message": "item 1 of lst: .cov is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1666,7 +1692,7 @@
   },
   {
     "description": "an own field named like a part keeps its dot, and so does the list a count or a walk reads from it",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own_count": "count of .cov.xs is 2", "part_count": "count of cov.xs is 1", "own_walk": "every .cov.xs is at least 1", "own_plain": ".name is \"r1\""}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own_count": "count of .cov.xs is 2", "part_count": "count of cov.xs is 1", "own_walk": "every .cov.xs is at least 1", "own_plain": ".name is \"r1\""}}}},
     "cases": [
       {
         "description": "names the own field, its list and its walk with the dot, and the part and a field no alias is called without it",
@@ -1686,7 +1712,7 @@
   },
   {
     "description": "a child subject whose part is named like its parent's, with a filter that wrote a dot",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1"}}}},
     "cases": [
       {
         "description": "is written wrong and the report echoes the dots as they were written",
@@ -1695,14 +1721,14 @@
         "expressions": {"r": {"$applies": ".cov is 1", "c": ".cov is 1"}},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a child subject that reads its own field named like its parent's part, with no part of its own",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
     "cases": [
       {
         "description": "prints no dot, because a bare name in the child doesn't read the parent's part",
@@ -1716,14 +1742,14 @@
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "unusable", "check": "d", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "message": "cov is 1, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a child subject whose part is refused for its name, with a field named like it",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov ": "x"}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov ": "x"}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
     "cases": [
       {
         "description": "prints no dot, because the refused name isn't cov",
@@ -1732,14 +1758,14 @@
         "expressions": {"r": {"$applies": "cov is 1", "c": "cov is 1", "d": "count of cov is 1"}},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.\"cov \"", "value": ["a name can't start or end with a space or an invisible character"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.\"cov \"", "value": ["a name can't start or end with a space or an invisible character"]}], "message": "subjects.item.has.\"cov \": a name can't start or end with a space or an invisible character", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a child subject whose part is refused for its value, with a field named like it",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
     "cases": [
       {
         "description": "prints the dot in the filter's expression as in its from, because the name is still the part's",
@@ -1748,14 +1774,14 @@
         "expressions": {"r": {"$applies": ".cov is 1", "c": ".cov is 1", "d": "count of .cov is 1"}},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round", "not a string or an object"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round", "not a string or an object"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round; subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a child subject whose part is named like its parent's, read in many places",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r0": {"subject": "item", "checks": {"c": "n is 1"}}, "r1": {"subject": "item", "checks": {"c": "cov.k is 0"}}, "r2": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r3": {"subject": "item", "checks": {"c": "count of .round is 1"}}, "r4": {"subject": "item", "checks": {"c": "item 1 of .zs is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": "y"}}}, "requirements": {"r0": {"subject": "item", "checks": {"c": "n is 1"}}, "r1": {"subject": "item", "checks": {"c": "cov.k is 0"}}, "r2": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r3": {"subject": "item", "checks": {"c": "count of .round is 1"}}, "r4": {"subject": "item", "checks": {"c": "item 1 of .zs is 1"}}}},
     "cases": [
       {
         "description": "prints the dot as the policy wrote it, in the filter, the checks and the walks",
@@ -1763,18 +1789,18 @@
         "input": {"rounds": [{"id": "r1", "y": {"k": 1}, "cov": {"k": 1, "xs": [1, 2]}, "d": {"b": {"k": 5, "xs": [1]}}, "items": [{"id": "i1", "n": 1, "cov": 1, "round": 1, "zs": [1], "y": {"k": 0}}, {"id": "i2", "n": 3, "cov": 2, "round": 2, "zs": [2], "y": {"k": 9}}], "rs": [{"cov": 1, "y": 3}]}]},
         "status": {"r0": "not_met", "r1": "not_met", "r2": "not_met", "r3": "not_met", "r4": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r0", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r1", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r2", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r3", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "passed": false, "requirement": "r4", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r0", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r1", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r2", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r3", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["cov can't be an alias: it's a part of round"]}], "message": "subjects.item.has.cov: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r4", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "walks and counts over an own field named like a part, in the checks and in the filters",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r0": {"subject": "round", "checks": {"c": "every .cov.xs is at least 2"}}, "r1": {"subject": "round", "checks": {"c": "some .cov.xs is 9"}}, "r2": {"subject": "round", "checks": {"c": "every items.zs whose it is 1 has .cov is 1"}}, "r3": {"subject": "round", "checks": {"c": "every items whose cov is 2 has n is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r0": {"subject": "round", "checks": {"c": "every .cov.xs is at least 2"}}, "r1": {"subject": "round", "checks": {"c": "some .cov.xs is 9"}}, "r2": {"subject": "round", "checks": {"c": "every items.zs whose it is 1 has .cov is 1"}}, "r3": {"subject": "round", "checks": {"c": "every items whose cov is 2 has n is 1"}}}},
     "cases": [
       {
         "description": "names the failed items and the inputs of the own field with the dot",
@@ -1784,21 +1810,21 @@
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "passed": false, "requirement": "r2", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "passed": false, "requirement": "r3", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "message": "checks.c: doesn't parse", "passed": false, "requirement": "r2", "subject": {"id": null, "type": "round"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "message": "checks.c: doesn't parse", "passed": false, "requirement": "r3", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r0", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r1", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "message": "item 1 of cov.xs is 1", "passed": false, "requirement": "r0", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}, {"cause": "value", "item": "item 2 of .cov.xs", "locations": ["/rounds/0/cov/xs/1"], "path": "item 2 of .cov.xs", "value": 2}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "message": "item 1 of cov.xs is 1; item 2 of cov.xs is 2", "passed": false, "requirement": "r1", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
   },
   {
     "description": "a child subject with no part of its own, reading a field named like its parent's part",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r0": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r1": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r2": {"subject": "item", "checks": {"c": ".zz is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r0": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r1": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r2": {"subject": "item", "checks": {"c": ".zz is 1"}}}},
     "cases": [
       {
         "description": "prints no dot, because a bare name in the child doesn't read the parent's part",
@@ -1816,21 +1842,21 @@
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r1", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r2", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "passed": false, "requirement": "r0", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "message": "cov is 2", "passed": false, "requirement": "r0", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "passed": false, "requirement": "r1", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "message": "cov is 2", "passed": false, "requirement": "r1", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "passed": false, "requirement": "r2", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/1/cov"], "name": "cov", "value": 2}], "message": "cov is 2", "passed": false, "requirement": "r2", "subject": {"id": "i2", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "passed": false, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "zz", "value": null}], "passed": false, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of cov", "value": null}, {"locations": [], "name": "cov", "value": []}], "message": "cov is 1, which isn't a list or an object", "passed": false, "requirement": "r1", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "zz", "value": null}], "message": "zz is missing", "passed": false, "requirement": "r2", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "a part refused for its value, read in many places",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id"}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}}}, "requirements": {"r00": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r01": {"subject": "item", "checks": {"c": "every .xs is at least 1"}}, "r02": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r03": {"subject": "item", "checks": {"c": {"for": "every .xs as x", "assert": "x is 1"}}}, "r04": {"subject": "item", "checks": {"c": "cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id"}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id", "has": {"cov": 5}}}, "requirements": {"r00": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r01": {"subject": "item", "checks": {"c": "every .xs is at least 1"}}, "r02": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r03": {"subject": "item", "checks": {"c": {"for": "every .xs as x", "assert": "x is 1"}}}, "r04": {"subject": "item", "checks": {"c": "cov is 1"}}}},
     "cases": [
       {
         "description": "prints the dot in every expression, because the refused name is still the part's",
@@ -1838,18 +1864,18 @@
         "input": {"rounds": [{"id": "r1", "d": {"b": {"k": 5}}, "items": [{"id": "i1", "n": 1, "cov": 1, "y": {"k": 0}, "xs": [0]}, {"id": "i2", "n": 2, "cov": 2, "y": {"k": 9}, "xs": [3]}]}]},
         "status": {"r00": "not_met", "r01": "not_met", "r02": "not_met", "r03": "not_met", "r04": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r00", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r01", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r02", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r03", "subject": {"id": null, "type": "item"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "passed": false, "requirement": "r04", "subject": {"id": null, "type": "item"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r00", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r01", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r02", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r03", "subject": {"id": null, "type": "item"}},
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.item.has.cov", "value": ["not a string or an object"]}], "message": "subjects.item.has.cov: not a string or an object", "passed": false, "requirement": "r04", "subject": {"id": null, "type": "item"}}
         ]
       }
     ]
   },
   {
     "description": "an own field named like a part, read by a walk that fails",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own": "every .cov.xs is at least 2", "part": "every cov.xs is at least 2"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r": {"subject": "round", "checks": {"own": "every .cov.xs is at least 2", "part": "every cov.xs is at least 2"}}}},
     "cases": [
       {
         "description": "names the item of the own field with the dot and the item of the part without it",
@@ -1860,15 +1886,15 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated round ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "own", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
-          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "item": "item 1 of cov.xs", "locations": ["/rounds/0/d/b/xs/0"], "path": "item 1 of cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/d/b/xs/0"], "name": "cov.xs[]", "part": {"id": null, "name": "cov"}, "value": [1]}], "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
+          {"cause": "value", "check": "own", "failed_items": [{"cause": "value", "item": "item 1 of .cov.xs", "locations": ["/rounds/0/cov/xs/0"], "path": "item 1 of .cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/cov/xs/0", "/rounds/0/cov/xs/1"], "name": ".cov.xs[]", "value": [1, 2]}], "message": "item 1 of cov.xs is 1", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}},
+          {"cause": "value", "check": "part", "failed_items": [{"cause": "value", "item": "item 1 of cov.xs", "locations": ["/rounds/0/d/b/xs/0"], "path": "item 1 of cov.xs", "value": 1}], "inputs": [{"locations": ["/rounds/0/d/b/xs/0"], "name": "cov.xs[]", "part": {"id": null, "name": "cov"}, "value": [1]}], "message": "item 1 of cov.xs is 1", "passed": false, "requirement": "r", "subject": {"id": "r1", "type": "round"}}
         ]
       }
     ]
   },
   {
     "description": "a part's alias on the right of a whose, with items that have a field of the same name",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "p"}}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": "every xs.v whose n is count of x.z is 1", "some_whose": "some xs.v whose n is count of x.z is 5", "count_whose": "count of xs whose n is count of x.z is 2", "sum_whose": "sum of xs.v whose n is count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1", "for_whose": {"for": "every xs whose n is count of x.z as y", "assert": "y.v is 1"}, "dot_right": "every xs.v whose n is count of .x.z is 1", "left": "count of xs whose count of x.z is 3 is 3"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "p"}}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": "every xs.v whose n is count of x.z is 1", "some_whose": "some xs.v whose n is count of x.z is 5", "count_whose": "count of xs whose n is count of x.z is 2", "sum_whose": "sum of xs.v whose n is count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1", "for_whose": {"for": "every xs whose n is count of x.z as y", "assert": "y.v is 1"}, "dot_right": "every xs.v whose n is count of .x.z is 1", "left": "count of xs whose count of x.z is 3 is 3"}}}},
     "cases": [
       {
         "description": "reads the part on the right, in every, some, count of, sum of and a for item, and the item's field on the left and after a dot",
@@ -1876,12 +1902,12 @@
         "input": {"things": [{"id": "a", "p": {"z": [1]}, "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}]},
         "results": [
           {"cause": "satisfied", "check": "count_whose", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs whose n equals count of x.z", "value": 2}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
-          {"cause": "value", "check": "dot_right", "failed_items": [{"cause": "value", "item": "item 3 of xs", "locations": ["/things/0/xs/2/v"], "path": "xs[2].v", "value": 5}], "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "dot_right", "failed_items": [{"cause": "value", "item": "item 3 of xs", "locations": ["/things/0/xs/2/v"], "path": "xs[2].v", "value": 5}], "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "item 3 of xs: v is 5", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "every_sum", "failed_items": [], "inputs": [{"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "every_whose", "failed_items": [], "inputs": [{"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "for_whose", "failed_items": [], "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "left", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs whose count of x.z is 3", "value": 3}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
-          {"cause": "value", "check": "some_whose", "failed_items": [{"cause": "value", "item": "item 1 of xs", "locations": ["/things/0/xs/0/v"], "path": "xs[0].v", "value": 1}, {"cause": "value", "item": "item 2 of xs", "locations": ["/things/0/xs/1/v"], "path": "xs[1].v", "value": 1}], "inputs": [{"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "some_whose", "failed_items": [{"cause": "value", "item": "item 1 of xs", "locations": ["/things/0/xs/0/v"], "path": "xs[0].v", "value": 1}, {"cause": "value", "item": "item 2 of xs", "locations": ["/things/0/xs/1/v"], "path": "xs[1].v", "value": 1}], "inputs": [{"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "item 1 of xs: v is 1; item 2 of xs: v is 1", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "thing"}},
           {"cause": "satisfied", "check": "sum_whose", "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": 2}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/0/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": [1]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "thing"}}
         ],
         "expressions": {"r": {"every_whose": "every xs.v whose n equals count of x.z is 1", "some_whose": "some xs.v whose n equals count of x.z is 5", "count_whose": "count of xs whose n equals count of x.z is 2", "sum_whose": "sum of xs.v whose n equals count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1", "for_whose": "for every xs whose n equals count of x.z as y: y.v is 1", "dot_right": "every xs.v whose n equals count of .x.z is 1", "left": "count of xs whose count of x.z is 3 is 3"}}
@@ -1890,31 +1916,31 @@
   },
   {
     "description": "a part's alias on the right of a whose, with a part that is missing, null or not a list",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "p"}}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": "every xs.v whose n is count of x.z is 1", "count_whose": "count of xs whose n is count of x.z is 2", "sum_whose": "sum of xs.v whose n is count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "p"}}}, "requirements": {"r": {"subject": "thing", "checks": {"every_whose": "every xs.v whose n is count of x.z is 1", "count_whose": "count of xs whose n is count of x.z is 2", "sum_whose": "sum of xs.v whose n is count of x.z is 2", "every_sum": "every xs.v whose n is at most sum of x.z is 1"}}}},
     "cases": [
       {
         "description": "fails closed for each thing, and never reads the items' own field instead",
         "rules": ["parts.where", "sentence.path.start", "sentence.path.part"],
         "input": {"things": [{"id": "missing", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"id": "null", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}], "p": null}, {"id": "text", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}], "p": {"z": "abc"}}, {"id": "object", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}], "p": {"z": {"k": 1}}}, {"id": "list_of_text", "xs": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}], "p": {"z": ["a"]}}]},
         "results": [
-          {"cause": "absent", "check": "count_whose", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
-          {"cause": "absent", "check": "every_sum", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 3 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
-          {"cause": "absent", "check": "every_whose", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 3 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
-          {"cause": "absent", "check": "sum_whose", "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
-          {"cause": "null", "check": "count_whose", "inputs": [{"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
-          {"cause": "null", "check": "every_sum", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 3 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
-          {"cause": "null", "check": "every_whose", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 3 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
-          {"cause": "null", "check": "sum_whose", "inputs": [{"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
-          {"cause": "unusable", "check": "count_whose", "inputs": [{"locations": ["/things/2/xs/0", "/things/2/xs/1", "/things/2/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/2/xs/0", "/things/2/xs/1", "/things/2/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
-          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}], "inputs": [{"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
-          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}], "inputs": [{"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
-          {"cause": "unusable", "check": "sum_whose", "inputs": [{"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}], "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
-          {"cause": "unusable", "check": "count_whose", "inputs": [{"locations": ["/things/3/xs/0", "/things/3/xs/1", "/things/3/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/3/xs/0", "/things/3/xs/1", "/things/3/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
-          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}], "inputs": [{"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
-          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}], "inputs": [{"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
-          {"cause": "unusable", "check": "sum_whose", "inputs": [{"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}], "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "absent", "check": "count_whose", "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "message": "x is missing", "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
+          {"cause": "absent", "check": "every_sum", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 3 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x is missing", "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
+          {"cause": "absent", "check": "every_whose", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}, {"cause": "absent", "item": "item 3 of xs", "locations": ["/things/0"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x is missing", "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
+          {"cause": "absent", "check": "sum_whose", "inputs": [{"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/0/xs/0/v", "/things/0/xs/1/v", "/things/0/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/0"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "message": "x is missing", "passed": false, "requirement": "r", "subject": {"id": "missing", "type": "thing"}},
+          {"cause": "null", "check": "count_whose", "inputs": [{"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/1/xs/0", "/things/1/xs/1", "/things/1/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "message": "x is null", "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "null", "check": "every_sum", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 3 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x is null", "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "null", "check": "every_whose", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}, {"cause": "null", "item": "item 3 of xs", "locations": ["/things/1/p"], "path": "x.z", "value": null}], "inputs": [{"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x is null", "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "null", "check": "sum_whose", "inputs": [{"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/1/xs/0/v", "/things/1/xs/1/v", "/things/1/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/1/p"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": null}], "message": "x is null", "passed": false, "requirement": "r", "subject": {"id": "null", "type": "thing"}},
+          {"cause": "unusable", "check": "count_whose", "inputs": [{"locations": ["/things/2/xs/0", "/things/2/xs/1", "/things/2/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/2/xs/0", "/things/2/xs/1", "/things/2/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}], "message": "x.z is \"abc\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}], "inputs": [{"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x.z is \"abc\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/2/p/z"], "path": "x.z", "value": "abc"}], "inputs": [{"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x.z is \"abc\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "sum_whose", "inputs": [{"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/2/xs/0/v", "/things/2/xs/1/v", "/things/2/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/2/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": "abc"}], "message": "x.z is \"abc\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "unusable", "check": "count_whose", "inputs": [{"locations": ["/things/3/xs/0", "/things/3/xs/1", "/things/3/xs/2"], "name": "count of xs whose n equals count of x.z", "value": null}, {"locations": ["/things/3/xs/0", "/things/3/xs/1", "/things/3/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}], "message": "x.z is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}], "inputs": [{"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x.z is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "unusable", "check": "every_whose", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/3/p/z"], "path": "x.z", "value": {"k": 1}}], "inputs": [{"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "x.z is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
+          {"cause": "unusable", "check": "sum_whose", "inputs": [{"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": null}, {"locations": ["/things/3/xs/0/v", "/things/3/xs/1/v", "/things/3/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/3/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": {"k": 1}}], "message": "x.z is {\"k\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "object", "type": "thing"}},
           {"cause": "satisfied", "check": "count_whose", "inputs": [{"locations": ["/things/4/xs/0", "/things/4/xs/1", "/things/4/xs/2"], "name": "count of xs whose n equals count of x.z", "value": 2}, {"locations": ["/things/4/xs/0", "/things/4/xs/1", "/things/4/xs/2"], "name": "xs[]", "value": [{"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 1, "v": 1, "x": {"z": [1, 1, 1]}}, {"n": 3, "v": 5, "x": {"z": [1, 1, 1]}}]}, {"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}], "passed": true, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
-          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/4/xs/0/n"], "path": "xs[0].n", "value": 1}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/4/xs/1/n"], "path": "xs[1].n", "value": 1}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/4/xs/2/n"], "path": "xs[2].n", "value": 3}], "inputs": [{"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}, {"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": false, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
+          {"cause": "unusable", "check": "every_sum", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/things/4/xs/0/n"], "path": "xs[0].n", "value": 1}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/things/4/xs/1/n"], "path": "xs[1].n", "value": 1}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/things/4/xs/2/n"], "path": "xs[2].n", "value": 3}], "inputs": [{"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}, {"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "message": "item 1 of xs: item 1 of $x.z is \"a\", which isn't a number; item 2 of xs: item 1 of $x.z is \"a\", which isn't a number; item 3 of xs: item 1 of $x.z is \"a\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
           {"cause": "satisfied", "check": "every_whose", "failed_items": [], "inputs": [{"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}, {"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}], "passed": true, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}},
           {"cause": "satisfied", "check": "sum_whose", "inputs": [{"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "sum of xs.v whose n equals count of x.z", "value": 2}, {"locations": ["/things/4/xs/0/v", "/things/4/xs/1/v", "/things/4/xs/2/v"], "name": "xs[].v", "value": [1, 1, 5]}, {"locations": ["/things/4/p/z"], "name": "x.z", "part": {"id": null, "name": "x"}, "value": ["a"]}], "passed": true, "requirement": "r", "subject": {"id": "list_of_text", "type": "thing"}}
         ],
@@ -1925,7 +1951,7 @@
   {
     "description": "a part's alias on the right side of a whose, with and without plus",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "kid": {
           "from": "kids",
@@ -2015,6 +2041,7 @@
                 "value": null
               }
             ],
+            "message": "pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2058,6 +2085,7 @@
                 "value": null
               }
             ],
+            "message": "pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2101,6 +2129,7 @@
                 "value": null
               }
             ],
+            "message": "pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2144,6 +2173,7 @@
                 "value": null
               }
             ],
+            "message": "pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2191,6 +2221,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: $pa.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2391,7 +2422,7 @@
   {
     "description": "a part's alias in an elapsed time on the right side of a whose",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "kid": {
           "from": "kids",
@@ -2482,6 +2513,7 @@
                 "value": null
               }
             ],
+            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2525,6 +2557,7 @@
                 "value": null
               }
             ],
+            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2568,6 +2601,7 @@
                 "value": null
               }
             ],
+            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2611,6 +2645,7 @@
                 "value": null
               }
             ],
+            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2654,6 +2689,7 @@
                 "value": null
               }
             ],
+            "message": "pa.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2872,7 +2908,7 @@
   {
     "description": "a parent's name on the right side of a whose, with and without plus",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "fam": {
           "from": "fams",
@@ -2957,6 +2993,7 @@
                 ]
               }
             ],
+            "message": "fam.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -2999,6 +3036,7 @@
                 ]
               }
             ],
+            "message": "fam.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3041,6 +3079,7 @@
                 ]
               }
             ],
+            "message": "fam.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3184,7 +3223,7 @@
   {
     "description": "a parent's name in an elapsed time on the right side of a whose",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "fam": {
           "from": "fams",
@@ -3274,6 +3313,7 @@
                 "value": null
               }
             ],
+            "message": "fam.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3316,6 +3356,7 @@
                 ]
               }
             ],
+            "message": "fam.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3358,6 +3399,7 @@
                 ]
               }
             ],
+            "message": "fam.t is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3513,7 +3555,7 @@
   {
     "description": "a for alias and the input on the right side of a whose with plus",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "kid": {
           "from": "kids",
@@ -3648,6 +3690,7 @@
                 ]
               }
             ],
+            "message": "item 1 of xs: x.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3687,6 +3730,7 @@
                 ]
               }
             ],
+            "message": "item 1 of items: $input.w is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3798,7 +3842,7 @@
   {
     "description": "a param on the right side of a whose with plus",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "kid": {
           "from": "kids",
@@ -3855,6 +3899,7 @@
                 ]
               }
             ],
+            "message": "items is [{\"hi\": 1, \"lo\": 5, \"status\": \"ok\", \"w\": 1}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -3914,7 +3959,7 @@
   {
     "description": "a count of or sum of a parent's part on the right side of a whose, alone and in a plus",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "fam": {
           "from": "fams",
@@ -4016,6 +4061,7 @@
                 ]
               }
             ],
+            "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4059,6 +4105,7 @@
                 ]
               }
             ],
+            "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4102,6 +4149,7 @@
                 ]
               }
             ],
+            "message": "items is [{\"lo\": 2, \"status\": \"ok\"}]",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4277,7 +4325,7 @@
   },
   {
     "description": "a parent's name on the right side of a count of or sum of in a whose",
-    "policy": {"ergo_spec": "v0.4", "requirements": {"r": {"checks": {"c": "count of items whose n is count of fam.z is 1", "d": "sum of items.v whose n is count of fam.z is 1", "e": "count of items whose n is count of .fam.z is 2", "f": "count of items whose count of fam.z is 1 is 3"}, "subject": "kid"}}, "subjects": {"fam": {"from": "fams", "identified_by": "id"}, "kid": {"from": "fam.kids", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of items whose n is count of fam.z is 1", "d": "sum of items.v whose n is count of fam.z is 1", "e": "count of items whose n is count of .fam.z is 2", "f": "count of items whose count of fam.z is 1 is 3"}, "subject": "kid"}}, "subjects": {"fam": {"from": "fams", "identified_by": "id"}, "kid": {"from": "fam.kids", "identified_by": "id"}}},
     "cases": [
       {
         "description": "counts the parent's field, not the item's field of the same name, while the left side and a name written with a dot read the item's",
@@ -4295,8 +4343,8 @@
         "rules": ["parts.where", "sentence.subject.chain", "sentence.path.start", "sentence.derived.count", "sentence.whose.item", "tally.walk"],
         "input": {"fams": [{"id": "F", "kids": [{"id": "K", "items": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0"], "name": "fam.z", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
-          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0"], "name": "fam.z", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0"], "name": "fam.z", "value": null}], "message": "fam.z is missing", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0"], "name": "fam.z", "value": null}], "message": "fam.z is missing", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of .fam.z", "value": 2}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose count of fam.z is 1", "value": 3}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}}
         ]
@@ -4306,8 +4354,8 @@
         "rules": ["parts.where", "sentence.subject.chain", "sentence.path.start", "sentence.derived.count", "sentence.whose.item", "tally.walk"],
         "input": {"fams": [{"id": "F", "kids": [{"id": "K", "items": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "z": null}]},
         "results": [
-          {"cause": "null", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
-          {"cause": "null", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": null}], "message": "fam.z is null", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": null}], "message": "fam.z is null", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of .fam.z", "value": 2}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose count of fam.z is 1", "value": 3}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}}
         ]
@@ -4317,8 +4365,8 @@
         "rules": ["parts.where", "sentence.subject.chain", "sentence.path.start", "sentence.derived.count", "sentence.whose.item", "tally.walk"],
         "input": {"fams": [{"id": "F", "kids": [{"id": "K", "items": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "z": "ab"}]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": "ab"}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
-          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": "ab"}], "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": "ab"}], "message": "fam.z is \"ab\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "sum of items.v whose n equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/items/0/v", "/fams/0/kids/0/items/1/v", "/fams/0/kids/0/items/2/v"], "name": "items[].v", "value": [1, 2, 4]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": "ab"}], "message": "fam.z is \"ab\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose n equals count of .fam.z", "value": 2}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
           {"cause": "satisfied", "check": "f", "inputs": [{"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "count of items whose count of fam.z is 1", "value": 3}, {"locations": ["/fams/0/kids/0/items/0", "/fams/0/kids/0/items/1", "/fams/0/kids/0/items/2"], "name": "items[]", "value": [{"fam": {"z": [1]}, "n": 2, "v": 1}, {"fam": {"z": [1]}, "n": 1, "v": 2}, {"fam": {"z": [1]}, "n": 1, "v": 4}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}}
         ]
@@ -4328,7 +4376,7 @@
   {
     "description": "an alias that is also a for alias",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -4400,6 +4448,7 @@
                 ]
               }
             ],
+            "message": "checks.c: cov can't be an alias: it's a part of round",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4414,7 +4463,7 @@
   {
     "description": "named by an alias that is a part",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -4482,6 +4531,7 @@
                 ]
               }
             ],
+            "message": "checks.c: named by cov reads a part, which isn't supported yet",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4496,7 +4546,7 @@
   {
     "description": "a subject that narrows another keeps its parts and adds its own",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -4619,6 +4669,7 @@
                 ]
               }
             ],
+            "message": "cov.x is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4668,7 +4719,7 @@
   {
     "description": "a subject that narrows another and adds a part with a kept alias",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -4742,6 +4793,7 @@
                 ]
               }
             ],
+            "message": "subjects.\"good round\".has.cov: cov can't be an alias: it's a part of round",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4756,7 +4808,7 @@
   {
     "description": "a chained subject reads its parent's parts",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts named by $params.art",
@@ -4869,6 +4921,7 @@
                 ]
               }
             ],
+            "message": "pra is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4943,6 +4996,7 @@
                 ]
               }
             ],
+            "message": "pra is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -4969,6 +5023,7 @@
                 ]
               }
             ],
+            "message": "rev.count is 1",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5012,7 +5067,7 @@
   {
     "description": "a chained subject with a part named like its parent",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "artifact": {
           "from": "trail.artifacts named by $params.art",
@@ -5092,6 +5147,7 @@
                 ]
               }
             ],
+            "message": "subjects.\"pull request\".has.artifact: artifact can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5106,7 +5162,7 @@
   {
     "description": "a subject whose parts are written wrong",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -5394,6 +5450,7 @@
                 ]
               }
             ],
+            "message": "subjects.round.has.\"with space\": invalid alias; subjects.round.has.$dollar: a name can't start with $; subjects.round.has.bare_by: from: unknown alias foo; subjects.round.has.blank: from: doesn't parse; subjects.round.has.each_of: from: a part is a path: whose and named by each of can't go in it; subjects.round.has.every: invalid alias; subjects.round.has.extra: unknown field other; subjects.round.has.fromnum: invalid from; subjects.round.has.idbad: identified_by: a part is a path: whose and named by each of can't go in it; subjects.round.has.idnum: invalid identified_by; subjects.round.has.in_input: from: a part reads inside its subject, so it can't start at $params or $input; subjects.round.has.in_params: from: a part reads inside its subject, so it can't start at $params or $input; subjects.round.has.nofrom: missing from; subjects.round.has.num: not a string or an object; subjects.round.has.who: from: a part is a path: whose and named by each of can't go in it",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5407,7 +5464,7 @@
   },
   {
     "description": "checks whose names need quoting in the report",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"$x\ty": "id exists", "$x y": "id exists", "$x\"y": "id exists", "$x": "id exists", "$a-b": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"$x\ty": "id exists", "$x y": "id exists", "$x\"y": "id exists", "$x": "id exists", "$a-b": "id exists"}}}},
     "cases": [
       {
         "description": "lists the wrong checks sorted by the name as the report writes it, quotes and escapes included",
@@ -5415,14 +5472,14 @@
         "input": {"things": [{"id": "a", "x": 1}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 5}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"$x y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\\"y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\ty\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$a-b", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$x", "value": ["a name can't start with $"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 5}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"$x y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\\"y\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.\"$x\\ty\"", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$a-b", "value": ["a name can't start with $"]}, {"locations": [], "name": "checks.$x", "value": ["a name can't start with $"]}], "message": "checks.\"$x y\": a name can't start with $; checks.\"$x\\\"y\": a name can't start with $; checks.\"$x\\ty\": a name can't start with $; checks.$a-b: a name can't start with $; checks.$x: a name can't start with $", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
   },
   {
     "description": "a requirement whose checks have awkward names",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"x y": 5, "x\"y": 5, "x\\y": 5, "x\ty": 5, "x<y": 5, "x>y": 5, "x&y": 5, "x\u2028y": 5, "x\u2029y": 5, "x\u007fy": 5, "x\by": 5, "x\fy": 5, "x\u0001y": 5, "x\ny": 5, "\u00e9": 5, "x.y": 5, "0x": 5, "a-b": 5, "a1": 5, "A": 5, "x": 5, "x/y": 5, "x'y": 5, "\u00e9x": 5, "x\u00a0y": 5, "x\u200by": 5, "x\ud83d\ude00": 5}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"x y": 5, "x\"y": 5, "x\\y": 5, "x\ty": 5, "x<y": 5, "x>y": 5, "x&y": 5, "x\u2028y": 5, "x\u2029y": 5, "x\u007fy": 5, "x\by": 5, "x\fy": 5, "x\u0001y": 5, "x\ny": 5, "\u00e9": 5, "x.y": 5, "0x": 5, "a-b": 5, "a1": 5, "A": 5, "x": 5, "x/y": 5, "x'y": 5, "\u00e9x": 5, "x\u00a0y": 5, "x\u200by": 5, "x\ud83d\ude00": 5}}}},
     "cases": [
       {
         "description": "lists the checks sorted by the name as the report writes it, quotes and escapes included, by code point",
@@ -5430,14 +5487,14 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 27}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"0x\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x&y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x'y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x.y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x/y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x<y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x>y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\\"y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\\\y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\by\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\fy\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\ny\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\ty\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\u0001y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"xy\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x​y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x😀\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"é\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"éx\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.A", "value": ["invalid check"]}, {"locations": [], "name": "checks.a-b", "value": ["invalid check"]}, {"locations": [], "name": "checks.a1", "value": ["invalid check"]}, {"locations": [], "name": "checks.x", "value": ["invalid check"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 27}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.\"0x\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x&y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x'y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x.y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x/y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x<y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x>y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\\"y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\\\y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\by\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\fy\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\ny\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\ty\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x\\u0001y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"xy\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x​y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x y\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"x😀\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"é\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.\"éx\"", "value": ["invalid check"]}, {"locations": [], "name": "checks.A", "value": ["invalid check"]}, {"locations": [], "name": "checks.a-b", "value": ["invalid check"]}, {"locations": [], "name": "checks.a1", "value": ["invalid check"]}, {"locations": [], "name": "checks.x", "value": ["invalid check"]}], "message": "checks.\"0x\": invalid check; checks.\"x y\": invalid check; checks.\"x&y\": invalid check; checks.\"x'y\": invalid check; checks.\"x.y\": invalid check; checks.\"x/y\": invalid check; checks.\"x<y\": invalid check; checks.\"x>y\": invalid check; checks.\"x\\\"y\": invalid check; checks.\"x\\\\y\": invalid check; checks.\"x\\by\": invalid check; checks.\"x\\fy\": invalid check; checks.\"x\\ny\": invalid check; checks.\"x\\ty\": invalid check; checks.\"x\\u0001y\": invalid check; checks.\"xy\": invalid check; checks.\"x y\": invalid check; checks.\"x​y\": invalid check; checks.\"x\\u2028y\": invalid check; checks.\"x\\u2029y\": invalid check; checks.\"x😀\": invalid check; checks.\"é\": invalid check; checks.\"éx\": invalid check; checks.A: invalid check; checks.a-b: invalid check; checks.a1: invalid check; checks.x: invalid check", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
   },
   {
     "description": "a subject whose parts have awkward names",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id", "has": {"x y": 5, "x\"y": 5, "x\\y": 5, "x\ty": 5, "x<y": 5, "x>y": 5, "x&y": 5, "x\u2028y": 5, "x\u2029y": 5, "x\u007fy": 5, "x\by": 5, "x\fy": 5, "x\u0001y": 5, "x\ny": 5, "\u00e9": 5, "x.y": 5, "0x": 5, "a-b": 5, "a1": 5, "A": 5, "x": 5, "x/y": 5, "x'y": 5, "\u00e9x": 5, "x\u00a0y": 5, "x\u200by": 5, "x\ud83d\ude00": 5}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "things", "identified_by": "id", "has": {"x y": 5, "x\"y": 5, "x\\y": 5, "x\ty": 5, "x<y": 5, "x>y": 5, "x&y": 5, "x\u2028y": 5, "x\u2029y": 5, "x\u007fy": 5, "x\by": 5, "x\fy": 5, "x\u0001y": 5, "x\ny": 5, "\u00e9": 5, "x.y": 5, "0x": 5, "a-b": 5, "a1": 5, "A": 5, "x": 5, "x/y": 5, "x'y": 5, "\u00e9x": 5, "x\u00a0y": 5, "x\u200by": 5, "x\ud83d\ude00": 5}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "lists the parts sorted by the name as the report writes it, quotes and escapes included, by code point",
@@ -5445,14 +5502,14 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"0x\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x&y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x'y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x.y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x/y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x<y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x>y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\\"y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\\\y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\by\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\fy\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\ny\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\ty\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\u0001y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"xy\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x​y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x😀\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"é\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"éx\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.A", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.a-b", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.a1", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.x", "value": ["not a string or an object"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"0x\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x&y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x'y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x.y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x/y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x<y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x>y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\\"y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\\\y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\by\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\fy\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\ny\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\ty\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x\\u0001y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"xy\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x​y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"x😀\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"é\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.\"éx\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.has.A", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.a-b", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.a1", "value": ["not a string or an object"]}, {"locations": [], "name": "subjects.s.has.x", "value": ["not a string or an object"]}], "message": "subjects.s.has.\"0x\": invalid alias; subjects.s.has.\"0x\": not a string or an object; subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x y\": not a string or an object; subjects.s.has.\"x&y\": invalid alias; subjects.s.has.\"x&y\": not a string or an object; subjects.s.has.\"x'y\": invalid alias; subjects.s.has.\"x'y\": not a string or an object; subjects.s.has.\"x.y\": invalid alias; subjects.s.has.\"x.y\": not a string or an object; subjects.s.has.\"x/y\": invalid alias; subjects.s.has.\"x/y\": not a string or an object; subjects.s.has.\"x<y\": invalid alias; subjects.s.has.\"x<y\": not a string or an object; subjects.s.has.\"x>y\": invalid alias; subjects.s.has.\"x>y\": not a string or an object; subjects.s.has.\"x\\\"y\": invalid alias; subjects.s.has.\"x\\\"y\": not a string or an object; subjects.s.has.\"x\\\\y\": invalid alias; subjects.s.has.\"x\\\\y\": not a string or an object; subjects.s.has.\"x\\by\": invalid alias; subjects.s.has.\"x\\by\": not a string or an object; subjects.s.has.\"x\\fy\": invalid alias; subjects.s.has.\"x\\fy\": not a string or an object; subjects.s.has.\"x\\ny\": invalid alias; subjects.s.has.\"x\\ny\": not a string or an object; subjects.s.has.\"x\\ty\": invalid alias; subjects.s.has.\"x\\ty\": not a string or an object; subjects.s.has.\"x\\u0001y\": invalid alias; subjects.s.has.\"x\\u0001y\": not a string or an object; subjects.s.has.\"xy\": invalid alias; subjects.s.has.\"xy\": not a string or an object; subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x y\": not a string or an object; subjects.s.has.\"x​y\": invalid alias; subjects.s.has.\"x​y\": not a string or an object; subjects.s.has.\"x\\u2028y\": invalid alias; subjects.s.has.\"x\\u2028y\": not a string or an object; subjects.s.has.\"x\\u2029y\": invalid alias; subjects.s.has.\"x\\u2029y\": not a string or an object; subjects.s.has.\"x😀\": invalid alias; subjects.s.has.\"x😀\": not a string or an object; subjects.s.has.\"é\": invalid alias; subjects.s.has.\"é\": not a string or an object; subjects.s.has.\"éx\": invalid alias; subjects.s.has.\"éx\": not a string or an object; subjects.s.has.A: not a string or an object; subjects.s.has.a-b: not a string or an object; subjects.s.has.a1: not a string or an object; subjects.s.has.x: not a string or an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
   },
   {
     "description": "a requirement with unknown fields that have awkward names",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}, "require": "bad", "x y": 1, "x\"y": 1, "x\\y": 1, "x\ty": 1, "x<y": 1, "x>y": 1, "x&y": 1, "x\u2028y": 1, "x\u2029y": 1, "x\u007fy": 1, "x\by": 1, "x\fy": 1, "x\u0001y": 1, "x\ny": 1, "\u00e9": 1, "x.y": 1, "0x": 1, "a-b": 1, "a1": 1, "A": 1, "x": 1, "x/y": 1, "x'y": 1, "\u00e9x": 1, "x\u00a0y": 1, "x\u200by": 1, "x\ud83d\ude00": 1}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}, "require": "bad", "x y": 1, "x\"y": 1, "x\\y": 1, "x\ty": 1, "x<y": 1, "x>y": 1, "x&y": 1, "x\u2028y": 1, "x\u2029y": 1, "x\u007fy": 1, "x\by": 1, "x\fy": 1, "x\u0001y": 1, "x\ny": 1, "\u00e9": 1, "x.y": 1, "0x": 1, "a-b": 1, "a1": 1, "A": 1, "x": 1, "x/y": 1, "x'y": 1, "\u00e9x": 1, "x\u00a0y": 1, "x\u200by": 1, "x\ud83d\ude00": 1}}},
     "cases": [
       {
         "description": "lists require second, then the fields sorted by the name as the report writes it, by code point",
@@ -5460,14 +5517,14 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": ["neither every nor some"]}, {"locations": [], "name": "\"0x\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x&y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x'y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x.y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x/y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x<y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x>y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\\"y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\\\y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\by\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\fy\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\ny\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\ty\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\u0001y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"xy\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x​y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x😀\"", "value": ["unknown field"]}, {"locations": [], "name": "\"é\"", "value": ["unknown field"]}, {"locations": [], "name": "\"éx\"", "value": ["unknown field"]}, {"locations": [], "name": "A", "value": ["unknown field"]}, {"locations": [], "name": "a-b", "value": ["unknown field"]}, {"locations": [], "name": "a1", "value": ["unknown field"]}, {"locations": [], "name": "x", "value": ["unknown field"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": ["neither every nor some"]}, {"locations": [], "name": "\"0x\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x&y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x'y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x.y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x/y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x<y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x>y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\\"y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\\\y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\by\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\fy\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\ny\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\ty\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x\\u0001y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"xy\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x​y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "\"x😀\"", "value": ["unknown field"]}, {"locations": [], "name": "\"é\"", "value": ["unknown field"]}, {"locations": [], "name": "\"éx\"", "value": ["unknown field"]}, {"locations": [], "name": "A", "value": ["unknown field"]}, {"locations": [], "name": "a-b", "value": ["unknown field"]}, {"locations": [], "name": "a1", "value": ["unknown field"]}, {"locations": [], "name": "x", "value": ["unknown field"]}], "message": "require: neither every nor some; \"0x\": unknown field; \"x y\": unknown field; \"x&y\": unknown field; \"x'y\": unknown field; \"x.y\": unknown field; \"x/y\": unknown field; \"x<y\": unknown field; \"x>y\": unknown field; \"x\\\"y\": unknown field; \"x\\\\y\": unknown field; \"x\\by\": unknown field; \"x\\fy\": unknown field; \"x\\ny\": unknown field; \"x\\ty\": unknown field; \"x\\u0001y\": unknown field; \"xy\": unknown field; \"x y\": unknown field; \"x​y\": unknown field; \"x\\u2028y\": unknown field; \"x\\u2029y\": unknown field; \"x😀\": unknown field; \"é\": unknown field; \"éx\": unknown field; A: unknown field; a-b: unknown field; a1: unknown field; x: unknown field", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
   },
   {
     "description": "a subject with unknown fields that have awkward names",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id", "x y": 1, "x\"y": 1, "x\\y": 1, "x\ty": 1, "x<y": 1, "x>y": 1, "x&y": 1, "x\u2028y": 1, "x\u2029y": 1, "x\u007fy": 1, "x\by": 1, "x\fy": 1, "x\u0001y": 1, "x\ny": 1, "\u00e9": 1, "x.y": 1, "0x": 1, "a-b": 1, "a1": 1, "A": 1, "x": 1, "x/y": 1, "x'y": 1, "\u00e9x": 1, "x\u00a0y": 1, "x\u200by": 1, "x\ud83d\ude00": 1}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "things", "identified_by": "id", "x y": 1, "x\"y": 1, "x\\y": 1, "x\ty": 1, "x<y": 1, "x>y": 1, "x&y": 1, "x\u2028y": 1, "x\u2029y": 1, "x\u007fy": 1, "x\by": 1, "x\fy": 1, "x\u0001y": 1, "x\ny": 1, "\u00e9": 1, "x.y": 1, "0x": 1, "a-b": 1, "a1": 1, "A": 1, "x": 1, "x/y": 1, "x'y": 1, "\u00e9x": 1, "x\u00a0y": 1, "x\u200by": 1, "x\ud83d\ude00": 1}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "lists the fields of the subject sorted by the name as the report writes it, by code point",
@@ -5475,14 +5532,14 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.\"0x\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x&y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x'y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x.y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x/y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x<y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x>y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\\"y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\\\y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\by\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\fy\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\ny\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\ty\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\u0001y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"xy\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x​y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x😀\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"é\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"éx\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.A", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.a-b", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.a1", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.x", "value": ["unknown field"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.\"0x\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x&y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x'y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x.y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x/y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x<y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x>y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\\"y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\\\y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\by\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\fy\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\ny\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\ty\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x\\u0001y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"xy\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x​y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"x😀\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"é\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.\"éx\"", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.A", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.a-b", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.a1", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.x", "value": ["unknown field"]}], "message": "subjects.s.\"0x\": unknown field; subjects.s.\"x y\": unknown field; subjects.s.\"x&y\": unknown field; subjects.s.\"x'y\": unknown field; subjects.s.\"x.y\": unknown field; subjects.s.\"x/y\": unknown field; subjects.s.\"x<y\": unknown field; subjects.s.\"x>y\": unknown field; subjects.s.\"x\\\"y\": unknown field; subjects.s.\"x\\\\y\": unknown field; subjects.s.\"x\\by\": unknown field; subjects.s.\"x\\fy\": unknown field; subjects.s.\"x\\ny\": unknown field; subjects.s.\"x\\ty\": unknown field; subjects.s.\"x\\u0001y\": unknown field; subjects.s.\"xy\": unknown field; subjects.s.\"x y\": unknown field; subjects.s.\"x​y\": unknown field; subjects.s.\"x\\u2028y\": unknown field; subjects.s.\"x\\u2029y\": unknown field; subjects.s.\"x😀\": unknown field; subjects.s.\"é\": unknown field; subjects.s.\"éx\": unknown field; subjects.s.A: unknown field; subjects.s.a-b: unknown field; subjects.s.a1: unknown field; subjects.s.x: unknown field", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
   },
   {
     "description": "a requirement's own fields next to a subject's fields and parts",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id", "zq": 1, "has": {"x y": 5}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}, "zz": 1, "a": 1, "x y": 1}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "things", "identified_by": "id", "zq": 1, "has": {"x y": 5}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}, "zz": 1, "a": 1, "x y": 1}}},
     "cases": [
       {
         "description": "lists the requirement's fields first, then the subject's, each sorted by name, so zz comes before subjects.s.zq",
@@ -5490,14 +5547,14 @@
         "input": {"things": [{"id": "t1"}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "a", "value": ["unknown field"]}, {"locations": [], "name": "zz", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.zq", "value": ["unknown field"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "\"x y\"", "value": ["unknown field"]}, {"locations": [], "name": "a", "value": ["unknown field"]}, {"locations": [], "name": "zz", "value": ["unknown field"]}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias", "not a string or an object"]}, {"locations": [], "name": "subjects.s.zq", "value": ["unknown field"]}], "message": "\"x y\": unknown field; a: unknown field; zz: unknown field; subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x y\": not a string or an object; subjects.s.zq: unknown field", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
   },
   {
     "description": "parts whose names need quoting in the report",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"s": {"from": "things", "identified_by": "id", "has": {"x\ty": "cov", "x y": "cov", "x\"y": "cov", "x": "cov"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "things", "identified_by": "id", "has": {"x\ty": "cov", "x y": "cov", "x\"y": "cov", "x": "cov"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "lists the wrong parts sorted by the name as the report writes it, quotes and escapes included",
@@ -5505,7 +5562,7 @@
         "input": {"things": [{"id": "a", "x": 1}]},
         "status": {"r": "not_met"},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\\"y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\ty\"", "value": ["invalid alias"]}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.s.has.\"x y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\\"y\"", "value": ["invalid alias"]}, {"locations": [], "name": "subjects.s.has.\"x\\ty\"", "value": ["invalid alias"]}], "message": "subjects.s.has.\"x y\": invalid alias; subjects.s.has.\"x\\\"y\": invalid alias; subjects.s.has.\"x\\ty\": invalid alias", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
         ]
       }
     ]
@@ -5513,7 +5570,7 @@
   {
     "description": "a subject whose has is not an object",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -5582,6 +5639,7 @@
                 ]
               }
             ],
+            "message": "subjects.round.has: not an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5596,7 +5654,7 @@
   {
     "description": "the parts a report lists",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "rounds",
@@ -5691,7 +5749,7 @@
   {
     "description": "a part whose path goes through a list",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "s": {
           "from": "$input",
@@ -5787,6 +5845,7 @@
                 ]
               }
             ],
+            "message": "item 3 of pull_requests: item 1 of reviews: state is \"bad\"",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -5831,7 +5890,7 @@
   {
     "description": "a part written with a dot on the left of a whose in the subject's own from line",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "kid": {
           "from": "kids whose .att.id is 1",
@@ -5986,6 +6045,7 @@
                 ]
               }
             ],
+            "message": ".att.id is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6018,7 +6078,7 @@
   },
   {
     "description": "a part written with a dot on the left of a whose in a child's from line",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose .cov.k is 1", "identified_by": "id", "has": {"cov": "cov"}}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose .cov.k is 1", "identified_by": "id", "has": {"cov": "cov"}}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "prints the dot the policy wrote",
@@ -6035,7 +6095,7 @@
   {
     "description": "a part read in a check with named by on its right side",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "t": {
           "from": "things",
@@ -6188,7 +6248,7 @@
   },
   {
     "description": "a part read through its alias",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"cov": "att.cov"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "cov.n is 2"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"cov": "att.cov"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "cov.n is 2"}}}},
     "cases": [
       {
         "description": "starts at the part's path inside the subject",
@@ -6203,7 +6263,7 @@
   {
     "description": "a failed sentence on a for line tags the inputs it read through a part",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "round": {
           "from": "trail",
@@ -6331,6 +6391,7 @@
                 ]
               }
             ],
+            "message": "item 1 of lst: entry.x is 1, and cov.x is 2",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6344,7 +6405,7 @@
   },
   {
     "description": "a count of and a sum of whose whose reads a part",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": {"from": "pa", "identified_by": "id"}}}}, "requirements": {"r": {"subject": "thing", "checks": {"count_of_items": "count of items whose w is pa.w is 1", "sum_of_items": "sum of items.n whose w is pa.w is 3", "count_of_part": "count of pa.items whose w is pa.w is 1", "sum_of_part": "sum of pa.items.n whose w is 2 is 5", "both": "count of items whose w is pa.w is count of pa.items"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": {"from": "pa", "identified_by": "id"}}}}, "requirements": {"r": {"subject": "thing", "checks": {"count_of_items": "count of items whose w is pa.w is 1", "sum_of_items": "sum of items.n whose w is pa.w is 3", "count_of_part": "count of pa.items whose w is pa.w is 1", "sum_of_part": "sum of pa.items.n whose w is 2 is 5", "both": "count of items whose w is pa.w is count of pa.items"}}}},
     "cases": [
       {
         "description": "carry the part's tag only when the counted or summed list comes from the part, and the part's own value keeps it",
@@ -6364,7 +6425,7 @@
   {
     "description": "a for alias named like a parent subject",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6466,6 +6527,7 @@
                 ]
               }
             ],
+            "message": "checks.c: b can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6480,7 +6542,7 @@
   {
     "description": "a for alias named like the check's own subject",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6582,6 +6644,7 @@
                 ]
               }
             ],
+            "message": "checks.c: kid can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6596,7 +6659,7 @@
   {
     "description": "a for alias named like a subject that isn't a parent",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6702,6 +6765,7 @@
                 ]
               }
             ],
+            "message": "checks.c: other can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6716,7 +6780,7 @@
   {
     "description": "a for alias named like a part of a parent subject",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6818,6 +6882,7 @@
                 ]
               }
             ],
+            "message": "checks.c: x can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6832,7 +6897,7 @@
   {
     "description": "a for alias named like a subject and like a part of a parent",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -6944,6 +7009,7 @@
                 ]
               }
             ],
+            "message": "subjects.b.has.b: b can't be an alias: it's a subject's name; checks.c: b can't be an alias: it's a part of b; checks.c: b can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6958,7 +7024,7 @@
   {
     "description": "a for alias that isn't named like a subject or a part",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7114,7 +7180,7 @@
   {
     "description": "a part named like the subject it belongs to",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7193,6 +7259,7 @@
                 ]
               }
             ],
+            "message": "subjects.kid.has.kid: kid can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7207,7 +7274,7 @@
   {
     "description": "a part named like a subject that isn't a parent",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7290,6 +7357,7 @@
                 ]
               }
             ],
+            "message": "subjects.kid.has.other: other can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7304,7 +7372,7 @@
   {
     "description": "a part named like a part of a parent",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7383,6 +7451,7 @@
                 ]
               }
             ],
+            "message": "subjects.kid.has.x: x can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7397,7 +7466,7 @@
   {
     "description": "a for alias named like a part of a grandparent subject",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "gp": {
           "from": "gps",
@@ -7491,6 +7560,7 @@
                 ]
               }
             ],
+            "message": "checks.c: cap can't be an alias: it's a part of gp",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7505,7 +7575,7 @@
   {
     "description": "a for alias on the second item named like a part of a parent subject",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7607,6 +7677,7 @@
                 ]
               }
             ],
+            "message": "checks.c: x can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7621,7 +7692,7 @@
   {
     "description": "a for alias on a first of item named like a parent subject",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7723,6 +7794,7 @@
                 ]
               }
             ],
+            "message": "checks.c: b can't be an alias: it's a subject's name",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7737,7 +7809,7 @@
   {
     "description": "a for alias named like a part kept from a subject the checked subject narrows",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7842,6 +7914,7 @@
                 ]
               }
             ],
+            "message": "checks.c: part can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7856,7 +7929,7 @@
   {
     "description": "a for alias named like a part kept by the parent of the checked subject from a subject it narrows",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -7961,6 +8034,7 @@
                 ]
               }
             ],
+            "message": "checks.c: part can't be an alias: it's a part of b",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -7975,7 +8049,7 @@
   {
     "description": "a for alias named like a part of a subject that isn't a parent",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -8138,7 +8212,7 @@
   {
     "description": "a for alias named like a part of a subject with a space in its name",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "pull request": {
           "from": "bs",
@@ -8240,6 +8314,7 @@
                 ]
               }
             ],
+            "message": "checks.c: pull can't be an alias: it's a part of \"pull request\"",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8254,7 +8329,7 @@
   {
     "description": "a part named like a part of a grandparent subject",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "gp": {
           "from": "gps",
@@ -8347,6 +8422,7 @@
                 ]
               }
             ],
+            "message": "subjects.leaf.has.cap: cap can't be an alias: it's a part of gp",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8361,7 +8437,7 @@
   {
     "description": "a part named like a part kept through two narrowings",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "base": {
           "from": "bs",
@@ -8465,6 +8541,7 @@
                 ]
               }
             ],
+            "message": "subjects.n.has.x: x can't be an alias: it's a part of base",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8479,7 +8556,7 @@
   {
     "description": "a part declared again by a subject it narrows",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "base": {
           "from": "bs",
@@ -8558,6 +8635,7 @@
                 "locations": []
               }
             ],
+            "message": "subjects.m.has.x: x can't be an alias: it's a part of base; subjects.n.has.x: x can't be an alias: it's a part of base; subjects.n.has.x: x can't be an alias: it's a part of m",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -8572,7 +8650,7 @@
   {
     "description": "a part named like a part of a subject that isn't a parent",
     "policy": {
-      "ergo_spec": "v0.4",
+      "ergo_spec": "v0.5-dev",
       "subjects": {
         "b": {
           "from": "bs",
@@ -8707,7 +8785,7 @@
   },
   {
     "description": "a from line with a field named like a part",
-    "policy": {"ergo_spec": "v0.4", "subjects": {"kid": {"from": "kids whose .att.id is 1", "identified_by": "id", "has": {"att": {"from": "atts.pr", "identified_by": "id"}}}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"kid": {"from": "kids whose .att.id is 1", "identified_by": "id", "has": {"att": {"from": "atts.pr", "identified_by": "id"}}}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "prints the filter with the dot it was written with, so it doesn't read as the part",

@@ -2,7 +2,15 @@
 
 Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](../../spec/CHANGELOG.md), and those of `ergo.rego` in [CHANGELOG.md](../../CHANGELOG.md).
 
-## 0.2.1 (not released yet)
+## 0.3.0 (not released yet)
+
+### New
+
+- Every failed row has a `message`, a line that says in plain words what Ergo found, as the spec says: `approver is "ana", and author is "ana"`, `item 2 of tests: ok is missing` or `signed: signature is missing; reviewed: reviewer is missing`. A row that passed has none. Each violation carries the message of its row. The Rego engine writes the same text.
+
+### Changed
+
+- The engine follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.3.0-dev`, and each failed row and each violation has a `message`. 149 of the spec's cases still get another text from the Rust engine, and `known-failures.txt` lists them.
 
 ## 0.2.0
 

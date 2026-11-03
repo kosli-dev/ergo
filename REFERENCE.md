@@ -17,7 +17,7 @@ This page describes everything Ergo accepts and everything it returns, the same 
 A policy is an object with two sections and the version of the [spec](spec/README.md#versions) it's written for, and it can [describe itself](#describing-a-policy) too. `subjects` says what the policy checks and where to find it in the input, and `requirements` says what must be true of it. Each section maps names to definitions. A policy is plain data, so it usually lives in a YAML or JSON file with top-level `ergo_spec`, `subjects` and `requirements` keys:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   deployment: { ... }
   commit: { ... }
@@ -28,11 +28,11 @@ requirements:
 
 An engine takes the policy, the input and the [params](#params), and reads only those, so the same arguments always give the same report. How to hand them over is on the page of each engine.
 
-`ergo_spec` is the version of the spec the policy is written for, and this copy of Ergo follows `v0.4`. A policy without it, or with `null`, a number like `0.1`, or another version, is written wrong, so every requirement's `$well_formed` row fails and lists it with the policy's other problems, as an input named `policy ergo_spec`. Its value says what's wrong: `missing`, `not a string`, `not a version V0.1` for a string that isn't shaped like a version, or `unsupported version v0.1, expected v0.4` for one this copy of Ergo doesn't follow. When the policy is in a file, pass `ergo_spec` from that file, like `data.ergo_spec` above, and don't write it in the Rego that hands the policy over: a fixed value there would say the file follows `v0.4` whatever it was written for. A policy written in Rego says it in the policy itself, like `{"ergo_spec": "v0.4", "subjects": ...}`.
+`ergo_spec` is the version of the spec the policy is written for, and this copy of Ergo follows `v0.5-dev`. A policy without it, or with `null`, a number like `0.1`, or another version, is written wrong, so every requirement's `$well_formed` row fails and lists it with the policy's other problems, as an input named `policy ergo_spec`. Its value says what's wrong: `missing`, `not a string`, `not a version V0.1` for a string that isn't shaped like a version, or `unsupported version v0.1, expected v0.5-dev` for one this copy of Ergo doesn't follow. When the policy is in a file, pass `ergo_spec` from that file, like `data.ergo_spec` above, and don't write it in the Rego that hands the policy over: a fixed value there would say the file follows `v0.5-dev` whatever it was written for. A policy written in Rego says it in the policy itself, like `{"ergo_spec": "v0.5-dev", "subjects": ...}`.
 
 Because each name is an object key, two requirements can't share a name, and every row in the report points back to exactly one requirement.
 
-A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. Its report then has a requirement of Ergo's own, `$policy`, with one `$well_formed` row that fails and says what is wrong, so the violations don't come back empty. For the policy `{"ergo_spec": "v0.4"}` and the input `{}`, the row is:
+A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. Its report then has a requirement of Ergo's own, `$policy`, with one `$well_formed` row that fails and says what is wrong, so the violations don't come back empty. For the policy `{"ergo_spec": "v0.5-dev"}` and the input `{}`, the row is:
 
 ```json
 {
@@ -47,6 +47,7 @@ A policy with no requirements is never compliant: it doesn't check anything, so 
       ]
     }
   ],
+  "message": "requirements: missing",
   "passed": false,
   "requirement": "$policy",
   "subject": {
@@ -63,7 +64,7 @@ A policy with no requirements is never compliant: it doesn't check anything, so 
 A policy can have a `description` and a `meta` of its own, next to its sections. They work like a [requirement's](#requirements): `description` says what the policy asks for, `meta` keeps anything else, like the id of the control the policy checks, and Ergo copies both to the top of the report and never reads them. This is where a control with several requirements keeps its text:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 description: Production changes are reviewed and approved
 meta: {control: DEV-0401, title: Security testing and code review}
 subjects:
@@ -95,9 +96,9 @@ the report starts with:
   "description": "Production changes are reviewed and approved",
   "engine": {
     "name": "ergo-rego",
-    "version": "0.4.1-dev"
+    "version": "0.5.0-dev"
   },
-  "ergo": "v0.4",
+  "ergo": "v0.5-dev",
   "meta": {
     "control": "DEV-0401",
     "title": "Security testing and code review"
@@ -153,7 +154,7 @@ A few details:
 A `from` line is a path, and `whose` with conditions joined by `and` keeps the subjects they hold for. Paths and conditions are written as in [checks](#checks). `identified_by` is a path written the same way:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   emergency change:
     from: deployments whose environment is "prod" and change_type is "emergency"
@@ -187,10 +188,10 @@ the `$applies` rows keep `d-1` and leave `d-2` out:
 ```json
 {"check": "$applies", "subject": {"id": "d-1", "type": "emergency change"}, "passed": true, "cause": "satisfied",
  "inputs": [{"name": "change_type", "value": "emergency", "locations": ["/deployments/0/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/0/environment"]}], "failed_assertions": []}
-{"check": "$applies", "subject": {"id": "d-2", "type": "emergency change"}, "passed": false, "cause": "value",
+{"check": "$applies", "subject": {"id": "d-2", "type": "emergency change"}, "passed": false, "cause": "value", "message": "change_type is \"standard\"",
  "inputs": [{"name": "change_type", "value": "standard", "locations": ["/deployments/1/change_type"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/1/environment"]}],
  "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "value"}]}
-{"check": "$applies", "subject": {"id": "d-3", "type": "emergency change"}, "passed": false, "cause": "absent",
+{"check": "$applies", "subject": {"id": "d-3", "type": "emergency change"}, "passed": false, "cause": "absent", "message": "change_type is missing",
  "inputs": [{"name": "change_type", "value": null, "locations": ["/deployments/2"]}, {"name": "environment", "value": "prod", "locations": ["/deployments/2/environment"]}],
  "failed_assertions": [{"assertion": "change_type is \"emergency\"", "cause": "absent"}]}
 ```
@@ -229,10 +230,10 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   ```json
   {"check": "$applies", "subject": {"id": "1.4.0", "type": "release"}, "passed": true, "cause": "satisfied",
    "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md", "src/api.go"], "locations": ["/releases/0/files/0/path", "/releases/0/files/1/path"]}], "failed_items": []}
-  {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value",
+  {"check": "$applies", "subject": {"id": "1.4.1", "type": "release"}, "passed": false, "cause": "value", "message": "item 1 of files: path is \"docs/upgrade.md\"",
    "inputs": [{"name": "files[].path", "value": ["docs/upgrade.md"], "locations": ["/releases/1/files/0/path"]}],
    "failed_items": [{"path": "files[0].path", "item": "item 1 of files", "cause": "value", "value": "docs/upgrade.md", "locations": ["/releases/1/files/0/path"]}]}
-  {"check": "$applies", "subject": {"id": "1.4.2", "type": "release"}, "passed": false, "cause": "value",
+  {"check": "$applies", "subject": {"id": "1.4.2", "type": "release"}, "passed": false, "cause": "value", "message": "files is []",
    "inputs": [{"name": "files[].path", "value": [], "locations": []}],
    "failed_items": [{"path": "files", "item": "files", "cause": "value", "value": [], "locations": ["/releases/2/files"]}]}
   ```
@@ -264,7 +265,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   The pull requests are a **child subject** of `artifact`: they only exist under an artifact that's in scope, and each one belongs to one artifact. Every row of a requirement on `pull request` says which, under `in`, apart from `$well_formed`, which is about the requirement as written:
 
   ```json
-  {"check": "approved", "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value",
+  {"check": "approved", "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value", "message": "approved_by is \"\"",
    "inputs": [{"name": "approved_by", "value": "", "locations": ["/trail/artifacts/web/pull_requests/1/approved_by"]}]}
   ```
 
@@ -282,7 +283,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   `from: artifact.pull_requests whose base is artifact.branch` keeps `pr/7` and leaves `pr/8` out of scope:
 
   ```json
-  {"check": "$applies", "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value",
+  {"check": "$applies", "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value", "message": "base is \"dev\", and artifact.branch is \"main\"",
    "inputs": [{"name": "artifact.branch", "value": "main", "locations": ["/trail/artifacts/web/branch"]}, {"name": "base", "value": "dev", "locations": ["/trail/artifacts/web/pull_requests/1/base"]}]}
   ```
 
@@ -321,12 +322,12 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   ```json
   {"check": "$well_formed",  "subject": {"type": "pull request", "id": null}, "passed": true, "cause": "satisfied"}
   {"check": "$min_subjects", "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "passed": true, "cause": "satisfied"}
-  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-2"}}, "passed": false, "cause": "value"}
-  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-4"}}, "passed": false, "cause": "absent"}
+  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-2"}}, "passed": false, "cause": "value", "message": "in-scope pull request count is 0"}
+  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-4"}}, "passed": false, "cause": "absent", "message": "in-scope pull request count is 0"}
   {"check": "$unique_ids",   "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "passed": true, "cause": "satisfied"}
   {"check": "$unique_ids",   "subject": {"type": "pull request", "id": null, "in": {"artifact": "sha-2"}}, "passed": true, "cause": "satisfied"}
   {"check": "approved",      "subject": {"type": "pull request", "id": "pr/7", "in": {"artifact": "sha-1"}}, "passed": true, "cause": "satisfied"}
-  {"check": "approved",      "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value"}
+  {"check": "approved",      "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value", "message": "approvals is 0"}
   ```
 
   - Each artifact gets its own `$min_subjects` and `$unique_ids` rows. `sha-2` has no pull requests, so it fails on its own row, unless the requirement has `min_subjects: 0`. Ids only need to be unique within each artifact, so `pr/7` under two artifacts is fine.
@@ -373,12 +374,12 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   the pull requests are one list, `pr/7` and `pr/8`, and the report has these rows after `$well_formed`:
 
   ```json
-  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null}, "passed": false, "cause": "absent",
+  {"check": "$min_subjects", "subject": {"type": "pull request", "id": null}, "passed": false, "cause": "absent", "message": "item 3 of artifacts: pull_requests is missing",
    "inputs": [{"name": "in-scope pull request count", "value": 2, "locations": ["/artifacts/0/pull_requests/0", "/artifacts/0/pull_requests/1"]}],
    "failed_items": [{"path": "artifacts[2].pull_requests", "item": "artifacts[2].pull_requests", "cause": "absent", "value": null, "locations": ["/artifacts/2"]}]}
   {"check": "$unique_ids",   "subject": {"type": "pull request", "id": null}, "passed": true,  "cause": "satisfied"}
   {"check": "approved",      "subject": {"type": "pull request", "id": "pr/7"}, "passed": true,  "cause": "satisfied"}
-  {"check": "approved",      "subject": {"type": "pull request", "id": "pr/8"}, "passed": false, "cause": "value"}
+  {"check": "approved",      "subject": {"type": "pull request", "id": "pr/8"}, "passed": false, "cause": "value", "message": "approvals is 0"}
   ```
 
   - Unlike a [child subject](#from-lines), these pull requests don't belong to an artifact. Their rows have no `in`, they're counted once, and their ids must be unique across all of them. A check can't read the artifact.
@@ -393,7 +394,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 When requirements check different parts of the same list, give each part its own subject, built on one that says where the list is. Say the SBOM lists components, some pinned by the lockfile and some exempt from the licence rules:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   component:
     from: components
@@ -445,7 +446,7 @@ A from line that's another subject's name reads that subject's `from` and `ident
 Data often keeps what a check needs deep inside the subject. Kosli, for one, puts every attestation at `compliance_status.attestations_statuses.<name>.attestation_data`, so a policy that reads three attestations repeats that path in every check. A subject can give a path a name once, with `has`, and the checks use the name. Each entry of `has` is a **part**, and its key is the part's alias. An alias is a short word that stands for something longer, as `as pr` does on a `for` line.
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   round:
     from: trail
@@ -487,7 +488,7 @@ With this input:
 ```json
 {"check": "complete", "subject": {"type": "round", "id": "round-1"}, "passed": true, "cause": "satisfied",
  "inputs": [{"name": "findings.truncated", "value": false, "locations": ["/trail/compliance_status/attestations_statuses/findings/attestation_data/truncated"], "part": {"name": "findings", "id": null}}]}
-{"check": "every_hunk_acknowledged", "subject": {"type": "round", "id": "round-1"}, "passed": false, "cause": "value",
+{"check": "every_hunk_acknowledged", "subject": {"type": "round", "id": "round-1"}, "passed": false, "cause": "value", "message": "coverage.attestation_data.hunks_acknowledged is 25, and coverage.attestation_data.hunks_total is 28",
  "inputs": [{"name": "coverage.attestation_data.hunks_acknowledged", "value": 25, "locations": ["/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data/hunks_acknowledged"], "part": {"name": "coverage", "id": "cov-9"}},
             {"name": "coverage.attestation_data.hunks_total", "value": 28, "locations": ["/trail/compliance_status/attestations_statuses/coverage-verification/attestation_data/hunks_total"], "part": {"name": "coverage", "id": "cov-9"}}]}
 ```
@@ -497,7 +498,7 @@ Each input read through a part says which part, and which one of them: `part` ha
 A part is a short name for its path and nothing more. `coverage.attestation_data.hunks_total` gives exactly the rows that `compliance_status.attestations_statuses.coverage-verification.attestation_data.hunks_total` gives: the same `passed`, the same `cause` and the same values. A part that is missing fails the check as `absent`, a `null` one as `absent` when a step follows it, and one of the wrong type as `unusable`, because the full path would. Only the names differ. With `coverage-verification` missing from the input, the row is
 
 ```json
-{"check": "every_hunk_acknowledged", "subject": {"type": "round", "id": "round-1"}, "passed": false, "cause": "absent",
+{"check": "every_hunk_acknowledged", "subject": {"type": "round", "id": "round-1"}, "passed": false, "cause": "absent", "message": "coverage.attestation_data.hunks_acknowledged is missing, and coverage.attestation_data.hunks_total is missing",
  "inputs": [{"name": "coverage.attestation_data.hunks_acknowledged", "value": null, "locations": ["/trail/compliance_status/attestations_statuses"], "part": {"name": "coverage", "id": null}},
             {"name": "coverage.attestation_data.hunks_total", "value": null, "locations": ["/trail/compliance_status/attestations_statuses"], "part": {"name": "coverage", "id": null}}]}
 ```
@@ -656,7 +657,7 @@ The subject is what each row is about, so it's the first choice to make, and it 
 With the commit as the subject, the check looks through its pull requests:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   commit:
     from: commits
@@ -680,7 +681,7 @@ The requirement is `not_met`: `a2` has no pull request.
 With the pull request as the subject, the same sentence turns into "some pull request was approved":
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   pull request:
     from: commits[0].pull_requests
@@ -716,7 +717,7 @@ A policy can hold several requirements with different subjects over the same inp
 A check is a sentence: one line of English. [spec/syntax.md](spec/syntax.md) has the full grammar. Write the sentence on its own, or under `assert` when the check has a `description` or `meta`:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   deployment:
     from: deployments
@@ -769,6 +770,7 @@ The report prints every sentence one way, so `'OPS-1'` shows as `"OPS-1"`, two s
     {"locations": ["/deployments/1/reviewed_at"], "name": "reviewed_at", "value": "2026-10-02T11:00:00Z"},
     {"locations": ["/deployments/1/deployed_at"], "name": "deployed_at", "value": "2026-10-02T10:00:00Z"}
   ],
+  "message": "reviewed_at is \"2026-10-02T11:00:00Z\", and deployed_at is \"2026-10-02T10:00:00Z\"",
   "passed": false,
   "requirement": "prod_deploy",
   "subject": {"id": "d2", "type": "deployment"}
@@ -817,7 +819,7 @@ The time phrases can take a written time or number too, like `opened is before "
 The negative phrases need what the positive ones need, so a field that can't be read fails them with the same cause. With this policy:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   artifact:
     from: artifacts
@@ -854,7 +856,7 @@ every check fails on `api`, with `value`. `web` passes all four, `notes` being `
 Text can be joined on the right side with `followed by`, from written strings and fields, as many pieces as you like: `rego.version is tag.version followed by "-dev"`, or `rego.spec is "v" followed by tag.version`. It goes after `is`, `equals`, `is not`, `does not equal`, `starts with`, `ends with`, `does not start with`, `does not end with`, `contains`, `does not contain` and the alphabetical phrases, and the sentence asks what the phrase asks of the joined text. There is no `preceded by`, because `"v" followed by x` says it. Every piece must be a string: a written one that isn't, like `followed by 1`, is written wrong, and a field that isn't one fails the check as `unusable`. With this policy:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   release:
     from: releases
@@ -891,7 +893,7 @@ both checks pass for `0.4`, fail as `value` for `0.5`, whose `rego.version` does
 After `is in`, `is not in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match`, the thing on the right can be a field too, read like the field after `is at least`: from the subject, from the name of a `for` line or from the item of a one-line `every` or `some` and a `whose`. With this policy and this input:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   deployment:
     from: deployments
@@ -923,6 +925,7 @@ requirements:
     {"locations": ["/deployments/1/tickets"], "name": "tickets", "value": ["OPS-1"]},
     {"locations": ["/deployments/1"], "name": "required_tickets", "value": null}
   ],
+  "message": "required_tickets is missing",
   "passed": false,
   "requirement": "prod_deploy",
   "subject": {"id": "d2", "type": "deployment"}
@@ -938,7 +941,7 @@ A path is keys joined by `.`, like `build.commit.sha`. A key with anything but l
 `named by` a bare field picks the key from the subject, so a limit can depend on a field like the severity. With the params `{"max_days": {"critical": 1, "high": 5}}`, this policy:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   vuln:
     from: vulns
@@ -963,7 +966,7 @@ and this input:
 `v-1` passes, `v-2` fails as `value`, and `v-3` fails as `absent`, because the params have no limit for `unknown`. Each row shows the field that picked the key after the check's own inputs:
 
 ```json
-{"check": "within_limit", "subject": {"id": "v-2", "type": "vuln"}, "passed": false, "cause": "value",
+{"check": "within_limit", "subject": {"id": "v-2", "type": "vuln"}, "passed": false, "cause": "value", "message": "age_days is 2, and $params.max_days named by severity is 1",
  "inputs": [
    {"name": "age_days", "value": 2, "locations": ["/vulns/1/age_days"]},
    {"name": "$params.max_days named by severity", "value": 1, "locations": ["$params:/max_days/critical"]},
@@ -1000,6 +1003,7 @@ The check's `expression` is `approved_by is not empty and reviewed_at is before 
     {"locations": ["/deployments/1/deployed_at"], "name": "deployed_at", "value": "2026-10-02T10:00:00Z"},
     {"locations": ["/deployments/1/reviewed_at"], "name": "reviewed_at", "value": "2026-10-02T11:00:00Z"}
   ],
+  "message": "approved_by is \"\"; reviewed_at is \"2026-10-02T11:00:00Z\", and deployed_at is \"2026-10-02T10:00:00Z\"",
   "passed": false,
   "requirement": "prod_deploy",
   "subject": {"id": "d2", "type": "deployment"}
@@ -1048,6 +1052,7 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
     {"locations": ["/components/2/licenses/0/license/id"], "name": "licenses[].license.id", "value": ["WTFPL"]},
     {"locations": ["/components/2/name"], "name": "name", "value": "leftpad"}
   ],
+  "message": "declared: item 1 of licenses: license.id is \"WTFPL\", and $params.allowed_licenses is [\"BSD-3-Clause\", \"Apache-2.0\"]; known: licenses is [{\"license\": {\"id\": \"WTFPL\"}}], and $params.known_package_licenses named by name is missing",
   "passed": false,
   "requirement": "licences",
   "subject": {"id": "leftpad", "type": "component"}
@@ -1078,6 +1083,7 @@ An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_o
     {"cause": "absent", "item": "pull_requests[1].commits", "locations": ["/releases/0/pull_requests/1"], "path": "pull_requests[1].commits", "value": null}
   ],
   "inputs": [{"locations": ["/releases/0/pull_requests/0/commits/0/signed", "/releases/0/pull_requests/0/commits/1/signed"], "name": "pull_requests[].commits[].signed", "value": [true, false]}],
+  "message": "item 1 of pull_requests: item 2 of commits: signed is false; item 2 of pull_requests: commits is missing",
   "passed": false,
   "requirement": "release",
   "subject": {"id": "r-1", "type": "release"}
@@ -1138,6 +1144,7 @@ reads "for every pull request, some approver approved it and isn't its author". 
       {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob", "number": 8}
     ]}
   ],
+  "message": "item 2 of pull_requests: item 1 of approvers: approver.state is \"COMMENTED\", and approver.username is \"bob\", and pr.author is \"bob\"",
   "passed": false,
   "requirement": "release",
   "subject": {"id": "r-1", "type": "release"}
@@ -1235,6 +1242,7 @@ picks `a1`, the commit with the latest `timestamp`, wherever it is in the list, 
     {"locations": ["/pull_requests/0/approvers/0"], "name": "approvers[]", "value": [{"username": "ada"}]},
     {"locations": ["/pull_requests/0/commits/0"], "name": "item 1 of commits", "value": {"author_username": "ada", "sha": "a1", "timestamp": 1760000200}}
   ],
+  "message": "item 1 of commits: item 1 of approvers: approver.username is \"ada\", and last_commit.author_username is \"ada\"",
   "passed": false,
   "requirement": "review",
   "subject": {"id": 7, "type": "pull_request"}
@@ -1298,7 +1306,7 @@ With `x plus y is at most 1` on `{"x": 0.1, "y": 0.2}`, the row is satisfied:
 With `{"x": 0.123456789012345, "y": 100}`, the sum needs 18 digits at one scale, so the row fails as `unusable` and `x plus y` is `null`:
 
 ```json
-{"check": "sum", "passed": false, "cause": "unusable", "inputs": [
+{"check": "sum", "passed": false, "cause": "unusable", "message": "x plus y needs more than 15 digits", "inputs": [
   {"name": "x plus y", "value": null, "locations": ["/things/0/x", "/things/0/y"]},
   {"name": "x", "value": 0.123456789012345, "locations": ["/things/0/x"]},
   {"name": "y", "value": 100, "locations": ["/things/0/y"]}
@@ -1376,7 +1384,7 @@ this input:
 and this policy:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   region:
     from: every deployment.regions
@@ -1392,7 +1400,7 @@ each region is a subject, with the region as its id, and the one that isn't allo
 ```json
 {"check": "allowed", "subject": {"id": "eu-west-1", "type": "region"}, "passed": true, "cause": "satisfied",
  "inputs": [{"name": "it", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}], "requirement": "allowed"}
-{"check": "allowed", "subject": {"id": "us-east-1", "type": "region"}, "passed": false, "cause": "value",
+{"check": "allowed", "subject": {"id": "us-east-1", "type": "region"}, "passed": false, "cause": "value", "message": "it is \"us-east-1\", and $params.allowed_regions is [\"eu-west-1\"]",
  "inputs": [{"name": "it", "value": "us-east-1", "locations": ["/deployment/regions/1"]}], "requirement": "allowed"}
 ```
 
@@ -1401,7 +1409,7 @@ each region is a subject, with the region as its id, and the one that isn't allo
 `it` is also the path after `every`, `some`, `count of` and `sum of`, so a subject that is a list can be checked item by item. With `from: every releases.tags` and the input `{"releases": {"tags": [["a", "b"], [1, "x"]]}}`, `every it is a string` passes the first tag list and fails the second, with the row:
 
 ```json
-{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "value",
+{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "value", "message": "item 1 of it is 1",
  "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1, "locations": ["/releases/tags/1/0"]}],
  "inputs": [{"name": "it[]", "value": [1, "x"], "locations": ["/releases/tags/1/0", "/releases/tags/1/1"]}], "requirement": "r"}
 ```
@@ -1411,9 +1419,9 @@ A position is written in words, as for a field. With the input `{"releases": {"t
 ```json
 {"check": "c", "subject": {"id": ["a", "b"], "type": "tags"}, "passed": true, "cause": "satisfied",
  "inputs": [{"name": "item 1 of it", "value": "a", "locations": ["/releases/tags/0/0"]}], "requirement": "r"}
-{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "unusable",
+{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "unusable", "message": "item 1 of it is 1, which isn't text",
  "inputs": [{"name": "item 1 of it", "value": 1, "locations": ["/releases/tags/1/0"]}], "requirement": "r"}
-{"check": "c", "subject": {"id": [], "type": "tags"}, "passed": false, "cause": "absent",
+{"check": "c", "subject": {"id": [], "type": "tags"}, "passed": false, "cause": "absent", "message": "item 1 of it is missing",
  "inputs": [{"name": "item 1 of it", "value": null, "locations": ["/releases/tags/2"]}], "requirement": "r"}
 ```
 
@@ -1442,9 +1450,9 @@ The report of a policy, an input and params is:
   "description": "",
   "engine": {
     "name": "ergo-rego",
-    "version": "0.4.1-dev"
+    "version": "0.5.0-dev"
   },
-  "ergo": "v0.4",
+  "ergo": "v0.5-dev",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
@@ -1560,11 +1568,44 @@ Several of these rules depend on how a number was written, not only on its value
   "check": "approved",
   "inputs": [{ "name": "approved_by", "value": null, "locations": ["/deployments/1"] }],
   "passed": false,
-  "cause": "absent"
+  "cause": "absent",
+  "message": "approved_by is missing"
 }
 ```
 
-Passing and failing rows have the same fields. A row of a check with `every`, `some` or a `for` line also has `failed_items`, and so does the `$min_subjects` row of a subject whose `from` line has [`every`](#from-lines). So does an `$applies` row of a subject whose `from` line has one `some` or `every` condition, and one with several conditions has `failed_assertions`, like a check written as several sentences. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+Passing and failing rows have the same fields, and a failing row also has a [`message`](#messages). A row of a check with `every`, `some` or a `for` line also has `failed_items`, and so does the `$min_subjects` row of a subject whose `from` line has [`every`](#from-lines). So does an `$applies` row of a subject whose `from` line has one `some` or `every` condition, and one with several conditions has `failed_assertions`, like a check written as several sentences. To find a row's description and expression, look up `requirements[row.requirement].checks[row.check]`. Look it up through the requirement, because two requirements can use the same check name for different things.
+
+### Messages
+
+A failed row has a `message`: one line of plain text that says what Ergo found, so a reader who doesn't read policies can follow it. A passed row has none. The message says what was found, never what was expected, because the check's `expression` already says that. It comes from the policy and the input only, so the same report always has the same messages.
+
+| Cause           | Message                                           | Example                                  |
+| --------------- | ------------------------------------------------- | ---------------------------------------- |
+| `value`         | each value compared, joined with `, and `         | `x is 4`                                 |
+| `absent`        | the inputs that are missing                       | `gone is missing`                        |
+| `null`          | the inputs that are `null`                        | `n is null`                              |
+| `unusable`      | the value, and the kind it isn't                  | `s is "3", which isn't a number`         |
+| `not_an_object` | the subject, called `it`                          | `it is "str", which isn't an object`     |
+| `ambiguous`     | the items that tie, and the key they tie on       | `item 1 and item 2 of commits tie on ts` |
+
+A number Ergo works out is named after the words that asked for it, like `count of l is 5`. How values are printed:
+
+- Text is in quotes. Text over 60 characters keeps the first 60 and ends with `…"`.
+- A list over 3 items shows the first 3 and then `and N more`, like `l is ["a", "b", "c", and 2 more]`.
+- An object whose JSON is over 80 characters is printed as `an object with N keys`, like `o is an object with 4 keys, which isn't text`, or `an object with 1 key`.
+- A line separator inside text (U+2028, U+2029 or U+0085) is written as `\u2028`, `\u2029` or `\u0085`, so a message stays on one line.
+
+For `every`, `some` and `for`, the message lists only the items that failed, counted from 1, with `; ` between them. After three items it ends with `; and N more`. With four items whose `ok` is `false`:
+
+```text
+item 2 of items: ok is false; item 3 of items: ok is false; item 4 of items: ok is false; and 1 more
+```
+
+In a `for` line, the item's fields are named without its alias when everything the item's sentences read belongs to that item. With `for: every commits as c` and `c.signed is true`, the message is `item 1 of commits: signed is false`, and when the item itself is `null` it's `item 1 of commits is null`. When a sentence also reads something else, like a field of the subject, a param or a second item, every name stays as the policy wrote it, like `item 1 of approvers: approver.username is "ann", and author is "ann"`. A list inside an item is named without the alias, like `item 1 of commits: item 2 of reviews: ok is false`.
+
+A check written as several sentences gives the message of each sentence that failed, joined with `; `, like `x is 4; y is missing`. In an `any_of`, each option's message starts with its name, like `one: x is 4; two: y is missing`.
+
+The `$applies` row of a subject that is out of scope says what the condition found, like `env is "staging"`.
 
 ### Where a value was read
 
@@ -1577,9 +1618,9 @@ Every entry in a row's `inputs`, in a check's `$refs` and in `failed_items` has 
 the two rows are:
 
 ```json
-{"check": "region", "subject": {"id": "d-1", "type": "deployment"}, "passed": false, "cause": "value",
+{"check": "region", "subject": {"id": "d-1", "type": "deployment"}, "passed": false, "cause": "value", "message": "region is \"us-east-1\", and $params.regions is [\"eu-west-1\"]",
  "inputs": [{"name": "region", "value": "us-east-1", "locations": ["/deployments/0/region"]}]}
-{"check": "region", "subject": {"id": "d-2", "type": "deployment"}, "passed": false, "cause": "absent",
+{"check": "region", "subject": {"id": "d-2", "type": "deployment"}, "passed": false, "cause": "absent", "message": "region is missing",
  "inputs": [{"name": "region", "value": null, "locations": ["/deployments/1"]}]}
 ```
 
@@ -1599,7 +1640,7 @@ and the check's `$refs` entry is `{"name": "$params.regions", "value": ["eu-west
 Take this policy:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   deployment:
     description: Something we ship
@@ -1667,7 +1708,7 @@ Each entry has:
 A subject that is written wrong still has its entry, so nothing disappears from the report. A subject whose `from` starts at another subject lists that subject even when the line is written wrong, like `every parent.items`, and a subject that narrows another has that subject's id then. A `from` that doesn't parse, or isn't a string, lists no other subject. An unknown name, like `$foo` in `parent.items whose zz is $foo`, only makes the line written wrong with `unknown name $foo`, so that line still lists `parent`. If the line has a syntax error too, like `parent.items whose zz is $foo foo bar`, it says `doesn't parse` and lists no other subject. With this policy and the same input, where `deployment` writes its `from` and `identified_by` as lists:
 
 ```yaml
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 subjects:
   deployment:
     from: [deployments]
@@ -1848,7 +1889,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 ## Violations
 
-The violations are the rows of the report that are real problems, each with its check's `description` and `expression` added, and its `$refs` added to the end of `inputs`:
+The violations are the rows of the report that are real problems, each with its check's `description` and `expression` added, and its `$refs` added to the end of `inputs`. Each keeps its row's [`message`](#messages). For the deployment `{"id": "d-2", "approved_by": null}`:
 
 ```json
 [
@@ -1858,8 +1899,9 @@ The violations are the rows of the report that are real problems, each with its 
     "check": "approved",
     "description": "Someone approved the deployment",
     "expression": "approved_by is a non-empty string",
-    "inputs": [{ "name": "approved_by", "value": null, "locations": ["/deployments/1"] }],
-    "cause": "absent"
+    "inputs": [{ "name": "approved_by", "value": null, "locations": ["/deployments/1/approved_by"] }],
+    "cause": "null",
+    "message": "approved_by is null"
   }
 ]
 ```
@@ -1874,7 +1916,7 @@ It leaves out:
 
 It keeps the rows of a requirement with any other `status`, or none. It keeps `$min_subjects` failures, because finding nothing to check is a problem, and `$well_formed` failures, because they mean the policy itself is broken.
 
-It only reads the report, never the input or the policy. It returns a list in the same order as `results`, so two failures that look the same are both kept. And it returns data, not text, so you decide how to word your messages. A missing `description` or `expression` comes back as `""`.
+It only reads the report, never the input or the policy. It returns a list in the same order as `results`, so two failures that look the same are both kept. And it returns data, so you can word your own messages from `inputs` instead of using `message`. A missing `description` or `expression` comes back as `""`.
 
 To decide whether to allow something, use `report.compliant`, not whether `violations` is empty. The two are worked out separately, so a mistake in how you use violations can't let something through.
 

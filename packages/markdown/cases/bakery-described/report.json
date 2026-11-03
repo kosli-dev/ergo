@@ -5,7 +5,7 @@
     "name": "ergo-rego",
     "version": "ergo.rego's version"
   },
-  "ergo": "v0.4",
+  "ergo": "v0.5-dev",
   "meta": {},
   "requirements": {
     "cake batch": {
@@ -214,6 +214,7 @@
           ]
         }
       ],
+      "message": "allergens is [\"nuts\", \"milk\"]",
       "passed": false,
       "requirement": "cake batch",
       "subject": {
@@ -260,6 +261,7 @@
           "value": "nuts"
         }
       ],
+      "message": "allergens is \"nuts\", which isn't a list",
       "passed": false,
       "requirement": "cake batch",
       "subject": {
@@ -306,6 +308,7 @@
           "value": null
         }
       ],
+      "message": "allergens is missing",
       "passed": false,
       "requirement": "cake batch",
       "subject": {

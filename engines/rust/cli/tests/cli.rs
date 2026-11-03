@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
-const POLICY_YAML: &str = r#"ergo_spec: v0.4
+const POLICY_YAML: &str = r#"ergo_spec: v0.5-dev
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -116,6 +116,7 @@ fn violations_gives_the_one_violation_the_readme_shows() {
             "description": "Someone approved the deployment",
             "expression": "approved_by is a non-empty string",
             "inputs": [{"name": "approved_by", "value": null, "locations": ["/deployments/1"]}],
+            "message": "approved_by is missing",
             "requirement": "prod_deploy",
             "subject": {"id": "d-2", "type": "deployment"}
         }])
@@ -152,7 +153,7 @@ fn written_wrong_policy(name: &str) -> String {
     write(
         &dir(name),
         "wrong.yaml",
-        &POLICY_YAML.replace("ergo_spec: v0.4", "ergo_spec: v0.1"),
+        &POLICY_YAML.replace("ergo_spec: v0.5-dev", "ergo_spec: v0.1"),
     )
 }
 
@@ -276,7 +277,7 @@ fn fail_exits_three_when_the_policy_has_no_requirements_because_no_check_ran() {
     for (file, text) in [
         ("empty.json", "{}"),
         ("future.json", r#"{"ergo_spec": "v9.9"}"#),
-        ("none.json", r#"{"ergo_spec": "v0.4"}"#),
+        ("none.json", r#"{"ergo_spec": "v0.5-dev"}"#),
         ("null.yaml", "null\n"),
         ("list.yaml", "- 1\n"),
     ] {
@@ -352,6 +353,7 @@ fn output_is_pretty_with_two_spaces_sorted_keys_and_a_trailing_newline() {
         "value": null
       }
     ],
+    "message": "approved_by is missing",
     "requirement": "prod_deploy",
     "subject": {
       "id": "d-2",
@@ -385,7 +387,7 @@ fn pretty_output_escapes_like_opa() {
     let policy = write(
         &dir,
         "policy.json",
-        r#"{"ergo_spec":"v0.4","meta":{"k":"a<b>&c\u2028é"}}"#,
+        r#"{"ergo_spec":"v0.5-dev","meta":{"k":"a<b>&c\u2028é"}}"#,
     );
     let input = write(&dir, "input.json", "{}");
     let text = out(&ergo(&["report", "--policy", &policy, "--input", &input]));
@@ -401,7 +403,7 @@ fn params_are_read_from_the_params_file() {
     let policy = write(
         &dir,
         "policy.yaml",
-        "ergo_spec: v0.4\nsubjects:\n  item:\n    from: items\n    identified_by: id\nrequirements:\n  r:\n    subject: item\n    checks:\n      small: n is at most $params.limit\n",
+        "ergo_spec: v0.5-dev\nsubjects:\n  item:\n    from: items\n    identified_by: id\nrequirements:\n  r:\n    subject: item\n    checks:\n      small: n is at most $params.limit\n",
     );
     let input = write(&dir, "input.json", r#"{"items":[{"id":"a","n":5}]}"#);
     let low = write(&dir, "low.yaml", "limit: 3\n");

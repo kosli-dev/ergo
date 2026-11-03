@@ -374,6 +374,7 @@ fn number_entry(text: &str, result: &Result<Number, Cause>, locations: Vec<Strin
         },
         locations,
         part: None,
+        state: crate::path::Outcome::Found,
     }
 }
 
@@ -487,6 +488,7 @@ fn counted_entries(
         },
         locations: list.locations.clone(),
         part: list.part.clone(),
+        state: crate::path::Outcome::Found,
     }];
     entries.push(list);
     entries.extend(super::field_inputs(&counted.path, ctx));
@@ -503,6 +505,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             value: Value::Array(Vec::new()),
             locations: Vec::new(),
             part: None,
+            state: crate::path::Outcome::Found,
         };
         let (entries, located) = counted_entries(counted, &result, list, Vec::new(), ctx);
         return Worked {
@@ -529,6 +532,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             value: Value::Array(Vec::new()),
             locations: Vec::new(),
             part: None,
+            state: crate::path::Outcome::Found,
         };
         let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
@@ -580,6 +584,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             .map(|item| item.end_location.render())
             .collect(),
         part: path::part_tag(&counted.path, &outer).map(|(name, id)| Part { name, id }),
+        state: crate::path::Outcome::Found,
     };
     let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
     Worked {
@@ -1077,6 +1082,125 @@ pub fn lower_condition(
         },
     };
     Some(lower_terms(&[term], phrase, scope).map(|lowered| lowered.map(Check::Tally)))
+}
+
+pub fn derived_value(derived: &Derived, ctx: &Ctx) -> Result<Number, Cause> {
+    work_derived(derived, ctx).result
+}
+
+pub fn derived_operands(derived: &Derived) -> (Vec<&Path>, Vec<&Path>, Vec<(&Path, &Path)>) {
+    let mut plain = Vec::new();
+    let mut counted = Vec::new();
+    let mut elapsed = Vec::new();
+    for term in &derived.terms {
+        match term {
+            Term::Path(path) => plain.push(path),
+            Term::Elapsed(e) => elapsed.push((&e.from, &e.to)),
+            Term::Counted(c) => counted.push(&c.path),
+            Term::Number(_) => {}
+        }
+    }
+    (plain, counted, elapsed)
+}
+
+pub fn tally_sides(check: &Tally) -> Vec<&Side> {
+    std::iter::once(&check.left)
+        .chain(check.right.as_ref())
+        .collect()
+}
+
+pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> {
+    let mut out = Vec::new();
+    for term in &derived.terms {
+        let Term::Counted(counted) = term else {
+            continue;
+        };
+        let outer = outer_ctx(ctx);
+        if walk::path_needs_an_object_subject(&counted.path, ctx) {
+            continue;
+        }
+        let walked = walk::walk(
+            &counted.path,
+            &outer,
+            Options {
+                if_any: false,
+                empty_adds_nothing: true,
+            },
+        );
+        if walked.unreadable.is_some() {
+            continue;
+        }
+        let mut found: Vec<(Cause, String)> = walked
+            .failures
+            .iter()
+            .map(|f| (f.cause, f.msg.clone()))
+            .collect();
+        let mut at = outer.clone();
+        for item in &walked.items {
+            at.subject = item.item.clone();
+            let name = walked.item_name(&item.item_segs);
+            let mut undecided = false;
+            for check in &counted.whose {
+                let verdict = run_check(check, &at);
+                if !matches!(verdict.cause, Cause::Satisfied | Cause::Value) {
+                    undecided = true;
+                    found.push((
+                        verdict.cause,
+                        super::message::prefixed(
+                            &name,
+                            &super::message::message(check, &at, &verdict),
+                        ),
+                    ));
+                }
+            }
+            let kept = counted
+                .whose
+                .iter()
+                .all(|check| run_check(check, &at).cause != Cause::Value);
+            if undecided || !kept {
+                continue;
+            }
+            let rest = crate::name::name(&item.rest_path());
+            if item.miss == Cause::NotAnObject {
+                found.push((
+                    Cause::NotAnObject,
+                    super::message::isnt(&name, item.item.value, "an object"),
+                ));
+                continue;
+            }
+            match item.end {
+                None => found.push((
+                    item.miss,
+                    super::message::prefixed(
+                        &name,
+                        &super::message::stated(&rest, item.miss, &Value::Null, "a number"),
+                    ),
+                )),
+                Some(end) if counted.kind == Kind::Sum && !end.is_number() => {
+                    let c = if end.is_null() {
+                        Cause::Null
+                    } else {
+                        Cause::Unusable
+                    };
+                    found.push((
+                        c,
+                        super::message::prefixed(
+                            &name,
+                            &super::message::stated(&rest, c, end, "a number"),
+                        ),
+                    ));
+                }
+                _ => {}
+            }
+        }
+        out.extend(
+            found
+                .into_iter()
+                .filter(|(c, _)| *c == cause)
+                .map(|(_, text)| text),
+        );
+    }
+    out
 }
 
 #[cfg(test)]
@@ -2188,7 +2312,7 @@ mod tests {
 
     fn row_names(checks: Value) -> Vec<String> {
         let policy = json!({
-            "ergo_spec": "v0.4",
+            "ergo_spec": "v0.5-dev",
             "subjects": {"t": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "t", "checks": {"c": checks}}}
         });

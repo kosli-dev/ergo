@@ -1,5 +1,5 @@
 ---
-ergo_spec: v0.4
+ergo_spec: v0.5-dev
 ---
 
 # Cake batches

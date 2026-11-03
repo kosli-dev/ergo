@@ -1689,6 +1689,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("lists[$input.ks]", "lists named by $input.ks"),
     ("lists[$input.kx]", "lists named by $input.kx"),
     ("lists[$input.kz]", "lists named by $input.kz"),
+    (
+        "things whose env is \"prod\"",
+        "things whose env is \"prod\"",
+    ),
+    ("reports.a.b.coverage", "reports.a.b.coverage"),
+    ("reports.coverage", "reports.coverage"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2850,6 +2856,8 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("ys", "ys"),
     ("cov", "cov"),
     ("status.coverage.data", "status.coverage.data"),
+    ("reports.a.b.coverage", "reports.a.b.coverage"),
+    ("reports.coverage", "reports.coverage"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[
