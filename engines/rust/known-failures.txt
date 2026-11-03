@@ -52,10 +52,7 @@ parts / a parent's name on the right side of a whose, with and without plus / re
 parts / a part's alias in an elapsed time on the right side of a whose / reads the part when the part is missing, and not the item's own field of the same name
 parts / a part's alias on the right of a whose, with a part that is missing, null or not a list / fails closed for each thing, and never reads the items' own field instead
 parts / a part's alias on the right side of a whose, with and without plus / reads the part when the part is missing, and not the item's own field of the same name
-parts / a subject with two parts, one written as a line and one with an id / fails as unusable when something on the way to the part can't hold a key
-parts / a subject with two parts, one written as a line and one with an id / fails as unusable when the part is a string, as the full path would
 parts / an own field named like a part, read by a walk that fails / names the item of the own field with the dot and the item of the part without it
-parts / the same check written with an alias and with the path it stands for / gives the same rows when the part is missing, null or a string
 parts / walks and counts over an own field named like a part, in the checks and in the filters / names the failed items and the inputs of the own field with the dot
 parts / where a part's alias is read / an alias shadows a field with the same name, and the dot in front reads the field
 parts / where a part's alias is read / reads the alias in the conditions of the from line, in a for line's assertions, and on the right side after a one-line every, but not on the left of a whose

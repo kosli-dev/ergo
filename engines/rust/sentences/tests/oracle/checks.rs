@@ -4703,6 +4703,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of cov.files is 1",
+        "count of cov.files is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every cov.files.pct is at least 80",
+        "every cov.files.pct is at least 80",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8046,6 +8058,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "last of cs sorted by ts as c",
         "last of cs sorted by ts as c",
+        &[],
+        &[],
+    ),
+    (
+        "every prs as pr, some pr.approvers as approver",
+        "every prs as pr, some pr.approvers as approver",
         &[],
         &[],
     ),

@@ -10057,8 +10057,20 @@ _m_parent_clause(subj, check, name) := [c |
 	v != null
 	k := _m_step_key(subj, side[i])
 	not _can_hold(v, k)
-	c := _m_isnt(_input_name(array.slice(side, 0, i)), v, _m_holder(k))
+	c := _m_isnt(_m_part_name(array.slice(side, 0, i)), v, _m_holder(k))
 ]
+
+default _m_part_unreached(_) := false
+
+_m_part_unreached(p) if {
+	_part_start(p)
+	count(p) > 1
+	count(p) - 1 < _part_of(p).n
+}
+
+_m_part_name(p) := concat("", [_part_of(p).alias, " can't be read: ", _input_name(array.slice(p, 1, count(p)))]) if _m_part_unreached(p)
+
+else := _input_name(p)
 
 _m_paths_named(check, name) := [p | some side in _m_sides(check); some p in _m_side_paths(side); is_array(p); _input_name(p) == name]
 
@@ -10401,10 +10413,14 @@ _m_item_name(path, _) := _input_name(_as_subject_part(array.slice(path, k, count
 	k > 0
 }
 
-_m_item_name(path, roots) := _failed_name(path, roots) if {
+_m_item_name(path, roots) := _m_unreached_or(path, roots) if {
 	count([j | some j, step in path; is_number(step)]) == 0
 	not _m_off_item_path(path)
 }
+
+_m_unreached_or(path, _) := _m_part_name(path) if _m_part_unreached(path)
+
+_m_unreached_or(path, roots) := _failed_name(path, roots) if not _m_part_unreached(path)
 
 _m_item_name(path, roots) := concat(": ", array.concat(
 	array.concat([_failed_name(array.slice(path, 0, idx[0] + 1), roots)], [concat("", ["item ", _literal_text(path[idx[k]] + 1), " of ", _plain_steps_name(array.slice(path, idx[k - 1] + 1, idx[k]))]) | some k in numbers.range(1, count(idx) - 1)]),
@@ -10793,24 +10809,42 @@ _m_for_fail(f) := [_m_isnt(object.get(f, "said", f.item), object.get(f, "raw", f
 	not is_object(object.get(f, "raw", f.value))
 }
 
-_m_for_fail(f) := [_m_under(object.get(f, "said", f.item), concat(", and ", _m_first_marked(_once([ps[0] | some ps in lines]))))] if {
+_m_for_fail(f) := [_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_groups(_once([p | some ps in lines; some p in ps]))] if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions != []
 	lines := [_m_line_msg(l, _m_owns(f)) | some l in f.failed_assertions]
-	every ps in lines {
-		count(ps) == 1
-	}
 }
 
-_m_for_fail(f) := _once([_m_under(object.get(f, "said", f.item), p) | some ps in lines; some p in ps]) if {
-	not "msg" in object.keys(f)
-	not _m_bare_item(f)
-	f.failed_assertions != []
-	lines := [_m_line_msg(l, _m_owns(f)) | some l in f.failed_assertions]
-	some ps in lines
-	count(ps) != 1
-}
+_m_lead_of(t) := lead if {
+	m := regex.find_all_string_submatch_n(`^(item [0-9]+ of [^:]*?)(: | is )`, t, 1)
+	count(m) > 0
+	lead := m[0][1]
+} else := ""
+
+_m_leads(texts) := [l |
+	some i, t in texts
+	l := _m_lead_of(t)
+	l != ""
+	not l in [_m_lead_of(x) | some x in array.slice(texts, 0, i)]
+]
+
+_m_groups(texts) := [texts] if count(_m_leads(texts)) == 0
+
+else := [[t | some t in texts; _m_in_group(t, lead, k)] | some k, lead in _m_leads(texts)]
+
+_m_in_group(t, lead, _) if _m_lead_of(t) == lead
+
+_m_in_group(t, _, 0) if _m_lead_of(t) == ""
+
+_m_after_lead(first, x) := substring(x, count(lead), -1) if {
+	lead := concat("", [_m_lead_of(first), ": "])
+	lead != ": "
+	startswith(first, lead)
+	startswith(x, lead)
+} else := x
+
+_m_group_text(g) := concat(", and ", _m_first_marked(array.concat([g[0]], [_m_after_lead(g[0], x) | some x in array.slice(g, 1, count(g))])))
 
 _m_for_fail(f) := [concat("", [object.get(f, "said", f.item), ": ", t]) | some x in f.failed_items; some t in _m_inner_fail(x)] if {
 	not "msg" in object.keys(f)

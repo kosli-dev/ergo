@@ -137,6 +137,11 @@ impl Walked<'_> {
             .map(|(at, _)| at)
             .collect();
         let Some(first) = indexes.first() else {
+            if let Start::Part(part) = &self.start
+                && segs.len() < part.steps.len()
+            {
+                return format!("{} can't be read: {}", part.name, self.name_of(segs, true));
+            }
             return self.name_of(segs, true);
         };
         let plain = |segs: &[Seg]| {

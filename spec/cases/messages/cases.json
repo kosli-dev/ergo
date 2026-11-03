@@ -437,5 +437,99 @@
         ]
       }
     ]
+  },
+  {
+    "description": "the sentences of a for item are named once",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": ["approver.state is \"APPROVED\"", "approver.username does not equal pr.author"], "for": "every prs as pr, some pr.approvers as approver"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "an item that failed two sentences is named once, with , and between them",
+        "rules": ["message.join", "message.items"],
+        "input": {"things": [{"id": "t", "prs": [{"approvers": [{"state": "APPROVED", "username": "bob"}], "author": "ann"}, {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob"}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/1/approvers/0/state"], "name": "approver.state", "value": "COMMENTED"}], "item": "item 1 of pr.approvers"}]}, {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/1/approvers/0/username"], "name": "approver.username", "value": "bob"}, {"locations": ["/things/0/prs/1/author"], "name": "pr.author", "value": "bob"}], "item": "item 1 of pr.approvers"}]}], "item": "item 2 of prs", "locations": ["/things/0/prs/1"], "path": "item 2 of prs", "value": {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob"}}], "inputs": [{"locations": ["/things/0/prs/0/approvers/0", "/things/0/prs/1/approvers/0"], "name": "pr.approvers[]", "value": [{"state": "APPROVED", "username": "bob"}, {"state": "COMMENTED", "username": "bob"}]}, {"locations": ["/things/0/prs/0", "/things/0/prs/1"], "name": "prs[]", "value": [{"approvers": [{"state": "APPROVED", "username": "bob"}], "author": "ann"}, {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob"}]}], "message": "item 2 of prs: item 1 of approvers: approver.state is \"COMMENTED\", and approver.username is \"bob\", and pr.author is \"bob\"", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a sentence that fails for two items of the second list gives each pair its own part",
+        "rules": ["message.join", "message.items"],
+        "input": {"things": [{"id": "t", "prs": [{"approvers": [{"state": "X", "username": "a"}, {"state": "X", "username": "a"}], "author": "a"}, {"approvers": [{"state": "X", "username": "b"}], "author": "b"}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/0/state"], "name": "approver.state", "value": "X"}], "item": "item 1 of pr.approvers"}, {"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/1/state"], "name": "approver.state", "value": "X"}], "item": "item 2 of pr.approvers"}]}, {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/0/username"], "name": "approver.username", "value": "a"}, {"locations": ["/things/0/prs/0/author"], "name": "pr.author", "value": "a"}], "item": "item 1 of pr.approvers"}, {"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/1/username"], "name": "approver.username", "value": "a"}, {"locations": ["/things/0/prs/0/author"], "name": "pr.author", "value": "a"}], "item": "item 2 of pr.approvers"}]}], "item": "item 1 of prs", "locations": ["/things/0/prs/0"], "path": "item 1 of prs", "value": {"approvers": [{"state": "X", "username": "a"}, {"state": "X", "username": "a"}], "author": "a"}}, {"cause": "value", "failed_assertions": [{"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/1/approvers/0/state"], "name": "approver.state", "value": "X"}], "item": "item 1 of pr.approvers"}]}, {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/1/approvers/0/username"], "name": "approver.username", "value": "b"}, {"locations": ["/things/0/prs/1/author"], "name": "pr.author", "value": "b"}], "item": "item 1 of pr.approvers"}]}], "item": "item 2 of prs", "locations": ["/things/0/prs/1"], "path": "item 2 of prs", "value": {"approvers": [{"state": "X", "username": "b"}], "author": "b"}}], "inputs": [{"locations": ["/things/0/prs/0/approvers/0", "/things/0/prs/0/approvers/1", "/things/0/prs/1/approvers/0"], "name": "pr.approvers[]", "value": [{"state": "X", "username": "a"}, {"state": "X", "username": "a"}, {"state": "X", "username": "b"}]}, {"locations": ["/things/0/prs/0", "/things/0/prs/1"], "name": "prs[]", "value": [{"approvers": [{"state": "X", "username": "a"}, {"state": "X", "username": "a"}], "author": "a"}, {"approvers": [{"state": "X", "username": "b"}], "author": "b"}]}], "message": "item 1 of prs: item 1 of approvers: approver.state is \"X\", and approver.username is \"a\", and pr.author is \"a\"; item 1 of prs: item 2 of approvers: approver.state is \"X\", and approver.username is \"a\", and pr.author is \"a\"; item 2 of prs: item 1 of approvers: approver.state is \"X\", and approver.username is \"b\", and pr.author is \"b\"", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "and N more counts items, not sentences",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t", "prs": [{"approvers": [{"state": "X", "username": "a"}], "author": "a"}, {"approvers": [{"state": "X", "username": "b"}], "author": "b"}, {"approvers": [], "author": "c"}, {"approvers": [], "author": "d"}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/0/state"], "name": "approver.state", "value": "X"}], "item": "item 1 of pr.approvers"}]}, {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/0/approvers/0/username"], "name": "approver.username", "value": "a"}, {"locations": ["/things/0/prs/0/author"], "name": "pr.author", "value": "a"}], "item": "item 1 of pr.approvers"}]}], "item": "item 1 of prs", "locations": ["/things/0/prs/0"], "path": "item 1 of prs", "value": {"approvers": [{"state": "X", "username": "a"}], "author": "a"}}, {"cause": "value", "failed_assertions": [{"assertion": "approver.state is \"APPROVED\"", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/1/approvers/0/state"], "name": "approver.state", "value": "X"}], "item": "item 1 of pr.approvers"}]}, {"assertion": "approver.username does not equal pr.author", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/prs/1/approvers/0/username"], "name": "approver.username", "value": "b"}, {"locations": ["/things/0/prs/1/author"], "name": "pr.author", "value": "b"}], "item": "item 1 of pr.approvers"}]}], "item": "item 2 of prs", "locations": ["/things/0/prs/1"], "path": "item 2 of prs", "value": {"approvers": [{"state": "X", "username": "b"}], "author": "b"}}, {"cause": "value", "failed_assertions": [], "failed_items": [{"cause": "value", "item": "pr.approvers", "locations": ["/things/0/prs/2/approvers"], "path": "pr.approvers", "value": []}], "item": "item 3 of prs", "locations": ["/things/0/prs/2"], "path": "item 3 of prs", "value": {"approvers": [], "author": "c"}}, {"cause": "value", "failed_assertions": [], "failed_items": [{"cause": "value", "item": "pr.approvers", "locations": ["/things/0/prs/3/approvers"], "path": "pr.approvers", "value": []}], "item": "item 4 of prs", "locations": ["/things/0/prs/3"], "path": "item 4 of prs", "value": {"approvers": [], "author": "d"}}], "inputs": [{"locations": ["/things/0/prs/0/approvers/0", "/things/0/prs/1/approvers/0"], "name": "pr.approvers[]", "value": [{"state": "X", "username": "a"}, {"state": "X", "username": "b"}]}, {"locations": ["/things/0/prs/0", "/things/0/prs/1", "/things/0/prs/2", "/things/0/prs/3"], "name": "prs[]", "value": [{"approvers": [{"state": "X", "username": "a"}], "author": "a"}, {"approvers": [{"state": "X", "username": "b"}], "author": "b"}, {"approvers": [], "author": "c"}, {"approvers": [], "author": "d"}]}], "message": "item 1 of prs: item 1 of approvers: approver.state is \"X\", and approver.username is \"a\", and pr.author is \"a\"; item 2 of prs: item 1 of approvers: approver.state is \"X\", and approver.username is \"b\", and pr.author is \"b\"; item 3 of prs: pr.approvers is []; and 1 more", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part that can't be reached is named with the value that stopped the read",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "cov.pct is at least 80"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"cov": "reports.coverage"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "one step before the part",
+        "rules": ["message.part"],
+        "input": {"things": [{"id": "t", "reports": "none"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/reports"], "name": "cov.pct", "part": {"id": null, "name": "cov"}, "value": null}], "message": "cov can't be read: reports is \"none\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a part that is reached but can't take the next step is named as the value",
+        "rules": ["message.part"],
+        "input": {"things": [{"id": "t", "reports": {"coverage": "x"}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/reports/coverage"], "name": "cov.pct", "part": {"id": null, "name": "cov"}, "value": null}], "message": "cov is \"x\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part three steps deep that can't be reached",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "cov.pct is at least 80"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"cov": "reports.a.b.coverage"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the value that stopped the read is the second step",
+        "rules": ["message.part"],
+        "input": {"things": [{"id": "t", "reports": {"a": "none"}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/reports/a"], "name": "cov.pct", "part": {"id": null, "name": "cov"}, "value": null}], "message": "cov can't be read: reports.a is \"none\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an every over a part that can't be reached",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "every cov.files.pct is at least 80"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"cov": "reports.coverage"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the part is named, and the kind is a list or an object",
+        "rules": ["message.part"],
+        "input": {"things": [{"id": "t", "reports": "none"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "cov", "locations": ["/things/0/reports"], "path": "cov", "value": "none"}], "inputs": [{"locations": [], "name": "cov.files.pct", "part": {"id": null, "name": "cov"}, "value": []}], "message": "cov can't be read: reports is \"none\", which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of over a part that can't be reached",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of cov.files is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "has": {"cov": "reports.coverage"}, "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the part is named once",
+        "rules": ["message.part"],
+        "input": {"things": [{"id": "t", "reports": "none"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of cov.files", "part": {"id": null, "name": "cov"}, "value": null}, {"locations": [], "name": "cov.files", "part": {"id": null, "name": "cov"}, "value": []}], "message": "cov can't be read: reports is \"none\", which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

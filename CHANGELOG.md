@@ -10,7 +10,7 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 
 ### Changed
 
-- This version follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: each failed row and violation has a `message`. The report's `ergo` follows the spec version.
+- This version follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.5.0-dev`, and each failed row and each violation has a `message`.
 
 ## 0.4.0
 

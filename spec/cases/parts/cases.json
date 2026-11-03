@@ -569,7 +569,7 @@
                 ]
               }
             ],
-            "message": "findings is \"ok\", which isn't an object",
+            "message": "findings can't be read: compliance_status is \"ok\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -604,7 +604,7 @@
                 ]
               }
             ],
-            "message": "coverage is \"ok\", which isn't an object",
+            "message": "coverage can't be read: compliance_status is \"ok\", which isn't an object",
             "passed": false,
             "requirement": "review_round",
             "subject": {

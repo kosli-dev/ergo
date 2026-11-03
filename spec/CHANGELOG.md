@@ -11,7 +11,7 @@ Each version says whether reports changed, so that anyone who only stores report
 
 ### Changed
 
-- Reports change: every failed row, and every violation, has a new `message` field. The report schema allows it. Nothing else in a report changes.
+- Reports change: the report's `ergo` says `v0.5-dev`, every failed row has a new `message` field, and so does every violation. The report schema allows it. Nothing else in a report changes.
 
 ## 0.4
 

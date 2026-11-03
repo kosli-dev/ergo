@@ -1144,7 +1144,7 @@ reads "for every pull request, some approver approved it and isn't its author". 
       {"approvers": [{"state": "COMMENTED", "username": "bob"}], "author": "bob", "number": 8}
     ]}
   ],
-  "message": "item 2 of pull_requests: item 1 of approvers: approver.state is \"COMMENTED\", and item 1 of approvers: approver.username is \"bob\", and pr.author is \"bob\"",
+  "message": "item 2 of pull_requests: item 1 of approvers: approver.state is \"COMMENTED\", and approver.username is \"bob\", and pr.author is \"bob\"",
   "passed": false,
   "requirement": "release",
   "subject": {"id": "r-1", "type": "release"}

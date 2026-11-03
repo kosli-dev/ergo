@@ -3,7 +3,7 @@ use super::tally::{self, Side as TallySide};
 use super::{Check, Input, Verdict, lists, read_path, run as run_check};
 use crate::cause::Cause;
 use crate::name;
-use crate::path::{self, Ctx, Outcome, Path, Resolved, Step};
+use crate::path::{self, Ctx, Outcome, Path, Resolved, Start, Step};
 use crate::value::json_text;
 use serde_json::Value;
 
@@ -291,7 +291,15 @@ pub fn key_faults_of(path: &Path, ctx: &Ctx) -> Vec<String> {
 }
 
 fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
-    single_path(check).map_or_else(Vec::new, |path| blocked_of(path, ctx))
+    if matches!(check, Check::Tally(_)) {
+        return Vec::new();
+    }
+    once_of(
+        side_paths(check)
+            .into_iter()
+            .flat_map(|path| blocked_of(path, ctx))
+            .collect(),
+    )
 }
 
 pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
@@ -338,6 +346,28 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
                         shown
                     };
                     return vec![isnt(&shown, value, holder)];
+                }
+                if let (Start::Part(part), false) = (&path.start, value.is_null()) {
+                    let prefix = Path {
+                        start: part.base.clone(),
+                        steps: part.steps[..at].to_vec(),
+                    };
+                    let holder = if matches!(resolved, Resolved::Index(_)) {
+                        "a list"
+                    } else {
+                        "an object"
+                    };
+                    let shown = name::name(&prefix);
+                    let shown = if shown.is_empty() {
+                        "it".to_string()
+                    } else {
+                        shown
+                    };
+                    return vec![format!(
+                        "{} can't be read: {}",
+                        part.name,
+                        isnt(&shown, value, holder)
+                    )];
                 }
                 return Vec::new();
             }
