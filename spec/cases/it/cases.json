@@ -819,5 +819,236 @@
         ]
       }
     ]
+  },
+  {
+    "description": "that on a from line picks items by the value itself, and the $applies row names the item by the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "each string is read as the subject, and the row names it w, not it",
+        "rules": ["sentence.condition.word", "sentence.subject.condition", "sentence.subject.applies", "scope.filters"],
+        "input": {"ws": ["bay", "apple"]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/ws/0"], "name": "w", "value": "bay"}], "passed": true, "requirement": "r", "subject": {"id": "bay", "type": "w"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/ws/1"], "name": "w", "value": "apple"}], "message": "w is \"apple\"", "passed": false, "requirement": "r", "subject": {"id": "apple", "type": "w"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ws/0"], "name": "it", "value": "bay"}], "passed": true, "requirement": "r", "subject": {"id": "bay", "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that twice on a from line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "every ws that starts with \"b\" and that ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "every condition has to pass, and the $applies row joins them with and",
+        "rules": ["sentence.condition.word", "sentence.subject.applies"],
+        "input": {"ws": ["bay", "bee", "ally", null, 3]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "failed_assertions": [], "inputs": [{"locations": ["/ws/0"], "name": "w", "value": "bay"}], "passed": true, "requirement": "r", "subject": {"id": "bay", "type": "w"}},
+          {"cause": "value", "check": "$applies", "failed_assertions": [{"assertion": "w ends with \"y\"", "cause": "value"}], "inputs": [{"locations": ["/ws/1"], "name": "w", "value": "bee"}], "message": "w is \"bee\"", "passed": false, "requirement": "r", "subject": {"id": "bee", "type": "w"}},
+          {"cause": "value", "check": "$applies", "failed_assertions": [{"assertion": "w starts with \"b\"", "cause": "value"}], "inputs": [{"locations": ["/ws/2"], "name": "w", "value": "ally"}], "message": "w is \"ally\"", "passed": false, "requirement": "r", "subject": {"id": "ally", "type": "w"}},
+          {"cause": "null", "check": "$applies", "failed_assertions": [{"assertion": "w starts with \"b\"", "cause": "null"}, {"assertion": "w ends with \"y\"", "cause": "null"}], "inputs": [{"locations": ["/ws/3"], "name": "w", "value": null}], "message": "w is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "w"}},
+          {"cause": "unusable", "check": "$applies", "failed_assertions": [{"assertion": "w starts with \"b\"", "cause": "unusable"}, {"assertion": "w ends with \"y\"", "cause": "unusable"}], "inputs": [{"locations": ["/ws/4"], "name": "w", "value": 3}], "message": "w is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "w"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ws/0"], "name": "it", "value": "bay"}], "passed": true, "requirement": "r", "subject": {"id": "bay", "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that and whose in one from line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "every ws whose it starts with \"b\" and that ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "the two words mix, and each condition keeps its own reading",
+        "rules": ["sentence.condition.word", "sentence.subject.applies"],
+        "input": {"ws": ["bay", "bee", "ally"]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "failed_assertions": [], "inputs": [{"locations": ["/ws/0"], "name": "it", "value": "bay"}, {"locations": ["/ws/0"], "name": "w", "value": "bay"}], "passed": true, "requirement": "r", "subject": {"id": "bay", "type": "w"}},
+          {"cause": "value", "check": "$applies", "failed_assertions": [{"assertion": "w ends with \"y\"", "cause": "value"}], "inputs": [{"locations": ["/ws/1"], "name": "it", "value": "bee"}, {"locations": ["/ws/1"], "name": "w", "value": "bee"}], "message": "w is \"bee\"", "passed": false, "requirement": "r", "subject": {"id": "bee", "type": "w"}},
+          {"cause": "value", "check": "$applies", "failed_assertions": [{"assertion": "it starts with \"b\"", "cause": "value"}], "inputs": [{"locations": ["/ws/2"], "name": "it", "value": "ally"}, {"locations": ["/ws/2"], "name": "w", "value": "ally"}], "message": "it is \"ally\"", "passed": false, "requirement": "r", "subject": {"id": "ally", "type": "w"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ws/0"], "name": "it", "value": "bay"}], "passed": true, "requirement": "r", "subject": {"id": "bay", "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that without every on a from line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "ws that starts with \"b\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "a list of strings is read like it is with every",
+        "rules": ["sentence.condition.word", "sentence.subject.condition"],
+        "input": {"ws": ["bay", "bee"]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/ws/0"], "name": "w", "value": "bay"}], "passed": true, "requirement": "r", "subject": {"id": "bay", "type": "w"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/ws/1"], "name": "w", "value": "bee"}], "passed": true, "requirement": "r", "subject": {"id": "bee", "type": "w"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ws/0"], "name": "it", "value": "bay"}], "passed": true, "requirement": "r", "subject": {"id": "bay", "type": "w"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ws/1"], "name": "it", "value": "bee"}], "passed": true, "requirement": "r", "subject": {"id": "bee", "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that in a check",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"e": "every ws that starts with \"b\" ends with \"y\"", "n": "count of ws that starts with \"b\" and that ends with \"y\" is 1", "s": "some ws that starts with \"b\" is alphabetically after \"bb\""}}}},
+    "cases": [
+      {
+        "description": "every, count of and some keep the items that pass, and a list that that walks is listed with []",
+        "rules": ["sentence.condition.word", "sentence.that.name", "walk.items", "tally.whose"],
+        "input": {"deployments": [{"id": "d1", "ws": ["bay", "bee", "ally"]}, {"id": "d2", "ws": ["bay", "bez"]}]},
+        "results": [
+          {"cause": "value", "check": "e", "failed_items": [{"cause": "value", "item": "item 2 of ws", "locations": ["/deployments/0/ws/1"], "path": "item 2 of ws", "value": "bee"}], "inputs": [{"locations": ["/deployments/0/ws/0", "/deployments/0/ws/1", "/deployments/0/ws/2"], "name": "ws[]", "value": ["bay", "bee", "ally"]}], "message": "item 2 of ws is \"bee\"", "passed": false, "requirement": "r", "subject": {"id": "d1", "type": "d"}},
+          {"cause": "satisfied", "check": "n", "inputs": [{"locations": ["/deployments/0/ws/0", "/deployments/0/ws/1", "/deployments/0/ws/2"], "name": "count of ws that starts with \"b\" and that ends with \"y\"", "value": 1}, {"locations": ["/deployments/0/ws/0", "/deployments/0/ws/1", "/deployments/0/ws/2"], "name": "ws[]", "value": ["bay", "bee", "ally"]}], "passed": true, "requirement": "r", "subject": {"id": "d1", "type": "d"}},
+          {"cause": "satisfied", "check": "s", "failed_items": [], "inputs": [{"locations": ["/deployments/0/ws/0", "/deployments/0/ws/1", "/deployments/0/ws/2"], "name": "ws[]", "value": ["bay", "bee", "ally"]}], "passed": true, "requirement": "r", "subject": {"id": "d1", "type": "d"}},
+          {"cause": "value", "check": "e", "failed_items": [{"cause": "value", "item": "item 2 of ws", "locations": ["/deployments/1/ws/1"], "path": "item 2 of ws", "value": "bez"}], "inputs": [{"locations": ["/deployments/1/ws/0", "/deployments/1/ws/1"], "name": "ws[]", "value": ["bay", "bez"]}], "message": "item 2 of ws is \"bez\"", "passed": false, "requirement": "r", "subject": {"id": "d2", "type": "d"}},
+          {"cause": "satisfied", "check": "n", "inputs": [{"locations": ["/deployments/1/ws/0", "/deployments/1/ws/1"], "name": "count of ws that starts with \"b\" and that ends with \"y\"", "value": 1}, {"locations": ["/deployments/1/ws/0", "/deployments/1/ws/1"], "name": "ws[]", "value": ["bay", "bez"]}], "passed": true, "requirement": "r", "subject": {"id": "d2", "type": "d"}},
+          {"cause": "satisfied", "check": "s", "failed_items": [], "inputs": [{"locations": ["/deployments/1/ws/0", "/deployments/1/ws/1"], "name": "ws[]", "value": ["bay", "bez"]}], "passed": true, "requirement": "r", "subject": {"id": "d2", "type": "d"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that on a for line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that starts with \"b\" as w", "assert": "w ends with \"y\""}}}}},
+    "cases": [
+      {
+        "description": "the for line keeps the strings that pass",
+        "rules": ["sentence.condition.word", "for.walk"],
+        "input": {"deployments": [{"id": "d1", "ws": ["bay", "bee", "ally"]}]},
+        "results": [
+          {"cause": "value", "check": "f", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "w ends with \"y\"", "cause": "value", "inputs": [{"locations": ["/deployments/0/ws/1"], "name": "w", "value": "bee"}]}], "item": "item 2 of ws", "locations": ["/deployments/0/ws/1"], "path": "item 2 of ws", "value": "bee"}], "inputs": [{"locations": ["/deployments/0/ws/0", "/deployments/0/ws/1", "/deployments/0/ws/2"], "name": "ws[]", "value": ["bay", "bee", "ally"]}], "message": "item 2 of ws is \"bee\"", "passed": false, "requirement": "r", "subject": {"id": "d1", "type": "d"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field called that",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "every items whose .that is \"x\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "is written with a dot and reads the field",
+        "rules": ["sentence.condition.word", "sentence.words"],
+        "input": {"items": [{"that": "x"}, {"that": "y"}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/items/0/that"], "name": ".that", "value": "x"}], "passed": true, "requirement": "r", "subject": {"id": {"that": "x"}, "type": "w"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/items/1/that"], "name": ".that", "value": "y"}], "message": ".that is \"y\"", "passed": false, "requirement": "r", "subject": {"id": {"that": "y"}, "type": "w"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/items/0"], "name": "it", "value": {"that": "x"}}], "message": "it is {\"that\": \"x\"}, which isn't text or a list", "passed": false, "requirement": "r", "subject": {"id": {"that": "x"}, "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field called that in a check",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": ".that is \"x\""}}}},
+    "cases": [
+      {
+        "description": "the dot reads the field",
+        "rules": ["sentence.words"],
+        "input": {"deployments": [{"id": "d1", "that": "x"}, {"id": "d2", "that": "y"}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/deployments/0/that"], "name": ".that", "value": "x"}], "passed": true, "requirement": "r", "subject": {"id": "d1", "type": "d"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/deployments/1/that"], "name": ".that", "value": "y"}], "message": ".that is \"y\"", "passed": false, "requirement": "r", "subject": {"id": "d2", "type": "d"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "whose a is 1 and b is 2 on a from line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "every things whose a is 1 and b is 2"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and the requirement gets no row but $well_formed",
+        "rules": ["sentence.condition.word", "sentence.subject.from"],
+        "input": {"ws": ["bay"], "things": [{"a": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.w.from", "value": ["doesn't parse"]}], "message": "subjects.w.from: doesn't parse", "passed": false, "requirement": "r", "subject": {"id": null, "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "and with a bare phrase after a that on a from line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "every ws that starts with \"b\" and ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and the requirement gets no row but $well_formed",
+        "rules": ["sentence.condition.word", "sentence.subject.from"],
+        "input": {"ws": ["bay"], "things": [{"a": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.w.from", "value": ["doesn't parse"]}], "message": "subjects.w.from: doesn't parse", "passed": false, "requirement": "r", "subject": {"id": null, "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that with no phrase on a from line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "every ws that"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and the requirement gets no row but $well_formed",
+        "rules": ["sentence.condition.word", "sentence.subject.from"],
+        "input": {"ws": ["bay"], "things": [{"a": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.w.from", "value": ["doesn't parse"]}], "message": "subjects.w.from: doesn't parse", "passed": false, "requirement": "r", "subject": {"id": null, "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that after that without and on a from line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "every ws that starts with \"b\" that ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and the requirement gets no row but $well_formed",
+        "rules": ["sentence.condition.word", "sentence.subject.from"],
+        "input": {"ws": ["bay"], "things": [{"a": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.w.from", "value": ["doesn't parse"]}], "message": "subjects.w.from: doesn't parse", "passed": false, "requirement": "r", "subject": {"id": null, "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "whose after that without and on a from line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"w": {"from": "every ws that starts with \"b\" whose it ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "it is not empty"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and the requirement gets no row but $well_formed",
+        "rules": ["sentence.condition.word", "sentence.subject.from"],
+        "input": {"ws": ["bay"], "things": [{"a": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "subjects.w.from", "value": ["doesn't parse"]}], "message": "subjects.w.from: doesn't parse", "passed": false, "requirement": "r", "subject": {"id": null, "type": "w"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "whose a is 1 and b is 2 in a check",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every items whose a is 1 and b is 2 is not empty"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and the requirement gets no row but $well_formed",
+        "rules": ["sentence.condition.word", "sentence.check"],
+        "input": {"deployments": [{"id": "d1", "items": [{"a": 1, "b": 2}], "ws": ["x"]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "message": "checks.c: doesn't parse", "passed": false, "requirement": "r", "subject": {"id": null, "type": "d"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that with no phrase in a check",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every ws that is not empty"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and the requirement gets no row but $well_formed",
+        "rules": ["sentence.condition.word", "sentence.check"],
+        "input": {"deployments": [{"id": "d1", "items": [{"a": 1, "b": 2}], "ws": ["x"]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["doesn't parse"]}], "message": "checks.c: doesn't parse", "passed": false, "requirement": "r", "subject": {"id": null, "type": "d"}}
+        ]
+      }
+    ]
   }
 ]
