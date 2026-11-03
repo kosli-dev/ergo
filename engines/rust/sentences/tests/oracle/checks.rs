@@ -4802,6 +4802,40 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("subject.k is 1", "subject.k is 1", &[], &[]),
     ("y.k is 1", "y.k is 1", &[], &[]),
     ("z.k is 1", "z.k is 1", &[], &[]),
+    ("count of xs is 1", "count of xs is 1", &[], &[]),
+    ("count of xs is 2", "count of xs is 2", &[], &[]),
+    (
+        "every lst.x whose x is 9 is 2",
+        "every lst.x whose x is 9 is 2",
+        &[],
+        &[],
+    ),
+    ("l.x is 1", "l.x is 1", &[], &[]),
+    ("l.x is 2", "l.x is 2", &[], &[]),
+    ("x.k is 1", "x.k is 1", &[], &[]),
+    ("x.k is 2", "x.k is 2", &[], &[]),
+    ("every w.items.lo is 9", "every w.items.lo is 9", &[], &[]),
+    (
+        "every w.items.status whose lo is 1 is \"ok\"",
+        "every w.items.status whose lo is 1 is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every w.items.status whose lo is at least cov.x is \"ok\"",
+        "every w.items.status whose lo is at least cov.x is \"ok\"",
+        &[],
+        &[],
+    ),
+    ("w.n is 9", "w.n is 9", &[], &[]),
+    ("w.v is at least zz", "w.v is at least zz", &[], &[]),
+    ("x is 9", "x is 9", &[], &[]),
+    ("x is at least 2", "x is at least 2", &[], &[]),
+    ("every w.items.m is 1", "every w.items.m is 1", &[], &[]),
+    ("every xs.k is 5", "every xs.k is 5", &[], &[]),
+    ("i.k is 1", "i.k is 1", &[], &[]),
+    ("w.k is 1", "w.k is 1", &[], &[]),
+    ("x.k is in $params.l", "x.k is in $params.l", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8188,6 +8222,26 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every zs as subject", "every zs as subject", &[], &[]),
+    (
+        "every lst whose x is 5 as l",
+        "every lst whose x is 5 as l",
+        &[],
+        &[],
+    ),
+    (
+        "every lst whose x is 9 as l",
+        "every lst whose x is 9 as l",
+        &[],
+        &[],
+    ),
+    ("every ws as w", "every ws as w", &[], &[]),
+    (
+        "every ws as w, every w.items as i",
+        "every ws as w, every w.items as i",
+        &[],
+        &[],
+    ),
+    ("first of lst as w", "first of lst as w", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

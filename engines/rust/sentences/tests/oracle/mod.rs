@@ -1695,6 +1695,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("reports.a.b.coverage", "reports.a.b.coverage"),
     ("reports.coverage", "reports.coverage"),
+    ("ws", "ws"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2858,6 +2859,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("status.coverage.data", "status.coverage.data"),
     ("reports.a.b.coverage", "reports.a.b.coverage"),
     ("reports.coverage", "reports.coverage"),
+    ("ws", "ws"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[
