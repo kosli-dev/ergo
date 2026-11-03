@@ -5,6 +5,9 @@ pub mod checks;
 pub const FROM_OK: &[(&str, &str)] = &[
     ("round.items whose .cov is 1", "round.items whose cov is 1"),
     ("y", "y"),
+    ("t.ws whose lo is at least 1", "t.ws whose lo is at least 1"),
+    ("things named by $params.k", "things named by $params.k"),
+    ("things whose k is 1", "things whose k is 1"),
     ("first of t.ws", "first of t.ws"),
     ("first of things", "first of things"),
     ("item 2 of t.ws", "item 2 of t.ws"),

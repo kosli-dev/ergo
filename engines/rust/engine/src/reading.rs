@@ -349,6 +349,15 @@ fn blocked_ancestors(name: &str, raw: &BTreeMap<String, Raw>) -> Vec<String> {
     }
 }
 
+fn reads_alias(text: &str, ancestor: &str) -> bool {
+    text.match_indices(ancestor).any(|(at, _)| {
+        let before = text[..at].chars().next_back();
+        let after = text[at + ancestor.len()..].chars().next();
+        before.is_none_or(|c| !(c.is_alphanumeric() || c == '_' || c == '.' || c == '$'))
+            && after.is_none_or(|c| c == '.' || c.is_whitespace())
+    })
+}
+
 fn right_side_text(condition: &s::FromCondition, scope: &Scope) -> String {
     let s::FromCondition::Condition(condition) = condition else {
         return String::new();
@@ -780,12 +789,18 @@ impl Reading {
                         })
                     });
                     found_problems.extend(syntax_problems);
+                    if reads {
+                        found_problems.extend(s::from_self_problems(line, &alias_refs));
+                    }
                     let mut filters = Vec::new();
                     let blocked = blocked_ancestors(name, &raw);
                     for condition in line.whose.iter().filter(|_| reads) {
                         for ancestor in &blocked {
                             let reduced = scope.clone().without_parent(ancestor);
-                            if right_side_text(condition, &reduced)
+                            if reads_alias(
+                                &s::print_from_condition(condition, &alias_refs, &parent_refs),
+                                ancestor,
+                            ) && right_side_text(condition, &reduced)
                                 != right_side_text(condition, &scope)
                             {
                                 chain_problems

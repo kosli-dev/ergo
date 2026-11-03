@@ -25,6 +25,38 @@ pub fn check_problems(check: &Check, aliases: &[&str]) -> Vec<String> {
     found.into_iter().collect()
 }
 
+/// Lists the `whose` conditions of a `from` line that compare a field with itself, when the line has no other problem.
+///
+/// ```
+/// use ergo_policy_sentences::{from_self_problems, parse_from};
+///
+/// let line = parse_from("things whose x is x").unwrap();
+/// assert_eq!(from_self_problems(&line, &[]), ["whose: x is compared with itself"]);
+/// ```
+pub fn from_self_problems(line: &FromLine, aliases: &[&str]) -> Vec<String> {
+    if !from_base(line).is_empty() {
+        return Vec::new();
+    }
+    let mut out = BTreeSet::new();
+    for condition in &line.whose {
+        let FromCondition::Condition(condition) = condition else {
+            continue;
+        };
+        let Left::Path(path) = &condition.left else {
+            continue;
+        };
+        if let Some(term) = self_term(&condition.phrase)
+            && same_path(path, term, aliases, false)
+        {
+            out.insert(format!(
+                "whose: {} is compared with itself",
+                print_path(path, Side::Left, aliases)
+            ));
+        }
+    }
+    out.into_iter().collect()
+}
+
 /// Lists only the problems of a check that come from a field compared with itself.
 ///
 /// It gives what [`check_problems`] gives when the check has no other problem, and an empty list otherwise.

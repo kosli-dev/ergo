@@ -329,16 +329,14 @@ fn walk_from<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>], base: Located<'a>)
             }
         }
     }
-    {
-        for each in &mut broken {
-            if let Some((number, tail)) = each
-                .msg
-                .strip_prefix("item ")
-                .and_then(|rest| rest.split_once(" of it"))
-                && (tail.is_empty() || tail.starts_with([':', ' ']))
-            {
-                each.msg = format!("item {number} of $input{tail}");
-            }
+    for each in &mut broken {
+        if let Some((number, tail)) = each
+            .msg
+            .strip_prefix("item ")
+            .and_then(|rest| rest.split_once(" of it"))
+            && (tail.is_empty() || tail.starts_with([':', ' ']))
+        {
+            each.msg = format!("item {number} of $input{tail}");
         }
     }
     broken.sort_by(|a, b| a.order.cmp(&b.order));
@@ -2742,5 +2740,49 @@ mod tests {
             .map(|input| input["value"].clone())
             .collect();
         assert_eq!(texts, [json!(["one can't be an alias"])]);
+    }
+
+    fn from_problems_of(from: &str, parent: &str) -> Vec<Value> {
+        let r = report(
+            &json!({"ts": []}),
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {
+                    "t": {"from": "ts"},
+                    "w": {"from": parent},
+                    "thing": {"from": from}
+                },
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
+            }),
+            &json!({}),
+        );
+        rows(&r, "$well_formed")[0]["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|input| {
+                input["name"]
+                    .as_str()
+                    .is_some_and(|n| n.starts_with("subjects."))
+            })
+            .map(|input| json!([input["name"], input["value"]]))
+            .collect()
+    }
+
+    #[test]
+    fn a_dotted_right_side_reads_the_input_field_so_it_never_names_a_grandparent() {
+        let listed = from_problems_of("w.kids whose lo is at least .t.cov.x", "t.ws named by zz");
+        assert_eq!(listed, [json!(["subjects.w.from", ["unknown alias zz"]])]);
+    }
+
+    #[test]
+    fn a_from_line_whose_that_compares_a_field_with_itself_is_written_wrong() {
+        assert_eq!(
+            from_problems_of("w.kids whose lo is at least lo", "t.ws"),
+            [json!([
+                "subjects.thing.from",
+                ["whose: lo is compared with itself"]
+            ])]
+        );
     }
 }

@@ -1498,5 +1498,83 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a subject read from a key named by a param that is missing",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things named by $params.k"}}, "requirements": {"s": {"subject": "t", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "says the param is missing before it reads the list",
+        "rules": ["message.cause", "message.from", "subjects.sentence"],
+        "input": {"things": {"a": {"x": 1}}},
+        "results": [
+          {"cause": "absent", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$params.k is missing", "passed": false, "requirement": "s", "subject": {"id": null, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject read from a key named by a param that isn't text",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things named by $params.k"}}, "requirements": {"s": {"subject": "t", "checks": {"c": "x exists"}}}},
+    "params": {"k": 5},
+    "cases": [
+      {
+        "description": "says the param isn't text",
+        "rules": ["message.cause", "message.from", "subjects.sentence"],
+        "input": {"things": {"a": {"x": 1}}},
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$params.k is 5, which isn't text", "passed": false, "requirement": "s", "subject": {"id": null, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject read from a key named by a param that the object lacks",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things named by $params.k"}}, "requirements": {"s": {"subject": "t", "checks": {"c": "x exists"}}}},
+    "params": {"k": "b"},
+    "cases": [
+      {
+        "description": "names the key the object lacks",
+        "rules": ["message.cause", "message.from", "subjects.sentence"],
+        "input": {"things": {"a": {"x": 1}}},
+        "results": [
+          {"cause": "absent", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "things.b is missing", "passed": false, "requirement": "s", "subject": {"id": null, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject whose from line has a whose over items that aren't objects",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things whose k is 1"}}, "requirements": {"s": {"subject": "t", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "says each item that isn't an object can't be read",
+        "rules": ["message.applies", "message.cause"],
+        "input": {"things": [{"k": 1}, 3, null]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": {"k": 1}, "type": "t"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/1"], "name": "k", "value": null}], "message": "it is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 3, "type": "t"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/2"], "name": "k", "value": null}], "message": "it is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": null, "type": "t"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "message": "x is missing", "passed": false, "requirement": "s", "subject": {"id": {"k": 1}, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a child subject whose from line has a whose over items that aren't objects",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "t.ws whose lo is at least 1"}}, "requirements": {"s": {"subject": "w", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "says each item that isn't an object can't be read",
+        "rules": ["message.applies", "message.cause"],
+        "input": {"things": [{"id": "a", "ws": [{"lo": 2}, 4, null]}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/0/lo"], "name": "lo", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": {"lo": 2}, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/1"], "name": "lo", "value": null}], "message": "it is 4, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 4, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/2"], "name": "lo", "value": null}], "message": "it is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": null, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/ws/0"], "name": "x", "value": null}], "message": "x is missing", "passed": false, "requirement": "s", "subject": {"id": {"lo": 2}, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}}
+        ]
+      }
+    ]
   }
 ]
