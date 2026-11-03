@@ -885,5 +885,89 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line over a list of lists whose values spell the alias",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "every z.k is 9", "for": "every zs as z"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a value that holds the alias before a colon is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "$z: x"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["$z: x"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "$z: x"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "$z: x"}]]}], "message": "item 1 of zs: item 1 of z: k is \"$z: x\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a value that holds the alias before a semicolon is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "a$z; x"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["a$z; x"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "a$z; x"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "a$z; x"}]]}], "message": "item 1 of zs: item 1 of z: k is \"a$z; x\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a value that holds the alias before a space is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "$z "}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["$z "]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "$z "}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "$z "}]]}], "message": "item 1 of zs: item 1 of z: k is \"$z \", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a value that holds the alias before a comma is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "cost $z, ok"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["cost $z, ok"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "cost $z, ok"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "cost $z, ok"}]]}], "message": "item 1 of zs: item 1 of z: k is \"cost $z, ok\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a value that holds the alias before a dot is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "$z.x"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": ["$z.x"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "$z.x"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "$z.x"}]]}], "message": "item 1 of zs: item 1 of z: k is \"$z.x\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an object that holds the alias in a value is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": {"a": "$z: b"}}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": [{"a": "$z: b"}]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": {"a": "$z: b"}}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": {"a": "$z: b"}}]]}], "message": "item 1 of zs: item 1 of z: k is {\"a\": \"$z: b\"}, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an object that holds the alias in a key is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": {"$z ": 1}}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "z[].k", "value": [{"$z ": 1}]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": {"$z ": 1}}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": {"$z ": 1}}]]}], "message": "item 1 of zs: item 1 of z: k is {\"$z \": 1}, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a list that holds the alias in its items is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": ["$z ", "$z,"]}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every z.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k/0", "/things/0/zs/0/0/k/1"], "name": "z[].k[]", "value": ["$z ", "$z,"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": ["$z ", "$z,"]}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": ["$z ", "$z,"]}]]}], "message": "item 1 of zs: item 1 of z: item 1 of k is \"$z \", which isn't a number, and item 2 of k is \"$z,\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose alias is named applies and whose value spells it",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "every applies.k is 9", "for": "every zs as applies"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a value that holds the alias is printed as the input had it",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "zs": [[{"k": "$applies: $applies;"}]]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every applies.k is 9", "cause": "unusable", "inputs": [{"locations": ["/things/0/zs/0/0/k"], "name": "applies[].k", "value": ["$applies: $applies;"]}]}], "item": "item 1 of zs", "locations": ["/things/0/zs/0"], "path": "item 1 of zs", "value": [{"k": "$applies: $applies;"}]}], "inputs": [{"locations": ["/things/0/zs/0"], "name": "zs[]", "value": [[{"k": "$applies: $applies;"}]]}], "message": "item 1 of zs: item 1 of applies: k is \"$applies: $applies;\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

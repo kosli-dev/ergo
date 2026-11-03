@@ -4797,6 +4797,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("y.k is 9", "y.k is 9", &[], &[]),
+    ("every applies.k is 9", "every applies.k is 9", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8169,6 +8170,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every zs as applies", "every zs as applies", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

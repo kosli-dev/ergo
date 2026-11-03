@@ -1864,6 +1864,18 @@ _plain_step_name(0, step) := step if {
 	startswith(step, "$")
 	not step in {"$$input", "$$params", "$input", "$params"}
 	not _parent_name(step)
+	not _for_alias_step(step)
+}
+
+_plain_step_name(0, step) := concat("", ["\u0002", substring(step, 1, -1)]) if {
+	is_string(step)
+	_for_alias_step(step)
+	not _parent_name(step)
+}
+
+_for_alias_step(step) if {
+	startswith(step, "$")
+	input["ergo/names"]["$for"][substring(step, 1, -1)] == true
 }
 
 _plain_step_name(0, step) := _s_parent_key(substring(step, 1, -1)) if _parent_name(step)
@@ -8809,7 +8821,7 @@ _s_named_step(i, step, names) := concat("", ["$", step]) if {
 
 _for_names := object.get(input, "ergo/names", {})
 
-_bound(names, name, v, at) := object.union(names, {name: v, "$at": object.union(object.get(names, "$at", {}), {"names": object.union(object.get(object.get(names, "$at", {}), "names", {}), {name: at})})})
+_bound(names, name, v, at) := object.union(names, {name: v, "$for": object.union(object.get(names, "$for", {}), {name: true}), "$at": object.union(object.get(names, "$at", {}), {"names": object.union(object.get(object.get(names, "$at", {}), "names", {}), {name: at})})})
 
 _for_row(check, subj) := r if {
 	r := _for_row_raw(check, subj)
@@ -9139,12 +9151,12 @@ _for_from_first(check) if {
 	step.named_by == check.items[0].as
 }
 
-_for_judge_outer(check, subj, names, item, e, pre, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(check, item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, _walk_at(w, e))), "lines": res.lines} if {
+_for_judge_outer(check, subj, names, item, e, pre, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, _walk_at(w, e))), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
 	res := _for_outer_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept, pre)
 }
 
-_for_judge_inner(check, subj, names, item, e, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(check, item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, _walk_at(w, e))), "lines": res.lines} if {
+_for_judge_inner(check, subj, names, item, e, w) := {"passed": res.passed, "kept": wh.kept, "failure": _for_why(item, e, names, wh, _for_failure(e, wh.undecided, wh.kept, res, _walk_at(w, e))), "lines": res.lines} if {
 	wh := _for_whose(item, e, names)
 	res := _for_inner_next(check, subj, _bound(names, item.as, e.v, _walk_at(w, e)), wh.undecided, wh.kept)
 }
@@ -9221,7 +9233,7 @@ _for_inner(check, subj, names, w) := {"passed": false, "cause": "not_an_object",
 }
 
 _for_lines(check, subj, names) := {"passed": count(lines) == 0, "cause": _all_of_cause(lines), "lines": lines} if {
-	lines := [object.union({"assertion": check.assertions[i], "cause": cause, "inputs": _for_line_inputs(check, c, read), "msg": [_m_aliased(check, x) | some x in m]}, _m_own_msg(check, c, m, count(read) == 1)) |
+	lines := [object.union({"assertion": check.assertions[i], "cause": cause, "inputs": _for_line_inputs(check, c, read), "msg": [_m_aliased(x) | some x in m]}, _m_own_msg(check, c, m, count(read) == 1)) |
 		some i, c in check.checks
 		cause := _for_cause(c, subj) with input as {"ergo/names": names}
 		cause != "satisfied"
@@ -9256,7 +9268,7 @@ _for_renamed(check, i) := object.union(i, {"name": _for_input_name(i.name, {item
 
 _for_input_name(name, aliases) := concat("", [m[1], alias, m[2]]) if {
 	some alias in aliases
-	m := regex.find_all_string_submatch_n(concat("", [`(?s)^((?:item [0-9]+ of )?)\$`, _quoted(alias), `((?:[.\[ ].*)?)$`]), name, 1)[0]
+	m := regex.find_all_string_submatch_n(concat("", [`(?s)^((?:item [0-9]+ of )?)\x02`, _quoted(alias), `((?:[.\[ ].*)?)$`]), name, 1)[0]
 } else := name
 
 _for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(check, f.path), "cause": l.cause, "inputs": l.inputs, "msg": [_m_under(_m_for_item_name(check, f.path), x) | some x in l.msg], "own": _m_own_under(_m_for_item_name(check, f.path), object.get(l, "own_msg", null))} |
@@ -10624,7 +10636,7 @@ _m_sentence(c, subj, cause) := [_message(c, subj, cause)] if not _walks(c)
 
 _m_sentence(c, subj, cause) := _walk_parts(c, subj, {"cause": cause}, _walk_row(c, subj)) if _walks(c)
 
-_m_own_msg(check, c, m, one) := {"own_msg": [_m_aliased(check, _m_unalias(a, one, x)) | some x in m]} if {
+_m_own_msg(check, c, m, one) := {"own_msg": [_m_aliased(_m_unalias(a, one, x)) | some x in m]} if {
 	a := check.items[count(check.items) - 1].as
 	_reads_name(c, a)
 	not _m_reads_other(c, a)
@@ -10678,11 +10690,11 @@ _m_other_name(x, a) if {
 	x.named_by != a
 }
 
-_m_unalias(a, one, x) := _m_lead_alias(a, one, strings.replace_n({concat("", ["$", a, "."]): ""}, x))
+_m_unalias(a, one, x) := _m_lead_alias(a, one, strings.replace_n({concat("", ["\u0002", a, "."]): ""}, x))
 
 _m_lead_alias(a, one, y) := concat("", ["\u0001", a, "\u0001", substring(y, count(a) + 1, -1)]) if {
 	one == true
-	startswith(y, concat("", ["$", a, " is "]))
+	startswith(y, concat("", ["\u0002", a, " is "]))
 }
 
 else := y
@@ -10695,24 +10707,19 @@ _m_first_marked(xs) := array.concat([xs[0]], [_m_unmarked(x) | some x in array.s
 
 _m_unmarked(x) := strings.replace_n({"\u0001": ""}, x)
 
-_m_aliased(check, m) := _m_alias_end(check, strings.replace_n({concat("", ["$", item.as, c]): concat("", [item.as, c]) | some item in check.items; some c in [".", "[", " ", ",", ":", ";"]}, m))
+_m_aliased(m) := strings.replace_n({"\u0002": ""}, m)
 
-_m_alias_end(check, m) := concat("", [trim_suffix(m, concat("", ["$", a])), a]) if {
-	some a in {item.as | some item in check.items}
-	endswith(m, concat("", ["$", a]))
-} else := m
+_for_why(_, _, _, _, null) := null
 
-_for_why(_, _, _, _, _, null) := null
-
-_for_why(_, _, _, _, wh, failure) := failure if {
+_for_why(_, _, _, wh, failure) := failure if {
 	failure != null
 	wh.undecided == []
 }
 
-_for_why(check, item, e, names, wh, failure) := object.union(failure, {"why": [concat("", [_m_item_name(e.i, set()), ": ", m])]}) if {
+_for_why(item, e, names, wh, failure) := object.union(failure, {"why": [concat("", [_m_item_name(e.i, set()), ": ", m])]}) if {
 	failure != null
 	wh.undecided != []
-	ms := [_m_aliased(check, _message(c, e.iv, cause)) |
+	ms := [_m_aliased(_message(c, e.iv, cause)) |
 		some c in item.whose
 		cause := _row_cause(c, e.iv, "") with input as {"ergo/names": names}
 		not cause in {"satisfied", "value"}
