@@ -760,17 +760,20 @@ pub(crate) fn merge_inputs(mut inputs: Vec<Input>) -> Vec<Input> {
 }
 
 fn merged_inputs(inputs: Vec<Input>) -> Vec<Value> {
-    merge_inputs(inputs).iter().map(Input::to_json).collect()
+    let mut entries: Vec<Value> = merge_inputs(inputs).iter().map(Input::to_json).collect();
+    entries.dedup();
+    entries
 }
 
 fn inputs_in_order(inputs: Vec<Input>) -> Vec<Value> {
-    let mut kept: Vec<Input> = Vec::new();
+    let mut kept: Vec<Value> = Vec::new();
     for input in inputs {
-        if !kept.contains(&input) {
-            kept.push(input);
+        let entry = input.to_json();
+        if !kept.contains(&entry) {
+            kept.push(entry);
         }
     }
-    kept.iter().map(Input::to_json).collect()
+    kept
 }
 
 struct Applied {

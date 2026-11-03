@@ -5074,6 +5074,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     (
+        "every ws.x whose x is 1 and 'a' is 'a' is not empty",
+        &["doesn't parse"],
+    ),
+    (
+        "every ws.x whose x is 1\u{a0}and y is 2 is not empty",
+        &["doesn't parse"],
+    ),
+    (
+        "every ws.x whose x is 1 and\u{3000}y is 2 is not empty",
+        &["doesn't parse"],
+    ),
+    (
         "every ws that is \"a\" and is \"b\"",
         &["a condition after and starts with whose or that"],
     ),

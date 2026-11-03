@@ -4233,6 +4233,13 @@ _own_check_problems(req) := {[_field_path_name(_problem_at(req, f, n, p[0])), p[
 	here := _s_written_here(req, f, n)
 	found := _check_problems(check, _from_names(req, here), here)
 	some p in found
+	not _own_name_problem(req, f, n, p[1])
+}
+
+_own_name_problem(req, "applies_to", n, problem) if {
+	owner := _resolution_of(req).filter_owners[n]
+	_dollar_name(owner)
+	problem == concat("", ["unknown alias ", owner])
 }
 
 _ancestors_of(req) := _s_ancestors(req.subject, data.ergo_subject_sentences.chains) if _chained(req)
@@ -6841,7 +6848,7 @@ _s_problems(text, pat) := [concat("", ["unclosed quote at column ", _json_text(c
 _s_bare_and := "a condition after and starts with whose or that"
 
 _s_bare_and_in(text, pat) if {
-	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [`(?:`, pat.strings, `|\S)+`]), trim_space(text), -1)]
+	tokens := [m[0] | some m in regex.find_all_string_submatch_n(concat("", [`(?:`, pat.strings, `|[^ ])+`]), trim_space(text), -1)]
 	some i, word in tokens
 	word in {"whose", "that"}
 	some j, token in tokens
@@ -6851,7 +6858,7 @@ _s_bare_and_in(text, pat) if {
 	count([1 | some t in before; t == "between"]) <= count([1 | some t in before; t == "and"])
 	next := tokens[j + 1]
 	not next in {"whose", "that", "every", "some", "count", "sum", "first", "last", "item"}
-	not regex.match(`^["$0-9-]`, next)
+	not regex.match(`^["'$0-9-]`, next)
 }
 
 _s_parsed_anyway(text, pat) := {"assertions": assertions} if {

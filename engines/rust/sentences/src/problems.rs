@@ -92,7 +92,10 @@ fn bare_and(c: &[char]) -> bool {
             }
         }
     }
-    let tokens: Vec<&str> = blanked.split_whitespace().collect();
+    let tokens: Vec<&str> = blanked
+        .split(' ')
+        .filter(|token| !token.is_empty())
+        .collect();
     let mut started = false;
     let mut betweens = 0;
     let mut ands = 0;

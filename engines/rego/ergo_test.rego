@@ -5863,6 +5863,18 @@ test_that_names_the_item_by_the_plain_subject_name_and_writes_the_expression_the
 	}
 }
 
+test_a_subject_named_with_a_dollar_sign_gets_only_the_name_problem_with_a_that_from_line if {
+	every name in ["$w", "$input"] {
+		rep := _from_report({"ws": ["a"]}, {name: {"from": "every ws that is not empty"}}, {"c": "it is not empty"}, {})
+		_from_problems(rep) == [{"name": concat(".", ["subjects", name]), "value": ["a name can't start with $"], "locations": []}]
+	}
+}
+
+test_a_subject_named_like_a_field_of_its_own_item_lists_an_input_read_twice_once if {
+	rep := _from_report({"ws": [null]}, {"x": {"from": "every ws whose x is 1 and that is not empty"}}, {"c": "it is not empty"}, {})
+	[r.inputs | some r in rep.results; r.check == "$applies"] == [[{"name": "x", "value": null, "locations": ["/ws/0"]}]]
+}
+
 test_every_condition_of_a_from_line_needs_its_own_word_after_an_and if {
 	doc := {"ws": ["bay", "bee"]}
 	every line in [`every ws that starts with "b" and ends with "y"`, `every ws whose it starts with "b" and ends with "y"`] {
