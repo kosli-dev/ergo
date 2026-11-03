@@ -16,6 +16,10 @@ This file is about `ergo.rego` only. The Rust engine's changes are in [engines/r
 - This version follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.5.0-dev`, and each failed row and each violation has a `message`. Besides that, a path on the right side of those phrases that goes through a list of objects used to fail every row as `unusable` with `it is in $input.sbom.components.name is false`, and now compares or says what couldn't be read, and a `$input` or `$params` path that reads into text says which value can't hold the next step.
 - Every condition after an `and` in a `whose` chain starts with its own `whose` or `that`, as spec 0.5 says, so `whose a is 1 and b is 2` is written wrong and becomes `whose a is 1 and whose b is 2`. Reports of policies written the old way change, because they now fail `$well_formed`. Other reports don't change.
 
+### Fixed
+
+- A `for` item that isn't an object no longer stops the report with `eval_conflict_error` when a path reads inside it and names its key by a field, like `w.k named by zz` with `w` a list, or `w[1] named by zz` and `w[0].a named by zz` with `w` a list: the check fails with the cause the spec gives. Reports change for checks that read such a path and used to fail as `not_an_object` because the key field was bad. With `for: every ws as w`, `assert: w named by zz is 1` and input `{"things": [{"id": "a", "ws": [3]}]}` (no `zz`), the row said `item 1 of ws is 3, which isn't an object` with cause `not_an_object`, and says `item 1 of ws: zz is missing` with cause `absent`. A `zz` that is `null` or not text gives `null` or `unusable` the same way. With `assert: w[0] named by zz is 1` and `{"ws": [[{"a": 1}]]}`, `not_an_object` became `absent`, and with `"zz": 3` it is `unusable`. `w[0] named by zz does not exist` with `{"ws": [[1]], "zz": "a"}` failed as `not_an_object` before and now passes, as `w[0].a does not exist` already did.
+
 ## 0.4.0
 
 ### New
