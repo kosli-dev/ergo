@@ -10418,9 +10418,9 @@ _m_item_name(path, roots) := _m_unreached_or(path, roots) if {
 	not _m_off_item_path(path)
 }
 
-_m_unreached_or(path, _) := _m_part_name(path) if _m_part_unreached(path)
+_m_unreached_or(path, roots) := _m_part_name(path) if _m_part_unreached(path)
 
-_m_unreached_or(path, roots) := _failed_name(path, roots) if not _m_part_unreached(path)
+else := _failed_name(path, roots)
 
 _m_item_name(path, roots) := concat(": ", array.concat(
 	array.concat([_failed_name(array.slice(path, 0, idx[0] + 1), roots)], [concat("", ["item ", _literal_text(path[idx[k]] + 1), " of ", _plain_steps_name(array.slice(path, idx[k - 1] + 1, idx[k]))]) | some k in numbers.range(1, count(idx) - 1)]),
@@ -10816,35 +10816,37 @@ _m_for_fail(f) := [_m_under(object.get(f, "said", f.item), _m_group_text(g)) | s
 	lines := [_m_line_msg(l, _m_owns(f)) | some l in f.failed_assertions]
 }
 
-_m_lead_of(t) := lead if {
-	m := regex.find_all_string_submatch_n(`^(item [0-9]+ of [^:]*?)(: | is )`, t, 1)
-	count(m) > 0
-	lead := m[0][1]
+_m_lead_of(t) := substring(t, 0, k) if {
+	startswith(t, "item ")
+	cuts := [i | some i in [indexof(t, ": "), indexof(t, " is ")]; i > 0]
+	count(cuts) > 0
+	k := min(cuts)
+	contains(substring(t, 0, k), " of ")
 } else := ""
 
-_m_leads(texts) := [l |
-	some i, t in texts
-	l := _m_lead_of(t)
-	l != ""
-	not l in [_m_lead_of(x) | some x in array.slice(texts, 0, i)]
-]
+_m_groups(texts) := [texts] if count(texts) < 2
 
-_m_groups(texts) := [texts] if count(_m_leads(texts)) == 0
+else := _m_grouped(texts, [_m_lead_of(t) | some t in texts])
 
-else := [[t | some t in texts; _m_in_group(t, lead, k)] | some k, lead in _m_leads(texts)]
+_m_grouped(texts, ls) := [texts] if count(_m_leads(ls)) == 0
 
-_m_in_group(t, lead, _) if _m_lead_of(t) == lead
+else := [[texts[j] | some j, l in ls; _m_in_group(l, lead, k)] | some k, lead in _m_leads(ls)]
 
-_m_in_group(t, _, 0) if _m_lead_of(t) == ""
+_m_leads(ls) := [l | some i, l in ls; l != ""; not l in array.slice(ls, 0, i)]
 
-_m_after_lead(first, x) := substring(x, count(lead), -1) if {
-	lead := concat("", [_m_lead_of(first), ": "])
-	lead != ": "
-	startswith(first, lead)
-	startswith(x, lead)
+_m_in_group(l, lead, _) if l == lead
+
+_m_in_group("", _, 0)
+
+_m_after_lead(lead, x) := substring(x, count(prefix), -1) if {
+	lead != ""
+	prefix := concat("", [lead, ": "])
+	startswith(x, prefix)
 } else := x
 
-_m_group_text(g) := concat(", and ", _m_first_marked(array.concat([g[0]], [_m_after_lead(g[0], x) | some x in array.slice(g, 1, count(g))])))
+_m_group_text(g) := g[0] if count(g) == 1
+
+else := concat(", and ", _m_first_marked(array.concat([g[0]], [_m_after_lead(_m_lead_of(g[0]), x) | some x in array.slice(g, 1, count(g))])))
 
 _m_for_fail(f) := [concat("", [object.get(f, "said", f.item), ": ", t]) | some x in f.failed_items; some t in _m_inner_fail(x)] if {
 	not "msg" in object.keys(f)
