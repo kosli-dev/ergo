@@ -329,9 +329,11 @@ fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
             .collect(),
         other => side_paths(other),
     };
+    let rights = lists::right_paths(check);
     once_of(
         paths
             .into_iter()
+            .filter(|path| !rights.contains(path) || lists::walked(path, ctx).is_none())
             .flat_map(|path| blocked_of(path, ctx))
             .collect(),
     )
@@ -616,7 +618,6 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             let mut all = key_faults(check, ctx);
             all.extend(blocked(check, ctx));
             all.extend(faults(check, ctx, verdict));
-            all.extend(lists::ref_blocked(check, ctx));
             all.extend(
                 lists::walk_fault(check, ctx)
                     .filter(|(cause, _)| *cause == Cause::Unusable)

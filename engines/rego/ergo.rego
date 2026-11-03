@@ -1786,12 +1786,27 @@ _rkeys(path) := [_key(seg) | some seg in array.slice(path, 1, count(path))] if {
 	}
 }
 
+_rkeys(path) := [_key(seg) | some seg in array.slice(path, 1, count(path))] if {
+	_named_walk_path(path)
+	every seg in array.slice(path, 1, count(path)) {
+		not is_object(seg)
+	}
+}
+
 _rstart(x, path) := x if {
 	_plain_path(path)
 	is_object(x)
 }
 
 _rstart(_, path) := _start_of(null, path) if _builtin(path)
+
+_rstart(x, path) := _start_of(x, path) if _named_walk_path(path)
+
+_named_walk_path(path) if {
+	_named(path)
+	not _builtin(path)
+	not _has_field_step(path)
+}
 
 _rwalks(x, path) if {
 	is_array(path)
@@ -10427,7 +10442,11 @@ _m_ref_blocked(check) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
 	not _can_hold(v, k)
 ]
 
-_m_walk_ref_faults(subj, check) := array.concat(array.concat(_m_ref_blocked(check), [_ref_walk_text(r) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"]), [t | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"; t := s.text])
+_m_walk_ref_faults(subj, check) := [] if {
+	count(_m_tally_parts(check)) > 0
+} else := _m_walk_ref_faults_of(subj, check)
+
+_m_walk_ref_faults_of(subj, check) := array.concat(array.concat(_m_ref_blocked(check), [_ref_walk_text(r) | some r in sort(_check_refs(check)); _ref_failed_walk(r); _ref_state(r) == "unusable"]), [t | some side in _m_sides(check); _walked_side(side); s := _m_shown(subj, side); s.state == "unusable"; t := s.text])
 
 _m_ref_list_fault(check) := [[check[f], _m_right_kind(cmp, v)]] if {
 	some f in ["values", "patterns"]
@@ -10822,7 +10841,7 @@ _m_tally(subj, side) := [["unusable", c] | some c in _m_parent_clause(subj, {"op
 _m_tally(subj, side) := array.concat(
 	array.concat(
 		[[f.cause, _m_fail(f, set())] | some f in array.concat(w.fails, _walk_stop(w))],
-		[[s, concat("", [_ref_name(r), " is ", _m_state_word(s)])] | some r in sort({r | some c in side.whose; some r in _check_refs(c)}); s := _ref_state(r); s in {"absent", "null"}],
+		[[s, concat("", [_ref_name(r), " is ", _m_state_word(s)])] | some r in sort({r | some c in side.whose; some r in _check_refs(c)}); not _ref_failed_walk(r); s := _ref_state(r); s in {"absent", "null"}],
 	),
 	[x | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws), [y | _tally_judge(side, e, flaws).read; some y in _m_tally_item(f, e)])],
 ) if {
@@ -10870,11 +10889,11 @@ _m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ",
 
 _m_cond_message(c, item, cause) := concat(", and ", cs) if {
 	cause in {"absent", "null"}
-	cs := _once(array.concat(array.concat(_m_key_states(item, c, cause), [concat("", [s.name, " is ", _m_state_word(cause)]) | some s in _m_sources(item, c); s.state == cause]), _m_item_tallies(item, c, cause)))
+	cs := _once(array.concat(array.concat(_m_key_states(item, c, cause), [_m_state_clause(s) | some s in _m_sources(item, c); s.state == cause]), _m_item_tallies(item, c, cause)))
 	cs != []
 } else := concat(", and ", cs) if {
 	cause == "unusable"
-	cs := _once(array.concat(array.concat(array.concat(_m_key_faults(item, c), _m_blocked(item, c)), _m_faults(item, c)), _m_item_tallies(item, c, cause)))
+	cs := _once(array.concat(array.concat(array.concat(array.concat(_m_key_faults(item, c), _m_blocked(item, c)), _m_faults(item, c)), _m_walk_ref_faults(item, c)), _m_item_tallies(item, c, cause)))
 	cs != []
 } else := _m_fallback(c)
 

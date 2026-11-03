@@ -11433,3 +11433,48 @@ test_a_whose_that_reads_a_ref_that_walks_an_empty_list_decides_before_its_left_s
 	rows := _walk_right_rows("every deps.name whose tags contains $input.sbom.components.name is \"a\"", {"sbom": {"components": []}, "things": [{"id": "t1", "deps": [{"name": "a", "tags": "text"}]}]}, {})
 	[row[1] | some row in rows] == ["value"]
 }
+
+test_a_whose_inside_count_of_and_sum_of_walks_a_ref_on_its_right_side if {
+	doc := {"sbom": {"components": [{"name": "click"}]}, "things": [{"id": "t1", "deps": [{"name": "click", "n": 2}, {"name": "x", "n": 5}]}]}
+	_walk_right_rows("count of deps whose name is in $input.sbom.components.name is 1", doc, {}) == [[true, "satisfied", ""]]
+	_walk_right_rows("sum of deps.n whose name is in $input.sbom.components.name is 2", doc, {}) == [[true, "satisfied", ""]]
+	[row[1] | some row in _walk_right_rows("count of deps whose name is in $input.sbom.components.name is 1", object.union(doc, {"sbom": {"components": [{"name": "click"}, {}]}}), {})] == ["absent"]
+}
+
+test_a_whose_inside_count_of_says_which_value_cant_hold_the_next_step_of_a_ref if {
+	rows := _walk_right_rows("count of deps whose name is in $input.a.b is 1", {"a": "text", "things": [{"id": "t1", "deps": [{"name": "click"}]}]}, {})
+	rows == [[false, "unusable", "item 1 of deps: $input.a is \"text\", which isn't an object"]]
+}
+
+_walk_parent_policy := {
+	"ergo_spec": "v0.5-dev",
+	"subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}},
+	"requirements": {"s": {"subject": "dep", "checks": {"c": "name is in repo.allowed.name"}}},
+}
+
+test_a_path_that_starts_at_a_parent_walks_and_fails_closed_on_each_broken_shape if {
+	rows := [[r.subject.id, r.cause] |
+		some r in ergo.report(
+			{"repos": [
+				{"id": "r1", "allowed": [{"name": "click"}], "deps": [{"name": "click"}, {"name": "attrs"}]},
+				{"id": "r2", "allowed": [{"name": "click"}, {}], "deps": [{"name": "click"}]},
+				{"id": "r3", "allowed": [], "deps": [{"name": "x"}]},
+				{"id": "r4", "allowed": [{"name": null}], "deps": [{"name": "y"}]},
+				{"id": "r5", "allowed": "t", "deps": [{"name": "z"}]},
+			]},
+			_walk_parent_policy, {},
+		).results
+		r.check == "c"
+	]
+	rows == [["click", "satisfied"], ["attrs", "value"], ["click", "absent"], ["x", "value"], ["y", "null"], ["z", "unusable"]]
+}
+
+test_a_path_that_starts_at_a_part_walks_and_names_the_part if {
+	policy := {
+		"ergo_spec": "v0.5-dev",
+		"subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}},
+		"requirements": {"s": {"subject": "repo", "checks": {"c": "id is in lock.pkgs.name"}}},
+	}
+	rows := [r | some r in ergo.report({"repos": [{"id": "click", "lockfile": {"pkgs": [{"name": "click"}]}}]}, policy, {}).results; r.check == "c"]
+	rows[0].inputs[1] == {"name": "lock.pkgs[].name", "value": ["click"], "locations": ["/repos/0/lockfile/pkgs/0/name"], "part": {"id": null, "name": "lock"}}
+}

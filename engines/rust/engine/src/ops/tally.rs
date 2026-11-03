@@ -467,6 +467,9 @@ fn unusable_ref(check: &Check, ctx: &Ctx) -> Option<Cause> {
         .flat_map(path::step_refs)
         .collect();
     let causes = check.refs().into_iter().filter_map(|reference| {
+        if let Some(walk) = super::lists::walked(&reference, ctx) {
+            return walk.cause.filter(|cause| *cause != Cause::Value);
+        }
         let read = path::read(&reference, ctx);
         match (read.outcome.cause(), read.value) {
             (Some(cause), _) => Some(cause),

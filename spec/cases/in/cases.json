@@ -415,5 +415,129 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a ref that walks, read by a whose inside count of and sum of",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"a": "count of deps whose name is in $input.sbom.components.name is 1", "b": "sum of deps.n whose name is in $input.sbom.components.name is 2"}}}},
+    "cases": [
+      {
+        "description": "counts the items whose value is in the list it reads",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right"],
+        "input": {"sbom": {"components": [{"name": "click"}, {"name": "jinja2"}]}, "repos": [{"id": "r1", "deps": [{"name": "click", "n": 2}, {"name": "attrs", "n": 5}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/repos/0/deps/0", "/repos/0/deps/1"], "name": "count of deps whose name is in $input.sbom.components.name", "value": 1}, {"locations": ["/repos/0/deps/0", "/repos/0/deps/1"], "name": "deps[]", "value": [{"n": 2, "name": "click"}, {"n": 5, "name": "attrs"}]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/repos/0/deps/0/n", "/repos/0/deps/1/n"], "name": "sum of deps.n whose name is in $input.sbom.components.name", "value": 2}, {"locations": ["/repos/0/deps/0/n", "/repos/0/deps/1/n"], "name": "deps[].n", "value": [2, 5]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "leaves every item out as value when the list is empty",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"sbom": {"components": []}, "repos": [{"id": "r1", "deps": [{"name": "click", "n": 2}]}]},
+        "results": [
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/repos/0/deps/0"], "name": "count of deps whose name is in $input.sbom.components.name", "value": 0}, {"locations": ["/repos/0/deps/0"], "name": "deps[]", "value": [{"n": 2, "name": "click"}]}], "message": "count of deps whose name is in $input.sbom.components.name is 0", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "value", "check": "b", "inputs": [{"locations": ["/repos/0/deps/0/n"], "name": "sum of deps.n whose name is in $input.sbom.components.name", "value": 0}, {"locations": ["/repos/0/deps/0/n"], "name": "deps[].n", "value": [2]}], "message": "sum of deps.n whose name is in $input.sbom.components.name is 0", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "fails as absent and names the item that cannot be read",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"sbom": {"components": [{"name": "click"}, {}]}, "repos": [{"id": "r1", "deps": [{"name": "click", "n": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/repos/0/deps/0"], "name": "count of deps whose name is in $input.sbom.components.name", "value": null}, {"locations": ["/repos/0/deps/0"], "name": "deps[]", "value": [{"n": 2, "name": "click"}]}], "message": "item 1 of deps: item 2 of $input.sbom.components: name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/repos/0/deps/0/n"], "name": "sum of deps.n whose name is in $input.sbom.components.name", "value": null}, {"locations": ["/repos/0/deps/0/n"], "name": "deps[].n", "value": [2]}], "message": "item 1 of deps: item 2 of $input.sbom.components: name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path that starts at a parent or a grandparent walks",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}, "file": {"from": "dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "dep", "checks": {"a": "name is in repo.allowed.name"}}}},
+    "cases": [
+      {
+        "description": "compares with the list of what it reads from each item of the parent",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.inputs"],
+        "input": {"repos": [{"id": "r1", "allowed": [{"name": "click"}], "deps": [{"name": "click"}, {"name": "attrs"}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/repos/0/deps/0/name"], "name": "name", "value": "click"}, {"locations": ["/repos/0/allowed/0/name"], "name": "repo.allowed[].name", "value": ["click"]}], "passed": true, "requirement": "s", "subject": {"id": "click", "in": {"repo": "r1"}, "type": "dep"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/repos/0/deps/1/name"], "name": "name", "value": "attrs"}, {"locations": ["/repos/0/allowed/0/name"], "name": "repo.allowed[].name", "value": ["click"]}], "message": "name is \"attrs\", and repo.allowed[].name is [\"click\"]", "passed": false, "requirement": "s", "subject": {"id": "attrs", "in": {"repo": "r1"}, "type": "dep"}}
+        ]
+      },
+      {
+        "description": "fails closed on a missing name, an empty list, a null name and text",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "allowed": [{"name": "click"}, {}], "deps": [{"name": "click"}]}, {"id": "r2", "allowed": [], "deps": [{"name": "click"}]}, {"id": "r3", "allowed": [{"name": null}], "deps": [{"name": "click"}]}, {"id": "r4", "allowed": "t", "deps": [{"name": "click"}]}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/repos/0/deps/0/name"], "name": "name", "value": "click"}, {"locations": ["/repos/0/allowed/0/name", "/repos/0/allowed/1"], "name": "repo.allowed[].name", "value": ["click", null]}], "message": "item 2 of repo.allowed: name is missing", "passed": false, "requirement": "s", "subject": {"id": "click", "in": {"repo": "r1"}, "type": "dep"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/repos/1/deps/0/name"], "name": "name", "value": "click"}, {"locations": [], "name": "repo.allowed[].name", "value": []}], "message": "name is \"click\", and repo.allowed is []", "passed": false, "requirement": "s", "subject": {"id": "click", "in": {"repo": "r2"}, "type": "dep"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/repos/2/deps/0/name"], "name": "name", "value": "click"}, {"locations": ["/repos/2/allowed/0/name"], "name": "repo.allowed[].name", "value": [null]}], "message": "item 1 of repo.allowed: name is null", "passed": false, "requirement": "s", "subject": {"id": "click", "in": {"repo": "r3"}, "type": "dep"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/repos/3/deps/0/name"], "name": "name", "value": "click"}, {"locations": ["/repos/3/allowed"], "name": "repo.allowed.name", "value": null}], "message": "repo.allowed is \"t\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "click", "in": {"repo": "r4"}, "type": "dep"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path that starts at a grandparent walks",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}, "file": {"from": "dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "file", "checks": {"a": "path is in repo.allowed.name"}}}},
+    "cases": [
+      {
+        "description": "compares with the list of what it reads from each item of the grandparent",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.inputs"],
+        "input": {"repos": [{"id": "r1", "allowed": [{"name": "a"}], "deps": [{"name": "click", "files": [{"path": "a"}, {"path": "b"}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/repos/0/deps/0/files/0/path"], "name": "path", "value": "a"}, {"locations": ["/repos/0/allowed/0/name"], "name": "repo.allowed[].name", "value": ["a"]}], "passed": true, "requirement": "s", "subject": {"id": "a", "in": {"dep": "click", "repo": "r1"}, "type": "file"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/repos/0/deps/0/files/1/path"], "name": "path", "value": "b"}, {"locations": ["/repos/0/allowed/0/name"], "name": "repo.allowed[].name", "value": ["a"]}], "message": "path is \"b\", and repo.allowed[].name is [\"a\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "in": {"dep": "click", "repo": "r1"}, "type": "file"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path that starts at a part walks",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"a": "id is in lock.pkgs.name"}}}},
+    "cases": [
+      {
+        "description": "compares with the list of what it reads from each item and tags the entry with the part",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.inputs"],
+        "input": {"repos": [{"id": "click", "lockfile": {"pkgs": [{"name": "click"}]}}, {"id": "attrs", "lockfile": {"pkgs": [{"name": "click"}]}}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/repos/0/id"], "name": "id", "value": "click"}, {"locations": ["/repos/0/lockfile/pkgs/0/name"], "name": "lock.pkgs[].name", "part": {"id": null, "name": "lock"}, "value": ["click"]}], "passed": true, "requirement": "s", "subject": {"id": "click", "type": "repo"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/repos/1/id"], "name": "id", "value": "attrs"}, {"locations": ["/repos/1/lockfile/pkgs/0/name"], "name": "lock.pkgs[].name", "part": {"id": null, "name": "lock"}, "value": ["click"]}], "message": "id is \"attrs\", and lock.pkgs[].name is [\"click\"]", "passed": false, "requirement": "s", "subject": {"id": "attrs", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "fails closed on a missing name, an empty list, a null name and text",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "click", "lockfile": {"pkgs": [{"name": "click"}, {}]}}, {"id": "b", "lockfile": {"pkgs": []}}, {"id": "c", "lockfile": {"pkgs": [{"name": null}]}}, {"id": "d", "lockfile": {"pkgs": "t"}}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/repos/0/id"], "name": "id", "value": "click"}, {"locations": ["/repos/0/lockfile/pkgs/0/name", "/repos/0/lockfile/pkgs/1"], "name": "lock.pkgs[].name", "part": {"id": null, "name": "lock"}, "value": ["click", null]}], "message": "item 2 of lock.pkgs: name is missing", "passed": false, "requirement": "s", "subject": {"id": "click", "type": "repo"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/repos/1/id"], "name": "id", "value": "b"}, {"locations": [], "name": "lock.pkgs[].name", "part": {"id": null, "name": "lock"}, "value": []}], "message": "id is \"b\", and lock.pkgs is []", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "repo"}},
+          {"cause": "null", "check": "a", "inputs": [{"locations": ["/repos/2/id"], "name": "id", "value": "c"}, {"locations": ["/repos/2/lockfile/pkgs/0/name"], "name": "lock.pkgs[].name", "part": {"id": null, "name": "lock"}, "value": [null]}], "message": "item 1 of lock.pkgs: name is null", "passed": false, "requirement": "s", "subject": {"id": "c", "type": "repo"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/repos/3/id"], "name": "id", "value": "d"}, {"locations": ["/repos/3/lockfile/pkgs"], "name": "lock.pkgs.name", "part": {"id": null, "name": "lock"}, "value": null}], "message": "lock.pkgs is \"t\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "d", "type": "repo"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a path that walks on the right of a for line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"f": {"for": "every deps as d", "assert": "d.name is in $input.sbom.components.name"}, "g": {"for": "every deps as d", "assert": "d.name is in allowed.name"}}}}},
+    "cases": [
+      {
+        "description": "says which item of which list could not be read",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"sbom": {"components": [{"name": "click"}, {}]}, "repos": [{"id": "r1", "allowed": [{"name": "click"}, {"name": null}], "deps": [{"name": "click"}, {"name": "attrs"}]}]},
+        "results": [
+          {"cause": "absent", "check": "f", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "d.name is in $input.sbom.components.name", "cause": "absent", "inputs": [{"locations": ["/repos/0/deps/0/name"], "name": "d.name", "value": "click"}]}], "item": "item 1 of deps", "locations": ["/repos/0/deps/0"], "path": "item 1 of deps", "value": {"name": "click"}}, {"cause": "absent", "failed_assertions": [{"assertion": "d.name is in $input.sbom.components.name", "cause": "absent", "inputs": [{"locations": ["/repos/0/deps/1/name"], "name": "d.name", "value": "attrs"}]}], "item": "item 2 of deps", "locations": ["/repos/0/deps/1"], "path": "item 2 of deps", "value": {"name": "attrs"}}], "inputs": [{"locations": ["/repos/0/deps/0", "/repos/0/deps/1"], "name": "deps[]", "value": [{"name": "click"}, {"name": "attrs"}]}], "message": "item 1 of deps: item 2 of $input.sbom.components: name is missing; item 2 of deps: item 2 of $input.sbom.components: name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "null", "check": "g", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "d.name is in allowed.name", "cause": "null", "inputs": [{"locations": ["/repos/0/deps/0/name"], "name": "d.name", "value": "click"}, {"locations": ["/repos/0/allowed/0/name", "/repos/0/allowed/1/name"], "name": "allowed[].name", "value": ["click", null]}]}], "item": "item 1 of deps", "locations": ["/repos/0/deps/0"], "path": "item 1 of deps", "value": {"name": "click"}}, {"cause": "null", "failed_assertions": [{"assertion": "d.name is in allowed.name", "cause": "null", "inputs": [{"locations": ["/repos/0/deps/1/name"], "name": "d.name", "value": "attrs"}, {"locations": ["/repos/0/allowed/0/name", "/repos/0/allowed/1/name"], "name": "allowed[].name", "value": ["click", null]}]}], "item": "item 2 of deps", "locations": ["/repos/0/deps/1"], "path": "item 2 of deps", "value": {"name": "attrs"}}], "inputs": [{"locations": ["/repos/0/allowed"], "name": "allowed.name", "value": null}, {"locations": ["/repos/0/deps/0", "/repos/0/deps/1"], "name": "deps[]", "value": [{"name": "click"}, {"name": "attrs"}]}], "message": "item 1 of deps: item 2 of allowed: name is null; item 2 of deps: item 2 of allowed: name is null", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "fails as value when the lists are empty",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"sbom": {"components": []}, "repos": [{"id": "r1", "allowed": [], "deps": [{"name": "click"}]}]},
+        "results": [
+          {"cause": "value", "check": "f", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "d.name is in $input.sbom.components.name", "cause": "value", "inputs": [{"locations": ["/repos/0/deps/0/name"], "name": "d.name", "value": "click"}]}], "item": "item 1 of deps", "locations": ["/repos/0/deps/0"], "path": "item 1 of deps", "value": {"name": "click"}}], "inputs": [{"locations": ["/repos/0/deps/0"], "name": "deps[]", "value": [{"name": "click"}]}], "message": "item 1 of deps: d.name is \"click\", and $input.sbom.components is []", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "value", "check": "g", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "d.name is in allowed.name", "cause": "value", "inputs": [{"locations": ["/repos/0/deps/0/name"], "name": "d.name", "value": "click"}, {"locations": [], "name": "allowed[].name", "value": []}]}], "item": "item 1 of deps", "locations": ["/repos/0/deps/0"], "path": "item 1 of deps", "value": {"name": "click"}}], "inputs": [{"locations": ["/repos/0/allowed"], "name": "allowed.name", "value": null}, {"locations": ["/repos/0/deps/0"], "name": "deps[]", "value": [{"name": "click"}]}], "message": "item 1 of deps: d.name is \"click\", and allowed is []", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      }
+    ]
   }
 ]

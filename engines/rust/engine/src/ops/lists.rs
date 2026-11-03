@@ -134,6 +134,7 @@ pub struct Walked {
     pub locations: Vec<String>,
     pub cause: Option<Cause>,
     pub text: String,
+    pub part: Option<super::Part>,
 }
 
 impl Walked {
@@ -142,7 +143,7 @@ impl Walked {
             name: self.name.clone(),
             value: Value::Array(self.value.clone()),
             locations: self.locations.clone(),
-            part: None,
+            part: self.part.clone(),
             state: Outcome::Found,
         }
     }
@@ -211,11 +212,10 @@ fn item_fault(walked: &walk::Walked, item: &walk::WalkItem) -> Option<(Cause, Ve
 }
 
 pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
-    let simple = matches!(path.start, Start::Input | Start::Params | Start::Subject)
-        && path
-            .steps
-            .iter()
-            .all(|step| matches!(step, Step::Key(_) | Step::Index(_)));
+    let simple = path
+        .steps
+        .iter()
+        .all(|step| matches!(step, Step::Key(_) | Step::Index(_)));
     if !simple || path::read(path, ctx).outcome != Outcome::Unusable {
         return None;
     }
@@ -247,6 +247,7 @@ pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
             .collect(),
         cause,
         text,
+        part: path::part_tag(path, ctx).map(|(name, id)| super::Part { name, id }),
     })
 }
 
@@ -835,18 +836,6 @@ pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
         }
         _ => None,
     })
-}
-
-pub fn ref_blocked(check: &super::Check, ctx: &Ctx) -> Vec<String> {
-    rights_of(check)
-        .into_iter()
-        .flat_map(|right| match right {
-            Right::Ref(path) | Right::Field(path) if walked(path, ctx).is_none() => {
-                super::message::blocked_of(path, ctx)
-            }
-            _ => Vec::new(),
-        })
-        .collect()
 }
 
 fn left_found(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
