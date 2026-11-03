@@ -625,6 +625,14 @@ pub fn stated(name: &str, cause: Cause, value: &Value, kind: &str) -> String {
     }
 }
 
+pub fn prefixed_for(item: &str, said: &str, cause: Cause) -> String {
+    if cause == Cause::NotAnObject {
+        format!("{item}: {said}")
+    } else {
+        prefixed(item, said)
+    }
+}
+
 pub fn prefixed(item: &str, said: &str) -> String {
     match said.strip_prefix("it ") {
         Some(rest) => format!("{item} {rest}"),
@@ -930,7 +938,8 @@ pub fn read_names(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
 }
 
 pub fn first_list_text(path: &Path, ctx: &Ctx) -> Option<String> {
-    (1..=path.steps.len()).find_map(|at| {
+    let from = usize::from(!matches!(path.start, Start::Part(_)));
+    (from..=path.steps.len()).find_map(|at| {
         let prefix = Path {
             start: path.start.clone(),
             steps: path.steps[..at].to_vec(),

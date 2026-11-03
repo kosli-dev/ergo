@@ -4764,6 +4764,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("k.\"a\u{2028}b\" is 1", "k.\"a\u{2028}b\" is 1", &[], &[]),
+    ("count of xs is 1", "count of xs is 1", &[], &[]),
+    ("count of xs is 2", "count of xs is 2", &[], &[]),
+    (
+        "every lst.x whose x is 9 is 2",
+        "every lst.x whose x is 9 is 2",
+        &[],
+        &[],
+    ),
+    ("l.x is 1", "l.x is 1", &[], &[]),
+    ("l.x is 2", "l.x is 2", &[], &[]),
+    ("x.k is 1", "x.k is 1", &[], &[]),
+    ("x.k is 2", "x.k is 2", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8126,6 +8138,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every prs as pr, some pr.\"a: b\" as ap",
         "every prs as pr, some pr.\"a: b\" as ap",
+        &[],
+        &[],
+    ),
+    (
+        "every lst whose x is 5 as l",
+        "every lst whose x is 5 as l",
+        &[],
+        &[],
+    ),
+    (
+        "every lst whose x is 9 as l",
+        "every lst whose x is 9 as l",
         &[],
         &[],
     ),

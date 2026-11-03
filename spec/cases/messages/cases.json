@@ -765,5 +765,111 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a message leaves out a clause that an earlier sentence gave",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x is 1", "x is 2"]}, "d": {"assert": ["x is 1", "y is 2", "x is 3"]}, "e": {"assert": ["count of xs is 1", "count of xs is 2"]}}}}},
+    "cases": [
+      {
+        "description": "the same value is said once",
+        "rules": ["message.join"],
+        "input": {"things": [{"id": "t1", "x": 5, "y": 4, "xs": [1, 2, 3]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_assertions": [{"assertion": "x is 1", "cause": "value"}, {"assertion": "x is 2", "cause": "value"}], "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 5}], "message": "x is 5", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "failed_assertions": [{"assertion": "x is 1", "cause": "value"}, {"assertion": "y is 2", "cause": "value"}, {"assertion": "x is 3", "cause": "value"}], "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 5}, {"locations": ["/things/0/y"], "name": "y", "value": 4}], "message": "x is 5; y is 4", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "e", "failed_assertions": [{"assertion": "count of xs is 1", "cause": "value"}, {"assertion": "count of xs is 2", "cause": "value"}], "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs", "value": 3}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [1, 2, 3]}], "message": "count of xs is 3", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a missing field is said once",
+        "rules": ["message.join"],
+        "input": {"things": [{"id": "t1", "y": 4, "xs": [1, 2, 3]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_assertions": [{"assertion": "x is 1", "cause": "absent"}, {"assertion": "x is 2", "cause": "absent"}], "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "message": "x is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "d", "failed_assertions": [{"assertion": "x is 1", "cause": "absent"}, {"assertion": "y is 2", "cause": "value"}, {"assertion": "x is 3", "cause": "absent"}], "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}, {"locations": ["/things/0/y"], "name": "y", "value": 4}], "message": "x is missing; y is 4", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "e", "failed_assertions": [{"assertion": "count of xs is 1", "cause": "value"}, {"assertion": "count of xs is 2", "cause": "value"}], "inputs": [{"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "count of xs", "value": 3}, {"locations": ["/things/0/xs/0", "/things/0/xs/1", "/things/0/xs/2"], "name": "xs[]", "value": [1, 2, 3]}], "message": "count of xs is 3", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an every with two sentences says a repeated item once",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": ["x.k is 1", "x.k is 2"]}}}}},
+    "cases": [
+      {
+        "description": "the item is named once",
+        "rules": ["message.join", "message.items"],
+        "input": {"things": [{"id": "t1", "xs": [{"k": 5}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "x.k is 1", "cause": "value", "inputs": [{"locations": ["/things/0/xs/0/k"], "name": "x.k", "value": 5}]}, {"assertion": "x.k is 2", "cause": "value", "inputs": [{"locations": ["/things/0/xs/0/k"], "name": "x.k", "value": 5}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": {"k": 5}}], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"k": 5}]}], "message": "item 1 of xs: k is 5", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a whose that leaves no item of a part prints the part's list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"lst": "d.items"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every lst whose x is 9 as l", "assert": "l.x is 2"}, "d": {"assert": "every lst.x whose x is 9 is 2"}}}}},
+    "cases": [
+      {
+        "description": "the part's list is printed",
+        "rules": ["message.empty"],
+        "input": {"things": [{"id": "t1", "d": {"items": [{"x": 1}]}}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [], "inputs": [{"locations": ["/things/0/d/items/0"], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": [{"x": 1}]}], "message": "lst is [{\"x\": 1}]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "failed_items": [], "inputs": [{"locations": ["/things/0/d/items/0/x"], "name": "lst[].x", "part": {"id": null, "name": "lst"}, "value": [1]}], "message": "lst is [{\"x\": 1}]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an empty part is printed as empty",
+        "rules": ["message.empty"],
+        "input": {"things": [{"id": "t1", "d": {"items": []}}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "lst", "locations": ["/things/0/d/items"], "path": "lst", "value": []}], "inputs": [{"locations": [], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": []}], "message": "lst is []", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "d", "failed_items": [{"cause": "value", "item": "lst", "locations": ["/things/0/d/items"], "path": "lst", "value": []}], "inputs": [{"locations": [], "name": "lst[].x", "part": {"id": null, "name": "lst"}, "value": []}], "message": "lst is []", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose whose meets an item that isn't an object",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every commits whose kind is \"code\" as c", "assert": "c.signed is true"}}}}},
+    "cases": [
+      {
+        "description": "each such item is named with it",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t1", "commits": [{"kind": "code", "signed": true}, null, 5, "s"]}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of commits", "locations": ["/things/0/commits/1"], "path": "item 2 of commits", "value": null}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 3 of commits", "locations": ["/things/0/commits/2"], "path": "item 3 of commits", "value": 5}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 4 of commits", "locations": ["/things/0/commits/3"], "path": "item 4 of commits", "value": "s"}], "inputs": [{"locations": ["/things/0/commits/0", "/things/0/commits/1", "/things/0/commits/2", "/things/0/commits/3"], "name": "commits[]", "value": [{"kind": "code", "signed": true}, null, 5, "s"]}], "message": "item 2 of commits: it is null, which isn't an object; item 3 of commits: it is 5, which isn't an object; item 4 of commits: it is \"s\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias read in a whose keeps its name",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"alias": {"for": "every xs as x", "assert": "every x.items.status whose lo is at least x.w plus hi is \"ok\""}}}}},
+    "cases": [
+      {
+        "description": "the alias is named with its field",
+        "rules": ["message.alias"],
+        "input": {"things": [{"id": "t1", "xs": [{"items": [{"lo": 5, "hi": 1, "status": "ok", "w": 1}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "alias", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "every x.items.status whose lo is at least x.w plus hi is \"ok\"", "cause": "absent", "inputs": [{"locations": ["/things/0/xs/0/items/0/status"], "name": "x.items[].status", "value": ["ok"]}, {"locations": ["/things/0/xs/0"], "name": "x.w", "value": null}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": {"items": [{"hi": 1, "lo": 5, "status": "ok", "w": 1}]}}], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"items": [{"hi": 1, "lo": 5, "status": "ok", "w": 1}]}]}], "message": "item 1 of xs: x.w is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over a part meets an item that isn't an object",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"lst": "d.items"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every lst whose x is 5 as l", "assert": "l.x is 1"}}}}},
+    "cases": [
+      {
+        "description": "each such item is named with it",
+        "rules": ["message.items"],
+        "input": {"things": [{"id": "t1", "d": {"items": [{"x": 5}, null, 5, "s"]}}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "l.x is 1", "cause": "value", "inputs": [{"locations": ["/things/0/d/items/0/x"], "name": "l.x", "value": 5}]}], "item": "item 1 of lst", "locations": ["/things/0/d/items/0"], "path": "item 1 of lst", "value": {"x": 5}}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of lst", "locations": ["/things/0/d/items/1"], "path": "item 2 of lst", "value": null}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 3 of lst", "locations": ["/things/0/d/items/2"], "path": "item 3 of lst", "value": 5}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 4 of lst", "locations": ["/things/0/d/items/3"], "path": "item 4 of lst", "value": "s"}], "inputs": [{"locations": ["/things/0/d/items/0", "/things/0/d/items/1", "/things/0/d/items/2", "/things/0/d/items/3"], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": [{"x": 5}, null, 5, "s"]}], "message": "item 1 of lst: x is 5; item 2 of lst: it is null, which isn't an object; item 3 of lst: it is 5, which isn't an object; and 1 more", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

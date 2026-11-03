@@ -1,3 +1,2 @@
-parts / a for alias and the input on the right side of a whose with plus / reads the alias and the input, and not the item's own field of the same name
 parts / a part's alias on the right of a whose, with a part that is missing, null or not a list / fails closed for each thing, and never reads the items' own field instead
 parts / a part's alias on the right side of a whose, with and without plus / reads the part when the part is missing, and not the item's own field of the same name

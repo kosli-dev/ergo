@@ -514,9 +514,10 @@ impl For {
                 .zip(&verdicts)
                 .find(|(_, verdict)| !matches!(verdict.cause, Cause::Satisfied | Cause::Value))
                 .map(|(check, verdict)| {
-                    super::message::prefixed(
+                    super::message::prefixed_for(
                         &walked.item_name_dotted(&w.item_segs),
                         &super::message::message(check, &at, verdict),
+                        verdict.cause,
                     )
                 });
             let dead_item = |cause: Cause| Dead {
@@ -1159,7 +1160,8 @@ impl For {
                         None => name.as_str(),
                     };
                     bare == alias || bare.starts_with(&format!("{alias}."))
-                }) && !reads_worked_out(&sentence.check);
+                }) && !reads_worked_out(&sentence.check)
+                    && !whose_reads_alias_field(&sentence.check, alias);
                 let walks = matches!(sentence.check, Check::Walk(_));
                 let text = match (&ran.message, walks) {
                     (Some(said), true) => said.clone(),
@@ -1257,7 +1259,12 @@ impl For {
                                 f.text.clone()
                             }
                         })
-                        .collect::<Vec<_>>()
+                        .fold(Vec::<String>::new(), |mut once, text| {
+                            if !once.contains(&text) {
+                                once.push(text);
+                            }
+                            once
+                        })
                         .join(", and ")
                 };
                 let said = if all_own && groups.is_empty() {
@@ -1844,6 +1851,17 @@ impl For {
 
     fn shared_second(&self) -> bool {
         self.items.len() == 2 && !reads_path(&self.items[1].path, &self.items[0].alias)
+    }
+}
+
+fn whose_reads_alias_field(check: &Check, alias: &str) -> bool {
+    match check {
+        Check::Walk(walk) => walk.whose.iter().any(|whose| {
+            whose.paths().iter().any(|path| {
+                matches!(&path.start, Start::Alias(name) if name == alias) && !path.steps.is_empty()
+            })
+        }),
+        _ => false,
     }
 }
 

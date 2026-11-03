@@ -1090,7 +1090,13 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
                 None => ops::message::message(&item.check, ctx, v),
             })
             .collect();
-        row.message = Some(messages.join("; "));
+        let mut once: Vec<String> = Vec::new();
+        for text in messages {
+            if !once.contains(&text) {
+                once.push(text);
+            }
+        }
+        row.message = Some(once.join("; "));
     }
     if plan.items.len() == 1 {
         row.failed_items = failed_items;

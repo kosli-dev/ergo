@@ -66,6 +66,7 @@ pub struct Failure {
     pub path: String,
     pub item: String,
     pub said: String,
+    pub off: bool,
     pub cause: Cause,
     pub value: Value,
     pub location: Option<Location>,
@@ -542,6 +543,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             path: walked_all.name_of(&raw.segs, raw.unaliased),
             item: walked_all.name_of(&raw.segs, raw.unaliased),
             said: walked_all.item_name_dotted(&raw.segs),
+            off: false,
             msg: message::stated(
                 &walked_all.item_name(&raw.segs),
                 raw.cause,
@@ -766,6 +768,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     order,
                     path: name,
                     said: walked.item_name_dotted(&item.item_segs),
+                    off: !off.is_empty(),
                     item: walked.name_of(&item.item_segs, item.unaliased),
                     cause: verdict.cause,
                     value: read
@@ -788,6 +791,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     msg: said,
                     order: item.end_segs.clone(),
                     said: walked.item_name_dotted(&item.end_segs),
+                    off: !off.is_empty(),
                     path: walked.name_of(&item.end_segs, item.unaliased),
                     item: walked.name_of(&item.item_segs, item.unaliased),
                     cause: leaf.cause,
@@ -886,7 +890,12 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
     } else {
         let mut sorted = fails.clone();
         sorted.sort_by(|a, b| a.order.cmp(&b.order));
-        sorted_msgs = sorted.iter().map(|f| f.msg.clone()).collect();
+        sorted_msgs = sorted
+            .iter()
+            .filter(|f| f.off)
+            .chain(sorted.iter().filter(|f| !f.off))
+            .map(|f| f.msg.clone())
+            .collect();
         sorted.iter().map(|f| f.to_json()).collect()
     };
     let tag = path::part_tag(&walk.path, &outer).map(|(name, id)| super::Part { name, id });

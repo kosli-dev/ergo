@@ -10,7 +10,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ### Changed
 
-- The engine follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.3.0-dev`, and each failed row and each violation has a `message`. Three of the spec's cases, all about how a part's alias or a `for` alias is named inside a `whose`, still get another text from the Rust engine, and `known-failures.txt` lists them.
+- The engine follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.3.0-dev`, and each failed row and each violation has a `message`. Two of the spec's cases still get another text from the Rust engine, and `known-failures.txt` lists them. In both, Rego prints a part's alias with a leading `$` (`$x.z`, `$pa.w`) inside a `whose`, and the Rust engine prints it without. Two more differences are known and no case covers them: a `count of`, `sum of` or `count of ... whose` over items that aren't objects reads `the check is false` in Rego and `item 2 of commits is null, which isn't an object` in the Rust engine, and Rego leaks a `$` into a few more names (`item 1 of $z:`, `$cov.x`) that the Rust engine writes without it.
 
 ## 0.2.0
 
