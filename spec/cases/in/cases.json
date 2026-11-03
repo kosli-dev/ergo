@@ -645,5 +645,105 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a leading dot on a right side that walks keeps its dot when an item is not an object, with a part of the same name",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name", "plain": "x is in lock.pkgs.name"}}}},
+    "cases": [
+      {
+        "description": "names the list of the field with the dot and the list of the part without it",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "x": "a", "lock": {"pkgs": ["t"]}, "lockfile": {"pkgs": ["u"]}}]},
+        "results": [
+          {"cause": "unusable", "check": "dot", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": ["/repos/0/lock/pkgs/0"], "name": ".lock.pkgs[].name", "value": [null]}], "message": "item 1 of .lock.pkgs is \"t\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "unusable", "check": "plain", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": ["/repos/0/lockfile/pkgs/0"], "name": "lock.pkgs[].name", "part": {"id": null, "name": "lock"}, "value": [null]}], "message": "item 1 of lock.pkgs is \"u\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "names each item that is not an object, null included",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "x": "a", "lock": {"pkgs": [{"name": "a"}, "t", null]}, "lockfile": {"pkgs": [{"name": "a"}]}}]},
+        "results": [
+          {"cause": "unusable", "check": "dot", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": ["/repos/0/lock/pkgs/0/name", "/repos/0/lock/pkgs/1", "/repos/0/lock/pkgs/2"], "name": ".lock.pkgs[].name", "value": ["a", null, null]}], "message": "item 2 of .lock.pkgs is \"t\", which isn't an object; item 3 of .lock.pkgs is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "satisfied", "check": "plain", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": ["/repos/0/lockfile/pkgs/0/name"], "name": "lock.pkgs[].name", "part": {"id": null, "name": "lock"}, "value": ["a"]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a leading dot on a right side without a part of the same name leaves the dot out when an item is not an object",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name"}}}},
+    "cases": [
+      {
+        "description": "names the list without the dot",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "x": "a", "lock": {"pkgs": ["t"]}}]},
+        "results": [
+          {"cause": "unusable", "check": "dot", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": ["/repos/0/lock/pkgs/0"], "name": "lock.pkgs[].name", "value": [null]}], "message": "item 1 of lock.pkgs is \"t\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a leading dot on the right of a for line keeps its dot when an item of the field is not an object",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"every": {"for": "every items as p", "assert": "p.name is in .p.name"}, "some": {"for": "some items as q", "assert": "q.name is in .q.name"}}}}},
+    "cases": [
+      {
+        "description": "names the field with the dot and the item with its alias",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "p": ["t"], "q": ["t"], "items": [{"name": "a"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "every", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "p.name is in .p.name", "cause": "unusable", "inputs": [{"locations": ["/repos/0/items/0/name"], "name": "p.name", "value": "a"}, {"locations": ["/repos/0/p/0"], "name": ".p[].name", "value": [null]}]}], "item": "item 1 of items", "locations": ["/repos/0/items/0"], "path": "item 1 of items", "value": {"name": "a"}}], "inputs": [{"locations": ["/repos/0/p"], "name": ".p.name", "value": null}, {"locations": ["/repos/0/items/0"], "name": "items[]", "value": [{"name": "a"}]}], "message": "item 1 of items: item 1 of .p is \"t\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "unusable", "check": "some", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "q.name is in .q.name", "cause": "unusable", "inputs": [{"locations": ["/repos/0/items/0/name"], "name": "q.name", "value": "a"}, {"locations": ["/repos/0/q/0"], "name": ".q[].name", "value": [null]}]}], "item": "item 1 of items", "locations": ["/repos/0/items/0"], "path": "item 1 of items", "value": {"name": "a"}}], "inputs": [{"locations": ["/repos/0/q"], "name": ".q.name", "value": null}, {"locations": ["/repos/0/items/0"], "name": "items[]", "value": [{"name": "a"}]}], "message": "item 1 of items: item 1 of .q is \"t\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a leading dot on a right side that walks keeps its dot when a parent subject has the name",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "dep", "checks": {"dot": "name is in .repo.pkgs.name"}}}},
+    "cases": [
+      {
+        "description": "names the field of the dep with the dot when it is empty, has an item that is not an object, or has no name",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "pkgs": [{"name": "z"}], "deps": [{"name": "a", "repo": {"pkgs": []}}, {"name": "b", "repo": {"pkgs": ["u"]}}, {"name": "c", "repo": {"pkgs": [{}]}}]}]},
+        "results": [
+          {"cause": "value", "check": "dot", "inputs": [{"locations": ["/repos/0/deps/0/name"], "name": "name", "value": "a"}, {"locations": [], "name": ".repo.pkgs[].name", "value": []}], "message": "name is \"a\", and .repo.pkgs is []", "passed": false, "requirement": "s", "subject": {"id": "a", "in": {"repo": "r1"}, "type": "dep"}},
+          {"cause": "unusable", "check": "dot", "inputs": [{"locations": ["/repos/0/deps/1/name"], "name": "name", "value": "b"}, {"locations": ["/repos/0/deps/1/repo/pkgs/0"], "name": ".repo.pkgs[].name", "value": [null]}], "message": "item 1 of .repo.pkgs is \"u\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "b", "in": {"repo": "r1"}, "type": "dep"}},
+          {"cause": "absent", "check": "dot", "inputs": [{"locations": ["/repos/0/deps/2/name"], "name": "name", "value": "c"}, {"locations": ["/repos/0/deps/2/repo/pkgs/0"], "name": ".repo.pkgs[].name", "value": [null]}], "message": "item 1 of .repo.pkgs: name is missing", "passed": false, "requirement": "s", "subject": {"id": "c", "in": {"repo": "r1"}, "type": "dep"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of and sum of read the field named like a part and list it with the dot",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"count": "count of .lock.pkgs is 1", "sum": "sum of .lock.pkgs.n is 1", "sum_plain": "sum of lock.pkgs.n is 1"}}}},
+    "cases": [
+      {
+        "description": "lists the field with the dot and the part without it, and names the item of the part",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of"],
+        "input": {"repos": [{"id": "r1", "x": "a", "lock": {"pkgs": [{"n": 1}, {}, "t"]}, "lockfile": {"pkgs": [{"n": 5}]}}]},
+        "results": [
+          {"cause": "value", "check": "count", "inputs": [{"locations": ["/repos/0/lock/pkgs/0", "/repos/0/lock/pkgs/1", "/repos/0/lock/pkgs/2"], "name": "count of .lock.pkgs", "value": 3}, {"locations": ["/repos/0/lock/pkgs/0", "/repos/0/lock/pkgs/1", "/repos/0/lock/pkgs/2"], "name": ".lock.pkgs[]", "value": [{"n": 1}, {}, "t"]}], "message": "count of .lock.pkgs is 3", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "not_an_object", "check": "sum", "inputs": [{"locations": ["/repos/0/lock/pkgs/0/n", "/repos/0/lock/pkgs/1", "/repos/0/lock/pkgs/2"], "name": "sum of .lock.pkgs.n", "value": null}, {"locations": ["/repos/0/lock/pkgs/0/n", "/repos/0/lock/pkgs/1", "/repos/0/lock/pkgs/2"], "name": ".lock.pkgs[].n", "value": [1, null, null]}], "message": "item 3 of lock.pkgs is \"t\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "value", "check": "sum_plain", "inputs": [{"locations": ["/repos/0/lockfile/pkgs/0/n"], "name": "sum of lock.pkgs.n", "part": {"id": null, "name": "lock"}, "value": 5}, {"locations": ["/repos/0/lockfile/pkgs/0/n"], "name": "lock.pkgs[].n", "part": {"id": null, "name": "lock"}, "value": [5]}], "message": "sum of lock.pkgs.n is 5", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field that is on both sides of a phrase is named once in the message",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"plain": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "plain", "checks": {"bare": "tags contains none of tags", "dot": "tags contains none of .tags"}}}},
+    "cases": [
+      {
+        "description": "says the value once",
+        "rules": ["message.join", "compare.list"],
+        "input": {"repos": [{"id": "r1", "tags": ["a"]}]},
+        "results": [
+          {"cause": "value", "check": "bare", "inputs": [{"locations": ["/repos/0/tags"], "name": "tags", "value": ["a"]}], "message": "tags is [\"a\"]", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "plain"}},
+          {"cause": "value", "check": "dot", "inputs": [{"locations": ["/repos/0/tags"], "name": "tags", "value": ["a"]}], "message": "tags is [\"a\"]", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "plain"}}
+        ]
+      }
+    ]
   }
 ]

@@ -11587,3 +11587,21 @@ test_a_for_line_item_keeps_its_alias_when_the_right_side_reads_a_field_called_li
 	rows[0].message == "item 1 of items: p.name is \"a\", and .p is []"
 	rows[0].names == [".p.name", "items[]"]
 }
+
+test_a_leading_dot_on_a_right_side_keeps_its_dot_when_an_item_of_the_field_is_not_an_object if {
+	_dot_rows({"pkgs": ["t"]}) == [{"cause": "unusable", "message": "item 1 of .lock.pkgs is \"t\", which isn't an object", "names": ["x", ".lock.pkgs[].name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_leaves_its_dot_out_when_an_item_is_not_an_object_and_nothing_has_its_name if {
+	_dot_plain_rows("x is in .lock.pkgs.name", {"repos": [{"id": "r", "x": "a", "lock": {"pkgs": ["t"]}}]}) == [{"cause": "unusable", "message": "item 1 of lock.pkgs is \"t\", which isn't an object", "names": ["x", "lock.pkgs[].name"]}]
+}
+
+test_a_for_line_keeps_the_dot_of_a_right_side_when_an_item_of_the_field_is_not_an_object if {
+	rows := _dot_plain_rows({"for": "every items as p", "assert": "p.name is in .p.name"}, {"repos": [{"id": "r", "p": ["t"], "items": [{"name": "a"}]}]})
+	rows[0].message == "item 1 of items: item 1 of .p is \"t\", which isn't an object"
+}
+
+test_a_field_on_both_sides_of_a_phrase_is_said_once_in_the_message if {
+	_dot_plain_rows("tags contains none of .tags", {"repos": [{"id": "r", "tags": ["a"]}]})[0].message == "tags is [\"a\"]"
+	_dot_plain_rows("tags contains none of tags", {"repos": [{"id": "r", "tags": ["a"]}]})[0].message == "tags is [\"a\"]"
+}

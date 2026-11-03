@@ -4966,6 +4966,37 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("x is in lock.pkgs.name", "x is in lock.pkgs.name", &[], &[]),
+    (
+        "count of .lock.pkgs is 1",
+        "count of lock.pkgs is 1",
+        &[],
+        &[],
+    ),
+    (
+        "name is in .repo.pkgs.name",
+        "name is in repo.pkgs.name",
+        &[],
+        &[],
+    ),
+    (
+        "sum of .lock.pkgs.n is 1",
+        "sum of lock.pkgs.n is 1",
+        &[],
+        &[],
+    ),
+    ("sum of lock.pkgs.n is 1", "sum of lock.pkgs.n is 1", &[], &[]),
+    (
+        "tags contains none of .tags",
+        "tags contains none of tags",
+        &[],
+        &[],
+    ),
+    (
+        "tags contains none of tags",
+        "tags contains none of tags",
+        &[],
+        &[],
+    ),
     ("i.name is in .q.name", "i.name is in q.name", &[], &[]),
     (
         "name is in .allowed.name",
@@ -8386,6 +8417,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("every deps as d", "every deps as d", &[], &[]),
     ("every items as p", "every items as p", &[], &[]),
     ("every items as q", "every items as q", &[], &[]),
+    ("some items as q", "some items as q", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

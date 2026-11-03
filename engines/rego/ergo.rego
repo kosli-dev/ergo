@@ -1860,20 +1860,20 @@ _rwalk(x, path) := {"state": _worst_or_value(states), "failed": count(states) > 
 
 _rwalk_text(x, path) := _m_joined(_m_fail_parts("unusable", fails, _dotted_roots([path]))) if {
 	w := _rwalk_run(x, path)
-	fails := array.concat(array.concat(w.fails, [f | some e in w.items; some f in _rwalk_item_fails(e)]), _walk_stop(w))
+	fails := array.concat(array.concat(w.fails, [f | some e in w.items; some f in _rwalk_item_fails(e, _dotted_roots([path]))]), _walk_stop(w))
 }
 
-_rwalk_item_fails(e) := [{"path": e.c, "item": e.i, "cause": state, "value": null, "msg": ""} | some state in _rwalk_item_states(e)] if {
+_rwalk_item_fails(e, _) := [{"path": e.c, "item": e.i, "cause": state, "value": null, "msg": ""} | some state in _rwalk_item_states(e)] if {
 	e.v != _unusable_mark
 	is_object(e.iv)
 }
 
-_rwalk_item_fails(e) := [{"path": e.i, "item": e.i, "cause": "unusable", "value": e.iv, "msg": _m_isnt(_m_item_name(e.i, set()), e.iv, "an object")}] if {
+_rwalk_item_fails(e, roots) := [{"path": e.i, "item": e.i, "cause": "unusable", "value": e.iv, "msg": _m_isnt(_m_item_name(e.i, roots), e.iv, "an object")}] if {
 	e.v in {_absent, _unusable_mark}
 	not is_object(e.iv)
 }
 
-_rwalk_item_fails(e) := [{"path": broken, "item": e.i, "cause": "unusable", "value": v, "msg": _m_isnt(_m_item_name(broken, set()), v, "an object")}] if {
+_rwalk_item_fails(e, roots) := [{"path": broken, "item": e.i, "cause": "unusable", "value": v, "msg": _m_isnt(_m_item_name(broken, roots), v, "an object")}] if {
 	e.v == _unusable_mark
 	is_object(e.iv)
 	i := _rwalk_break(e)
@@ -10257,7 +10257,7 @@ _m_side_sources(_, side) := [] if _m_tally_side(side)
 _m_tally_side(side) if _basic_form(side) in {"count_of", "sum_of"}
 
 _m_message(check, subj, "value") := m if {
-	clauses := [c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)]
+	clauses := _once([c | some side in _m_sides(check); some c in _m_value_clauses(subj, side)])
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check)
