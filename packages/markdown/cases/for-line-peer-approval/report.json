@@ -244,7 +244,7 @@
           ]
         }
       ],
-      "message": "item 2 of pull_requests: item 1 of approvers: approver.state is \"COMMENTED\", and item 1 of approvers: approver.username is \"bob\", and pr.author is \"bob\"",
+      "message": "item 2 of pull_requests: item 1 of approvers: approver.state is \"COMMENTED\", and approver.username is \"bob\", and pr.author is \"bob\"",
       "passed": false,
       "requirement": "release",
       "subject": {
