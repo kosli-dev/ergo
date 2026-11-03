@@ -21081,5 +21081,1825 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for alias that is a list, read by a position and then by a key: w[0].a does not exist",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ws as w",
+              "assert": "w[0].a does not exist"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when the item at the position is a number",
+        "rules": [
+          "path.unusable",
+          "path.not_an_object",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a does not exist",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0].a",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              }
+            ],
+            "message": "item 1 of ws: item 1 of w is 1, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the item at the position is text",
+        "rules": [
+          "path.unusable",
+          "path.not_an_object",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  "x"
+                ]
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a does not exist",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0].a",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  "x"
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    "x"
+                  ]
+                ]
+              }
+            ],
+            "message": "item 1 of ws: item 1 of w is \"x\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when the list is empty",
+        "rules": [
+          "path.unusable",
+          "path.not_an_object",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                []
+              ]
+            }
+          ]
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  []
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when the item at the position is null",
+        "rules": [
+          "path.unusable",
+          "path.not_an_object",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  null
+                ]
+              ]
+            }
+          ]
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    null
+                  ]
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as value when the item at the position has the key",
+        "rules": [
+          "path.unusable",
+          "path.not_an_object",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  {
+                    "a": 1
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a does not exist",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0/a"
+                        ],
+                        "name": "w[0].a",
+                        "value": 1
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  {
+                    "a": 1
+                  }
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    {
+                      "a": 1
+                    }
+                  ]
+                ]
+              }
+            ],
+            "message": "item 1 of ws: w[0].a is 1",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the item is a number, not a list",
+        "rules": [
+          "path.unusable",
+          "path.not_an_object",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a does not exist",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w[0].a",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              }
+            ],
+            "message": "item 1 of ws is 3, which isn't a list",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias read by a position and then by a key from a field: w[0] named by zz is 1",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ws as w",
+              "assert": "w[0] named by zz is 1"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when the item at the position is a number and the field is text",
+        "rules": [
+          "path.field_step",
+          "path.unusable",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ],
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0] named by zz is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0] named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "item 1 of ws: item 1 of w is 1, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the alias is a number, whatever the field holds",
+        "rules": [
+          "path.field_step",
+          "path.unusable",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ],
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0] named by zz is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w[0] named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "item 1 of ws: w is 3, which isn't a list",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the alias is a number and the field is missing",
+        "rules": [
+          "path.field_step",
+          "path.unusable",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0] named by zz is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w[0] named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "zz",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "zz",
+                "value": null
+              }
+            ],
+            "message": "item 1 of ws: w is 3, which isn't a list",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the alias is null",
+        "rules": [
+          "path.field_step",
+          "path.unusable",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                null
+              ],
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0] named by zz is 1",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w[0] named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "item 1 of ws: w[0] named by zz is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as absent when the field is missing and the item at the position is a number",
+        "rules": [
+          "path.field_step",
+          "path.unusable",
+          "for.named_by"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0] named by zz is 1",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0] named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "zz",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "zz",
+                "value": null
+              }
+            ],
+            "message": "item 1 of ws: zz is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias read by a position and then by a key from a field: w[0] named by zz does not exist",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ws as w",
+              "assert": "w[0] named by zz does not exist"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when the item at the position is a number and the field is text",
+        "rules": [
+          "path.field_step",
+          "path.unusable",
+          "for.named_by",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ],
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0] named by zz does not exist",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0] named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "item 1 of ws: item 1 of w is 1, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the alias is a number and the field is text",
+        "rules": [
+          "path.field_step",
+          "path.unusable",
+          "for.named_by",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                3
+              ],
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0] named by zz does not exist",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0"
+                        ],
+                        "name": "w[0] named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": 3
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  3
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "item 1 of ws: w is 3, which isn't a list",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "passes when the alias is null and the field is text",
+        "rules": [
+          "path.field_step",
+          "path.unusable",
+          "for.named_by",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                null
+              ],
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": true,
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  null
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "passed": true,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias read by a position, then a key, then a key from a field: w[0].a named by zz exists",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ws as w",
+              "assert": "w[0].a named by zz exists"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when the item at the position is a number and the field is text",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "path.not_an_object"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ],
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a named by zz exists",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0].a named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": "a"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "item 1 of ws: item 1 of w is 1, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the item at the position is a number and the field is missing",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "path.not_an_object"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a named by zz exists",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0].a named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0"
+                        ],
+                        "name": "zz",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0"
+                ],
+                "name": "zz",
+                "value": null
+              }
+            ],
+            "message": "item 1 of ws: item 1 of w is 1, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the item at the position is a number and the field is null",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "path.not_an_object"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ],
+              "zz": null
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a named by zz exists",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0].a named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": null
+              }
+            ],
+            "message": "item 1 of ws: item 1 of w is 1, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      },
+      {
+        "description": "fails as unusable when the item at the position is a number and the field is a number",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "path.not_an_object"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  1
+                ]
+              ],
+              "zz": 3
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a named by zz exists",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0].a named by zz",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/things/0/zz"
+                        ],
+                        "name": "zz",
+                        "value": 3
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    1
+                  ]
+                ]
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": 3
+              }
+            ],
+            "message": "item 1 of ws: zz is 3, which isn't text, and item 1 of w is 1, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "$params read by a position and then by a key, with params as a number",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "d": {
+              "assert": "$params[0] named by zz does not exist"
+            }
+          }
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "fails as unusable, saying the check is false",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params[0] named by zz",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "$params[0] named by zz does not exist is false",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "$params read by a position and then by a key, with params as text",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "d": {
+              "assert": "$params[0] named by zz does not exist"
+            }
+          }
+        }
+      }
+    },
+    "params": "s",
+    "cases": [
+      {
+        "description": "fails as unusable, saying the check is false",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params[0] named by zz",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "$params[0] named by zz does not exist is false",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "$params read by a position and then by a key, with params as true",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "d": {
+              "assert": "$params[0] named by zz does not exist"
+            }
+          }
+        }
+      }
+    },
+    "params": true,
+    "cases": [
+      {
+        "description": "fails as unusable, saying the check is false",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params[0] named by zz",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "$params[0] named by zz does not exist is false",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias that is a list, read by a position and then by a key: w[0].a does not exist, with true at the position",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ws as w",
+              "assert": "w[0].a does not exist"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when the item at the position is true",
+        "rules": [
+          "path.unusable",
+          "path.not_an_object",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  true
+                ]
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a does not exist",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0].a",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  true
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    true
+                  ]
+                ]
+              }
+            ],
+            "message": "item 1 of ws: item 1 of w is true, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

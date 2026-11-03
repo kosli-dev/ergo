@@ -3548,14 +3548,8 @@ _starts_at_non_object(subj, path) if {
 	not is_object(start)
 	not _reads_itself(path)
 	not _position_first(path)
-	not _list_read_by_position(start, path)
 	not _params_not_given(path)
 	not _field_unusable_after_read(subj, path)
-}
-
-_list_read_by_position(start, path) if {
-	is_array(start)
-	_position_first(array.slice(path, 0, _first_field_step(path)))
 }
 
 _field_unusable_after_read(subj, path) if {
@@ -3579,6 +3573,12 @@ _list_subject_path(path) if {
 }
 
 _position_first(path) if _index_step(_keys_of(path)[0])
+
+_position_first(path) if {
+	not _builtin(path)
+	_has_field_step(path)
+	_index_step(_step_key(_path_steps(path)[0]))
+}
 
 _any_read_state(subj, path) := s if {
 	s := _name_step_state(path)
@@ -3612,6 +3612,14 @@ _first_field_step(path) := min({i | some i, seg in path; _field_step(seg)})
 _state_before_field(subj, prefix) := "unusable" if {
 	start := _start_of(subj, prefix)
 	is_object(start)
+	_blocked(start, _keys_in(subj, prefix))
+}
+
+else := "unusable" if {
+	not _builtin(prefix)
+	_position_first(prefix)
+	start := _start_of(subj, prefix)
+	is_array(start)
 	_blocked(start, _keys_in(subj, prefix))
 }
 
@@ -3695,6 +3703,14 @@ _path_read_state(subj, path) := "null" if _resolved(subj, path) == null
 _path_read_state(subj, path) := "unusable" if {
 	start := _start_of(subj, path)
 	is_object(start)
+	_blocked(start, _keys_in(subj, path))
+}
+
+_path_read_state(subj, path) := "unusable" if {
+	not _builtin(path)
+	_position_first(path)
+	start := _start_of(subj, path)
+	is_array(start)
 	_blocked(start, _keys_in(subj, path))
 }
 

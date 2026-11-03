@@ -11684,3 +11684,36 @@ test_named_by_each_of_params_or_input_is_still_read_in_a_child_from_line if {
 	rows := [[r.subject.id, r.cause] | some r in _each_start_report(doc, "t named by each of $input.keys").results; r.check == "c"]
 	rows == [["p", "satisfied"]]
 }
+
+params_position_messages := {row.check: row.message |
+	some row in report(
+		{"items": [{"id": 1, "zz": "a"}]},
+		{"s": {
+			"subject_type": "thing",
+			"from": "items",
+			"identified_by": "id",
+			"checks": {
+				"c": {"assert": "$params[0].a does not exist"},
+				"d": {"assert": "$params[0].a exists"},
+				"e": {"assert": "$params[0] named by zz does not exist"},
+			},
+		}},
+	).results
+	row.check != "$min_subjects"
+}
+
+test_a_params_path_that_starts_with_a_position_says_the_check_failed_not_the_item if {
+	every params in [[1], [[1]], [[true]], [["x"]]] {
+		params_position_messages == {
+			"c": "$params[0].a does not exist is false",
+			"d": "$params[0].a exists is false",
+			"e": "$params[0] named by zz does not exist is false",
+		} with data.params as params
+	}
+}
+
+test_a_params_path_that_starts_with_a_position_on_a_value_that_is_not_a_list_says_the_check_failed if {
+	every params in [3, "s", true] {
+		params_position_messages.e == "$params[0] named by zz does not exist is false" with data.params as params
+	}
+}
