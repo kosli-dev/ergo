@@ -66,11 +66,45 @@ pub struct Failure {
     pub path: String,
     pub item: String,
     pub said: String,
-    pub off: bool,
+    pub rank: Vec<Rank>,
     pub cause: Cause,
     pub value: Value,
     pub location: Option<Location>,
     pub msg: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Rank {
+    Index(u64),
+    Text(String),
+}
+
+fn rank_of(start: &Start, segs: &[Seg]) -> Vec<Rank> {
+    let mut rank = match start {
+        Start::Subject | Start::Own => Vec::new(),
+        Start::Alias(alias) => vec![Rank::Text(format!("${alias}"))],
+        Start::Part(part) => vec![Rank::Text(format!("${{\"alias\":\"{}\"", part.name))],
+        Start::Params => vec![Rank::Text("$$params".to_string())],
+        Start::Input => vec![Rank::Text("$$input".to_string())],
+    };
+    rank.extend(segs.iter().map(|seg| match seg {
+        Seg::Index(at) => Rank::Index(*at),
+        Seg::Key(key) => Rank::Text(key.clone()),
+    }));
+    rank
+}
+
+fn rank_of_path(path: &Path) -> Vec<Rank> {
+    let segs: Vec<Seg> = path::leading_steps(&path.start)
+        .iter()
+        .chain(path.steps.iter())
+        .map(|step| match step {
+            Step::Index(at) => Seg::Index(*at),
+            Step::Key(key) => Seg::Key(key.clone()),
+            Step::Ref(_) | Step::Field(_) => Seg::Key(String::new()),
+        })
+        .collect();
+    rank_of(&path.start, &segs)
 }
 
 impl Failure {
@@ -543,7 +577,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             path: walked_all.name_of(&raw.segs, raw.unaliased),
             item: walked_all.name_of(&raw.segs, raw.unaliased),
             said: walked_all.item_name_dotted(&raw.segs),
-            off: false,
+            rank: rank_of(&path.start, &raw.segs),
             msg: message::stated(
                 &walked_all.item_name(&raw.segs),
                 raw.cause,
@@ -741,6 +775,14 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     None => (Vec::new(), false),
                 };
                 let mut order = item.item_segs.clone();
+                let rank = match &named {
+                    Some((path, _)) if outside => rank_of_path(path),
+                    _ => {
+                        let mut segs = order.clone();
+                        segs.extend(steps.iter().map(seg_of));
+                        rank_of(&walk.path.start, &segs)
+                    }
+                };
                 let name = if outside {
                     named
                         .as_ref()
@@ -768,7 +810,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     order,
                     path: name,
                     said: walked.item_name_dotted(&item.item_segs),
-                    off: !off.is_empty(),
+                    rank,
                     item: walked.name_of(&item.item_segs, item.unaliased),
                     cause: verdict.cause,
                     value: read
@@ -791,7 +833,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     msg: said,
                     order: item.end_segs.clone(),
                     said: walked.item_name_dotted(&item.end_segs),
-                    off: !off.is_empty(),
+                    rank: rank_of(&walk.path.start, &item.end_segs),
                     path: walked.name_of(&item.end_segs, item.unaliased),
                     item: walked.name_of(&item.item_segs, item.unaliased),
                     cause: leaf.cause,
@@ -889,13 +931,8 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         Vec::new()
     } else {
         let mut sorted = fails.clone();
-        sorted.sort_by(|a, b| a.order.cmp(&b.order));
-        sorted_msgs = sorted
-            .iter()
-            .filter(|f| f.off)
-            .chain(sorted.iter().filter(|f| !f.off))
-            .map(|f| f.msg.clone())
-            .collect();
+        sorted.sort_by(|a, b| a.rank.cmp(&b.rank));
+        sorted_msgs = sorted.iter().map(|f| f.msg.clone()).collect();
         sorted.iter().map(|f| f.to_json()).collect()
     };
     let tag = path::part_tag(&walk.path, &outer).map(|(name, id)| super::Part { name, id });

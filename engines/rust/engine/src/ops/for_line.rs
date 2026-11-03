@@ -852,11 +852,10 @@ fn sort_failure(
 type SortRead<'a> = (Live<'a>, Result<Value, Cause>, Option<Location>, String);
 
 struct Sfail {
-    names: Vec<String>,
     own: bool,
+    one: bool,
     text: String,
     parts: Vec<String>,
-    walks: bool,
     reads_last: bool,
     idx: usize,
     cause: Cause,
@@ -875,7 +874,6 @@ struct Child {
 struct Outcome {
     parts: Vec<String>,
     leaf: Vec<(String, bool)>,
-    bare: bool,
     said: String,
     cause: Cause,
     assertions: Vec<Value>,
@@ -1030,7 +1028,6 @@ impl For {
                     Some(Outcome {
                         parts: Vec::new(),
                         leaf: Vec::new(),
-                        bare: false,
                         said: String::new(),
                         cause: Cause::NotAnObject,
                         assertions: Vec::new(),
@@ -1056,13 +1053,15 @@ impl For {
                             .collect(),
                     };
                     let second = self.shared_second();
-                    parts.extend(
-                        nested
-                            .dead
-                            .iter()
-                            .filter(|d| !(second && d.shared) && d.cause != Cause::Ambiguous)
-                            .map(|d| self.dead_text(d)),
-                    );
+                    if assertions.is_empty() {
+                        parts.extend(
+                            nested
+                                .dead
+                                .iter()
+                                .filter(|d| !(second && d.shared) && d.cause != Cause::Ambiguous)
+                                .map(|d| self.dead_text(d)),
+                        );
+                    }
                     let ties: Vec<&Dead> = nested
                         .dead
                         .iter()
@@ -1075,7 +1074,6 @@ impl For {
                         Some(Outcome {
                             parts: parts.clone(),
                             leaf: Vec::new(),
-                            bare: false,
                             said: parts.join("; "),
                             cause: nested.cause,
                             assertions,
@@ -1139,29 +1137,21 @@ impl For {
         self.items.iter().map(|i| i.alias.as_str()).collect()
     }
 
+    fn last_alias(&self) -> &str {
+        self.items
+            .last()
+            .map(|i| i.alias.as_str())
+            .unwrap_or_default()
+    }
+
     fn try_sentences(&self, ctx: &Ctx) -> (Option<Outcome>, Vec<Sfail>) {
+        let alias = self.last_alias();
         let mut sfails = Vec::new();
         for (idx, sentence) in self.sentences.iter().enumerate() {
             let ran = run_full(&sentence.check, ctx);
             let verdict = ran.verdict.clone();
             if !verdict.passed() {
-                let alias = self
-                    .items
-                    .last()
-                    .map(|i| i.alias.as_str())
-                    .unwrap_or_default();
-                let names = super::message::read_names(&sentence.check, ctx, &verdict);
-                let own = names.iter().all(|name| {
-                    let bare = match name
-                        .strip_prefix("item ")
-                        .and_then(|r| r.split_once(" of "))
-                    {
-                        Some((_, rest)) => rest,
-                        None => name.as_str(),
-                    };
-                    bare == alias || bare.starts_with(&format!("{alias}."))
-                }) && !reads_worked_out(&sentence.check)
-                    && !whose_reads_alias_field(&sentence.check, alias);
+                let own = sentence.reads_last && !reads_other(&sentence.check, alias);
                 let walks = matches!(sentence.check, Check::Walk(_));
                 let text = match (&ran.message, walks) {
                     (Some(said), true) => said.clone(),
@@ -1179,125 +1169,78 @@ impl For {
                     }
                     _ => vec![text.clone()],
                 };
+                let inputs: Vec<Value> =
+                    reading_order(&sentence.check, &verdict.inputs, &self.alias_names())
+                        .iter()
+                        .map(Input::to_json)
+                        .collect();
                 sfails.push(Sfail {
-                    names,
                     own,
+                    one: inputs.len() == 1,
                     text,
                     parts,
-                    walks,
                     reads_last: sentence.reads_last,
                     idx,
                     cause: verdict.cause,
-                    inputs: reading_order(&sentence.check, &verdict.inputs, &self.alias_names())
-                        .iter()
-                        .map(Input::to_json)
-                        .collect(),
+                    inputs,
                 });
             }
         }
-        match Cause::worst(sfails.iter().map(|f| f.cause)) {
-            None => (None, sfails),
-            Some(cause) => {
-                let assertions = sfails
-                    .iter()
-                    .map(|f| {
-                        json!({
-                            "assertion": self.sentences[f.idx].text,
-                            "cause": f.cause.name(),
-                            "inputs": f.inputs,
-                        })
-                    })
-                    .collect();
-                let all_own = sfails.iter().all(|f| f.own);
-                let walked = sfails.iter().any(|f| f.walks);
-                let two = self.items.len() > 1 && sfails.iter().any(|f| f.reads_last);
-                let mut texts: Vec<String> = Vec::new();
-                if walked && !two {
-                    for text in sfails.iter().flat_map(|f| f.parts.iter()) {
-                        let text = if all_own {
-                            self.strip(text)
-                        } else {
-                            text.clone()
-                        };
-                        if !texts.contains(&text) {
-                            texts.push(text);
-                        }
-                    }
+        let Some(cause) = Cause::worst(sfails.iter().map(|f| f.cause)) else {
+            return (None, sfails);
+        };
+        let assertions = sfails
+            .iter()
+            .map(|f| {
+                json!({
+                    "assertion": self.sentences[f.idx].text,
+                    "cause": f.cause.name(),
+                    "inputs": f.inputs,
+                })
+            })
+            .collect();
+        let all_own = sfails.iter().all(|f| f.own);
+        let two = self.items.len() > 1 && sfails.iter().any(|f| f.reads_last);
+        let mut texts: Vec<String> = Vec::new();
+        for f in &sfails {
+            let lines: &[String] = if two {
+                std::slice::from_ref(&f.text)
+            } else {
+                &f.parts
+            };
+            for line in lines {
+                let text = if all_own {
+                    own_text(line, alias, f.one)
+                } else {
+                    line.clone()
+                };
+                if !texts.contains(&text) {
+                    texts.push(text);
                 }
-                let groups = if texts.len() > 1 {
-                    group_by_lead(&texts)
-                } else {
-                    Vec::new()
-                };
-                if groups.len() > 1 {
-                    let leaf: Vec<(String, bool)> = groups
-                        .iter()
-                        .map(|group| (group_text(group), lead_of(&group[0]).is_empty()))
-                        .collect();
-                    return (
-                        Some(Outcome {
-                            parts: Vec::new(),
-                            leaf,
-                            bare: false,
-                            said: String::new(),
-                            cause,
-                            assertions,
-                            inner: Vec::new(),
-                        }),
-                        sfails,
-                    );
-                }
-                let said = if groups.len() == 1 {
-                    group_text(&groups[0])
-                } else {
-                    sfails
-                        .iter()
-                        .map(|f| {
-                            if walked && !two {
-                                f.parts.join("; ")
-                            } else {
-                                f.text.clone()
-                            }
-                        })
-                        .fold(Vec::<String>::new(), |mut once, text| {
-                            if !once.contains(&text) {
-                                once.push(text);
-                            }
-                            once
-                        })
-                        .join(", and ")
-                };
-                let said = if all_own && groups.is_empty() {
-                    self.strip(&said)
-                } else {
-                    said
-                };
-                let alias = self
-                    .items
-                    .last()
-                    .map(|i| i.alias.as_str())
-                    .unwrap_or_default();
-                let only_alias = sfails.len() == 1
-                    && (sfails[0].names == [alias.to_string()]
-                        || (sfails[0].walks && said.starts_with(&format!("{alias} is "))));
-                let (said, bare) = match said.strip_prefix(&format!("{alias} is ")) {
-                    Some(rest) if all_own && only_alias => (format!(" is {rest}"), true),
-                    _ => (said, false),
-                };
-                (
-                    Some(Outcome {
-                        parts: Vec::new(),
-                        leaf: Vec::new(),
-                        bare,
-                        said,
-                        cause,
-                        assertions,
-                        inner: Vec::new(),
-                    }),
-                    sfails,
-                )
             }
         }
+        let groups = if two {
+            vec![vec![first_marked(&texts).join(", and ")]]
+        } else {
+            group_by_lead(&texts)
+        };
+        let outcome = |leaf: Vec<(String, bool)>, said: String| Outcome {
+            parts: Vec::new(),
+            leaf,
+            said,
+            cause,
+            assertions,
+            inner: Vec::new(),
+        };
+        if groups.len() > 1 {
+            let leaf = groups
+                .iter()
+                .map(|group| (group_text(group), lead_of(&group[0]).is_empty()))
+                .collect();
+            return (Some(outcome(leaf, String::new())), sfails);
+        }
+        let said = groups.first().map(|g| group_text(g)).unwrap_or_default();
+        (Some(outcome(Vec::new(), said)), sfails)
     }
 
     fn aggregate(&self, children: &[Child]) -> Vec<Value> {
@@ -1414,7 +1357,12 @@ impl For {
                 }
                 _ => {
                     let on_items = in_walk.contains(&std::ptr::from_ref(path));
-                    inputs.extend(walk::path_inputs(path, ctx, &hidden, on_items));
+                    let at = if matches!(path.start, Start::Part(_)) {
+                        outer_ctx(ctx)
+                    } else {
+                        ctx.clone()
+                    };
+                    inputs.extend(walk::path_inputs(path, &at, &hidden, on_items));
                 }
             }
         }
@@ -1648,24 +1596,21 @@ impl For {
                 let Some(fail) = child.sfails.iter().find(|f| f.idx == idx) else {
                     continue;
                 };
-                if child.failed.as_ref().is_some_and(|o| o.bare) {
-                    if let Some(text) = self.child_text(child)
-                        && !texts.contains(&text)
-                    {
-                        texts.push(text);
-                    }
-                    continue;
-                }
                 let own = child.sfails.iter().all(|f| f.own);
                 let said = if own {
-                    self.strip(&fail.text)
+                    own_text(&fail.text, self.last_alias(), fail.one)
                 } else {
                     fail.text.clone()
                 };
                 let text = if sentence.reads_last {
-                    super::message::prefixed(&self.strip(child.entry.shown()), &said)
+                    let name = self.strip(child.entry.shown());
+                    if said.starts_with(MARK) {
+                        under(&name, &said)
+                    } else {
+                        super::message::prefixed(&name, &said)
+                    }
                 } else {
-                    said
+                    unmarked(&said)
                 };
                 if !texts.contains(&text) {
                     texts.push(text);
@@ -1710,15 +1655,15 @@ impl For {
 
     fn child_texts(&self, child: &Child) -> Vec<(String, bool)> {
         match &child.failed {
-            Some(outcome) if !outcome.leaf.is_empty() && outcome.cause != Cause::NotAnObject => {
+            Some(outcome) if !outcome.leaf.is_empty() && !bare_item(outcome, &child.entry) => {
                 let name = self.strip(child.entry.shown());
                 outcome
                     .leaf
                     .iter()
-                    .map(|(part, extra)| (format!("{name}: {part}"), *extra))
+                    .map(|(part, extra)| (under(&name, part), *extra))
                     .collect()
             }
-            Some(outcome) if !outcome.parts.is_empty() && outcome.cause != Cause::NotAnObject => {
+            Some(outcome) if !outcome.parts.is_empty() && !bare_item(outcome, &child.entry) => {
                 let name = self.strip(child.entry.shown());
                 outcome
                     .parts
@@ -1737,7 +1682,7 @@ impl For {
     fn child_text(&self, child: &Child) -> Option<String> {
         let outcome = child.failed.as_ref()?;
         let name = self.strip(child.entry.shown());
-        Some(if outcome.cause == Cause::NotAnObject {
+        Some(if bare_item(outcome, &child.entry) {
             super::message::isnt(&name, &child.entry.value, "an object")
         } else if outcome.said.is_empty() {
             if outcome.assertions.is_empty() && outcome.inner.is_empty() {
@@ -1750,10 +1695,8 @@ impl For {
             } else {
                 return None;
             }
-        } else if outcome.bare {
-            format!("{name}{}", outcome.said)
         } else {
-            format!("{name}: {}", outcome.said)
+            under(&name, &outcome.said)
         })
     }
 
@@ -1854,27 +1797,143 @@ impl For {
     }
 }
 
-fn whose_reads_alias_field(check: &Check, alias: &str) -> bool {
+fn bare_item(outcome: &Outcome, entry: &Dead) -> bool {
+    outcome.cause == Cause::NotAnObject && !entry.value.is_object()
+}
+
+const MARK: char = '\u{1}';
+
+fn reads_other(check: &Check, alias: &str) -> bool {
+    let at_alias = |path: &Path| matches!(&path.start, Start::Alias(name) if name == alias);
+    let mut top: Vec<&Path> = check.paths();
+    if let Check::Walk(walk) = check {
+        top.push(&walk.path);
+    }
+    top.iter().any(|path| !at_alias(path))
+        || check.refs().iter().any(|path| !at_alias(path))
+        || nested_checks(check).into_iter().any(|inner| {
+            worked_out(inner)
+                || inner
+                    .paths()
+                    .into_iter()
+                    .chain(match inner {
+                        Check::Walk(walk) => Some(&walk.path),
+                        _ => None,
+                    })
+                    .any(|path| foreign_step(path, alias))
+        })
+}
+
+fn nested_checks(check: &Check) -> Vec<&Check> {
+    let mut out = vec![check];
     match check {
-        Check::Walk(walk) => walk.whose.iter().any(|whose| {
-            whose.paths().iter().any(|path| {
-                matches!(&path.start, Start::Alias(name) if name == alias) && !path.steps.is_empty()
-            })
-        }),
+        Check::Walk(walk) => {
+            for inner in walk.whose.iter().chain(std::iter::once(&*walk.check)) {
+                out.extend(nested_checks(inner));
+            }
+        }
+        Check::Tally(tally) => {
+            for side in std::iter::once(&tally.left).chain(tally.right.as_ref()) {
+                if let Side::Derived(derived) = side {
+                    for term in &derived.terms {
+                        if let Term::Counted(counted) = term {
+                            for inner in &counted.whose {
+                                out.extend(nested_checks(inner));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Check::AnyOf(any) => {
+            for option in &any.options {
+                for inner in option {
+                    out.extend(nested_checks(inner));
+                }
+            }
+        }
+        _ => {}
+    }
+    out
+}
+
+fn worked_out(check: &Check) -> bool {
+    let joined = |side: &super::compare::Side| matches!(side, super::compare::Side::Join(_));
+    match check {
+        Check::Tally(tally) => std::iter::once(&tally.left)
+            .chain(tally.right.as_ref())
+            .any(|side| match side {
+                Side::Derived(_) => true,
+                Side::Plain(plain) => joined(plain),
+            }),
+        Check::Compare(compare) => joined(&compare.left) || joined(&compare.right),
+        Check::CompareTime(compare) => joined(&compare.left) || joined(&compare.right),
         _ => false,
     }
 }
 
-fn reads_worked_out(check: &Check) -> bool {
-    match check {
-        Check::Tally(tally) => super::tally::tally_sides(tally)
-            .into_iter()
-            .any(|side| matches!(side, Side::Derived(_))),
-        Check::Compare(compare) => [&compare.left, &compare.right]
-            .into_iter()
-            .any(|side| matches!(side, super::compare::Side::Join(_))),
-        _ => false,
+fn foreign_step(path: &Path, alias: &str) -> bool {
+    path.steps.iter().any(|step| match step {
+        Step::Field(_) => true,
+        Step::Ref(reference) => {
+            !matches!(&reference.start, Start::Alias(name) if name == alias)
+                || foreign_step(reference, alias)
+        }
+        Step::Key(_) | Step::Index(_) => false,
+    })
+}
+
+fn own_text(text: &str, alias: &str, one: bool) -> String {
+    let marked = one && text.starts_with(&format!("{alias} is "));
+    let text = unalias(text, alias);
+    if marked {
+        format!("{MARK}{alias}{MARK}{}", &text[alias.len()..])
+    } else {
+        text
     }
+}
+
+fn unalias(text: &str, alias: &str) -> String {
+    let dotted = format!("{alias}.");
+    let mut out = String::with_capacity(text.len());
+    let mut at = 0;
+    while let Some(found) = text[at..].find(&dotted) {
+        let start = at + found;
+        let before = text[..start].chars().next_back();
+        let boundary =
+            before.is_none_or(|c| !(c.is_alphanumeric() || matches!(c, '_' | '-' | '.' | '$')));
+        out.push_str(&text[at..start]);
+        if boundary && outside_quotes(&text[..start]) {
+            at = start + dotted.len();
+        } else {
+            out.push_str(&dotted);
+            at = start + dotted.len();
+        }
+    }
+    out.push_str(&text[at..]);
+    out
+}
+
+fn under(name: &str, text: &str) -> String {
+    match text
+        .strip_prefix(MARK)
+        .and_then(|rest| rest.split_once(MARK))
+    {
+        Some((_, after)) => format!("{name}{after}"),
+        None => format!("{name}: {text}"),
+    }
+}
+
+fn unmarked(text: &str) -> String {
+    text.replace(MARK, "")
+}
+
+fn first_marked(texts: &[String]) -> Vec<String> {
+    texts
+        .iter()
+        .enumerate()
+        .map(|(k, text)| if k == 0 { text.clone() } else { unmarked(text) })
+        .collect()
 }
 
 fn for_joined(said: Vec<Said>) -> String {
@@ -1974,7 +2033,7 @@ fn group_text(group: &[String]) -> String {
             text.strip_prefix(&format!("{lead}: ")).unwrap_or(text)
         };
         out.push_str(", and ");
-        out.push_str(after);
+        out.push_str(&unmarked(after));
     }
     out
 }
@@ -2998,5 +3057,31 @@ mod tests {
             json!({"cs": [{"a": 1}], "ps": [{"n": 1}]}),
         );
         assert_eq!(names(&found), ["cs[]", "ps[]"]);
+    }
+
+    #[test]
+    fn an_item_read_beside_a_param_keeps_its_alias() {
+        let found = row(
+            "every cs as c",
+            json!("c.a is in $params.list"),
+            json!({"cs": [{"a": "y"}]}),
+        );
+        assert_eq!(
+            found["message"],
+            "item 1 of cs: c.a is \"y\", and $params.list is [\"x\"]"
+        );
+    }
+
+    #[test]
+    fn an_inner_item_that_only_a_missing_param_stops_is_named_first_as_ergo_rego_does() {
+        let found = row(
+            "every ws as w",
+            json!("every w.items.status whose lo is at least $params.p is \"ok\""),
+            json!({"ws": [{"items": [{"hi": 2}, {"lo": 5}]}]}),
+        );
+        assert_eq!(
+            found["message"],
+            "item 1 of ws: item 2 of items: $params.p is missing; item 1 of ws: item 1 of items: lo is missing, and $params.p is missing"
+        );
     }
 }

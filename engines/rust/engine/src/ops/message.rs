@@ -155,13 +155,6 @@ fn first_input(path: &Path, ctx: &Ctx) -> Option<Input> {
     read_path(path, ctx).inputs.into_iter().next()
 }
 
-pub fn shown_names(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
-    sources(check, ctx, verdict)
-        .into_iter()
-        .map(|i| i.name)
-        .collect()
-}
-
 fn sources(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<Input> {
     match check {
         Check::Compare(compare) => [&compare.left, &compare.right]
@@ -295,6 +288,28 @@ pub fn key_faults_of(path: &Path, ctx: &Ctx) -> Vec<String> {
         }
     }
     out
+}
+
+fn aliases_blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
+    check
+        .sides()
+        .iter()
+        .flatten()
+        .filter_map(|side| {
+            let Start::Alias(alias) = &side.path.start else {
+                return None;
+            };
+            let first = side.path.steps.first()?;
+            let value = ctx.aliases.get(alias)?.value;
+            let holder = match first {
+                Step::Index(_) if !value.is_array() => "a list",
+                Step::Index(_) => return None,
+                _ if value.is_object() => return None,
+                _ => "an object",
+            };
+            Some(isnt(alias, value, holder))
+        })
+        .collect()
 }
 
 fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
@@ -585,17 +600,19 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         Cause::NotAnObject => {
             let subject = ctx.subject.value;
             if subject.is_object() {
-                match check {
-                    Check::Tally(t) => tally::tally_sides(t)
-                        .into_iter()
-                        .filter_map(|side| match side {
-                            TallySide::Derived(d) => Some(d),
-                            TallySide::Plain(_) => None,
-                        })
-                        .flat_map(|d| tally::counted_texts(d, ctx, Cause::NotAnObject))
-                        .collect(),
-                    _ => Vec::new(),
+                let mut found = aliases_blocked(check, ctx);
+                if let Check::Tally(t) = check {
+                    found.extend(
+                        tally::tally_sides(t)
+                            .into_iter()
+                            .filter_map(|side| match side {
+                                TallySide::Derived(d) => Some(d),
+                                TallySide::Plain(_) => None,
+                            })
+                            .flat_map(|d| tally::counted_texts(d, ctx, Cause::NotAnObject)),
+                    );
                 }
+                found
             } else {
                 vec![isnt("it", subject, "an object")]
             }
@@ -915,26 +932,6 @@ pub fn ref_fault_list(checks: &[&Check], ctx: &Ctx) -> Vec<String> {
 pub fn flawed_text(checks: &[&Check], ctx: &Ctx) -> Option<String> {
     let out = ref_fault_list(checks, ctx);
     (!out.is_empty()).then(|| out.join(", and "))
-}
-
-pub fn read_names(check: &Check, ctx: &Ctx, verdict: &Verdict) -> Vec<String> {
-    let mut names = match check {
-        Check::Walk(walk) => {
-            let mut out = vec![name::name(&walk.path)];
-            out.extend(walk.refs().iter().map(name::name));
-            out
-        }
-        Check::For(_) | Check::AnyOf(_) => verdict.inputs.iter().map(|i| i.name.clone()).collect(),
-        _ => {
-            let mut out = shown_names(check, ctx, verdict);
-            for path in side_paths(check) {
-                out.extend(key_steps(path).map(name::name));
-            }
-            out
-        }
-    };
-    names.dedup();
-    names
 }
 
 pub fn first_list_text(path: &Path, ctx: &Ctx) -> Option<String> {

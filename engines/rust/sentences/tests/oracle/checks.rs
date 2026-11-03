@@ -4776,6 +4776,23 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("l.x is 2", "l.x is 2", &[], &[]),
     ("x.k is 1", "x.k is 1", &[], &[]),
     ("x.k is 2", "x.k is 2", &[], &[]),
+    ("every w.items.lo is 9", "every w.items.lo is 9", &[], &[]),
+    (
+        "every w.items.status whose lo is 1 is \"ok\"",
+        "every w.items.status whose lo is 1 is \"ok\"",
+        &[],
+        &[],
+    ),
+    (
+        "every w.items.status whose lo is at least cov.x is \"ok\"",
+        "every w.items.status whose lo is at least cov.x is \"ok\"",
+        &[],
+        &[],
+    ),
+    ("w.n is 9", "w.n is 9", &[], &[]),
+    ("w.v is at least zz", "w.v is at least zz", &[], &[]),
+    ("x is 9", "x is 9", &[], &[]),
+    ("x is at least 2", "x is at least 2", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8153,6 +8170,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every ws as w", "every ws as w", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
