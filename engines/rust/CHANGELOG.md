@@ -8,6 +8,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - Every failed row has a `message`, a line that says in plain words what Ergo found, as the spec says: `approver is "ana", and author is "ana"`, `item 2 of tests: ok is missing` or `signed: signature is missing; reviewed: reviewer is missing`. A row that passed has none. Each violation carries the message of its row. The Rego engine writes the same text.
 
+- A path on the right side of `is one of`, `contains`, `matches` and the other phrases that take a list walks lists, as the spec says: `pin is in $input.sbom.components.name` compares `pin` with the names of the components. A list it can't read from every item fails every row, with the cause and words `every` uses. A `$input` path or a field on the right that reads into text now says which value can't hold the next step, where it said `the check is false`.
+
 ### Changed
 
 - The engine follows spec 0.5, so a policy says `ergo_spec: v0.5`. Reports change for every policy: the report's `ergo` says `v0.5-dev`, its `engine` version says `0.3.0-dev`, and each failed row and each violation has a `message`. 149 of the spec's cases still get another text from the Rust engine, and `known-failures.txt` lists them.

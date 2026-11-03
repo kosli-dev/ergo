@@ -934,6 +934,46 @@ requirements:
 
 They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `includes_some`, `not_includes_all`, `matches_any` and `not_matches_any`, and only sentences can use those. The row has the same `passed` and `cause` as the sentence with `$params.required_tickets` holding that field's value, and the field is in the row's `inputs` after the left side instead of in `$refs`. A field on the right that's missing or `null` fails the row as `absent` or `null`, whatever the left side is. One that can't be used fails it as `unusable`: not a list after `is in`, `is not in`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match`, an empty list after `contains all of`, `contains none of`, `contains some of` and `does not contain all of`, and patterns that aren't all valid regular expressions. Only when the right side can be used does the left side's own cause count.
 
+A path on the right that goes through a list of objects is walked the way a path after `every` is, and the phrase compares with the list of what the path ends at in each item. With this policy and this input:
+
+```yaml
+ergo_spec: v0.5-dev
+subjects:
+  pin:
+    from: pins
+    identified_by: name
+requirements:
+  pinned:
+    subject: pin
+    checks:
+      in_the_sbom: name is in $input.sbom.components.name
+```
+
+```json
+{
+  "sbom": {"components": [{"name": "click"}, {"name": "jinja2"}]},
+  "pins": [{"name": "click"}, {"name": "attrs"}]
+}
+```
+
+`click` passes and `attrs` fails as `value`:
+
+```json
+{
+  "cause": "value",
+  "check": "in_the_sbom",
+  "inputs": [
+    {"locations": ["/pins/1/name"], "name": "name", "value": "attrs"}
+  ],
+  "message": "name is \"attrs\", and $input.sbom.components[].name is [\"click\", \"jinja2\"]",
+  "passed": false,
+  "requirement": "pinned",
+  "subject": {"id": "attrs", "type": "pin"}
+}
+```
+
+The path is in the check's `$refs` as `$input.sbom.components[].name`, with the location of each name, and a path from the subject is in the row's `inputs` instead. It works after every phrase above. Ergo can't tell whether the names are complete when one can't be read, so every row fails: a component with no name fails as `absent`, with the message `item 2 of $input.sbom.components: name is missing`, one with a `null` name as `null`, something that isn't an object in the list or after the name as `unusable`, and an empty list as `value`, even after `is not in`, with the message `$input.sbom.components is []`. A path that meets no list is read as before, so a list that is `null` or missing fails as `null` or `absent`, and text fails as `unusable` with `$input.sbom.components is "x", which isn't an object`. A phrase that takes one value, like `is` or `starts with`, doesn't read its right side this way.
+
 The thing on the right is a value when it's in quotes, a number, `true`, `false` or `null`, and a field otherwise. A list of values is separated by `, `. A string can be in single quotes, which keep backslashes as written, so `'^\s*FROM'` needs no doubled backslash.
 
 A path is keys joined by `.`, like `build.commit.sha`. A key with anything but letters, digits, `_` and `-` goes in double quotes, like `labels."app.kubernetes.io/name"`. `$params.regions` reads the params and `$input.repo` the input. `artifacts named by $params.name` reads the key the param holds, and so does `artifacts[$params.name]`. `named by` a bare field reads the key the subject holds, as below. `item 2 of commits`, `first of commits` and `commits[1]` read one item of a list. A position above 9007199254740991, the largest whole number a 64-bit float holds exactly, is written wrong, with `9007199254740992 can't be a list position`. A param or input value after `named by` or in brackets has to hold a string: a number never picks a position, so `commits[$params.n]` with `n` holding `1` fails the check as `unusable`, and so does a boolean, a list or an object. A `null` one fails it as `null` and a missing one as `absent`. A path can't start with a word the sentences use, like `empty`, `count`, `true` or `it`. Put a dot in front, `.empty is 1`, to read a field with that name. `it` is the [subject itself](#the-subject-itself), so a field called `it` is `.it`.

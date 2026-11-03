@@ -4764,6 +4764,87 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("k.\"a\u{2028}b\" is 1", "k.\"a\u{2028}b\" is 1", &[], &[]),
+    (
+        "tags contains $input.names.n",
+        "tags contains $input.names.n",
+        &[],
+        &[],
+    ),
+    (
+        "tags contains all of $input.names.n",
+        "tags contains all of $input.names.n",
+        &[],
+        &[],
+    ),
+    (
+        "tags contains all of deps.name",
+        "tags contains all of deps.name",
+        &[],
+        &[],
+    ),
+    (
+        "tags contains none of $input.names.n",
+        "tags contains none of $input.names.n",
+        &[],
+        &[],
+    ),
+    (
+        "tags contains some of $input.names.n",
+        "tags contains some of $input.names.n",
+        &[],
+        &[],
+    ),
+    (
+        "tags does not contain $input.names.n",
+        "tags does not contain $input.names.n",
+        &[],
+        &[],
+    ),
+    (
+        "tags does not contain all of $input.names.n",
+        "tags does not contain all of $input.names.n",
+        &[],
+        &[],
+    ),
+    (
+        "x does not match $input.names.n",
+        "x does not match $input.names.n",
+        &[],
+        &[],
+    ),
+    ("x is in $input.a.b.c", "x is in $input.a.b.c", &[], &[]),
+    ("x is in $input.a.b.c.d", "x is in $input.a.b.c.d", &[], &[]),
+    (
+        "x is in $input.sbom.components.name",
+        "x is in $input.sbom.components.name",
+        &[],
+        &[],
+    ),
+    (
+        "x is in $params.deps.name",
+        "x is in $params.deps.name",
+        &[],
+        &[],
+    ),
+    ("x is in deps.name", "x is in deps.name", &[], &[]),
+    (
+        "x is not in $input.names.n",
+        "x is not in $input.names.n",
+        &[],
+        &[],
+    ),
+    (
+        "x is not in $input.sbom.components.name",
+        "x is not in $input.sbom.components.name",
+        &[],
+        &[],
+    ),
+    (
+        "x matches $input.names.n",
+        "x matches $input.names.n",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

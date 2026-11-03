@@ -8,10 +8,11 @@ Each version says whether reports changed, so that anyone who only stores report
 
 - Every failed row has a `message`, a line of plain text that says what Ergo found, never what the check expected: `approver is "ana", and author is "ana"`, `item 2 of tests: ok is false` or `signed: signature is missing; reviewed: reviewer is missing`. [message.row](semantics.md#messages) and the rules after it say how each cause, value, list, `for` line and `any_of` option is written, and how a `for` item is named, with or without its alias ([message.alias](semantics.md#messages)). A row that passed has none.
 - A violation carries the `message` of its row.
+- A path on the right side of `is one of`, `is not one of`, `contains`, `does not contain`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match` walks lists the way a path after `every` does ([walk.right](semantics.md#compare)): `pin is in $input.sbom.components.name` compares `pin` with the names of the components. The right side is listed as `$input.sbom.components[].name`, and a list it can't read from every item fails every row, with the cause and words `every` uses.
 
 ### Changed
 
-- Reports change: the report's `ergo` says `v0.5-dev`, every failed row has a new `message` field, and so does every violation. The report schema allows it. Nothing else in a report changes.
+- Reports change: the report's `ergo` says `v0.5-dev`, every failed row has a new `message` field, and so does every violation. The report schema allows it. Nothing else in a report changes, except that a path on the right side of those phrases that goes through a list of objects used to fail every row as `unusable` with no message that said why, and now compares with the list it reads or fails with the cause and message of the item that can't be read, and that a `$input` or `$params` path that reads into text, like `$input.a.b` with `a` text, now says `$input.a is "x", which isn't an object`.
 
 ## 0.4
 

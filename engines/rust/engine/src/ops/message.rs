@@ -502,10 +502,18 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         return any_of_message(any, ctx);
     }
     let clauses: Vec<String> = match verdict.cause {
-        Cause::Value => sources(check, ctx, verdict)
-            .iter()
-            .filter_map(state_clause)
-            .collect(),
+        Cause::Value => {
+            let mut said: Vec<String> = sources(check, ctx, verdict)
+                .iter()
+                .filter_map(state_clause)
+                .collect();
+            said.extend(
+                lists::walk_fault(check, ctx)
+                    .filter(|(cause, _)| *cause == Cause::Value)
+                    .map(|(_, text)| text),
+            );
+            said
+        }
         Cause::Absent | Cause::Null => {
             let want = state_of(verdict.cause).unwrap_or(Outcome::Absent);
             let keys = key_states(check, ctx, want);
@@ -515,6 +523,11 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                     .filter(|i| i.state == want)
                     .map(|i| format!("{} is {}", i.name, state_word(want)))
                     .collect();
+                found.extend(
+                    lists::walk_fault(check, ctx)
+                        .filter(|(cause, _)| *cause == verdict.cause)
+                        .map(|(_, text)| text),
+                );
                 if let Check::Tally(tally_check) = check {
                     for side in tally::tally_sides(tally_check) {
                         if let TallySide::Derived(derived) = side {
@@ -534,6 +547,12 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             let mut all = key_faults(check, ctx);
             all.extend(blocked(check, ctx));
             all.extend(faults(check, ctx, verdict));
+            all.extend(lists::ref_blocked(check, ctx));
+            all.extend(
+                lists::walk_fault(check, ctx)
+                    .filter(|(cause, _)| *cause == Cause::Unusable)
+                    .map(|(_, text)| text),
+            );
             let digits = " needs more than 15 digits";
             let others = all.iter().any(|c| !c.ends_with(digits));
             let mut once = Vec::new();

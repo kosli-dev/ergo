@@ -11306,3 +11306,125 @@ test_message_pairs_sort_by_the_number_of_their_item_and_a_lead_without_a_number_
 	ergo._m_lead_n("item 12 of x") == 12
 	ergo._m_lead_n("item x of y") == 0
 }
+
+_walk_right_rows(check, doc, params) := [[r.passed, r.cause, object.get(r, "message", "")] | some r in ergo.report(doc, _sentence_policy({"c": check}), params).results; r.check == "c"]
+
+_walk_right_doc(components) := {"sbom": {"components": components}, "things": [{"id": "t1", "x": "click", "tags": ["click"]}, {"id": "t2", "x": "attrs", "tags": ["attrs"]}]}
+
+test_a_ref_that_walks_a_list_of_objects_compares_with_what_it_reads_from_each_item if {
+	_walk_right_rows("x is in $input.sbom.components.name", _walk_right_doc([{"name": "click"}, {"name": "jinja2"}]), {}) == [
+		[true, "satisfied", ""],
+		[false, "value", "x is \"attrs\", and $input.sbom.components[].name is [\"click\", \"jinja2\"]"],
+	]
+}
+
+test_a_ref_that_walks_a_list_of_objects_is_listed_in_refs_with_the_location_of_each_item if {
+	report := ergo.report(_walk_right_doc([{"name": "click"}, {"name": "jinja2"}]), _sentence_policy({"c": "x is in $input.sbom.components.name"}), {})
+	report.requirements.s.checks.c["$refs"] == [{"name": "$input.sbom.components[].name", "value": ["click", "jinja2"], "locations": ["/sbom/components/0/name", "/sbom/components/1/name"]}]
+}
+
+test_a_param_that_walks_a_list_of_objects_compares_with_what_it_reads_from_each_item if {
+	_walk_right_rows("x is in $params.deps.name", _walk_right_doc([]), {"deps": [{"name": "click"}]}) == [
+		[true, "satisfied", ""],
+		[false, "value", "x is \"attrs\", and $params.deps[].name is [\"click\"]"],
+	]
+}
+
+test_every_list_phrase_fails_every_row_as_absent_when_an_item_has_no_value_even_the_rows_that_would_pass if {
+	every _, words in _list_phrases {
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc([{"name": "click"}, {}]), {}) {
+			row[1] == "absent"
+			row[2] == "item 2 of $input.sbom.components: name is missing"
+		}
+	}
+}
+
+test_every_list_phrase_fails_every_row_as_null_when_an_item_has_a_null_value if {
+	every _, words in _list_phrases {
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc([{"name": null}]), {}) {
+			row[1] == "null"
+			row[2] == "item 1 of $input.sbom.components: name is null"
+		}
+	}
+}
+
+test_every_list_phrase_fails_every_row_as_value_when_the_list_it_walks_is_empty_even_the_ones_that_say_not if {
+	every _, words in _list_phrases {
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc([]), {}) {
+			row[0] == false
+			row[1] == "value"
+			endswith(row[2], "$input.sbom.components is []")
+		}
+	}
+}
+
+test_every_list_phrase_fails_every_row_as_unusable_when_an_item_or_what_it_reads_past_is_not_an_object if {
+	every _, words in _list_phrases {
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc(["click"]), {}) {
+			row[1] == "unusable"
+			endswith(row[2], "item 1 of $input.sbom.components is \"click\", which isn't an object")
+		}
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name.x"]), _walk_right_doc([{"name": "click"}]), {}) {
+			row[1] == "unusable"
+			endswith(row[2], "item 1 of $input.sbom.components: name is \"click\", which isn't an object")
+		}
+	}
+}
+
+test_a_ref_that_reads_into_text_says_which_value_cant_hold_the_next_step if {
+	every row in _walk_right_rows("x is in $input.sbom.components.name", {"sbom": {"components": "x"}, "things": [{"id": "t1", "x": "a"}]}, {}) {
+		row[1] == "unusable"
+		row[2] == "$input.sbom.components is \"x\", which isn't an object"
+	}
+}
+
+test_a_ref_that_reads_into_null_or_something_missing_fails_as_it_did_before_the_walk if {
+	every doc in [{"sbom": {"components": null}}, {"sbom": {}}, {"sbom": {"components": {"a": 1}}}] {
+		every row in _walk_right_rows("x is in $input.sbom.components.name", object.union(doc, {"things": [{"id": "t1", "x": "a"}]}), {}) {
+			row[1] == "absent"
+			row[2] == "$input.sbom.components.name is missing"
+		}
+	}
+}
+
+test_a_path_that_ends_at_a_list_is_not_walked_after_its_last_step if {
+	_walk_right_rows("x is in $input.sbom.names", {"sbom": {"names": []}, "things": [{"id": "t1", "x": "a"}]}, {}) == [[false, "value", "x is \"a\", and $input.sbom.names is []"]]
+}
+
+test_a_field_that_walks_a_list_of_objects_lists_what_it_reads_in_the_rows_inputs if {
+	rows := _sentence_rows({"c": "x is in deps.name"}, {"things": [{"id": "t1", "x": "a", "deps": [{"name": "a"}, {"name": "b"}]}]}, {})
+	rows == [["c", true, "satisfied", [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "deps[].name", "value": ["a", "b"], "locations": ["/things/0/deps/0/name", "/things/0/deps/1/name"]}]]]
+}
+
+test_a_list_phrase_with_a_field_that_walks_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every _, words in _list_phrases {
+		every right in [
+			{"v": [{"z": "a"}]},
+			{"v": [{"z": "a"}, {"z": "b"}]},
+			{"v": [{"z": "a"}, {}]},
+			{"v": [{"z": null}]},
+			{"v": [{"z": ["a"]}]},
+			{"v": [{"z": "^a"}]},
+			{"v": [{"y": 1}]},
+			{"v": ["s"]},
+			{"v": [null]},
+			{"v": [[{"z": "a"}]]},
+		] {
+			_list_same_as_params(words, ".z", right)
+		}
+	}
+}
+
+test_a_path_that_walks_on_the_left_stays_unusable_even_when_the_right_is_the_same_path if {
+	_walk_right_rows("deps.name is in deps.name", {"things": [{"id": "t1", "deps": [{"name": "a"}]}]}, {}) == [[false, "unusable", "deps is [{\"name\": \"a\"}], which isn't an object"]]
+}
+
+test_a_whose_that_reads_a_ref_that_walks_an_empty_list_leaves_the_item_out_as_a_value if {
+	rows := _walk_right_rows("every deps.name whose x is in $input.sbom.components.name is \"a\"", {"sbom": {"components": []}, "things": [{"id": "t1", "deps": [{"name": "a", "x": "a"}]}]}, {})
+	rows == [[false, "value", "deps is [{\"name\": \"a\", \"x\": \"a\"}]"]]
+}
+
+test_a_whose_that_reads_a_ref_that_walks_an_empty_list_decides_before_its_left_side_is_looked_at if {
+	rows := _walk_right_rows("every deps.name whose tags contains $input.sbom.components.name is \"a\"", {"sbom": {"components": []}, "things": [{"id": "t1", "deps": [{"name": "a", "tags": "text"}]}]}, {})
+	[row[1] | some row in rows] == ["value"]
+}

@@ -69,7 +69,6 @@ parts / where a part's alias is read / reads the alias in the conditions of the 
 requirements / a walk that starts at an input that is a list / names a list that breaks from $input
 requirements / a walk that starts at an input that is a list, without $input / names a list that breaks from $input
 sentences / a field after a phrase that takes a list / fails as unusable on the right when it isn't a list, whatever the left side is, but any value is a value to look for after contains
-sentences / a field after a phrase that takes a list, read through a path that can't hold it / fails as unusable on the right when the path reads into something that can't hold the field
 sentences / a for alias inside an item's scope / an alias on the right is the alias, the left of a whose and a dotted name are the field, and the report prints the dot where it matters
 sentences / a for alias on the right of a whose, with an alias that is null, text or an object / fails closed for each thing, and never reads the items' own field instead
 sentences / a for alias on the right of a whose, with items that have a field of the same name / reads the alias on the right, in every, some, count of and sum of, and the item's field on the left and after a dot
