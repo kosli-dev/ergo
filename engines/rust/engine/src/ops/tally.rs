@@ -404,7 +404,17 @@ fn work_derived(derived: &Derived, ctx: &Ctx) -> Worked<Number> {
     };
     let located = once(worked.iter().flat_map(|w| &w.located));
     let below: Vec<Input> = worked.into_iter().flat_map(|w| w.entries).collect();
-    let mut entries = vec![number_entry(&derived.text, &result, located.clone())];
+    let mut sum = number_entry(&derived.text, &result, located.clone());
+    let mut tags: Vec<&super::Part> = Vec::new();
+    for tag in below.iter().filter_map(|entry| entry.part.as_ref()) {
+        if !tags.contains(&tag) {
+            tags.push(tag);
+        }
+    }
+    if let [only] = tags.as_slice() {
+        sum.part = Some((*only).clone());
+    }
+    let mut entries = vec![sum];
     entries.extend(below);
     Worked {
         result,
@@ -1127,7 +1137,22 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
                 empty_adds_nothing: true,
             },
         );
-        if walked.unreadable.is_some() {
+        if let Some(outcome) = walked.unreadable {
+            match outcome.cause() {
+                Some(Cause::Absent) if cause == Cause::Absent => {
+                    out.push(format!("{} is missing", walked.name));
+                }
+                Some(Cause::Null) if cause == Cause::Null => {
+                    out.push(format!("{} is null", walked.name));
+                }
+                Some(Cause::Unusable) if cause == Cause::Unusable => {
+                    let blocked = super::message::blocked_of(&counted.path, &outer);
+                    if !blocked.is_empty() {
+                        out.push(super::message::joined(blocked));
+                    }
+                }
+                _ => {}
+            }
             continue;
         }
         let mut found: Vec<(Cause, String)> = walked
@@ -1135,6 +1160,20 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
             .iter()
             .map(|f| (f.cause, f.msg.clone()))
             .collect();
+        let mut refs: Vec<Path> = counted.whose.iter().flat_map(Check::refs).collect();
+        refs.sort_by_key(name::name);
+        refs.dedup();
+        for reference in &refs {
+            let read = path::read(reference, &outer);
+            let said = match read.outcome {
+                path::Outcome::Absent => Some((Cause::Absent, "missing")),
+                path::Outcome::Null => Some((Cause::Null, "null")),
+                _ => None,
+            };
+            if let Some((found_cause, word)) = said {
+                found.push((found_cause, format!("{} is {word}", name::name(reference))));
+            }
+        }
         let mut at = outer.clone();
         for item in &walked.items {
             at.subject = item.item.clone();
@@ -1144,12 +1183,17 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
                 let verdict = run_check(check, &at);
                 if !matches!(verdict.cause, Cause::Satisfied | Cause::Value) {
                     undecided = true;
+                    let off = super::message::off_item(check, &outer, verdict.cause);
                     found.push((
                         verdict.cause,
-                        super::message::prefixed(
-                            &name,
-                            &super::message::message(check, &at, &verdict),
-                        ),
+                        if off.is_empty() {
+                            super::message::prefixed(
+                                &name,
+                                &super::message::message(check, &at, &verdict),
+                            )
+                        } else {
+                            off.join(", and ")
+                        },
                     ));
                 }
             }
@@ -1193,12 +1237,14 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
                 _ => {}
             }
         }
-        out.extend(
-            found
-                .into_iter()
-                .filter(|(c, _)| *c == cause)
-                .map(|(_, text)| text),
-        );
+        let said: Vec<String> = found
+            .into_iter()
+            .filter(|(c, _)| *c == cause)
+            .map(|(_, text)| text)
+            .collect();
+        if !said.is_empty() {
+            out.push(super::message::joined(said));
+        }
     }
     out
 }
