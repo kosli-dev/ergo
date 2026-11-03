@@ -271,5 +271,79 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a time compared with a deadline from the params: soon",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "opened is before $params.deadline"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": {"deadline": "soon"},
+    "cases": [
+      {
+        "description": "a param that isn't a time is named, not the field",
+        "rules": ["message.cause"],
+        "input": {"things": [{"id": "t", "opened": "2026-10-02T10:00:00Z"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/opened"], "name": "opened", "value": "2026-10-02T10:00:00Z"}, {"locations": ["$params:/deadline"], "name": "$params.deadline", "value": "soon"}], "message": "$params.deadline is \"soon\", which isn't a time", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time compared with a deadline from the params: earlier",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "opened is before $params.deadline"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": {"deadline": "2026-10-01T00:00:00Z"},
+    "cases": [
+      {
+        "description": "a time later than the deadline names both times",
+        "rules": ["message.value"],
+        "input": {"things": [{"id": "t", "opened": "2026-10-02T10:00:00Z"}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/opened"], "name": "opened", "value": "2026-10-02T10:00:00Z"}, {"locations": ["$params:/deadline"], "name": "$params.deadline", "value": "2026-10-01T00:00:00Z"}], "message": "opened is \"2026-10-02T10:00:00Z\", and $params.deadline is \"2026-10-01T00:00:00Z\"", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time compared with a deadline from the params: later",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "opened is before $params.deadline"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": {"deadline": "2026-10-03T00:00:00Z"},
+    "cases": [
+      {
+        "description": "a time before the deadline passes",
+        "rules": ["message.row"],
+        "input": {"things": [{"id": "t", "opened": "2026-10-02T10:00:00Z"}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/opened"], "name": "opened", "value": "2026-10-02T10:00:00Z"}, {"locations": ["$params:/deadline"], "name": "$params.deadline", "value": "2026-10-03T00:00:00Z"}], "passed": true, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time compared with a deadline from the params: number",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "opened is before $params.deadline"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": {"deadline": 5},
+    "cases": [
+      {
+        "description": "a deadline that is a number says which kind of time it wants",
+        "rules": ["message.cause"],
+        "input": {"things": [{"id": "t", "opened": "2026-10-02T10:00:00Z"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/opened"], "name": "opened", "value": "2026-10-02T10:00:00Z"}, {"locations": ["$params:/deadline"], "name": "$params.deadline", "value": 5}], "message": "opened is \"2026-10-02T10:00:00Z\", which isn't a time written like 5", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a time compared with a deadline from the params: missing",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "opened is before $params.deadline"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a deadline the params don't have is missing",
+        "rules": ["message.cause"],
+        "input": {"things": [{"id": "t", "opened": "2026-10-02T10:00:00Z"}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/opened"], "name": "opened", "value": "2026-10-02T10:00:00Z"}, {"locations": ["$params:"], "name": "$params.deadline", "value": null}], "message": "$params.deadline is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]
