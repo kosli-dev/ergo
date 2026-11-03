@@ -41,8 +41,16 @@ for / whose on a for item / an item whose kind is missing is undecided: every fa
 for / whose on a for item / an item whose kind is null is undecided, and fails as null
 for / whose on a for item / under some, an undecided item and a failed item give the first cause, absent
 for / whose on a for item / when whose leaves no item in, every and some fail as value and if any passes
+messages / a for line over a part that can't be reached / the part is named, and the kind is a list or an object
+messages / a for line over two lists with a sentence that doesn't read the second item / the sentence joins the first part only
 messages / a for line that picks nothing prints the list it read / a whose that leaves no item prints the list
 messages / a for line that picks nothing prints the list it read / an empty list prints as empty
+messages / a one-list for line over a key that holds a colon / two sentences that walk the same list give one part
+messages / a one-list for line with a sentence that walks a list and one that doesn't / the sentence that doesn't walk gets its own part
+messages / a some over a list inside a part / an item of the list is named with the part's name
+messages / a sum of a part that isn't an object / the part is named
+messages / an any_of with an every over items that fail differently / each option gives its failed items
+messages / two worked-out values that can't be used / the values are joined with a comma and and
 parts / a for alias and the input on the right side of a whose with plus / reads the alias and the input, and not the item's own field of the same name
 parts / a parent's name in an elapsed time on the right side of a whose / reads the parent when the parent lacks the field, and not the item's own field of the same name
 parts / a parent's name on the right side of a count of or sum of in a whose / fails as absent when the parent has no such field, even though the items have one

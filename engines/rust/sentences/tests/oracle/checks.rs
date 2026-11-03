@@ -4715,6 +4715,48 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("ap.s is 1", "ap.s is 1", &[], &[]),
+    ("ap.t is 1", "ap.t is 1", &[], &[]),
+    (
+        "approvals is at least artifact.cov.min",
+        "approvals is at least artifact.cov.min",
+        &[],
+        &[],
+    ),
+    ("cov.n plus 1 is 3", "cov.n plus 1 is 3", &[], &[]),
+    (
+        "every c.\"r: s\".n is 1",
+        "every c.\"r: s\".n is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every c.\"r: s\".ok is true",
+        "every c.\"r: s\".ok is true",
+        &[],
+        &[],
+    ),
+    (
+        "every c.reviews.ok is true",
+        "every c.reviews.ok is true",
+        &[],
+        &[],
+    ),
+    ("every cs.ok is true", "every cs.ok is true", &[], &[]),
+    ("f.pct is at least 80", "f.pct is at least 80", &[], &[]),
+    ("pr.author is \"z\"", "pr.author is \"z\"", &[], &[]),
+    (
+        "some cov.files.pct is at least 80",
+        "some cov.files.pct is at least 80",
+        &[],
+        &[],
+    ),
+    (
+        "sum of p.n plus sum of q.n is 100",
+        "sum of p.n plus sum of q.n is 100",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8064,6 +8106,19 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every prs as pr, some pr.approvers as approver",
         "every prs as pr, some pr.approvers as approver",
+        &[],
+        &[],
+    ),
+    ("every cov.files as f", "every cov.files as f", &[], &[]),
+    (
+        "every prs as pr, some pr.\"a is b\" as ap",
+        "every prs as pr, some pr.\"a is b\" as ap",
+        &[],
+        &[],
+    ),
+    (
+        "every prs as pr, some pr.\"a: b\" as ap",
+        "every prs as pr, some pr.\"a: b\" as ap",
         &[],
         &[],
     ),

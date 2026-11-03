@@ -10068,9 +10068,13 @@ _m_part_unreached(p) if {
 	count(p) - 1 < _part_of(p).n
 }
 
-_m_part_name(p) := concat("", [_part_of(p).alias, " can't be read: ", _input_name(array.slice(p, 1, count(p)))]) if _m_part_unreached(p)
+_m_part_name(p) := concat("", [_m_part_prefix(_part_of(p)), _part_of(p).alias, " can't be read: ", _m_part_prefix(_part_of(p)), _input_name(array.slice(p, 1, count(p)))]) if _m_part_unreached(p)
 
 else := _input_name(p)
+
+_m_part_prefix(m) := "" if m.of == null
+
+_m_part_prefix(m) := concat("", [_s_parent_key(m.of), "."]) if m.of != null
 
 _m_paths_named(check, name) := [p | some side in _m_sides(check); some p in _m_side_paths(side); is_array(p); _input_name(p) == name]
 
@@ -10809,34 +10813,47 @@ _m_for_fail(f) := [_m_isnt(object.get(f, "said", f.item), object.get(f, "raw", f
 	not is_object(object.get(f, "raw", f.value))
 }
 
-_m_for_fail(f) := [_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_groups(_once([p | some ps in lines; some p in ps]))] if {
+_m_for_fail(f) := [_m_under(object.get(f, "said", f.item), _m_group_text(g)) | some g in _m_groups(_once([p | some ps in lines; some p in ps]), _m_two_list(f))] if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions != []
-	lines := [_m_line_msg(l, _m_owns(f)) | some l in f.failed_assertions]
+	lines := [_m_line_msg(l, f) | some l in f.failed_assertions]
+}
+
+default _m_two_list(_) := false
+
+_m_two_list(f) if {
+	some l in f.failed_assertions
+	"items" in object.keys(l)
 }
 
 _m_lead_of(t) := substring(t, 0, k) if {
 	startswith(t, "item ")
-	cuts := [i | some i in [indexof(t, ": "), indexof(t, " is ")]; i > 0]
+	cuts := [i | some i in array.concat(indexof_n(t, ": "), indexof_n(t, " is ")); i > 0; _m_outside_quotes(substring(t, 0, i))]
 	count(cuts) > 0
 	k := min(cuts)
 	contains(substring(t, 0, k), " of ")
 } else := ""
 
-_m_groups(texts) := [texts] if count(texts) < 2
+_m_outside_quotes(p) if count(split(replace(replace(p, "\\\\", ""), "\\\"", ""), "\"")) % 2 == 1
 
-else := _m_grouped(texts, [_m_lead_of(t) | some t in texts])
+_m_groups(texts, two) := [texts] if count(texts) < 2
 
-_m_grouped(texts, ls) := [texts] if count(_m_leads(ls)) == 0
+else := _m_grouped(texts, [_m_lead_of(t) | some t in texts], two)
 
-else := [[texts[j] | some j, l in ls; _m_in_group(l, lead, k)] | some k, lead in _m_leads(ls)]
+_m_grouped(texts, ls, _) := [texts] if count(_m_leads(ls)) == 0
+
+_m_grouped(texts, ls, true) := [[texts[j] | some j, l in ls; _m_in_group(l, lead, k, true)] | some k, lead in _m_leads(ls)] if count(_m_leads(ls)) > 0
+
+_m_grouped(texts, ls, false) := [[texts[j] | some j, l in ls; l == lead] | some lead in _m_all_leads(ls)] if count(_m_leads(ls)) > 0
 
 _m_leads(ls) := [l | some i, l in ls; l != ""; not l in array.slice(ls, 0, i)]
 
-_m_in_group(l, lead, _) if l == lead
+_m_all_leads(ls) := [l | some i, l in ls; not l in array.slice(ls, 0, i)]
 
-_m_in_group("", _, 0)
+_m_in_group(l, lead, _, _) if l == lead
+
+_m_in_group("", _, 0, true)
 
 _m_after_lead(lead, x) := substring(x, count(prefix), -1) if {
 	lead != ""
@@ -10862,9 +10879,31 @@ _m_for_fail(f) := [_m_named_item(f)] if {
 	count(object.get(f, "failed_items", [])) == 0
 }
 
-_m_line_msg(l, own) := [p | some x in l.items; some p in _m_line_text(x, own)] if "items" in object.keys(l)
+_m_line_msg(l, f) := [p | some x in l.items; some p in _m_line_text(x, _m_pair_owns(f, x.item))] if "items" in object.keys(l)
 
-_m_line_msg(l, own) := _m_pick_msg(l, own) if not "items" in object.keys(l)
+_m_line_msg(l, f) := _m_pick_msg(l, _m_owns(f)) if not "items" in object.keys(l)
+
+_m_pair_owns(f, item) if {
+	every l in f.failed_assertions {
+		_m_owned_for(l, item)
+	}
+}
+
+else := false
+
+_m_owned_for(l, item) if {
+	"items" in object.keys(l)
+	every x in l.items {
+		_m_item_owned(x, item)
+	}
+}
+
+_m_item_owned(x, item) if x.item != item
+
+_m_item_owned(x, item) if {
+	x.item == item
+	is_array(x.own)
+}
 
 _m_line_text(x, false) := x.msg
 
