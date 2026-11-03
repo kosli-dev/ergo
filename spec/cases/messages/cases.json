@@ -963,5 +963,70 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line over two lists, with a sentence that walks a list of the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every ws as w, every w.items as i", "assert": "every xs.k is 5"}}}}},
+    "cases": [
+      {
+        "description": "each item of the subject's list is a part of its own, under the first list's item",
+        "rules": ["message.items", "message.join"],
+        "input": {"things": [{"id": "t1", "ws": [{"items": [{"a": 1}]}, {"items": [{"a": 2}]}], "xs": [{"k": 1}, {"n": 3}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "every xs.k is 5", "cause": "absent", "inputs": [{"locations": ["/things/0/xs/0/k", "/things/0/xs/1"], "name": "xs[].k", "value": [1, null]}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": {"items": [{"a": 1}]}}, {"cause": "absent", "failed_assertions": [{"assertion": "every xs.k is 5", "cause": "absent", "inputs": [{"locations": ["/things/0/xs/0/k", "/things/0/xs/1"], "name": "xs[].k", "value": [1, null]}]}], "item": "item 2 of ws", "locations": ["/things/0/ws/1"], "path": "item 2 of ws", "value": {"items": [{"a": 2}]}}], "inputs": [{"locations": ["/things/0/ws/0/items/0", "/things/0/ws/1/items/0"], "name": "w.items[]", "value": [{"a": 1}, {"a": 2}]}, {"locations": ["/things/0/ws/0", "/things/0/ws/1"], "name": "ws[]", "value": [{"items": [{"a": 1}]}, {"items": [{"a": 2}]}]}, {"locations": ["/things/0/xs/0/k", "/things/0/xs/1"], "name": "xs[].k", "value": [1, null]}], "message": "item 1 of ws: item 1 of xs: k is 1; item 1 of ws: item 2 of xs: k is missing; item 2 of ws: item 1 of xs: k is 1; and 1 more", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over two lists, with a walk under the first item before a sentence on the second",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every ws as w, every w.items as i", "assert": ["every w.items.m is 1", "i.k is 1"]}}}}},
+    "cases": [
+      {
+        "description": "the parts follow the items, not the sentences",
+        "rules": ["message.join"],
+        "input": {"things": [{"id": "t1", "ws": [{"items": [{"k": 2, "m": 1}, {"k": 1}]}, {"items": {}}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "every w.items.m is 1", "cause": "absent", "inputs": [{"locations": ["/things/0/ws/0/items/0/m", "/things/0/ws/0/items/1"], "name": "w.items[].m", "value": [1, null]}]}, {"assertion": "i.k is 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/ws/0/items/0/k"], "name": "i.k", "value": 2}], "item": "item 1 of w.items"}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": {"items": [{"k": 2, "m": 1}, {"k": 1}]}}, {"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "w.items", "locations": ["/things/0/ws/1/items"], "path": "w.items", "value": {}}], "item": "item 2 of ws", "locations": ["/things/0/ws/1"], "path": "item 2 of ws", "value": {"items": {}}}], "inputs": [{"locations": ["/things/0/ws/0/items/0", "/things/0/ws/0/items/1"], "name": "w.items[]", "value": [{"k": 2, "m": 1}, {"k": 1}]}, {"locations": ["/things/0/ws/0", "/things/0/ws/1"], "name": "ws[]", "value": [{"items": [{"k": 2, "m": 1}, {"k": 1}]}, {"items": {}}]}], "message": "item 1 of ws: item 1 of items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items is {}, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line over two lists, with a sentence on the second item before a walk under the first",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every ws as w, every w.items as i", "assert": ["i.k is 1", "every w.items.m is 1"]}}}}},
+    "cases": [
+      {
+        "description": "the parts follow the items, not the sentences",
+        "rules": ["message.join"],
+        "input": {"things": [{"id": "t1", "ws": [{"items": [{"k": 2, "m": 1}, {"k": 1}]}, {"items": {}}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "i.k is 1", "cause": "value", "items": [{"cause": "value", "inputs": [{"locations": ["/things/0/ws/0/items/0/k"], "name": "i.k", "value": 2}], "item": "item 1 of w.items"}]}, {"assertion": "every w.items.m is 1", "cause": "absent", "inputs": [{"locations": ["/things/0/ws/0/items/0/m", "/things/0/ws/0/items/1"], "name": "w.items[].m", "value": [1, null]}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": {"items": [{"k": 2, "m": 1}, {"k": 1}]}}, {"cause": "unusable", "failed_assertions": [], "failed_items": [{"cause": "unusable", "item": "w.items", "locations": ["/things/0/ws/1/items"], "path": "w.items", "value": {}}], "item": "item 2 of ws", "locations": ["/things/0/ws/1"], "path": "item 2 of ws", "value": {"items": {}}}], "inputs": [{"locations": ["/things/0/ws/0/items/0", "/things/0/ws/0/items/1"], "name": "w.items[]", "value": [{"k": 2, "m": 1}, {"k": 1}]}, {"locations": ["/things/0/ws/0", "/things/0/ws/1"], "name": "ws[]", "value": [{"items": [{"k": 2, "m": 1}, {"k": 1}]}, {"items": {}}]}], "message": "item 1 of ws: item 1 of items: i.k is 2; item 1 of ws: item 2 of w.items: m is missing; item 2 of ws: w.items is {}, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose sentence compares with a param that isn't a list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": "x.k is in $params.l"}}}}},
+    "params": {"l": "no"},
+    "cases": [
+      {
+        "description": "the list the line reads is printed as found",
+        "rules": ["message.empty"],
+        "input": {"things": [{"id": "t1", "xs": [{"k": 1}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"k": 1}]}], "message": "xs is [{\"k\": 1}]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "with no list to print, the check is printed as the report writes it",
+        "rules": ["message.empty"],
+        "input": {"things": [{"id": "t1"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": [], "name": "xs", "value": []}], "message": "for every xs as x: x.k is in $params.l is false", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

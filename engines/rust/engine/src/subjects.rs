@@ -1039,9 +1039,13 @@ fn check_rows(env: &Env, judged: &Judged, anc: &[Anc]) -> Vec<Row> {
         .iter()
         .filter(|(name, _)| !name.starts_with('$'))
         .filter_map(|(name, read)| {
-            read.plan
-                .as_ref()
-                .map(|plan| check_row(env, name, plan, &ctx, judged, anc))
+            read.plan.as_ref().map(|plan| {
+                let mut row = check_row(env, name, plan, &ctx, judged, anc);
+                if row.message.as_deref() == Some(ops::message::FALLBACK) {
+                    row.message = Some(format!("{} is false", read.expression));
+                }
+                row
+            })
         })
         .collect()
 }

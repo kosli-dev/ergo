@@ -8798,5 +8798,19 @@
         "expressions": {"s": {"$applies": ".att.id is 1"}}
       }
     ]
+  },
+  {
+    "description": "a for line that picks an item of a part",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"lst": "ws"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"for": "first of lst as w", "assert": "w.k is 1"}}}}},
+    "cases": [
+      {
+        "description": "the picked item is tagged with the part",
+        "rules": ["parts.tag"],
+        "input": {"things": [{"id": "t1", "ws": [{"k": 2}, {"k": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "w.k is 1", "cause": "value", "inputs": [{"locations": ["/things/0/ws/0/k"], "name": "w.k", "value": 2}]}], "item": "item 1 of lst", "locations": ["/things/0/ws/0"], "path": "item 1 of lst", "value": {"k": 2}}], "inputs": [{"locations": ["/things/0/ws/0"], "name": "item 1 of lst", "part": {"id": null, "name": "lst"}, "value": {"k": 2}}], "message": "item 1 of lst: k is 2", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

@@ -337,9 +337,21 @@ fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
     )
 }
 
+fn key_unreadable_off_alias(path: &Path, ctx: &Ctx) -> bool {
+    !matches!(path.start, Start::Alias(_))
+        || path.steps.iter().any(|step| {
+            matches!(step, Step::Ref(reference) if !matches!(reference.start, Start::Alias(_)))
+                && path::resolve(step, ctx).is_err()
+        })
+}
+
+pub const FALLBACK: &str = "the check is false";
+
 pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
     let read = path::read(path, ctx);
-    if read.outcome != Outcome::Unusable || read.step_unreadable {
+    if read.outcome != Outcome::Unusable
+        || (read.step_unreadable && key_unreadable_off_alias(path, ctx))
+    {
         return Vec::new();
     }
     let Ok((mut value, _, _)) = path::start_of(&path.start, ctx) else {
@@ -363,6 +375,13 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
         };
         match holds {
             Some(next) => value = next,
+            None if matches!(
+                (&resolved, value),
+                (Resolved::Key(_), Value::Object(_)) | (Resolved::Index(_), Value::Array(_))
+            ) =>
+            {
+                return Vec::new();
+            }
             None => {
                 if at >= leading && !value.is_null() {
                     let prefix = Path {
@@ -544,7 +563,7 @@ fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
         parts.push(format!("{name}: {}", once.join(", and ")));
     }
     if parts.is_empty() {
-        "the check is false".to_string()
+        FALLBACK.to_string()
     } else {
         parts.join("; ")
     }
@@ -626,7 +645,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         }
     }
     if once.is_empty() {
-        "the check is false".to_string()
+        FALLBACK.to_string()
     } else {
         once.join(", and ")
     }
@@ -929,11 +948,6 @@ pub fn ref_fault_list(checks: &[&Check], ctx: &Ctx) -> Vec<String> {
     out
 }
 
-pub fn flawed_text(checks: &[&Check], ctx: &Ctx) -> Option<String> {
-    let out = ref_fault_list(checks, ctx);
-    (!out.is_empty()).then(|| out.join(", and "))
-}
-
 pub fn first_list_text(path: &Path, ctx: &Ctx) -> Option<String> {
     let from = usize::from(!matches!(path.start, Start::Part(_)));
     (from..=path.steps.len()).find_map(|at| {
@@ -1020,7 +1034,7 @@ pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> String {
         );
     }
     if said.is_empty() {
-        "the check is false".to_string()
+        FALLBACK.to_string()
     } else {
         joined(said)
     }
