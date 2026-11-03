@@ -3555,6 +3555,7 @@ _list_subject_path(path) if {
 _position_first(path) if _index_step(_keys_of(path)[0])
 
 _position_first(path) if {
+	not _builtin(path)
 	_has_field_step(path)
 	_index_step(_step_key(_path_steps(path)[0]))
 }
@@ -3595,6 +3596,7 @@ _state_before_field(subj, prefix) := "unusable" if {
 }
 
 else := "unusable" if {
+	not _builtin(prefix)
 	_position_first(prefix)
 	start := _start_of(subj, prefix)
 	is_array(start)
@@ -3685,6 +3687,7 @@ _path_read_state(subj, path) := "unusable" if {
 }
 
 _path_read_state(subj, path) := "unusable" if {
+	not _builtin(path)
 	_position_first(path)
 	start := _start_of(subj, path)
 	is_array(start)

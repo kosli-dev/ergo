@@ -22588,5 +22588,318 @@
         ]
       }
     ]
+  },
+  {
+    "description": "$params read by a position and then by a key, with params as a number",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "d": {
+              "assert": "$params[0] named by zz does not exist"
+            }
+          }
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "fails as unusable, saying the check is false",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params[0] named by zz",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "$params[0] named by zz does not exist is false",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "$params read by a position and then by a key, with params as text",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "d": {
+              "assert": "$params[0] named by zz does not exist"
+            }
+          }
+        }
+      }
+    },
+    "params": "s",
+    "cases": [
+      {
+        "description": "fails as unusable, saying the check is false",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params[0] named by zz",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "$params[0] named by zz does not exist is false",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "$params read by a position and then by a key, with params as true",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "d": {
+              "assert": "$params[0] named by zz does not exist"
+            }
+          }
+        }
+      }
+    },
+    "params": true,
+    "cases": [
+      {
+        "description": "fails as unusable, saying the check is false",
+        "rules": [
+          "path.unusable",
+          "path.field_step",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "zz": "a"
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "d",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params[0] named by zz",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/things/0/zz"
+                ],
+                "name": "zz",
+                "value": "a"
+              }
+            ],
+            "message": "$params[0] named by zz does not exist is false",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias that is a list, read by a position and then by a key: w[0].a does not exist, with true at the position",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ws as w",
+              "assert": "w[0].a does not exist"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as unusable when the item at the position is true",
+        "rules": [
+          "path.unusable",
+          "path.not_an_object",
+          "missing.pass"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "a",
+              "ws": [
+                [
+                  true
+                ]
+              ]
+            }
+          ]
+        },
+        "compliant": false,
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "w[0].a does not exist",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ws/0/0"
+                        ],
+                        "name": "w[0].a",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ws",
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "path": "item 1 of ws",
+                "value": [
+                  true
+                ]
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ws/0"
+                ],
+                "name": "ws[]",
+                "value": [
+                  [
+                    true
+                  ]
+                ]
+              }
+            ],
+            "message": "item 1 of ws: item 1 of w is true, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
