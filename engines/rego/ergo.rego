@@ -10960,18 +10960,6 @@ _m_from_message(doc, req, false, cause) := {"message": m} if {
 	fails := _every_walk(doc, _from_keys(req)).fails
 	count(fails) > 0
 	m := _m_joined([_m_named_fail(object.union(f, {"path": _m_input_item_name(f.path)})) | some p in sort({f.path | some f in fails}); some f in fails; f.path == p])
-} else := {"message": m} if {
-	cause in {"absent", "null", "not_an_object"}
-	keys := _from_keys(req)
-	count(keys) > 0
-	m := _message({"op": "present", "path": keys}, doc, cause)
-} else := {"message": _m_isnt(_path_name(keys), v, _m_walk_kind(v))} if {
-	cause == "unusable"
-	keys := _from_keys(req)
-	count(keys) > 0
-	v := _target(doc, req)
-	v != null
-	not _is_collection(v)
 } else := {}
 
 _m_input_item_name(path) := concat(": ", [_input_path_name([path[0]]), _m_item_name(array.slice(path, 1, count(path)), set())]) if {
