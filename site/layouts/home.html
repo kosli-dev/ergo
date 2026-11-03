@@ -9,8 +9,8 @@
       <h1 class="hero__title"><strong>{{ partial "copy.html" $c.hero.title }}</strong></h1>
       <p class="hero__lede">{{ partial "copy.html" $c.hero.lede }}</p>
       <div class="actions">
-        <a class="btn btn--primary" href="{{ "docs/getting-started/" | relURL }}">{{ $c.hero.primary }} <span aria-hidden="true">→</span></a>
-        <a class="btn btn--outline" href="{{ site.Params.repo }}">{{ partial "github-icon.html" . }}{{ $c.hero.secondary }}</a>
+        <a class="btn btn--primary" href="{{ "tutorial/" | relURL }}">{{ $c.hero.primary }} <span aria-hidden="true">→</span></a>
+        <a class="btn btn--outline" href="{{ "docs/getting-started/" | relURL }}">{{ $c.hero.secondary }}</a>
       </div>
       {{- with hugo.Data.release.rego }}
       <p class="hero__release">Latest release: <a href="{{ site.Params.repo }}/releases/tag/rego-v{{ . }}">ergo.rego {{ . }}</a>
@@ -155,7 +155,7 @@
   <div class="wrap">
     <h2 class="display-m">{{ partial "copy.html" $c.vocabulary.title }}<br><span class="muted">{{ partial "copy.html" $c.vocabulary.muted }}</span></h2>
     <p class="lede narrow">{{ partial "copy.html" $c.vocabulary.lede }}</p>
-    <p><a class="link" href="{{ "bakery/" | relURL }}">{{ $c.vocabulary.link }} <span aria-hidden="true">→</span></a></p>
+    <p><a class="link" href="{{ "tutorial/" | relURL }}">{{ $c.vocabulary.link }} <span aria-hidden="true">→</span></a> · <a class="link" href="{{ "bakery/" | relURL }}">{{ $c.vocabulary.bakery }} <span aria-hidden="true">→</span></a></p>
   </div>
 </section>
 

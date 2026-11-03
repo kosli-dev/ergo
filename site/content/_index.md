@@ -4,8 +4,8 @@ title: "Ergo - An open language for explainable policies."
 hero:
   title: An open language for explainable policies.
   lede: ==ergo== is an open source language for writing policies that explain themselves. Instead of a yes or no, every decision returns an audit report of what was checked, and why it passed or failed. Run your policies on Open Policy Agent with `ergo.rego`, or with the `ergo` CLI.
-  primary: Get started
-  secondary: GitHub
+  primary: Learn Ergo
+  secondary: Get started
   verdict: d-3 is out of scope. d-2 was never approved... and the report says so.
   fromto:
     label: The same policy written in Rego and in Ergo, and what each returns
@@ -101,8 +101,9 @@ architecture:
 vocabulary:
   title: Auditor says why
   muted: Computer says ==ergo==
-  lede: "Learn how to write self-explaining automated policies in this tutorial:"
-  link: The bakery example
+  lede: "Learn how to write self-explaining automated policies in this tutorial, in your browser:"
+  link: Learn Ergo
+  bakery: Read the bakery example
 
 start:
   title: No lock-in.
