@@ -4688,6 +4688,21 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("c.a is 1", "c.a is 1", &[], &[]),
+    (
+        "count of kids plus age is 100",
+        "count of kids plus age is 100",
+        &[],
+        &[],
+    ),
+    ("sig exists", "sig exists", &[], &[]),
+    ("sig is 1", "sig is 1", &[], &[]),
+    (
+        "sum of kids.n plus age is 100",
+        "sum of kids.n plus age is 100",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8025,6 +8040,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "last of commits sorted by ts as commit",
         "last of commits sorted by ts as commit",
+        &[],
+        &[],
+    ),
+    (
+        "last of cs sorted by ts as c",
+        "last of cs sorted by ts as c",
         &[],
         &[],
     ),

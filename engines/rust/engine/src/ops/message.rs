@@ -12,14 +12,18 @@ const OBJECT_LIMIT: usize = 80;
 const LIST_LIMIT: usize = 3;
 
 fn quoted(text: &str) -> String {
-    if text
+    let shown = if text
         .chars()
         .any(|c| c == '"' || c == '\\' || c.is_control())
     {
         json_text(&Value::String(text.to_string()))
     } else {
         format!("\"{text}\"")
-    }
+    };
+    shown
+        .replace('\u{2028}', "\\u2028")
+        .replace('\u{2029}', "\\u2029")
+        .replace('\u{85}', "\\u0085")
 }
 
 fn text(s: &str) -> String {
@@ -56,7 +60,8 @@ fn item(value: &Value) -> String {
         Value::Object(map) => {
             let whole = literal(value);
             if whole.chars().count() > OBJECT_LIMIT {
-                format!("an object with {} keys", map.len())
+                let word = if map.len() == 1 { "key" } else { "keys" };
+                format!("an object with {} {word}", map.len())
             } else {
                 whole
             }

@@ -136,7 +136,6 @@ walks / a one-line some compares with a parent's value / fails as absent and lis
 walks / a walk that can't be run as written / fails as unusable when a param its whose reads isn't a list, even with if any, and fails with the ref's cause when its named by can't be read
 walks / a walk through a for name, read from a parent on its right side / fails as unusable for a value that can't be compared
 walks / a walk whose parent path is named by a field of each item / fails as absent when the parent has none of the names
-walks / whose with a count inside a plus side names the count's list when it isn't one / names kids, with 5, when kids is found but isn't a list
 walks / whose with a count on the left names the side that couldn't be read / names the left side when both are found but cannot be compared
 walks / whose with a count on the right names the side that couldn't be read / names the left side when both are found but cannot be compared
 walks / whose with a parent subject's field on one side names it when it isn't there / names art.q, with the parent's location, when the parent doesn't have q

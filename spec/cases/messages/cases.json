@@ -345,5 +345,97 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a sum of or a count of beside a plus names what it couldn't read",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "sum of kids.n plus age is 100"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "an item of the summed list that isn't a number is named by its position",
+        "rules": ["message.worked_out", "message.cause"],
+        "input": {"things": [{"age": 5, "id": "t", "kids": [{"n": 1}, {}, {"n": "x"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/kids/0/n", "/things/0/kids/1", "/things/0/kids/2/n", "/things/0/age"], "name": "sum of kids.n plus age", "value": null}, {"locations": ["/things/0/kids/0/n", "/things/0/kids/1", "/things/0/kids/2/n"], "name": "sum of kids.n", "value": null}, {"locations": ["/things/0/kids/0/n", "/things/0/kids/1", "/things/0/kids/2/n"], "name": "kids[].n", "value": [1, null, "x"]}, {"locations": ["/things/0/age"], "name": "age", "value": 5}], "message": "item 3 of kids: n is \"x\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a summed list that is an object says it isn't a list or an object",
+        "rules": ["message.cause"],
+        "input": {"things": [{"age": 5, "id": "t", "kids": {"n": 1}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/age"], "name": "sum of kids.n plus age", "value": null}, {"locations": [], "name": "sum of kids.n", "value": null}, {"locations": [], "name": "kids.n", "value": []}, {"locations": ["/things/0/age"], "name": "age", "value": 5}], "message": "kids.n is 1, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of beside a plus names the list that isn't a list",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of kids plus age is 100"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a counted list that is an object says it isn't a list",
+        "rules": ["message.cause"],
+        "input": {"things": [{"age": 5, "id": "t", "kids": {"n": 1}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/age"], "name": "count of kids plus age", "value": null}, {"locations": [], "name": "count of kids", "value": null}, {"locations": [], "name": "kids", "value": []}, {"locations": ["/things/0/age"], "name": "age", "value": 5}], "message": "kids is {\"n\": 1}, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an item that can't be sorted on is named from the input",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "c.a is 1", "for": "last of cs sorted by ts as c"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a null and a text item are each named by what they hold",
+        "rules": ["message.items", "message.cause"],
+        "input": {"things": [{"cs": [{"a": 1, "ts": 1}, {"a": 2, "ts": 1}, null, "str", {"ts": "a"}], "id": "t"}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 3 of cs", "locations": ["/things/0/cs/2"], "path": "item 3 of cs", "value": null}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 4 of cs", "locations": ["/things/0/cs/3"], "path": "item 4 of cs", "value": null}, {"cause": "unusable", "failed_assertions": [], "item": "item 5 of cs", "locations": ["/things/0/cs/4/ts"], "path": "item 5 of cs", "value": "a"}], "inputs": [{"locations": ["/things/0/cs/0", "/things/0/cs/1", "/things/0/cs/2", "/things/0/cs/3", "/things/0/cs/4"], "name": "cs[]", "value": [{"a": 1, "ts": 1}, {"a": 2, "ts": 1}, null, "str", {"ts": "a"}]}], "message": "item 3 of cs is null, which isn't an object; item 4 of cs is \"str\", which isn't an object; item 5 of cs: ts is \"a\", which isn't a number, a time or a date", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an exists in an any_of option says what it found",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"any_of": {"one": "sig exists", "two": "sig is 1"}}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a null field that an option asks to exist is null in that option's message",
+        "rules": ["message.join", "message.cause"],
+        "input": {"things": [{"id": "t", "sig": null}]},
+        "results": [
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/things/0/sig"], "name": "sig", "value": null}], "message": "one: sig is null; two: sig is null", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an object too long to print is counted",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "x is 3"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "an object of one key says key, not keys",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "x": {"k": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": {"k": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}], "message": "x is an object with 1 key, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a text with a line separator prints on one line",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "x is 3"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "U+2028 is written as \\u2028 inside the quotes",
+        "rules": ["message.print"],
+        "input": {"things": [{"id": "t", "x": "a b"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "a b"}], "message": "x is \"a\\u2028b\", which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

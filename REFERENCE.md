@@ -873,8 +873,8 @@ and this input:
 
 ```json
 {"releases": [
-  {"tag": {"version": "0.4"}, "rego": {"version": "0.4-dev", "spec": "v0.5-dev"}},
-  {"tag": {"version": "0.5"}, "rego": {"version": "0.5", "spec": "v0.5-dev"}},
+  {"tag": {"version": "0.4"}, "rego": {"version": "0.4-dev", "spec": "v0.4"}},
+  {"tag": {"version": "0.5"}, "rego": {"version": "0.5", "spec": "v0.4"}},
   {"tag": {"version": 5}, "rego": {"version": "5-dev", "spec": "v5"}},
   {"tag": {}, "rego": {"version": "x", "spec": "v"}}
 ]}
@@ -1592,7 +1592,8 @@ A number Ergo works out is named after the words that asked for it, like `count 
 
 - Text is in quotes. Text over 60 characters keeps the first 60 and ends with `…"`.
 - A list over 3 items shows the first 3 and then `and N more`, like `l is ["a", "b", "c", and 2 more]`.
-- An object whose JSON is over 80 characters is printed as `an object with N keys`, like `o is an object with 4 keys, which isn't text`.
+- An object whose JSON is over 80 characters is printed as `an object with N keys`, like `o is an object with 4 keys, which isn't text`, or `an object with 1 key`.
+- A line separator inside text (U+2028, U+2029 or U+0085) is written as `\u2028`, `\u2029` or `\u0085`, so a message stays on one line.
 
 For `every`, `some` and `for`, the message lists only the items that failed, counted from 1, with `; ` between them. After three items it ends with `; and N more`. With four items whose `ok` is `false`:
 
@@ -1600,7 +1601,7 @@ For `every`, `some` and `for`, the message lists only the items that failed, cou
 item 2 of items: ok is false; item 3 of items: ok is false; item 4 of items: ok is false; and 1 more
 ```
 
-In a `for` line, the item's fields are named without its alias when everything the item's sentences read belongs to that item. With `for c in commits` and `c.signed is true`, the message is `item 1 of commits: signed is false`, and when the item itself is `null` it's `item 1 of commits is null`. When a sentence also reads something else, like a field of the subject, a param or a second item, every name stays as the policy wrote it, like `item 1 of approvers: approver.username is "ann", and author is "ann"`. A list inside an item is named without the alias, like `item 1 of commits: item 2 of reviews: ok is false`.
+In a `for` line, the item's fields are named without its alias when everything the item's sentences read belongs to that item. With `for: every commits as c` and `c.signed is true`, the message is `item 1 of commits: signed is false`, and when the item itself is `null` it's `item 1 of commits is null`. When a sentence also reads something else, like a field of the subject, a param or a second item, every name stays as the policy wrote it, like `item 1 of approvers: approver.username is "ann", and author is "ann"`. A list inside an item is named without the alias, like `item 1 of commits: item 2 of reviews: ok is false`.
 
 A check written as several sentences gives the message of each sentence that failed, joined with `; `, like `x is 4; y is missing`. In an `any_of`, each option's message starts with its name, like `one: x is 4; two: y is missing`.
 

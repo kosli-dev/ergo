@@ -88,7 +88,7 @@ The spec only covers numbers in the input and the params that a 64-bit float kee
 
 **[message.cause]** A row that failed with any other cause names only the inputs in that state. `absent` reads `<name> is missing`, `null` reads `<name> is null`, `unusable` reads `<name> is <value>, which isn't <kind>`, like `x is "3", which isn't a number`, and `not_an_object` reads `<name> is <value>, which isn't an object`, where the name is `it` for the subject. `ambiguous` names the items that tie and the key they were sorted by: `item 1 and item 2 of commits tie on ts`.
 
-**[message.print]** A value is printed as JSON, with `, ` between items and `: ` after keys, and keys sorted. Text over 60 code points keeps its first 60 and ends with `…"`. A list over 3 items shows its first 3 and then `and N more`, as in `["a", "b", "c", and 2 more]`. An object whose JSON is over 80 characters prints as `an object with N keys`.
+**[message.print]** A value is printed as JSON, with `, ` between items and `: ` after keys, and keys sorted. Text over 60 code points keeps its first 60 and ends with `…"`. A list over 3 items shows its first 3 and then `and N more`, as in `["a", "b", "c", and 2 more]`. An object whose JSON is over 80 characters prints as `an object with N keys`, or `an object with 1 key`. A line separator (U+2028, U+2029 or U+0085) inside text is written as `\u2028`, `\u2029` or `\u0085`, so a message stays on one line.
 
 **[message.worked_out]** A value Ergo works out, like a `count of`, a `sum of`, a `plus` or an elapsed time, is printed as the number it gave, under the name of that side, not as the values it came from: `count of tests is 1`, `sum of items.n plus extra is 12`.
 

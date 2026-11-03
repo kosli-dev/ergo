@@ -1746,7 +1746,7 @@ test_an_engine_reads_only_the_version_it_follows_so_any_other_ergo_spec_is_writt
 }
 
 test_an_ergo_spec_that_is_not_shaped_like_a_version_is_written_wrong_and_the_row_shows_it if {
-	every v in ["0.1", "V0.1", "v0.1.0", " v0.2-dev", "v0.2-dev ", "v.1", "v1", "", "v0.2-beta", "v0.2-", "v0.2-dev-dev", "v0.2-DEV", "v0.2-dev2", "v0.5-dev-devdev", "v-dev"] {
+	every v in ["0.1", "V0.1", "v0.1.0", " v0.2-dev", "v0.2-dev ", "v.1", "v1", "", "v0.2-beta", "v0.2-", "v0.2-dev-dev", "v0.2-DEV", "v0.2-dev2", "v0.4-devdev", "v-dev"] {
 		expected := concat("", ["not a version ", v])
 		_spec_rows(two_reqs_policy({"ergo_spec": v})) == [false, [
 			["s", false, [{"name": "policy ergo_spec", "value": [expected], "locations": []}]],
@@ -11277,4 +11277,15 @@ test_message_of_an_unreadable_input_with_refs_that_are_fine_still_has_a_message 
 	row.passed == false
 	row.cause == "unusable"
 	is_string(row.message)
+}
+
+test_message_of_a_missing_check_that_finds_nothing_missing_repeats_its_expression if {
+	check := {"$sides": [], "op": "present", "path": ["x"], "expression": "x exists"}
+	ergo._m_message(check, {"x": 1}, "absent") == "x exists is false"
+	ergo._m_message(check, {"x": 1}, "null") == "x exists is false"
+}
+
+test_message_of_exists_on_a_null_field_says_it_is_null_whatever_cause_the_line_has if {
+	check := {"$sides": [["x"]], "op": "present", "path": ["x"], "expression": "x exists"}
+	ergo._m_message(check, {"x": null}, "absent") == "x is null"
 }
