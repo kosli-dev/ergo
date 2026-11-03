@@ -30,14 +30,14 @@ impl Parser {
         chain_reads(
             i,
             usize::MAX,
-            |at| heads_at(&self.condition_memo, at, || self.condition(at)),
+            |at| heads_at(&self.condition_memo, at, || self.word_condition(at)),
             |end| self.ws(end).and_then(|m| self.lead(m, "and")),
         )
     }
 
     fn whose_opt(&self, i: usize) -> Reads<Chain<Condition>> {
         let mut out = Vec::new();
-        if let Some(k) = self.ws(i).and_then(|m| self.lead(m, "whose")) {
+        if let Some(k) = self.ws(i) {
             out.extend(self.conditions(k));
         }
         out.push((None, i));

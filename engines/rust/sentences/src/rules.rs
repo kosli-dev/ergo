@@ -42,6 +42,9 @@ pub fn from_self_problems(line: &FromLine, aliases: &[&str]) -> Vec<String> {
         let FromCondition::Condition(condition) = condition else {
             continue;
         };
+        if condition.that {
+            continue;
+        }
         let Left::Path(path) = &condition.left else {
             continue;
         };
@@ -575,6 +578,10 @@ impl Walk {
     }
 
     fn condition(&mut self, condition: &Condition, allow_it: bool) {
+        if condition.that {
+            self.phrase(&condition.phrase, false);
+            return;
+        }
         match &condition.left {
             Left::Path(path) => {
                 if allow_it {
@@ -803,6 +810,9 @@ fn full_steps(path: &Path) -> Vec<Step> {
 fn whose_self(whose: &[Condition], aliases: &[&str], derived_holder: bool) -> BTreeSet<String> {
     let mut out = BTreeSet::new();
     for condition in whose {
+        if condition.that {
+            continue;
+        }
         let Left::Path(path) = &condition.left else {
             continue;
         };

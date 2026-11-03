@@ -54,7 +54,8 @@ fn a_pick_item_has_a_position_a_path_whose_and_sorted_by() {
                     not: false,
                     operand: value(number("1")),
                     within: None
-                }
+                },
+                that: false
             }],
             sorted_by: Some(SortedBy {
                 path: key("created"),

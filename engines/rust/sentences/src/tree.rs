@@ -64,18 +64,21 @@ pub enum Quantifier {
     Some,
 }
 
-/// The `condition` rule: a left side and a phrase, used after `whose`.
+/// The `condition` rule: a left side and a phrase, written after `whose`, or after `that` when it speaks of the item itself.
 ///
 /// ```text
 /// y is 1
+/// that starts with "b"
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Condition {
-    /// What the condition looks at.
+    /// What the condition looks at. For a condition written with `that`, the item itself.
     pub left: Left,
     /// What is said about it.
     pub phrase: Phrase,
+    /// True when the condition is written `that <phrase>` and not `whose <left> <phrase>`.
+    pub that: bool,
 }
 
 /// The left side of a condition.

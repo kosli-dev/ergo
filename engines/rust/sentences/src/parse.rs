@@ -1045,6 +1045,7 @@ impl Parser {
                         Condition {
                             left: Left::Path(path.clone()),
                             phrase,
+                            that: false,
                         },
                         end,
                     ));
@@ -1068,11 +1069,42 @@ impl Parser {
                         Condition {
                             left: left.clone(),
                             phrase,
+                            that: false,
                         },
                         end,
                     ));
                 }
             }
+        }
+        out
+    }
+
+    fn that_condition(&self, i: usize) -> Reads<Condition> {
+        let mut out = Vec::new();
+        for (phrase, end) in self.phrase(i, false) {
+            out.push((
+                Condition {
+                    left: Left::Path(Path {
+                        position: None,
+                        start: Start::It,
+                        steps: Vec::new(),
+                    }),
+                    phrase,
+                    that: true,
+                },
+                end,
+            ));
+        }
+        out
+    }
+
+    pub(crate) fn word_condition(&self, i: usize) -> Reads<Condition> {
+        let mut out = Vec::new();
+        if let Some(k) = self.lead(i, "whose") {
+            out.extend(self.condition(k));
+        }
+        if let Some(k) = self.lead(i, "that") {
+            out.extend(self.that_condition(k));
         }
         out
     }
@@ -1094,34 +1126,36 @@ impl Parser {
 
     fn read_from_condition(&self, i: usize) -> Reads<FromCondition> {
         let mut out = Vec::new();
-        if let Some((quantifier, j)) = self.quantifier(i)
-            && let Some(k) = self.ws(j)
-        {
-            for (path, m) in self.path_or_it(k) {
-                let mut ends = Vec::new();
-                if let Some(n) = self.if_any(m) {
-                    ends.push((true, n));
-                }
-                ends.push((false, m));
-                for (if_any, n) in ends {
-                    if let Some(p) = self.ws(n) {
-                        for (phrase, end) in self.phrase(p, false) {
-                            out.push((
-                                FromCondition::Quantified {
-                                    quantifier,
-                                    path: path.clone(),
-                                    if_any,
-                                    phrase,
-                                },
-                                end,
-                            ));
+        if let Some(w) = self.lead(i, "whose") {
+            if let Some((quantifier, j)) = self.quantifier(w)
+                && let Some(k) = self.ws(j)
+            {
+                for (path, m) in self.path_or_it(k) {
+                    let mut ends = Vec::new();
+                    if let Some(n) = self.if_any(m) {
+                        ends.push((true, n));
+                    }
+                    ends.push((false, m));
+                    for (if_any, n) in ends {
+                        if let Some(p) = self.ws(n) {
+                            for (phrase, end) in self.phrase(p, false) {
+                                out.push((
+                                    FromCondition::Quantified {
+                                        quantifier,
+                                        path: path.clone(),
+                                        if_any,
+                                        phrase,
+                                    },
+                                    end,
+                                ));
+                            }
                         }
                     }
                 }
             }
         }
         out.extend(
-            self.condition(i)
+            self.word_condition(i)
                 .into_iter()
                 .map(|(c, j)| (FromCondition::Condition(c), j)),
         );
@@ -1148,7 +1182,7 @@ impl Parser {
             }
             eaches.push((None, j));
             for (each, j2) in eaches {
-                if let Some(k) = self.ws(j2).and_then(|m| self.lead(m, "whose")) {
+                if let Some(k) = self.ws(j2) {
                     for (whose, end) in self.read_from_conditions(k) {
                         out.push((
                             FromRead {

@@ -6060,7 +6060,7 @@ _from_line(raw) := line if {
 
 _from_problems(text, pat) := ["a condition after whose can't have a whose of its own"] if {
 	_s_problems(text, pat) == ["doesn't parse"]
-	regex.match(` +whose +(?:.* +and +)?(?:(?:every|some) +|(?:count|sum) +of +)\S+ +whose +`, text)
+	regex.match(` +whose +(?:.* +and +whose +)?(?:(?:every|some) +|(?:count|sum) +of +)\S+ +whose +`, text)
 } else := _s_problems(text, pat)
 
 _s_pick_problems(parsed) := ((({`an item starts with "every", "some" or a position, like "last of"` |

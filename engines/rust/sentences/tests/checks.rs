@@ -46,7 +46,8 @@ fn a_quantified_assertion_keeps_its_whose_and_if_any() {
             path: with_steps(key("items"), vec![dot("x")]),
             whose: vec![Condition {
                 left: Left::Path(key("k")),
-                phrase: is(number("1"))
+                phrase: is(number("1")),
+                that: false
             }],
             if_any: true,
             phrase: Phrase::Empty { not: false }
@@ -145,7 +146,8 @@ fn a_count_with_a_whose_is_a_derived_assertion() {
                 path: key("items"),
                 whose: vec![Condition {
                     left: Left::Path(key("k")),
-                    phrase: is(number("1"))
+                    phrase: is(number("1")),
+                    that: false
                 }]
             })],
             phrase: Phrase::Order {
