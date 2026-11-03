@@ -1720,6 +1720,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("reports.a.b.coverage", "reports.a.b.coverage"),
     ("reports.coverage", "reports.coverage"),
     ("ws", "ws"),
+    ("dep.files", "dep.files"),
+    ("lockfile", "lockfile"),
+    ("repo.deps", "repo.deps"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2884,6 +2887,8 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("reports.a.b.coverage", "reports.a.b.coverage"),
     ("reports.coverage", "reports.coverage"),
     ("ws", "ws"),
+    ("lockfile", "lockfile"),
+    ("path", "path"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[

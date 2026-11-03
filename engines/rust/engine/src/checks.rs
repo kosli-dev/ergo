@@ -351,6 +351,14 @@ pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<V
     };
     let mut entries: Vec<Value> = Vec::new();
     for reference in paths {
+        if let Some(walk) = crate::ops::lists::walked(reference, &ctx) {
+            entries.push(serde_json::json!({
+                "name": walk.name,
+                "value": walk.value,
+                "locations": walk.locations,
+            }));
+            continue;
+        }
         let read = path::read(reference, &ctx);
         let locations: Vec<String> = read.location.iter().map(Location::render).collect();
         entries.push(serde_json::json!({

@@ -11311,3 +11311,302 @@ test_message_pairs_sort_by_the_number_of_their_item_and_a_lead_without_a_number_
 	ergo._m_lead_n("item 12 of x") == 12
 	ergo._m_lead_n("item x of y") == 0
 }
+
+_walk_right_rows(check, doc, params) := [[r.passed, r.cause, object.get(r, "message", "")] | some r in ergo.report(doc, _sentence_policy({"c": check}), params).results; r.check == "c"]
+
+_walk_right_doc(components) := {"sbom": {"components": components}, "things": [{"id": "t1", "x": "click", "tags": ["click"]}, {"id": "t2", "x": "attrs", "tags": ["attrs"]}]}
+
+test_a_ref_that_walks_a_list_of_objects_compares_with_what_it_reads_from_each_item if {
+	_walk_right_rows("x is in $input.sbom.components.name", _walk_right_doc([{"name": "click"}, {"name": "jinja2"}]), {}) == [
+		[true, "satisfied", ""],
+		[false, "value", "x is \"attrs\", and $input.sbom.components[].name is [\"click\", \"jinja2\"]"],
+	]
+}
+
+test_a_ref_that_walks_a_list_of_objects_is_listed_in_refs_with_the_location_of_each_item if {
+	report := ergo.report(_walk_right_doc([{"name": "click"}, {"name": "jinja2"}]), _sentence_policy({"c": "x is in $input.sbom.components.name"}), {})
+	report.requirements.s.checks.c["$refs"] == [{"name": "$input.sbom.components[].name", "value": ["click", "jinja2"], "locations": ["/sbom/components/0/name", "/sbom/components/1/name"]}]
+}
+
+test_a_param_that_walks_a_list_of_objects_compares_with_what_it_reads_from_each_item if {
+	_walk_right_rows("x is in $params.deps.name", _walk_right_doc([]), {"deps": [{"name": "click"}]}) == [
+		[true, "satisfied", ""],
+		[false, "value", "x is \"attrs\", and $params.deps[].name is [\"click\"]"],
+	]
+}
+
+test_every_list_phrase_fails_every_row_as_absent_when_an_item_has_no_value_even_the_rows_that_would_pass if {
+	every _, words in _list_phrases {
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc([{"name": "click"}, {}]), {}) {
+			row[1] == "absent"
+			row[2] == "item 2 of $input.sbom.components: name is missing"
+		}
+	}
+}
+
+test_every_list_phrase_fails_every_row_as_null_when_an_item_has_a_null_value if {
+	every _, words in _list_phrases {
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc([{"name": null}]), {}) {
+			row[1] == "null"
+			row[2] == "item 1 of $input.sbom.components: name is null"
+		}
+	}
+}
+
+test_every_list_phrase_fails_every_row_as_value_when_the_list_it_walks_is_empty_even_the_ones_that_say_not if {
+	every _, words in _list_phrases {
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc([]), {}) {
+			row[0] == false
+			row[1] == "value"
+			endswith(row[2], "$input.sbom.components is []")
+		}
+	}
+}
+
+test_every_list_phrase_fails_every_row_as_unusable_when_an_item_or_what_it_reads_past_is_not_an_object if {
+	every _, words in _list_phrases {
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc(["click"]), {}) {
+			row[1] == "unusable"
+			endswith(row[2], "item 1 of $input.sbom.components is \"click\", which isn't an object")
+		}
+		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name.x"]), _walk_right_doc([{"name": "click"}]), {}) {
+			row[1] == "unusable"
+			endswith(row[2], "item 1 of $input.sbom.components: name is \"click\", which isn't an object")
+		}
+	}
+}
+
+test_a_ref_that_reads_into_text_says_which_value_cant_hold_the_next_step if {
+	every row in _walk_right_rows("x is in $input.sbom.components.name", {"sbom": {"components": "x"}, "things": [{"id": "t1", "x": "a"}]}, {}) {
+		row[1] == "unusable"
+		row[2] == "$input.sbom.components is \"x\", which isn't an object"
+	}
+}
+
+test_a_ref_that_reads_into_null_or_something_missing_fails_as_it_did_before_the_walk if {
+	every doc in [{"sbom": {"components": null}}, {"sbom": {}}, {"sbom": {"components": {"a": 1}}}] {
+		every row in _walk_right_rows("x is in $input.sbom.components.name", object.union(doc, {"things": [{"id": "t1", "x": "a"}]}), {}) {
+			row[1] == "absent"
+			row[2] == "$input.sbom.components.name is missing"
+		}
+	}
+}
+
+test_a_path_that_ends_at_a_list_is_not_walked_after_its_last_step if {
+	_walk_right_rows("x is in $input.sbom.names", {"sbom": {"names": []}, "things": [{"id": "t1", "x": "a"}]}, {}) == [[false, "value", "x is \"a\", and $input.sbom.names is []"]]
+}
+
+test_a_field_that_walks_a_list_of_objects_lists_what_it_reads_in_the_rows_inputs if {
+	rows := _sentence_rows({"c": "x is in deps.name"}, {"things": [{"id": "t1", "x": "a", "deps": [{"name": "a"}, {"name": "b"}]}]}, {})
+	rows == [["c", true, "satisfied", [{"name": "x", "value": "a", "locations": ["/things/0/x"]}, {"name": "deps[].name", "value": ["a", "b"], "locations": ["/things/0/deps/0/name", "/things/0/deps/1/name"]}]]]
+}
+
+_walk_rights := [
+	{"v": [{"z": "a"}]},
+	{"v": [{"z": "a"}, {"z": "b"}]},
+	{"v": [{"z": "a"}, {}]},
+	{"v": [{"z": null}]},
+	{"v": [{"z": ["a"]}]},
+	{"v": [{"z": "^a"}]},
+	{"v": [{"y": 1}]},
+	{"v": ["s"]},
+	{"v": [null]},
+	{"v": [[{"z": "a"}]]},
+]
+
+test_a_field_that_walks_after_is_in_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("is in", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_is_not_in_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("is not in", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_contains_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("contains", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_does_not_contain_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("does not contain", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_contains_all_of_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("contains all of", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_contains_none_of_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("contains none of", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_matches_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("matches", ".z", right)
+	}
+}
+
+test_a_field_that_walks_after_does_not_match_gives_the_verdict_and_cause_of_the_same_walk_in_params if {
+	every right in _walk_rights {
+		_list_same_as_params("does not match", ".z", right)
+	}
+}
+
+test_a_path_that_walks_on_the_left_stays_unusable_even_when_the_right_is_the_same_path if {
+	_walk_right_rows("deps.name is in deps.name", {"things": [{"id": "t1", "deps": [{"name": "a"}]}]}, {}) == [[false, "unusable", "deps is [{\"name\": \"a\"}], which isn't an object"]]
+}
+
+test_a_whose_that_reads_a_ref_that_walks_an_empty_list_leaves_the_item_out_as_a_value if {
+	rows := _walk_right_rows("every deps.name whose x is in $input.sbom.components.name is \"a\"", {"sbom": {"components": []}, "things": [{"id": "t1", "deps": [{"name": "a", "x": "a"}]}]}, {})
+	rows == [[false, "value", "deps is [{\"name\": \"a\", \"x\": \"a\"}]"]]
+}
+
+test_a_whose_that_reads_a_ref_that_walks_an_empty_list_decides_before_its_left_side_is_looked_at if {
+	rows := _walk_right_rows("every deps.name whose tags contains $input.sbom.components.name is \"a\"", {"sbom": {"components": []}, "things": [{"id": "t1", "deps": [{"name": "a", "tags": "text"}]}]}, {})
+	[row[1] | some row in rows] == ["value"]
+}
+
+test_a_whose_inside_count_of_and_sum_of_walks_a_ref_on_its_right_side if {
+	doc := {"sbom": {"components": [{"name": "click"}]}, "things": [{"id": "t1", "deps": [{"name": "click", "n": 2}, {"name": "x", "n": 5}]}]}
+	_walk_right_rows("count of deps whose name is in $input.sbom.components.name is 1", doc, {}) == [[true, "satisfied", ""]]
+	_walk_right_rows("sum of deps.n whose name is in $input.sbom.components.name is 2", doc, {}) == [[true, "satisfied", ""]]
+	[row[1] | some row in _walk_right_rows("count of deps whose name is in $input.sbom.components.name is 1", object.union(doc, {"sbom": {"components": [{"name": "click"}, {}]}}), {})] == ["absent"]
+}
+
+test_a_whose_inside_count_of_says_which_value_cant_hold_the_next_step_of_a_ref if {
+	rows := _walk_right_rows("count of deps whose name is in $input.a.b is 1", {"a": "text", "things": [{"id": "t1", "deps": [{"name": "click"}]}]}, {})
+	rows == [[false, "unusable", "item 1 of deps: $input.a is \"text\", which isn't an object"]]
+}
+
+_walk_parent_policy := {
+	"ergo_spec": "v0.5-dev",
+	"subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}},
+	"requirements": {"s": {"subject": "dep", "checks": {"c": "name is in repo.allowed.name"}}},
+}
+
+test_a_path_that_starts_at_a_parent_walks_and_fails_closed_on_each_broken_shape if {
+	rows := [[r.subject.id, r.cause] |
+		some r in ergo.report(
+			{"repos": [
+				{"id": "r1", "allowed": [{"name": "click"}], "deps": [{"name": "click"}, {"name": "attrs"}]},
+				{"id": "r2", "allowed": [{"name": "click"}, {}], "deps": [{"name": "click"}]},
+				{"id": "r3", "allowed": [], "deps": [{"name": "x"}]},
+				{"id": "r4", "allowed": [{"name": null}], "deps": [{"name": "y"}]},
+				{"id": "r5", "allowed": "t", "deps": [{"name": "z"}]},
+			]},
+			_walk_parent_policy, {},
+		).results
+		r.check == "c"
+	]
+	rows == [["click", "satisfied"], ["attrs", "value"], ["click", "absent"], ["x", "value"], ["y", "null"], ["z", "unusable"]]
+}
+
+test_a_path_that_starts_at_a_part_walks_and_names_the_part if {
+	policy := {
+		"ergo_spec": "v0.5-dev",
+		"subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}},
+		"requirements": {"s": {"subject": "repo", "checks": {"c": "id is in lock.pkgs.name"}}},
+	}
+	rows := [r | some r in ergo.report({"repos": [{"id": "click", "lockfile": {"pkgs": [{"name": "click"}]}}]}, policy, {}).results; r.check == "c"]
+	rows[0].inputs[1] == {"name": "lock.pkgs[].name", "value": ["click"], "locations": ["/repos/0/lockfile/pkgs/0/name"], "part": {"id": null, "name": "lock"}}
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_reads_the_field_and_not_the_part if {
+	policy := {
+		"ergo_spec": "v0.5-dev",
+		"subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}},
+		"requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name", "part": "x is in lock.pkgs.name"}}},
+	}
+	doc := {"repos": [{"id": "r", "x": "a.py", "lockfile": {"pkgs": [{"name": "a.py"}]}, "lock": {"pkgs": [{"name": "nope"}]}}]}
+	[[r.check, r.cause] | some r in ergo.report(doc, policy, {}).results; not startswith(r.check, "$")] == [["dot", "value"], ["part", "satisfied"]]
+}
+
+_dot_policy(checks) := {
+	"ergo_spec": "v0.5-dev",
+	"subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}},
+	"requirements": {"s": {"subject": "repo", "checks": checks}},
+}
+
+_dot_summary(results) := [{"cause": r.cause, "message": object.get(r, "message", null), "names": [i.name | some i in r.inputs]} |
+	some r in results
+	r.check == "c"
+]
+
+_dot_rows(lock) := _dot_summary(ergo.report({"repos": [{"id": "r", "x": "a", "lockfile": {"pkgs": [{"name": "a"}]}, "lock": lock}]}, _dot_policy({"c": "x is in .lock.pkgs.name"}), {}).results)
+
+_dot_plain_rows(check, doc) := _dot_summary(ergo.report(
+	doc, {
+		"ergo_spec": "v0.5-dev",
+		"subjects": {"repo": {"from": "repos", "identified_by": "id"}},
+		"requirements": {"s": {"subject": "repo", "checks": {"c": check}}},
+	},
+	{},
+).results)
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_as_absent_when_an_item_of_the_field_has_no_name if {
+	_dot_rows({"pkgs": [{"name": "a"}, {}]}) == [{"cause": "absent", "message": "item 2 of .lock.pkgs: name is missing", "names": ["x", ".lock.pkgs[].name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_when_the_field_has_no_list if {
+	_dot_rows(null) == [{"cause": "absent", "message": ".lock.pkgs.name is missing", "names": ["x", ".lock.pkgs.name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_as_null_when_an_item_of_the_field_has_a_null_name if {
+	_dot_rows({"pkgs": [{"name": null}]}) == [{"cause": "null", "message": "item 1 of .lock.pkgs: name is null", "names": ["x", ".lock.pkgs[].name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_as_unusable_when_the_field_holds_text if {
+	_dot_rows({"pkgs": "text"}) == [{"cause": "unusable", "message": ".lock.pkgs is \"text\", which isn't an object", "names": ["x", ".lock.pkgs.name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_as_value_when_the_list_of_the_field_is_empty if {
+	_dot_rows({"pkgs": []}) == [{"cause": "value", "message": "x is \"a\", and .lock.pkgs is []", "names": ["x", ".lock.pkgs[].name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_is_named_without_the_dot_when_nothing_has_its_name if {
+	_dot_plain_rows("x is in .lock.pkgs.name", {"repos": [{"id": "r", "x": "a"}]}) == [{"cause": "absent", "message": "lock.pkgs.name is missing", "names": ["x", "lock.pkgs.name"]}]
+	_dot_plain_rows("x is one of .tags", {"repos": [{"id": "r", "x": "z", "tags": ["a"]}]}) == [{"cause": "value", "message": "x is \"z\", and tags is [\"a\"]", "names": ["x", "tags"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_reads_the_left_field_lists_it_once if {
+	_dot_plain_rows("x contains all of .x", {"repos": [{"id": "r", "x": "a.py"}]}) == [{"cause": "unusable", "message": "x is \"a.py\", which isn't a list", "names": ["x"]}]
+}
+
+test_a_for_line_item_keeps_its_alias_when_the_right_side_reads_a_field_called_like_it if {
+	rows := _dot_plain_rows({"for": "every items as p", "assert": "p.name is in .p.name"}, {"repos": [{"id": "r", "p": [], "items": [{"name": "a"}]}]})
+	rows[0].message == "item 1 of items: p.name is \"a\", and .p is []"
+	rows[0].names == [".p.name", "items[]"]
+}
+
+test_a_leading_dot_on_a_right_side_keeps_its_dot_when_an_item_of_the_field_is_not_an_object if {
+	_dot_rows({"pkgs": ["t"]}) == [{"cause": "unusable", "message": "item 1 of .lock.pkgs is \"t\", which isn't an object", "names": ["x", ".lock.pkgs[].name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_leaves_its_dot_out_when_an_item_is_not_an_object_and_nothing_has_its_name if {
+	_dot_plain_rows("x is in .lock.pkgs.name", {"repos": [{"id": "r", "x": "a", "lock": {"pkgs": ["t"]}}]}) == [{"cause": "unusable", "message": "item 1 of lock.pkgs is \"t\", which isn't an object", "names": ["x", "lock.pkgs[].name"]}]
+}
+
+test_a_for_line_keeps_the_dot_of_a_right_side_when_an_item_of_the_field_is_not_an_object if {
+	rows := _dot_plain_rows({"for": "every items as p", "assert": "p.name is in .p.name"}, {"repos": [{"id": "r", "p": ["t"], "items": [{"name": "a"}]}]})
+	rows[0].message == "item 1 of items: item 1 of .p is \"t\", which isn't an object"
+}
+
+test_a_count_or_a_sum_on_both_sides_is_said_once_when_its_list_is_missing_or_null if {
+	_dot_plain_rows("count of xs is more than count of xs", {"repos": [{"id": "r"}]})[0].message == "xs is missing"
+	_dot_plain_rows("sum of xs.n is more than sum of xs.n", {"repos": [{"id": "r", "xs": null}]})[0].message == "xs is null"
+}
+
+test_a_field_on_both_sides_of_a_phrase_is_said_once_in_the_message if {
+	_dot_plain_rows("tags contains none of .tags", {"repos": [{"id": "r", "tags": ["a"]}]})[0].message == "tags is [\"a\"]"
+	_dot_plain_rows("tags contains none of tags", {"repos": [{"id": "r", "tags": ["a"]}]})[0].message == "tags is [\"a\"]"
+}

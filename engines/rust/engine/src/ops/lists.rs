@@ -1,9 +1,10 @@
 use super::compare::joined;
 use super::kinds::{Empty, HasType, Kind, NonEmptyString};
+use super::walk::{self, Options, Seg};
 use super::{Check, Input, Verdict, read_path, verdict};
 use crate::cause::Cause;
 use crate::lower::Scope;
-use crate::path::{Ctx, Outcome, Path, Start, is_ref, step_refs};
+use crate::path::{self, Ctx, Outcome, Path, Start, Step, is_ref, step_refs};
 use crate::value;
 use ergo_policy_sentences as tree;
 use regex::Regex;
@@ -124,6 +125,146 @@ struct RightRead {
     outcome: Outcome,
     value: Option<Value>,
     inputs: Vec<Input>,
+    forced: Option<Cause>,
+}
+
+pub struct Walked {
+    pub name: String,
+    pub value: Vec<Value>,
+    pub locations: Vec<String>,
+    pub cause: Option<Cause>,
+    pub text: String,
+    pub part: Option<super::Part>,
+}
+
+impl Walked {
+    pub fn input(&self) -> Input {
+        Input {
+            name: self.name.clone(),
+            value: Value::Array(self.value.clone()),
+            locations: self.locations.clone(),
+            part: self.part.clone(),
+            state: Outcome::Found,
+        }
+    }
+}
+
+fn broken_at(item: &walk::WalkItem) -> Option<(Vec<Seg>, Value)> {
+    let mut current = item.item.value;
+    for (at, seg) in item.rest.iter().enumerate() {
+        if matches!(seg, Seg::Key(_)) && !current.is_object() && !current.is_null() {
+            let mut segs = item.item_segs.clone();
+            segs.extend(item.rest[..at].iter().cloned());
+            return Some((segs, current.clone()));
+        }
+        current = match (current, seg) {
+            (Value::Object(map), Seg::Key(key)) => map.get(key)?,
+            (Value::Array(items), Seg::Index(index)) => items.get(usize::try_from(*index).ok()?)?,
+            _ => return None,
+        };
+    }
+    None
+}
+
+fn item_fault(walked: &walk::Walked, item: &walk::WalkItem) -> Option<(Cause, Vec<Seg>, String)> {
+    use super::message::{isnt, stated};
+    match item.end {
+        Some(Value::Null) => Some((
+            Cause::Null,
+            item.end_segs.clone(),
+            stated(
+                &walked.item_name(&item.end_segs),
+                Cause::Null,
+                &Value::Null,
+                "",
+            ),
+        )),
+        Some(_) => None,
+        None => match item.miss {
+            Cause::Absent => Some((
+                Cause::Absent,
+                item.end_segs.clone(),
+                stated(
+                    &walked.item_name(&item.end_segs),
+                    Cause::Absent,
+                    &Value::Null,
+                    "",
+                ),
+            )),
+            Cause::NotAnObject => Some((
+                Cause::Unusable,
+                item.item_segs.clone(),
+                isnt(
+                    &walked.item_name(&item.item_segs),
+                    item.item.value,
+                    "an object",
+                ),
+            )),
+            _ => broken_at(item).map(|(segs, value)| {
+                (
+                    Cause::Unusable,
+                    segs.clone(),
+                    isnt(&walked.item_name(&segs), &value, "an object"),
+                )
+            }),
+        },
+    }
+}
+
+pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
+    let simple = path
+        .steps
+        .iter()
+        .all(|step| matches!(step, Step::Key(_) | Step::Index(_)));
+    if !simple || path::read(path, ctx).outcome != Outcome::Unusable {
+        return None;
+    }
+    let options = Options {
+        own_dot: true,
+        ..Options::default()
+    };
+    let walked = walk::walk(path, ctx, options);
+    if walked.unreadable.is_some() || !walked.walked.iter().any(|level| *level < walked.steps) {
+        return None;
+    }
+    let mut faults: Vec<(Cause, Vec<Seg>, String)> = walked
+        .failures
+        .iter()
+        .map(|f| (f.cause, f.order.clone(), f.msg.clone()))
+        .collect();
+    faults.extend(
+        walked
+            .items
+            .iter()
+            .filter_map(|item| item_fault(&walked, item)),
+    );
+    faults.sort_by(|a, b| a.1.cmp(&b.1));
+    let cause = Cause::worst(faults.iter().map(|f| f.0));
+    let text = super::message::joined(faults.into_iter().map(|f| f.2).collect());
+    Some(Walked {
+        name: walked.name.clone(),
+        value: walked.items.iter().map(walk::WalkItem::shown).collect(),
+        locations: walked
+            .items
+            .iter()
+            .map(|item| item.end_location.render())
+            .collect(),
+        cause,
+        text,
+        part: path::part_tag(path, ctx).map(|(name, id)| super::Part { name, id }),
+    })
+}
+
+fn walked_read(walk: Walked, inputs: Vec<Input>) -> RightRead {
+    RightRead {
+        outcome: Outcome::Found,
+        value: walk
+            .cause
+            .is_none()
+            .then(|| Value::Array(walk.value.clone())),
+        inputs,
+        forced: walk.cause,
+    }
 }
 
 fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
@@ -132,23 +273,35 @@ fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
             outcome: Outcome::Found,
             value: Some(value.clone()),
             inputs: Vec::new(),
+            forced: None,
         },
-        Right::Ref(path) => {
-            let read = read_path(path, ctx);
-            RightRead {
-                outcome: read.outcome,
-                value: read.value,
-                inputs: read.inputs.into_iter().skip(1).collect(),
+        Right::Ref(path) => match walked(path, ctx) {
+            Some(walk) => walked_read(walk, Vec::new()),
+            None => {
+                let read = read_path(path, ctx);
+                RightRead {
+                    outcome: read.outcome,
+                    value: read.value,
+                    inputs: read.inputs.into_iter().skip(1).collect(),
+                    forced: None,
+                }
             }
-        }
-        Right::Field(path) => {
-            let read = read_path(path, ctx);
-            RightRead {
-                outcome: read.outcome,
-                value: read.value,
-                inputs: read.inputs,
+        },
+        Right::Field(path) => match walked(path, ctx) {
+            Some(walk) => {
+                let input = walk.input();
+                walked_read(walk, vec![input])
             }
-        }
+            None => {
+                let read = read_path(path, ctx);
+                RightRead {
+                    outcome: read.outcome,
+                    value: read.value,
+                    inputs: read.inputs,
+                    forced: None,
+                }
+            }
+        },
         Right::Join(pieces) => {
             let reads: Vec<RightRead> = pieces.iter().map(|p| read_right(p, ctx)).collect();
             let inputs = reads
@@ -164,6 +317,7 @@ fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
                             outcome: Outcome::Found,
                             value: None,
                             inputs,
+                            forced: None,
                         };
                     }
                     (outcome, _) => {
@@ -171,6 +325,7 @@ fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
                             outcome,
                             value: None,
                             inputs,
+                            forced: None,
                         };
                     }
                 }
@@ -179,6 +334,7 @@ fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
                 outcome: Outcome::Found,
                 value: Some(Value::String(text)),
                 inputs,
+                forced: None,
             }
         }
     }
@@ -204,7 +360,7 @@ where
     let read = read_right(right, ctx);
     let left = read_path(path, ctx);
     let inputs = left.inputs.into_iter().chain(read.inputs).collect();
-    let cause = match (read.outcome.cause(), &read.value) {
+    let cause = match (read.forced.or(read.outcome.cause()), &read.value) {
         (Some(cause), _) => cause,
         (None, Some(right_value)) => decide(right_value, &left.outcome, left.value.as_ref()),
         (None, None) => Cause::Unusable,
@@ -223,6 +379,9 @@ fn left_cause(outcome: &Outcome, found: Option<&Value>) -> Result<Value, Cause> 
 fn ref_read(right: &Right, ctx: &Ctx) -> Option<Value> {
     match right {
         Right::Ref(path) => {
+            if let Some(walk) = walked(path, ctx) {
+                return walk.cause.is_none().then_some(Value::Array(walk.value));
+            }
             let read = read_path(path, ctx);
             match read.outcome {
                 Outcome::Found => read.value,
@@ -508,9 +667,11 @@ fn right_text(right: &Right) -> String {
 fn right_shown(right: &Right, ctx: &Ctx) -> Vec<Input> {
     match right {
         Right::Written(_) => Vec::new(),
-        Right::Ref(path) | Right::Field(path) => {
-            read_path(path, ctx).inputs.into_iter().take(1).collect()
-        }
+        Right::Ref(path) | Right::Field(path) => match walked(path, ctx) {
+            Some(walk) if walk.cause.is_none() => vec![walk.input()],
+            Some(_) => Vec::new(),
+            None => read_path(path, ctx).inputs.into_iter().take(1).collect(),
+        },
         Right::Join(pieces) => {
             let read = read_right(right, ctx);
             match (read.outcome, read.value) {
@@ -636,6 +797,14 @@ fn ref_fault(
     let (Right::Ref(path) | Right::Field(path)) = right else {
         return Vec::new();
     };
+    if let Some(walk) = walked(path, ctx) {
+        let list = Value::Array(walk.value.clone());
+        return if walk.cause.is_none() && !usable(&list) {
+            vec![super::message::isnt(&walk.name, &list, &kind(&list))]
+        } else {
+            Vec::new()
+        };
+    }
     let read = read_path(path, ctx);
     match (read.outcome, read.value, read.inputs.first()) {
         (Outcome::Found, Some(value), Some(first)) if !usable(&value) => {
@@ -647,10 +816,30 @@ fn ref_fault(
 
 fn right_value(right: &Right, ctx: &Ctx) -> Option<Value> {
     let read = read_right(right, ctx);
-    match read.outcome {
-        Outcome::Found => read.value,
+    match (read.outcome, read.forced) {
+        (Outcome::Found, None) => read.value,
         _ => None,
     }
+}
+
+fn rights_of(check: &super::Check) -> Vec<&Right> {
+    match check {
+        super::Check::In(c) => vec![&c.values],
+        super::Check::Contains(c) => match &c.wanted {
+            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => vec![right],
+        },
+        super::Check::Matches(c) => vec![&c.patterns],
+        _ => Vec::new(),
+    }
+}
+
+pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
+    rights_of(check).into_iter().find_map(|right| match right {
+        Right::Ref(path) | Right::Field(path) => {
+            walked(path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
+        }
+        _ => None,
+    })
 }
 
 fn left_found(path: &Path, ctx: &Ctx) -> Option<(String, Value)> {
@@ -1484,5 +1673,141 @@ mod tests {
             json!({})
         ));
         assert!(!flawed_with(&lowered_check("x is in ys"), json!({})));
+    }
+
+    fn deps_name() -> Right {
+        Right::Field(key_path(Start::Subject, &["deps", "name"]))
+    }
+
+    fn params_deps_name() -> Right {
+        Right::Ref(key_path(Start::Params, &["deps", "name"]))
+    }
+
+    fn with_deps(deps: Value) -> Value {
+        json!({"x": "click", "deps": deps})
+    }
+
+    #[test]
+    fn a_field_that_walks_a_list_of_objects_compares_with_what_it_reads_from_each_item() {
+        let deps = json!([{"name": "click"}, {"name": "jinja2"}]);
+        assert_eq!(
+            is_in(with_deps(deps.clone()), deps_name(), false),
+            Cause::Satisfied
+        );
+        assert_eq!(
+            is_in(json!({"x": "attrs", "deps": deps}), deps_name(), false),
+            Cause::Value
+        );
+    }
+
+    #[test]
+    fn a_walk_fails_every_row_as_absent_when_an_item_has_no_value() {
+        let deps = json!([{"name": "click"}, {}]);
+        assert_eq!(
+            is_in(with_deps(deps.clone()), deps_name(), false),
+            Cause::Absent
+        );
+        assert_eq!(is_in(with_deps(deps), deps_name(), true), Cause::Absent);
+    }
+
+    #[test]
+    fn a_walk_fails_as_null_when_an_item_has_a_null_value() {
+        let deps = json!([{"name": null}]);
+        assert_eq!(is_in(with_deps(deps), deps_name(), false), Cause::Null);
+    }
+
+    #[test]
+    fn a_walk_fails_as_value_when_the_list_is_empty_even_after_is_not_in() {
+        assert_eq!(is_in(with_deps(json!([])), deps_name(), true), Cause::Value);
+        assert_eq!(
+            is_in(with_deps(json!([])), deps_name(), false),
+            Cause::Value
+        );
+    }
+
+    #[test]
+    fn a_walk_fails_as_unusable_when_an_item_is_not_an_object_or_the_values_have_more_than_one_type()
+     {
+        assert_eq!(
+            is_in(with_deps(json!(["click"])), deps_name(), false),
+            Cause::Unusable
+        );
+        assert_eq!(
+            is_in(
+                with_deps(json!([{"name": "click"}, {"name": 3}])),
+                deps_name(),
+                false
+            ),
+            Cause::Unusable
+        );
+    }
+
+    #[test]
+    fn a_path_that_meets_no_list_is_read_as_before() {
+        assert_eq!(
+            is_in(with_deps(json!("text")), deps_name(), false),
+            Cause::Unusable
+        );
+        assert_eq!(
+            is_in(with_deps(json!(null)), deps_name(), false),
+            Cause::Absent
+        );
+        assert_eq!(
+            is_in(json!({"x": "click"}), deps_name(), false),
+            Cause::Absent
+        );
+    }
+
+    #[test]
+    fn a_ref_that_walks_a_list_of_objects_reads_the_params_the_same_way() {
+        let check = In {
+            path: x(),
+            values: params_deps_name(),
+            not: false,
+        };
+        let params = Some(json!({"deps": [{"name": "click"}, {"name": "jinja2"}]}));
+        assert_eq!(
+            on(json!({"x": "click"}), params.clone(), |ctx| run_in(
+                &check, ctx
+            ))
+            .cause,
+            Cause::Satisfied
+        );
+        assert_eq!(
+            on(json!({"x": "attrs"}), params, |ctx| run_in(&check, ctx)).cause,
+            Cause::Value
+        );
+        assert_eq!(
+            on(
+                json!({"x": "click"}),
+                Some(json!({"deps": [{"name": "click"}, {}]})),
+                |ctx| run_in(&check, ctx)
+            )
+            .cause,
+            Cause::Absent
+        );
+    }
+
+    #[test]
+    fn a_walk_names_the_path_with_brackets_and_lists_where_each_value_was_read() {
+        let input = json!({"things": [with_deps(json!([{"name": "click"}, {}]))]});
+        let ctx = Ctx {
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: None,
+            aliases: BTreeMap::new(),
+        };
+        let walk = walked(&key_path(Start::Subject, &["deps", "name"]), &ctx).unwrap();
+        assert_eq!(walk.name, "deps[].name");
+        assert_eq!(walk.value, vec![json!("click"), Value::Null]);
+        assert_eq!(
+            walk.locations,
+            vec!["/things/0/deps/0/name", "/things/0/deps/1"]
+        );
+        assert_eq!(walk.cause, Some(Cause::Absent));
+        assert_eq!(walk.text, "item 2 of deps: name is missing");
     }
 }

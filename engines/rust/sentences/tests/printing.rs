@@ -202,9 +202,9 @@ fn a_dotted_path_in_the_path_of_a_from_line_keeps_its_dot_for_an_alias() {
 }
 
 #[test]
-fn a_list_path_never_gets_an_alias_dot() {
+fn a_list_path_keeps_its_dot_when_an_alias_has_its_name() {
     let read = from("x whose y is in .pr");
-    assert_eq!(print_from(&read, &["pr"], &[]), "x whose y is in pr");
+    assert_eq!(print_from(&read, &["pr"], &[]), "x whose y is in .pr");
 }
 
 #[test]

@@ -429,7 +429,7 @@ fn list_text(list: &List, aliases: &[&str]) -> String {
             let parts: Vec<String> = values.iter().map(value_text).collect();
             parts.join(", ")
         }
-        List::Path(path) => path_text(path, Side::Right, aliases, true),
+        List::Path(path) => path_text(path, Side::Right, aliases, false),
     }
 }
 
