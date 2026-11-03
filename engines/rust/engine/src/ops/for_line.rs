@@ -1073,9 +1073,9 @@ impl For {
                         .collect();
                     if !ties.is_empty() && !second {
                         if leaf.is_empty() {
-                            parts.push(self.tie_text(&ties));
+                            parts.push(self.tie_text(&ties, depth + 1));
                         } else {
-                            leaf.push((self.tie_text(&ties), false));
+                            leaf.push((self.tie_text(&ties, depth + 1), false));
                         }
                     }
                     let said = if leaf.is_empty() {
@@ -1539,7 +1539,7 @@ impl For {
         out
     }
 
-    fn tie_text(&self, ties: &[&Dead]) -> String {
+    fn tie_text(&self, ties: &[&Dead], from: usize) -> String {
         let names: Vec<&str> = ties.iter().map(|d| d.name.as_str()).collect();
         let split: Vec<Option<(&str, &str)>> = names
             .iter()
@@ -1559,13 +1559,17 @@ impl For {
             }
             _ => names.join(" and "),
         };
-        let by = self.items.iter().find_map(|item| match &item.how {
-            How::Pick {
-                sorted: Some(sorted),
-                ..
-            } => Some(crate::name::name(&sorted.path)),
-            _ => None,
-        });
+        let by = self
+            .items
+            .iter()
+            .skip(from)
+            .find_map(|item| match &item.how {
+                How::Pick {
+                    sorted: Some(sorted),
+                    ..
+                } => Some(crate::name::name(&sorted.path)),
+                _ => None,
+            });
         match by {
             Some(by) => format!("{listed} tie on {by}"),
             None => format!("{listed} tie"),
@@ -1737,7 +1741,7 @@ impl For {
             .filter(|d| d.cause == Cause::Ambiguous)
             .collect();
         if let Some(first) = ties.first() {
-            said.push((first.order.clone(), self.tie_text(&ties), false));
+            said.push((first.order.clone(), self.tie_text(&ties, 0), false));
         }
         let mut failed: Vec<(Vec<Seg>, Value)> = level
             .dead
@@ -1803,7 +1807,7 @@ impl For {
             .filter(|d| d.cause == Cause::Ambiguous)
             .collect();
         if let Some(first) = hoisted_ties.first() {
-            said.push((first.order.clone(), self.tie_text(&hoisted_ties), false));
+            said.push((first.order.clone(), self.tie_text(&hoisted_ties, 1), false));
         }
         for entry in hoisted {
             if entry.cause != Cause::Ambiguous {
