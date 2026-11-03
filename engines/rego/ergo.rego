@@ -3521,12 +3521,29 @@ else := "absent"
 
 default _path_read_state(_, _) := "absent"
 
-_path_read_state(subj, path) := "not_an_object" if {
+_path_read_state(subj, path) := "not_an_object" if _starts_at_non_object(subj, path)
+
+_starts_at_non_object(subj, path) if {
 	start := _start_of(subj, path)
 	not is_object(start)
 	not _reads_itself(path)
 	not _position_first(path)
+	not _list_read_by_position(start, path)
 	not _params_not_given(path)
+	not _field_unusable_after_read(subj, path)
+}
+
+_list_read_by_position(start, path) if {
+	is_array(start)
+	_position_first(array.slice(path, 0, _first_field_step(path)))
+}
+
+_field_unusable_after_read(subj, path) if {
+	is_object(subj)
+	some i, seg in path
+	_field_step(seg)
+	_read_before_field(_resolved(subj, array.slice(path, 0, i)))
+	not is_string(object.get(subj, seg.named_by_field, null))
 }
 
 _reads_itself(path) if _keys_of(path) == []
@@ -3555,6 +3572,7 @@ _field_step_state(subj, path) := "not_an_object" if {
 } else := s if {
 	prefix := array.slice(path, 0, _first_field_step(path))
 	not _read_before_field(_resolved(subj, prefix))
+	not _starts_at_non_object(subj, path)
 	s := _state_before_field(subj, prefix)
 } else := "null" if {
 	some i, seg in path
