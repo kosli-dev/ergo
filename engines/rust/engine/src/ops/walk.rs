@@ -58,6 +58,7 @@ impl Seg {
 pub struct Options {
     pub if_any: bool,
     pub empty_adds_nothing: bool,
+    pub own_dot: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -569,7 +570,8 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
         unreadable: None,
         start: path.start.clone(),
         keeps_dot: path.start == Start::Own
-            && matches!(path.steps.first(), Some(Step::Key(key)) if ctx.aliases.contains_key(key)),
+            && (options.own_dot
+                || matches!(path.steps.first(), Some(Step::Key(key)) if ctx.aliases.contains_key(key))),
     };
     let mut failures: Vec<Failure> = raws
         .into_iter()
@@ -890,6 +892,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         Options {
             if_any: walk.if_any,
             empty_adds_nothing: false,
+            own_dot: false,
         },
     );
     let outside = outside_inputs(walk, &outer);
@@ -1138,10 +1141,12 @@ mod tests {
             Options {
                 if_any: true,
                 empty_adds_nothing: false,
+                own_dot: false,
             },
             Options {
                 if_any: false,
                 empty_adds_nothing: true,
+                own_dot: false,
             },
         ] {
             let (items, failures, _) = walked(subject.clone(), &["xs", "a"], options);

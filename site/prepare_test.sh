@@ -69,7 +69,7 @@ echo "{}" > examples/demo/input.json
 for file in lib.mjs main.mjs lib.test.mjs; do echo "export {};" > "site/assets/js/tutorial/$file"; done
 echo ".tut {}" > site/assets/css/tutorial.css
 echo ":root {}" > site/assets/css/ergo.css
-echo "<div></div>" > site/layouts/tutorial.html
+echo "<head></head><div></div>" > site/layouts/tutorial.html
 echo "---" > site/content/tutorial.md
 printf 'package ergo\n\nversion := "0.1.0-dev"\n\n_spec := "v0.1"\n' > engines/rego/ergo.rego
 for name in policy report; do
@@ -168,6 +168,10 @@ lacks site/prepared/assets/js/tutorial/lib.test.mjs
 has site/prepared/assets/css/tutorial.css
 has site/prepared/reference/ergo.css
 has site/prepared/layouts/tutorial.html
+grep -qF '{{ partial "analytics.html" . }}' site/prepared/layouts/tutorial.html || {
+  echo "the prepared tutorial layout should have the analytics partial" >&2
+  exit 1
+}
 has site/prepared/content/tutorial.md
 lacks site/prepared/data/examples.yaml
 has site/assets/tutorial/ergo.wasm

@@ -7,8 +7,12 @@ trap 'rm -rf "$dir"' EXIT
 echo '<!doctype html><html><head><title>Playground</title></head><body>hi</body></html>' > "$dir/playground.html"
 mkdir "$dir/public"
 "$script" "$dir/playground.html" "$dir/public"
-grep -q '<head><meta name="robots" content="noindex"><title>Playground</title>' "$dir/public/playground/index.html" || {
+grep -q '<head><meta name="robots" content="noindex"><script async src="https://www.googletagmanager.com/gtag/js?id=[A-Z0-9-]*"></script><script>.*</script><title>Playground</title>' "$dir/public/playground/index.html" || {
   echo "playground.sh should put the noindex meta inside <head>" >&2
+  exit 1
+}
+grep -qF "googletagmanager.com/gtag/js?id=$(sed -n 's/^ *googleAnalytics = "\(.*\)"$/\1/p' "$(dirname "$script")/hugo.toml")" "$dir/public/playground/index.html" || {
+  echo "playground.sh should add the Google Analytics tag to the playground page" >&2
   exit 1
 }
 grep -q '<body>hi</body>' "$dir/public/playground/index.html" || {

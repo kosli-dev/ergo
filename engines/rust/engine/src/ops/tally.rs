@@ -467,6 +467,9 @@ fn unusable_ref(check: &Check, ctx: &Ctx) -> Option<Cause> {
         .flat_map(path::step_refs)
         .collect();
     let causes = check.refs().into_iter().filter_map(|reference| {
+        if let Some(walk) = super::lists::walked(&reference, ctx) {
+            return walk.cause.filter(|cause| *cause != Cause::Value);
+        }
         let read = path::read(&reference, ctx);
         match (read.outcome.cause(), read.value) {
             (Some(cause), _) => Some(cause),
@@ -530,6 +533,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         Options {
             if_any: false,
             empty_adds_nothing: true,
+            own_dot: false,
         },
     );
     let whose: Vec<&Check> = counted.whose.iter().collect();
@@ -1135,6 +1139,7 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
             Options {
                 if_any: false,
                 empty_adds_nothing: true,
+                own_dot: false,
             },
         );
         if let Some(outcome) = walked.unreadable {
