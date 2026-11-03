@@ -4984,7 +4984,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
-    ("sum of lock.pkgs.n is 1", "sum of lock.pkgs.n is 1", &[], &[]),
+    (
+        "sum of lock.pkgs.n is 1",
+        "sum of lock.pkgs.n is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs is more than count of xs",
+        "count of xs is more than count of xs",
+        &[],
+        &[],
+    ),
+    (
+        "sum of xs.n is more than sum of xs.n",
+        "sum of xs.n is more than sum of xs.n",
+        &[],
+        &[],
+    ),
     (
         "tags contains none of .tags",
         "tags contains none of tags",

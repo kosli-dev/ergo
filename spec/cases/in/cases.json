@@ -745,5 +745,29 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count of or a sum of that is on both sides of a comparison is named once when its list is missing or null",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"count": "count of xs is more than count of xs", "sum": "sum of xs.n is more than sum of xs.n"}}}},
+    "cases": [
+      {
+        "description": "says the list is missing once",
+        "rules": ["message.join", "message.items"],
+        "input": {"repos": [{"id": "r1"}]},
+        "results": [
+          {"cause": "absent", "check": "count", "inputs": [{"locations": [], "name": "count of xs", "value": null}, {"locations": [], "name": "xs", "value": []}], "message": "xs is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "absent", "check": "sum", "inputs": [{"locations": [], "name": "sum of xs.n", "value": null}, {"locations": [], "name": "xs.n", "value": []}], "message": "xs is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "says the list is null once",
+        "rules": ["message.join", "message.items"],
+        "input": {"repos": [{"id": "r1", "xs": null}]},
+        "results": [
+          {"cause": "null", "check": "count", "inputs": [{"locations": [], "name": "count of xs", "value": null}, {"locations": [], "name": "xs", "value": []}], "message": "xs is null", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "null", "check": "sum", "inputs": [{"locations": [], "name": "sum of xs.n", "value": null}, {"locations": [], "name": "xs.n", "value": []}], "message": "xs is null", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      }
+    ]
   }
 ]

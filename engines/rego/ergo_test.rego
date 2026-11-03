@@ -11601,6 +11601,11 @@ test_a_for_line_keeps_the_dot_of_a_right_side_when_an_item_of_the_field_is_not_a
 	rows[0].message == "item 1 of items: item 1 of .p is \"t\", which isn't an object"
 }
 
+test_a_count_or_a_sum_on_both_sides_is_said_once_when_its_list_is_missing_or_null if {
+	_dot_plain_rows("count of xs is more than count of xs", {"repos": [{"id": "r"}]})[0].message == "xs is missing"
+	_dot_plain_rows("sum of xs.n is more than sum of xs.n", {"repos": [{"id": "r", "xs": null}]})[0].message == "xs is null"
+}
+
 test_a_field_on_both_sides_of_a_phrase_is_said_once_in_the_message if {
 	_dot_plain_rows("tags contains none of .tags", {"repos": [{"id": "r", "tags": ["a"]}]})[0].message == "tags is [\"a\"]"
 	_dot_plain_rows("tags contains none of tags", {"repos": [{"id": "r", "tags": ["a"]}]})[0].message == "tags is [\"a\"]"

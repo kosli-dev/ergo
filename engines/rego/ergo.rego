@@ -10269,7 +10269,7 @@ _m_message(check, subj, cause) := m if {
 	m := concat(", and ", clauses)
 } else := m if {
 	cause in {"absent", "null"}
-	clauses := array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); s.state in _m_cause_states(check, cause)], _m_tallies(subj, check, cause))
+	clauses := _once(array.concat([_m_state_clause(s) | some s in _m_sources(subj, check); s.state in _m_cause_states(check, cause)], _m_tallies(subj, check, cause)))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if cause in {"absent", "null"}
