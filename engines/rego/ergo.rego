@@ -10243,11 +10243,6 @@ _m_side_value(_, side) := v if {
 	v := _written(side)
 }
 
-_m_side_value(_, side) := v if {
-	_is_ref(side)
-	v := _arg(side)
-}
-
 _m_side_value(subj, side) := v if {
 	_side_form(side) in {"count_of", "sum_of", "elapsed", "add", "join"}
 	[v] := _side_eval(subj, side).v
@@ -10979,10 +10974,7 @@ _m_from_ref_list(req) := array.concat(
 	[{"ref": r, "kind": "a list of text"} | some r in sort({r | some r in _keys_refs(_each_step(req))})],
 )
 
-_m_from_ref_cause(r) := "unusable" if {
-	_ref_state(r.ref) == "value"
-	_m_from_ref_text(r, "unusable")
-} else := _ref_state(r.ref)
+_m_from_ref_cause(r) := _ref_state(r.ref)
 
 _m_from_ref_text(r, state) := concat("", [_ref_name(r.ref), " is ", _m_state_word(state)]) if {
 	state in {"absent", "null"}

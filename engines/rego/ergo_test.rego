@@ -11268,3 +11268,13 @@ test_message_names_a_param_that_isnt_a_time_on_the_right_of_a_time_comparison if
 	row.cause == "unusable"
 	row.message == "$params.deadline is \"soon\", which isn't a time"
 }
+
+test_message_of_an_unreadable_input_with_refs_that_are_fine_still_has_a_message if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things named by $params.k", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is 1"}}}}
+	r := ergo.report({1: "x"}, policy, {"k": "a"})
+	some row in r.results
+	row.check == "$min_subjects"
+	row.passed == false
+	row.cause == "unusable"
+	is_string(row.message)
+}
