@@ -6721,7 +6721,14 @@ _s_marked_term(t, names) := object.union(t, {f: _s_marked(t[f], names, false) |
 
 _s_marked_phrase(ph, names) := object.union(ph, {"terms": [_s_marked_term(t, names) | some t in ph.terms]}) if is_array(object.get(ph, "terms", null))
 
+else := object.union(ph, {"path": _s_marked_dot(ph.path, names)}) if is_object(object.get(ph, "path", null))
+
 else := ph
+
+_s_marked_dot(p, names) := object.union(p, {"field": true, "own": false}) if {
+	_s_markable(p, names.all)
+	object.get(p, "dot", false) == true
+} else := p
 
 _s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, true), "phrase": _s_marked_phrase(c.phrase, names)}) if "path" in object.keys(c)
 
@@ -8334,12 +8341,7 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 	not _s_field_arg(a.phrase)
 }
 
-_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_dot_field(_s_list_path(a.phrase)))}, _s_shown_inputs(a)) if _s_field_arg(a.phrase)
-
-_s_dot_field(p) := object.union(p, {"field": true}) if {
-	object.get(p, "dot", false) == true
-	not "start" in object.keys(p)
-} else := p
+_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))}, _s_shown_inputs(a)) if _s_field_arg(a.phrase)
 
 _s_shown_inputs(a) := {"inputs": [_s_model_path(a.path)]} if _s_named_arg(a.phrase)
 
@@ -11003,6 +11005,12 @@ _m_other_path(x, a) if {
 	count(x) > 0
 	is_string(x[0])
 	x[0] != concat("", ["$", a])
+}
+
+_m_other_path(x, _) if {
+	is_array(x)
+	count(x) > 0
+	_string_literal(x[0])
 }
 
 _m_other_name(x, _) if {

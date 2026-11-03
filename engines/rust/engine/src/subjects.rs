@@ -241,6 +241,7 @@ fn walk_every<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>]) -> Read<'a> {
         walk::Options {
             if_any: true,
             empty_adds_nothing: false,
+            own_dot: false,
         },
     );
     if let Some(outcome) = walked.unreadable {

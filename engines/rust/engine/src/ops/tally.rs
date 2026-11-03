@@ -533,6 +533,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         Options {
             if_any: false,
             empty_adds_nothing: true,
+            own_dot: false,
         },
     );
     let whose: Vec<&Check> = counted.whose.iter().collect();
@@ -1138,6 +1139,7 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
             Options {
                 if_any: false,
                 empty_adds_nothing: true,
+                own_dot: false,
             },
         );
         if let Some(outcome) = walked.unreadable {

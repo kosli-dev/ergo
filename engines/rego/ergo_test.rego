@@ -11530,3 +11530,60 @@ test_a_leading_dot_on_a_right_side_that_walks_reads_the_field_and_not_the_part i
 	doc := {"repos": [{"id": "r", "x": "a.py", "lockfile": {"pkgs": [{"name": "a.py"}]}, "lock": {"pkgs": [{"name": "nope"}]}}]}
 	[[r.check, r.cause] | some r in ergo.report(doc, policy, {}).results; not startswith(r.check, "$")] == [["dot", "value"], ["part", "satisfied"]]
 }
+
+_dot_policy(checks) := {
+	"ergo_spec": "v0.5-dev",
+	"subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}},
+	"requirements": {"s": {"subject": "repo", "checks": checks}},
+}
+
+_dot_summary(results) := [{"cause": r.cause, "message": object.get(r, "message", null), "names": [i.name | some i in r.inputs]} |
+	some r in results
+	r.check == "c"
+]
+
+_dot_rows(lock) := _dot_summary(ergo.report({"repos": [{"id": "r", "x": "a", "lockfile": {"pkgs": [{"name": "a"}]}, "lock": lock}]}, _dot_policy({"c": "x is in .lock.pkgs.name"}), {}).results)
+
+_dot_plain_rows(check, doc) := _dot_summary(ergo.report(
+	doc, {
+		"ergo_spec": "v0.5-dev",
+		"subjects": {"repo": {"from": "repos", "identified_by": "id"}},
+		"requirements": {"s": {"subject": "repo", "checks": {"c": check}}},
+	},
+	{},
+).results)
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_as_absent_when_an_item_of_the_field_has_no_name if {
+	_dot_rows({"pkgs": [{"name": "a"}, {}]}) == [{"cause": "absent", "message": "item 2 of .lock.pkgs: name is missing", "names": ["x", ".lock.pkgs[].name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_when_the_field_has_no_list if {
+	_dot_rows(null) == [{"cause": "absent", "message": ".lock.pkgs.name is missing", "names": ["x", ".lock.pkgs.name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_as_null_when_an_item_of_the_field_has_a_null_name if {
+	_dot_rows({"pkgs": [{"name": null}]}) == [{"cause": "null", "message": "item 1 of .lock.pkgs: name is null", "names": ["x", ".lock.pkgs[].name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_as_unusable_when_the_field_holds_text if {
+	_dot_rows({"pkgs": "text"}) == [{"cause": "unusable", "message": ".lock.pkgs is \"text\", which isn't an object", "names": ["x", ".lock.pkgs.name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_walks_fails_as_value_when_the_list_of_the_field_is_empty if {
+	_dot_rows({"pkgs": []}) == [{"cause": "value", "message": "x is \"a\", and .lock.pkgs is []", "names": ["x", ".lock.pkgs[].name"]}]
+}
+
+test_a_leading_dot_on_a_right_side_is_named_without_the_dot_when_nothing_has_its_name if {
+	_dot_plain_rows("x is in .lock.pkgs.name", {"repos": [{"id": "r", "x": "a"}]}) == [{"cause": "absent", "message": "lock.pkgs.name is missing", "names": ["x", "lock.pkgs.name"]}]
+	_dot_plain_rows("x is one of .tags", {"repos": [{"id": "r", "x": "z", "tags": ["a"]}]}) == [{"cause": "value", "message": "x is \"z\", and tags is [\"a\"]", "names": ["x", "tags"]}]
+}
+
+test_a_leading_dot_on_a_right_side_that_reads_the_left_field_lists_it_once if {
+	_dot_plain_rows("x contains all of .x", {"repos": [{"id": "r", "x": "a.py"}]}) == [{"cause": "unusable", "message": "x is \"a.py\", which isn't a list", "names": ["x"]}]
+}
+
+test_a_for_line_item_keeps_its_alias_when_the_right_side_reads_a_field_called_like_it if {
+	rows := _dot_plain_rows({"for": "every items as p", "assert": "p.name is in .p.name"}, {"repos": [{"id": "r", "p": [], "items": [{"name": "a"}]}]})
+	rows[0].message == "item 1 of items: p.name is \"a\", and .p is []"
+	rows[0].names == [".p.name", "items[]"]
+}

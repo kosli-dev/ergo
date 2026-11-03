@@ -4966,6 +4966,17 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("x is in lock.pkgs.name", "x is in lock.pkgs.name", &[], &[]),
+    ("i.name is in .q.name", "i.name is in q.name", &[], &[]),
+    (
+        "name is in .allowed.name",
+        "name is in allowed.name",
+        &[],
+        &[],
+    ),
+    ("p.name is in .p.name", "p.name is in p.name", &[], &[]),
+    ("q.name is in .q.name", "q.name is in q.name", &[], &[]),
+    ("x contains all of .x", "x contains all of x", &[], &[]),
+    ("x is one of .tags", "x is in tags", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8373,6 +8384,8 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("first of lst as w", "first of lst as w", &[], &[]),
     ("every deps as d", "every deps as d", &[], &[]),
+    ("every items as p", "every items as p", &[], &[]),
+    ("every items as q", "every items as q", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

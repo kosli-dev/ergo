@@ -554,5 +554,96 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a leading dot on a right side that walks, with a part and a field of the same name",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name"}}}},
+    "cases": [
+      {
+        "description": "is satisfied by the field, and fails as value when it does not hold the name",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.plain"],
+        "input": {"repos": [{"id": "r1", "x": "a", "lock": {"pkgs": [{"name": "a"}]}, "lockfile": {"pkgs": [{"name": "nope"}]}}, {"id": "r2", "x": "a", "lock": {"pkgs": [{"name": "b"}]}, "lockfile": {"pkgs": [{"name": "a"}]}}]},
+        "results": [
+          {"cause": "satisfied", "check": "dot", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": ["/repos/0/lock/pkgs/0/name"], "name": ".lock.pkgs[].name", "value": ["a"]}], "passed": true, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "value", "check": "dot", "inputs": [{"locations": ["/repos/1/x"], "name": "x", "value": "a"}, {"locations": ["/repos/1/lock/pkgs/0/name"], "name": ".lock.pkgs[].name", "value": ["b"]}], "message": "x is \"a\", and .lock.pkgs[].name is [\"b\"]", "passed": false, "requirement": "s", "subject": {"id": "r2", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "fails as absent when an item of the field has no name, or the field is missing",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "x": "a", "lock": {"pkgs": [{"name": "a"}, {}]}, "lockfile": {"pkgs": [{"name": "a"}]}}, {"id": "r2", "x": "a", "lockfile": {"pkgs": [{"name": "a"}]}}]},
+        "results": [
+          {"cause": "absent", "check": "dot", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": ["/repos/0/lock/pkgs/0/name", "/repos/0/lock/pkgs/1"], "name": ".lock.pkgs[].name", "value": ["a", null]}], "message": "item 2 of .lock.pkgs: name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "absent", "check": "dot", "inputs": [{"locations": ["/repos/1/x"], "name": "x", "value": "a"}, {"locations": ["/repos/1"], "name": ".lock.pkgs.name", "value": null}], "message": ".lock.pkgs.name is missing", "passed": false, "requirement": "s", "subject": {"id": "r2", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "fails as null when an item of the field has a null name",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "x": "a", "lock": {"pkgs": [{"name": "a"}, {"name": null}]}, "lockfile": {"pkgs": [{"name": "a"}]}}]},
+        "results": [
+          {"cause": "null", "check": "dot", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": ["/repos/0/lock/pkgs/0/name", "/repos/0/lock/pkgs/1/name"], "name": ".lock.pkgs[].name", "value": ["a", null]}], "message": "item 2 of .lock.pkgs: name is null", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "fails as unusable when the field holds text where the list should be",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "x": "a", "lock": {"pkgs": "text"}, "lockfile": {"pkgs": [{"name": "a"}]}}]},
+        "results": [
+          {"cause": "unusable", "check": "dot", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": ["/repos/0/lock/pkgs"], "name": ".lock.pkgs.name", "value": null}], "message": ".lock.pkgs is \"text\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "fails as value when the list of the field is empty",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "x": "a", "lock": {"pkgs": []}, "lockfile": {"pkgs": [{"name": "a"}]}}]},
+        "results": [
+          {"cause": "value", "check": "dot", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a"}, {"locations": [], "name": ".lock.pkgs[].name", "value": []}], "message": "x is \"a\", and .lock.pkgs is []", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a leading dot on a right side only keeps its dot in a name when a part, an alias or a parent has that name",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "repo", "checks": {"missing": "x is in .lock.pkgs.name", "text": "x contains all of .x", "list": "x is one of .tags"}}, "t": {"subject": "dep", "checks": {"missing": "name is in .allowed.name"}}}},
+    "cases": [
+      {
+        "description": "names the path without the dot when nothing has its name",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "x": "a.py", "tags": ["b"], "deps": [{"name": "click"}]}]},
+        "results": [
+          {"cause": "value", "check": "list", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a.py"}, {"locations": ["/repos/0/tags"], "name": "tags", "value": ["b"]}], "message": "x is \"a.py\", and tags is [\"b\"]", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "absent", "check": "missing", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a.py"}, {"locations": ["/repos/0"], "name": "lock.pkgs.name", "value": null}], "message": "lock.pkgs.name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "unusable", "check": "text", "inputs": [{"locations": ["/repos/0/x"], "name": "x", "value": "a.py"}], "message": "x is \"a.py\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "absent", "check": "missing", "inputs": [{"locations": ["/repos/0/deps/0/name"], "name": "name", "value": "click"}, {"locations": ["/repos/0/deps/0"], "name": "allowed.name", "value": null}], "message": "allowed.name is missing", "passed": false, "requirement": "t", "subject": {"id": "click", "in": {"repo": "r1"}, "type": "dep"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a leading dot on the right of a for line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"alias": {"for": "every items as p", "assert": "p.name is in .p.name"}, "alias_list": {"for": "every items as q", "assert": "q.name is in .q.name"}, "other": {"for": "every items as i", "assert": "i.name is in .q.name"}}}}},
+    "cases": [
+      {
+        "description": "keeps the alias on the item and the dot on a field called like the alias",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "p": [], "q": [{"name": "b"}], "items": [{"name": "a"}]}]},
+        "results": [
+          {"cause": "value", "check": "alias", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "p.name is in .p.name", "cause": "value", "inputs": [{"locations": ["/repos/0/items/0/name"], "name": "p.name", "value": "a"}, {"locations": [], "name": ".p[].name", "value": []}]}], "item": "item 1 of items", "locations": ["/repos/0/items/0"], "path": "item 1 of items", "value": {"name": "a"}}], "inputs": [{"locations": ["/repos/0/p"], "name": ".p.name", "value": null}, {"locations": ["/repos/0/items/0"], "name": "items[]", "value": [{"name": "a"}]}], "message": "item 1 of items: p.name is \"a\", and .p is []", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "value", "check": "alias_list", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "q.name is in .q.name", "cause": "value", "inputs": [{"locations": ["/repos/0/items/0/name"], "name": "q.name", "value": "a"}, {"locations": ["/repos/0/q/0/name"], "name": ".q[].name", "value": ["b"]}]}], "item": "item 1 of items", "locations": ["/repos/0/items/0"], "path": "item 1 of items", "value": {"name": "a"}}], "inputs": [{"locations": ["/repos/0/q"], "name": ".q.name", "value": null}, {"locations": ["/repos/0/items/0"], "name": "items[]", "value": [{"name": "a"}]}], "message": "item 1 of items: q.name is \"a\", and .q[].name is [\"b\"]", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "value", "check": "other", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "i.name is in q.name", "cause": "value", "inputs": [{"locations": ["/repos/0/items/0/name"], "name": "i.name", "value": "a"}, {"locations": ["/repos/0/q/0/name"], "name": "q[].name", "value": ["b"]}]}], "item": "item 1 of items", "locations": ["/repos/0/items/0"], "path": "item 1 of items", "value": {"name": "a"}}], "inputs": [{"locations": ["/repos/0/items/0"], "name": "items[]", "value": [{"name": "a"}]}, {"locations": ["/repos/0/q"], "name": "q.name", "value": null}], "message": "item 1 of items: i.name is \"a\", and q[].name is [\"b\"]", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "lists the right side after the items when no name has the dot",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.fail"],
+        "input": {"repos": [{"id": "r1", "q": [{"name": "a"}, {}], "items": [{"name": "a"}]}]},
+        "results": [
+          {"cause": "absent", "check": "alias", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "p.name is in .p.name", "cause": "absent", "inputs": [{"locations": ["/repos/0/items/0/name"], "name": "p.name", "value": "a"}, {"locations": ["/repos/0"], "name": ".p.name", "value": null}]}], "item": "item 1 of items", "locations": ["/repos/0/items/0"], "path": "item 1 of items", "value": {"name": "a"}}], "inputs": [{"locations": ["/repos/0"], "name": ".p.name", "value": null}, {"locations": ["/repos/0/items/0"], "name": "items[]", "value": [{"name": "a"}]}], "message": "item 1 of items: .p.name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "absent", "check": "alias_list", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "q.name is in .q.name", "cause": "absent", "inputs": [{"locations": ["/repos/0/items/0/name"], "name": "q.name", "value": "a"}, {"locations": ["/repos/0/q/0/name", "/repos/0/q/1"], "name": ".q[].name", "value": ["a", null]}]}], "item": "item 1 of items", "locations": ["/repos/0/items/0"], "path": "item 1 of items", "value": {"name": "a"}}], "inputs": [{"locations": ["/repos/0/q"], "name": ".q.name", "value": null}, {"locations": ["/repos/0/items/0"], "name": "items[]", "value": [{"name": "a"}]}], "message": "item 1 of items: item 2 of .q: name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "absent", "check": "other", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "i.name is in q.name", "cause": "absent", "inputs": [{"locations": ["/repos/0/items/0/name"], "name": "i.name", "value": "a"}, {"locations": ["/repos/0/q/0/name", "/repos/0/q/1"], "name": "q[].name", "value": ["a", null]}]}], "item": "item 1 of items", "locations": ["/repos/0/items/0"], "path": "item 1 of items", "value": {"name": "a"}}], "inputs": [{"locations": ["/repos/0/items/0"], "name": "items[]", "value": [{"name": "a"}]}, {"locations": ["/repos/0/q"], "name": "q.name", "value": null}], "message": "item 1 of items: item 2 of q: name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      }
+    ]
   }
 ]
