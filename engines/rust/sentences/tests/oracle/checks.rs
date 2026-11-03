@@ -5126,7 +5126,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         &["doesn't parse"],
     ),
     (
-        ".true is between 2.5 and 4e2 and sum of x is not empty and every $params.p whose count of k1 is less than sum of k1 plus .\"a.b\" and .\"a.b\".\"é\".\"\" is \"s\" and $input.i does not contain 1e2 contains x",
+        ".true is between 2.5 and 4e2 and sum of x is not empty and every $params.p whose count of k1 is less than sum of k1 plus .\"a.b\" and whose .\"a.b\".\"é\".\"\" is \"s\" and whose $input.i does not contain 1e2 contains x",
         &[
             "\"contains\" after every or some would check each item of the last list, not the list: put the walk on a for line",
             "is not empty can't follow a count of, a sum of or a plus",
@@ -5972,7 +5972,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         &["doesn't parse"],
     ),
     (
-        "sum of .true whose sum of .\"a.b\".\"\"[3] equals -2.50 and sum of .\"a.b\".\"w v\" is \"s\" within 2 is before 5 plus days elapsed from .true to zz._k.\"w v\" plus .it",
+        "sum of .true whose sum of .\"a.b\".\"\"[3] equals -2.50 and whose sum of .\"a.b\".\"w v\" is \"s\" within 2 is before 5 plus days elapsed from .true to zz._k.\"w v\" plus .it",
         &[
             "\"within\" only compares numbers",
             "is before can't follow a count of, a sum of or a plus",
@@ -6248,11 +6248,11 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["\"is before\" takes a time or a number"],
     ),
     (
-        "count of .it.y.\"é\" is true and sum of zz is x plus x[0] and some \"q r\".\"é\"._k whose count of y equals days elapsed from \"q r\" to ._x-1 and .empty equals $input.i plus hours elapsed from .it[$params.k] to ._x-1.q, if any, is days elapsed from $params.p to .empty",
+        "count of .it.y.\"é\" is true and sum of zz is x plus x[0] and some \"q r\".\"é\"._k whose count of y equals days elapsed from \"q r\" to ._x-1 and whose .empty equals $input.i plus hours elapsed from .it[$params.k] to ._x-1.q, if any, is days elapsed from $params.p to .empty",
         &["if any can't go with some"],
     ),
     (
-        "count of item 3 of .true whose y equals 0.10 and y does not match 1e2 equals 0.10",
+        "count of item 3 of .true whose y equals 0.10 and whose y does not match 1e2 equals 0.10",
         &["invalid pattern 100"],
     ),
     (
@@ -6662,7 +6662,7 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ("every x matches \"\\\\C\"", &["invalid pattern \"\\\\C\""]),
     ("every x matches \"a?+\"", &["invalid pattern \"a?+\""]),
     (
-        "every x.q.q whose sum of .\"a.b\".\"w v\".\"é\" equals null and last of k1 is less than true is days elapsed from .empty to \"$s\".\"é\".\"\"",
+        "every x.q.q whose sum of .\"a.b\".\"w v\".\"é\" equals null and whose last of k1 is less than true is days elapsed from .empty to \"$s\".\"é\".\"\"",
         &["\"is less than\" takes a number"],
     ),
     (
@@ -7038,7 +7038,7 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "sum of .empty.z named by $params.\"x y\" whose $input.i is more than null and weeks elapsed from .true to first of .it is more than -2.50 is $params.p",
+        "sum of .empty.z named by $params.\"x y\" whose $input.i is more than null and whose weeks elapsed from .true to first of .it is more than -2.50 is $params.p",
         &["\"is more than\" takes a number"],
     ),
     (
@@ -7113,7 +7113,7 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ("x named by empty is 1", &["empty can't be an alias"]),
     ("x starts with null", &["\"starts with\" takes text"]),
     (
-        "y contains x.\"\" named by k and some item 3 of zz is 1e2 and some .true whose y is a non-empty string and days elapsed from zz to last of .\"a.b\" is k1 and weeks elapsed from .it to .it is equal to 'b\\c' within 2 is 1e2",
+        "y contains x.\"\" named by k and some item 3 of zz is 1e2 and some .true whose y is a non-empty string and whose days elapsed from zz to last of .\"a.b\" is k1 and whose weeks elapsed from .it to .it is equal to 'b\\c' within 2 is 1e2",
         &["\"within\" only compares numbers"],
     ),
     (
@@ -7544,8 +7544,8 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
-        "every item 3 of .empty whose .\"a.b\" does not match last of $params.p and count of k1 is equal to null, if any, as j",
-        "every item 3 of .empty whose \"a.b\" does not match last of $params.p and count of k1 is null, if any, as j",
+        "every item 3 of .empty whose .\"a.b\" does not match last of $params.p and whose count of k1 is equal to null, if any, as j",
+        "every item 3 of .empty whose \"a.b\" does not match last of $params.p and whose count of k1 is null, if any, as j",
         &[],
         &[],
     ),
@@ -7591,8 +7591,8 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every items as z", "every items as z", &[], &[]),
     (
-        "every items whose k is 1 and j is 2 as i",
-        "every items whose k is 1 and j is 2 as i",
+        "every items whose k is 1 and whose j is 2 as i",
+        "every items whose k is 1 and whose j is 2 as i",
         &[],
         &[],
     ),
@@ -8509,7 +8509,7 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
         &["doesn't parse"],
     ),
     (
-        "every .empty.q whose .true.z does not exist and sum of .it is .true as it, some y named by k.\"é\" whose count of .\"a.b\" named by k[0] matches 1, \"a\\u00e9\", \"s\" and k1 is less than null plus item 3 of x plus $input.i as j, first of zz sorted by .empty.\"é\", if any, as l",
+        "every .empty.q whose .true.z does not exist and whose sum of .it is .true as it, some y named by k.\"é\" whose count of .\"a.b\" named by k[0] matches 1, \"a\\u00e9\", \"s\" and whose k1 is less than null plus item 3 of x plus $input.i as j, first of zz sorted by .empty.\"é\", if any, as l",
         &["a for line holds two items at most"],
     ),
     (
@@ -8904,7 +8904,7 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["params can't be an alias"],
     ),
     (
-        "every ._x-1 whose count of y is less than $input.i and first of .empty.y does not match 'b\\c', \"s\", if any, as pr",
+        "every ._x-1 whose count of y is less than $input.i and whose first of .empty.y does not match 'b\\c', \"s\", if any, as pr",
         &["invalid pattern \"b\\\\c\""],
     ),
     (
@@ -8932,7 +8932,7 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["it can't be an alias"],
     ),
     (
-        "every item 3 of y whose .\"a.b\" equals null and x is a string as params",
+        "every item 3 of y whose .\"a.b\" equals null and whose x is a string as params",
         &["params can't be an alias"],
     ),
     ("every items as empty", &["empty can't be an alias"]),
@@ -8995,7 +8995,7 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["it can only start an assertion: write it first, like it is not empty"],
     ),
     (
-        "every x as j, some \"$s\" whose .true named by kk is not in $input.i and k1 is days elapsed from .true to \"$s\", if any, as it",
+        "every x as j, some \"$s\" whose .true named by kk is not in $input.i and whose k1 is days elapsed from .true to \"$s\", if any, as it",
         &["if any can't go with some", "it can't be an alias"],
     ),
     ("every xs as empty", &["empty can't be an alias"]),
@@ -9015,7 +9015,7 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["params can't be an alias"],
     ),
     (
-        "first of \"$s\".y as l, every .\"a.b\" whose .empty is null and y is not in 0.10, 1e2, 0.10 as it",
+        "first of \"$s\".y as l, every .\"a.b\" whose .empty is null and whose y is not in 0.10, 1e2, 0.10 as it",
         &["it can't be an alias"],
     ),
     (
@@ -9048,7 +9048,7 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ),
     ("some \"$s\" as params", &["params can't be an alias"]),
     (
-        "some \"$s\" whose $input.i is count of zz plus item 3 of $params.p.\"\".\"w v\" plus $params.p and .it[$params.k] is alphabetically after 1e2 as it, every item 2 from last of k1.q as j",
+        "some \"$s\" whose $input.i is count of zz plus item 3 of $params.p.\"\".\"w v\" plus $params.p and whose .it[$params.k] is alphabetically after 1e2 as it, every item 2 from last of k1.q as j",
         &[
             "\"is alphabetically after\" takes text",
             "it can't be an alias",

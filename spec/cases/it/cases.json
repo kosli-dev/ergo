@@ -309,7 +309,7 @@
   },
   {
     "description": "it in the whose of a from line",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"word": {"from": "every ws whose it is a string and it starts with 'b'"}}, "requirements": {"r": {"subject": "word", "checks": {"c": "it is a string"}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"word": {"from": "every ws whose it is a string and whose it starts with 'b'"}}, "requirements": {"r": {"subject": "word", "checks": {"c": "it is a string"}}}},
     "cases": [
       {
         "description": "each item is read as the subject, and the $applies row names it it",

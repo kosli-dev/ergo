@@ -237,7 +237,7 @@
       "ergo_spec": "v0.5-dev",
       "subjects": {
         "thing": {
-          "from": "things whose status is \"COMPLETE\" and status exists",
+          "from": "things whose status is \"COMPLETE\" and whose status exists",
           "identified_by": "id"
           }
       },
