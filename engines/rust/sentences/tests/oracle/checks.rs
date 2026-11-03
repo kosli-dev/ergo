@@ -1,4 +1,5 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("w is not empty", "w is not empty", &[], &[]),
     (".y.k is 9", "y.k is 9", &[], &[]),
     (".zz is 1", "zz is 1", &[], &[]),
     ("count of .round is 1", "count of round is 1", &[], &[]),
@@ -6177,6 +6178,10 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         &["doesn't parse"],
     ),
     ("every ws that is not empty", &["doesn't parse"]),
+    (
+        "every that is not empty",
+        &["that is a word of the grammar: write .that"],
+    ),
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
@@ -7300,6 +7305,12 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every ws that is one of \"bay\", \"bee\" as w",
+        "every ws that is one of \"bay\", \"bee\" as w",
+        &[],
+        &[],
+    ),
     (
         "every .cov.xs as p, every cov.xs as q",
         "every cov.xs as p, every cov.xs as q",

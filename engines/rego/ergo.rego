@@ -5883,9 +5883,9 @@ _s_patterns := {
 	"for_item": concat("", [`^(?:(every|some) +)?(`, path, `)(?: +(`, conds, `))?(?: +sorted +by +(`, path, `)( +alphabetically)?)?(, +if +any,)? +as +(`, key, `)$`]),
 	"from": concat("", [`^(`, path, `)(?: +named +by +each +of +(`, rpath, `))?(?: +(`, from_conds, `))?$`]),
 	"from_conds": concat("", [`(`, from_cond, `)(?: +and +|$)`]),
-	"from_cond": concat("", [`^(?:whose +(?:(every|some) +(`, path, `)(, +if +any,)?|(`, left, `)) +(`, phrase, `)|that +(`, phrase, `))$`]),
+	"from_cond": concat("", [`^(?:whose +(?:(every|some) +(`, path, `)(, +if +any,)?|(`, left, `)) +|that +)(`, phrase, `)$`]),
 	"conds": concat("", [`(`, cond, `)(?: +and +|$)`]),
-	"cond": concat("", [`^(?:whose +(`, left, `) +(`, phrase, `)|that +(`, phrase, `))$`]),
+	"cond": concat("", [`^(?:whose +(`, left, `) +|that +)(`, phrase, `)$`]),
 	"phrases": phrases,
 	"kinds": object.union({kind[0]: concat("", [`^(?:`, kind[1], `)$`]) | some kind in kinds}, {"operand": concat("", [`^(?:`, joined, `)$`]), "operand_within": concat("", [`^(?:`, joined, `(?: +within +`, num, `)?)$`])}),
 	"plain": concat("", [`^(`, path, `) +(\S.*)$`]),
@@ -5977,9 +5977,9 @@ _s_patterns := {
 		["operand_within", concat("", [operand, `(?:`, roughly, `)*(?: +within +`, num, `)?`])],
 	]
 	phrase := concat("", [`(?:`, concat("|", [concat("", [`(?:`, concat("|", [ph[1] | some ph in phrases; ph[3] == kind[0]]), `)`, kind[1]]) | some kind in kinds]), `)(?:`, roughly, `)*`])
-	cond := concat("", [`(?:whose +(?:`, derived, `|`, path, `) +(?:`, phrase, `)|that +(?:`, phrase, `))`])
+	cond := concat("", [`(?:whose +(?:`, derived, `|`, path, `) +|that +)(?:`, phrase, `)`])
 	conds := concat("", [cond, `(?: +and +`, cond, `)*`])
-	from_cond := concat("", [`(?:whose +(?:(?:every|some) +`, path, `(?:, +if +any,)?|(?:`, derived, `|`, path, `)) +(?:`, phrase, `)|that +(?:`, phrase, `))`])
+	from_cond := concat("", [`(?:whose +(?:(?:every|some) +`, path, `(?:, +if +any,)?|(?:`, derived, `|`, path, `)) +|that +)(?:`, phrase, `)`])
 	from_conds := concat("", [from_cond, `(?: +and +`, from_cond, `)*`])
 	assertion := concat("", [`(?:(?:every|some) +`, path, `|`, left, `)(?: +`, conds, `)?(?:, +if +any,)? +(?:`, phrase, `)`])
 	for_item := concat("", [`(?:(?:every|some) +)?`, path, `(?: +`, conds, `)?(?: +sorted +by +`, path, `(?: +alphabetically)?)?(?:, +if +any,)? +as +`, key])
@@ -6179,9 +6179,10 @@ _s_from_cond_of(text, pat) := object.union(_s_left_of(m[4], pat), {"phrase": _s_
 	m[4] != ""
 }
 
-_s_from_cond_of(text, pat) := {"path": _s_that_path, "phrase": _s_phrase_of(m[6], pat)} if {
+_s_from_cond_of(text, pat) := {"path": _s_that_path, "phrase": _s_phrase_of(m[5], pat)} if {
 	m := regex.find_all_string_submatch_n(pat.from_cond, text, 1)[0]
-	m[6] != ""
+	m[1] == ""
+	m[4] == ""
 }
 
 _s_that_path := {"steps": ["that"], "that": true}
@@ -6191,9 +6192,9 @@ _s_cond_of(text, pat) := object.union(_s_left_of(m[1], pat), {"phrase": _s_phras
 	m[1] != ""
 }
 
-_s_cond_of(text, pat) := {"path": _s_that_path, "phrase": _s_phrase_of(m[3], pat)} if {
+_s_cond_of(text, pat) := {"path": _s_that_path, "phrase": _s_phrase_of(m[2], pat)} if {
 	m := regex.find_all_string_submatch_n(pat.cond, text, 1)[0]
-	m[3] != ""
+	m[1] == ""
 }
 
 _s_left_of(text, pat) := {"path": _s_path_of(text, pat)} if {
@@ -6803,16 +6804,12 @@ _s_parsed_anyway(text, pat) := {"assertions": assertions} if {
 	assertions := [_s_assertion_of(a, pat) | some a in pieces]
 	count(assertions) == count(pieces)
 	count(pieces) > 0
-}
-
-_s_parsed_anyway(text, pat) := {"items": items} if {
+} else := {"items": items} if {
 	pieces := _s_pieces(pat.for_items, text)
 	items := [_s_for_item_of(a, pat) | some a in pieces]
 	count(items) == count(pieces)
 	count(pieces) in {1, 2}
-}
-
-_s_parsed_anyway(text, pat) := _s_from_plain(text, pat)
+} else := _s_from_plain(text, pat)
 
 _s_check_text(parsed) := concat(" and ", [_s_assertion_text(a) | some a in parsed.assertions])
 
@@ -11100,17 +11097,24 @@ _for_why(_, _, _, wh, failure) := failure if {
 	wh.undecided == []
 }
 
-_for_why(item, e, names, wh, failure) := object.union(failure, {"why": [concat("", [_m_item_name(e.i, set()), ": ", m])]}) if {
+_for_why(item, e, names, wh, failure) := object.union(failure, {"why": [ms[0]]}) if {
 	failure != null
 	wh.undecided != []
-	ms := [_m_aliased(_message(c, e.iv, cause)) |
+	ms := [_m_why_text(_m_item_name(e.i, set()), c, _m_aliased(_message(c, e.iv, cause))) |
 		some c in item.whose
 		cause := _row_cause(c, e.iv, "") with input as {"ergo/names": names}
 		not cause in {"satisfied", "value"}
 	] with input as {"ergo/names": names}
 	count(ms) > 0
-	m := ms[0]
 } else := failure
+
+_m_why_text(name, c, m) := concat("", [name, " ", trim_prefix(m, "it ")]) if _m_itself(c)
+
+else := concat("", [name, ": ", m])
+
+_m_itself(c) if object.get(c, "path", null) == []
+
+_m_itself(c) if object.get(c, "left", null) == []
 
 _m_strip(f) := object.union(object.remove(f, ["msg", "said", "raw"]), object.union({"failed_assertions": [_m_strip_line(l) | some l in f.failed_assertions]}, _m_strip_items(f))) if "failed_assertions" in object.keys(f)
 

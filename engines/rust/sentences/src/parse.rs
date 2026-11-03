@@ -1126,29 +1126,28 @@ impl Parser {
 
     fn read_from_condition(&self, i: usize) -> Reads<FromCondition> {
         let mut out = Vec::new();
-        if let Some(w) = self.lead(i, "whose") {
-            if let Some((quantifier, j)) = self.quantifier(w)
-                && let Some(k) = self.ws(j)
-            {
-                for (path, m) in self.path_or_it(k) {
-                    let mut ends = Vec::new();
-                    if let Some(n) = self.if_any(m) {
-                        ends.push((true, n));
-                    }
-                    ends.push((false, m));
-                    for (if_any, n) in ends {
-                        if let Some(p) = self.ws(n) {
-                            for (phrase, end) in self.phrase(p, false) {
-                                out.push((
-                                    FromCondition::Quantified {
-                                        quantifier,
-                                        path: path.clone(),
-                                        if_any,
-                                        phrase,
-                                    },
-                                    end,
-                                ));
-                            }
+        if let Some(w) = self.lead(i, "whose")
+            && let Some((quantifier, j)) = self.quantifier(w)
+            && let Some(k) = self.ws(j)
+        {
+            for (path, m) in self.path_or_it(k) {
+                let mut ends = Vec::new();
+                if let Some(n) = self.if_any(m) {
+                    ends.push((true, n));
+                }
+                ends.push((false, m));
+                for (if_any, n) in ends {
+                    if let Some(p) = self.ws(n) {
+                        for (phrase, end) in self.phrase(p, false) {
+                            out.push((
+                                FromCondition::Quantified {
+                                    quantifier,
+                                    path: path.clone(),
+                                    if_any,
+                                    phrase,
+                                },
+                                end,
+                            ));
                         }
                     }
                 }

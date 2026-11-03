@@ -9,7 +9,7 @@ Each rule has a name in brackets, like `[present.missing]`. The cases in [`cases
 - The **input** is the JSON document being checked.
 - The **params** are a second JSON document the policy can read, or nothing.
 - A **subject** is one thing a requirement checks, found in the input by the `from` of the subject definition it names.
-- A **check** is one named test in a requirement's `checks`. A condition after `whose` in a subject's `from` line is a check too, called a **filter**.
+- A **check** is one named test in a requirement's `checks`. A condition after `whose` or `that` in a subject's `from` line is a check too, called a **filter**.
 - A **row** is the result of one check on one subject, or of one check Ergo adds to a requirement.
 
 ## The model of a check

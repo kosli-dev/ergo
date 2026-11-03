@@ -1050,5 +1050,47 @@
         ]
       }
     ]
+  },
+  {
+    "description": "that with no path in a check",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every that is not empty"}}}},
+    "cases": [
+      {
+        "description": "is written wrong, and the requirement gets no row but $well_formed",
+        "rules": ["sentence.condition.word", "sentence.check"],
+        "input": {"deployments": [{"id": "d1", "ws": ["x"]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["that is a word of the grammar: write .that"]}], "message": "checks.c: that is a word of the grammar: write .that", "passed": false, "requirement": "r", "subject": {"id": null, "type": "d"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that on a for line over a value that isn't text",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that starts with \"b\" as w", "assert": "w is not empty"}}}}},
+    "cases": [
+      {
+        "description": "names the item before what it is, without it",
+        "rules": ["sentence.condition.word", "for.walk"],
+        "input": {"deployments": [{"id": "d1", "ws": ["b", 3]}]},
+        "results": [
+          {"cause": "unusable", "check": "f", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 2 of ws", "locations": ["/deployments/0/ws/1"], "path": "item 2 of ws", "value": 3}], "inputs": [{"locations": ["/deployments/0/ws/0", "/deployments/0/ws/1"], "name": "ws[]", "value": ["b", 3]}], "message": "item 2 of ws is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": "d1", "type": "d"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "that with a value to compare on a for line over a value that isn't text",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that is one of \"bay\", \"bee\" as w", "assert": "w is not empty"}}}}},
+    "cases": [
+      {
+        "description": "names the item before what it is, without it",
+        "rules": ["sentence.condition.word", "for.walk"],
+        "input": {"deployments": [{"id": "d1", "ws": ["bay", 3]}]},
+        "results": [
+          {"cause": "unusable", "check": "f", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 2 of ws", "locations": ["/deployments/0/ws/1"], "path": "item 2 of ws", "value": 3}], "inputs": [{"locations": ["/deployments/0/ws/0", "/deployments/0/ws/1"], "name": "ws[]", "value": ["bay", 3]}], "message": "item 2 of ws is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": "d1", "type": "d"}}
+        ]
+      }
+    ]
   }
 ]
