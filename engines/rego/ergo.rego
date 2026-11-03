@@ -1875,7 +1875,8 @@ _plain_step_name(0, step) := concat("", ["\u0002", substring(step, 1, -1)]) if {
 
 _for_alias_step(step) if {
 	startswith(step, "$")
-	input["ergo/names"]["$for"][substring(step, 1, -1)] == true
+	input["ergo/names"]["$at"].names[substring(step, 1, -1)]
+	step != "$subject"
 }
 
 _plain_step_name(0, step) := _s_parent_key(substring(step, 1, -1)) if _parent_name(step)
@@ -8821,7 +8822,7 @@ _s_named_step(i, step, names) := concat("", ["$", step]) if {
 
 _for_names := object.get(input, "ergo/names", {})
 
-_bound(names, name, v, at) := object.union(names, {name: v, "$for": object.union(object.get(names, "$for", {}), {name: true}), "$at": object.union(object.get(names, "$at", {}), {"names": object.union(object.get(object.get(names, "$at", {}), "names", {}), {name: at})})})
+_bound(names, name, v, at) := object.union(names, {name: v, "$at": object.union(object.get(names, "$at", {}), {"names": object.union(object.get(object.get(names, "$at", {}), "names", {}), {name: at})})})
 
 _for_row(check, subj) := r if {
 	r := _for_row_raw(check, subj)
@@ -9266,10 +9267,19 @@ _for_line_inputs(check, c, inputs) := [_for_renamed(check, i) | some i in inputs
 
 _for_renamed(check, i) := object.union(i, {"name": _for_input_name(i.name, {item.as | some item in check.items})})
 
-_for_input_name(name, aliases) := concat("", [m[1], alias, m[2]]) if {
+_for_input_name(name, aliases) := concat("", [parts[0], alias, rest]) if {
+	parts := split(name, "\u0002")
+	count(parts) == 2
+	regex.match(`^(?:item [0-9]+ of )?$`, parts[0])
 	some alias in aliases
-	m := regex.find_all_string_submatch_n(concat("", [`(?s)^((?:item [0-9]+ of )?)\x02`, _quoted(alias), `((?:[.\[ ].*)?)$`]), name, 1)[0]
+	startswith(parts[1], alias)
+	rest := substring(parts[1], count(alias), -1)
+	_alias_rest(rest)
 } else := name
+
+_alias_rest("")
+
+_alias_rest(rest) if regex.match(`^[.\[ ]`, rest)
 
 _for_line_items(check, i, a, fails) := {"items": [{"item": _for_item_name(check, f.path), "cause": l.cause, "inputs": l.inputs, "msg": [_m_under(_m_for_item_name(check, f.path), x) | some x in l.msg], "own": _m_own_under(_m_for_item_name(check, f.path), object.get(l, "own_msg", null))} |
 	some p in sort({f.path | some f in fails; some l in f.lines; l.assertion == a})
