@@ -958,5 +958,22 @@
         ]
       }
     ]
+  },
+  {
+    "description": "an object holding values of different kinds on the right side of a list check",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": "x is in thing", "b": "x is not in thing", "c": "x is one of thing", "d": "x is in $input.o"}, "subject": "thing"}}, "subjects": {"thing": {"from": "every xs"}}},
+    "cases": [
+      {
+        "description": "the subject and a path that are objects are not lists, whatever their values are",
+        "rules": ["sentence.path.subject", "in.values", "in.fail"],
+        "input": {"o": {"a": 0, "b": [0]}, "xs": [{"thing": [0], "x": 0}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/xs/0"], "name": "thing", "value": {"thing": [0], "x": 0}}], "message": "thing is {\"thing\": [0], \"x\": 0}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/xs/0"], "name": "thing", "value": {"thing": [0], "x": 0}}], "message": "thing is {\"thing\": [0], \"x\": 0}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/xs/0"], "name": "thing", "value": {"thing": [0], "x": 0}}], "message": "thing is {\"thing\": [0], \"x\": 0}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}], "message": "$input.o is {\"a\": 0, \"b\": [0]}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]
