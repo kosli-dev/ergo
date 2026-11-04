@@ -521,10 +521,9 @@ impl For {
                 .zip(&verdicts)
                 .find(|(_, verdict)| !matches!(verdict.cause, Cause::Satisfied | Cause::Value))
                 .map(|(check, verdict)| {
-                    super::message::prefixed_for(
+                    super::message::prefixed(
                         &walked.item_name_dotted(&w.item_segs),
                         &super::message::message(check, &at, verdict),
-                        verdict.cause,
                     )
                 });
             let dead_item = |cause: Cause| Dead {

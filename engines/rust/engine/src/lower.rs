@@ -351,15 +351,13 @@ impl Scope {
             s::Start::Field { key, dot: false } | s::Start::Quoted(key) if key == subject => key,
             _ => return None,
         };
-        let only_item =
-            written.position.is_none() && matches!(written.steps.as_slice(), [s::Step::Index(_)]);
-        if !parts || written.steps.is_empty() || only_item {
+        if !parts || written.steps.is_empty() {
             return None;
         }
         let mut names: Vec<&str> = self.aliases_ref();
         names.push(subject);
-        let text = s::print_path(written, s::Side::Left, &names);
-        let field = s::print_path(
+        let text = s::print_path_as_written(written, s::Side::Left, &names);
+        let field = s::print_path_as_written(
             &s::Path {
                 position: None,
                 start: s::Start::Field {

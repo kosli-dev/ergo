@@ -16,6 +16,18 @@ pub fn print_path(path: &Path, side: Side, aliases: &[&str]) -> String {
     path_text(path, side, aliases, false)
 }
 
+/// Prints a path the way it was written, so a list position in brackets at its end stays in brackets instead of becoming `item 2 of`.
+///
+/// ```
+/// use ergo_policy_sentences::{Side, parse_path, print_path_as_written};
+///
+/// let path = parse_path("x.y[1]").unwrap();
+/// assert_eq!(print_path_as_written(&path, Side::Left, &[]), "x.y[1]");
+/// ```
+pub fn print_path_as_written(path: &Path, side: Side, aliases: &[&str]) -> String {
+    path_text_with(path, side, aliases, false, false)
+}
+
 /// Prints a term as a canonical sentence.
 ///
 /// `aliases` holds the names that shadow a field, like a `for` alias or a part. A field written with a dot and called like one of them keeps its dot.

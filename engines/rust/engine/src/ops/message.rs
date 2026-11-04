@@ -654,12 +654,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 }
                 found
             } else {
-                let label = if matches!(check, Check::For(_)) {
-                    "the subject"
-                } else {
-                    ctx.subject_label()
-                };
-                vec![isnt(label, subject, "an object")]
+                vec![isnt(ctx.subject_label(), subject, "an object")]
             }
         }
         _ => Vec::new(),
@@ -684,14 +679,6 @@ pub fn stated(name: &str, cause: Cause, value: &Value, kind: &str) -> String {
         Cause::Unusable => isnt(name, value, kind),
         Cause::NotAnObject => isnt(name, value, "an object"),
         _ => is(name, value),
-    }
-}
-
-pub fn prefixed_for(item: &str, said: &str, cause: Cause) -> String {
-    if cause == Cause::NotAnObject {
-        format!("{item}: {said}")
-    } else {
-        prefixed(item, said)
     }
 }
 

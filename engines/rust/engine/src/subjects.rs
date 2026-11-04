@@ -331,6 +331,7 @@ fn walk_from<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>], base: Located<'a>)
             }
         }
     }
+    let root = from_root(anc);
     for each in &mut broken {
         if let Some((number, tail)) = each
             .msg
@@ -338,7 +339,9 @@ fn walk_from<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>], base: Located<'a>)
             .and_then(|rest| rest.split_once(" of the subject"))
             && (tail.is_empty() || tail.starts_with([':', ' ']))
         {
-            each.msg = format!("item {number} of $input{tail}");
+            each.msg = format!("item {number} of {root}{tail}");
+        } else if let Some(rest) = each.msg.strip_prefix("the subject ") {
+            each.msg = format!("{root} {rest}");
         }
     }
     broken.sort_by(|a, b| a.order.cmp(&b.order));
@@ -425,25 +428,26 @@ fn from_name(path: &Path, source: &Source, anc: &[Anc], ctx: &Ctx, resolved: boo
     };
     if let Some(bare) = name.strip_prefix("$input.") {
         name = bare.to_string();
-    } else if name == "$input" {
-        name = "the subject".to_string();
     }
-    if let (Source::Child { .. }, Some(parent)) = (source, anc.last()) {
-        if name == parent.name {
-            name = "the subject".to_string();
-        } else if let Some(rest) = name.strip_prefix(&format!("{}.", parent.name)) {
-            name = rest.to_string();
-        }
+    if let (Source::Child { .. }, Some(parent)) = (source, anc.last())
+        && let Some(rest) = name.strip_prefix(&format!("{}.", parent.name))
+    {
+        name = rest.to_string();
     }
     name = name.replace(" of $input.", " of ");
     if let (Source::Child { .. }, Some(parent)) = (source, anc.last()) {
         name = name.replace(&format!(" of {}.", parent.name), " of ");
     }
     if name.is_empty() {
-        "the subject".to_string()
+        from_root(anc)
     } else {
         name
     }
+}
+
+fn from_root(anc: &[Anc]) -> String {
+    anc.last()
+        .map_or_else(|| "$input".to_string(), |parent| parent.name.clone())
 }
 
 fn ref_fits(value: &Value, kind: &str) -> bool {
@@ -519,19 +523,16 @@ fn target_message(
     } else {
         env.input
     };
+    let root = from_root(anc);
     if child {
         if std::ptr::eq(doc, empty) {
-            return Some("the subject is missing".to_string());
+            return Some(format!("{root} is missing"));
         }
         match doc {
-            Value::Null => return Some("the subject is null".to_string()),
+            Value::Null => return Some(format!("{root} is null")),
             Value::Object(_) | Value::Array(_) => {}
             _ => {
-                return Some(ops::message::isnt(
-                    "the subject",
-                    doc,
-                    "a list or an object",
-                ));
+                return Some(ops::message::isnt(&root, doc, "a list or an object"));
             }
         }
     }
@@ -540,7 +541,7 @@ fn target_message(
         (Value::Array(items), Some(Step::Index(at)))
             if usize::try_from(*at).is_ok_and(|at| at >= items.len()) =>
         {
-            return Some(format!("item {} of $input is missing", at + 1));
+            return Some(format!("item {} of {root} is missing", at + 1));
         }
         (Value::Array(items), Some(Step::Key(key))) if cause == Cause::NotAnObject => {
             let said: Vec<String> = items
@@ -549,7 +550,7 @@ fn target_message(
                 .filter(|(_, item)| !item.is_object())
                 .map(|(at, _)| {
                     format!(
-                        "item {} of $input: {}",
+                        "item {} of {root}: {}",
                         at + 1,
                         ops::message::isnt(
                             &crate::name::key_text(key),
@@ -579,7 +580,7 @@ fn target_message(
                 let read = path::read(&prefix, &ctx);
                 if read.outcome == Outcome::Found && read.value.is_some_and(Value::is_object) {
                     let shown = if k == 0 {
-                        "$input".to_string()
+                        root.clone()
                     } else {
                         from_name(&prefix, source, anc, &ctx, true)
                     };
@@ -631,11 +632,7 @@ fn target_message(
             if parent.is_array() || parent.is_object() {
                 return None;
             }
-            Some(ops::message::isnt(
-                "the subject",
-                parent,
-                "a list or an object",
-            ))
+            Some(ops::message::isnt(&root, parent, "a list or an object"))
         }
         _ => None,
     }
@@ -863,7 +860,7 @@ fn apply(filters: &[Filter], ctx: &Ctx, unreadable: bool) -> Applied {
     let message = if matched {
         None
     } else if once.is_empty() {
-        Some("the subject doesn't match".to_string())
+        Some(format!("{} doesn't match", ctx.subject_label()))
     } else {
         Some(once.join("; "))
     };
@@ -929,8 +926,9 @@ fn judge<'a>(
     entries
         .into_iter()
         .map(|entry| {
-            let ctx = context(env, entry.at.clone(), anc);
+            let mut ctx = context(env, entry.at.clone(), anc);
             let (id, id_location) = id_of(lowered, &entry, &ctx);
+            ctx.label = Some(env.subject.to_string());
             let applied = (!lowered.filters.is_empty())
                 .then(|| apply(&lowered.filters, &ctx, !env.unreadable.is_empty()));
             Judged {
