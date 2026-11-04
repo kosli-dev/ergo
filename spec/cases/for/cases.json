@@ -22900,5 +22900,43 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line whose item path is the subject's own name, on a subject that isn't an object",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "k is 1", "for": "every thing as k"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "every xs"}}},
+    "cases": [
+      {
+        "description": "a list subject is not an object, whatever it holds",
+        "rules": ["for.flaws"],
+        "input": {"xs": [[1, 2]]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "the subject is [1, 2], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [1, 2], "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a text subject is not an object",
+        "rules": ["for.flaws"],
+        "input": {"xs": ["text"]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "the subject is \"text\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an empty list subject is not an object",
+        "rules": ["for.flaws"],
+        "input": {"xs": [[]]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "the subject is [], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [], "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a list of objects as the subject is not an object",
+        "rules": ["for.flaws"],
+        "input": {"xs": [[{"k": 1}]]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "the subject is [{\"k\": 1}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [{"k": 1}], "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]

@@ -975,5 +975,29 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line whose reads a field named like the subject with a dot",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": ".x is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "every kids whose .kid is 1"}}},
+    "cases": [
+      {
+        "description": "the dot reads the item's own field kid, not the subject",
+        "rules": ["name.dot", "subjects.sentence"],
+        "input": {"kids": [{"kid": 1, "x": 1}, {"kid": 2, "x": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/kids/0/kid"], "name": ".kid", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"kid": 1, "x": 1}, "type": "kid"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/kids/1/kid"], "name": ".kid", "value": 2}], "message": ".kid is 2", "passed": false, "requirement": "r", "subject": {"id": {"kid": 2, "x": 1}, "type": "kid"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/kids/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"kid": 1, "x": 1}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "an item without the field is left out as absent and the report gives the dot",
+        "rules": ["name.dot", "subjects.sentence"],
+        "input": {"kids": [{"x": 1}]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/kids/0"], "name": ".kid", "value": null}], "message": ".kid is missing", "passed": false, "requirement": "r", "subject": {"id": {"x": 1}, "type": "kid"}}
+        ]
+      }
+    ]
   }
 ]
