@@ -5041,6 +5041,79 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("review is \"ok\"", "review is \"ok\"", &[], &[]),
     ("who is \"ann\"", "who is \"ann\"", &[], &[]),
     ("version exists", "version exists", &[], &[]),
+    ("c is an object", "c is an object", &[], &[]),
+    ("note is \"fine\"", "note is \"fine\"", &[], &[]),
+    ("c.version is \"1\"", "c.version is \"1\"", &[], &[]),
+    (
+        "every distinct xs.k is at least $input.lo",
+        "every distinct xs.k is at least $input.lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k is at least .lo",
+        "every distinct xs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k is at least lim",
+        "every distinct xs.k is at least lim",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k is at least lo",
+        "every distinct xs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k is lo",
+        "every distinct xs.k equals lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k whose lo is 1 is 5",
+        "every distinct xs.k whose lo is 1 is 5",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.ys.k is lo",
+        "every distinct xs.ys.k equals lo",
+        &[],
+        &[],
+    ),
+    ("every vs is 1", "every vs is 1", &[], &[]),
+    (
+        "ok is $input.sbom.components[0].licenses[0].ok",
+        "ok equals $input.sbom.components[0].licenses[0].ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct xs.k is in allowed",
+        "some distinct xs.k is in allowed",
+        &[],
+        &[],
+    ),
+    ("version is \"1\"", "version is \"1\"", &[], &[]),
+    (
+        "version is $input.sbom.components[0].version",
+        "version equals $input.sbom.components[0].version",
+        &[],
+        &[],
+    ),
+    (
+        "version is $input.sbom.components[2].version",
+        "version equals $input.sbom.components[2].version",
+        &[],
+        &[],
+    ),
+    ("x.k is at least x.lo", "x.k is at least x.lo", &[], &[]),
+    ("xs exists", "xs exists", &[], &[]),
     (
         "every notes is \"fine\"",
         "every notes is \"fine\"",
@@ -7907,6 +7980,8 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("every notes as note", "every notes as note", &[], &[]),
+    ("every distinct xs as x", "every distinct xs as x", &[], &[]),
     (
         "every items that is not empty and whose kind is \"a\" as i",
         "every items that is not empty and whose kind is \"a\" as i",

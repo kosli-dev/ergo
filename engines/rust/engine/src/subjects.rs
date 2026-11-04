@@ -34,7 +34,7 @@ struct Anc<'a> {
 struct Entry<'a> {
     at: Located<'a>,
     key: Option<String>,
-    copies: Vec<String>,
+    copies: Vec<Location>,
 }
 
 fn merged_copies(entries: Vec<Entry<'_>>) -> Vec<Entry<'_>> {
@@ -43,7 +43,7 @@ fn merged_copies(entries: Vec<Entry<'_>>) -> Vec<Entry<'_>> {
     for entry in entries {
         let key = value::copy_key(entry.at.value);
         match seen.get(&key) {
-            Some(&at) => out[at].copies.push(entry.at.location.render()),
+            Some(&at) => out[at].copies.push(entry.at.location.clone()),
             None => {
                 seen.insert(key, out.len());
                 out.push(entry);
@@ -53,25 +53,141 @@ fn merged_copies(entries: Vec<Entry<'_>>) -> Vec<Entry<'_>> {
     out
 }
 
-fn copied_row(row: &mut Row, first: &str, copies: &[String]) {
-    for input in &mut row.inputs {
-        value::copy_locations(input, first, copies);
-    }
-    if let Some(items) = &mut row.failed_items {
-        value::copy_locations(items, first, copies);
+impl<'a> Entry<'a> {
+    fn at_each(&self) -> Vec<Located<'a>> {
+        std::iter::once(self.at.clone())
+            .chain(self.copies.iter().map(|location| Located {
+                value: self.at.value,
+                location: location.clone(),
+            }))
+            .collect()
     }
 }
 
-fn copied_evaluation(evaluation: &mut Evaluation, first: &str, copies: &[String]) {
-    for row in evaluation
-        .min_subjects
-        .iter_mut()
-        .chain(evaluation.unique_ids.iter_mut())
-        .chain(evaluation.applies.iter_mut())
-        .chain(evaluation.subject_rows.iter_mut().flatten())
-    {
-        copied_row(row, first, copies);
+fn merged_column(lists: &[&Vec<Value>]) -> Vec<Value> {
+    let longest = lists.iter().map(|list| list.len()).max().unwrap_or(0);
+    let mut out: Vec<Value> = Vec::new();
+    for at in 0..longest {
+        let mut column: Vec<Value> = Vec::new();
+        for list in lists {
+            if let Some(found) = list.get(at)
+                && !column.contains(found)
+            {
+                column.push(found.clone());
+            }
+        }
+        out.extend(column);
     }
+    out
+}
+
+fn merged_value(values: &[&Value]) -> Value {
+    match values[0] {
+        Value::Object(map) => {
+            let mut out = map.clone();
+            for key in [
+                "locations",
+                "inputs",
+                "items",
+                "failed_items",
+                "failed_assertions",
+            ] {
+                let found: Vec<&Vec<Value>> = values
+                    .iter()
+                    .filter_map(|value| value.get(key).and_then(Value::as_array))
+                    .collect();
+                if found.len() != values.len() {
+                    continue;
+                }
+                let merged = if key == "locations" {
+                    merged_column(&found)
+                } else {
+                    merged_list(&found)
+                };
+                out.insert(key.to_string(), Value::Array(merged));
+            }
+            Value::Object(out)
+        }
+        other => other.clone(),
+    }
+}
+
+fn merged_list(lists: &[&Vec<Value>]) -> Vec<Value> {
+    (0..lists[0].len())
+        .map(|at| {
+            let column: Vec<&Value> = lists.iter().filter_map(|list| list.get(at)).collect();
+            merged_value(&column)
+        })
+        .collect()
+}
+
+fn merged_rows(rows: Vec<Row>) -> Row {
+    let inputs: Vec<&Vec<Value>> = rows.iter().map(|row| &row.inputs).collect();
+    let merged_inputs = merged_list(&inputs);
+    let failed: Vec<&Value> = rows
+        .iter()
+        .filter_map(|row| row.failed_items.as_ref())
+        .collect();
+    let merged_failed = (failed.len() == rows.len() && !failed.is_empty()).then(|| {
+        let lists: Vec<&Vec<Value>> = failed.iter().filter_map(|v| v.as_array()).collect();
+        Value::Array(merged_list(&lists))
+    });
+    let mut row = rows.into_iter().next().expect("one row for each copy");
+    row.inputs = merged_inputs;
+    if merged_failed.is_some() {
+        row.failed_items = merged_failed;
+    }
+    row
+}
+
+fn merged_evaluations(runs: Vec<Vec<Evaluation>>) -> Vec<Evaluation> {
+    let mut runs = runs.into_iter();
+    let Some(first) = runs.next() else {
+        return Vec::new();
+    };
+    let rest: Vec<Vec<Evaluation>> = runs.collect();
+    first
+        .into_iter()
+        .enumerate()
+        .map(|(at, evaluation)| {
+            let others: Vec<&Evaluation> = rest.iter().filter_map(|run| run.get(at)).collect();
+            let merge = |pick: &dyn Fn(&Evaluation) -> &Vec<Row>, mine: Vec<Row>| -> Vec<Row> {
+                mine.into_iter()
+                    .enumerate()
+                    .map(|(i, row)| {
+                        let mut all = vec![row];
+                        all.extend(others.iter().filter_map(|e| pick(e).get(i).cloned()));
+                        merged_rows(all)
+                    })
+                    .collect()
+            };
+            Evaluation {
+                total: evaluation.total,
+                matching: evaluation.matching,
+                min_subjects: merge(&|e| &e.min_subjects, evaluation.min_subjects),
+                unique_ids: merge(&|e| &e.unique_ids, evaluation.unique_ids),
+                applies: merge(&|e| &e.applies, evaluation.applies),
+                subject_rows: evaluation
+                    .subject_rows
+                    .into_iter()
+                    .enumerate()
+                    .map(|(g, group)| {
+                        group
+                            .into_iter()
+                            .enumerate()
+                            .map(|(i, row)| {
+                                let mut all = vec![row];
+                                all.extend(others.iter().filter_map(|e| {
+                                    e.subject_rows.get(g).and_then(|rows| rows.get(i)).cloned()
+                                }));
+                                merged_rows(all)
+                            })
+                            .collect()
+                    })
+                    .collect(),
+            }
+        })
+        .collect()
 }
 
 struct Broken {
@@ -1052,10 +1168,11 @@ fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
         group.sort_by_key(|(index, _)| *index);
         for (_, item) in group.iter() {
             if let Some(at) = &item.id_location {
+                let copies: Vec<String> = item.entry.copies.iter().map(Location::render).collect();
                 locations.extend(value::copied_locations(
                     std::slice::from_ref(at),
                     &item.entry.at.location.render(),
-                    &item.entry.copies,
+                    &copies,
                 ));
             }
         }
@@ -1118,7 +1235,8 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     let locations: Vec<String> = in_scope
         .iter()
         .flat_map(|j| {
-            std::iter::once(j.entry.at.location.render()).chain(j.entry.copies.iter().cloned())
+            std::iter::once(j.entry.at.location.render())
+                .chain(j.entry.copies.iter().map(Location::render))
         })
         .collect();
     let every = matches!(&lowered.source, Source::Root { every: true, .. });
@@ -1171,24 +1289,38 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
         .iter()
         .filter_map(|j| {
             j.applied.as_ref().map(|a| {
-                let mut row = applies_row(env, j, a, anc);
-                if !j.entry.copies.is_empty() {
-                    copied_row(&mut row, &j.entry.at.location.render(), &j.entry.copies);
+                let mut rows = vec![applies_row(env, j, a, anc)];
+                for at in j.entry.at_each().into_iter().skip(1) {
+                    let mut ctx = context(env, at, anc);
+                    ctx.label = Some(env.subject.to_string());
+                    let applied = apply(&lowered.filters, &ctx, !env.unreadable.is_empty());
+                    rows.push(applies_row(env, j, &applied, anc));
                 }
-                row
+                merged_rows(rows)
             })
         })
         .collect();
     let subject_rows = in_scope
         .iter()
         .map(|j| {
-            let mut rows = check_rows(env, j, anc);
-            if !j.entry.copies.is_empty() {
-                for row in &mut rows {
-                    copied_row(row, &j.entry.at.location.render(), &j.entry.copies);
-                }
-            }
-            rows
+            let runs: Vec<Vec<Row>> = j
+                .entry
+                .at_each()
+                .into_iter()
+                .map(|at| check_rows(env, j, at, anc))
+                .collect();
+            let mut runs = runs.into_iter();
+            let first = runs.next().unwrap_or_default();
+            let rest: Vec<Vec<Row>> = runs.collect();
+            first
+                .into_iter()
+                .enumerate()
+                .map(|(i, row)| {
+                    let mut all = vec![row];
+                    all.extend(rest.iter().filter_map(|run| run.get(i).cloned()));
+                    merged_rows(all)
+                })
+                .collect::<Vec<Row>>()
         })
         .filter(|rows| !rows.is_empty())
         .collect();
@@ -1202,8 +1334,13 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     }
 }
 
-fn check_rows(env: &Env, judged: &Judged, anc: &[Anc]) -> Vec<Row> {
-    let mut ctx = context(env, judged.entry.at.clone(), anc);
+fn check_rows<'a>(
+    env: &Env<'a>,
+    judged: &Judged<'a>,
+    at: Located<'a>,
+    anc: &[Anc<'a>],
+) -> Vec<Row> {
+    let mut ctx = context(env, at, anc);
     ctx.label = Some(env.subject.to_string());
     env.checks
         .iter()
@@ -1357,16 +1494,13 @@ fn descend<'a>(
             Some(applied) => applied.cause,
         };
         if cause == Cause::Satisfied {
-            anc.push(here);
-            let mut below = descend(env, &chain[1..], anc, empty);
-            anc.pop();
-            if !judged.entry.copies.is_empty() {
-                let first = judged.entry.at.location.render();
-                for evaluation in &mut below {
-                    copied_evaluation(evaluation, &first, &judged.entry.copies);
-                }
+            let mut runs = Vec::new();
+            for at in judged.entry.at_each() {
+                anc.push(Anc { at, ..here.clone() });
+                runs.push(descend(env, &chain[1..], anc, empty));
+                anc.pop();
             }
-            out.extend(below);
+            out.extend(merged_evaluations(runs));
         } else if cause != Cause::Value {
             here.name = parent.clone();
             anc.push(here);

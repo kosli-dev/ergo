@@ -671,7 +671,8 @@ fn has_elapsed(terms: &[s::Term]) -> bool {
 pub fn in_from_line(found: Vec<String>) -> Vec<String> {
     let mut out = Vec::new();
     for problem in found {
-        let argument = problem.ends_with(" can't take a count of, a sum of or a plus");
+        let argument = problem.ends_with(" can't take a count of, a sum of or a plus")
+            || problem.starts_with(DISTINCT_ITEM);
         if problem == ELAPSED_AFTER_QUANTIFIER {
             out.push(problem.clone());
         }
@@ -985,6 +986,9 @@ pub fn lower_quantified(
             None => None,
         },
     };
+    if distinct && let Some(found) = &check {
+        problems.extend(distinct_item_problem(found));
+    }
     if !problems.is_empty() {
         return Err(problems);
     }
@@ -1002,6 +1006,26 @@ pub fn lower_quantified(
         }))),
         _ => Err(vec![format!("every or some{UNSUPPORTED_SUFFIX}")]),
     }
+}
+
+const DISTINCT_ITEM: &str = "distinct can't go with a phrase that also reads ";
+
+fn distinct_item_problem(check: &Check) -> Option<String> {
+    let mut names: Vec<String> = check
+        .paths()
+        .into_iter()
+        .chain(check.refs().iter())
+        .filter(|path| matches!(path.start, Start::Subject | Start::Own) && !path.steps.is_empty())
+        .map(crate::name::name)
+        .collect();
+    names.sort();
+    names.dedup();
+    (!names.is_empty()).then(|| {
+        format!(
+            "{DISTINCT_ITEM}{} from each item, and copies of the value can differ there: leave distinct out, or put the items on a for line",
+            names.join(", ")
+        )
+    })
 }
 
 fn unsupported(condition: &s::Condition, names: &[&str]) -> Vec<String> {

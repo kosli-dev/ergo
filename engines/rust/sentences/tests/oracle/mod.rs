@@ -7,6 +7,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("c whose type is \"library\"", "c whose type is \"library\""),
     ("c.licenses", "c.licenses"),
     ("lic.terms", "lic.terms"),
+    ("every distinct xs", "every distinct xs"),
+    (
+        "every rels whose some distinct files.kind is at least lo",
+        "every rels whose some distinct files.kind is at least lo",
+    ),
+    ("limits.lo", "limits.lo"),
     ("distinct sbom.components", "distinct sbom.components"),
     ("every distinct items", "every distinct items"),
     (
@@ -2926,6 +2932,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("fingerprint", "fingerprint"),
     ("id", "id"),
     ("t", "t"),
+    ("limits.lo", "limits.lo"),
     ("info.who", "info.who"),
     ("item 3 of d.items", "item 3 of d.items"),
     ("k1", "k1"),

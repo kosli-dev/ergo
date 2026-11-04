@@ -1133,20 +1133,6 @@ impl For {
             if outcome.is_none() {
                 passed += 1;
             }
-            let (mut outcome, mut sfails) = (outcome, sfails);
-            if !live.copies.is_empty() {
-                let first = live.location.render();
-                for sfail in &mut sfails {
-                    for input in &mut sfail.inputs {
-                        crate::value::copy_locations(input, &first, &live.copies);
-                    }
-                }
-                if let Some(found) = &mut outcome {
-                    for assertion in &mut found.assertions {
-                        crate::value::copy_locations(assertion, &first, &live.copies);
-                    }
-                }
-            }
             children.push(Child {
                 order: live.order,
                 entry,
@@ -1853,25 +1839,10 @@ impl For {
             } else {
                 outcome.cause
             };
-            let first = entry.location.as_ref().map(Location::render);
             let inner = inner.iter().map(Dead::plain).collect();
             let mut json = entry.json(outcome.assertions, inner);
-            if let Some(first) = first.filter(|_| !copies.is_empty()) {
-                for key in ["locations", "failed_items"] {
-                    if let Some(found) = json.get_mut(key) {
-                        let mut wrapped = json!({ "locations": found.take() });
-                        if key == "locations" {
-                            crate::value::copy_locations(&mut wrapped, &first, &copies);
-                        } else {
-                            crate::value::copy_locations(
-                                &mut wrapped["locations"],
-                                &first,
-                                &copies,
-                            );
-                        }
-                        *found = wrapped["locations"].take();
-                    }
-                }
+            if let Some(Value::Array(locations)) = json.get_mut("locations") {
+                locations.extend(copies.into_iter().map(Value::String));
             }
             failed.push((order, json));
         }

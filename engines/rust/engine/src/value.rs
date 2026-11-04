@@ -276,36 +276,6 @@ pub fn copied_locations(locations: &[String], first: &str, copies: &[String]) ->
     out
 }
 
-pub fn copy_locations(value: &mut Value, first: &str, copies: &[String]) {
-    match value {
-        Value::Object(map) => {
-            for (key, inner) in map.iter_mut() {
-                match inner {
-                    Value::Array(items)
-                        if key == "locations" && items.iter().all(Value::is_string) =>
-                    {
-                        let texts: Vec<String> = items
-                            .iter()
-                            .filter_map(|v| v.as_str().map(str::to_string))
-                            .collect();
-                        *items = copied_locations(&texts, first, copies)
-                            .into_iter()
-                            .map(Value::String)
-                            .collect();
-                    }
-                    other => copy_locations(other, first, copies),
-                }
-            }
-        }
-        Value::Array(items) => {
-            for item in items {
-                copy_locations(item, first, copies);
-            }
-        }
-        _ => {}
-    }
-}
-
 pub fn all_equal(pairs: impl Iterator<Item = Option<bool>>) -> Option<bool> {
     let pairs: Vec<Option<bool>> = pairs.collect();
     if pairs.contains(&Some(false)) {
