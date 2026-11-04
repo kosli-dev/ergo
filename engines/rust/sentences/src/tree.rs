@@ -477,8 +477,8 @@ pub enum Position {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Start {
-    /// `it`.
-    It,
+    /// The item a `that` condition reads. It has no spelling in a path.
+    That,
     /// `$params`.
     Params,
     /// `$input`.

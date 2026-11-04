@@ -53,6 +53,7 @@ mod tests {
     fn cause(subject: Value, value: Value) -> Cause {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

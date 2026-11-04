@@ -201,17 +201,17 @@ fn a_derived_assertion_takes_a_compare_phrase_only() {
 }
 
 #[test]
-fn it_starts_an_assertion_and_follows_a_quantifier() {
+fn it_is_a_field_at_the_start_of_an_assertion_and_after_a_quantifier() {
     assert_eq!(
         assertion("it is empty"),
         Assertion::Plain {
-            path: it(),
+            path: key("it"),
             phrase: Phrase::Empty { not: false }
         }
     );
     assert!(matches!(
         assertion("every it is 1"),
-        Assertion::Quantified { path, .. } if path == it()
+        Assertion::Quantified { path, .. } if path == key("it")
     ));
     assert!(parse_check("x is 1 and it exists").is_ok());
 }

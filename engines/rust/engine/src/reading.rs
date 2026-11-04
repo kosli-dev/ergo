@@ -600,9 +600,6 @@ fn source_of(
             let path = scope.path(&sentence_path)?;
             let each_of = match &line.named_by_each_of {
                 None => None,
-                Some(each) if each.start == s::Start::It => {
-                    return Err(vec![format!("{name}: it can't name keys")]);
-                }
                 Some(each) => Some(scope.path(each)?),
             };
             Ok(Source::Child { path, each_of })
@@ -622,8 +619,8 @@ fn source_of(
                             each_steps.insert(0, Step::Key(key.clone()));
                             Start::Subject
                         }
-                        s::Start::It => {
-                            return Err(vec![format!("{name}: it can't name keys")]);
+                        s::Start::That => {
+                            return Err(vec![format!("{name}: that can't name keys")]);
                         }
                         s::Start::Unknown(unknown) => {
                             return Err(vec![format!("{}{unknown}", lower::UNKNOWN_NAME)]);
@@ -862,7 +859,10 @@ impl Reading {
                                         ),
                                     )
                                 } else {
-                                    lower::lower_condition(condition, &scope)
+                                    lower::lower_condition(
+                                        condition,
+                                        &scope.clone().with_subject(name),
+                                    )
                                 };
                                 match lowered {
                                     Ok(check) => filters.push(Filter { text, check }),

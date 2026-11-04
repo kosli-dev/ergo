@@ -327,9 +327,7 @@ fn path_text(path: &Path, side: Side, aliases: &[&str], own: bool) -> String {
 
 fn path_text_with(path: &Path, side: Side, aliases: &[&str], own: bool, lift: bool) -> String {
     let lifted = match (&path.position, &path.start, path.steps.last()) {
-        (None, start, Some(Step::Index(number)))
-            if lift && *start != Start::It && !above_list_position(number) =>
-        {
+        (None, _, Some(Step::Index(number))) if lift && !above_list_position(number) => {
             Some(Position::Item {
                 number: increment(number),
                 from_last: false,
@@ -346,7 +344,7 @@ fn path_text_with(path: &Path, side: Side, aliases: &[&str], own: bool, lift: bo
         out.push_str(&position_text(position));
     }
     match &path.start {
-        Start::It => out.push_str("it"),
+        Start::That => out.push_str("that"),
         Start::Params => out.push_str("$params"),
         Start::Input => out.push_str("$input"),
         Start::Unknown(name) => out.push_str(name),

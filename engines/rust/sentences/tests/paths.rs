@@ -319,7 +319,6 @@ fn grammar_words_are_not_bare_first_keys() {
         "first",
         "hours",
         "in",
-        "it",
         "item",
         "last",
         "less",
@@ -363,22 +362,22 @@ fn words_that_are_not_in_the_list_are_keys() {
 }
 
 #[test]
-fn it_is_only_read_where_the_grammar_puts_it() {
-    assert!(parse_from("it").is_err());
+fn it_is_read_as_a_key_wherever_a_path_goes() {
+    assert!(parse_from("it").is_ok());
     assert!(parse_from("x whose it is 1").is_ok());
     assert!(parse_from("x whose some it is 1").is_ok());
     assert!(parse_from("x whose count of it is 1").is_ok());
     assert!(parse_from("x whose first of it is 1").is_ok());
-    assert!(parse_from("x whose a1 is it").is_err());
-    assert!(parse_from("x whose a1 equals it").is_err());
-    assert!(parse_from("x whose a1 is one of it").is_err());
-    assert!(parse_from("x whose days elapsed from it to b1 is 1").is_err());
-    assert!(parse_from("x named by each of it").is_err());
+    assert!(parse_from("x whose a1 is it").is_ok());
+    assert!(parse_from("x whose a1 equals it").is_ok());
+    assert!(parse_from("x whose a1 is one of it").is_ok());
+    assert!(parse_from("x whose days elapsed from it to b1 is 1").is_ok());
+    assert!(parse_from("x named by each of it").is_ok());
 }
 
 #[test]
-fn it_in_a_condition_is_the_item_itself() {
-    assert_eq!(condition("it is \"a\"").left, Left::Path(it()));
+fn it_in_a_condition_is_a_field_of_the_item() {
+    assert_eq!(condition("it is \"a\"").left, Left::Path(key("it")));
     assert_eq!(
         condition("item 2 of it exists").left,
         Left::Path(Path {
@@ -386,7 +385,10 @@ fn it_in_a_condition_is_the_item_itself() {
                 number: "2".into(),
                 from_last: false
             }),
-            start: Start::It,
+            start: Start::Field {
+                key: "it".into(),
+                dot: false
+            },
             steps: vec![]
         })
     );
@@ -405,10 +407,10 @@ fn a_dotted_it_is_a_field() {
 }
 
 #[test]
-fn a_step_cannot_follow_it() {
-    assert!(parse_from("x whose it.name is 1").is_err());
-    assert!(parse_from("x whose it[0] is 1").is_err());
-    assert!(parse_from("x whose it named by k is 1").is_err());
+fn a_step_can_follow_it() {
+    assert!(parse_from("x whose it.name is 1").is_ok());
+    assert!(parse_from("x whose it[0] is 1").is_ok());
+    assert!(parse_from("x whose it named by k is 1").is_ok());
 }
 
 #[test]

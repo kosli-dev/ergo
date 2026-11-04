@@ -105,7 +105,7 @@ impl Parser {
         if let Some((quantifier, j)) = self.quantifier(i)
             && let Some(k) = self.ws(j)
         {
-            for (path, m) in self.path_or_it(k) {
+            for (path, m) in self.path_left(k) {
                 for (whose, w) in self.whose_opt(m) {
                     for (if_any, n) in self.if_any_opt(w) {
                         let Some(p) = self.ws(n) else { continue };
@@ -123,7 +123,7 @@ impl Parser {
                 }
             }
         }
-        for (path, j) in self.path_or_it(i) {
+        for (path, j) in self.path_left(i) {
             let mut starts = vec![(j, Vec::new())];
             if self.lenient {
                 for (whose, w) in self.whose_opt(j) {

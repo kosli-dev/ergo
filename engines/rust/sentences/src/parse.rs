@@ -506,13 +506,7 @@ impl Parser {
             }
             _ => {
                 let (key, end) = self.bare_key(i)?;
-                if key == "it" {
-                    if self.lenient {
-                        Some((Start::It, end))
-                    } else {
-                        None
-                    }
-                } else if is_word(&key) && !self.lenient {
+                if is_word(&key) && !self.lenient {
                     None
                 } else {
                     Some((Start::Field { key, dot: false }, end))
@@ -599,43 +593,8 @@ impl Parser {
         out
     }
 
-    fn it_whole(&self, i: usize) -> Option<usize> {
-        let j = self.lit(i, "it")?;
-        if self.at(j).is_some_and(is_key_char) {
-            None
-        } else {
-            Some(j)
-        }
-    }
-
-    pub(crate) fn it_path(&self, i: usize) -> Reads<Path> {
-        if self.lenient {
-            return Vec::new();
-        }
-        let it = |position: Option<Position>, j: usize| {
-            self.it_whole(j).map(|end| {
-                (
-                    Path {
-                        position,
-                        start: Start::It,
-                        steps: Vec::new(),
-                    },
-                    end,
-                )
-            })
-        };
-        let mut out = Vec::new();
-        out.extend(it(None, i));
-        for (position, k) in self.after_position(i) {
-            out.extend(it(Some(position), k));
-        }
-        out
-    }
-
-    pub(crate) fn path_or_it(&self, i: usize) -> Reads<Path> {
-        let mut out = self.it_path(i);
-        out.extend(self.path(i, Side::Left));
-        out
+    pub(crate) fn path_left(&self, i: usize) -> Reads<Path> {
+        self.path(i, Side::Left)
     }
 
     fn derived(&self, i: usize) -> Reads<Derived> {
@@ -645,7 +604,7 @@ impl Parser {
             ("sum of", DerivedKind::Sum),
         ] {
             if let Some(j) = self.lead(i, spelling) {
-                for (path, end) in self.path_or_it(j) {
+                for (path, end) in self.path_left(j) {
                     out.push((
                         Derived {
                             kind,
@@ -1038,7 +997,7 @@ impl Parser {
 
     pub(crate) fn condition(&self, i: usize) -> Reads<Condition> {
         let mut out = Vec::new();
-        for (path, j) in self.path_or_it(i) {
+        for (path, j) in self.path_left(i) {
             if let Some(k) = self.ws(j) {
                 for (phrase, end) in self.phrase(k, false) {
                     out.push((
@@ -1086,7 +1045,7 @@ impl Parser {
                 Condition {
                     left: Left::Path(Path {
                         position: None,
-                        start: Start::It,
+                        start: Start::That,
                         steps: Vec::new(),
                     }),
                     phrase,
@@ -1130,7 +1089,7 @@ impl Parser {
             && let Some((quantifier, j)) = self.quantifier(w)
             && let Some(k) = self.ws(j)
         {
-            for (path, m) in self.path_or_it(k) {
+            for (path, m) in self.path_left(k) {
                 let mut ends = Vec::new();
                 if let Some(n) = self.if_any(m) {
                     ends.push((true, n));

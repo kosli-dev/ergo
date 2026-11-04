@@ -103,7 +103,9 @@ fn lowered_plan(
                     text: s::print_assertion(assertion, aliases),
                     check,
                 }),
-                Err(found) => problems.extend(found.into_iter().map(|p| format!("{place}{p}"))),
+                Err(found) => {
+                    problems.extend(found.into_iter().map(|p| lower::in_place(place, &p)))
+                }
             }
         }
     }
@@ -125,9 +127,18 @@ fn read_one(
             plan: None,
         };
     }
-    let aliases_owned = scope.aliases();
+    let named_scope = match subject {
+        Some(name) => scope.clone().with_subject(name),
+        None => scope.clone(),
+    };
+    let scope = &named_scope;
+    let mut aliases_owned = scope.aliases();
+    let mut print_owned = reading.printed_aliases(subject, scope);
+    if let Some(name) = subject {
+        aliases_owned.push(name.to_string());
+        print_owned.push(name.to_string());
+    }
     let aliases: Vec<&str> = aliases_owned.iter().map(String::as_str).collect();
-    let print_owned = reading.printed_aliases(subject, scope);
     let print_aliases: Vec<&str> = print_owned.iter().map(String::as_str).collect();
     let mut problems = BTreeSet::new();
     let wrong = |problems: BTreeSet<String>| CheckRead {
@@ -341,6 +352,7 @@ pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value>
 
 pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<Value> {
     let ctx = Ctx {
+        label: None,
         subject: Located {
             value: input,
             location: Location::input_root(),

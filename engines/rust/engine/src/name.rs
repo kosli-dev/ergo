@@ -21,7 +21,6 @@ const WORDS: &[&str] = &[
     "first",
     "hours",
     "in",
-    "it",
     "item",
     "last",
     "less",
@@ -88,7 +87,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
     let mark = |out: &mut String, at: usize| {
         if marks.is_some_and(|marks| marks.contains(&at)) {
             if out.is_empty() {
-                out.push_str("it");
+                out.push_str("the subject");
             }
             out.push_str("[]");
         }
@@ -116,11 +115,11 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
             }
             Step::Index(index) => {
                 if at == last && marks.is_none() {
-                    let rest = if out.is_empty() { "it" } else { &out };
+                    let rest = if out.is_empty() { "the subject" } else { &out };
                     out = format!("item {} of {}", index.saturating_add(1), rest);
                 } else {
                     if out.is_empty() && marks.is_some() {
-                        out.push_str("it");
+                        out.push_str("the subject");
                     }
                     out.push_str(&format!("[{index}]"));
                 }
@@ -142,7 +141,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
     }
     mark(&mut out, path.steps.len());
     if out.is_empty() {
-        "it".to_string()
+        "the subject".to_string()
     } else {
         out
     }
@@ -189,7 +188,7 @@ mod tests {
 
     #[test]
     fn the_subject_alone_is_it() {
-        assert_eq!(name(&subject(vec![])), "it");
+        assert_eq!(name(&subject(vec![])), "the subject");
     }
 
     #[test]
@@ -228,7 +227,7 @@ mod tests {
     fn a_first_key_that_is_a_grammar_word_gets_a_dot() {
         assert_eq!(name(&subject(vec![k("empty")])), ".empty");
         assert_eq!(name(&subject(vec![k("a"), k("x")])), ".a.x");
-        assert_eq!(name(&subject(vec![k("it")])), ".it");
+        assert_eq!(name(&subject(vec![k("it")])), "it");
     }
 
     #[test]
@@ -310,8 +309,11 @@ mod tests {
     }
 
     #[test]
-    fn an_index_on_a_subject_that_is_a_list_is_item_of_it() {
-        assert_eq!(name(&subject(vec![Step::Index(0)])), "item 1 of it");
+    fn an_index_on_a_subject_that_is_a_list_is_item_of_the_subject() {
+        assert_eq!(
+            name(&subject(vec![Step::Index(0)])),
+            "item 1 of the subject"
+        );
     }
 
     #[test]

@@ -15,6 +15,26 @@ pub struct PartDef {
     pub id: Option<Vec<Step>>,
 }
 
+pub fn in_place(place: &str, problem: &str) -> String {
+    if !problem.contains(FOLLOW_MARK) {
+        return format!("{place}{problem}");
+    }
+    let kept = match place.rfind("line ") {
+        Some(at)
+            if place[at + 5..]
+                .strip_suffix(": ")
+                .is_some_and(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit())) =>
+        {
+            &place[..at]
+        }
+        _ => place,
+    };
+    let kept = kept.strip_suffix("for: ").unwrap_or(kept);
+    format!("{kept}{problem}")
+}
+
+const FOLLOW_MARK: &str = ", which means the subject: for a field called ";
+
 #[derive(Debug, Clone, Default)]
 pub struct Scope {
     left_reads_parents: bool,
@@ -24,6 +44,7 @@ pub struct Scope {
     parents: BTreeMap<String, BTreeMap<String, PartDef>>,
     for_aliases: BTreeSet<String>,
     pending: BTreeSet<String>,
+    subject: Option<String>,
 }
 
 fn not_a_position(number: &str) -> Vec<String> {
@@ -126,9 +147,10 @@ pub fn part_steps(path: &s::Path) -> Result<Vec<Step>, Vec<String>> {
                     .to_string(),
             ]);
         }
-        s::Start::It => {
+        s::Start::That => {
             return Err(vec![
-                "it can only start an assertion: write it first, like it is not empty".to_string(),
+                "that can only start a condition: write that first, like that is not empty"
+                    .to_string(),
             ]);
         }
         s::Start::Unknown(name) => return Err(vec![format!("{UNKNOWN_NAME}{name}")]),
@@ -163,6 +185,11 @@ impl Scope {
         self
     }
 
+    pub fn with_subject(mut self, name: &str) -> Scope {
+        self.subject = Some(name.to_string());
+        self
+    }
+
     pub fn with_for_alias(mut self, alias: &str) -> Scope {
         self.for_aliases.insert(alias.to_string());
         self
@@ -190,6 +217,11 @@ impl Scope {
             s::Step::Index(number) => index_of(number).map(Step::Index),
             s::Step::NamedBy(reference) | s::Step::Brackets(reference) => match reference {
                 s::Reference::Name(name) => {
+                    if self.subject.as_deref() == Some(name.as_str()) {
+                        return Err(vec![format!(
+                            "named by {name}: {name} is the whole subject, so it can't name a key"
+                        )]);
+                    }
                     if self.pending.contains(name) {
                         return Err(vec![format!("unknown alias {name}")]);
                     }
@@ -289,6 +321,44 @@ impl Scope {
         }
     }
 
+    fn follow_problem(&self, written: &s::Path, parts: bool) -> Option<String> {
+        let subject = self.subject.as_deref()?;
+        let key = match &written.start {
+            s::Start::Field { key, dot: false } | s::Start::Quoted(key) if key == subject => key,
+            _ => return None,
+        };
+        let only_item =
+            written.position.is_none() && matches!(written.steps.as_slice(), [s::Step::Index(_)]);
+        if !parts || written.steps.is_empty() || only_item {
+            return None;
+        }
+        let mut names: Vec<&str> = self.aliases_ref();
+        names.push(subject);
+        let text = s::print_path(written, s::Side::Left, &names);
+        let field = s::print_path(
+            &s::Path {
+                position: None,
+                start: s::Start::Field {
+                    key: key.clone(),
+                    dot: true,
+                },
+                steps: written.steps.clone(),
+            },
+            s::Side::Left,
+            &names,
+        );
+        Some(format!(
+            "{text}: nothing can follow {subject}{FOLLOW_MARK}{subject}, write {field}"
+        ))
+    }
+
+    fn aliases_ref(&self) -> Vec<&str> {
+        let mut names: BTreeSet<&str> = self.parts.keys().map(String::as_str).collect();
+        names.extend(self.parents.keys().map(String::as_str));
+        names.extend(self.for_aliases.iter().map(String::as_str));
+        names.into_iter().collect()
+    }
+
     fn read_path(
         &self,
         written: &s::Path,
@@ -298,6 +368,7 @@ impl Scope {
     ) -> Result<path::Path, Vec<String>> {
         let mut problems = Vec::new();
         let mut steps = Vec::new();
+        problems.extend(self.follow_problem(written, parts));
         for step in &written.steps {
             match self.step(step) {
                 Ok(step) => steps.push(step),
@@ -313,7 +384,7 @@ impl Scope {
             return Err(problems);
         }
         let (start, steps) = match &written.start {
-            s::Start::It => (Start::Subject, steps),
+            s::Start::That => (Start::Subject, steps),
             s::Start::Params => (Start::Params, steps),
             s::Start::Input => (Start::Input, steps),
             s::Start::Unknown(name) => return Err(vec![format!("{UNKNOWN_NAME}{name}")]),
@@ -335,6 +406,13 @@ impl Scope {
         mut steps: Vec<Step>,
     ) -> (Start, Vec<Step>) {
         if !dot {
+            if parts && self.subject.as_deref() == Some(key) {
+                let whole = PartDef {
+                    steps: Vec::new(),
+                    id: None,
+                };
+                return (part_start(key, self.base(), &whole), steps);
+            }
             if parts && let Some(part) = self.parts.get(key) {
                 return (part_start(key, self.base(), part), steps);
             }
@@ -360,6 +438,7 @@ impl Scope {
         if self.parents.contains_key(key)
             || self.parts.contains_key(key)
             || self.for_aliases.contains(key)
+            || (dot && self.subject.as_deref() == Some(key))
         {
             steps.insert(0, Step::Key(key.to_string()));
             return (Start::Own, steps);
@@ -768,7 +847,7 @@ pub fn lower_quantified(
     }
     let on_item = s::Path {
         position: None,
-        start: s::Start::It,
+        start: s::Start::That,
         steps: Vec::new(),
     };
     let check = match phrase {
@@ -841,7 +920,7 @@ mod tests {
     fn it(position: Option<s::Position>) -> s::Path {
         s::Path {
             position,
-            start: s::Start::It,
+            start: s::Start::That,
             steps: Vec::new(),
         }
     }
@@ -1055,7 +1134,7 @@ mod tests {
     }
 
     #[test]
-    fn a_part_path_keeps_its_first_key_and_rejects_params_input_and_it() {
+    fn a_part_path_keeps_its_first_key_and_rejects_params_input_and_that() {
         let steps = part_steps(&path("d.b[1]")).unwrap();
         assert_eq!(steps, [key("d"), key("b"), Step::Index(1)]);
         assert_eq!(
@@ -1068,7 +1147,7 @@ mod tests {
         );
         assert_eq!(
             part_steps(&it(None)).unwrap_err(),
-            ["it can only start an assertion: write it first, like it is not empty"]
+            ["that can only start a condition: write that first, like that is not empty"]
         );
         assert_eq!(
             part_steps(&path("a1 named by foo")).unwrap_err(),

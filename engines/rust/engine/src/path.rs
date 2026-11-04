@@ -120,6 +120,13 @@ pub struct Ctx<'a> {
     pub input: &'a Value,
     pub params: Option<&'a Value>,
     pub aliases: BTreeMap<String, Located<'a>>,
+    pub label: Option<String>,
+}
+
+impl Ctx<'_> {
+    pub fn subject_label(&self) -> &str {
+        self.label.as_deref().unwrap_or("the subject")
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -378,6 +385,7 @@ mod tests {
 
         fn run(&self, path: &Path) -> (Outcome, Option<Value>, Option<String>) {
             let ctx = Ctx {
+                label: None,
                 subject: Located {
                     value: &self.subject,
                     location: Location::input_root().key("s"),
@@ -453,6 +461,7 @@ mod tests {
             },
         );
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -487,6 +496,7 @@ mod tests {
                 },
             );
             let ctx = Ctx {
+                label: None,
                 subject: Located {
                     value: &w.subject,
                     location: Location::input_root(),
@@ -507,6 +517,7 @@ mod tests {
     fn an_alias_nothing_holds_is_absent_with_no_location() {
         let w = World::new("{}");
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1013,6 +1024,7 @@ mod tests {
             },
         );
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1036,6 +1048,7 @@ mod tests {
     fn a_part_tag_has_the_alias_and_the_id_read_inside_the_part() {
         let w = World::new(r#"{"d": {"id": "c1", "x": 1}}"#);
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1053,6 +1066,7 @@ mod tests {
     fn a_part_tag_id_is_null_without_an_id_path_or_when_the_id_leads_nowhere() {
         let w = World::new(r#"{"d": {"id": null}}"#);
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),
@@ -1079,6 +1093,7 @@ mod tests {
     fn a_path_that_does_not_start_at_a_part_has_no_tag() {
         let w = World::new("{}");
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &w.subject,
                 location: Location::input_root(),

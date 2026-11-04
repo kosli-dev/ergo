@@ -1,5 +1,5 @@
 use crate::numbers::{Decimal, above_list_position, out_of_range, valid_pattern, written_time};
-use crate::print::{increment, json_string, key_text, number_text, print_path};
+use crate::print::{increment, json_string, number_text, print_path};
 use crate::tree::*;
 use crate::words::is_word;
 use std::cmp::Ordering;
@@ -99,7 +99,7 @@ pub fn from_problems(line: &FromLine) -> Vec<String> {
 pub(crate) fn check_base(check: &Check, hidden: &[Condition]) -> BTreeSet<String> {
     let mut walk = Walk::default();
     for condition in hidden {
-        walk.condition(condition, false);
+        walk.condition(condition);
     }
     for assertion in &check.assertions {
         walk.assertion(assertion);
@@ -110,7 +110,7 @@ pub(crate) fn check_base(check: &Check, hidden: &[Condition]) -> BTreeSet<String
 pub(crate) fn for_base(line: &ForLine, hidden: &[Condition]) -> BTreeSet<String> {
     let mut walk = Walk::default();
     for condition in hidden {
-        walk.condition(condition, false);
+        walk.condition(condition);
     }
     let aliases: Vec<&str> = line.items.iter().map(alias_of).collect();
     for (n, item) in line.items.iter().enumerate() {
@@ -136,7 +136,7 @@ pub(crate) fn from_base(line: &FromLine) -> BTreeSet<String> {
     }
     for condition in &line.whose {
         match condition {
-            FromCondition::Condition(condition) => walk.condition(condition, true),
+            FromCondition::Condition(condition) => walk.condition(condition),
             FromCondition::Quantified {
                 quantifier,
                 path,
@@ -144,7 +144,7 @@ pub(crate) fn from_base(line: &FromLine) -> BTreeSet<String> {
                 phrase,
             } => {
                 walk.if_any_with_some(*quantifier, *if_any);
-                walk.allowed(path);
+                walk.path(path);
                 walk.phrase(phrase, true);
             }
         }
@@ -160,10 +160,6 @@ fn alias_of(item: &ForItem) -> &str {
 
 fn bad_name(name: &str) -> bool {
     is_word(name) || name == "params" || name == "input"
-}
-
-fn is_whole_it(path: &Path) -> bool {
-    path.start == Start::It && path.steps.is_empty()
 }
 
 fn op_name(phrase: &Phrase) -> &'static str {
@@ -243,17 +239,10 @@ fn in_range_number(value: &Value) -> bool {
 #[derive(Default)]
 struct Walk {
     out: BTreeSet<String>,
-    whole_it: usize,
-    allowed_it: usize,
 }
 
 impl Walk {
-    fn finish(mut self) -> BTreeSet<String> {
-        if self.whole_it > self.allowed_it {
-            self.out.insert(
-                "it can only start an assertion: write it first, like it is not empty".to_string(),
-            );
-        }
+    fn finish(self) -> BTreeSet<String> {
         self.out
     }
 
@@ -275,23 +264,10 @@ impl Walk {
             self.index(number);
         }
         match &path.start {
-            Start::Field { key, dot: false } if is_word(key) && key != "it" => {
+            Start::Field { key, dot: false } if is_word(key) => {
                 self.out
                     .insert(format!("{key} is a word of the grammar: write .{key}"));
             }
-            Start::It => match path.steps.first() {
-                None => self.whole_it += 1,
-                Some(Step::Key(key) | Step::BracketKey(key)) => {
-                    let text = key_text(key);
-                    self.out.insert(format!(
-                        "it is the whole subject: write {text}, not it.{text}"
-                    ));
-                }
-                Some(_) => {
-                    self.out
-                        .insert("it is the whole subject: nothing can follow it".to_string());
-                }
-            },
             Start::Unknown(name) => {
                 self.out.insert(format!("unknown name {name}"));
             }
@@ -304,23 +280,14 @@ impl Walk {
                 | Step::Brackets(Reference::Unknown { name, .. }) => {
                     self.out.insert(format!("unknown name {name}"));
                 }
-                Step::NamedBy(Reference::Name(name)) | Step::Brackets(Reference::Name(name)) => {
-                    if name == "it" {
-                        self.out.insert("it can't name a key".to_string());
-                    } else if bad_name(name) {
-                        self.out.insert(format!("{name} can't be an alias"));
-                    }
+                Step::NamedBy(Reference::Name(name)) | Step::Brackets(Reference::Name(name))
+                    if bad_name(name) =>
+                {
+                    self.out.insert(format!("{name} can't be an alias"));
                 }
                 _ => {}
             }
         }
-    }
-
-    fn allowed(&mut self, path: &Path) {
-        if is_whole_it(path) {
-            self.allowed_it += 1;
-        }
-        self.path(path);
     }
 
     fn number(&mut self, text: &str) {
@@ -335,14 +302,10 @@ impl Walk {
         }
     }
 
-    fn derived(&mut self, derived: &Derived, allow_it: bool) {
-        if allow_it {
-            self.allowed(&derived.path);
-        } else {
-            self.path(&derived.path);
-        }
+    fn derived(&mut self, derived: &Derived) {
+        self.path(&derived.path);
         for condition in &derived.whose {
-            self.condition(condition, false);
+            self.condition(condition);
         }
     }
 
@@ -355,7 +318,7 @@ impl Walk {
         match term {
             Term::Path(path) => self.path(path),
             Term::Number(text) => self.number(text),
-            Term::Derived(derived) => self.derived(derived, false),
+            Term::Derived(derived) => self.derived(derived),
             Term::Elapsed(elapsed) => self.elapsed(elapsed),
         }
     }
@@ -577,21 +540,15 @@ impl Walk {
         }
     }
 
-    fn condition(&mut self, condition: &Condition, allow_it: bool) {
+    fn condition(&mut self, condition: &Condition) {
         if condition.that {
             self.phrase(&condition.phrase, false);
             return;
         }
         match &condition.left {
-            Left::Path(path) => {
-                if allow_it {
-                    self.allowed(path);
-                } else {
-                    self.path(path);
-                }
-            }
+            Left::Path(path) => self.path(path),
             Left::Derived(derived) => {
-                self.derived(derived, allow_it);
+                self.derived(derived);
                 self.after_terms(&[], &condition.phrase);
             }
             Left::Elapsed(elapsed) => {
@@ -605,7 +562,7 @@ impl Walk {
     fn assertion(&mut self, assertion: &Assertion) {
         match assertion {
             Assertion::Plain { path, phrase } => {
-                self.allowed(path);
+                self.path(path);
                 self.phrase(phrase, false);
             }
             Assertion::Quantified {
@@ -616,16 +573,16 @@ impl Walk {
                 phrase,
             } => {
                 self.if_any_with_some(*quantifier, *if_any);
-                self.allowed(path);
+                self.path(path);
                 for condition in whose {
-                    self.condition(condition, false);
+                    self.condition(condition);
                 }
                 self.phrase(phrase, true);
             }
             Assertion::Derived { terms, phrase } => {
                 for term in terms {
                     match term {
-                        Term::Derived(derived) => self.derived(derived, true),
+                        Term::Derived(derived) => self.derived(derived),
                         other => self.term(other),
                     }
                 }
@@ -651,7 +608,7 @@ impl Walk {
                 self.if_any_with_some(*quantifier, *if_any);
                 self.path(path);
                 for condition in whose {
-                    self.condition(condition, false);
+                    self.condition(condition);
                 }
             }
             ForItem::Pick {
@@ -666,7 +623,7 @@ impl Walk {
                 }
                 self.path(path);
                 for condition in whose {
-                    self.condition(condition, false);
+                    self.condition(condition);
                 }
                 if let Some(sorted) = sorted_by {
                     self.path(&sorted.path);
@@ -681,7 +638,6 @@ impl Walk {
                     } else {
                         let name = match &sorted.path.start {
                             Start::Field { key, dot: false } => Some(key.as_str()),
-                            Start::It => Some("it"),
                             _ => None,
                         };
                         if let Some(name) = name
@@ -700,7 +656,7 @@ impl Walk {
 
 #[derive(PartialEq)]
 enum Kind {
-    It,
+    That,
     Params,
     Input,
     Unknown(String),
@@ -717,7 +673,7 @@ fn normal_step(step: &Step) -> Step {
 
 fn lifted(path: &Path) -> (Option<Position>, Vec<Step>) {
     match (&path.position, &path.start, path.steps.last()) {
-        (None, start, Some(Step::Index(number))) if *start != Start::It => (
+        (None, _, Some(Step::Index(number))) => (
             Some(Position::Item {
                 number: increment(number),
                 from_last: false,
@@ -736,7 +692,7 @@ fn lifted(path: &Path) -> (Option<Position>, Vec<Step>) {
 
 fn kind_of(path: &Path) -> Kind {
     match &path.start {
-        Start::It => Kind::It,
+        Start::That => Kind::That,
         Start::Params => Kind::Params,
         Start::Input => Kind::Input,
         Start::Unknown(name) => Kind::Unknown(name.clone()),
@@ -800,7 +756,6 @@ fn full_steps(path: &Path) -> Vec<Step> {
     let mut all = Vec::new();
     match &path.start {
         Start::Field { key, .. } | Start::Quoted(key) => all.push(Step::Key(key.clone())),
-        Start::It => all.push(Step::Key("it".to_string())),
         _ => {}
     }
     all.extend(steps);
@@ -861,7 +816,6 @@ fn check_self(check: &Check, aliases: &[&str]) -> BTreeSet<String> {
                     && term.start != Start::Params
                     && term.start != Start::Input
                     && !matches!(term.start, Start::Unknown(_))
-                    && term.start != Start::It
                     && !matches!(term.steps.last(), Some(Step::Index(_)))
                 {
                     let walked = full_steps(path);

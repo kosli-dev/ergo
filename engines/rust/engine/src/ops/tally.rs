@@ -561,6 +561,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
     let mut at = outer.clone();
     for item in &walked.items {
         at.subject = item.item.clone();
+        at.label = None;
         let verdicts: Vec<Cause> = counted
             .whose
             .iter()
@@ -1182,6 +1183,7 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
         let mut at = outer.clone();
         for item in &walked.items {
             at.subject = item.item.clone();
+            at.label = None;
             let name = walked.item_name(&item.item_segs);
             let mut undecided = false;
             for check in &counted.whose {
@@ -1285,6 +1287,7 @@ mod tests {
     fn verdict_of(sentence: &str, subject: Value) -> Verdict {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -1862,6 +1865,7 @@ mod tests {
             map.extend(rest.clone());
         }
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2402,6 +2406,7 @@ mod tests {
     fn failed_items_of(sentence: &str, items: Value, params: Value) -> Vec<Value> {
         let input = json!({"things": [{"items": items}]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2578,6 +2583,7 @@ mod tests {
         let tree = s::parse_check(sentence).unwrap();
         let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2640,6 +2646,7 @@ mod tests {
         let tree = s::parse_check(sentence).unwrap();
         let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

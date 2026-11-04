@@ -202,6 +202,7 @@ mod tests {
     fn cause_with(subject: Value, order: Order) -> Cause {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -393,6 +394,7 @@ mod tests {
     fn a_written_time_on_the_right_has_no_input() {
         let input = json!({"things": [{"a": "2024-01-01"}]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

@@ -50,6 +50,7 @@ mod tests {
     fn run_on(subject: &Value, params: Option<&Value>, check: &Present) -> Verdict {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

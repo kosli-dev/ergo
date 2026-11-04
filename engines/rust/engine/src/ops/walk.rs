@@ -699,7 +699,11 @@ pub(super) fn path_needs_an_object_subject(path: &Path, ctx: &Ctx) -> bool {
     }
     match &path.start {
         Start::Subject | Start::Own => !matches!(path.steps.first(), None | Some(Step::Index(_))),
-        Start::Part(part) => part.base == Start::Subject,
+        Start::Part(part) => {
+            part.base == Start::Subject
+                && !(part.steps.is_empty()
+                    && matches!(path.steps.first(), None | Some(Step::Index(_))))
+        }
         _ => false,
     }
 }
@@ -755,6 +759,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
         .iter()
         .map(|item| {
             at.subject = item.item.clone();
+            at.label = None;
             let verdicts: Vec<(&Check, Verdict)> = walk
                 .whose
                 .iter()
@@ -982,8 +987,16 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
                 inputs: Vec::new(),
             },
             failed_items: Vec::new(),
-            message: Some(message::isnt("it", ctx.subject.value, "an object")),
-            parts: vec![message::isnt("it", ctx.subject.value, "an object")],
+            message: Some(message::isnt(
+                ctx.subject_label(),
+                ctx.subject.value,
+                "an object",
+            )),
+            parts: vec![message::isnt(
+                ctx.subject_label(),
+                ctx.subject.value,
+                "an object",
+            )],
         };
     }
     let mut row = read_row(walk, ctx);
@@ -1031,6 +1044,7 @@ mod tests {
 
     fn ctx<'a>(subject: &'a Value, input: &'a Value, params: Option<&'a Value>) -> Ctx<'a> {
         Ctx {
+            label: None,
             subject: Located {
                 value: subject,
                 location: Location::input_root().key("s"),
@@ -1420,7 +1434,7 @@ mod tests {
         let on_it = every(&[], vec![], equals(json!(1)), false);
         let out = row(&on_it, json!([1, 2]));
         assert_eq!(out.verdict.cause, Cause::Value);
-        assert_eq!(out.verdict.inputs[0].name, "it[]");
+        assert_eq!(out.verdict.inputs[0].name, "the subject[]");
     }
 
     #[test]

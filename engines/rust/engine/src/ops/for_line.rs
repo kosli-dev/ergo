@@ -270,7 +270,7 @@ pub fn lower_for(
     }
     let mut problems: Vec<String> = problems
         .into_iter()
-        .map(|problem| format!("for: {problem}"))
+        .map(|problem| crate::lower::in_place("for: ", &problem))
         .collect();
     let names = bound.aliases();
     let names: Vec<&str> = names.iter().map(String::as_str).collect();
@@ -287,7 +287,9 @@ pub fn lower_for(
                     .is_some_and(|alias| reads_alias(&check, alias)),
                 check,
             }),
-            Err(found) => problems.extend(found.into_iter().map(|p| format!("{place}{p}"))),
+            Err(found) => {
+                problems.extend(found.into_iter().map(|p| crate::lower::in_place(place, &p)))
+            }
         }
     }
     if !problems.is_empty() {
@@ -496,6 +498,7 @@ impl For {
         let mut at = outer.clone();
         for w in &walked.items {
             at.subject = w.item.clone();
+            at.label = None;
             let verdicts: Vec<Verdict> = item
                 .whose
                 .iter()
@@ -653,6 +656,7 @@ impl For {
                     .map(|w| w.item.clone())
                     .unwrap_or_else(|| found.at.clone());
                 at.subject = holder;
+                at.label = None;
                 let read = path::read(&sorted.path, &at);
                 let location = read.location.clone();
                 let result = match (read.outcome.cause(), read.value) {

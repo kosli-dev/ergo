@@ -130,6 +130,7 @@ mod tests {
     fn verdict(options: Vec<Vec<Check>>, subject: Value) -> Verdict {
         let input = json!({"s": subject});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["s"],
                 location: Location::input_root().key("s"),
