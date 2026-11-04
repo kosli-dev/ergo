@@ -18,7 +18,7 @@ This page follows the latest release of `ergo.rego`.
 
 `ergo.rego` is a single file. Download it into your project and write a policy next to it.
 
-You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.20.1 or later to run it, and we test Ergo with OPA 1.20.2. Older versions give wrong results or don't load it: OPA 1.19 says `1 >= 100.0` is true, so a check can pass when it should fail, OPA 1.20.0 stops with `panic: illegal value` on `0.0 == 1.5`, and OPA 1.2 stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
+You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.20.1 or later to run it, and we test Ergo with OPA 1.22.0. Older versions give wrong results or don't load it: OPA 1.19 says `1 >= 100.0` is true, so a check can pass when it should fail, OPA 1.20.0 stops with `panic: illegal value` on `0.0 == 1.5`, and OPA 1.2 stops with `rego_parse_error: unexpected as keyword`. Run `opa version` to see which one you have.
 
 Download `ergo.rego` from the [latest release](https://github.com/kosli-dev/ergo/releases/latest) into the directory that holds your policies:
 
