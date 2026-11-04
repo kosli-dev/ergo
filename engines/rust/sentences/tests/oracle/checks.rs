@@ -5041,6 +5041,68 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("review is \"ok\"", "review is \"ok\"", &[], &[]),
     ("who is \"ann\"", "who is \"ann\"", &[], &[]),
     ("version exists", "version exists", &[], &[]),
+    (
+        "every distinct $input.s.ts[0].fs.k is at least lo",
+        "every distinct $input.s.ts[0].fs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct f.ok is at least lo",
+        "every distinct f.ok is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k is at least .lo",
+        "every distinct t.fs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k is at least lo",
+        "every distinct t.fs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k is at least t.lo",
+        "every distinct t.fs.k is at least t.lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k whose lo is 1 is at least lo",
+        "every distinct t.fs.k whose lo is 1 is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is at least lo",
+        "every distinct ts.fs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is at least lo plus 0",
+        "every distinct ts.fs.k is at least lo plus 0",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is lo plus 4",
+        "every distinct ts.fs.k equals lo plus 4",
+        &[],
+        &[],
+    ),
+    ("lo exists", "lo exists", &[], &[]),
+    (
+        "some distinct t.fs.k is in ok",
+        "some distinct t.fs.k is in ok",
+        &[],
+        &[],
+    ),
+    ("t exists", "t exists", &[], &[]),
     ("c is an object", "c is an object", &[], &[]),
     ("note is \"fine\"", "note is \"fine\"", &[], &[]),
     ("c.version is \"1\"", "c.version is \"1\"", &[], &[]),
@@ -7980,6 +8042,13 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    ("every ts as t", "every ts as t", &[], &[]),
+    (
+        "every ts as t, every t.fs as f",
+        "every ts as t, every t.fs as f",
+        &[],
+        &[],
+    ),
     ("every notes as note", "every notes as note", &[], &[]),
     ("every distinct xs as x", "every distinct xs as x", &[], &[]),
     (

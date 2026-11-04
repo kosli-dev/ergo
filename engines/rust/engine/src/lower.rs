@@ -986,8 +986,8 @@ pub fn lower_quantified(
             None => None,
         },
     };
-    if distinct && let Some(found) = &check {
-        problems.extend(distinct_item_problem(found));
+    if distinct {
+        problems.extend(distinct_item_problem(phrase, &item));
     }
     if !problems.is_empty() {
         return Err(problems);
@@ -1011,13 +1011,33 @@ pub fn lower_quantified(
 const DISTINCT_ITEM: &str =
     "distinct is about the value its path points at, but the phrase also reads ";
 
-fn distinct_item_problem(check: &Check) -> Option<String> {
-    let mut names: Vec<String> = check
-        .paths()
+fn phrase_paths(phrase: &s::Phrase) -> Vec<&s::Path> {
+    let mut paths: Vec<&s::Path> = phrase_terms(phrase)
+        .iter()
+        .filter_map(|term| match term {
+            s::Term::Path(path) => Some(path),
+            _ => None,
+        })
+        .collect();
+    if let s::Phrase::OneOf { list, .. }
+    | s::Phrase::Matches { list, .. }
+    | s::Phrase::ContainsAll(list)
+    | s::Phrase::ContainsNone(list)
+    | s::Phrase::ContainsSome(list)
+    | s::Phrase::NotContainsAll(list) = phrase
+        && let s::List::Path(path) = list
+    {
+        paths.push(path);
+    }
+    paths
+}
+
+fn distinct_item_problem(phrase: &s::Phrase, item: &Scope) -> Option<String> {
+    let mut names: Vec<String> = phrase_paths(phrase)
         .into_iter()
-        .chain(check.refs().iter())
+        .filter_map(|path| item.path(path).ok())
         .filter(|path| matches!(path.start, Start::Subject | Start::Own) && !path.steps.is_empty())
-        .map(crate::name::name)
+        .map(|path| crate::name::name(&path))
         .collect();
     names.sort();
     names.dedup();
