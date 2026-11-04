@@ -26501,5 +26501,1287 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with params as a number",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is 3, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with params as text",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "params": "s",
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is \"s\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with params as true",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "params": true,
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is true, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with params as an empty list",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "params": [],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is [], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with params as [3]",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "params": [
+      3
+    ],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is [3], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with params as [[1]]",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "params": [
+      [
+        1
+      ]
+    ],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is [[1]], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with params as [{\"v\": 1}]",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "params": [
+      {
+        "v": 1
+      }
+    ],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is [{\"v\": 1}], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with params as [[\"k\"]]",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "params": [
+      [
+        "k"
+      ]
+    ],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is [[\"k\"]], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with params as null",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "params": null,
+    "cases": [
+      {
+        "description": "fails $min_subjects as absent and says the param is missing",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              }
+            ],
+            "message": "$params.ks is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params.ks, with no params",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params.ks"
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails $min_subjects as absent and says the param is missing",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              }
+            ],
+            "message": "$params.ks is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params[0], with params as a number",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params[0]"
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is 3, which isn't a list",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params[0], with params as an empty list",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params[0]"
+        }
+      }
+    },
+    "params": [],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is [], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params[0], with params as [3]",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params[0]"
+        }
+      }
+    },
+    "params": [
+      3
+    ],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "item 1 of $params is 3, which isn't a list of text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params[0], with params as [[\"k\"]]",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params[0]"
+        }
+      }
+    },
+    "params": [
+      [
+        "k"
+      ]
+    ],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is [[\"k\"]], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params[0].ks, with params as [3]",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params[0].ks"
+        }
+      }
+    },
+    "params": [
+      3
+    ],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "item 1 of $params is 3, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params[0].ks, with params as [{\"ks\": [\"k\"]}]",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params[0].ks"
+        }
+      }
+    },
+    "params": [
+      {
+        "ks": [
+          "k"
+        ]
+      }
+    ],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is [{\"ks\": [\"k\"]}], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by each of $params[0].ks, with params as [{\"ks\": 3}]",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by each of $params[0].ks"
+        }
+      }
+    },
+    "params": [
+      {
+        "ks": 3
+      }
+    ],
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "k": {
+              "id": "t"
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params[0].ks is 3, which isn't a list of text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by $params.env named by each of $params.ks, with params as a number",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by $params.env named by each of $params.ks"
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "prod": {
+              "k": {
+                "id": "t"
+              }
+            }
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is 3, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by $params.env, with params as a number",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by $params.env",
+          "identified_by": "id"
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "prod": [
+              {
+                "id": "t"
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is 3, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, things named by $params.env, with params as null",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "things named by $params.env",
+          "identified_by": "id"
+        }
+      }
+    },
+    "params": null,
+    "cases": [
+      {
+        "description": "fails $min_subjects as absent and says the param is missing",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "prod": [
+              {
+                "id": "t"
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              }
+            ],
+            "message": "$params.env is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line that reads the params, every things named by $params.env, with params as a number",
+    "policy": {
+      "ergo_spec": "v0.5-dev",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": "id exists"
+          },
+          "subject": "s"
+        }
+      },
+      "subjects": {
+        "s": {
+          "from": "every things named by $params.env",
+          "identified_by": "id"
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "makes no subjects and fails $min_subjects as unusable, naming the params",
+        "rules": ["path.start", "message.from", "subjects.sentence"],
+        "input": {
+          "things": {
+            "prod": [
+              {
+                "id": "t"
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "$min_subjects",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope s count",
+                "value": 0
+              },
+              {
+                "locations": [],
+                "name": "$params",
+                "value": [
+                  "not an object"
+                ]
+              }
+            ],
+            "message": "$params is 3, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "type": "s"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
