@@ -5437,6 +5437,38 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("rel[1] is 2", "item 2 of rel is 2", &[], &[]),
     ("some rel[0] is 1", "some item 1 of rel is 1", &[], &[]),
     ("x is rel[0]", "x equals item 1 of rel", &[], &[]),
+    (
+        "count of \"my rel\"[0] is 1",
+        "count of item 1 of \"my rel\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of $input.ys whose k is s is 1",
+        "count of $input.ys whose k equals s is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of $input.ys whose k is .s is 2",
+        "count of $input.ys whose k equals s is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose count of s is 1 is 1",
+        "count of ys whose count of s is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose s[0] is 1 is 1",
+        "count of ys whose item 1 of s is 1 is 1",
+        &[],
+        &[],
+    ),
+    ("every \"item\" is 1", "every .item is 1", &[], &[]),
+    ("rel is not empty", "rel is not empty", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -6529,6 +6561,7 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         &["a condition after and starts with whose or that"],
     ),
     ("every ws that is not empty", &["doesn't parse"]),
+    ("x is \"my rel\"[0]", &["doesn't parse"]),
     (
         "every that is not empty",
         &["that is a word of the grammar: write .that"],

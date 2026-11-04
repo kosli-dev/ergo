@@ -191,6 +191,21 @@ impl Scope {
         self
     }
 
+    pub fn whose_left(&self, condition: &s::Condition) -> s::Condition {
+        match &self.subject {
+            Some(name) if self.item || self.from_line => left_dotted(condition, name),
+            _ => condition.clone(),
+        }
+    }
+
+    pub fn left_print_names(&self) -> Vec<String> {
+        let mut names = self.parent_names();
+        if self.from_line {
+            names.extend(self.subject.iter().cloned());
+        }
+        names
+    }
+
     pub fn for_from_line(mut self) -> Scope {
         self.from_line = true;
         self
@@ -702,6 +717,38 @@ pub fn tally_condition_problems(condition: &s::Condition) -> Vec<String> {
     problems
 }
 
+pub fn name_dotted(path: &s::Path, name: &str) -> s::Path {
+    match &path.start {
+        s::Start::Field { key, dot: false } | s::Start::Quoted(key) if key == name => s::Path {
+            start: s::Start::Field {
+                key: key.clone(),
+                dot: true,
+            },
+            ..path.clone()
+        },
+        _ => path.clone(),
+    }
+}
+
+pub fn left_dotted(condition: &s::Condition, name: &str) -> s::Condition {
+    let left = match &condition.left {
+        s::Left::Path(path) => s::Left::Path(name_dotted(path, name)),
+        s::Left::Derived(derived) => s::Left::Derived(s::Derived {
+            path: name_dotted(&derived.path, name),
+            ..derived.clone()
+        }),
+        s::Left::Elapsed(elapsed) => s::Left::Elapsed(s::Elapsed {
+            from: name_dotted(&elapsed.from, name),
+            to: name_dotted(&elapsed.to, name),
+            ..elapsed.clone()
+        }),
+    };
+    s::Condition {
+        left,
+        ..condition.clone()
+    }
+}
+
 pub fn lower_tally_condition(
     condition: &s::Condition,
     scope: &Scope,
@@ -732,6 +779,7 @@ fn with_problems(
 }
 
 pub fn lower_condition(condition: &s::Condition, scope: &Scope) -> Result<Check, Vec<String>> {
+    let condition = &scope.whose_left(condition);
     with_problems(
         lower_condition_phrase(condition, scope),
         argument_problems(&condition.phrase)

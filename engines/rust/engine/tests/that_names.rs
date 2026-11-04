@@ -44,7 +44,7 @@ fn the_row_names_the_item_by_the_plain_subject_name() {
 }
 
 #[test]
-fn a_subject_named_like_a_field_of_its_own_item_lists_an_input_read_twice_once() {
+fn a_subject_named_like_a_field_its_whose_reads_lists_the_field_and_the_item_apart() {
     let report = ergo_policy_engine::report(
         &json!({"ws": [null]}),
         &json!({
@@ -62,7 +62,10 @@ fn a_subject_named_like_a_field_of_its_own_item_lists_an_input_read_twice_once()
         .unwrap();
     assert_eq!(
         row["inputs"],
-        json!([{"name": "x", "value": null, "locations": ["/ws/0"]}])
+        json!([
+            {"name": ".x", "value": null, "locations": ["/ws/0"]},
+            {"name": "x", "value": null, "locations": ["/ws/0"]}
+        ])
     );
 }
 

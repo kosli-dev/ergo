@@ -1805,6 +1805,19 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("rel.kids whose kid.x is 1", "rel.kids whose kid.x is 1"),
     ("rel.kids whose rel.w is 1", "rel.kids whose rel.w is 1"),
     ("every things", "every things"),
+    ("every xs whose \"item\" is 1", "every xs whose .item is 1"),
+    (
+        "every xs whose \"first\" is 1",
+        "every xs whose .first is 1",
+    ),
+    (
+        "every xs whose count of \"item\" is 1",
+        "every xs whose count of .item is 1",
+    ),
+    (
+        "every xs whose every rel is 1",
+        "every xs whose every rel is 1",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

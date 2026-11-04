@@ -219,11 +219,7 @@ pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
     if !simple || path::read(path, ctx).outcome != Outcome::Unusable {
         return None;
     }
-    let options = Options {
-        own_dot: true,
-        ..Options::default()
-    };
-    let walked = walk::walk(path, ctx, options);
+    let walked = walk::walk(path, ctx, Options::default());
     if walked.unreadable.is_some() || !walked.walked.iter().any(|level| *level < walked.steps) {
         return None;
     }

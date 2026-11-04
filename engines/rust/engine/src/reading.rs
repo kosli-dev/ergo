@@ -880,11 +880,11 @@ impl Reading {
                                 phrase,
                             } => match lower::lower_quantified(
                                 *quantifier,
-                                path,
+                                &lower::name_dotted(path, name),
                                 &[],
                                 *if_any,
                                 phrase,
-                                &scope,
+                                &scope.clone().with_subject(name).for_from_line(),
                             ) {
                                 Ok(check) => filters.push(Filter { text, check }),
                                 Err(found) => found_problems.extend(lower::in_from_line(found)),

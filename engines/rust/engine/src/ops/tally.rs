@@ -536,7 +536,6 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         Options {
             if_any: false,
             empty_adds_nothing: true,
-            own_dot: false,
         },
     );
     let whose: Vec<&Check> = counted.whose.iter().collect();
@@ -840,7 +839,7 @@ fn term_text(term: &s::Term, names: &[&str], left: Option<&[&str]>) -> String {
 }
 
 fn lower_term(term: &s::Term, scope: &Scope, names: &[&str]) -> Result<Option<Term>, Vec<String>> {
-    let parent_names = scope.parent_names();
+    let parent_names = scope.left_print_names();
     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
     let scope_left = scope.prints_left().then_some(parent_refs.as_slice());
     match term {
@@ -878,7 +877,7 @@ fn lower_counted(
     scope: &Scope,
     names: &[&str],
 ) -> Result<Option<Term>, Vec<String>> {
-    let parent_names = scope.parent_names();
+    let parent_names = scope.left_print_names();
     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
     let scope_left = scope.prints_left().then_some(parent_refs.as_slice());
     let mut problems = Vec::new();
@@ -921,7 +920,7 @@ fn lower_side(
     scope: &Scope,
     names: &[&str],
 ) -> Result<Option<Side>, Vec<String>> {
-    let parent_names = scope.parent_names();
+    let parent_names = scope.left_print_names();
     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
     let scope_left = scope.prints_left().then_some(parent_refs.as_slice());
     let mut lowered = Vec::new();
@@ -1143,7 +1142,6 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
             Options {
                 if_any: false,
                 empty_adds_nothing: true,
-                own_dot: false,
             },
         );
         if let Some(outcome) = walked.unreadable {
@@ -2836,7 +2834,7 @@ mod tests {
             json!({"xs": [{"kid": 1}]}),
         );
         assert_eq!(row["cause"], "unusable");
-        assert_eq!(row["message"], "kid is 1, which isn't a list or an object");
+        assert_eq!(row["message"], ".kid is 1, which isn't a list or an object");
         assert_eq!(row["inputs"][1]["name"], ".kid");
     }
 

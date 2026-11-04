@@ -246,7 +246,6 @@ fn walk_from<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>], base: Located<'a>)
         walk::Options {
             if_any: true,
             empty_adds_nothing: false,
-            own_dot: false,
         },
     );
     if let Some(outcome) = walked.unreadable {

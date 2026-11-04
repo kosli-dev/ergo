@@ -468,7 +468,6 @@ impl For {
             Options {
                 if_any,
                 empty_adds_nothing: empty_ok,
-                own_dot: false,
             },
         );
         if let Some(outcome) = walked.unreadable {
@@ -1313,7 +1312,6 @@ impl For {
             Options {
                 if_any,
                 empty_adds_nothing: false,
-                own_dot: false,
             },
         );
         Input {

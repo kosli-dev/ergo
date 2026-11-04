@@ -124,7 +124,7 @@ fn a_subject_called_it_is_an_ordinary_name() {
 }
 
 #[test]
-fn the_subjects_name_in_its_own_from_line_reads_the_item_it_picks() {
+fn the_subjects_name_in_its_own_from_line_whose_reads_the_items_own_field() {
     let report = report(
         "kid",
         "kids whose kid is 1",
@@ -134,11 +134,8 @@ fn the_subjects_name_in_its_own_from_line_reads_the_item_it_picks() {
     assert_eq!(
         rows(&report, "$applies"),
         [
-            (
-                "unusable",
-                "kid is {\"v\": 1, \"x\": 1}, which isn't a number"
-            ),
-            ("value", "kid is 4"),
+            ("absent", ".kid is missing"),
+            ("not_an_object", "kid is 4, which isn't an object"),
         ]
         .map(|(c, m)| (c.to_string(), m.to_string()))
     );
