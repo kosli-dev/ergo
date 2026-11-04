@@ -999,5 +999,49 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a count of a field named like the subject, written with a dot",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of .kid is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "every kids"}}},
+    "cases": [
+      {
+        "description": "a field that isn't a list or an object is said once, as the walk says it",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"kids": [{"kid": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of .kid", "value": null}, {"locations": [], "name": ".kid", "value": []}], "message": "kid is 1, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": {"kid": 1}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "a missing field is named with its dot in the inputs and without it in the message",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"kids": [{"x": 1}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": [], "name": "count of .kid", "value": null}, {"locations": [], "name": ".kid", "value": []}], "message": "kid is missing", "passed": false, "requirement": "r", "subject": {"id": {"x": 1}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count whose reads a field named like the subject and a part",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of ys whose thing is p is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "every xs", "has": {"p": "thing"}}}},
+    "cases": [
+      {
+        "description": "an item that isn't an object is named with the dot of the field the whose reads",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"xs": [{"thing": {"x": 1}, "x": 2, "ys": [{"thing": 1}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0/ys/0"], "name": "count of ys whose thing equals p", "value": null}, {"locations": ["/xs/0/ys/0"], "name": "ys[]", "value": [{"thing": 1}]}, {"locations": ["/xs/0/thing"], "name": "p", "part": {"id": null, "name": "p"}, "value": {"x": 1}}], "message": "item 1 of ys: .thing is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"thing": {"x": 1}, "x": 2, "ys": [{"thing": 1}]}, "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a subject that isn't an object still lists the part the whose reads",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"xs": [[1, 2]]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": [], "name": "count of ys whose thing equals p", "value": null}, {"locations": [], "name": "ys", "value": []}, {"locations": ["/xs/0"], "name": "p", "part": {"id": null, "name": "p"}, "value": null}], "message": "thing is [1, 2], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [1, 2], "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]
