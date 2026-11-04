@@ -5101,6 +5101,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of w[0] named by zz is 1",
+        "count of w[0] named by zz is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of x[0][0] named by zz is 1",
+        "count of x[0][0] named by zz is 1",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

@@ -11303,14 +11303,36 @@ test_message_of_a_count_names_an_item_whose_field_cant_hold_the_next_step if {
 	row.message == "item 1 of xs: n is 5, which isn't an object"
 }
 
+_count_message(assertion, thing, params) := row.message if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": assertion}}}}
+	r := ergo.report({"things": [object.union({"id": "t"}, thing)]}, policy, params)
+	some row in r.results
+	row.check == "c"
+}
+
 test_message_of_a_count_names_the_list_in_a_list_item_it_not_an_empty_name if {
-	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of x[0] named by zz is 1"}}}}
-	every zz in [{"zz": "a"}, {}, {"zz": null}, {"zz": 3}] {
-		r := ergo.report({"things": [object.union({"id": "t", "x": [[1]]}, zz)]}, policy, {})
-		some row in r.results
-		row.check == "c"
-		not contains(row.message, "of  ")
-	}
+	_count_message("count of x[0] named by zz is 1", {"x": [[1]], "zz": "a"}, {}) == "item 1 of x: item 1 of it is 1, which isn't an object"
+	_count_message("count of x[0] named by zz is 1", {"x": [[{"a": 1}, 3]], "zz": "a"}, {}) == "item 1 of x: item 2 of it is 3, which isn't an object"
+	_count_message("count of x[0] named by zz is 1", {"x": [[[]]], "zz": "a"}, {}) == "item 1 of x: item 1 of it is [], which isn't an object"
+	_count_message("count of x[0] named by zz is 1", {"x": [[]], "zz": "a"}, {}) == "count of x[0] named by zz is 0"
+	_count_message("count of x[0] named by zz is 5", {"x": [[{"a": 1}]], "zz": "a"}, {}) == "count of x[0] named by zz is 1"
+	_count_message("count of x[0][0] named by zz is 1", {"x": [[[1]]], "zz": "a"}, {}) == "item 1 of x: item 1 of it: item 1 of it is 1, which isn't an object"
+}
+
+test_message_of_a_count_names_the_list_in_a_list_item_it_with_a_for_alias if {
+	_count_message_for("count of w[0] named by zz is 1", {"ws": [[{"a": 1}, 3]], "zz": "a"}) == "item 1 of ws: item 1 of w: .a is 1, which isn't a list or an object"
+}
+
+test_message_of_a_count_names_the_list_in_a_list_item_it_in_params if {
+	_count_message("count of $params.p[0] named by zz is 1", {"zz": "a"}, {"p": [[1]]}) == "item 1 of $params.p: item 1 of it is 1, which isn't an object"
+	_count_message("count of $params.p[0][0] named by zz is 1", {"zz": "a"}, {"p": [[[1]]]}) == "item 1 of $params.p: item 1 of it: item 1 of it is 1, which isn't an object"
+}
+
+_count_message_for(assertion, thing) := row.message if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": assertion, "for": "every ws as w"}}}}}
+	r := ergo.report({"things": [object.union({"id": "t"}, thing)]}, policy, {})
+	some row in r.results
+	row.check == "c"
 }
 
 test_message_of_a_count_with_a_key_from_a_field_names_the_value_once if {
