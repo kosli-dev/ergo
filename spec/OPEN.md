@@ -69,7 +69,7 @@ Three ways to settle it:
 
 ## Numbers with huge exponents
 
-OPA crashes when it compares a number whose exponent is beyond ±1e6 with any other number, from the input, the params or the policy, so `ergo.rego` gives no report at all. `size is at least 5` on this input stops OPA 1.20.2 with `panic: illegal value` in `ast.NumberCompare`:
+OPA 1.20.2 crashes when it compares a number whose exponent is beyond ±1e6 with any other number, from the input, the params or the policy, so `ergo.rego` gives no report at all. `size is at least 5` on this input stops OPA 1.20.2 with `panic: illegal value` in `ast.NumberCompare`. OPA 1.22.0 doesn't crash, but it refuses this input, and `1e1000000` too, with `invalid number: number too big` before `ergo.rego` runs, so there's still no report:
 
 ```json
 {"items": [{"size": 1e1000001}]}

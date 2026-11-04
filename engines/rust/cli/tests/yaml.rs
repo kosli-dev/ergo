@@ -22,17 +22,28 @@ fn same(text: &str, expected: Value) {
 }
 
 #[test]
-fn yes_and_no_words_are_booleans() {
-    for t in [
-        "yes", "Yes", "YES", "on", "On", "ON", "y", "Y", "true", "True", "TRUE",
-    ] {
+fn only_true_and_false_are_booleans() {
+    for t in ["true", "True", "TRUE"] {
         same(t, json!(true));
     }
-    for t in [
-        "no", "No", "NO", "off", "Off", "OFF", "n", "N", "false", "False", "FALSE",
-    ] {
+    for t in ["false", "False", "FALSE"] {
         same(t, json!(false));
     }
+}
+
+#[test]
+fn yes_no_on_and_off_are_strings_as_opa_1_22_reads_them() {
+    for t in [
+        "yes", "Yes", "YES", "on", "On", "ON", "y", "Y", "no", "No", "NO", "off", "Off", "OFF",
+        "n", "N",
+    ] {
+        same(t, json!(t));
+    }
+    assert_eq!(
+        parse("a: [yes, no, on, off, y, n]\n").unwrap(),
+        json!({"a": ["yes", "no", "on", "off", "y", "n"]})
+    );
+    assert_eq!(parse("yes\n").unwrap(), json!("yes"));
 }
 
 #[test]
@@ -50,8 +61,27 @@ fn null_forms() {
 
 #[test]
 fn boolean_keys_become_the_words() {
-    let v = parse("n: 1\ny: 2\n").unwrap();
+    let v = parse("False: 1\nTRUE: 2\n").unwrap();
     assert_eq!(v, json!({"false": 1, "true": 2}));
+}
+
+#[test]
+fn yes_no_on_and_off_keys_keep_their_text() {
+    let v = parse("n: 1\ny: 2\nyes: 3\noff: 4\n").unwrap();
+    assert_eq!(v, json!({"n": 1, "y": 2, "yes": 3, "off": 4}));
+    assert_eq!(
+        parse("a: &k on\nb: {*k : 1}\n").unwrap()["b"],
+        json!({"on": 1})
+    );
+}
+
+#[test]
+fn a_key_written_plain_and_quoted_is_one_key_and_the_last_wins() {
+    assert_eq!(parse("on: 1\n'on': 2\n").unwrap(), json!({"on": 2}));
+    assert_eq!(
+        parse("true: a\nTrue: b\n'true': c\n").unwrap(),
+        json!({"true": "c"})
+    );
 }
 
 #[test]
@@ -161,14 +191,113 @@ fn explicit_tags() {
         json!("1")
     );
     assert_eq!(parse("b: !!int \"3\"\n").unwrap()["b"], json!(3));
-    assert!(parse("a: !custom 1\n").is_err());
 }
 
 #[test]
-fn a_timestamp_tag_keeps_the_text() {
+fn a_tag_outside_the_core_schema_keeps_the_text_as_opa_does() {
+    for (text, expected) in [
+        ("!custom 1", json!("1")),
+        ("!foo 010", json!("010")),
+        ("!foo yes", json!("yes")),
+        ("!<!foo> 5", json!("5")),
+        ("!!foo 5", json!("5")),
+        ("!!set a", json!("a")),
+        ("!!merge 1", json!("1")),
+        ("!!merge <<", json!("<<")),
+        ("!foo [1, true]", json!([1, true])),
+        ("!custom {x: 1}", json!({"x": 1})),
+    ] {
+        assert_eq!(value(text), expected, "{text}");
+    }
     assert_eq!(
-        parse("v: !!timestamp 2026-10-29\n").unwrap()["v"],
-        json!("2026-10-29")
+        parse("%TAG !e! tag:example.com,2000:\n---\na: !e!foo 5\n").unwrap(),
+        json!({"a": "5"})
+    );
+}
+
+#[test]
+fn a_verbatim_core_tag_reads_like_its_short_form() {
+    assert_eq!(value("!<tag:yaml.org,2002:int> 5"), json!(5));
+    assert_eq!(value("!<tag:yaml.org,2002:str> 5"), json!("5"));
+}
+
+#[test]
+fn a_timestamp_tag_writes_the_time_as_opa_1_22_does() {
+    for (text, expected) in [
+        ("2026-10-29", "2026-10-29T00:00:00Z"),
+        ("'2001-12-14'", "2001-12-14T00:00:00Z"),
+        ("0000-01-01", "0000-01-01T00:00:00Z"),
+        ("2001-12-14 21:59:43", "2001-12-14T21:59:43Z"),
+        ("2001-12-14  21:59:43", "2001-12-14T21:59:43Z"),
+        ("2001-12-14 1:2:3", "2001-12-14T01:02:03Z"),
+        ("2001-12-14 21:59:43,5", "2001-12-14T21:59:43.5Z"),
+        ("2001-12-14T21:59:43+00:00", "2001-12-14T21:59:43Z"),
+        ("2001-12-14T21:59:43-00:00", "2001-12-14T21:59:43Z"),
+        ("2001-12-14t21:59:43Z", "2001-12-14T21:59:43Z"),
+        ("2001-1-2T3:04:05.000Z", "2001-01-02T03:04:05Z"),
+        ("2001-12-14T21:59:43.0Z", "2001-12-14T21:59:43Z"),
+        (
+            "2001-12-14T21:59:43.10-05:00",
+            "2001-12-14T21:59:43.1-05:00",
+        ),
+        (
+            "\"2001-12-14T01:02:03,25+01:00\"",
+            "2001-12-14T01:02:03.25+01:00",
+        ),
+        (
+            "2001-12-14T21:59:43.123456789123Z",
+            "2001-12-14T21:59:43.123456789Z",
+        ),
+        ("2001-12-14T21:59:43.000+01:30", "2001-12-14T21:59:43+01:30"),
+        ("2001-12-14T21:59:43+05:60", "2001-12-14T21:59:43+06:00"),
+        ("2001-12-14T21:59:43+23:59", "2001-12-14T21:59:43+23:59"),
+        (
+            "9999-12-31T23:59:59.999999999-23:00",
+            "9999-12-31T23:59:59.999999999-23:00",
+        ),
+    ] {
+        assert_eq!(
+            value(&format!("!!timestamp {text}")),
+            json!(expected),
+            "{text}"
+        );
+    }
+}
+
+#[test]
+fn a_timestamp_tag_with_a_time_zone_of_24_hours_or_more_is_an_error_as_in_opa_1_22() {
+    for text in [
+        "2001-12-14T21:59:43+24:00",
+        "2001-12-14T21:59:43+23:60",
+        "2001-12-14T21:59:43-24:00",
+    ] {
+        assert!(
+            matches!(
+                parse(&format!("v: !!timestamp {text}\n")),
+                Err(Error::NotJson(_))
+            ),
+            "{text}"
+        );
+    }
+}
+
+#[test]
+fn a_date_written_plain_keeps_its_text() {
+    for text in [
+        "2001-12-14",
+        "2001-12-14t21:59:43.10-05:00",
+        "2001-12-14 21:59:43",
+    ] {
+        assert_eq!(value(text), json!(text));
+    }
+}
+
+#[test]
+fn a_timestamp_key_is_an_error_as_in_opa_1_22() {
+    assert!(parse("!!timestamp 2001-12-14: a\n").is_err());
+    assert_eq!(
+        parse("2001-12-14: a\n").unwrap(),
+        json!({"2001-12-14": "a"})
     );
 }
 
@@ -200,10 +329,74 @@ fn anchors_aliases_and_merge_keys() {
 }
 
 #[test]
-fn merge_keys_follow_document_order() {
+fn a_key_written_in_the_map_wins_over_a_merged_one_wherever_it_is() {
     let v = parse("b: &b\n  k: 1\n  j: 1\nm:\n  k: 2\n  <<: *b\no:\n  <<: *b\n  k: 3\n").unwrap();
-    assert_eq!(v["m"], json!({"k": 1, "j": 1}));
+    assert_eq!(v["m"], json!({"k": 2, "j": 1}));
     assert_eq!(v["o"], json!({"k": 3, "j": 1}));
+    let v = parse("a: &a {k: 1}\nm:\n  k: 0\n  k: 2\n  <<: *a\n").unwrap();
+    assert_eq!(v["m"], json!({"k": 2}));
+    assert_eq!(
+        parse("m: {<<: {k: 1}, k: 2}\n").unwrap()["m"],
+        json!({"k": 2})
+    );
+    let v = parse("x: &x {a: 1}\nm:\n  <<: *x\n  a: ~\n").unwrap();
+    assert_eq!(v["m"], json!({"a": null}));
+}
+
+#[test]
+fn the_first_of_several_merge_keys_wins() {
+    let v = parse("a: &a {k: 1}\nb: &b {k: 2}\nm:\n  <<: *a\n  <<: *b\n").unwrap();
+    assert_eq!(v["m"], json!({"k": 1}));
+    let v = parse("m:\n  <<: {k: 1}\n  <<: {k: 2, j: 2}\n  j: 3\n").unwrap();
+    assert_eq!(v["m"], json!({"k": 1, "j": 3}));
+    let v = parse("m:\n  <<: {k: 1}\n  <<: [{k: 2}, {j: 1}]\n").unwrap();
+    assert_eq!(v["m"], json!({"k": 1, "j": 1}));
+}
+
+#[test]
+fn a_merged_map_keeps_its_own_keys_over_what_it_merges() {
+    let v = parse("a: &a {k: 1, <<: {k: 9, z: 9}}\nm:\n  <<: *a\n").unwrap();
+    assert_eq!(v["a"], json!({"k": 1, "z": 9}));
+    assert_eq!(v["m"], json!({"k": 1, "z": 9}));
+    let v = parse("m:\n  <<: {<<: {k: 1, z: 1}, k: 2}\n").unwrap();
+    assert_eq!(v["m"], json!({"k": 2, "z": 1}));
+}
+
+#[test]
+fn a_key_next_to_a_merge_key_keeps_its_text() {
+    let v = parse("base: &b {k: 1}\nm:\n  <<: *b\n  y: 2\n").unwrap();
+    assert_eq!(v["m"], json!({"k": 1, "y": 2}));
+    assert_eq!(parse("m:\n  <<: {on: 1}\n").unwrap()["m"], json!({"on": 1}));
+    let v = parse("m: &m\n  <<: {k: 1}\nn: *m\n").unwrap();
+    assert_eq!(v, json!({"m": {"k": 1}, "n": {"k": 1}}));
+}
+
+#[test]
+fn a_merge_key_is_plain_or_tagged_merge() {
+    assert_eq!(
+        parse("m:\n  !!merge <<: {k: 1}\n").unwrap()["m"],
+        json!({"k": 1})
+    );
+    assert_eq!(
+        parse("m:\n  !!merge '<<': {k: 1}\n").unwrap()["m"],
+        json!({"k": 1})
+    );
+    assert_eq!(parse("m:\n  ! <<: {k: 1}\n").unwrap()["m"], json!({"k": 1}));
+    assert_eq!(
+        parse("m:\n  <<: {k: 1}\n  !!merge <<: {k: 2}\n").unwrap()["m"],
+        json!({"k": 1})
+    );
+    for text in ["'<<'", "! '<<'", "!!str <<"] {
+        assert_eq!(
+            parse(&format!("m:\n  {text}: {{k: 1}}\n")).unwrap()["m"],
+            json!({"<<": {"k": 1}}),
+            "{text}"
+        );
+    }
+    assert_eq!(
+        parse("m:\n  !!merge foo: {k: 1}\n").unwrap()["m"],
+        json!({"foo": {"k": 1}})
+    );
 }
 
 #[test]
@@ -220,7 +413,15 @@ fn the_first_map_of_a_merge_list_wins_over_a_later_explicit_key_only_before_it()
 
 #[test]
 fn a_merge_of_a_non_map_is_an_error() {
-    assert!(parse("m:\n  <<: 1\n").is_err());
+    for text in [
+        "m:\n  <<: 1\n",
+        "m:\n  <<: ~\n",
+        "m:\n  <<: [{k: 1}, 5]\n",
+        "m:\n  <<: {k: 1}\n  <<: 5\n",
+        "a: &a [{k: 1}]\nm:\n  <<: *a\n",
+    ] {
+        assert!(parse(text).is_err(), "{text:?}");
+    }
 }
 
 #[test]
@@ -249,6 +450,130 @@ fn infinity_and_nan_are_errors() {
 #[test]
 fn only_the_first_document_is_read() {
     assert_eq!(parse("a: 1\n---\nb: 2\n").unwrap(), json!({"a": 1}));
+    assert_eq!(parse("a: 1\n---\nb: !!int foo\n").unwrap(), json!({"a": 1}));
+    assert_eq!(parse("a: 1\n---\nb: 1\nb: 2\n").unwrap(), json!({"a": 1}));
+    assert_eq!(parse("a: &x 1\n---\nb: *x\n").unwrap(), json!({"a": 1}));
+    assert_eq!(parse("a: 1\n---\nb: .inf\n").unwrap(), json!({"a": 1}));
+    assert_eq!(parse("a: 1\n---\n").unwrap(), json!({"a": 1}));
+    assert_eq!(parse("---\n---\na: 1\n").unwrap(), Value::Null);
+}
+
+#[test]
+fn a_later_document_that_is_not_valid_yaml_is_an_error_as_in_opa_1_22() {
+    for text in [
+        "a: 1\n---\nb: [\n",
+        "a: 1\n---\nb: &x [\n",
+        "a: 1\n---\nb: *nope\n",
+        "a: 1\n--- |\n  text\n---\nc: *nope\n",
+    ] {
+        assert!(matches!(parse(text), Err(Error::Invalid(_))), "{text:?}");
+    }
+}
+
+#[test]
+fn a_later_document_too_deep_or_of_another_yaml_version_is_refused_as_in_opa_1_22() {
+    std::thread::Builder::new()
+        .stack_size(256 << 20)
+        .spawn(|| {
+            refused(&format!("a: 1\n---\n{}", nested(10_001)), "10,000");
+            assert_eq!(
+                parse(&format!("a: 1\n---\n{}", nested(10_000))).unwrap(),
+                json!({"a": 1})
+            );
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+    refused("a: 1\n...\n%YAML 1.2\n---\nb: 1\n", "%YAML");
+    assert_eq!(
+        parse("a: 1\n...\n%YAML 1.1\n---\nb: 1\n").unwrap(),
+        json!({"a": 1})
+    );
+}
+
+#[test]
+fn the_same_alias_twice_as_a_key_is_an_error_as_in_opa_1_22() {
+    assert!(parse("a: &a k\nm:\n  *a : 1\n  *a : 2\n").is_err());
+    assert_eq!(
+        parse("a: &a k\nm:\n  *a : 1\n  k: 2\n").unwrap()["m"],
+        json!({"k": 2})
+    );
+    assert_eq!(
+        parse("a: &a k\nm:\n  k: 1\n  *a : 2\n").unwrap()["m"],
+        json!({"k": 2})
+    );
+}
+
+#[test]
+fn an_alias_key_is_repeated_by_the_anchor_name_as_opa_1_22_compares_them() {
+    for text in [
+        "a: &k foo\nm:\n  *k : 1\n  x: &k bar\n  *k : 2\n",
+        "x: &k foo\nm:\n  *k : 1\n  *k : 2\n",
+        "a: &k foo\nb: &k foo\nm:\n  *k : 1\n  *k : 2\n",
+        "&k foo: 1\nm:\n  *k : 1\n  *k : 2\n",
+        "m:\n  x: &k foo\n  *k : 1\n  y: &k bar\n  *k : 2\n",
+        "a: &k [1]\nm:\n  *k : 1\n  *k : 2\n",
+        "a: &k foo\nm: {*k : 1, *k : 2}\n",
+        "é: &k foo\nm:\n  *k : 1\n  *k : 2\n",
+    ] {
+        assert!(parse(text).is_err(), "{text:?}");
+    }
+    for (text, expected) in [
+        ("m:\n  &k foo: 1\n  *k : 2\n", json!({"m": {"foo": 2}})),
+        (
+            "a: &k foo\nb: &j foo\nm:\n  *k : 1\n  *j : 2\n",
+            json!({"a": "foo", "b": "foo", "m": {"foo": 2}}),
+        ),
+        (
+            "a: &k foo\nm:\n  *k : 1\n  n:\n    *k : 2\n",
+            json!({"a": "foo", "m": {"foo": 1, "n": {"foo": 2}}}),
+        ),
+        (
+            "é: &kk foo\nm:\n  *kk : 1\n  x: &k foo\n  *k : 2\n",
+            json!({"é": "foo", "m": {"foo": 2, "x": "foo"}}),
+        ),
+    ] {
+        assert_eq!(parse(text).unwrap(), expected, "{text:?}");
+    }
+}
+
+#[test]
+fn a_bare_exclamation_mark_tag_reads_a_plain_value_as_if_it_had_no_tag_as_in_opa_1_21() {
+    for (text, expected) in [
+        ("! 5", json!(5)),
+        ("! true", json!(true)),
+        ("! ~", Value::Null),
+        ("! null", Value::Null),
+        ("!", Value::Null),
+        ("! 0x10", json!(16)),
+        ("! 010", json!(8)),
+        ("! 1.5", json!(1.5)),
+        ("! 9223372036854775808", json!(9223372036854775808u64)),
+        ("! yes", json!("yes")),
+        ("! 2001-12-14", json!("2001-12-14")),
+        ("&a ! 5", json!(5)),
+        ("! &a 5", json!(5)),
+        ("! ''", json!("")),
+        ("! '5'", json!("5")),
+        ("! \"true\"", json!("true")),
+        ("! |\n  5\n", json!("5\n")),
+        ("! [1, true]", json!([1, true])),
+        ("! {a: 1}", json!({"a": 1})),
+    ] {
+        same(text, expected);
+    }
+    assert_eq!(
+        parse("a: &x ! 5\nb: *x\n").unwrap(),
+        json!({"a": 5, "b": 5})
+    );
+    assert_eq!(parse("! 5\n").unwrap(), json!(5));
+    assert_eq!(parse("! ~\n").unwrap(), Value::Null);
+    assert_eq!(parse("v: !\n  - 1\n").unwrap(), json!({"v": [1]}));
+    assert_eq!(parse("! 5: a\n").unwrap(), json!({"5": "a"}));
+    assert_eq!(parse("! .inf: a\n").unwrap(), json!({".inf": "a"}));
+    assert_eq!(parse("! '<<': 1\n").unwrap(), json!({"<<": 1}));
+    assert!(parse("v: ! .inf\n").is_err());
+    assert!(parse("! ~: 1\n").is_err());
 }
 
 #[test]
@@ -262,7 +587,7 @@ fn an_empty_file_is_null_and_a_top_level_list_or_scalar_is_kept() {
 #[test]
 fn nested_lists_and_flow_collections() {
     assert_eq!(
-        parse("a: [1, {b: yes}]\n").unwrap(),
+        parse("a: [1, {b: true}]\n").unwrap(),
         json!({"a": [1, {"b": true}]})
     );
 }
@@ -355,6 +680,18 @@ fn a_core_tag_that_does_not_fit_the_value_is_refused_as_opa_refuses_it() {
         "!!timestamp 2001-12-14T21:59:43+0500",
         "!!timestamp 2001-12-14T21:59:43",
         "!!timestamp 2001-12-14T21:59:43.Z",
+        "!!timestamp 2001-12-14T21:59Z",
+        "!!timestamp 2001-12-14T21:59:43z",
+        "!!timestamp 2001-12-14T21:59:43+5:00",
+        "!!timestamp 2001-12-14T21:59:43.1+05:6",
+        "!!timestamp 2001-12-14 21:59:43 Z",
+        "!!timestamp 2001-12-14T24:00:00Z",
+        "!!timestamp 2001-12-14T21:59:60Z",
+        "!!timestamp 2001-012-14",
+        "!!bool yes",
+        "!!bool on",
+        "!!bool 'yes'",
+        "!!int yes",
     ] {
         match parse(&format!("v: {text}\n")) {
             Err(Error::Invalid(message)) => assert!(message.contains("!!"), "{text}: {message}"),
@@ -373,28 +710,23 @@ fn a_core_tag_that_fits_the_value_reads_as_opa_reads_it() {
         ("!!int 1_000", json!(1000)),
         ("!!int '12'", json!(12)),
         ("!!int 12345678901234567890", json!(12345678901234567890u64)),
-        ("!!bool yes", json!(true)),
-        ("!!bool 'yes'", json!(true)),
+        ("!!bool true", json!(true)),
+        ("!!bool 'True'", json!(true)),
+        ("!!bool FALSE", json!(false)),
         ("!!null", Value::Null),
         ("!!null ''", Value::Null),
         ("!!null ~", Value::Null),
         ("!!str 123", json!("123")),
         ("!!str yes", json!("yes")),
-        ("!!timestamp 2001-12-14", json!("2001-12-14")),
-        ("!!timestamp '2001-12-14'", json!("2001-12-14")),
-        ("!!timestamp 2000-02-29", json!("2000-02-29")),
+        ("!!timestamp 2001-12-14", json!("2001-12-14T00:00:00Z")),
+        ("!!timestamp 2000-02-29", json!("2000-02-29T00:00:00Z")),
         (
             "!!timestamp 2001-12-14t21:59:43.10-05:00",
-            json!("2001-12-14t21:59:43.10-05:00"),
+            json!("2001-12-14T21:59:43.1-05:00"),
         ),
-        (
-            "!!timestamp 2001-12-14 21:59:43.10",
-            json!("2001-12-14 21:59:43.10"),
-        ),
-        ("!!timestamp 2001-12-14T1:2:3Z", json!("2001-12-14T1:2:3Z")),
         (
             "!!timestamp 2001-12-14T1:2:3,5+01:00",
-            json!("2001-12-14T1:2:3,5+01:00"),
+            json!("2001-12-14T01:02:03.5+01:00"),
         ),
     ] {
         same(text, expected);
@@ -441,15 +773,42 @@ fn characters_yaml_allows_are_read() {
 
 #[test]
 fn a_yaml_version_other_than_1_1_is_refused_as_opa_refuses_it() {
-    for version in ["1.2", "1.0", "2.0"] {
+    for version in [
+        "1.2", "1.0", "2.0", "1.10", "1.1.1", "1", "1.1x", "+1.1", "001.1", "1.001", "",
+    ] {
         refused(&format!("%YAML {version}\n---\na: 1\n"), "%YAML");
     }
     refused("# c\n\n%YAML 1.2\n---\na: 1\n", "%YAML");
 }
 
 #[test]
+fn a_directive_other_than_yaml_and_tag_is_refused_as_opa_refuses_it() {
+    for text in [
+        "%FOO bar\n---\na: 1\n",
+        "%FOO\n---\na: 1\n",
+        "%YAMLX 1.1\n---\na: 1\n",
+        "%TAGS a b\n---\na: 1\n",
+        "%yaml 1.1\n---\na: 1\n",
+        "%YAML 1.1\n%FOO\n---\na: 1\n",
+        "a: 1\n...\n%FOO bar\n---\nb: 1\n",
+    ] {
+        assert!(matches!(parse(text), Err(Error::Invalid(_))), "{text:?}");
+    }
+}
+
+#[test]
 fn yaml_1_1_is_read() {
-    assert_eq!(parse("%YAML 1.1\n---\na: 1\n").unwrap(), json!({"a": 1}));
+    for version in ["1.1", "01.1", "1.01", "01.01", "1.1 # c", "\t1.1"] {
+        assert_eq!(
+            parse(&format!("%YAML {version}\n---\na: 1\n")).unwrap(),
+            json!({"a": 1}),
+            "{version}"
+        );
+    }
+    assert_eq!(
+        parse("%TAG !e! tag:example.com,2000:\n---\na: 1\n").unwrap(),
+        json!({"a": 1})
+    );
     assert_eq!(
         parse("a: '%YAML 1.2'\n").unwrap(),
         json!({"a": "%YAML 1.2"})
@@ -512,13 +871,18 @@ fn an_alias_used_as_a_key_is_named_like_the_scalar_it_points_to() {
 }
 
 #[test]
-fn a_key_past_the_largest_signed_64_bit_integer_is_refused_as_opa_refuses_it() {
-    for text in [
-        "9223372036854775808",
-        "18446744073709551615",
-        "0xffffffffffffffff",
+fn a_key_up_to_the_largest_unsigned_64_bit_integer_is_named_by_its_digits_as_in_opa_1_22() {
+    for (text, name) in [
+        ("9223372036854775808", "9223372036854775808"),
+        ("18446744073709551615", "18446744073709551615"),
+        ("0xffffffffffffffff", "18446744073709551615"),
+        ("-9223372036854775809", "-9.223372e+18"),
     ] {
-        refused(&format!("{text}: a\n"), text);
+        assert_eq!(
+            parse(&format!("{text}: a\n")).unwrap(),
+            json!({name: "a"}),
+            "{text}"
+        );
     }
 }
 

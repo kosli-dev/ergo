@@ -88,7 +88,7 @@ With the following `deployments.json` input:
 }
 ```
 
-Run it with one of the two engines: [Ergo with OPA](OPA.md) or [Ergo CLI](CLI.md). Both give the same report, apart from `engine`, which says which one made it.
+Run it with one of the two engines: [Ergo with OPA](OPA.md) or [Ergo CLI](CLI.md). Both give the same report, apart from `engine`, which says which one made it. For YAML files that needs OPA 1.21 or later, see [OPA.md](OPA.md).
 
 The report records every check Ergo ran, including the ones that passed. It comes in four parts, after the policy's own `description` and `meta`, which this one doesn't have, and `engine` and `ergo`, which say what made the report and which version of the [spec](spec/README.md#versions) it follows:
 
