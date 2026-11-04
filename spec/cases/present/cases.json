@@ -73,7 +73,7 @@
         "rules": ["present.other", "path.not_an_object"],
         "input": {"things": ["t1"]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "it is \"t1\", which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "thing is \"t1\", which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       },
       {
@@ -81,7 +81,7 @@
         "rules": ["present.other", "path.not_an_object"],
         "input": {"things": [null]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "c", "message": "it is null, which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
+          {"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "c", "message": "thing is null, which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/things/0"]}]}
         ]
       }
     ]
@@ -407,7 +407,7 @@
         "rules": ["location.read", "location.start"],
         "input": {"things": ["text", {"id": "t2", "x": 1}]},
         "results": [
-          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "message": "it is \"text\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "text", "type": "thing"}},
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "message": "thing is \"text\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "text", "type": "thing"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/1/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t2", "type": "thing"}}
         ]
       }

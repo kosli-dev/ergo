@@ -1046,7 +1046,7 @@
                 ]
               }
             ],
-            "message": "it is \"text\", which isn't an object",
+            "message": "s is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1073,7 +1073,7 @@
                 ]
               }
             ],
-            "message": "it is \"text\", which isn't an object",
+            "message": "s is \"text\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1108,7 +1108,7 @@
                 ]
               }
             ],
-            "message": "it is null, which isn't an object",
+            "message": "s is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1135,7 +1135,7 @@
                 ]
               }
             ],
-            "message": "it is null, which isn't an object",
+            "message": "s is null, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1170,7 +1170,7 @@
                 ]
               }
             ],
-            "message": "it is 5, which isn't an object",
+            "message": "s is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -1197,7 +1197,7 @@
                 ]
               }
             ],
-            "message": "it is 5, which isn't an object",
+            "message": "s is 5, which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -6562,7 +6562,7 @@
           "checks": {
             "c": {
               "for": "every xs as kid",
-              "assert": "kid.v is 1"
+              "assert": "kid is 1"
             }
           }
         }

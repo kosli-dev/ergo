@@ -795,7 +795,7 @@
         "rules": ["walk.flaws", "path.not_an_object"],
         "input": {"things": ["text"]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "text"}, "check": "c", "message": "it is \"text\", which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [], "failed_items": []}
+          {"requirement": "s", "subject": {"type": "thing", "id": "text"}, "check": "c", "message": "thing is \"text\", which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [], "failed_items": []}
         ]
       }
     ]

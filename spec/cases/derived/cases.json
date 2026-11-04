@@ -10348,7 +10348,7 @@
                 ]
               }
             ],
-            "message": "it is 5, which isn't an object",
+            "message": "thing is 5, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -10375,7 +10375,7 @@
                 ]
               }
             ],
-            "message": "it is null, which isn't an object",
+            "message": "thing is null, which isn't an object",
             "passed": false,
             "requirement": "s",
             "subject": {
