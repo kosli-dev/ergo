@@ -1127,14 +1127,22 @@ pub fn tally_sides(check: &Tally) -> Vec<&Side> {
 }
 
 pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> {
+    derived
+        .terms
+        .iter()
+        .filter_map(|term| match term {
+            Term::Counted(counted) => counted_text(counted, ctx, cause),
+            _ => None,
+        })
+        .collect()
+}
+
+pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String> {
     let mut out = Vec::new();
-    for term in &derived.terms {
-        let Term::Counted(counted) = term else {
-            continue;
-        };
+    {
         let outer = outer_ctx(ctx);
         if walk::path_needs_an_object_subject(&counted.path, ctx) {
-            continue;
+            return None;
         }
         let walked = walk::walk(
             &counted.path,
@@ -1160,7 +1168,7 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
                 }
                 _ => {}
             }
-            continue;
+            return out.pop();
         }
         let mut found: Vec<(Cause, String)> = walked
             .failures
@@ -1254,7 +1262,7 @@ pub fn counted_texts(derived: &Derived, ctx: &Ctx, cause: Cause) -> Vec<String> 
             out.push(super::message::joined(said));
         }
     }
-    out
+    out.pop()
 }
 
 #[cfg(test)]

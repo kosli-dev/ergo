@@ -200,10 +200,15 @@ impl Walked<'_> {
             let Seg::Index(at) = &segs[pair[1]] else {
                 continue;
             };
+            let between = &segs[pair[0] + 1..pair[1]];
             parts.push(format!(
                 "item {} of {}",
                 at + 1,
-                plain(&segs[pair[0] + 1..pair[1]])
+                if between.is_empty() {
+                    "it".to_string()
+                } else {
+                    plain(between)
+                }
             ));
         }
         let tail = &segs[indexes[indexes.len() - 1] + 1..];

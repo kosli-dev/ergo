@@ -704,7 +704,10 @@ _from_unreadable(req) if {
 	not is_string(k)
 }
 
-_from_cause(req) := flaws[0] if {
+_from_cause(req) := "unusable" if {
+	some r in _m_from_ref_list(req)
+	_m_from_params_unread(r.ref)
+} else := flaws[0] if {
 	flaws := _from_path_flaws(req)
 	count(flaws) > 0
 } else := _worst_of(unread) if {
@@ -1830,6 +1833,11 @@ _ref_read(path) := v if {
 	is_object(start)
 	v := object.get(start, [_key(seg) | some seg in array.slice(path, 1, count(path))], _absent)
 	v != _absent
+} else := v if {
+	_builtin(path)
+	start := _start_of(null, path)
+	v := _read_from(start, [_key(seg) | some seg in array.slice(path, 1, count(path))])
+	v != _absent
 } else := w.value if {
 	_ref_walks(path)
 	w := _ref_walk(path)
@@ -1837,7 +1845,7 @@ _ref_read(path) := v if {
 } else := _absent if {
 	_builtin(path)
 	start := _start_of(null, path)
-	is_object(start)
+	start != null
 }
 
 _ref_walks(path) if _rwalks(null, path)
@@ -3761,7 +3769,10 @@ _name_step_state(path) := "null" if {
 	not is_string(input["ergo/names"][step.named_by])
 }
 
-_path_read_state(subj, path) := "null" if _resolved(subj, path) == null
+_path_read_state(subj, path) := "null" if {
+	_resolved(subj, path) == null
+	not _params_null(path)
+}
 
 _path_read_state(subj, path) := "unusable" if {
 	start := _start_of(subj, path)
@@ -3926,20 +3937,27 @@ _under_literal(check, p) if {
 
 default _ref_state(_) := "absent"
 
-_ref_state(r) := "null" if _ref_read(r) == null
+_ref_state(r) := _ref_state_read(r) if not _params_null(r)
 
-_ref_state(r) := "unusable" if {
+_params_null(r) if {
+	r[0] == "$$params"
+	data.ergo_params == null
+}
+
+_ref_state_read(r) := "null" if _ref_read(r) == null
+
+_ref_state_read(r) := "unusable" if {
 	_ref_read(r) == _absent
 	not _ref_walks(r)
 	_blocked(_start_of(null, r), [seg | some seg in array.slice(r, 1, count(r))])
 }
 
-_ref_state(r) := _ref_walk(r).state if {
+_ref_state_read(r) := _ref_walk(r).state if {
 	_ref_walks(r)
 	_ref_walk(r).failed
 }
 
-_ref_state(r) := "value" if {
+_ref_state_read(r) := "value" if {
 	v := _ref_read(r)
 	v != _absent
 	v != null
@@ -8818,7 +8836,11 @@ _walk_keys(check, subj) := ks if {
 	ks := _keys_in(subj, check.path)
 }
 
-_walk_start(check, subj) := {"c": _walk_root(check.path), "v": _start_of(subj, check.path), "i": null, "iv": null, "r": [], "a": _walk_base(check.path)}
+_walk_start(check, subj) := {"c": _walk_root(check.path), "v": _walk_start_value(subj, check.path), "i": null, "iv": null, "r": [], "a": _walk_base(check.path)}
+
+_walk_start_value(subj, path) := _start_of(subj, path) if not _params_null(path)
+
+_walk_start_value(_, path) := _absent if _params_null(path)
 
 _walk_base(path) := base if base := _start_at(path)
 
@@ -10499,7 +10521,7 @@ _m_cause_states(check, cause) := {"absent", "null"} if {
 } else := {cause}
 
 _m_message(check, subj, "unusable") := m if {
-	clauses := _once(array.concat(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_blocked(subj, check)), _m_faults(subj, check)), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")))
+	clauses := _once(array.concat(array.concat(array.concat(array.concat(array.concat(_m_key_faults(subj, check), _m_blocked(subj, check)), _m_params_faults(subj, check)), _m_faults(subj, check)), _m_walk_ref_faults(subj, check)), _m_tallies(subj, check, "unusable")))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := m if {
@@ -10507,10 +10529,51 @@ _m_message(check, subj, "unusable") := m if {
 		some side in _m_sides(check)
 		_side_form(side) in {"add", "sum_of"}
 		_side_eval(subj, side).v == []
+		not _m_params_unread(check)
 	]
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check)
+
+_m_reads_params(check) if {
+	walk(check, [_, v])
+	is_array(v)
+	v[0] == "$$params"
+}
+
+_m_params_break(path) := [c |
+	is_array(path)
+	count(path) > 1
+	path[0] == "$$params"
+	i := min({j |
+		some j in numbers.range(1, count(path) - 1)
+		not _m_params_holds(path, j)
+	})
+	c := _m_params_isnt(path, i)
+]
+
+_m_params_holds(path, j) if {
+	keys := [_m_step_key(null, step) | some step in array.slice(path, 1, j)]
+	count(keys) == j - 1
+	v := _read_from(data.ergo_params, keys)
+	k := _m_step_key(null, path[j])
+	_can_hold(v, k)
+}
+
+_m_params_isnt(path, i) := _m_isnt(_ref_name(array.slice(path, 0, i)), v, _m_holder(k)) if {
+	keys := [_m_step_key(null, step) | some step in array.slice(path, 1, i)]
+	count(keys) == i - 1
+	v := _read_from(data.ergo_params, keys)
+	v != _absent
+	v != null
+	k := _m_step_key(null, path[i])
+}
+
+_m_params_unread(check) if {
+	_m_reads_params(check)
+	not is_object(data.ergo_params)
+	data.ergo_params != null
+}
 
 _m_message(check, subj, "not_an_object") := _m_isnt(_m_label(check), subj, "an object") if not is_object(subj)
 
@@ -10526,7 +10589,13 @@ _m_message(check, subj, "not_an_object") := m if {
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if is_object(subj)
 
-_m_fallback(check) := concat("", [check.expression, " is false"]) if _written_expression(check)
+_m_fallback(check) := concat(", and ", cs) if {
+	_m_params_unread(check)
+	cs := sort({c | walk(check, [_, v]); some c in _m_params_break(v)})
+	cs != []
+} else := _m_isnt("$params", data.ergo_params, "an object") if _m_params_unread(check)
+
+else := concat("", [check.expression, " is false"]) if _written_expression(check)
 
 else := "the check is false"
 
@@ -10605,17 +10674,36 @@ _m_blocked(subj, check) := [c |
 	some c in _m_parent_clause(subj, check, s.name)
 ]
 
+_m_params_faults(subj, check) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
+	some side in _m_sides(check)
+	is_array(side)
+	side[0] == "$$params"
+	some i in numbers.range(count(side) - 1, 1)
+	prefix := array.slice(side, 0, i)
+	v := _m_resolved_prefix(subj, prefix)
+	v != _absent
+	v != null
+	k := _m_step_key(subj, side[i])
+	not _can_hold(v, k)
+]
+
 _m_parent_clause(subj, check, name) := [c |
 	some side in _m_paths_named(check, name)
 	is_array(side)
 	some i in numbers.range(count(side) - 1, 1)
-	v := _resolved(subj, array.slice(side, 0, i))
+	v := _m_resolved_prefix(subj, array.slice(side, 0, i))
 	v != _absent
 	v != null
 	k := _m_step_key(subj, side[i])
 	not _can_hold(v, k)
 	c := _m_isnt(_m_part_name(array.slice(side, 0, i)), v, _m_holder(k))
 ]
+
+_m_resolved_prefix(subj, prefix) := _resolved(subj, prefix) if not _params_prefix(prefix)
+
+_m_resolved_prefix(subj, prefix) := _read_from(_start_of(subj, prefix), _keys_in(subj, prefix)) if _params_prefix(prefix)
+
+_params_prefix(prefix) if prefix[0] == "$$params"
 
 default _m_part_unreached(_) := false
 
@@ -10681,12 +10769,16 @@ _m_ref_blocked(check) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
 	not _ref_walks(r)
 	some i in numbers.range(count(r) - 1, 1)
 	prefix := array.slice(r, 0, i)
-	v := _ref_read(prefix)
+	v := _m_prefix_read(prefix)
 	v != _absent
 	v != null
 	k := _key(r[i])
 	not _can_hold(v, k)
 ]
+
+_m_prefix_read(prefix) := _ref_read(prefix) if not _params_prefix(prefix)
+
+_m_prefix_read(prefix) := _m_resolved_prefix(null, prefix) if _params_prefix(prefix)
 
 _m_walk_ref_faults(subj, check) := [] if {
 	count(_m_tally_parts(check)) > 0
@@ -11009,13 +11101,17 @@ _m_unreached_or(path, roots) := _m_part_name(path) if _m_part_unreached(path)
 else := _failed_name(path, roots)
 
 _m_item_name(path, roots) := concat(": ", array.concat(
-	array.concat([_failed_name(array.slice(path, 0, idx[0] + 1), roots)], [concat("", ["item ", _literal_text(path[idx[k]] + 1), " of ", _plain_steps_name(array.slice(path, idx[k - 1] + 1, idx[k]))]) | some k in numbers.range(1, count(idx) - 1)]),
+	array.concat([_failed_name(array.slice(path, 0, idx[0] + 1), roots)], [concat("", ["item ", _literal_text(path[idx[k]] + 1), " of ", _m_inner_name(array.slice(path, idx[k - 1] + 1, idx[k]))]) | some k in numbers.range(1, count(idx) - 1)]),
 	[_plain_steps_name(tail) | tail := array.slice(path, idx[count(idx) - 1] + 1, count(path)); tail != []],
 )) if {
 	idx := [j | some j, step in path; is_number(step)]
 	count(idx) > 0
 	not _m_off_item_path(path)
 }
+
+_m_inner_name([]) := "it"
+
+_m_inner_name(steps) := _plain_steps_name(steps) if steps != []
 
 _m_off_item_path(path) if {
 	some k, step in path
@@ -11340,6 +11436,9 @@ _m_for_empty(check, subj, cause) := cs if {
 	cause == "unusable"
 	cs := _once([c | some item in check.items; some c in array.concat(_m_key_faults(subj, _m_for_item(item)), _m_whose_ref_faults(item))])
 	cs != []
+} else := [_m_fallback(check)] if {
+	cause == "unusable"
+	_m_params_unread(check)
 } else := cs if {
 	cs := _once([c | some item in check.items; _m_narrows(subj, item); some c in _m_list_found(subj, item.path)])
 	cs != []
@@ -11711,10 +11810,31 @@ _m_from_item_name(req, path) := concat(": ", [_visible_path_name([path[0]], _m_f
 	is_number(path[0])
 } else := _m_item_name(path, set()) if path != []
 
-_m_from_refs(req, cause) := ms if {
+_m_from_refs(req, cause) := _once([m | some r in _m_from_ref_list(req); m := _m_from_ref_said(r)]) if {
+	some r in _m_from_ref_list(req)
+	_m_from_params_unread(r.ref)
+} else := ms if {
 	ms := [m | some r in _m_from_ref_list(req); m := _m_from_ref_text(r, cause)]
 	count(ms) > 0
 } else := [m | some r in _m_from_ref_list(req); m := _m_from_ref_text(r, _m_from_ref_cause(r))]
+
+_m_from_ref_said(r) := _m_from_params_text(r) if _m_from_params_unread(r.ref)
+
+_m_from_ref_said(r) := _m_from_ref_text(r, _m_from_ref_cause(r)) if not _m_from_params_unread(r.ref)
+
+_m_from_params_unread(ref) if {
+	ref[0] == "$$params"
+	not is_object(data.ergo_params)
+	data.ergo_params != null
+}
+
+_m_from_params_text(r) := _m_isnt(_ref_name(r.ref), v, r.kind) if {
+	_ref_state(r.ref) == "value"
+	v := _ref_read(r.ref)
+	not _m_from_ref_fits(v, r.kind)
+} else := c if {
+	some c in _m_params_break(r.ref)
+} else := _m_isnt("$params", data.ergo_params, "an object")
 
 _m_from_ref_list(req) := array.concat(
 	[{"ref": r, "kind": "text"} | some r in sort({seg.ref | some seg in _from_path(req); _is_ref(seg)})],

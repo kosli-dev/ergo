@@ -128,6 +128,9 @@ fn each_of_entries<'a>(
     each_of: &Path,
     anc: &[Anc<'a>],
 ) -> Read<'a> {
+    if each_of.start == Start::Params && !env.unreadable.is_empty() {
+        return Read::Failed(Cause::Unusable);
+    }
     let ctx = context(env, input_root(env), anc);
     let object = path::read(path, &ctx);
     let keys = path::read(each_of, &ctx);
@@ -495,6 +498,32 @@ fn ref_message(env: &Env, lowered: &Lowered, anc: &[Anc], cause: Cause) -> Optio
                 _ => None,
             }
         };
+    let unread_params = ctx.params.filter(|p| !p.is_object() && !p.is_null());
+    if let Some(params) = unread_params
+        && listed.iter().any(|(r, _)| r.start == Start::Params)
+    {
+        let mut said: Vec<String> = Vec::new();
+        for ((reference, _), (name, outcome, value, kind)) in listed.iter().zip(&states) {
+            let text = if reference.start != Start::Params {
+                says(name, *outcome, value, kind, None)
+            } else if let (Outcome::Found, Some(found)) = (outcome, value)
+                && !ref_fits(found, kind)
+            {
+                Some(ops::message::isnt(name, found, kind))
+            } else {
+                Some(
+                    ops::message::params_break(reference, params, &ctx)
+                        .unwrap_or_else(|| ops::message::isnt("$params", params, "an object")),
+                )
+            };
+            if let Some(text) = text
+                && !said.contains(&text)
+            {
+                said.push(text);
+            }
+        }
+        return (!said.is_empty()).then(|| ops::message::joined(said));
+    }
     let mut said: Vec<String> = states
         .iter()
         .filter_map(|(name, outcome, value, kind)| says(name, *outcome, value, kind, Some(cause)))
@@ -1110,7 +1139,15 @@ fn check_rows(env: &Env, judged: &Judged, anc: &[Anc]) -> Vec<Row> {
             read.plan.as_ref().map(|plan| {
                 let mut row = check_row(env, name, plan, &ctx, judged, anc);
                 if row.message.as_deref() == Some(ops::message::FALLBACK) {
-                    row.message = Some(format!("{} is false", read.expression));
+                    let named = (row.cause == Cause::Unusable)
+                        .then(|| {
+                            plan.items.iter().find_map(|item| {
+                                ops::message::params_that_arent_an_object(&item.check, &ctx)
+                            })
+                        })
+                        .flatten();
+                    row.message =
+                        Some(named.unwrap_or_else(|| format!("{} is false", read.expression)));
                 }
                 row
             })
@@ -1311,7 +1348,7 @@ pub fn find_subjects(
         subject,
         checks: read_checks(reading, requirement),
         input,
-        params: params.as_object().map(|_| params),
+        params: (!params.is_null()).then_some(params),
         unreadable: unreadable_params(params),
     };
     let empty = &path::ABSENT;
@@ -2861,5 +2898,236 @@ mod tests {
         );
         assert_eq!(r["subjects"]["thing"]["from"], json!("<invalid from>"));
         assert_eq!(r["subjects"]["w"]["from"], json!("<invalid from>"));
+    }
+
+    fn message_of(check: Value, input: Value, params: Value) -> Value {
+        let r = report(
+            &input,
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+                "requirements": {"s": {"subject": "thing", "checks": {"c": check}}}
+            }),
+            &params,
+        );
+        rows(&r, "c")[0]["message"].clone()
+    }
+
+    #[test]
+    fn a_for_line_that_reads_params_that_arent_an_object_names_them() {
+        let input = json!({"things": [{"id": "t", "ws": [1]}]});
+        for check in [
+            json!({"for": "every $params as p", "assert": "p.v is 1"}),
+            json!({"for": "every $params.v as p", "assert": "p is 1"}),
+            json!({"for": "every ws as w", "assert": "w is in $params.v"}),
+        ] {
+            assert_eq!(
+                message_of(check, input.clone(), json!(3)),
+                json!("$params is 3, which isn't an object")
+            );
+        }
+    }
+
+    #[test]
+    fn a_named_by_or_a_whose_that_reads_params_that_arent_an_object_names_them() {
+        let input = json!({"things": [{"id": "t", "x": {"a": 1}, "ws": [{"x": 1}]}]});
+        for check in [
+            "x named by $params.v is 1",
+            "every ws whose x is $params.v is 1",
+        ] {
+            assert_eq!(
+                message_of(json!(check), input.clone(), json!("s")),
+                json!("$params is \"s\", which isn't an object")
+            );
+        }
+    }
+
+    #[test]
+    fn a_count_whose_whose_reads_params_that_are_a_list_names_them_not_the_digits() {
+        assert_eq!(
+            message_of(
+                json!("count of $params whose v is 1 is 1"),
+                json!({"things": [{"id": "t"}]}),
+                json!([3])
+            ),
+            json!("$params is [3], which isn't an object")
+        );
+    }
+
+    #[test]
+    fn a_ref_on_the_right_is_named_after_the_left_side_and_a_subject_field_before_it() {
+        let input = json!({"things": [{"id": "t", "zz": "v", "y": 3}], "y": 3});
+        assert_eq!(
+            message_of(json!("zz contains $params.v"), input.clone(), json!(3)),
+            json!("zz is \"v\", which isn't a list, and $params is 3, which isn't an object")
+        );
+        assert_eq!(
+            message_of(json!("zz contains $input.y.v"), input.clone(), json!({})),
+            json!("zz is \"v\", which isn't a list, and $input.y is 3, which isn't an object")
+        );
+        assert_eq!(
+            message_of(json!("zz contains y.v"), input, json!({})),
+            json!("y is 3, which isn't an object, and zz is \"v\", which isn't a list")
+        );
+    }
+
+    #[test]
+    fn a_key_after_a_position_of_params_holding_a_list_names_the_item() {
+        assert_eq!(
+            message_of(
+                json!("x is in $params[0].v"),
+                json!({"things": [{"id": "t", "x": 1}]}),
+                json!([[1]])
+            ),
+            json!("item 1 of $params is [1], which isn't an object")
+        );
+    }
+
+    #[test]
+    fn a_count_through_a_position_names_the_item_once() {
+        let input = json!({"things": [{"id": "t", "y": [{"v": 1}]}], "y": [{"v": 1}]});
+        assert_eq!(
+            message_of(json!("count of y[0].v is 1"), input.clone(), json!({})),
+            json!("item 1 of y: v is 1, which isn't a list or an object")
+        );
+        assert_eq!(
+            message_of(json!("count of $input.y[0].v is 1"), input, json!({})),
+            json!("item 1 of $input.y: v is 1, which isn't a list or an object")
+        );
+        assert_eq!(
+            message_of(
+                json!("count of $params[0].v is 1"),
+                json!({"things": [{"id": "t"}]}),
+                json!([{"v": 1}])
+            ),
+            json!("item 1 of $params: v is 1, which isn't a list or an object")
+        );
+    }
+
+    fn from_rows(line: &str, params: Value) -> Vec<(String, String, Value)> {
+        let r = report(
+            &json!({"things": {"k": {"id": "t"}}}),
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {"s": {"from": line}},
+                "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}
+            }),
+            &params,
+        );
+        r["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|row| row["check"] != "$well_formed" && row["check"] != "$unique_ids")
+            .map(|row| {
+                (
+                    row["check"].as_str().unwrap().to_string(),
+                    row["cause"].as_str().unwrap().to_string(),
+                    row["message"].clone(),
+                )
+            })
+            .collect()
+    }
+
+    fn min_subjects(cause: &str, message: &str) -> Vec<(String, String, Value)> {
+        vec![(
+            "$min_subjects".to_string(),
+            cause.to_string(),
+            json!(message),
+        )]
+    }
+
+    #[test]
+    fn a_from_line_that_reads_params_that_arent_an_object_names_the_params_and_not_the_object() {
+        for (params, shown) in [
+            (json!(3), "3"),
+            (json!("s"), "\"s\""),
+            (json!(true), "true"),
+            (json!([]), "[]"),
+            (json!([3]), "[3]"),
+            (json!([[1]]), "[[1]]"),
+            (json!([{"v": 1}]), "[{\"v\": 1}]"),
+            (json!([["k"]]), "[[\"k\"]]"),
+        ] {
+            let said = format!("$params is {shown}, which isn't an object");
+            for line in [
+                "things named by each of $params.ks",
+                "things named by $params.env named by each of $params.ks",
+                "every things named by $params.env",
+            ] {
+                assert_eq!(
+                    from_rows(line, params.clone()),
+                    min_subjects("unusable", &said),
+                    "{line} with {params}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_from_line_that_reads_a_position_of_the_params_names_what_it_found_there() {
+        assert_eq!(
+            from_rows("things named by each of $params[0]", json!(3)),
+            min_subjects("unusable", "$params is 3, which isn't a list")
+        );
+        assert_eq!(
+            from_rows("things named by each of $params[0]", json!([3])),
+            min_subjects(
+                "unusable",
+                "item 1 of $params is 3, which isn't a list of text"
+            )
+        );
+        assert_eq!(
+            from_rows("things named by each of $params[0].ks", json!([3])),
+            min_subjects("unusable", "item 1 of $params is 3, which isn't an object")
+        );
+        assert_eq!(
+            from_rows("things named by each of $params[0].ks", json!([{"ks": 3}])),
+            min_subjects("unusable", "$params[0].ks is 3, which isn't a list of text")
+        );
+    }
+
+    #[test]
+    fn a_from_line_that_reads_the_input_and_params_that_arent_an_object_names_both() {
+        assert_eq!(
+            from_rows(
+                "things named by $input.nope named by each of $params.ks",
+                json!(3)
+            ),
+            min_subjects(
+                "unusable",
+                "$input.nope is missing; $params is 3, which isn't an object"
+            )
+        );
+    }
+
+    #[test]
+    fn a_from_line_makes_no_subjects_from_keys_in_params_that_arent_an_object() {
+        assert_eq!(
+            from_rows("things named by each of $params[0]", json!([["k"]])),
+            min_subjects("unusable", "$params is [[\"k\"]], which isn't an object")
+        );
+        assert_eq!(
+            from_rows(
+                "things named by each of $params[0].ks",
+                json!([{"ks": ["k"]}])
+            ),
+            min_subjects(
+                "unusable",
+                "$params is [{\"ks\": [\"k\"]}], which isn't an object"
+            )
+        );
+    }
+
+    #[test]
+    fn a_from_line_that_reads_null_params_says_the_param_is_missing() {
+        assert_eq!(
+            from_rows("things named by each of $params.ks", Value::Null),
+            min_subjects("absent", "$params.ks is missing")
+        );
+        assert_eq!(
+            from_rows("things named by $params.env", Value::Null),
+            min_subjects("absent", "$params.env is missing")
+        );
     }
 }

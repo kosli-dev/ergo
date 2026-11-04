@@ -312,7 +312,7 @@ fn aliases_blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
         .collect()
 }
 
-fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
+fn blocked(check: &Check, ctx: &Ctx, late: bool) -> Vec<String> {
     let paths: Vec<&Path> = match check {
         Check::Tally(t) => tally::tally_sides(t)
             .into_iter()
@@ -333,6 +333,10 @@ fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
     once_of(
         paths
             .into_iter()
+            .filter(|path| {
+                (rights.contains(path) && matches!(path.start, Start::Input | Start::Params))
+                    == late
+            })
             .filter(|path| !rights.contains(path) || lists::walked(path, ctx).is_none())
             .flat_map(|path| blocked_of(path, ctx))
             .collect(),
@@ -345,6 +349,20 @@ fn key_unreadable_off_alias(path: &Path, ctx: &Ctx) -> bool {
             matches!(step, Step::Ref(reference) if !matches!(reference.start, Start::Alias(_)))
                 && path::resolve(step, ctx).is_err()
         })
+}
+
+fn params_position_fault(check: &Check, ctx: &Ctx) -> Vec<String> {
+    let Check::Walk(walk) = check else {
+        return Vec::new();
+    };
+    match (&walk.path.start, walk.path.steps.first(), ctx.params) {
+        (Start::Params, Some(Step::Index(_)), Some(params))
+            if !params.is_array() && !params.is_null() =>
+        {
+            vec![isnt("$params", params, "a list")]
+        }
+        _ => Vec::new(),
+    }
 }
 
 pub const FALLBACK: &str = "the check is false";
@@ -617,15 +635,18 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         }
         Cause::Unusable => {
             let mut all = key_faults(check, ctx);
-            all.extend(blocked(check, ctx));
+            all.extend(blocked(check, ctx, false));
+            all.extend(params_position_fault(check, ctx));
             all.extend(faults(check, ctx, verdict));
+            all.extend(blocked(check, ctx, true));
             all.extend(
                 lists::walk_fault(check, ctx)
                     .filter(|(cause, _)| *cause == Cause::Unusable)
                     .map(|(_, text)| text),
             );
             let digits = " needs more than 15 digits";
-            let others = all.iter().any(|c| !c.ends_with(digits));
+            let others = all.iter().any(|c| !c.ends_with(digits))
+                || params_that_arent_an_object(check, ctx).is_some();
             let mut once = Vec::new();
             for clause in all {
                 if others && clause.ends_with(digits) {
@@ -665,10 +686,126 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             once.push(clause);
         }
     }
+    if once.is_empty() && verdict.cause == Cause::Unusable {
+        once.extend(params_that_arent_an_object(check, ctx));
+    }
     if once.is_empty() {
         FALLBACK.to_string()
     } else {
         once.join(", and ")
+    }
+}
+
+pub fn params_that_arent_an_object(check: &Check, ctx: &Ctx) -> Option<String> {
+    let params = ctx.params.filter(|p| !p.is_object() && !p.is_null())?;
+    let mut paths = Vec::new();
+    params_paths(check, &mut paths);
+    let paths: Vec<&Path> = paths
+        .into_iter()
+        .filter(|path| path.start == Start::Params)
+        .collect();
+    if paths.is_empty() {
+        return None;
+    }
+    let mut clauses: Vec<String> = paths
+        .iter()
+        .filter_map(|path| params_break(path, params, ctx))
+        .collect();
+    clauses.sort();
+    clauses.dedup();
+    if clauses.is_empty() {
+        Some(isnt("$params", params, "an object"))
+    } else {
+        Some(clauses.join(", and "))
+    }
+}
+
+pub fn params_break(path: &Path, params: &Value, ctx: &Ctx) -> Option<String> {
+    let mut at = params;
+    for (i, step) in path.steps.iter().enumerate() {
+        let key = match step {
+            Step::Key(key) => Resolved::Key(key.clone()),
+            Step::Index(index) => Resolved::Index(*index),
+            Step::Ref(_) => path::resolve(step, ctx).ok()?,
+            Step::Field(_) => return None,
+        };
+        let next = match (&key, at) {
+            (Resolved::Key(key), Value::Object(map)) => map.get(key),
+            (Resolved::Index(index), Value::Array(items)) => usize::try_from(*index)
+                .ok()
+                .and_then(|index| items.get(index)),
+            (Resolved::Key(_), _) => {
+                return Some(isnt(&params_prefix(path, i), at, "an object"));
+            }
+            (Resolved::Index(_), _) => {
+                return Some(isnt(&params_prefix(path, i), at, "a list"));
+            }
+        };
+        match next {
+            Some(Value::Null) | None => return None,
+            Some(value) => at = value,
+        }
+    }
+    None
+}
+
+fn params_prefix(path: &Path, steps: usize) -> String {
+    name::name(&Path {
+        start: Start::Params,
+        steps: path.steps[..steps].to_vec(),
+    })
+}
+
+fn params_paths<'a>(check: &'a Check, out: &mut Vec<&'a Path>) {
+    fn with_steps<'a>(path: &'a Path, out: &mut Vec<&'a Path>) {
+        out.push(path);
+        for step in &path.steps {
+            if let Step::Ref(inner) | Step::Field(inner) = step {
+                with_steps(inner, out);
+            }
+        }
+    }
+    for path in check.paths().into_iter().chain(lists::right_paths(check)) {
+        with_steps(path, out);
+    }
+    match check {
+        Check::Tally(tally) => {
+            for side in std::iter::once(&tally.left).chain(tally.right.as_ref()) {
+                if let TallySide::Derived(derived) = side {
+                    for term in &derived.terms {
+                        if let tally::Term::Counted(counted) = term {
+                            with_steps(&counted.path, out);
+                            for inner in &counted.whose {
+                                params_paths(inner, out);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Check::Walk(walk) => {
+            with_steps(&walk.path, out);
+            for inner in walk.whose.iter().chain(std::iter::once(&*walk.check)) {
+                params_paths(inner, out);
+            }
+        }
+        Check::For(line) => {
+            for item in &line.items {
+                with_steps(&item.path, out);
+                for inner in &item.whose {
+                    params_paths(inner, out);
+                }
+            }
+            for sentence in &line.sentences {
+                params_paths(&sentence.check, out);
+            }
+        }
+        Check::AnyOf(any) => {
+            for inner in any.options.iter().flatten() {
+                params_paths(inner, out);
+            }
+        }
+        _ => {}
     }
 }
 
@@ -877,7 +1014,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         any = true;
                     }
                 }
-                for path in plain {
+                for path in &plain {
                     if let Some(input) = first_input(path, ctx)
                         && input.state == Outcome::Found
                         && !input.value.is_number()
@@ -886,10 +1023,14 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         any = true;
                     }
                 }
-                let counted_said = tally::counted_texts(derived, ctx, Cause::Unusable);
-                for path in counted {
-                    if counted_said.is_empty()
-                        && let Some(input) = first_input(path, ctx)
+                for term in &derived.terms {
+                    let tally::Term::Counted(term) = term else {
+                        continue;
+                    };
+                    if let Some(said) = tally::counted_text(term, ctx, Cause::Unusable) {
+                        out.push(said);
+                        any = true;
+                    } else if let Some(input) = first_input(&term.path, ctx)
                         && input.state == Outcome::Found
                         && !input.value.is_array()
                         && !input.value.is_object()
@@ -898,11 +1039,10 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         any = true;
                     }
                 }
-                if !counted_said.is_empty() {
-                    out.extend(counted_said);
-                    any = true;
-                }
-                if !any && tally::derived_value(derived, ctx).is_err() {
+                let all_found = counted.iter().chain(plain.iter()).all(|path| {
+                    first_input(path, ctx).is_none_or(|input| input.state == Outcome::Found)
+                });
+                if !any && all_found && tally::derived_value(derived, ctx).is_err() {
                     out.push(format!("{} needs more than 15 digits", derived.text));
                 }
             }
