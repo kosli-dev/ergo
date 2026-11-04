@@ -18,6 +18,14 @@ const at = (text, ctx = {}) => {
 };
 const texts = (found, kind) => found.items.filter((i) => !kind || i.kind === kind).map((i) => i.text);
 
+test("a check offers the name of its own subject, and a from line does not", () => {
+  assert.deepEqual(texts(at("re|", { subject: "region" }), "subject"), ["region"]);
+  assert.deepEqual(texts(at("|", { subject: "web app" }), "subject"), ['"web app"']);
+  assert.deepEqual(texts(at("re|", { subject: null }), "subject"), []);
+  assert.deepEqual(texts(at("re|", { kind: "from", subject: "region", subjects: [] }), "subject"), []);
+  assert.deepEqual(texts(at("it|", { subject: "region" }), "word"), []);
+});
+
 test("a from line offers the subjects of the policy except its own", () => {
   const found = at("|", { kind: "from", subjects: ["artifact", "release", "pr"], subject: "release" });
   assert.deepEqual(texts(found, "subject"), ["artifact", "pr"]);

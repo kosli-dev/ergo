@@ -16,7 +16,7 @@
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
   --h-key:#7A3E9D; --h-word:#1B4DB1; --h-string:#1A6F3A; --h-number:#A8521A; --h-ref:#0B6E8E;
-  --h-marker:#8A93A0; --h-alias:#B0306A;
+  --h-marker:#8A93A0; --h-alias:#B0306A; --h-subject:#1F6F8B;
   --lh:22px; --pad:12px;
 }
 @media (prefers-color-scheme: dark) {
@@ -28,7 +28,7 @@
     --other:#E0A44A; --other-wash:#2A2113;
     --bad:#F08A8A; --bad-wash:#2C1618; --good:#6FD08F; --good-wash:#12271A;
     --h-key:#D29BEA; --h-word:#8FB3FF; --h-string:#8FD3A0; --h-number:#F0A878; --h-ref:#6CC9E0;
-    --h-marker:#6E7988; --h-alias:#F29BC1;
+    --h-marker:#6E7988; --h-alias:#F29BC1; --h-subject:#7CC4DE;
   }
 }
 *,*::before,*::after { box-sizing:border-box; }
@@ -98,6 +98,7 @@ textarea { border:0; resize:none; background:transparent; color:var(--ink);
 .h-marker { color:var(--h-marker); }
 .h-field { color:var(--ink); }
 .h-alias { color:var(--h-alias); }
+.h-subject { color:var(--h-subject); }
 .h-problem { text-decoration:underline wavy var(--bad); text-decoration-skip-ink:none; text-underline-offset:3px; }
 .tip { position:fixed; z-index:20; max-width:min(34rem,90vw); padding:.5rem .7rem; background:var(--surface); color:var(--ink);
   border:1px solid var(--hairline); border-radius:3px; box-shadow:0 4px 14px rgb(0 0 0 / .18); font-size:.76rem; line-height:1.4; pointer-events:none; }

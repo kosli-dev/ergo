@@ -59,7 +59,7 @@ export const makeAnalyser = (parser, base = "plain") => {
     return {
       tree: read.tree,
       problems: read.problems,
-      tokens: read.tree && s.exact ? treeTokens(s.kind, read.tree, s.text, aliases, base) : null,
+      tokens: read.tree && s.exact ? treeTokens(s.kind, read.tree, s.text, aliases, base, s.subject ?? null) : null,
       lines: read.tree ? describe(s.kind, read.tree, ctx) : [],
       aliases,
       aliasKeys,

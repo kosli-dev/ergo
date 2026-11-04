@@ -62,31 +62,38 @@ const startOf = (path) => {
   return type === "Quoted" ? ["Field", { key: value, dot: true }] : [type, value];
 };
 
-const refOps = (ref, out, aliases) => {
+const refOps = (ref, out, scope) => {
   const [type, value] = variant(ref);
   if (type === "Params") out.push(D("$params"), K(value, "ref"));
   else if (type === "Input") out.push(D("$input"), K(value, "ref"));
   else if (type === "Unknown") {
     out.push(D(value.name));
     if (value.key !== null) out.push(K(value.key, "ref"));
-  } else out.push(K(value, aliases.has(value) ? "alias" : "field"));
+  } else out.push(K(value, scope.aliases.has(value) ? "alias" : "field"));
 };
 
-const pathOps = (path, out, aliases) => {
+const kindOfName = (path, value, scope) => {
+  if (variant(path.start)[0] === "Quoted") return value.key === scope.subject ? "subject" : "field";
+  if (value.dot) return "field";
+  if (value.key === scope.subject) return "subject";
+  return scope.aliases.has(value.key) ? "alias" : "field";
+};
+
+const pathOps = (path, out, scope) => {
   const [kind, position] = path.position ? variant(path.position) : [null, null];
   if (kind === "Item") out.push(N(position.number));
   const [type, value] = startOf(path);
   if (type === "Params") out.push(D("$params"));
   else if (type === "Input") out.push(D("$input"));
   else if (type === "Unknown") out.push(D(value));
-  else if (type === "Field") out.push(K(value.key, !value.dot && aliases.has(value.key) ? "alias" : "field"));
+  else if (type === "Field") out.push(K(value.key, kindOfName(path, value, scope)));
   const rooted = type === "Params" || type === "Input";
   path.steps.forEach((step, i) => {
     const [name, body] = variant(step);
     if (name === "Key") out.push(K(body, rooted && i === 0 ? "ref" : "field"));
     else if (name === "BracketKey") out.push(K(body, "field"));
     else if (name === "Index") out.push(N(body));
-    else refOps(body, out, aliases);
+    else refOps(body, out, scope);
   });
 };
 
@@ -96,60 +103,60 @@ const valueOps = (value, out) => {
   else if (type === "Number") out.push(N(body));
 };
 
-const termOps = (term, out, aliases) => {
+const termOps = (term, out, scope) => {
   const [type, body] = variant(term);
-  if (type === "Path") pathOps(body, out, aliases);
+  if (type === "Path") pathOps(body, out, scope);
   else if (type === "Number") out.push(N(body));
-  else if (type === "Derived") derivedOps(body, out, aliases);
+  else if (type === "Derived") derivedOps(body, out, scope);
   else if (type === "Elapsed") {
-    pathOps(body.from, out, aliases);
-    pathOps(body.to, out, aliases);
+    pathOps(body.from, out, scope);
+    pathOps(body.to, out, scope);
   }
 };
 
-const derivedOps = (derived, out, aliases) => {
-  pathOps(derived.path, out, aliases);
-  for (const c of derived.whose) conditionOps(c, out, aliases);
+const derivedOps = (derived, out, scope) => {
+  pathOps(derived.path, out, scope);
+  for (const c of derived.whose) conditionOps(c, out, scope);
 };
 
-const operandOps = (operand, out, aliases) => {
+const operandOps = (operand, out, scope) => {
   const [type, body] = variant(operand);
   if (type === "Value") valueOps(body, out);
-  else if (type === "Joined") for (const piece of body) operandOps(piece, out, aliases);
-  else for (const t of body) termOps(t, out, aliases);
+  else if (type === "Joined") for (const piece of body) operandOps(piece, out, scope);
+  else for (const t of body) termOps(t, out, scope);
 };
 
-const listOps = (list, out, aliases) => {
+const listOps = (list, out, scope) => {
   const [type, body] = variant(list);
   if (type === "Values") for (const v of body) valueOps(v, out);
-  else pathOps(body, out, aliases);
+  else pathOps(body, out, scope);
 };
 
-const phraseOps = (phrase, out, aliases) => {
+const phraseOps = (phrase, out, scope) => {
   const [type, body] = variant(phrase);
   if (type === "Is") {
-    operandOps(body.operand, out, aliases);
+    operandOps(body.operand, out, scope);
     if (body.within !== null) out.push(N(body.within));
-  } else if (["Order", "Contains", "Alphabetically", "Time"].includes(type)) operandOps(body.operand, out, aliases);
+  } else if (["Order", "Contains", "Alphabetically", "Time"].includes(type)) operandOps(body.operand, out, scope);
   else if (type === "Between") out.push(N(body.min), N(body.max));
-  else if (type === "OneOf" || type === "Matches") listOps(body.list, out, aliases);
-  else if (["ContainsAll", "ContainsNone", "ContainsSome", "NotContainsAll"].includes(type)) listOps(body, out, aliases);
-  else if (["StartsWith", "EndsWith", "NotStartsWith", "NotEndsWith"].includes(type)) operandOps(body, out, aliases);
+  else if (type === "OneOf" || type === "Matches") listOps(body.list, out, scope);
+  else if (["ContainsAll", "ContainsNone", "ContainsSome", "NotContainsAll"].includes(type)) listOps(body, out, scope);
+  else if (["StartsWith", "EndsWith", "NotStartsWith", "NotEndsWith"].includes(type)) operandOps(body, out, scope);
 };
 
-const leftOps = (left, out, aliases) => {
+const leftOps = (left, out, scope) => {
   const [type, body] = variant(left);
-  if (type === "Path") pathOps(body, out, aliases);
-  else if (type === "Derived") derivedOps(body, out, aliases);
+  if (type === "Path") pathOps(body, out, scope);
+  else if (type === "Derived") derivedOps(body, out, scope);
   else {
-    pathOps(body.from, out, aliases);
-    pathOps(body.to, out, aliases);
+    pathOps(body.from, out, scope);
+    pathOps(body.to, out, scope);
   }
 };
 
-const conditionOps = (condition, out, aliases) => {
-  leftOps(condition.left, out, aliases);
-  phraseOps(condition.phrase, out, aliases);
+const conditionOps = (condition, out, scope) => {
+  leftOps(condition.left, out, { ...scope, subject: null });
+  phraseOps(condition.phrase, out, scope);
 };
 
 const positionOps = (position, out) => {
@@ -157,37 +164,38 @@ const positionOps = (position, out) => {
   if (type === "Item") out.push(N(body.number));
 };
 
-const operandsOf = (kind, tree, aliases) => {
+const operandsOf = (kind, tree, aliases, subject) => {
+  const scope = { aliases, subject: kind === "check" ? subject : null };
   const out = [];
   if (kind === "check") {
     for (const a of tree.assertions) {
       const [type, body] = variant(a);
       if (type === "Plain") {
-        pathOps(body.path, out, aliases);
+        pathOps(body.path, out, scope);
       } else if (type === "Quantified") {
-        pathOps(body.path, out, aliases);
-        for (const c of body.whose) conditionOps(c, out, aliases);
-      } else for (const t of body.terms) termOps(t, out, aliases);
-      phraseOps(body.phrase, out, aliases);
+        pathOps(body.path, out, scope);
+        for (const c of body.whose) conditionOps(c, out, scope);
+      } else for (const t of body.terms) termOps(t, out, scope);
+      phraseOps(body.phrase, out, scope);
     }
   } else if (kind === "for") {
     for (const item of tree.items) {
       const [type, body] = variant(item);
       if (type === "Pick") positionOps(body.position, out);
-      pathOps(body.path, out, aliases);
-      for (const c of body.whose) conditionOps(c, out, aliases);
-      if (type === "Pick" && body.sorted_by) pathOps(body.sorted_by.path, out, aliases);
+      pathOps(body.path, out, scope);
+      for (const c of body.whose) conditionOps(c, out, scope);
+      if (type === "Pick" && body.sorted_by) pathOps(body.sorted_by.path, out, scope);
       out.push(K(body.alias, "alias"));
     }
   } else {
-    pathOps(tree.path, out, aliases);
-    if (tree.named_by_each_of) pathOps(tree.named_by_each_of, out, aliases);
+    pathOps(tree.path, out, scope);
+    if (tree.named_by_each_of) pathOps(tree.named_by_each_of, out, scope);
     for (const c of tree.whose) {
       const [type, body] = variant(c);
-      if (type === "Condition") conditionOps(body, out, aliases);
+      if (type === "Condition") conditionOps(body, out, scope);
       else {
-        pathOps(body.path, out, aliases);
-        phraseOps(body.phrase, out, aliases);
+        pathOps(body.path, out, scope);
+        phraseOps(body.phrase, out, scope);
       }
     }
   }
@@ -218,11 +226,11 @@ const merge = (tokens) => {
   return out;
 };
 
-const ROLE = { field: "field", alias: "alias", ref: "ref" };
+const ROLE = { field: "field", alias: "alias", ref: "ref", subject: "subject" };
 
-/** Colours a sentence from its tree. The tree has no positions, so the names and values it holds are matched, in order, against the words, strings and numbers of the text. Gives a list of `{kind, text}` pieces that joins back to `text`, with the kinds `word`, `field`, `alias`, `ref`, `string` and `number`, and `base` for the rest. Gives `null` when the text and the tree don't match, so the caller can colour it another way. */
-export const treeTokens = (kind, tree, text, aliases = [], base = "plain") => {
-  const ops = operandsOf(kind, tree, new Set(aliases));
+/** Colours a sentence from its tree. The tree has no positions, so the names and values it holds are matched, in order, against the words, strings and numbers of the text. Gives a list of `{kind, text}` pieces that joins back to `text`, with the kinds `word`, `field`, `alias`, `subject`, `ref`, `string` and `number`, and `base` for the rest. Gives `null` when the text and the tree don't match, so the caller can colour it another way. */
+export const treeTokens = (kind, tree, text, aliases = [], base = "plain", subject = null) => {
+  const ops = operandsOf(kind, tree, new Set(aliases), subject);
   const tokens = [];
   let next = 0;
   let previous = null;
@@ -262,6 +270,11 @@ export const treeTokens = (kind, tree, text, aliases = [], base = "plain") => {
   return next === ops.length ? merge(tokens) : null;
 };
 
+const namesSubject = (path, subject) => {
+  const [type, value] = variant(path.start);
+  return type === "Quoted" ? value === subject : type === "Field" && !value.dot && value.key === subject;
+};
+
 const keyText = (key) => (/^[A-Za-z_][\w-]*$/.test(key) ? key : JSON.stringify(key));
 
 const positionText = (position) => {
@@ -281,7 +294,7 @@ const referenceText = (ref) => {
 /** Writes a path as a sentence writes it, like `item 2 of pr.approvers` or `xs named by $params.k`. */
 export const pathText = (path) => {
   const [type, value] = startOf(path);
-  const start = type === "It" ? "it" : type === "Params" ? "$params" : type === "Input" ? "$input" : type === "Unknown" ? value : `${value.dot ? "." : ""}${keyText(value.key)}`;
+  const start = type === "Params" ? "$params" : type === "Input" ? "$input" : type === "Unknown" ? value : `${value.dot ? "." : ""}${keyText(value.key)}`;
   const steps = path.steps.map((step) => {
     const [name, body] = variant(step);
     if (name === "Key") return `.${keyText(body)}`;
@@ -638,7 +651,8 @@ export const describe = (kind, tree, ctx = {}) => {
   for (const path of paths) refKeys(path, refs);
   for (const ref of [...refs].sort()) lines.push(ref.startsWith("$params") ? `${ref} is the value of ${ref.slice(8)} in the params the report was given.` : `${ref} is ${ref.slice(7)} in the report's input, read from the top.`);
   lines.push(...[...aliasLines.values()]);
-  if (paths.some((p) => variant(p.start)[0] === "It")) lines.push("it is the subject itself.");
+  const own = ctx.subject ?? null;
+  if (own !== null && paths.some((p) => namesSubject(p, own))) lines.push(`${keyText(own)} is the subject itself.`);
   return lines;
 };
 

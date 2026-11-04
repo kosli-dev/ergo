@@ -347,7 +347,22 @@ test("hover reads a count, a sum, elapsed time, between and within", () => {
   assert.equal(reading("n is between 5 and 9"), "Passes when n is between 5 and 9, both included. Fails when n is missing, null or not a number.");
   assert.equal(reading("n is 6 within 1"), "Passes when n is within 1 of 6. Fails when n is missing, null or not a number.");
   assert.equal(reading("days elapsed from s to e is 2"), "Passes when the days from s to e is 2. Fails when either time of the days from s to e is missing, null or not a time.");
-  assert.equal(reading("it is a non-empty string"), "Passes when it is a string with at least one character. Fails when it is missing, null or not a string.\nit is the subject itself.");
+  assert.equal(reading("region is a non-empty string", [], { subject: "region" }), "Passes when region is a string with at least one character. Fails when region is missing, null or not a string.\nregion is the subject itself.");
+  assert.equal(reading("it is a non-empty string", [], { subject: "region" }), "Passes when it is a string with at least one character. Fails when it is missing, null or not a string.");
+  assert.equal(reading('"region" is a non-empty string', [], { subject: "region" }).split("\n").at(-1), "region is the subject itself.");
+});
+
+test("the subject's name is coloured as the subject, and a dot or a word that only looks like it is a field", () => {
+  const colour = (line, subject) => {
+    const [kind, tree] = kindOf(line);
+    return pairs(treeTokens(kind, tree, line, [], "code", subject)).filter((p) => /^(subject|field):/.test(p));
+  };
+  assert.deepEqual(colour('region is "x"', "region"), ["subject:region"]);
+  assert.deepEqual(colour('.region is "x"', "region"), ["field:.region"]);
+  assert.deepEqual(colour('it is "x"', "region"), ["field:it"]);
+  assert.deepEqual(colour('it is "x"', "it"), ["subject:it"]);
+  assert.deepEqual(colour('x is region', "region"), ["field:x", "subject:region"]);
+  assert.deepEqual(colour('region is "x"', null), ["field:region"]);
 });
 
 test("hover shows the reading and the problems of the sentence under the pointer", () => {
@@ -371,6 +386,15 @@ test("markdownSentences finds each sentence with its place, its for line and its
   assert.deepEqual(sentences.map((s) => s.forText), [null, null, null, "every pull_requests as pr, some pr.approvers as approver", "every pull_requests as pr, some pr.approvers as approver"]);
   assert.equal(sentences[0].subject, "release");
   assert.deepEqual(sentenceProblems(makeAnalyser(parser, "code")({ sentences, subjects })), []);
+});
+
+test("a Markdown check gets the subject of its requirement from the compiled policy", () => {
+  const source = readFileSync(new URL("../../markdown/cases/for-line-peer-approval/policy.ergo.md", import.meta.url), "utf8");
+  const compiled = compile(source);
+  const withPolicy = markdownSentences(source, compiled.blocks, compiled.policy).sentences;
+  const subjectOf = Object.values(compiled.policy.requirements)[0].subject;
+  assert.deepEqual(withPolicy.filter((s) => s.kind === "check").map((s) => s.subject), [subjectOf, subjectOf, subjectOf]);
+  assert.deepEqual(markdownSentences(source, compiled.blocks).sentences.filter((s) => s.kind === "check").map((s) => s.subject), [null, null, null]);
 });
 
 test("yamlSentences finds the from, for, assert and any_of sentences, the parts of the subject and where each is written", () => {
