@@ -1,9 +1,9 @@
-//! Reads YAML the way OPA 1.20.2 does: YAML 1.1 words and numbers, `<<` merge keys, the last of a repeated key, only the first document, and most of the files OPA refuses. Numbers keep the digits they were written with, so `1e400` is a number here and the string `"1e400"` in OPA. The Rust README lists the other known differences: a few malformed files OPA refuses are read here, and a few files OPA reads are refused.
+//! Reads YAML the way OPA 1.22.0 does: only `true` and `false` are booleans, so `yes`, `no`, `on` and `off` are strings, YAML 1.1 numbers like `010`, `<<` merge keys where a key written in the map wins, the last of a repeated key, only the first document while the others must still be valid, and most of the files OPA refuses. Numbers keep the digits they were written with, so `1e400` is a number here and the string `"1e400"` in OPA. CLI.md lists the other known differences: a few malformed files OPA refuses are read here, and a few files OPA reads are refused.
 
 use crate::number::number;
 use saphyr_parser::{Event, Parser, ScalarStyle, Tag};
 use serde_json::{Map, Value};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 type Events<'a> = Parser<'a, saphyr_parser::StrInput<'a>>;
@@ -25,7 +25,7 @@ fn invalid(message: impl Into<String>) -> Error {
 
 const MAX_DEPTH: usize = 10_000;
 
-/// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error, on `.inf` and `.nan`, on a tag it doesn't know, on a key that isn't a scalar or is `null`, on an alias with no anchor, on more than 10,000 levels of nesting, on more aliases than OPA reads, on control characters, and on a `%YAML` version other than 1.1.
+/// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error in any document, on `.inf` and `.nan`, on a core tag that doesn't fit its value, on a key that isn't a scalar, is `null` or is a `!!timestamp`, on the same alias used twice as a key of one mapping, on an alias with no anchor, on more than 10,000 levels of nesting, on more aliases than OPA reads, on control characters, and on a `%YAML` version other than 1.1.
 pub fn parse(text: &str) -> Result<Value, Error> {
     characters(text)?;
     version(text)?;
@@ -59,8 +59,31 @@ fn read(text: &str) -> Result<Value, Stop> {
         match next(&mut events)? {
             Event::StreamStart | Event::Nothing => {}
             Event::StreamEnd => return Ok(Value::Null),
-            Event::DocumentStart(_) => return Reader::default().document(&mut events),
+            Event::DocumentStart(_) => {
+                let value = Reader::default().document(&mut events)?;
+                rest(&mut events)?;
+                return Ok(value);
+            }
             _ => return Err(invalid("unexpected content").into()),
+        }
+    }
+}
+
+fn rest(events: &mut Events) -> Result<(), Stop> {
+    let mut depth = 0;
+    loop {
+        match next(events)? {
+            Event::StreamEnd => return Ok(()),
+            Event::SequenceStart(..) | Event::MappingStart(..) => {
+                depth += 1;
+                if depth > MAX_DEPTH {
+                    return Err(
+                        Error::Refused("it nests more than 10,000 levels".to_string()).into(),
+                    );
+                }
+            }
+            Event::SequenceEnd | Event::MappingEnd => depth -= 1,
+            _ => {}
         }
     }
 }
@@ -127,7 +150,23 @@ fn characters(text: &str) -> Result<(), Error> {
 }
 
 fn version(text: &str) -> Result<(), Error> {
-    for line in text.trim_start_matches('\u{feff}').lines() {
+    let text = text.trim_start_matches('\u{feff}');
+    directives(text)?;
+    let mut start = 0;
+    for line in text.split_inclusive('\n') {
+        start += line.len();
+        let marker = line
+            .strip_prefix("...")
+            .is_some_and(|after| after.chars().next().is_none_or(|c| " \t\r\n".contains(c)));
+        if marker {
+            directives(&text[start..])?;
+        }
+    }
+    Ok(())
+}
+
+fn directives(text: &str) -> Result<(), Error> {
+    for line in text.lines() {
         let trimmed = line.trim();
         if trimmed.is_empty() || trimmed.starts_with('#') {
             continue;
@@ -169,7 +208,7 @@ struct Node {
     value: Result<Rc<Tree>, Error>,
     key: Result<String, Error>,
     size: u64,
-    alias: bool,
+    alias: Option<usize>,
 }
 
 struct Anchor {
@@ -178,15 +217,25 @@ struct Anchor {
     size: u64,
 }
 
+#[derive(Default)]
 enum Slot {
+    #[default]
     Key,
     Value(String),
     Merge,
 }
 
+#[derive(Default)]
+struct Entries {
+    written: Vec<(String, Rc<Tree>)>,
+    merged: Vec<Rc<Tree>>,
+    alias_keys: HashSet<usize>,
+    slot: Slot,
+}
+
 enum Collection {
     List(Vec<Rc<Tree>>),
-    Map(Vec<(String, Rc<Tree>)>, Slot),
+    Map(Entries),
 }
 
 struct Frame {
@@ -209,11 +258,7 @@ impl Reader {
         loop {
             let node = match next(events)? {
                 Event::Scalar(text, style, anchor, tag) => {
-                    if self.expects_key()
-                        && style == ScalarStyle::Plain
-                        && tag.is_none()
-                        && text == "<<"
-                    {
+                    if self.expects_key() && merge_key(&text, style, tag.as_deref()) {
                         self.expect(Slot::Merge);
                         continue;
                     }
@@ -223,7 +268,7 @@ impl Reader {
                         value: scalar.value(&text).map(|v| Rc::new(Tree::Leaf(v))),
                         key: scalar.key(&text),
                         size: 1,
-                        alias: false,
+                        alias: None,
                     };
                     self.remember(anchor, &node);
                     node
@@ -242,7 +287,7 @@ impl Reader {
                         value: anchor.value.clone(),
                         key: anchor.key.clone(),
                         size: 1 + anchor.size,
-                        alias: true,
+                        alias: Some(id),
                     }
                 }
                 Event::SequenceStart(anchor, _) => {
@@ -250,7 +295,7 @@ impl Reader {
                     continue;
                 }
                 Event::MappingStart(anchor, _) => {
-                    self.open(Collection::Map(Vec::new(), Slot::Key), anchor)?;
+                    self.open(Collection::Map(Entries::default()), anchor)?;
                     continue;
                 }
                 Event::SequenceEnd | Event::MappingEnd => {
@@ -260,13 +305,13 @@ impl Reader {
                         .ok_or_else(|| invalid("unexpected content"))?;
                     let tree = match frame.collection {
                         Collection::List(items) => Tree::List(items),
-                        Collection::Map(entries, _) => Tree::Map(entries),
+                        Collection::Map(entries) => Tree::Map(entries.build()),
                     };
                     let node = Node {
                         value: Ok(Rc::new(tree)),
                         key: Err(Error::NotJson("a key is a list or a mapping".to_string())),
                         size: frame.size,
-                        alias: false,
+                        alias: None,
                     };
                     self.remember(frame.anchor, &node);
                     node
@@ -290,7 +335,10 @@ impl Reader {
         matches!(
             self.frames.last(),
             Some(Frame {
-                collection: Collection::Map(_, Slot::Key),
+                collection: Collection::Map(Entries {
+                    slot: Slot::Key,
+                    ..
+                }),
                 ..
             })
         )
@@ -298,11 +346,11 @@ impl Reader {
 
     fn expect(&mut self, next: Slot) {
         if let Some(Frame {
-            collection: Collection::Map(_, slot),
+            collection: Collection::Map(entries),
             ..
         }) = self.frames.last_mut()
         {
-            *slot = next;
+            entries.slot = next;
         }
     }
 
@@ -342,25 +390,57 @@ fn excessive(decoded: u64, aliased: u64) -> bool {
     aliased > 100 && decoded > 1000 && aliased as f64 / decoded as f64 > allowed
 }
 
+fn merge_key(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> bool {
+    text == "<<"
+        && match tag.map(core) {
+            None => style == ScalarStyle::Plain,
+            Some(Some("merge")) => true,
+            Some(_) => style == ScalarStyle::Plain && tag.is_some_and(non_specific),
+        }
+}
+
+fn core(tag: &Tag) -> Option<&str> {
+    if tag.handle == "!!" || tag.handle == "tag:yaml.org,2002:" {
+        Some(tag.suffix.as_str())
+    } else if tag.handle.is_empty() {
+        tag.suffix.strip_prefix("tag:yaml.org,2002:")
+    } else {
+        None
+    }
+}
+
+fn non_specific(tag: &Tag) -> bool {
+    tag.handle.is_empty() && tag.suffix == "!"
+}
+
 fn place(collection: &mut Collection, node: Node) -> Result<(), Error> {
     match collection {
         Collection::List(items) => items.push(node.value?),
-        Collection::Map(entries, slot) => match std::mem::replace(slot, Slot::Key) {
-            Slot::Key => *slot = Slot::Value(node.key?),
-            Slot::Value(name) => entries.push((name, node.value?)),
+        Collection::Map(entries) => match std::mem::take(&mut entries.slot) {
+            Slot::Key => {
+                if let Some(id) = node.alias
+                    && !entries.alias_keys.insert(id)
+                {
+                    return Err(Error::Refused(
+                        "the same alias is a key twice in one mapping".to_string(),
+                    ));
+                }
+                entries.slot = Slot::Value(node.key?);
+            }
+            Slot::Value(name) => entries.written.push((name, node.value?)),
             Slot::Merge => {
                 let source: Rc<Tree> = node.value?;
-                merge(entries, &source, node.alias)?;
+                merge(&mut entries.merged, &source, node.alias.is_some())?;
             }
         },
     }
     Ok(())
 }
 
-fn merge(into: &mut Vec<(String, Rc<Tree>)>, source: &Tree, alias: bool) -> Result<(), Error> {
-    match source {
-        Tree::Map(entries) => {
-            into.extend(entries.iter().cloned());
+fn merge(into: &mut Vec<Rc<Tree>>, source: &Rc<Tree>, alias: bool) -> Result<(), Error> {
+    match &**source {
+        Tree::Map(_) => {
+            into.push(Rc::clone(source));
             Ok(())
         }
         Tree::List(_) if alias => Err(Error::Refused(
@@ -368,12 +448,37 @@ fn merge(into: &mut Vec<(String, Rc<Tree>)>, source: &Tree, alias: bool) -> Resu
                 .to_string(),
         )),
         Tree::List(items) if items.iter().all(|item| matches!(**item, Tree::Map(_))) => {
-            for item in items.iter().rev() {
-                merge(into, item, false)?;
-            }
+            into.extend(items.iter().cloned());
             Ok(())
         }
         _ => Err(invalid("a merge key needs a mapping or a list of mappings")),
+    }
+}
+
+impl Entries {
+    fn build(self) -> Vec<(String, Rc<Tree>)> {
+        let mut at: HashMap<String, usize> = HashMap::new();
+        let mut out: Vec<(String, Rc<Tree>)> = Vec::with_capacity(self.written.len());
+        for (name, value) in self.written {
+            match at.get(&name) {
+                Some(&i) => out[i].1 = value,
+                None => {
+                    at.insert(name.clone(), out.len());
+                    out.push((name, value));
+                }
+            }
+        }
+        for source in &self.merged {
+            if let Tree::Map(entries) = &**source {
+                for (name, value) in entries {
+                    if !at.contains_key(name) {
+                        at.insert(name.clone(), out.len());
+                        out.push((name.clone(), Rc::clone(value)));
+                    }
+                }
+            }
+        }
+        out
     }
 }
 
@@ -422,6 +527,7 @@ enum Scalar {
     Float(String),
     Special(&'static str),
     Str(String),
+    Time(String),
 }
 
 impl Scalar {
@@ -433,7 +539,7 @@ impl Scalar {
                 Ok(number(digits))
             }
             Scalar::Special(_) => Err(Error::NotJson(format!("{text} isn't a JSON number"))),
-            Scalar::Str(s) => Ok(Value::String(s.clone())),
+            Scalar::Str(s) | Scalar::Time(s) => Ok(Value::String(s.clone())),
         }
     }
 
@@ -441,10 +547,8 @@ impl Scalar {
         match self {
             Scalar::Null => Err(Error::NotJson("a key is null".to_string())),
             Scalar::Bool(b) => Ok(b.to_string()),
-            Scalar::Int(digits) => Ok(digits.clone()),
-            Scalar::Uint(_) => Err(Error::Refused(format!(
-                "the key {text} is past the largest 64-bit signed integer"
-            ))),
+            Scalar::Int(digits) | Scalar::Uint(digits) => Ok(digits.clone()),
+            Scalar::Time(_) => Err(Error::NotJson(format!("the key {text} is a !!timestamp"))),
             Scalar::Float(digits) => Ok(match digits.parse::<f64>() {
                 Ok(f) if f.is_finite() => shortest(f as f32),
                 _ => text.to_string(),
@@ -503,18 +607,21 @@ fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Scalar, E
             Scalar::Str(text.to_string())
         });
     };
-    let core = tag.handle == "!!" || tag.handle == "tag:yaml.org,2002:";
+    let Some(suffix) = core(tag) else {
+        return Ok(Scalar::Str(text.to_string()));
+    };
     let resolved = resolve(text);
-    let (fits, kind) = match (core, tag.suffix.as_str()) {
-        (true, "str") => return Ok(Scalar::Str(text.to_string())),
-        (true, "binary") => return base64(text).map(Scalar::Str),
-        (true, "timestamp") if timestamp(text) => return Ok(Scalar::Str(text.to_string())),
-        (true, "timestamp") => (None, "a date or a time"),
-        (true, "int") => (
+    let (fits, kind) = match suffix {
+        "binary" => return base64(text).map(Scalar::Str),
+        "timestamp" => match timestamp(text) {
+            Some(written) => return written.map(Scalar::Time),
+            None => (None, "a date or a time"),
+        },
+        "int" => (
             matches!(resolved, Scalar::Int(_) | Scalar::Uint(_)).then_some(resolved),
             "an integer",
         ),
-        (true, "float") => (
+        "float" => (
             match resolved {
                 Scalar::Int(digits) => Some(Scalar::Float(digits)),
                 Scalar::Float(_) | Scalar::Special(_) => Some(resolved),
@@ -522,30 +629,21 @@ fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Scalar, E
             },
             "a number",
         ),
-        (true, "bool") => (
+        "bool" => (
             matches!(resolved, Scalar::Bool(_)).then_some(resolved),
             "true or false",
         ),
-        (true, "null") => (matches!(resolved, Scalar::Null).then_some(resolved), "null"),
-        _ => {
-            return Err(invalid(format!(
-                "the tag {}{} isn't supported",
-                tag.handle, tag.suffix
-            )));
-        }
+        "null" => (matches!(resolved, Scalar::Null).then_some(resolved), "null"),
+        _ => return Ok(Scalar::Str(text.to_string())),
     };
-    fits.ok_or_else(|| invalid(format!("!!{} `{text}` isn't {kind}", tag.suffix)))
+    fits.ok_or_else(|| invalid(format!("!!{suffix} `{text}` isn't {kind}")))
 }
 
 fn resolve(text: &str) -> Scalar {
     match text {
         "" | "~" | "null" | "Null" | "NULL" => Scalar::Null,
-        "y" | "Y" | "yes" | "Yes" | "YES" | "on" | "On" | "ON" | "true" | "True" | "TRUE" => {
-            Scalar::Bool(true)
-        }
-        "n" | "N" | "no" | "No" | "NO" | "off" | "Off" | "OFF" | "false" | "False" | "FALSE" => {
-            Scalar::Bool(false)
-        }
+        "true" | "True" | "TRUE" => Scalar::Bool(true),
+        "false" | "False" | "FALSE" => Scalar::Bool(false),
         ".nan" | ".NaN" | ".NAN" => Scalar::Special(".nan"),
         ".inf" | ".Inf" | ".INF" | "+.inf" | "+.Inf" | "+.INF" => Scalar::Special(".inf"),
         "-.inf" | "-.Inf" | "-.INF" => Scalar::Special("-.inf"),
@@ -626,68 +724,87 @@ fn integer(negative: bool, body: &str) -> Option<Option<Scalar>> {
     }
 }
 
-fn timestamp(text: &str) -> bool {
+fn timestamp(text: &str) -> Option<Result<String, Error>> {
     let b = text.as_bytes();
     let mut i = 0;
-    let Some(year) = number_at(b, &mut i, 4, 4) else {
-        return false;
-    };
-    let Some(month) = after(b, &mut i, b'-', 2) else {
-        return false;
-    };
-    let Some(day) = after(b, &mut i, b'-', 2) else {
-        return false;
-    };
+    let year = number_at(b, &mut i, 4, 4)?;
+    let month = after(b, &mut i, b'-', 2)?;
+    let day = after(b, &mut i, b'-', 2)?;
     let leap = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
     let days = match month {
         2 if leap => 29,
         2 => 28,
         4 | 6 | 9 | 11 => 30,
         1..=12 => 31,
-        _ => return false,
+        _ => return None,
     };
     if day < 1 || day > days {
-        return false;
+        return None;
     }
+    let date = format!("{year:04}-{month:02}-{day:02}");
     if i == b.len() {
-        return true;
+        return Some(Ok(format!("{date}T00:00:00Z")));
     }
     let zoned = match b[i] {
         b'T' | b't' => true,
         b' ' => false,
-        _ => return false,
+        _ => return None,
     };
     i += 1;
-    let Some(hour) = number_at(b, &mut i, 1, 2) else {
-        return false;
-    };
-    let (Some(minute), Some(second)) = (after(b, &mut i, b':', 2), after(b, &mut i, b':', 2))
-    else {
-        return false;
-    };
-    if hour > 23 || minute > 59 || second > 59 {
-        return false;
+    while !zoned && b.get(i) == Some(&b' ') {
+        i += 1;
     }
+    let hour = number_at(b, &mut i, 1, 2)?;
+    let minute = after(b, &mut i, b':', 2)?;
+    let second = after(b, &mut i, b':', 2)?;
+    if hour > 23 || minute > 59 || second > 59 {
+        return None;
+    }
+    let mut fraction = "";
     if matches!(b.get(i), Some(b'.' | b',')) && b.get(i + 1).is_some_and(u8::is_ascii_digit) {
         i += 1;
+        let start = i;
         while b.get(i).is_some_and(u8::is_ascii_digit) {
             i += 1;
         }
+        fraction = text[start..i.min(start + 9)].trim_end_matches('0');
     }
+    let point = if fraction.is_empty() { "" } else { "." };
+    let clock = format!("{date}T{hour:02}:{minute:02}:{second:02}{point}{fraction}");
     if !zoned {
-        return i == b.len();
+        return (i == b.len()).then(|| Ok(format!("{clock}Z")));
     }
-    match &b[i..] {
-        [b'Z'] => true,
-        [b'+' | b'-', h1, h2, b':', m1, m2] => {
+    let minutes = match &b[i..] {
+        [b'Z'] => 0,
+        [sign @ (b'+' | b'-'), h1, h2, b':', m1, m2] => {
             let two = |a: u8, b: u8| {
                 (a.is_ascii_digit() && b.is_ascii_digit())
-                    .then(|| u32::from(a - b'0') * 10 + u32::from(b - b'0'))
+                    .then(|| i32::from(a - b'0') * 10 + i32::from(b - b'0'))
             };
-            matches!((two(*h1, *h2), two(*m1, *m2)), (Some(h), Some(m)) if h <= 24 && m <= 60)
+            let (h, m) = (two(*h1, *h2)?, two(*m1, *m2)?);
+            if h > 24 || m > 60 {
+                return None;
+            }
+            if *sign == b'-' {
+                -(h * 60 + m)
+            } else {
+                h * 60 + m
+            }
         }
-        _ => false,
-    }
+        _ => return None,
+    };
+    Some(match minutes.abs() {
+        0 => Ok(format!("{clock}Z")),
+        1440.. => Err(Error::NotJson(format!(
+            "!!timestamp `{text}` has a time zone of 24 hours or more, which OPA can't write"
+        ))),
+        offset => Ok(format!(
+            "{clock}{}{:02}:{:02}",
+            if minutes < 0 { '-' } else { '+' },
+            offset / 60,
+            offset % 60
+        )),
+    })
 }
 
 fn after(b: &[u8], i: &mut usize, separator: u8, most: usize) -> Option<u32> {

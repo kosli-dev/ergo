@@ -47,14 +47,14 @@ Without `--fail`, the command exits 0 whenever it printed the output, even when 
 
 When the command line or a file is wrong, the command says why on one line of stderr.
 
-YAML is read the way OPA reads it: `yes`, `no`, `on` and `off` are booleans, `010` is 8, `0x10` is 16, dates stay strings, `<<` merges, and only the first document counts. `ergo` also refuses most files OPA refuses, like one with a control character, a tag that doesn't fit its value like `!!int 1.5`, more than 10,000 levels of nesting, or too many aliases.
+YAML is read the way OPA 1.22.0 reads it. Only `true` and `false` are booleans, so `yes`, `no`, `on` and `off` are strings: with `approved: yes`, `approved is true` fails, so write `approved: true`. `010` is 8, `0x10` is 16, dates stay strings, and a date tagged `!!timestamp` is written out in full, like `2001-12-14T00:00:00Z`. `<<` merges, and a key written in the mapping wins over a merged one, wherever the `<<` is. A tag YAML doesn't define, like `!custom 5`, keeps the text, `"5"`. Only the first document counts, but the others must still be valid YAML. `ergo` also refuses most files OPA refuses, like one with a control character, a tag that doesn't fit its value like `!!int 1.5` or `!!bool yes`, more than 10,000 levels of nesting, or too many aliases.
 
 These differences are known:
 
 - `ergo` keeps a number as it was written, and OPA turns it into a 64-bit float, so `1.10` stays `1.10` where OPA reads 1.1. Outside the range of a float this changes more than the digits: OPA reads `1e400` as the string `"1e400"` and `1e-400` as 0, and `ergo` reads both as the numbers written. So with `size: 1e400`, `size is at least 5` passes in `ergo` and fails in `ergo.rego`, and with `size: 1e-400`, `size is more than 0` does the same.
 - `ergo` reads some malformed files that OPA refuses, so a check can pass on a file `ergo.rego` never reads. These are a line that starts with a tab, or a blank line holding one, a directive other than `%YAML` and `%TAG`, a file of only `...`, an escape YAML 1.1 doesn't have like `\/`, a plain key over two lines or longer than 1,024 characters, `{a` and `: 1}` on separate lines, `&x:` written without a space, and LS or PS used as a line break.
-- `ergo` refuses some files OPA reads. These are a tab after a colon, a tag outside YAML's own, a verbatim tag, `!!merge`, UTF-16, a byte order mark inside a value, flow collections nested more than 255 levels, a quoted value whose next line starts with a tab, `*a: v` with no space before the colon, `%YAML 01.1`, and a `!!timestamp` with two spaces before the time.
-- A few values differ: LS and PS inside quoted text, the U+FFFD characters for bad UTF-8 in a `!!binary`, and two keys that end up with the same name, like `1:` and `1.0:`, where OPA keeps one at random and `ergo` keeps the last.
+- `ergo` refuses some files OPA reads. These are a tab after a colon, UTF-16, a byte order mark inside a value, flow collections nested more than 255 levels, a quoted value whose next line starts with a tab, `*a: v` with no space before the colon, and `%YAML 01.1`.
+- A few values differ: LS and PS inside quoted text, and the U+FFFD characters for bad UTF-8 in a `!!binary`.
 
 ## Updating
 
