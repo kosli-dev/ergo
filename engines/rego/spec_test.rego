@@ -61,10 +61,85 @@ test_the_deep_walks_cases_pass if {
 	_compiled_differences("deep_walks") == set()
 }
 
-test_the_distinct_cases_pass if {
-	_topic_failures("distinct") == _known_in("distinct")
-	_compiled_differences("distinct") == set()
-}
+test_the_distinct_cases_pass_part_1_of_20 if _case_part_passes("distinct", 0, 20)
+
+test_the_distinct_cases_pass_part_2_of_20 if _case_part_passes("distinct", 1, 20)
+
+test_the_distinct_cases_pass_part_3_of_20 if _case_part_passes("distinct", 2, 20)
+
+test_the_distinct_cases_pass_part_4_of_20 if _case_part_passes("distinct", 3, 20)
+
+test_the_distinct_cases_pass_part_5_of_20 if _case_part_passes("distinct", 4, 20)
+
+test_the_distinct_cases_pass_part_6_of_20 if _case_part_passes("distinct", 5, 20)
+
+test_the_distinct_cases_pass_part_7_of_20 if _case_part_passes("distinct", 6, 20)
+
+test_the_distinct_cases_pass_part_8_of_20 if _case_part_passes("distinct", 7, 20)
+
+test_the_distinct_cases_pass_part_9_of_20 if _case_part_passes("distinct", 8, 20)
+
+test_the_distinct_cases_pass_part_10_of_20 if _case_part_passes("distinct", 9, 20)
+
+test_the_distinct_cases_pass_part_11_of_20 if _case_part_passes("distinct", 10, 20)
+
+test_the_distinct_cases_pass_part_12_of_20 if _case_part_passes("distinct", 11, 20)
+
+test_the_distinct_cases_pass_part_13_of_20 if _case_part_passes("distinct", 12, 20)
+
+test_the_distinct_cases_pass_part_14_of_20 if _case_part_passes("distinct", 13, 20)
+
+test_the_distinct_cases_pass_part_15_of_20 if _case_part_passes("distinct", 14, 20)
+
+test_the_distinct_cases_pass_part_16_of_20 if _case_part_passes("distinct", 15, 20)
+
+test_the_distinct_cases_pass_part_17_of_20 if _case_part_passes("distinct", 16, 20)
+
+test_the_distinct_cases_pass_part_18_of_20 if _case_part_passes("distinct", 17, 20)
+
+test_the_distinct_cases_pass_part_19_of_20 if _case_part_passes("distinct", 18, 20)
+
+test_the_distinct_cases_pass_part_20_of_20 if _case_part_passes("distinct", 19, 20)
+
+test_the_distinct_cases_pass_compiled_part_1_of_20 if _differences_compiled("distinct", _case_part("distinct", 0, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_2_of_20 if _differences_compiled("distinct", _case_part("distinct", 1, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_3_of_20 if _differences_compiled("distinct", _case_part("distinct", 2, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_4_of_20 if _differences_compiled("distinct", _case_part("distinct", 3, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_5_of_20 if _differences_compiled("distinct", _case_part("distinct", 4, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_6_of_20 if _differences_compiled("distinct", _case_part("distinct", 5, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_7_of_20 if _differences_compiled("distinct", _case_part("distinct", 6, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_8_of_20 if _differences_compiled("distinct", _case_part("distinct", 7, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_9_of_20 if _differences_compiled("distinct", _case_part("distinct", 8, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_10_of_20 if _differences_compiled("distinct", _case_part("distinct", 9, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_11_of_20 if _differences_compiled("distinct", _case_part("distinct", 10, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_12_of_20 if _differences_compiled("distinct", _case_part("distinct", 11, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_13_of_20 if _differences_compiled("distinct", _case_part("distinct", 12, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_14_of_20 if _differences_compiled("distinct", _case_part("distinct", 13, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_15_of_20 if _differences_compiled("distinct", _case_part("distinct", 14, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_16_of_20 if _differences_compiled("distinct", _case_part("distinct", 15, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_17_of_20 if _differences_compiled("distinct", _case_part("distinct", 16, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_18_of_20 if _differences_compiled("distinct", _case_part("distinct", 17, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_19_of_20 if _differences_compiled("distinct", _case_part("distinct", 18, 20)) == set()
+
+test_the_distinct_cases_pass_compiled_part_20_of_20 if _differences_compiled("distinct", _case_part("distinct", 19, 20)) == set()
 
 test_the_equals_cases_pass if {
 	_topic_failures("equals") == _known_in("equals")
@@ -134,6 +209,17 @@ test_the_requirements_cases_pass if {
 }
 
 _part(topic, n, parts) := [group | some i, group in data.spec.cases[topic]; i % parts == n]
+
+_case_part(topic, n, parts) := [object.union(group, {"cases": cases}) |
+	some i, group in data.spec.cases[topic]
+	cases := [c | some j, c in group.cases; (i + j) % parts == n]
+	count(cases) > 0
+]
+
+_case_part_passes(topic, n, parts) if _failures(topic, _case_part(topic, n, parts)) == known_differences & {concat(" / ", [topic, group.description, c.description]) |
+	some group in _case_part(topic, n, parts)
+	some c in group.cases
+}
 
 _part_passes(topic, n, parts) if _failures(topic, _part(topic, n, parts)) == known_differences & {concat(" / ", [topic, group.description, c.description]) |
 	some group in _part(topic, n, parts)

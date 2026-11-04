@@ -12032,22 +12032,34 @@ test_a_dot_in_a_from_whose_reads_the_field_named_like_the_subject if {
 	[r.passed | some r in rep.results; r.check == "c"] == [true]
 }
 
-test_a_distinct_phrase_that_reads_the_item_is_written_wrong_wherever_the_sentence_stands if {
+test_a_distinct_phrase_that_reads_the_item_is_written_wrong_as_a_check if _distinct_scope_in(0)
+
+test_a_distinct_phrase_that_reads_the_item_is_written_wrong_on_a_line_of_an_assert_list if _distinct_scope_in(1)
+
+test_a_distinct_phrase_that_reads_the_item_is_written_wrong_under_a_for_line if _distinct_scope_in(2)
+
+test_a_distinct_phrase_that_reads_the_item_is_written_wrong_on_a_line_under_a_for_line if _distinct_scope_in(3)
+
+test_a_distinct_phrase_that_reads_the_item_is_written_wrong_in_an_any_of_option if _distinct_scope_in(4)
+
+test_a_distinct_phrase_that_reads_the_item_is_written_wrong_in_a_from_line if {
+	problems := _from_problems(_from_report({"rs": [{"fs": [{"k": 5, "lo": 1}]}]}, {"w": {"from": "every rs whose some distinct fs.k is at least lo"}}, {"c": "w exists"}, {}))
+	some i in problems
+	some p in i.value
+	startswith(p, "whose: distinct is about the value its path points at")
+}
+
+_distinct_scope_in(place) if {
 	every sentence in [`every distinct xs.k is at least lo`, `some distinct xs.k is in ok`, `every distinct xs.k is at least .lo`, `every distinct xs.k whose lo is 1 is at least lo`, `every distinct xs.k is lo plus 4`] {
-		every check in [
+		checks := [
 			sentence,
 			{"assert": ["xs exists", sentence]},
 			{"for": "every ys as y", "assert": sentence},
 			{"for": "every ys as y", "assert": ["y exists", sentence]},
 			{"any_of": {"x": sentence, "y": "xs exists"}},
-		] {
-			_distinct_scope_problem({"c": check})
-		}
+		]
+		_distinct_scope_problem({"c": checks[place]})
 	}
-	problems := _from_problems(_from_report({"rs": [{"fs": [{"k": 5, "lo": 1}]}]}, {"w": {"from": "every rs whose some distinct fs.k is at least lo"}}, {"c": "w exists"}, {}))
-	some i in problems
-	some p in i.value
-	startswith(p, "whose: distinct is about the value its path points at")
 }
 
 _distinct_scope_problem(checks) if {
