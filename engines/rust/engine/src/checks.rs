@@ -207,6 +207,9 @@ fn read_one(
                         &aliases,
                         &mut problems,
                     );
+                    if for_line.is_some() {
+                        problems.retain(|problem| !problem.contains(lower::DISTINCT_ITEM));
+                    }
                     if !parsed.ok || !for_ok || !problems.is_empty() {
                         return wrong(problems);
                     }

@@ -5042,6 +5042,91 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("who is \"ann\"", "who is \"ann\"", &[], &[]),
     ("version exists", "version exists", &[], &[]),
     (
+        "every distinct hs.k is not in p.ok",
+        "every distinct hs.k is not in p.ok",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k is not in t.ok",
+        "every distinct t.fs.k is not in t.ok",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k matches t.pats",
+        "every distinct t.fs.k matches t.pats",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is at least first of lol",
+        "every distinct ts.fs.k is at least first of lol",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is at least last of lol",
+        "every distinct ts.fs.k is at least last of lol",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k matches lim",
+        "every distinct ts.fs.k matches lim",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct hs.k is in p.ok",
+        "some distinct hs.k is in p.ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct hs.k is in p.pl",
+        "some distinct hs.k is in p.pl",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct hs.k is one of p.ok",
+        "some distinct hs.k is in p.ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct t.fs.k is in t.ok",
+        "some distinct t.fs.k is in t.ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct t.fs.k is one of t.ok",
+        "some distinct t.fs.k is in t.ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct ts.fs.k is in .lim",
+        "some distinct ts.fs.k is in lim",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct ts.fs.k is in lim",
+        "some distinct ts.fs.k is in lim",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct ts.fs.k is in ok",
+        "some distinct ts.fs.k is in ok",
+        &[],
+        &[],
+    ),
+    ("y exists", "y exists", &[], &[]),
+    (
         "every distinct $input.s.ts[0].fs.k is at least lo",
         "every distinct $input.s.ts[0].fs.k is at least lo",
         &[],
@@ -9409,6 +9494,10 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "every ys as y whose y is 1",
+        &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
+    ),
     (
         "every xs as x, distinct first of ys as y",
         &["distinct goes after every, some, count of or sum of"],

@@ -1008,7 +1008,7 @@ pub fn lower_quantified(
     }
 }
 
-const DISTINCT_ITEM: &str =
+pub const DISTINCT_ITEM: &str =
     "distinct is about the value its path points at, but the phrase also reads ";
 
 fn phrase_paths(phrase: &s::Phrase) -> Vec<&s::Path> {

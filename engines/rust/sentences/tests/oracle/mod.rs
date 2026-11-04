@@ -7,6 +7,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("c whose type is \"library\"", "c whose type is \"library\""),
     ("c.licenses", "c.licenses"),
     ("lic.terms", "lic.terms"),
+    ("ok", "ok"),
+    (
+        "p.gs whose some distinct hs.k is in p.ok",
+        "p.gs whose some distinct hs.k is in p.ok",
+    ),
+    ("rs", "rs"),
     ("every distinct xs", "every distinct xs"),
     (
         "every rels whose some distinct files.kind is at least lo",
@@ -2931,6 +2937,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("d.q", "d.q"),
     ("fingerprint", "fingerprint"),
     ("id", "id"),
+    ("ok", "ok"),
     ("t", "t"),
     ("limits.lo", "limits.lo"),
     ("info.who", "info.who"),
