@@ -400,7 +400,7 @@
         "rules": ["sentence.condition.word", "for.walk"],
         "input": {"t": {"items": [{"kind": "a", "qty": 1}, 5]}},
         "results": [
-          {"cause": "not_an_object", "check": "f", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of items", "locations": ["/t/items/0"], "path": "item 1 of items", "value": {"kind": "a", "qty": 1}}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of items", "locations": ["/t/items/1"], "path": "item 2 of items", "value": 5}], "inputs": [{"locations": ["/t/items/0", "/t/items/1"], "name": "items[]", "value": [{"kind": "a", "qty": 1}, 5]}], "message": "item 1 of items is {\"kind\": \"a\", \"qty\": 1}, which isn't text or a list; item 2 of items: the subject is 5, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"items": [{"kind": "a", "qty": 1}, 5]}, "type": "t"}}
+          {"cause": "not_an_object", "check": "f", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of items", "locations": ["/t/items/0"], "path": "item 1 of items", "value": {"kind": "a", "qty": 1}}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of items", "locations": ["/t/items/1"], "path": "item 2 of items", "value": 5}], "inputs": [{"locations": ["/t/items/0", "/t/items/1"], "name": "items[]", "value": [{"kind": "a", "qty": 1}, 5]}], "message": "item 1 of items is {\"kind\": \"a\", \"qty\": 1}, which isn't text or a list; item 2 of items is 5, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"items": [{"kind": "a", "qty": 1}, 5]}, "type": "t"}}
         ]
       }
     ]
@@ -459,7 +459,7 @@
         "input": {"items": [{"kind": "a"}, "x"]},
         "results": [
           {"cause": "unusable", "check": "$applies", "failed_assertions": [{"assertion": "\"my w\" is not empty", "cause": "unusable"}], "inputs": [{"locations": ["/items/0/kind"], "name": "kind", "value": "a"}, {"locations": ["/items/0"], "name": "my w", "value": {"kind": "a"}}], "message": "my w is {\"kind\": \"a\"}, which isn't text or a list", "passed": false, "requirement": "r", "subject": {"id": {"kind": "a"}, "type": "my w"}},
-          {"cause": "not_an_object", "check": "$applies", "failed_assertions": [{"assertion": "kind is \"a\"", "cause": "not_an_object"}], "inputs": [{"locations": ["/items/1"], "name": "kind", "value": null}, {"locations": ["/items/1"], "name": "my w", "value": "x"}], "message": "the subject is \"x\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "my w"}}
+          {"cause": "not_an_object", "check": "$applies", "failed_assertions": [{"assertion": "kind is \"a\"", "cause": "not_an_object"}], "inputs": [{"locations": ["/items/1"], "name": "kind", "value": null}, {"locations": ["/items/1"], "name": "my w", "value": "x"}], "message": "my w is \"x\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "my w"}}
         ]
       }
     ]
@@ -490,7 +490,7 @@
         "input": {"items": [{"kind": "a"}, "x"]},
         "results": [
           {"cause": "unusable", "check": "$applies", "failed_assertions": [{"assertion": "\"item\" is not empty", "cause": "unusable"}], "inputs": [{"locations": ["/items/0"], "name": "item", "value": {"kind": "a"}}, {"locations": ["/items/0/kind"], "name": "kind", "value": "a"}], "message": "item is {\"kind\": \"a\"}, which isn't text or a list", "passed": false, "requirement": "r", "subject": {"id": {"kind": "a"}, "type": "item"}},
-          {"cause": "not_an_object", "check": "$applies", "failed_assertions": [{"assertion": "kind is \"a\"", "cause": "not_an_object"}], "inputs": [{"locations": ["/items/1"], "name": "item", "value": "x"}, {"locations": ["/items/1"], "name": "kind", "value": null}], "message": "the subject is \"x\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "item"}}
+          {"cause": "not_an_object", "check": "$applies", "failed_assertions": [{"assertion": "kind is \"a\"", "cause": "not_an_object"}], "inputs": [{"locations": ["/items/1"], "name": "item", "value": "x"}, {"locations": ["/items/1"], "name": "kind", "value": null}], "message": "item is \"x\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "item"}}
         ]
       }
     ]
@@ -521,7 +521,7 @@
         "input": {"items": [{"kind": "a"}, "x"]},
         "results": [
           {"cause": "unusable", "check": "$applies", "failed_assertions": [{"assertion": "\"that\" is not empty", "cause": "unusable"}], "inputs": [{"locations": ["/items/0/kind"], "name": "kind", "value": "a"}, {"locations": ["/items/0"], "name": "that", "value": {"kind": "a"}}], "message": "that is {\"kind\": \"a\"}, which isn't text or a list", "passed": false, "requirement": "r", "subject": {"id": {"kind": "a"}, "type": "that"}},
-          {"cause": "not_an_object", "check": "$applies", "failed_assertions": [{"assertion": "kind is \"a\"", "cause": "not_an_object"}], "inputs": [{"locations": ["/items/1"], "name": "kind", "value": null}, {"locations": ["/items/1"], "name": "that", "value": "x"}], "message": "the subject is \"x\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "that"}}
+          {"cause": "not_an_object", "check": "$applies", "failed_assertions": [{"assertion": "kind is \"a\"", "cause": "not_an_object"}], "inputs": [{"locations": ["/items/1"], "name": "kind", "value": null}, {"locations": ["/items/1"], "name": "that", "value": "x"}], "message": "that is \"x\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "that"}}
         ]
       }
     ]

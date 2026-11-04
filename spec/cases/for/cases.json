@@ -5984,7 +5984,7 @@
               "id": "text"
             },
             "check": "c",
-            "message": "the subject is \"text\", which isn't an object",
+            "message": "thing is \"text\", which isn't an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [],
@@ -22910,7 +22910,7 @@
         "rules": ["for.flaws"],
         "input": {"xs": [[1, 2]]},
         "results": [
-          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "the subject is [1, 2], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [1, 2], "type": "thing"}}
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is [1, 2], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [1, 2], "type": "thing"}}
         ]
       },
       {
@@ -22918,7 +22918,7 @@
         "rules": ["for.flaws"],
         "input": {"xs": ["text"]},
         "results": [
-          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "the subject is \"text\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}}
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is \"text\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}}
         ]
       },
       {
@@ -22926,7 +22926,7 @@
         "rules": ["for.flaws"],
         "input": {"xs": [[]]},
         "results": [
-          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "the subject is [], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [], "type": "thing"}}
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is [], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [], "type": "thing"}}
         ]
       },
       {
@@ -22934,7 +22934,35 @@
         "rules": ["for.flaws"],
         "input": {"xs": [[{"k": 1}]]},
         "results": [
-          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "the subject is [{\"k\": 1}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [{"k": 1}], "type": "thing"}}
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is [{\"k\": 1}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [{"k": 1}], "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line on a subject that isn't an object names the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.k is 1", "for": "every ys whose k is 1 as y"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "every xs"}}},
+    "cases": [
+      {
+        "description": "the message names thing, never the subject",
+        "rules": ["for.flaws", "message.items"],
+        "input": {"xs": [3]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line's whose on an item that isn't an object names the item",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "x.k is 1", "for": "every xs whose k is 1 as x"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "$input"}}},
+    "cases": [
+      {
+        "description": "the message says the item is the value, with no colon and no subject",
+        "rules": ["message.items"],
+        "input": {"xs": [1]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/xs/0"], "path": "item 1 of xs", "value": 1}], "inputs": [{"locations": ["/xs/0"], "name": "xs[]", "value": [1]}], "message": "item 1 of xs is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"xs": [1]}, "type": "thing"}}
         ]
       }
     ]

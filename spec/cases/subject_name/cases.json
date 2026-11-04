@@ -355,21 +355,6 @@
     ]
   },
   {
-    "description": "a position in brackets after the subject name reads an item of a list subject",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region[0] is 1"}}}},
-    "cases": [
-      {
-        "description": "the brackets pick the item, and a subject that is not a list is unusable",
-        "rules": ["sentence.path.subject", "sentence.path.index"],
-        "input": {"xs": [{"id": "a", "name": "n"}]},
-        "results": [
-          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "allowed", "subject": {"id": null, "type": "region"}},
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "item 1 of region", "value": null}], "message": "region is {\"id\": \"a\", \"name\": \"n\"}, which isn't a list", "passed": false, "requirement": "allowed", "subject": {"id": {"id": "a", "name": "n"}, "type": "region"}}
-        ]
-      }
-    ]
-  },
-  {
     "description": "region followed by named by",
     "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region named by $params.k is 1"}}}},
     "cases": [
@@ -744,24 +729,20 @@
     ]
   },
   {
-    "description": "a position directly after the subject name reads an item of a list subject",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"a": "region[0] is 1", "b": "first of region is 1", "c": "item 2 of region is 2"}}}},
+    "description": "a position in words directly after the subject name reads an item of a list subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"b": "first of region is 1", "c": "item 2 of region is 2"}}}},
     "cases": [
       {
-        "description": "the same item is read by brackets and by words, and a subject that is not a list is unusable",
+        "description": "first of and item N of read the item, and a subject that is not a list is unusable",
         "rules": ["sentence.path.subject", "sentence.path.index", "name.index"],
         "input": {"xs": [[1, 2], [], "a", null]},
         "results": [
-          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/xs/0/0"], "name": "item 1 of region", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
           {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/xs/0/0"], "name": "item 1 of region", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/1"], "name": "item 2 of region", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
-          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/xs/1"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "r", "subject": {"id": [], "type": "region"}},
           {"cause": "absent", "check": "b", "inputs": [{"locations": ["/xs/1"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "r", "subject": {"id": [], "type": "region"}},
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "r", "subject": {"id": [], "type": "region"}},
-          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/xs/2"], "name": "item 1 of region", "value": null}], "message": "region is \"a\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}},
           {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/xs/2"], "name": "item 1 of region", "value": null}], "message": "region is \"a\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}},
           {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "item 2 of region", "value": null}], "message": "region is \"a\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}},
-          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/xs/3"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
           {"cause": "absent", "check": "b", "inputs": [{"locations": ["/xs/3"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
         ]
@@ -1347,6 +1328,81 @@
         "input": {"things": [{"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}]},
         "results": [
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/ys/0", "/things/0/ys/1"], "name": "count of ys whose \"a\\\\b\" is 1", "value": null}, {"locations": ["/things/0/ys/0", "/things/0/ys/1"], "name": "ys[]", "value": [{"v": 1}, {"v": 2}]}], "message": "item 1 of ys: .\"a\\\\b\" is missing; item 2 of ys: .\"a\\\\b\" is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}, "type": "a\\b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the subject name followed by [0] is written wrong, whatever the check says",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": "rel[0] is 1", "b": "rel[1] is 2", "c": "rel[0].k is 1", "d": "every rel[0] is 1", "e": "count of rel[0] is 1", "f": "x is rel[0]", "g": "rel[0] exists", "h": "rel[0][1] is 1", "i": "some rel[0] is 1", "j": "every items whose k is rel[0] is 1"}, "subject": "rel"}}, "subjects": {"rel": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "a list subject: each check says to write a dot for a field",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"items": [{"k": 1}], "rels": [[1, 2]], "x": 1},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 10}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.b", "value": ["rel[1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[1]"]}, {"locations": [], "name": "checks.c", "value": ["rel[0].k: nothing can follow rel, which means the subject: for a field called rel, write .rel[0].k"]}, {"locations": [], "name": "checks.d", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.e", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.f", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.g", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.h", "value": ["rel[0][1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0][1]"]}, {"locations": [], "name": "checks.i", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.j", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}], "message": "checks.a: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.b: rel[1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[1]; checks.c: rel[0].k: nothing can follow rel, which means the subject: for a field called rel, write .rel[0].k; checks.d: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.e: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.f: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.g: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.h: rel[0][1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0][1]; checks.i: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.j: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]", "passed": false, "requirement": "r", "subject": {"id": null, "type": "rel"}}
+        ]
+      },
+      {
+        "description": "an object subject: the same problems",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"items": [{"k": 1}], "rels": [{"a": 1}], "x": 1},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 10}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.b", "value": ["rel[1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[1]"]}, {"locations": [], "name": "checks.c", "value": ["rel[0].k: nothing can follow rel, which means the subject: for a field called rel, write .rel[0].k"]}, {"locations": [], "name": "checks.d", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.e", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.f", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.g", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.h", "value": ["rel[0][1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0][1]"]}, {"locations": [], "name": "checks.i", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.j", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}], "message": "checks.a: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.b: rel[1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[1]; checks.c: rel[0].k: nothing can follow rel, which means the subject: for a field called rel, write .rel[0].k; checks.d: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.e: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.f: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.g: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.h: rel[0][1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0][1]; checks.i: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.j: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]", "passed": false, "requirement": "r", "subject": {"id": null, "type": "rel"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "first of and item N of the subject name are read as positions",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": "first of rel is 1", "b": "item 2 of rel is 2"}, "subject": "rel"}}, "subjects": {"rel": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "on a list subject they pass",
+        "rules": ["sentence.path.index", "sentence.path.subject.name"],
+        "input": {"rels": [[1, 2]]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/rels/0/0"], "name": "item 1 of rel", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "rel"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/rels/0/1"], "name": "item 2 of rel", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "rel"}}
+        ]
+      },
+      {
+        "description": "on an object subject they fail because it isn't a list",
+        "rules": ["sentence.path.index", "sentence.path.subject.name"],
+        "input": {"rels": [{"a": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/rels/0"], "name": "item 1 of rel", "value": null}], "message": "rel is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"a": 1}, "type": "rel"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/rels/0"], "name": "item 2 of rel", "value": null}], "message": "rel is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"a": 1}, "type": "rel"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name followed by [0] is written wrong, and first of it is read",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": "\"a b\"[0] is 1", "b": "first of \"a b\" is 1", "c": "\"a b\"[0].k is 1"}, "subject": "a b"}}, "subjects": {"a b": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "the problem prints the name as written and the field with its dot",
+        "rules": ["sentence.path.subject.step", "name.dot"],
+        "input": {"rels": [[1, 2]]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 3}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["\"a b\"[0]: nothing can follow a b, which means the subject: for a field called a b, write .\"a b\"[0]"]}, {"locations": [], "name": "checks.c", "value": ["\"a b\"[0].k: nothing can follow a b, which means the subject: for a field called a b, write .\"a b\"[0].k"]}], "message": "checks.a: \"a b\"[0]: nothing can follow a b, which means the subject: for a field called a b, write .\"a b\"[0]; checks.c: \"a b\"[0].k: nothing can follow a b, which means the subject: for a field called a b, write .\"a b\"[0].k", "passed": false, "requirement": "r", "subject": {"id": null, "type": "a b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field or a part named like the subject can take [0]",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": ".rel[0] is 1", "b": "p[0] is 1"}, "subject": "rel"}}, "subjects": {"rel": {"from": "every rels", "has": {"p": "ps"}}}},
+    "cases": [
+      {
+        "description": "none of them is written wrong",
+        "rules": ["sentence.path.subject.step", "parts.alias"],
+        "input": {"rels": [{"ps": [1], "rel": [1]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/rels/0/rel/0"], "name": "item 1 of .rel", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"ps": [1], "rel": [1]}, "type": "rel"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/rels/0/ps/0"], "name": "item 1 of p", "part": {"id": null, "name": "p"}, "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"ps": [1], "rel": [1]}, "type": "rel"}}
         ]
       }
     ]
