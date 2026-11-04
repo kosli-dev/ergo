@@ -225,7 +225,10 @@ pub fn lower_for(
                     },
                 };
                 let sorted = match sorted_by {
-                    Some(sorted) => match item_scope.path(&sorted.path) {
+                    Some(sorted) => match item_scope
+                        .item_scope_for_sort_key(&sorted.path)
+                        .path(&sorted.path)
+                    {
                         Ok(path) => Some(Sorted {
                             path,
                             alphabetically: sorted.alphabetically,

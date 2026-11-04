@@ -863,7 +863,7 @@ impl Reading {
                                 } else {
                                     lower::lower_condition(
                                         condition,
-                                        &scope.clone().with_subject(name),
+                                        &scope.clone().with_subject(name).for_from_line(),
                                     )
                                 };
                                 match lowered {

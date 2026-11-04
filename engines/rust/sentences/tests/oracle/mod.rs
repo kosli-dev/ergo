@@ -1798,6 +1798,13 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("x whose some it.aa is 1", "x whose some it.aa is 1"),
     ("x[it]", "x named by it"),
     ("xs whose name is it", "xs whose name equals it"),
+    ("every items", "every items"),
+    ("every releases", "every releases"),
+    ("every rels", "every rels"),
+    ("every rels whose rel.w is 1", "every rels whose rel.w is 1"),
+    ("rel.kids whose kid.x is 1", "rel.kids whose kid.x is 1"),
+    ("rel.kids whose rel.w is 1", "rel.kids whose rel.w is 1"),
+    ("every things", "every things"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

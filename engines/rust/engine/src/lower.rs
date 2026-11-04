@@ -40,6 +40,7 @@ pub struct Scope {
     left_reads_parents: bool,
     as_left: bool,
     item: bool,
+    from_line: bool,
     parts: BTreeMap<String, PartDef>,
     parents: BTreeMap<String, BTreeMap<String, PartDef>>,
     for_aliases: BTreeSet<String>,
@@ -190,6 +191,25 @@ impl Scope {
         self
     }
 
+    pub fn for_from_line(mut self) -> Scope {
+        self.from_line = true;
+        self
+    }
+
+    pub fn item_scope_for_sort_key(&self, written: &s::Path) -> Scope {
+        let named_like_subject = match &written.start {
+            s::Start::Field { key, dot: false } | s::Start::Quoted(key) => {
+                self.subject.as_deref() == Some(key.as_str())
+            }
+            _ => false,
+        };
+        let mut scope = self.clone();
+        if named_like_subject {
+            scope.subject = None;
+        }
+        scope
+    }
+
     pub fn with_for_alias(mut self, alias: &str) -> Scope {
         self.for_aliases.insert(alias.to_string());
         self
@@ -323,6 +343,9 @@ impl Scope {
     }
 
     fn follow_problem(&self, written: &s::Path, parts: bool) -> Option<String> {
+        if self.from_line {
+            return None;
+        }
         let subject = self.subject.as_deref()?;
         let key = match &written.start {
             s::Start::Field { key, dot: false } | s::Start::Quoted(key) if key == subject => key,

@@ -701,10 +701,7 @@ fn kind_of(path: &Path) -> Kind {
 }
 
 fn dot_of(path: &Path) -> bool {
-    matches!(
-        path.start,
-        Start::Field { dot: true, .. } | Start::Quoted(_)
-    )
+    matches!(path.start, Start::Field { dot: true, .. })
 }
 
 fn first_key(path: &Path) -> Option<&str> {
