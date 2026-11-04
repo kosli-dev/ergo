@@ -5352,24 +5352,64 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x is one of it", "x is in it", &[], &[]),
     ("x is one of region.names", "x is in region.names", &[], &[]),
     ("x is region.name", "x equals region.name", &[], &[]),
-    ("\"item\" is .\"item\"", ".item equals .item", &[".item is compared with itself"], &[".item is compared with itself"]),
+    (
+        "\"item\" is .\"item\"",
+        ".item equals .item",
+        &[".item is compared with itself"],
+        &[".item is compared with itself"],
+    ),
     ("\"item\".\"x\" is 1", ".item.x is 1", &[], &[]),
     ("\"item\".name is \"a\"", ".item.name is \"a\"", &[], &[]),
     ("\"item\".name is \"b\"", ".item.name is \"b\"", &[], &[]),
     ("\"item\".name is \"c\"", ".item.name is \"c\"", &[], &[]),
     ("\"item\"[0].x is 1", ".item[0].x is 1", &[], &[]),
     (".w is 1", "w is 1", &[], &[]),
-    ("count of \"item\".xs is 1", "count of .item.xs is 1", &[], &[]),
-    ("count of xs whose \"item\" is 1 is 1", "count of xs whose .item is 1 is 1", &[], &[]),
-    ("first of \"item\".name is \"a\"", "first of .item.name is \"a\"", &[], &[]),
-    ("sum of xs whose \"item\" is 1 is 1", "sum of xs whose .item is 1 is 1", &[], &[]),
+    (
+        "count of \"item\".xs is 1",
+        "count of .item.xs is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose \"item\" is 1 is 1",
+        "count of xs whose .item is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "first of \"item\".name is \"a\"",
+        "first of .item.name is \"a\"",
+        &[],
+        &[],
+    ),
+    (
+        "sum of xs whose \"item\" is 1 is 1",
+        "sum of xs whose .item is 1 is 1",
+        &[],
+        &[],
+    ),
     ("x.id is \"b\"", "x.id is \"b\"", &[], &[]),
     ("\"a<b\".x is 1", "\"a<b\".x is 1", &[], &[]),
     ("\"a\\\"b\".x is 1", "\"a\\\"b\".x is 1", &[], &[]),
     ("\"a\\\\b\".x is 1", "\"a\\\\b\".x is 1", &[], &[]),
-    ("count of ys whose \"a<b\" is 1 is 1", "count of ys whose \"a<b\" is 1 is 1", &[], &[]),
-    ("count of ys whose \"a\\\"b\" is 1 is 1", "count of ys whose \"a\\\"b\" is 1 is 1", &[], &[]),
-    ("count of ys whose \"a\\\\b\" is 1 is 1", "count of ys whose \"a\\\\b\" is 1 is 1", &[], &[]),
+    (
+        "count of ys whose \"a<b\" is 1 is 1",
+        "count of ys whose \"a<b\" is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose \"a\\\"b\" is 1 is 1",
+        "count of ys whose \"a\\\"b\" is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose \"a\\\\b\" is 1 is 1",
+        "count of ys whose \"a\\\\b\" is 1 is 1",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8890,8 +8930,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
-    ("first of xs sorted by \"item\" as x", "first of xs sorted by .item as x", &[], &[]),
-    ("first of xs sorted by rel as x", "first of xs sorted by rel as x", &[], &[]),
+    (
+        "first of xs sorted by \"item\" as x",
+        "first of xs sorted by .item as x",
+        &[],
+        &[],
+    ),
+    (
+        "first of xs sorted by rel as x",
+        "first of xs sorted by rel as x",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
