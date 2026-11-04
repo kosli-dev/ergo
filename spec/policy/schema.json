@@ -59,7 +59,7 @@
         },
         "from": {
           "type": "string",
-          "description": "A from line: a path, optionally named by each of a list, optionally whose or that and conditions. spec/syntax.md says how it's written."
+          "description": "A from line: optionally every or every distinct, a path, optionally named by each of a list, optionally whose or that and conditions. spec/syntax.md says how it's written."
         },
         "identified_by": {
           "type": "string",
@@ -218,7 +218,7 @@
             },
             "for": {
               "type": "string",
-              "description": "A for line: one or two items, each every or some, a path, an optional whose or that and as a name."
+              "description": "A for line: one or two items, each every or some, optionally distinct, a path, an optional whose or that and as a name."
             },
             "description": {
               "type": [

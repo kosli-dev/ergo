@@ -387,6 +387,46 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   - A list that's missing, like `sha-3`'s, `null` or not a list fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`. The row's `failed_items` says where, and the pull requests that could be read are still checked. So does a value at the end that isn't an object, and a path with no list along it, as `every` does in a check.
   - Without `every`, a path through a list reads nothing, and `$min_subjects` fails as `unusable`.
   - `every` can't go with a path that starts at another subject's name or with `named by each of`. Both are written wrong. A path that starts with a dot, like `every .artifact.p`, reads the input field and is fine. A child subject reads names one parent at a time.
+- `every distinct` makes one subject of items that are exactly the same, which SBOM tools often write twice. With this input:
+
+  ```json
+  {"sbom": {"components": [
+    {"name": "click", "version": "8.1"},
+    {"name": "jinja2", "version": "3.1"},
+    {"name": "click", "version": "8.1"}
+  ]}}
+  ```
+
+  and this policy:
+
+  ```yaml
+  subjects:
+    component:
+      from: every distinct sbom.components
+      identified_by: name
+  requirements:
+    versioned:
+      subject: component
+      checks:
+        version: version exists
+  ```
+
+  there are two subjects, and each row of `click` lists both copies, so the report still shows it was there twice:
+
+  ```json
+  {"check": "$min_subjects", "subject": {"type": "component", "id": null}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "in-scope component count", "value": 2, "locations": ["/sbom/components/0", "/sbom/components/2", "/sbom/components/1"]}]}
+  {"check": "$unique_ids", "subject": {"type": "component", "id": null}, "passed": true, "cause": "satisfied"}
+  {"check": "version", "subject": {"type": "component", "id": "click"}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "version", "value": "8.1", "locations": ["/sbom/components/0/version", "/sbom/components/2/version"]}]}
+  {"check": "version", "subject": {"type": "component", "id": "jinja2"}, "passed": true, "cause": "satisfied",
+   "inputs": [{"name": "version", "value": "3.1", "locations": ["/sbom/components/1/version"]}]}
+  ```
+
+  - Two values are the same when they're equal as JSON: `1` and `1.0` are the same, and so are two objects with the same keys in another order. Two lists with the same items in another order aren't.
+  - Items that share an id but differ in anything else, like a third `click` with version `8.2`, are all kept, and `$unique_ids` fails on them and lists the location of every copy's id. Ergo never picks one of two pieces of evidence that disagree, so there's no `distinct by` a field.
+  - Copies are merged before the `whose` is read, so they get one `$applies` row, and the rows of a child subject, like `from: component.licenses`, list the location under every copy too.
+  - `distinct` goes after `every` on a `from` line. Without `every`, like `from: distinct sbom.components`, it is written wrong.
 - A `from` or `identified_by` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"], "locations": []}`.
 - A `from` that can't be read fails `$min_subjects`, and its `message` says where the read stopped: `item 2 of things is missing`, or `things is 5, which isn't a list or an object`. A child subject names the path inside its parent, without the parent's name, like `ws is missing` or `item 1 of ws is missing`. When the read stops before its first step, the message names `$input`, like `$input is null`, or the parent, like `artifact is null` or `item 1 of artifact is missing` for a child of `artifact`.
 
@@ -1133,6 +1173,7 @@ An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_o
 
 - `inputs` names the path with `[]` after each list walked, and holds the value each item's path ended at.
 - Each entry in `failed_items` gives the field that failed as `path`, and the item it belongs to as `item`, so a tool can show the item by reading the input there. A list that's missing, `null`, not a list or empty is listed in its items' place. When a `whose` that compares two fields can't decide for an item, the entry names the field it couldn't read, or the left one when it read neither or both, like `hi` for `whose lo is at least hi` on `{"lo": 1}`, with `value` `null`. A field that's `null` counts as not read, and so does the list of a `count of` that isn't a list.
+- `distinct` after `every` or `some` drops an item whose value is the same as an earlier one's: `every distinct commits.author is "ann"` on commits by `ann`, `bob` and `bob` fails with one entry in `failed_items`, for `item 2 of commits`, whose `locations` are `/commits/1/author` and `/commits/2/author`. The row's `inputs` still list all three authors. An item a `whose` can't decide, and a value that's missing, is never dropped. A `for` line takes it too, like `for: every distinct commits.author as author`: the alias stands for each different author once, and the entry of a failed one lists every copy. `distinct` goes right after `every`, `some`, `count of` or `sum of`, and anywhere else it is written wrong with `distinct goes after every, some, count of or sum of`. A field called `distinct` is written `.distinct`.
 - An empty list fails `every` as `value`, because no commits isn't proof that every commit is signed. Write `, if any,` after the path to let empty lists pass: `every review.incidents, if any, is not empty`. A missing list still fails.
 - `whose` keeps the items that pass its conditions, read on each item: `some pull_requests.approvers whose state is "APPROVED" exists` passes above, with `bob`'s approval. An item a condition can't decide, because the field it reads is missing, fails the check rather than being left out.
 - In a one-line `every` or `some`, a field on the right of the phrase is the item's too, so `some approvers.timestamp whose state is "APPROVED" is after last_commit` reads both from each approver. To compare with a field of the subject, use a `for` line, below. A `for` alias is read on the right of a `whose` too, `count of` and `sum of` included, so with `for: every groups as g`, `count of rows whose n is count of g is 1` counts the group `g`, and `.g` reads each row's own `g`. A child subject's parent works the same way: with the parent `fam`, `count of rows whose n is count of fam.z is 1` counts the parent's `z`, `count of rows whose count of fam.z is 1 is 3` counts each row's own `fam.z`, and `.fam.z` on the right reads the row's. A parent whose `z` is missing, `null` or not a list fails the check as `absent`, `null` or `unusable`.
@@ -1332,6 +1373,7 @@ Each entry also has `locations`. A number Ergo worked out lists where what it ca
 - An item that `whose` can't decide about fails the check with the `whose`'s own cause, as with `every`, and the rest of its path isn't read: `sum of items.x whose k is "a"` on an item with `k: null` fails as `null`, whatever its `x` holds.
 - `whose` goes after the last `count of` or `sum of`, and only on the left: `claude_found plus count of findings whose source is "gpt" is at least 3`.
 - A row shows each input once, so `count of approvals plus count of approvals is 4` lists `count of approvals` and `approvals[]` one time each.
+- `distinct` after `count of` or `sum of` takes each value once: on commits by `ann`, `ann` and `bob`, `count of distinct commits.author is at least 2` passes, and its row lists `count of distinct commits.author` with `2` and `commits[].author` with all three names. `sum of distinct stages.usd` adds each different amount once, so two stages that both cost `1.5` add `1.5`. With a `whose`, only the items it keeps are counted.
 - Numbers are added as decimals, so `0.1` plus `0.2` is `0.3`. Take every number added, a count or a sum included, and the result, and let p be the most decimal places any of them has, counted on the value: `1.50` has 1, `1e2` has 0 and `1e-7` has 7. p has to be at most 15, and each of them times 10^p has to be a whole number below 10^15, or the check fails as `unusable` and the number is `null`. So the sum has to fit in 15 digits at one scale. That's stricter than 15 significant digits for big round numbers, because `1e20` plus `1e20` fails too. Every runtime can decide it exactly, so every runtime gives the same answer.
 
 With `x plus y is at most 1` on `{"x": 0.1, "y": 0.2}`, the row is satisfied:
