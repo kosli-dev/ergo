@@ -823,6 +823,134 @@
     ]
   },
   {
+    "description": "does not exist on a path whose key from a field can't be read fails, whether or not the path before it is there",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "x[0] named by zz does not exist"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the field is missing and x is missing",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x[0] named by zz", "value": null}, {"locations": ["/things/0"], "name": "zz", "value": null}], "message": "zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the field is missing and x is null",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t", "x": null}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x[0] named by zz", "value": null}, {"locations": ["/things/0"], "name": "zz", "value": null}], "message": "zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the field is null and x is null",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t", "x": null, "zz": null}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x[0] named by zz", "value": null}, {"locations": ["/things/0/zz"], "name": "zz", "value": null}], "message": "x[0] named by zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the field is a number and x is missing",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t", "zz": 3}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x[0] named by zz", "value": null}, {"locations": ["/things/0/zz"], "name": "zz", "value": 3}], "message": "x[0] named by zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the field is a list and x is null",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t", "x": null, "zz": ["k"]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x[0] named by zz", "value": null}, {"locations": ["/things/0/zz"], "name": "zz", "value": ["k"]}], "message": "x[0] named by zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the field is text and x is null, so the path is read and is missing",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t", "x": null, "zz": "k"}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x[0] named by zz", "value": null}, {"locations": ["/things/0/zz"], "name": "zz", "value": "k"}], "passed": true, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "does not exist on a key from a field after a field of the subject fails when the key can't be read",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "x.a named by zz does not exist"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the field is missing and x has no a",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t", "x": {"k": 1}}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.a named by zz", "value": null}, {"locations": ["/things/0"], "name": "zz", "value": null}], "message": "zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the field is a number and x is missing",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t", "zz": 3}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x.a named by zz", "value": null}, {"locations": ["/things/0/zz"], "name": "zz", "value": 3}], "message": "x.a named by zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "does not exist on a key from a field of the subject fails when the key can't be read",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "x named by zz does not exist"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the field is missing and x is missing",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x named by zz", "value": null}, {"locations": ["/things/0"], "name": "zz", "value": null}], "message": "zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the field is null and x is missing",
+        "rules": ["path.field_step", "missing.pass"],
+        "input": {"things": [{"id": "t", "zz": null}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x named by zz", "value": null}, {"locations": ["/things/0/zz"], "name": "zz", "value": null}], "message": "x named by zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "does not exist on a for alias read by a position and a key from a field fails when the key can't be read",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "w[0] named by zz does not exist", "for": "every ws as w"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the field is missing and the alias is an empty list",
+        "rules": ["path.field_step", "missing.pass", "message.alias"],
+        "input": {"things": [{"id": "t", "ws": [[]]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "w[0] named by zz does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/ws/0"], "name": "w[0] named by zz", "value": null}, {"locations": ["/things/0"], "name": "zz", "value": null}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": []}], "inputs": [{"locations": ["/things/0/ws/0"], "name": "ws[]", "value": [[]]}, {"locations": ["/things/0"], "name": "zz", "value": null}], "message": "item 1 of ws: zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the field is a number and the alias is an empty list",
+        "rules": ["path.field_step", "missing.pass", "message.alias"],
+        "input": {"things": [{"id": "t", "ws": [[]], "zz": 3}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "w[0] named by zz does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/ws/0"], "name": "w[0] named by zz", "value": null}, {"locations": ["/things/0/zz"], "name": "zz", "value": 3}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": []}], "inputs": [{"locations": ["/things/0/ws/0"], "name": "ws[]", "value": [[]]}, {"locations": ["/things/0/zz"], "name": "zz", "value": 3}], "message": "item 1 of ws: w[0] named by zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the field is text and the alias is an empty list, so the path is missing and the check passes",
+        "rules": ["path.field_step", "missing.pass", "message.alias"],
+        "input": {"things": [{"id": "t", "ws": [[]], "zz": "k"}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/things/0/ws/0"], "name": "ws[]", "value": [[]]}, {"locations": ["/things/0/zz"], "name": "zz", "value": "k"}], "passed": true, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a count of a list in a list names each item of the inner list by it",
     "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of x[0] named by zz is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
     "cases": [

@@ -11335,6 +11335,43 @@ _count_message_for(assertion, thing) := row.message if {
 	row.check == "c"
 }
 
+_row_of(assertion, thing, params) := row if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": assertion}}}}
+	r := ergo.report({"things": [object.union({"id": "t"}, thing)]}, policy, params)
+	some row in r.results
+	row.check == "c"
+}
+
+test_does_not_exist_fails_when_the_key_from_a_field_cant_be_read_whatever_the_path_before_it_holds if {
+	every thing in [{}, {"zz": null}, {"zz": 3}, {"zz": ["k"]}, {"x": null}, {"x": null, "zz": 3}, {"x": 3, "zz": 3}, {"x": [[]], "zz": null}, {"x": {"k": 1}}] {
+		every assertion in ["x named by zz does not exist", "x[0] named by zz does not exist", "x.a named by zz does not exist"] {
+			row := _row_of(assertion, thing, {})
+			row.passed == false
+		}
+	}
+	every thing in [{}, {"zz": null}, {"zz": 3}, {"zz": ["k"]}] {
+		every params in [{}, {"p": null}, {"p": [[]]}, {"p": 3}] {
+			row := _row_of("$params.p named by zz does not exist", thing, params)
+			row.passed == false
+		}
+	}
+}
+
+test_does_not_exist_with_a_key_from_a_field_that_can_be_read_passes_when_the_path_is_missing if {
+	_row_of("x[0] named by zz does not exist", {"x": null, "zz": "k"}, {}).passed
+	_row_of("x.a named by zz does not exist", {"x": {"k": 1}, "zz": "k"}, {}).passed
+	_row_of("$params.p[0] named by zz does not exist", {"zz": "k"}, {"p": []}).passed
+}
+
+test_does_not_exist_with_a_key_from_a_field_that_cant_be_read_fails_as_absent_with_its_message if {
+	row := _row_of("x[0] named by zz does not exist", {}, {})
+	row.cause == "absent"
+	row.message == "zz is missing"
+	row2 := _row_of("x[0] named by zz does not exist", {"zz": 3}, {})
+	row2.cause == "absent"
+	row2.message == "x[0] named by zz is missing"
+}
+
 test_message_of_a_count_with_a_key_from_a_field_names_the_value_once if {
 	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of x named by zz is 1"}}}}
 	r := ergo.report({"things": [{"id": "t", "x": {"k": 1}, "zz": "k"}]}, policy, {})

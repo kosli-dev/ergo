@@ -26,6 +26,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - A `from` line whose `named by each of` list starts at a field or a subject, like `t named by each of t.keys`, is written wrong, as the spec says, where the engine read the parent's field. Its `$well_formed` row lists `named by each of takes a list from $params or $input, so it can't start at a field or a subject`, like `ergo.rego`.
 - A tie in the second list of a `for` line names the second item's key, like `item 1 and item 2 of p.items tie on hi`, where it named the first item's.
 - A failed `count of` whose path ends in a key read from a field, like `count of x named by zz is 1` with `x` holding `{"k": 1}` and `zz` set to `"k"`, names the value once, as `ergo.rego` does: `x.k is 1, which isn't a list or an object`, where the message said it twice.
+- `does not exist` on a path with a `named by` field that can't be read, like `x[0] named by zz does not exist` with `x` missing and `zz` missing, `null` or not text, now fails as `absent`, as spec 0.5 says and `ergo.rego` does, where it passed. Reports change for such a check: `passed` goes from `true` to `false`.
 
 ## 0.2.0
 

@@ -5113,6 +5113,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "x named by zz does not exist",
+        "x named by zz does not exist",
+        &[],
+        &[],
+    ),
+    (
+        "x.a named by zz does not exist",
+        "x.a named by zz does not exist",
+        &[],
+        &[],
+    ),
+    (
+        "x[0] named by zz does not exist",
+        "x[0] named by zz does not exist",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
