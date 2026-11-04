@@ -222,11 +222,7 @@ pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
     {
         return None;
     }
-    let options = Options {
-        own_dot: true,
-        ..Options::default()
-    };
-    let walked = walk::walk(path, ctx, options);
+    let walked = walk::walk(path, ctx, Options::default());
     if walked.unreadable.is_some() || !walked.walked.iter().any(|level| *level < walked.steps) {
         return None;
     }
@@ -1010,6 +1006,7 @@ mod tests {
     fn on(subject: Value, params: Option<Value>, run: impl Fn(&Ctx) -> Verdict) -> Verdict {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -1637,6 +1634,7 @@ mod tests {
     fn flawed_with(check: &Check, params: Value) -> bool {
         let input = json!({"things": [{"x": "a"}]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -1795,6 +1793,7 @@ mod tests {
     fn a_walk_names_the_path_with_brackets_and_lists_where_each_value_was_read() {
         let input = json!({"things": [with_deps(json!([{"name": "click"}, {}]))]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),

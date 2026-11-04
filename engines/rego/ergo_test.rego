@@ -3928,7 +3928,7 @@ test_a_count_with_a_whose_keeps_the_whose_on_the_assertion_and_plus_inside_the_c
 
 test_a_path_reads_params_input_lookups_positions_and_quoted_keys if {
 	_read(`$params.k."b c"[2].d is 1`).assertions[0].path == {"start": "params", "steps": ["k", "b c", {"index": 2}, "d"]}
-	_read(`$params.k."b c"[2] is 1`).assertions[0].path == {"start": "params", "position": 3, "steps": ["k", "b c"]}
+	_read(`$params.k."b c"[2] is 1`).assertions[0].path == {"start": "params", "position": 3, "steps": ["k", "b c"], "bracketed": true}
 	_read(`item 3 of k."b c" is 1`).assertions[0].path == {"position": 3, "steps": ["k", "b c"]}
 	_read(`item 3 of k[0] is 1`).assertions[0].path == {"position": 3, "steps": ["k", {"index": 0}]}
 	_read(`$input.x named by persona.y is 1`).assertions[0].path == {"start": "input", "steps": ["x", {"named_by": {"steps": ["persona"]}}, "y"]}
@@ -4035,7 +4035,20 @@ test_the_report_prints_one_spelling_for_each_phrase if {
 	_printed(`count of x whose n is 1 is 2`) == "count of x whose n is 1 is 2"
 	_printed(`sum of x.n plus 1 plus count of y is 2`) == "sum of x.n plus 1 plus count of y is 2"
 	_printed(`count of x[0] is 1 and y equals sum of z[1].n`) == "count of item 1 of x is 1 and y equals sum of z[1].n"
-	_read(_printed(`count of x[0] is 1`)) == _read(`count of x[0] is 1`)
+	_read(`count of x[0] is 1`).assertions[0].terms[0].count == {"bracketed": true, "position": 1, "steps": ["x"]}
+	_read(_printed(`count of x[0] is 1`)).assertions[0].terms[0].count == {"position": 1, "steps": ["x"]}
+}
+
+test_a_position_in_brackets_is_read_like_one_in_words_but_remembers_how_it_was_written if {
+	_read(`x[0] is 1`).assertions[0].path == {"bracketed": true, "position": 1, "steps": ["x"]}
+	_read(`first of x is 1`).assertions[0].path == {"position": "first", "steps": ["x"]}
+	_read(`item 1 of x is 1`).assertions[0].path == {"position": 1, "steps": ["x"]}
+	_printed(`x[0] is 1`) == "item 1 of x is 1"
+}
+
+test_a_check_on_an_item_that_isnt_an_object_keeps_its_words_when_the_requirement_names_no_subject if {
+	ergo._named_check({"op": "exists"}, {}, 3) == {"op": "exists"}
+	ergo._named_check({"op": "exists"}, {"subject": "t"}, 3) == {"op": "exists", "label": "t"}
 }
 
 test_a_for_line_reads_its_items if {
@@ -5596,7 +5609,7 @@ test_a_subject_with_no_from_reads_the_input_field_named_like_it if {
 	every def in [null, {}, {"identified_by": "fingerprint"}] {
 		[[r[1], r[2]] | some r in _from_rows(_from_report(doc, {"artifact": def}, {"c": "signed is true"}, {}))] == [["c", "satisfied"]]
 	}
-	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"artifact": {"from": "$input", "identified_by": "artifact.fingerprint"}}, {"c": "artifact.signed is true"}, {}))] == [["sha256:abc", "satisfied"]]
+	[[r[0], r[2]] | some r in _from_rows(_from_report(doc, {"artifact": {"from": "$input", "identified_by": "artifact.fingerprint"}}, {"c": ".artifact.signed is true"}, {}))] == [["sha256:abc", "satisfied"]]
 }
 
 test_a_from_named_by_a_param_or_by_each_of_a_param_list if {
@@ -5844,7 +5857,7 @@ test_a_from_condition_with_if_any_after_some_or_a_whose_of_its_own_is_written_wr
 }
 
 test_that_on_a_from_line_keeps_items_by_their_value_and_names_each_by_the_subject if {
-	rep := _from_report({"ws": ["bay", "apple"]}, {"w": {"from": `every ws that starts with "b"`}}, {"c": "it is not empty"}, {})
+	rep := _from_report({"ws": ["bay", "apple"]}, {"w": {"from": `every ws that starts with "b"`}}, {"c": "w is not empty"}, {})
 	apply_rows := [r | some r in rep.results; r.check == "$applies"]
 	sort([r.subject.id | some r in apply_rows]) == ["apple", "bay"]
 	apple := [r | some r in apply_rows; r.subject.id == "apple"][0]
@@ -5870,20 +5883,20 @@ test_a_subject_named_with_a_dollar_sign_gets_only_the_name_problem_with_a_that_f
 	}
 }
 
-test_a_subject_named_like_a_field_of_its_own_item_lists_an_input_read_twice_once if {
-	rep := _from_report({"ws": [null]}, {"x": {"from": "every ws whose x is 1 and that is not empty"}}, {"c": "it is not empty"}, {})
-	[r.inputs | some r in rep.results; r.check == "$applies"] == [[{"name": "x", "value": null, "locations": ["/ws/0"]}]]
+test_a_subject_named_like_a_field_its_whose_reads_lists_the_field_and_the_item_apart if {
+	rep := _from_report({"ws": [null]}, {"x": {"from": "every ws whose x is 1 and that is not empty"}}, {"c": "w is not empty"}, {})
+	[r.inputs | some r in rep.results; r.check == "$applies"] == [[{"name": ".x", "value": null, "locations": ["/ws/0"]}, {"name": "x", "value": null, "locations": ["/ws/0"]}]]
 }
 
 test_every_condition_of_a_from_line_needs_its_own_word_after_an_and if {
 	doc := {"ws": ["bay", "bee"]}
 	every line in [`every ws that starts with "b" and ends with "y"`, `every ws whose it starts with "b" and ends with "y"`] {
-		_from_problems(_from_report(doc, {"w": {"from": line}}, {"c": "it is not empty"}, {})) == [{"name": "subjects.w.from", "value": ["a condition after and starts with whose or that"], "locations": []}]
+		_from_problems(_from_report(doc, {"w": {"from": line}}, {"c": "w is not empty"}, {})) == [{"name": "subjects.w.from", "value": ["a condition after and starts with whose or that"], "locations": []}]
 	}
 	every line in [`every ws that starts with "b" that ends with "y"`, `every ws that`] {
-		_from_problems(_from_report(doc, {"w": {"from": line}}, {"c": "it is not empty"}, {})) == [{"name": "subjects.w.from", "value": ["doesn't parse"], "locations": []}]
+		_from_problems(_from_report(doc, {"w": {"from": line}}, {"c": "w is not empty"}, {})) == [{"name": "subjects.w.from", "value": ["doesn't parse"], "locations": []}]
 	}
-	rep := _from_report(doc, {"w": {"from": `every ws that starts with "b" and that ends with "y"`}}, {"c": "it is not empty"}, {})
+	rep := _from_report(doc, {"w": {"from": `every ws that starts with "b" and that ends with "y"`}}, {"c": "w is not empty"}, {})
 	[r.subject.id | some r in rep.results; r.check == "c"] == ["bay"]
 }
 
@@ -5894,7 +5907,7 @@ test_a_between_does_not_make_an_and_a_bare_condition if {
 }
 
 test_a_field_called_that_is_read_with_a_dot if {
-	rep := _from_report({"xs": [{"that": "x"}, {"that": "y"}]}, {"s": {"from": `every xs whose .that is "x"`}}, {"c": "it is not empty"}, {})
+	rep := _from_report({"xs": [{"that": "x"}, {"that": "y"}]}, {"s": {"from": `every xs whose .that is "x"`}}, {"c": "w is not empty"}, {})
 	count([r | some r in rep.results; r.check == "c"]) == 1
 }
 
@@ -10211,59 +10224,57 @@ test_the_applies_row_of_a_some_or_every_condition_gives_one_location_per_item_an
 	}
 }
 
-_it_policy(from, checks) := {
+_subject_policy(from, checks) := {
 	"ergo_spec": "v0.5-dev",
 	"subjects": {"s": {"from": from}},
 	"requirements": {"r": {"subject": "s", "checks": checks}},
 }
 
-_it_report(doc, from, checks, params) := ergo.report(doc, _it_policy(from, checks), params)
+_subject_report(doc, from, checks, params) := ergo.report(doc, _subject_policy(from, checks), params)
 
-_it_rows(doc, from, check, params) := [[r.subject.id, r.passed, r.cause, r.inputs] | some r in _it_report(doc, from, {"c": check}, params).results; r.check == "c"]
+_subject_rows(doc, from, check, params) := [[r.subject.id, r.passed, r.cause, r.inputs] | some r in _subject_report(doc, from, {"c": check}, params).results; r.check == "c"]
 
-_it_problems(from, checks) := [i.value | some i in _it_report({"xs": []}, from, checks, {}).results[0].inputs; i.name == _it_problem_name(from)][0]
+_subject_has_no_problem(from, checks) if count([i | some i in _subject_report({"xs": []}, from, checks, {}).results[0].inputs; i.name == "checks.c"]) == 0
 
-_it_problem_name(from) := "subjects.s.from" if from != "every xs"
+_subject_problems(from, checks) := [i.value | some i in _subject_report({"xs": []}, from, checks, {}).results[0].inputs; i.name == "checks.c"][0]
 
-_it_problem_name("every xs") := "checks.c"
-
-test_it_is_the_subject_itself_when_the_subject_is_a_string if {
-	_it_rows(
+test_subject_is_the_subject_itself_when_the_subject_is_a_string if {
+	_subject_rows(
 		{"deployment": {"id": "d-17", "regions": ["eu-west-1", "us-east-1"]}},
 		"every deployment.regions",
-		"it is one of $params.allowed_regions",
+		"s is one of $params.allowed_regions",
 		{"allowed_regions": ["eu-west-1"]},
 	) == [
-		["eu-west-1", true, "satisfied", [{"name": "it", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}]],
-		["us-east-1", false, "value", [{"name": "it", "value": "us-east-1", "locations": ["/deployment/regions/1"]}]],
+		["eu-west-1", true, "satisfied", [{"name": "s", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}]],
+		["us-east-1", false, "value", [{"name": "s", "value": "us-east-1", "locations": ["/deployment/regions/1"]}]],
 	]
-	rep := _it_report({"deployment": {"regions": ["eu-west-1"]}}, "every deployment.regions", {"c": "it is one of $params.allowed_regions"}, {"allowed_regions": ["eu-west-1"]})
-	rep.requirements.r.checks.c.expression == "it is in $params.allowed_regions"
+	rep := _subject_report({"deployment": {"regions": ["eu-west-1"]}}, "every deployment.regions", {"c": "s is one of $params.allowed_regions"}, {"allowed_regions": ["eu-west-1"]})
+	rep.requirements.r.checks.c.expression == "s is in $params.allowed_regions"
 }
 
-_it_phrases := [
+_subject_phrases := [
 	"is an object", "is a string", "is a list", "is a number", "exists", "does not exist", "is empty", "is not empty",
 	"is a non-empty string", "is at least 2", "is not 1", "is one of 1, 2", "is one of $params.l", "equals $params.n",
 	"contains 'a'", "contains all of 1, 2", "matches 'a'", "starts with 'a'", "is before '2020-01-01T00:00:00Z'",
 	"is between 1 and 3", "is alphabetically before 'b'",
 ]
 
-_it_values := [null, "a", 1, "", [], {}, [1, 2], {"k": 1}, true, "2019-01-01T00:00:00Z"]
+_subject_values := [null, "a", 1, "", [], {}, [1, 2], {"k": 1}, true, "2019-01-01T00:00:00Z"]
 
-_it_by_value(rows) := {json.marshal(r[3][0].value): [r[1], r[2]] | some r in rows}
+_subject_by_value(rows) := {json.marshal(r[3][0].value): [r[1], r[2]] | some r in rows}
 
-test_it_fails_like_a_field_that_holds_the_same_value if {
-	every phrase in _it_phrases {
+test_subject_fails_like_a_field_that_holds_the_same_value if {
+	every phrase in _subject_phrases {
 		params := {"l": [1], "n": 1}
-		got := _it_by_value(_it_rows({"xs": _it_values}, "every xs", concat(" ", ["it", phrase]), params))
-		want := _it_by_value(_it_rows({"xs": [{"id": i, "x": v} | some i, v in _it_values]}, "every xs", concat(" ", ["x", phrase]), params))
-		count(got) == count(_it_values)
+		got := _subject_by_value(_subject_rows({"xs": _subject_values}, "every xs", concat(" ", ["s", phrase]), params))
+		want := _subject_by_value(_subject_rows({"xs": [{"id": i, "x": v} | some i, v in _subject_values]}, "every xs", concat(" ", ["x", phrase]), params))
+		count(got) == count(_subject_values)
 		got == want
 	}
 }
 
-test_it_is_an_object_passes_for_an_object_and_fails_for_anything_else if {
-	_it_by_value(_it_rows({"xs": [{"a": 1}, "s", null, 3, [1]]}, "every xs", "it is an object", {})) == {
+test_subject_is_an_object_passes_for_an_object_and_fails_for_anything_else if {
+	_subject_by_value(_subject_rows({"xs": [{"a": 1}, "s", null, 3, [1]]}, "every xs", "s is an object", {})) == {
 		`{"a":1}`: [true, "satisfied"],
 		`"s"`: [false, "value"],
 		"null": [false, "null"],
@@ -10272,88 +10283,85 @@ test_it_is_an_object_passes_for_an_object_and_fails_for_anything_else if {
 	}
 }
 
-test_it_on_a_null_subject_fails_as_null_and_on_the_wrong_type_as_value_or_unusable if {
-	rows := _it_by_value(_it_rows({"xs": [null, "a", 3]}, "every xs", "it is at least 2", {}))
+test_subject_on_a_null_subject_fails_as_null_and_on_the_wrong_type_as_value_or_unusable if {
+	rows := _subject_by_value(_subject_rows({"xs": [null, "a", 3]}, "every xs", "s is at least 2", {}))
 	rows == {"null": [false, "null"], `"a"`: [false, "unusable"], "3": [true, "satisfied"]}
-	_it_by_value(_it_rows({"xs": [null, "a", 3]}, "every xs", "it is a string", {})) == {"null": [false, "null"], `"a"`: [true, "satisfied"], "3": [false, "value"]}
+	_subject_by_value(_subject_rows({"xs": [null, "a", 3]}, "every xs", "s is a string", {})) == {"null": [false, "null"], `"a"`: [true, "satisfied"], "3": [false, "value"]}
 }
 
-test_it_walks_and_counts_a_subject_that_is_a_list if {
+test_subject_walks_and_counts_a_subject_that_is_a_list if {
 	doc := {"xs": [["a", "b"], [1, 2], [1, "a"], [], null, "s"]}
-	rows := _it_rows(doc, "every xs", "every it is a string", {})
+	rows := _subject_rows(doc, "every xs", "every s is a string", {})
 	[[r[1], r[2]] | some r in rows] == [[true, "satisfied"], [false, "value"], [false, "value"], [false, "value"], [false, "null"], [false, "unusable"]]
-	rows[1][3] == [{"name": "it[]", "value": [1, 2], "locations": ["/xs/1/0", "/xs/1/1"]}]
-	_it_report(doc, "every xs", {"c": "every it is a string"}, {}).results[4].failed_items == [
-		{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1, "locations": ["/xs/1/0"]},
-		{"cause": "value", "item": "item 2 of it", "path": "item 2 of it", "value": 2, "locations": ["/xs/1/1"]},
+	rows[1][3] == [{"name": "s[]", "value": [1, 2], "locations": ["/xs/1/0", "/xs/1/1"]}]
+	_subject_report(doc, "every xs", {"c": "every s is a string"}, {}).results[4].failed_items == [
+		{"cause": "value", "item": "item 1 of s", "path": "item 1 of s", "value": 1, "locations": ["/xs/1/0"]},
+		{"cause": "value", "item": "item 2 of s", "path": "item 2 of s", "value": 2, "locations": ["/xs/1/1"]},
 	]
-	[[r[1], r[2]] | some r in _it_rows(doc, "every xs", "some it is a string", {})] == [[true, "satisfied"], [false, "value"], [true, "satisfied"], [false, "value"], [false, "null"], [false, "unusable"]]
-	counts := _it_rows(doc, "every xs", "count of it is 2", {})
+	[[r[1], r[2]] | some r in _subject_rows(doc, "every xs", "some s is a string", {})] == [[true, "satisfied"], [false, "value"], [true, "satisfied"], [false, "value"], [false, "null"], [false, "unusable"]]
+	counts := _subject_rows(doc, "every xs", "count of s is 2", {})
 	[[r[1], r[2]] | some r in counts] == [[true, "satisfied"], [true, "satisfied"], [true, "satisfied"], [false, "value"], [false, "null"], [false, "unusable"]]
-	counts[1][3] == [{"name": "count of it", "value": 2, "locations": ["/xs/1/0", "/xs/1/1"]}, {"name": "it[]", "value": [1, 2], "locations": ["/xs/1/0", "/xs/1/1"]}]
-	sums := _it_rows(doc, "every xs", "sum of it is 3", {})
+	counts[1][3] == [{"name": "count of s", "value": 2, "locations": ["/xs/1/0", "/xs/1/1"]}, {"name": "s[]", "value": [1, 2], "locations": ["/xs/1/0", "/xs/1/1"]}]
+	sums := _subject_rows(doc, "every xs", "sum of s is 3", {})
 	[[r[1], r[2]] | some r in sums] == [[false, "unusable"], [true, "satisfied"], [false, "unusable"], [false, "value"], [false, "null"], [false, "unusable"]]
 }
 
-test_it_in_an_every_names_an_empty_list_and_a_missing_one_it if {
-	rows := _it_rows({"xs": [[], null]}, "every xs", "every it is a string", {})
-	rows[1][3] == [{"name": "it", "value": [], "locations": []}]
-	rep := _it_report({"xs": [[]]}, "every xs", {"c": "every it is a string"}, {})
-	[r.failed_items | some r in rep.results; r.check == "c"] == [[{"cause": "value", "item": "it", "path": "it", "value": [], "locations": ["/xs/0"]}]]
+test_subject_in_an_every_names_an_empty_list_and_a_missing_one if {
+	rows := _subject_rows({"xs": [[], null]}, "every xs", "every s is a string", {})
+	rows[1][3] == [{"name": "s", "value": [], "locations": []}]
+	rep := _subject_report({"xs": [[]]}, "every xs", {"c": "every s is a string"}, {})
+	[r.failed_items | some r in rep.results; r.check == "c"] == [[{"cause": "value", "item": "s", "path": "s", "value": [], "locations": ["/xs/0"]}]]
 }
 
-test_a_field_called_it_is_written_with_a_dot_and_printed_with_one if {
-	doc := {"xs": [{"id": "a", "it": 1}, {"id": "b", "it": 2}]}
-	_it_rows(doc, "every xs", ".it is 1", {}) == [
-		[{"id": "a", "it": 1}, true, "satisfied", [{"name": ".it", "value": 1, "locations": ["/xs/0/it"]}]],
-		[{"id": "b", "it": 2}, false, "value", [{"name": ".it", "value": 2, "locations": ["/xs/1/it"]}]],
+test_a_field_called_like_the_subject_is_written_with_a_dot_and_printed_with_one if {
+	doc := {"xs": [{"id": "a", "s": 1}, {"id": "b", "s": 2}]}
+	_subject_rows(doc, "every xs", ".s is 1", {}) == [
+		[{"id": "a", "s": 1}, true, "satisfied", [{"name": ".s", "value": 1, "locations": ["/xs/0/s"]}]],
+		[{"id": "b", "s": 2}, false, "value", [{"name": ".s", "value": 2, "locations": ["/xs/1/s"]}]],
 	]
-	_it_report(doc, "every xs", {"c": "\"it\" is 1"}, {}).requirements.r.checks.c.expression == ".it is 1"
-	[r[1] | some r in _it_rows(doc, "every xs", "it is an object", {})] == [true, true]
-	_it_rows({"xs": [{"id": "a", "x": {"it": 1}}]}, "every xs", "x.it is 1", {}) == [[{"id": "a", "x": {"it": 1}}, true, "satisfied", [{"name": "x.it", "value": 1, "locations": ["/xs/0/x/it"]}]]]
-	rep := _it_report(doc, "every xs", {"c": ".it is 1 and it is an object"}, {})
-	rep.requirements.r.checks.c.expression == ".it is 1 and it is an object"
+	[r[1] | some r in _subject_rows(doc, "every xs", "s is an object", {})] == [true, true]
+	_subject_rows({"xs": [{"id": "a", "x": {"s": 1}}]}, "every xs", "x.s is 1", {}) == [[{"id": "a", "x": {"s": 1}}, true, "satisfied", [{"name": "x.s", "value": 1, "locations": ["/xs/0/x/s"]}]]]
+	rep := _subject_report(doc, "every xs", {"c": ".s is 1 and s is an object"}, {})
+	rep.requirements.r.checks.c.expression == ".s is 1 and s is an object"
 }
 
-test_it_is_a_word_of_the_grammar_so_a_bare_it_never_reads_a_field if {
-	"it" in ergo._s_words
-	_it_rows({"xs": [{"id": "a", "it": 1}]}, "every xs", "it is 1", {}) == [[{"id": "a", "it": 1}, false, "unusable", [{"name": "it", "value": {"id": "a", "it": 1}, "locations": ["/xs/0"]}]]]
+test_a_subjects_name_reads_the_subject_and_never_a_field_with_the_same_name if {
+	_subject_rows({"xs": [{"id": "a", "s": 1}]}, "every xs", "s is 1", {}) == [[{"id": "a", "s": 1}, false, "unusable", [{"name": "s", "value": {"id": "a", "s": 1}, "locations": ["/xs/0"]}]]]
 }
 
-test_it_works_after_and_and_in_an_any_of_option_and_names_the_subject if {
-	rows := _it_rows({"xs": [1, 2]}, "every xs", "it is 1 and it is a number", {})
+test_subject_works_after_and_and_in_an_any_of_option_and_names_the_subject if {
+	rows := _subject_rows({"xs": [1, 2]}, "every xs", "s is 1 and s is a number", {})
 	[[r[0], r[1], r[2]] | some r in rows] == [[1, true, "satisfied"], [2, false, "value"]]
-	_it_report({"xs": [1, 2]}, "every xs", {"c": "it is 1 and it is a number"}, {}).results[4].failed_assertions == [{"assertion": "it is 1", "cause": "value"}]
-	options := _it_rows({"xs": [1, "a", null]}, "every xs", {"any_of": {"num": "it is a number", "str": ["it is a string", "it is 'a'"]}}, {})
+	_subject_report({"xs": [1, 2]}, "every xs", {"c": "s is 1 and s is a number"}, {}).results[4].failed_assertions == [{"assertion": "s is 1", "cause": "value"}]
+	options := _subject_rows({"xs": [1, "a", null]}, "every xs", {"any_of": {"num": "s is a number", "str": ["s is a string", "s is 'a'"]}}, {})
 	[[r[0], r[1], r[2]] | some r in options] == [[1, true, "satisfied"], ["a", true, "satisfied"], [null, false, "null"]]
-	_it_report({"xs": [1]}, "every xs", {"c": {"any_of": {"num": "it is a number", "str": "it is a string"}}}, {}).requirements.r.checks.c.expression == "one of: num(it is a number) | str(it is a string)"
+	_subject_report({"xs": [1]}, "every xs", {"c": {"any_of": {"num": "s is a number", "str": "s is a string"}}}, {}).requirements.r.checks.c.expression == "one of: num(s is a number) | str(s is a string)"
 }
 
-test_it_after_a_for_line_is_still_the_subject_and_not_the_item if {
+test_the_subjects_name_after_a_for_line_is_still_the_subject_and_not_the_item if {
 	doc := {"xs": [{"id": "a", "l": [1, 2]}]}
-	rows := _it_rows(doc, "every xs", {"for": "every l as e", "assert": ["it is an object", "e is 1"]}, {})
+	rows := _subject_rows(doc, "every xs", {"for": "every l as e", "assert": ["s is an object", "e is 1"]}, {})
 	rows[0][1] == false
-	rows[0][3][0] == {"name": "it", "value": {"id": "a", "l": [1, 2]}, "locations": ["/xs/0"]}
-	_it_report(doc, "every xs", {"c": {"for": "every l as e", "assert": ["it is an object", "e is 1"]}}, {}).requirements.r.checks.c.expression == "for every l as e: it is an object and e is 1"
+	{"name": "s", "value": {"id": "a", "l": [1, 2]}, "locations": ["/xs/0"]} in rows[0][3]
+	_subject_report(doc, "every xs", {"c": {"for": "every l as e", "assert": ["s is an object", "e is 1"]}}, {}).requirements.r.checks.c.expression == "for every l as e: s is an object and e is 1"
 }
 
-test_it_in_a_from_line_whose_reads_each_item_and_names_it_in_the_applies_row if {
-	rep := _it_report({"ws": ["a", "bb", null, 3, "cc"]}, "every ws whose it is a string and whose it starts with 'b'", {"c": "it is a string"}, {})
-	applies := [[r.subject.id, r.passed, r.cause, r.inputs] | some r in rep.results; r.check == "$applies"]
+test_subject_name_after_whose_in_its_own_from_line_reads_each_items_own_field if {
+	rep := _subject_report({"ws": [{"s": "a"}, {"s": "bb"}, "bb", {}]}, "every ws whose s is a string and whose s starts with 'b'", {"c": "s is an object"}, {})
+	applies := [[r.subject.id, r.passed, r.cause, object.get(r, "message", "")] | some r in rep.results; r.check == "$applies"]
 	applies == [
-		["a", false, "value", [{"name": "it", "value": "a", "locations": ["/ws/0"]}]],
-		["bb", true, "satisfied", [{"name": "it", "value": "bb", "locations": ["/ws/1"]}]],
-		[null, false, "null", [{"name": "it", "value": null, "locations": ["/ws/2"]}]],
-		[3, false, "unusable", [{"name": "it", "value": 3, "locations": ["/ws/3"]}]],
-		["cc", false, "value", [{"name": "it", "value": "cc", "locations": ["/ws/4"]}]],
+		[{"s": "a"}, false, "value", ".s is \"a\""],
+		[{"s": "bb"}, true, "satisfied", ""],
+		["bb", false, "not_an_object", "s is \"bb\", which isn't an object"],
+		[{}, false, "absent", ".s is missing"],
 	]
-	[r.subject.id | some r in rep.results; r.check == "c"] == ["bb"]
-	counted := _it_report({"xs": [[1], [1, 2], []]}, "every xs whose count of it is at least 2", {"c": "it is a list"}, {})
-	[r.subject.id | some r in counted.results; r.check == "c"] == [[1, 2]]
+	[r.subject.id | some r in rep.results; r.check == "c"] == [{"s": "bb"}]
+	counted := _subject_report({"xs": [{"s": [1]}, {"s": [1, 2]}]}, "every xs whose count of s is at least 2", {"c": "s is an object"}, {})
+	[r.subject.id | some r in counted.results; r.check == "c"] == [{"s": [1, 2]}]
 }
 
 test_two_equal_plain_values_fail_unique_ids_and_are_still_checked_with_it if {
-	rep := _it_report({"xs": ["a", "a", "b"]}, "every xs", {"c": "it is a string"}, {})
+	rep := _subject_report({"xs": ["a", "a", "b"]}, "every xs", {"c": "s is a string"}, {})
 	uniq := [r | some r in rep.results; r.check == "$unique_ids"]
 	uniq[0].passed == false
 	uniq[0].inputs == [{"name": "repeated s ids", "value": ["a"], "locations": ["/xs/0", "/xs/1"]}]
@@ -10361,164 +10369,174 @@ test_two_equal_plain_values_fail_unique_ids_and_are_still_checked_with_it if {
 	rep.compliant == false
 }
 
-test_it_followed_by_a_step_is_written_wrong_and_says_to_write_the_field_alone if {
-	_it_problems("every xs", {"c": "it.name is 1"}) == ["it is the whole subject: write name, not it.name"]
-	_it_problems("every xs", {"c": `it."x y" is 1`}) == [`it is the whole subject: write "x y", not it."x y"`]
-	_it_problems("every xs", {"c": "every it.name is 1"}) == ["it is the whole subject: write name, not it.name"]
-	every text in ["it[0] is 1", "it[0].k is 1", "it named by $params.k is 1", "first of it[0] is 1", "count of it[1] is 1"] {
-		_it_problems("every xs", {"c": text}) == ["it is the whole subject: nothing can follow it"]
-	}
+test_nothing_can_follow_a_subjects_name_and_the_problem_says_to_write_a_dot_for_a_field if {
+	_subject_problems("every xs", {"c": "s.name is 1"}) == ["s.name: nothing can follow s, which means the subject: for a field called s, write .s.name"]
+	_subject_problems("every xs", {"c": `s."x y" is 1`}) == [`s."x y": nothing can follow s, which means the subject: for a field called s, write .s."x y"`]
+	_subject_problems("every xs", {"c": "every s.name is 1"}) == ["s.name: nothing can follow s, which means the subject: for a field called s, write .s.name"]
+	_subject_problems("every xs", {"c": "x is s.k"}) == ["s.k: nothing can follow s, which means the subject: for a field called s, write .s.k"]
+	_subject_problems("every xs", {"c": "count of s.k is 1"}) == ["s.k: nothing can follow s, which means the subject: for a field called s, write .s.k"]
+	_subject_problems("every xs", {"c": "s[0].k is 1"}) == ["s[0].k: nothing can follow s, which means the subject: for a field called s, write .s[0].k"]
+	_subject_problems("every xs", {"c": "first of s.k is 1"}) == ["first of s.k: nothing can follow s, which means the subject: for a field called s, write .s.k"]
 }
 
-test_it_on_the_right_side_or_anywhere_but_the_start_of_an_assertion_is_written_wrong if {
-	every text in [
-		"$params.p equals it", "x is it", "x is one of it", "x contains it", "it is it", "x is 1 plus it", "count of x is count of it",
-		"it plus 1 is 2", "it is 1 and x is it", "every xs whose it is 1 is 2", "every xs whose x is it is 2", "count of xs whose it is 1 is 2",
-		"every it whose it is 1 is 2", "sum of x is sum of it",
-	] {
-		_it_problems("every xs", {"c": text}) == ["it can only start an assertion: write it first, like it is not empty"]
-	}
-	every line in [
-		{"for": "every it as e", "assert": "e is 1"},
-		{"for": "every xs whose it is 1 as e", "assert": "e is 1"},
-		{"for": "every xs whose x is it as e", "assert": "e is 1"},
-		{"for": "last of xs sorted by it as e", "assert": "e is 1"},
-		{"for": "every xs as e, every it as f", "assert": "e is f"},
-	] {
-		_it_problems("every xs", {"c": line}) == ["for: it can only start an assertion: write it first, like it is not empty"]
-	}
-	_it_problems("every it", {"c": "x exists"}) == ["it can only start an assertion: write it first, like it is not empty"]
-	_it_problems("every it whose x is 1", {"c": "x exists"}) == ["it can only start an assertion: write it first, like it is not empty"]
-	_it_problems("xs whose x is it", {"c": "x exists"}) == ["it can only start an assertion: write it first, like it is not empty"]
+test_the_subjects_name_followed_by_brackets_is_written_wrong_but_first_of_and_item_n_of_are_read if {
+	_subject_problems("every xs", {"c": "s[0] is 1"}) == ["s[0]: nothing can follow s, which means the subject: for a field called s, write .s[0]"]
+	_subject_problems("every xs", {"c": "s[1] is 1"}) == ["s[1]: nothing can follow s, which means the subject: for a field called s, write .s[1]"]
+	_subject_problems("every xs", {"c": "every s[0] is 1"}) == ["s[0]: nothing can follow s, which means the subject: for a field called s, write .s[0]"]
+	_subject_problems("every xs", {"c": "count of s[0] is 1"}) == ["s[0]: nothing can follow s, which means the subject: for a field called s, write .s[0]"]
+	_subject_problems("every xs", {"c": "x is s[0]"}) == ["s[0]: nothing can follow s, which means the subject: for a field called s, write .s[0]"]
+	_subject_problems("every xs", {"c": "s[0][1] is 1"}) == ["s[0][1]: nothing can follow s, which means the subject: for a field called s, write .s[0][1]"]
+	_subject_has_no_problem("every xs", {"c": `"a b"[0] is 1`})
+	_subject_has_no_problem("every xs", {"c": "first of s is 1"})
+	_subject_has_no_problem("every xs", {"c": "item 2 of s is 1"})
+	_subject_has_no_problem("every xs", {"c": ".s[0] is 1"})
 }
 
-test_it_cannot_name_a_key_or_be_an_alias if {
-	_it_problems("every xs", {"c": "$params.m named by it is 1"}) == ["it can't name a key"]
-	_it_problems("every xs", {"c": "x named by it is 1"}) == ["it can't name a key"]
-	_it_problems("every xs", {"c": {"for": "every xs as it", "assert": "it is 1"}}) == ["for: it can't be an alias"]
+test_the_subjects_name_on_the_right_of_a_phrase_reads_the_subject if {
+	_subject_rows({"xs": [1, 2]}, "every xs", "s is s", {}) == []
+	rows := _subject_rows({"xs": [{"id": "a", "x": 1}, {"id": "b", "x": {"id": "b", "x": 2}}]}, "every xs", "x is s", {})
+	[r[1] | some r in rows] == [false, false]
+	rows[0][3] == [{"name": "x", "value": 1, "locations": ["/xs/0/x"]}, {"name": "s", "value": {"id": "a", "x": 1}, "locations": ["/xs/0"]}]
+	_subject_rows({"xs": [[1, 2]]}, "every xs", "count of x is count of s", {})[0][1] == false
 }
 
-test_a_written_wrong_it_stops_the_requirement_with_only_its_well_formed_row if {
-	rep := _it_report({"xs": [1]}, "every xs", {"c": "it.name is 1"}, {})
+test_a_for_alias_cannot_be_called_like_the_subject if {
+	_subject_problems("every xs", {"c": {"for": "every xs as s", "assert": "s is 1"}}) == ["s can't be an alias: it's a subject's name"]
+}
+
+test_a_written_wrong_subject_name_stops_the_requirement_with_only_its_well_formed_row if {
+	rep := _subject_report({"xs": [1]}, "every xs", {"c": "s.name is 1"}, {})
 	stopped(rep)
 }
 
-test_it_cannot_be_a_part_path_or_an_identified_by if {
-	rep := ergo.report({"xs": [1]}, {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "every xs", "has": {"p": "it"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}}, {})
-	stopped(rep)
-	rep2 := ergo.report({"xs": [1]}, {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "every xs", "identified_by": "it"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}}, {})
-	stopped(rep2)
+test_a_part_path_or_an_identified_by_called_like_the_subject_reads_a_field_of_the_subject if {
+	rep := ergo.report({"xs": [{"id": "a", "s": 1}]}, {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "every xs", "has": {"p": "s"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "p is 1"}}}}, {})
+	[[r.passed, r.cause] | some r in rep.results; r.check == "c"] == [[true, "satisfied"]]
+	rep2 := ergo.report({"xs": [{"id": "a", "s": 1}]}, {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "every xs", "identified_by": "s"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}}, {})
+	[r.subject.id | some r in rep2.results; r.check == "c"] == [1]
 }
 
-_it_named(subjects, subject) := [i | some r in ergo.report({"xs": [1]}, {"ergo_spec": "v0.5-dev", "subjects": subjects, "requirements": {"r": {"subject": subject, "checks": {"c": "x exists"}}}}, {}).results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")]
+_subject_named(subjects, subject) := [i | some r in ergo.report({"xs": [1]}, {"ergo_spec": "v0.5-dev", "subjects": subjects, "requirements": {"r": {"subject": subject, "checks": {"c": "x exists"}}}}, {}).results; r.check == "$well_formed"; some i in r.inputs; startswith(i.name, "subjects.")]
 
-test_a_subject_called_it_is_written_wrong_for_the_requirement_that_uses_it if {
-	_it_named({"it": {"from": "xs"}}, "it") == [{"name": "subjects.it", "value": ["it is a word of the grammar, so a subject can't be called it"], "locations": []}]
-	_it_named({"it": {"from": "xs"}, "b": {"from": "it"}}, "b") != []
+test_a_subject_called_it_reads_the_subject_like_any_other_name if {
+	_subject_named({"it": {"from": "xs"}}, "it") == []
+	rep := ergo.report({"xs": [1, 2]}, {"ergo_spec": "v0.5-dev", "subjects": {"it": {"from": "every xs"}}, "requirements": {"r": {"subject": "it", "checks": {"c": "it is 1"}}}}, {})
+	[[r.subject.id, r.passed] | some r in rep.results; r.check == "c"] == [[1, true], [2, false]]
 }
 
-test_only_the_exact_name_it_is_refused_as_a_subject_name if {
-	every name in ["It", "items", "it x", "it_"] {
-		_it_named({name: {"from": "xs"}}, name) == []
-	}
-	_it_named({"it": {"from": "xs"}, "b": {"from": "xs"}}, "b") == []
+test_a_field_called_it_is_written_with_a_dot_when_the_subject_is_called_it if {
+	doc := {"xs": [{"id": "a", "it": 1}]}
+	rep := ergo.report(doc, {"ergo_spec": "v0.5-dev", "subjects": {"it": {"from": "every xs"}}, "requirements": {"r": {"subject": "it", "checks": {"c": ".it is 1 and it is an object"}}}}, {})
+	[[r.passed, r.cause] | some r in rep.results; r.check == "c"] == [[true, "satisfied"]]
 }
 
-_it_position_sentences := [
+_subject_position_sentences := [
 	"first of X is 1", "item 2 of X is 'x'", "first of X exists",
 	"first of X does not exist", "first of X is not empty", "first of X is a string", "first of X is one of 1, 2",
 	"every first of X is 1", "some item 2 of X is 1", "count of first of X is 1", "sum of item 2 of X is 3",
 	"every X is a string", "some X is a string", "count of X is 2", "sum of X is 3", "X is a list",
 ]
 
-_it_position_values := [[1, "x"], [], "s", null, [["a"], "b"], {"k": 1}, {}, 3, true]
+_subject_position_values := [[1, "x"], [], "s", null, [["a"], "b"], {"k": 1}, {}, 3, true]
 
-_it_shape(rows) := json.marshal([[r.passed, r.cause, _unlocated(r.inputs), _unlocated(object.get(r, "failed_items", null))] | some r in rows])
+_subject_shape(rows) := json.marshal([[r.passed, r.cause, _unlocated(r.inputs), _unlocated(object.get(r, "failed_items", null))] | some r in rows])
 
 _unlocated(entries) := [{k: v | some k, v in e; k != "locations"} | some e in entries] if entries != null
 
 _unlocated(null) := null
 
-_it_field_shape(rows) := replace(replace(replace(replace(_it_shape(rows), `"v[`, `"it[`), `"v"`, `"it"`), ` of v"`, ` of it"`), ` of v[`, ` of it[`)
+_subject_field_shape(rows) := replace(replace(replace(replace(_subject_shape(rows), `"v[`, `"s[`), `"v"`, `"s"`), ` of v"`, ` of s"`), ` of v[`, ` of s[`)
 
-_it_rows_of(doc, from, text) := [r | some r in _it_report(doc, from, {"c": text}, {}).results; r.check == "c"]
+_subject_rows_of(doc, from, text) := [r | some r in _subject_report(doc, from, {"c": text}, {}).results; r.check == "c"]
 
-test_a_position_on_it_reads_and_names_like_the_same_position_on_a_field if {
-	every text in _it_position_sentences {
-		on_it := _it_rows_of({"xs": _it_position_values}, "every xs", replace(text, "X", "it"))
-		on_field := _it_rows_of({"xs": [{"id": i, "v": v} | some i, v in _it_position_values]}, "every xs", replace(text, "X", "v"))
-		count(on_it) == count(_it_position_values)
-		_it_shape(on_it) == _it_field_shape(on_field)
+test_a_position_on_subject_reads_and_names_like_the_same_position_on_a_field if {
+	every text in _subject_position_sentences {
+		on_it := _subject_rows_of({"xs": _subject_position_values}, "every xs", replace(text, "X", "s"))
+		on_field := _subject_rows_of({"xs": [{"id": i, "v": v} | some i, v in _subject_position_values]}, "every xs", replace(text, "X", "v"))
+		count(on_it) == count(_subject_position_values)
+		_subject_shape(on_it) == _subject_field_shape(on_field)
 	}
 }
 
-test_a_position_on_it_names_the_item_the_way_a_field_does if {
-	rows := _it_rows({"xs": [["a", "b"]]}, "every xs", "first of it is 'a'", {})
-	rows == [[["a", "b"], true, "satisfied", [{"name": "item 1 of it", "value": "a", "locations": ["/xs/0/0"]}]]]
-	_it_rows({"xs": [[]]}, "every xs", "first of it is 'a'", {})[0][2] == "absent"
-	_it_rows({"xs": ["s"]}, "every xs", "first of it is 'a'", {})[0][2] == "unusable"
-	_it_report({"xs": [["a"]]}, "every xs", {"c": "item 2 of it is 'a'"}, {}).requirements.r.checks.c.expression == "item 2 of it is \"a\""
-	_it_problems("every xs", {"c": "first of it.k is 1"}) == ["it is the whole subject: write k, not it.k"]
+test_a_position_on_the_subjects_name_names_the_item_the_way_a_field_does if {
+	rows := _subject_rows({"xs": [["a", "b"]]}, "every xs", "first of s is 'a'", {})
+	rows == [[["a", "b"], true, "satisfied", [{"name": "item 1 of s", "value": "a", "locations": ["/xs/0/0"]}]]]
+	_subject_rows({"xs": [[]]}, "every xs", "first of s is 'a'", {})[0][2] == "absent"
+	_subject_rows({"xs": ["s"]}, "every xs", "first of s is 'a'", {})[0][2] == "unusable"
+	_subject_rows({"xs": [null]}, "every xs", "first of s is 'a'", {})[0][2] == "absent"
+	_subject_report({"xs": [["a"]]}, "every xs", {"c": "item 2 of s is 'a'"}, {}).requirements.r.checks.c.expression == "item 2 of s is \"a\""
+	_subject_problems("every xs", {"c": "first of s.k is 1"}) == ["first of s.k: nothing can follow s, which means the subject: for a field called s, write .s.k"]
 }
 
-test_a_position_on_it_is_written_wrong_where_it_cannot_start_an_assertion if {
-	_it_problems("every xs", {"c": "x is first of it"}) == ["it can only start an assertion: write it first, like it is not empty"]
-	_it_problems("every xs", {"c": {"for": "last of it as e", "assert": "e is 1"}}) == ["for: it can only start an assertion: write it first, like it is not empty"]
+test_a_position_on_the_subjects_name_works_on_the_right_and_fails_in_a_for_line_over_a_list_subject if {
+	rows := _subject_rows({"xs": [[1, 2]]}, "every xs", "x is first of s", {})
+	rows[0][1] == false
+	_subject_rows({"xs": [[1, 2]]}, "every xs", {"for": "last of s as e", "assert": "e is 2"}, {})[0][2] == "not_an_object"
 }
 
 test_a_walk_from_a_for_alias_that_is_null_fails_as_null_like_a_field_that_is_null if {
-	_it_rows({"xs": [null]}, "every xs", "every first of it is 1", {})[0][2] == "null"
-	rep := _it_report({"xs": [{"id": 1, "names": [null], "n": null}]}, "every xs", {"c": {"for": "every names as n", "assert": "every n.ys is 1"}, "d": "every .n.ys is 1"}, {})
+	_subject_rows({"xs": [null]}, "every xs", "every first of s is 1", {})[0][2] == "null"
+	rep := _subject_report({"xs": [{"id": 1, "names": [null], "n": null}]}, "every xs", {"c": {"for": "every names as n", "assert": "every n.ys is 1"}, "d": "every .n.ys is 1"}, {})
 	[r.cause | some r in rep.results; r.check in {"c", "d"}] == ["null", "null"]
 }
 
-test_a_position_on_a_for_alias_holding_a_list_reads_it_as_it_does_on_a_field if {
-	rep := _it_report({"xs": [{"id": 1, "bs": [["x", "y"], [], "s"]}]}, "every xs", {"c": {"for": "every bs as b", "assert": "first of b is \"x\""}}, {})
+test_a_position_on_a_for_alias_holding_a_list_reads_subject_as_subject_does_on_a_field if {
+	rep := _subject_report({"xs": [{"id": 1, "bs": [["x", "y"], [], "s"]}]}, "every xs", {"c": {"for": "every bs as b", "assert": "first of b is \"x\""}}, {})
 	[[f.item, f.cause] | some r in rep.results; r.check == "c"; some f in r.failed_items] == [["item 2 of bs", "absent"], ["item 3 of bs", "unusable"]]
 }
 
-test_as_sentences_writes_an_empty_path_as_it_and_a_field_called_it_with_a_dot if {
-	ergo.as_sentences({"requirements": {"r": {"checks": {"c": {"op": "equals", "path": [], "value": "x"}}}}}).requirements.r.checks.c == `it is "x"`
-	ergo.as_sentences({"requirements": {"r": {"checks": {"c": {"op": "in", "path": [], "values": ["a"]}}}}}).requirements.r.checks.c == `it is one of "a"`
-	ergo.as_sentences({"requirements": {"r": {"checks": {"c": {"op": "equals", "path": ["it"], "value": 1}}}}}).requirements.r.checks.c == ".it is 1"
+test_as_sentences_leaves_an_empty_path_and_a_field_called_like_the_subject_as_they_are if {
+	pol := {"subjects": {"s": {"from": "xs"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"op": "equals", "path": [], "value": "x"}, "d": {"op": "equals", "path": ["s"], "value": 1}, "e": {"op": "present", "path": ["k"]}}}}}
+	checks := ergo.as_sentences(pol).requirements.r.checks
+	checks.c == {"op": "equals", "path": [], "value": "x"}
+	checks.d == {"op": "equals", "path": ["s"], "value": 1}
+	checks.e == "k exists"
+	ergo.as_sentences({"requirements": {"r": {"checks": {"d": {"op": "equals", "path": ["s"], "value": 1}}}}}).requirements.r.checks.d == "s is 1"
 }
 
-test_it_in_a_plus_term_is_allowed_on_the_left_side_and_written_wrong_on_the_right if {
-	_it_rows({"xs": [[1, 2]]}, "every xs", "count of it plus 1 is 3", {})[0][1] == true
-	_it_rows({"xs": [[1, 2]]}, "every xs", "count of it plus count of $params.ys is 3", {"ys": [0]})[0][1] == true
-	_it_problems("every xs", {"c": "count of xs is 1 plus count of it"}) == ["it can only start an assertion: write it first, like it is not empty"]
+test_the_subjects_name_in_a_plus_term_reads_the_subject_on_either_side if {
+	_subject_rows({"xs": [[1, 2]]}, "every xs", "count of s plus 1 is 3", {})[0][1] == true
+	_subject_rows({"xs": [[1, 2]]}, "every xs", "count of s plus count of $params.ys is 3", {"ys": [0]})[0][1] == true
+	_subject_rows({"xs": [[1, 2]]}, "every xs", "2 plus count of s is 4", {})[0][1] == true
 }
 
-test_it_after_some_or_every_in_a_from_line_whose_reads_the_subject_as_the_same_check_does if {
-	rows := [[r.subject.id, r.cause] | some r in _it_report({"xs": [[1, 2], [1], [], "s"]}, "every xs whose some it is 1", {"c": "it is not empty"}, {}).results; r.check == "$applies"]
-	rows == [[[1, 2], "satisfied"], [[1], "satisfied"], [[], "value"], ["s", "unusable"]]
-	[[r.subject.id, r.cause] | some r in _it_report({"xs": [[1, 2], [1]]}, "every xs whose every it is 1", {"c": "it is not empty"}, {}).results; r.check == "$applies"] == [[[1, 2], "value"], [[1], "satisfied"]]
-	_it_problems("every xs whose some it is it", {"c": "it is not empty"}) == ["it can only start an assertion: write it first, like it is not empty"]
+test_the_subjects_name_after_some_or_every_in_a_from_line_whose_reads_the_items_own_field if {
+	doc := {"xs": [{"s": [1, 2]}, {"s": [1]}, {"s": []}, {"s": "s"}, "s"]}
+	rows := [[r.subject.id, r.cause, object.get(r, "message", "")] | some r in _subject_report(doc, "every xs whose some s is 1", {"c": ".s is not empty"}, {}).results; r.check == "$applies"]
+	rows == [
+		[{"s": [1, 2]}, "satisfied", ""],
+		[{"s": [1]}, "satisfied", ""],
+		[{"s": []}, "value", ".s is []"],
+		[{"s": "s"}, "unusable", ".s is \"s\", which isn't a list or an object"],
+		["s", "not_an_object", "s is \"s\", which isn't an object"],
+	]
+	[[r.subject.id, r.cause] | some r in _subject_report({"xs": [{"s": [1, 2]}, {"s": [1]}]}, "every xs whose every s is 1", {"c": ".s is not empty"}, {}).results; r.check == "$applies"] == [[{"s": [1, 2]}, "value"], [{"s": [1]}, "satisfied"]]
 }
 
-test_it_reads_the_location_of_the_subject_itself_and_of_each_item_of_a_list_subject if {
+test_subject_reads_the_location_of_the_subject_itself_and_of_each_item_of_a_list_subject if {
 	doc := {"values": [1], "lists": [[1, 2]], "sets": [[3]]}
-	plain := _it_report(doc, "every values", {"c": "it is 1"}, {})
-	[r.inputs | some r in plain.results; r.check == "c"] == [[{"name": "it", "value": 1, "locations": ["/values/0"]}]]
-	list := _it_report(doc, "every lists", {"c": "every it is 1 and count of it is 2"}, {})
+	plain := _subject_report(doc, "every values", {"c": "s is 1"}, {})
+	[r.inputs | some r in plain.results; r.check == "c"] == [[{"name": "s", "value": 1, "locations": ["/values/0"]}]]
+	list := _subject_report(doc, "every lists", {"c": "every s is 1 and count of s is 2"}, {})
 	[r.inputs | some r in list.results; r.check == "c"] == [[
-		{"name": "count of it", "value": 2, "locations": ["/lists/0/0", "/lists/0/1"]},
-		{"name": "it[]", "value": [1, 2], "locations": ["/lists/0/0", "/lists/0/1"]},
+		{"name": "count of s", "value": 2, "locations": ["/lists/0/0", "/lists/0/1"]},
+		{"name": "s[]", "value": [1, 2], "locations": ["/lists/0/0", "/lists/0/1"]},
 	]]
-	kept := _it_report(doc, "every sets whose some it is 1", {"c": "it is not empty"}, {})
+	kept := _subject_report({"sets": [{"s": [3]}]}, "every sets whose some s is 1", {"c": ".s is not empty"}, {})
 	[[r.inputs, r.failed_items] | some r in kept.results; r.check == "$applies"] == [[
-		[{"name": "it[]", "value": [3], "locations": ["/sets/0/0"]}],
-		[{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 3, "locations": ["/sets/0/0"]}],
+		[{"name": ".s[]", "value": [3], "locations": ["/sets/0/s/0"]}],
+		[{"cause": "value", "item": "item 1 of .s", "path": "item 1 of .s", "value": 3, "locations": ["/sets/0/s/0"]}],
 	]]
 }
 
-test_an_applies_row_with_some_it_names_its_failed_items_as_the_check_row_does if {
-	applies := [[r.subject.id, r.cause, r.failed_items] | some r in _it_report({"xs": [[1, 2], [3], [], "s"]}, "every xs whose some it is 1", {"c": "it is not empty"}, {}).results; r.check == "$applies"]
-	check := [[r.subject.id, r.cause, r.failed_items] | some r in _it_report({"xs": [[1, 2], [3], [], "s"]}, "every xs", {"c": "some it is 1"}, {}).results; r.check == "c"]
+test_an_applies_row_with_some_subject_names_its_failed_items_as_the_check_row_does if {
+	doc := {"xs": [{"s": [1, 2]}, {"s": [3]}, {"s": []}, {"s": "s"}]}
+	applies := [[r.subject.id, r.cause, r.failed_items] | some r in _subject_report(doc, "every xs whose some s is 1", {"c": ".s is not empty"}, {}).results; r.check == "$applies"]
+	check := [[r.subject.id, r.cause, r.failed_items] | some r in _subject_report(doc, "every xs", {"c": "some .s is 1"}, {}).results; r.check == "c"]
 	applies == check
-	applies[1] == [[3], "value", [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 3, "locations": ["/xs/1/0"]}]]
-	applies[2] == [[], "value", [{"cause": "value", "item": "it", "path": "it", "value": [], "locations": ["/xs/2"]}]]
-	applies[3] == ["s", "unusable", [{"cause": "unusable", "item": "it", "path": "it", "value": "s", "locations": ["/xs/3"]}]]
+	applies[1] == [{"s": [3]}, "value", [{"cause": "value", "item": "item 1 of .s", "path": "item 1 of .s", "value": 3, "locations": ["/xs/1/s/0"]}]]
+	applies[2] == [{"s": []}, "value", [{"cause": "value", "item": ".s", "path": ".s", "value": [], "locations": ["/xs/2/s"]}]]
+	applies[3] == [{"s": "s"}, "unusable", [{"cause": "unusable", "item": ".s", "path": ".s", "value": "s", "locations": ["/xs/3/s"]}]]
 }
 
 test_a_row_shows_an_input_once_when_the_check_reads_it_twice if {
@@ -10754,7 +10772,7 @@ test_a_for_alias_named_like_a_parent_subject_is_written_wrong if {
 }
 
 test_a_for_alias_named_like_the_checks_own_subject_is_written_wrong if {
-	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "every xs as kid", "assert": "kid.v is 1"}) == [["kid can't be an alias: it's a subject's name"]]
+	_clash_problems({"x": "k1.k2.k3"}, {}, {"for": "every xs as kid", "assert": "kid is an object"}) == [["kid can't be an alias: it's a subject's name"]]
 }
 
 test_a_for_alias_named_like_an_unrelated_subject_is_written_wrong if {
@@ -11235,7 +11253,7 @@ test_message_ties_in_different_lists_are_joined_with_and if {
 }
 
 test_message_of_a_subject_that_does_not_match_without_a_filter_message if {
-	ergo._m_applies({}, {}, false) == {"message": "the subject doesn't match"}
+	ergo._m_applies({}, {"subject": "thing"}, false) == {"message": "thing doesn't match"}
 }
 
 test_message_names_the_object_that_cant_hold_a_key_read_from_a_field if {
@@ -11947,4 +11965,69 @@ test_a_sum_or_count_that_reads_params_that_are_a_list_names_them_not_the_digits 
 			"g": concat("", ["$params is ", case[1], ", which isn't an object"]),
 		} with data.params as case[0]
 	}
+}
+
+test_a_key_named_by_the_whole_subject_says_the_subject_cant_name_a_key if {
+	message := "named by s: s is the whole subject, so it can't name a key"
+	_subject_problems("every xs", {"c": "x named by s is 1"}) == [message]
+	_subject_problems("every xs", {"c": "$params.m named by s is 1"}) == [message]
+	_subject_problems("every xs", {"c": "x is at most $params.m named by s"}) == [message]
+	_subject_problems("every xs", {"c": {"for": "every x as e", "assert": "e named by s is 1"}}) == [message]
+	_subject_problems("every xs", {"c": {"any_of": {"a": "x named by s is 1", "b": "x exists"}}}) == [concat("", ["option a: ", message])]
+	_subject_problems("every xs", {"c": {"assert": ["x exists", "x named by s is 1"]}}) == [message]
+}
+
+test_nothing_can_follow_a_subjects_name_in_an_any_of_option if {
+	_subject_problems("every xs", {"c": {"any_of": {"a": "s.name is 1", "b": "x exists"}}}) == ["option a: s.name: nothing can follow s, which means the subject: for a field called s, write .s.name"]
+	_subject_problems("every xs", {"c": {"any_of": {"a": ["x exists", "s.name is 1"], "b": "x exists"}}}) == ["option a: s.name: nothing can follow s, which means the subject: for a field called s, write .s.name"]
+}
+
+test_a_subject_name_on_the_right_of_a_for_whose_reads_the_subject_and_not_a_missing_field if {
+	doc := {"xs": [{"id": "i", "k": [{"v": "i"}, {"v": "j"}]}]}
+	rows := _subject_rows(doc, "every xs", {"for": "every k whose v is s as e", "assert": "e is an object"}, {})
+	[r[2] | some r in rows] == ["unusable"]
+	[i.name | some i in rows[0][3]] == ["k[]"]
+	counted := _subject_rows(doc, "every xs", {"for": "every k whose v is count of s as e", "assert": "e is an object"}, {})
+	[r[2] | some r in counted] == ["unusable"]
+	_subject_rows(doc, "every xs", "count of k whose v is s is 1", {})[0][2] == "unusable"
+}
+
+test_a_path_with_no_name_is_called_the_subject_and_never_it if {
+	ergo._path_name([]) == "the subject"
+	ergo._path_name([0]) == "item 1 of the subject"
+	ergo._steps_name([0]) == "the subject[0]"
+	ergo._walk_root_name([]) == ["the subject"]
+}
+
+test_a_for_line_that_walks_a_list_subject_fails_as_not_an_object_like_any_for_line_on_a_list_subject if {
+	doc := {"xs": [[1, 2], [3]]}
+	every line in ["last of s as e", "first of s as e", "every s as e", "some s as e"] {
+		rows := _subject_rows(doc, "every xs", {"for": line, "assert": "e is 1"}, {})
+		[[r[1], r[2]] | some r in rows] == [[false, "not_an_object"], [false, "not_an_object"]]
+	}
+	rep := _subject_report(doc, "every xs", {"c": {"for": "last of s as e", "assert": "e is 1"}}, {})
+	[r.message | some r in rep.results; r.check == "c"] == ["s is [1, 2], which isn't an object", "s is [3], which isn't an object"]
+	object_rows := _subject_rows({"xs": [{"id": "a"}]}, "every xs", {"for": "last of s as e", "assert": "e is 1"}, {})
+	[[r[1], r[2]] | some r in object_rows] == [[false, "unusable"]]
+}
+
+test_a_failed_walk_item_message_names_the_item_and_not_the_subject if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "k1.k2"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every x.z is 1"}}}}
+	rep := ergo.report({"things": [{"id": "t2", "k1": {"k2": {"z": [1, 2]}}}]}, policy, {})
+	[r.message | some r in rep.results; r.check == "c"] == ["item 2 of x.z is 2"]
+}
+
+test_an_object_with_values_of_different_kinds_on_the_right_fails_as_not_a_list_and_does_not_crash if {
+	every c in ["x is in thing", "x is not in thing", "x is one of thing", "x is in $input.o"] {
+		policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": c}}}}
+		rep := ergo.report({"things": [{"x": 0, "thing": [0]}], "o": {"a": 0, "b": [0]}}, policy, {})
+		[[r.passed, r.cause] | some r in rep.results; r.check == "c"] == [[false, "unusable"]]
+	}
+}
+
+test_a_dot_in_a_from_whose_reads_the_field_named_like_the_subject if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"kid": {"from": "every kids whose .kid is 1"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": ".x is 1"}}}}
+	rep := ergo.report({"kids": [{"kid": 1, "x": 1}, {"kid": 2, "x": 1}, {"x": 1}]}, policy, {})
+	[[r.cause, r.message] | some r in rep.results; r.check == "$applies"; r.cause != "satisfied"] == [["value", ".kid is 2"], ["absent", ".kid is missing"]]
+	[r.passed | some r in rep.results; r.check == "c"] == [true]
 }

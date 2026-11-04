@@ -176,52 +176,25 @@ fn a_word_that_is_a_phrase_start_is_still_a_word() {
 }
 
 #[test]
-fn it_followed_by_a_key_says_what_to_write() {
-    assert_eq!(
-        failure("x whose it.name is 1"),
-        vec!["it is the whole subject: write name, not it.name"]
-    );
-    assert_eq!(
-        failure("x whose it.\"a b\" is 1"),
-        vec!["it is the whole subject: write \"a b\", not it.\"a b\""]
-    );
+fn it_as_the_path_of_a_from_line_has_nothing_to_say() {
+    for line in [
+        "it",
+        "every it",
+        "x named by each of it",
+        "x whose y equals it",
+        "x whose y is one of it",
+    ] {
+        assert_eq!(from_problems(&from(line)), Vec::<String>::new(), "{line}");
+    }
 }
 
 #[test]
-fn it_followed_by_anything_else_says_nothing_can_follow() {
+fn word_problems_are_listed_in_order() {
     assert_eq!(
-        failure("x whose it[0] is 1"),
-        vec!["it is the whole subject: nothing can follow it"]
-    );
-    assert_eq!(
-        failure("x whose it named by k is 1"),
-        vec!["it is the whole subject: nothing can follow it"]
-    );
-}
-
-#[test]
-fn it_as_the_path_of_a_from_line_can_only_start_an_assertion() {
-    let message = "it can only start an assertion: write it first, like it is not empty";
-    assert_eq!(failure("it"), vec![message]);
-    assert_eq!(failure("every it"), vec![message]);
-    assert_eq!(failure("it whose y is 1"), vec![message]);
-    assert_eq!(failure("x named by each of it"), vec![message]);
-    assert_eq!(failure("x whose y equals it"), vec![message]);
-    assert_eq!(failure("x whose y is one of it"), vec![message]);
-    assert_eq!(
-        failure("x whose days elapsed from it to z is 1"),
-        vec![message]
-    );
-}
-
-#[test]
-fn it_problems_are_listed_with_word_problems_in_order() {
-    assert_eq!(
-        failure("empty whose it.name is 1 and whose y equals it"),
+        failure("empty whose between.name is 1 and whose y equals x"),
         vec![
+            "between is a word of the grammar: write .between",
             "empty is a word of the grammar: write .empty",
-            "it can only start an assertion: write it first, like it is not empty",
-            "it is the whole subject: write name, not it.name",
         ]
     );
 }
@@ -434,13 +407,6 @@ fn a_path_that_does_not_parse_has_the_same_messages() {
         one("empty is a word of the grammar: write .empty", None)
     );
     assert_eq!(
-        parse_path("it").unwrap_err(),
-        one(
-            "it can only start an assertion: write it first, like it is not empty",
-            None
-        )
-    );
-    assert_eq!(
         parse_path("x whose y is 1").unwrap_err(),
         one("doesn't parse", None)
     );
@@ -467,14 +433,6 @@ fn a_line_that_is_only_a_path_names_what_is_wrong_with_the_path_first() {
     assert_eq!(
         check_failure("whose"),
         ["whose is a word of the grammar: write .whose"]
-    );
-    assert_eq!(
-        check_failure("it"),
-        ["it can only start an assertion: write it first, like it is not empty"]
-    );
-    assert_eq!(
-        check_failure("it.x"),
-        ["it is the whole subject: write x, not it.x"]
     );
     assert_eq!(
         check_failure("x named by between"),

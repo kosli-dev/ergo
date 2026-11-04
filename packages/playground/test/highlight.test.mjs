@@ -127,14 +127,14 @@ test("the YAML view reads a subject's from as a sentence, and identified_by, sub
 });
 
 test("the YAML view reads a key with spaces, quoted or not", () => {
-  const text = "requirements:\n  cake batch:\n    checks:\n      \"nut: free\":\n        assert: it is 1\n      'it''s ok':\n        assert: it is 2\n";
+  const text = "requirements:\n  cake batch:\n    checks:\n      \"nut: free\":\n        assert: n is 1\n      'it''s ok':\n        assert: n is 2\n";
   assert.deepEqual(yaml(text).slice(1, 7), [
     "  [key:cake batch]:",
     "    [key:checks]:",
     '      [key:"nut: free"]:',
-    "        [key:assert]: [word:it] [word:is] [number:1]",
+    "        [key:assert]: n [word:is] [number:1]",
     "      [key:'it''s ok']:",
-    "        [key:assert]: [word:it] [word:is] [number:2]",
+    "        [key:assert]: n [word:is] [number:2]",
   ]);
 });
 

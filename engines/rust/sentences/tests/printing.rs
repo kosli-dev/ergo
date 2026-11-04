@@ -136,7 +136,7 @@ fn other_keys_print_as_json_strings() {
 #[test]
 fn a_first_key_that_is_a_word_keeps_its_dot() {
     assert_eq!(path_printed(".empty.it"), ".empty.it");
-    assert_eq!(path_printed(".it"), ".it");
+    assert_eq!(path_printed(".it"), "it");
     assert_eq!(printed_phrase("equals .true"), "equals .true");
     assert_eq!(
         printed_phrase("equals .empty plus .of"),
@@ -223,7 +223,7 @@ fn print_term_and_print_path_follow_the_side() {
         panic!()
     };
     assert_eq!(print_term(&terms[0], &[]), ".\"a b\"");
-    assert_eq!(print_term(&terms[1], &[]), ".it");
+    assert_eq!(print_term(&terms[1], &[]), "it");
     let Term::Path(p) = &terms[0] else { panic!() };
     assert_eq!(print_path(p, Side::Left, &[]), "\"a b\"");
     assert_eq!(print_path(p, Side::Right, &[]), ".\"a b\"");
@@ -323,7 +323,7 @@ fn bracket_keys_print_as_dotted_keys() {
 }
 
 #[test]
-fn it_prints_as_it_with_or_without_a_position() {
+fn it_prints_as_a_field_with_or_without_a_position() {
     assert_eq!(printed("x whose it is 1"), "x whose it is 1");
     assert_eq!(
         printed("x whose first of it exists"),

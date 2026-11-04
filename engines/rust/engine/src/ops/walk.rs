@@ -58,7 +58,6 @@ impl Seg {
 pub struct Options {
     pub if_any: bool,
     pub empty_adds_nothing: bool,
-    pub own_dot: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -201,10 +200,15 @@ impl Walked<'_> {
             let Seg::Index(at) = &segs[pair[1]] else {
                 continue;
             };
+            let between = &segs[pair[0] + 1..pair[1]];
             parts.push(format!(
                 "item {} of {}",
                 at + 1,
-                plain(&segs[pair[0] + 1..pair[1]])
+                if between.is_empty() {
+                    "it".to_string()
+                } else {
+                    plain(between)
+                }
             ));
         }
         let tail = &segs[indexes[indexes.len() - 1] + 1..];
@@ -569,9 +573,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
         name: shown_name,
         unreadable: None,
         start: path.start.clone(),
-        keeps_dot: path.start == Start::Own
-            && (options.own_dot
-                || matches!(path.steps.first(), Some(Step::Key(key)) if ctx.aliases.contains_key(key))),
+        keeps_dot: path.start == Start::Own,
     };
     let mut failures: Vec<Failure> = raws
         .into_iter()
@@ -699,7 +701,11 @@ pub(super) fn path_needs_an_object_subject(path: &Path, ctx: &Ctx) -> bool {
     }
     match &path.start {
         Start::Subject | Start::Own => !matches!(path.steps.first(), None | Some(Step::Index(_))),
-        Start::Part(part) => part.base == Start::Subject,
+        Start::Part(part) => {
+            part.base == Start::Subject
+                && !(part.steps.is_empty()
+                    && matches!(path.steps.first(), None | Some(Step::Index(_))))
+        }
         _ => false,
     }
 }
@@ -755,6 +761,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
         .iter()
         .map(|item| {
             at.subject = item.item.clone();
+            at.label = None;
             let verdicts: Vec<(&Check, Verdict)> = walk
                 .whose
                 .iter()
@@ -892,7 +899,6 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         Options {
             if_any: walk.if_any,
             empty_adds_nothing: false,
-            own_dot: false,
         },
     );
     let outside = outside_inputs(walk, &outer);
@@ -982,8 +988,16 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
                 inputs: Vec::new(),
             },
             failed_items: Vec::new(),
-            message: Some(message::isnt("it", ctx.subject.value, "an object")),
-            parts: vec![message::isnt("it", ctx.subject.value, "an object")],
+            message: Some(message::isnt(
+                ctx.subject_label(),
+                ctx.subject.value,
+                "an object",
+            )),
+            parts: vec![message::isnt(
+                ctx.subject_label(),
+                ctx.subject.value,
+                "an object",
+            )],
         };
     }
     let mut row = read_row(walk, ctx);
@@ -1031,6 +1045,7 @@ mod tests {
 
     fn ctx<'a>(subject: &'a Value, input: &'a Value, params: Option<&'a Value>) -> Ctx<'a> {
         Ctx {
+            label: None,
             subject: Located {
                 value: subject,
                 location: Location::input_root().key("s"),
@@ -1141,12 +1156,10 @@ mod tests {
             Options {
                 if_any: true,
                 empty_adds_nothing: false,
-                own_dot: false,
             },
             Options {
                 if_any: false,
                 empty_adds_nothing: true,
-                own_dot: false,
             },
         ] {
             let (items, failures, _) = walked(subject.clone(), &["xs", "a"], options);
@@ -1420,7 +1433,7 @@ mod tests {
         let on_it = every(&[], vec![], equals(json!(1)), false);
         let out = row(&on_it, json!([1, 2]));
         assert_eq!(out.verdict.cause, Cause::Value);
-        assert_eq!(out.verdict.inputs[0].name, "it[]");
+        assert_eq!(out.verdict.inputs[0].name, "the subject[]");
     }
 
     #[test]

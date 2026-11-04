@@ -225,7 +225,10 @@ pub fn lower_for(
                     },
                 };
                 let sorted = match sorted_by {
-                    Some(sorted) => match item_scope.path(&sorted.path) {
+                    Some(sorted) => match item_scope
+                        .item_scope_for_sort_key(&sorted.path)
+                        .path(&item_scope.sort_key_path(&sorted.path))
+                    {
                         Ok(path) => Some(Sorted {
                             path,
                             alphabetically: sorted.alphabetically,
@@ -270,7 +273,7 @@ pub fn lower_for(
     }
     let mut problems: Vec<String> = problems
         .into_iter()
-        .map(|problem| format!("for: {problem}"))
+        .map(|problem| crate::lower::in_place("for: ", &problem))
         .collect();
     let names = bound.aliases();
     let names: Vec<&str> = names.iter().map(String::as_str).collect();
@@ -287,7 +290,9 @@ pub fn lower_for(
                     .is_some_and(|alias| reads_alias(&check, alias)),
                 check,
             }),
-            Err(found) => problems.extend(found.into_iter().map(|p| format!("{place}{p}"))),
+            Err(found) => {
+                problems.extend(found.into_iter().map(|p| crate::lower::in_place(place, &p)))
+            }
         }
     }
     if !problems.is_empty() {
@@ -463,7 +468,6 @@ impl For {
             Options {
                 if_any,
                 empty_adds_nothing: empty_ok,
-                own_dot: false,
             },
         );
         if let Some(outcome) = walked.unreadable {
@@ -496,6 +500,7 @@ impl For {
         let mut at = outer.clone();
         for w in &walked.items {
             at.subject = w.item.clone();
+            at.label = None;
             let verdicts: Vec<Verdict> = item
                 .whose
                 .iter()
@@ -515,10 +520,9 @@ impl For {
                 .zip(&verdicts)
                 .find(|(_, verdict)| !matches!(verdict.cause, Cause::Satisfied | Cause::Value))
                 .map(|(check, verdict)| {
-                    super::message::prefixed_for(
+                    super::message::prefixed(
                         &walked.item_name_dotted(&w.item_segs),
                         &super::message::message(check, &at, verdict),
-                        verdict.cause,
                     )
                 });
             let dead_item = |cause: Cause| Dead {
@@ -653,6 +657,7 @@ impl For {
                     .map(|w| w.item.clone())
                     .unwrap_or_else(|| found.at.clone());
                 at.subject = holder;
+                at.label = None;
                 let read = path::read(&sorted.path, &at);
                 let location = read.location.clone();
                 let result = match (read.outcome.cause(), read.value) {
@@ -1307,7 +1312,6 @@ impl For {
             Options {
                 if_any,
                 empty_adds_nothing: false,
-                own_dot: false,
             },
         );
         Input {
@@ -1394,7 +1398,14 @@ impl For {
 
     pub fn run(&self, ctx: &Ctx) -> Run {
         let first = &self.items[0];
-        if walk::path_needs_an_object_subject(&first.path, ctx) {
+        let whole_subject = !ctx.subject.value.is_object()
+            && first.path.steps.is_empty()
+            && match &first.path.start {
+                Start::Subject => true,
+                Start::Part(part) => part.base == Start::Subject && part.steps.is_empty(),
+                _ => false,
+            };
+        if whole_subject || walk::path_needs_an_object_subject(&first.path, ctx) {
             return Run {
                 verdict: Verdict {
                     cause: Cause::NotAnObject,
@@ -2335,6 +2346,49 @@ mod tests {
         assert_eq!(found["cause"], "not_an_object");
         assert_eq!(found["inputs"], json!([]));
         assert_eq!(found["failed_items"], json!([]));
+    }
+
+    #[test]
+    fn a_for_line_over_the_subject_by_its_name_fails_as_not_an_object_on_a_subject_that_is_not_an_object()
+     {
+        for subject in [json!(["a"]), json!("text"), json!([]), json!([{"k": 1}])] {
+            let policy = json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {"thing": {"from": "every xs"}},
+                "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every thing as k", "assert": "k is 1"}}}}
+            });
+            let report = crate::report(&json!({"xs": [subject]}), &policy, &json!({}));
+            let found = report["results"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|row| row["check"] == "c")
+                .unwrap();
+            assert_eq!(found["cause"], "not_an_object");
+            assert_eq!(found["inputs"], json!([]));
+            assert_eq!(found["failed_items"], json!([]));
+        }
+    }
+
+    #[test]
+    fn a_failed_assertion_keeps_the_dot_of_a_field_named_like_the_subject() {
+        let policy = json!({
+            "ergo_spec": "v0.5-dev",
+            "subjects": {"thing": {"from": "every xs"}},
+            "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every ys as k", "assert": ".thing is 1"}}}}
+        });
+        let input = json!({"xs": [{"thing": 2, "ys": [1]}]});
+        let report = crate::report(&input, &policy, &json!({}));
+        let found = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == "c")
+            .unwrap();
+        assert_eq!(
+            found["failed_items"][0]["failed_assertions"][0]["assertion"],
+            ".thing is 1"
+        );
     }
 
     #[test]

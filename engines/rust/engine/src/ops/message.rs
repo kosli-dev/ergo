@@ -415,7 +415,7 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
                     };
                     let shown = name::name(&prefix);
                     let shown = if shown.is_empty() {
-                        "it".to_string()
+                        "the subject".to_string()
                     } else {
                         shown
                     };
@@ -433,7 +433,7 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
                     };
                     let shown = name::name(&prefix);
                     let shown = if shown.is_empty() {
-                        "it".to_string()
+                        "the subject".to_string()
                     } else {
                         shown
                     };
@@ -675,7 +675,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 }
                 found
             } else {
-                vec![isnt("it", subject, "an object")]
+                vec![isnt(ctx.subject_label(), subject, "an object")]
             }
         }
         _ => Vec::new(),
@@ -819,16 +819,8 @@ pub fn stated(name: &str, cause: Cause, value: &Value, kind: &str) -> String {
     }
 }
 
-pub fn prefixed_for(item: &str, said: &str, cause: Cause) -> String {
-    if cause == Cause::NotAnObject {
-        format!("{item}: {said}")
-    } else {
-        prefixed(item, said)
-    }
-}
-
 pub fn prefixed(item: &str, said: &str) -> String {
-    match said.strip_prefix("it ") {
+    match said.strip_prefix("the subject ") {
         Some(rest) => format!("{item} {rest}"),
         None => format!("{item}: {said}"),
     }

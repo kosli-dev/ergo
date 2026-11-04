@@ -91,6 +91,7 @@ export const suggest = (ctx, cursor) => {
     if (kind === "from" && /^(?:every\s+)?$/.test(head)) {
       for (const name of subjects) if (name !== subject && (starts(name) || name === prefix)) items.push({ text: written(name), kind: "subject" });
     }
+    if (kind === "check" && typeof subject === "string" && !names.includes(subject) && starts(subject)) items.push({ text: written(subject), kind: "subject" });
     if (kind !== "from") {
       for (const name of parts) if (starts(name)) items.push({ text: name, kind: "part" });
       for (const name of aliases) if (!parts.includes(name) && starts(name)) items.push({ text: name, kind: "alias" });

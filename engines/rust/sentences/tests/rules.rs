@@ -442,15 +442,15 @@ fn a_word_after_named_by_cannot_be_an_alias() {
 }
 
 #[test]
-fn it_cannot_name_a_key() {
-    assert_eq!(problems("x named by it exists"), one("it can't name a key"));
-    assert_eq!(problems("x[it] exists"), one("it can't name a key"));
+fn it_can_name_a_key_because_it_is_an_ordinary_field() {
+    assert_eq!(problems("x named by it exists"), none());
+    assert_eq!(problems("x[it] exists"), none());
     assert_eq!(problems("x named by itx exists"), none());
 }
 
 #[test]
 fn an_alias_of_a_for_item_cannot_be_a_word() {
-    for word in ["it", "empty", "params", "input", "every"] {
+    for word in ["empty", "params", "input", "every"] {
         assert_eq!(
             for_problems(&for_line(&format!("every items as {word}")), &[]),
             one(&format!("{word} can't be an alias")),
@@ -461,6 +461,11 @@ fn an_alias_of_a_for_item_cannot_be_a_word() {
         for_problems(&for_line("every items as item_1"), &[]),
         none()
     );
+}
+
+#[test]
+fn an_alias_of_a_for_item_can_be_called_it() {
+    assert_eq!(for_problems(&for_line("every items as it"), &[]), none());
 }
 
 #[test]
@@ -476,7 +481,7 @@ fn an_alias_given_twice_is_reported() {
 }
 
 #[test]
-fn it_can_start_an_assertion_and_follow_every_some_count_and_sum() {
+fn it_is_an_ordinary_field_everywhere_in_a_check() {
     for line in [
         "it is empty",
         "every it is 1",
@@ -487,15 +492,7 @@ fn it_can_start_an_assertion_and_follow_every_some_count_and_sum() {
         "first of it is 1",
         "every item 2 of it is 1",
         "it is 1 and it is 2",
-    ] {
-        assert_eq!(problems(line), none(), "{line}");
-    }
-}
-
-#[test]
-fn it_anywhere_else_in_a_check_is_misplaced() {
-    let message = one("it can only start an assertion: write it first, like it is not empty");
-    for line in [
+        "it.name is 1",
         "x equals it",
         "x equals it plus 1",
         "x is one of it",
@@ -506,54 +503,37 @@ fn it_anywhere_else_in_a_check_is_misplaced() {
         "x contains it",
     ] {
         match parse_check(line) {
-            Ok(read) => assert_eq!(check_problems(&read, &[]), message, "{line}"),
-            Err(_) => assert_eq!(check_failure(line), message, "{line}"),
+            Ok(read) => assert_eq!(check_problems(&read, &[]), none(), "{line}"),
+            Err(_) => panic!("{line} should parse"),
         }
     }
 }
 
 #[test]
-fn it_in_a_for_line_is_misplaced() {
-    let message = one("it can only start an assertion: write it first, like it is not empty");
-    assert_eq!(for_failure("every it as i"), message);
-    assert_eq!(for_failure("last of items sorted by it as i"), message);
+fn it_in_a_for_line_is_an_ordinary_field() {
+    assert_eq!(for_problems(&for_line("every it as i"), &[]), none());
+    assert_eq!(
+        for_problems(&for_line("last of items sorted by it as i"), &[]),
+        none()
+    );
     assert_eq!(
         for_problems(&for_line("every items whose it is 1 as i"), &[]),
-        message
+        none()
     );
 }
 
 #[test]
-fn it_in_a_from_line_is_allowed_in_a_condition_only() {
+fn it_in_a_from_line_is_an_ordinary_field() {
     for line in [
         "x whose it is 1",
         "x whose some it is 1",
         "x whose count of it is 1",
         "x whose first of it exists",
+        "x whose y equals it",
+        "x whose days elapsed from it to y is 1",
     ] {
         assert_eq!(from_problems(&from(line)), none(), "{line}");
     }
-    let message = one("it can only start an assertion: write it first, like it is not empty");
-    assert_eq!(failure("x whose y equals it"), message);
-    assert_eq!(failure("x whose days elapsed from it to y is 1"), message);
-}
-
-#[test]
-fn it_followed_by_a_step_is_reported_on_a_tree() {
-    let tree = Check {
-        assertions: vec![Assertion::Plain {
-            path: Path {
-                position: None,
-                start: Start::It,
-                steps: vec![dot("name")],
-            },
-            phrase: Phrase::Exists { not: false },
-        }],
-    };
-    assert_eq!(
-        check_problems(&tree, &[]),
-        one("it is the whole subject: write name, not it.name")
-    );
 }
 
 #[test]

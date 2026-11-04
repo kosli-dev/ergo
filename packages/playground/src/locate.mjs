@@ -28,8 +28,8 @@ const trimmed = (text) => {
   return { text: text.trim(), lead };
 };
 
-/** Finds every sentence in a policy written as Markdown: the code spans of checks and options, which are `for` lines when they start with `for `, and the code span of a subject's `from` field. `blocks` is what `compile` gives. Each sentence is `{kind, line, start, end, text, exact, group, forText, subject}`, where `line` counts from 1, `start` and `end` are positions in that line, `exact` says the text is what the line holds there, `group` names the check it belongs to and `forText` is that check's `for` line. Gives `{sentences, subjects}`. */
-export const markdownSentences = (source, blocks) => {
+/** Finds every sentence in a policy written as Markdown: the code spans of checks and options, which are `for` lines when they start with `for `, and the code span of a subject's `from` field. `blocks` is what `compile` gives, and `policy` is the compiled policy, which tells a check its requirement's subject. Each sentence is `{kind, line, start, end, text, exact, group, forText, subject}`, where `line` counts from 1, `start` and `end` are positions in that line, `exact` says the text is what the line holds there, `group` names the check it belongs to and `forText` is that check's `for` line. Gives `{sentences, subjects}`. */
+export const markdownSentences = (source, blocks, policy = null) => {
   const lines = source.split("\n");
   const found = [];
   let tree;
@@ -66,10 +66,16 @@ export const markdownSentences = (source, blocks) => {
   const forOf = new Map();
   for (const s of found) if (s.kind === "for" && !forOf.has(s.group)) forOf.set(s.group, s.text);
   const subjectBlocks = blocks.filter((b) => b.kind === "subject");
+  const requirementBlocks = blocks.filter((b) => b.kind === "requirement");
+  const subjectOfCheck = (s) => {
+    const name = innermost(requirementBlocks, s.line, () => true)?.name;
+    const subject = typeof name === "string" ? policy?.requirements?.[name]?.subject : null;
+    return typeof subject === "string" ? subject : null;
+  };
   const sentences = found.map((s) => ({
     ...s,
     forText: s.kind === "check" ? (forOf.get(s.group) ?? null) : null,
-    subject: s.kind === "from" ? (innermost(subjectBlocks, s.line, () => true)?.name ?? null) : null,
+    subject: s.kind === "from" ? (innermost(subjectBlocks, s.line, () => true)?.name ?? null) : s.kind === "check" ? subjectOfCheck(s) : null,
     parts: {},
   }));
   return { sentences, subjects: subjectBlocks.map((b) => b.name).filter((n) => typeof n === "string") };

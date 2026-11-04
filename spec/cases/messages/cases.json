@@ -48,7 +48,7 @@
         "rules": ["message.cause"],
         "input": {"things": ["t1"]},
         "results": [
-          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "message": "it is \"t1\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "message": "thing is \"t1\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -1373,7 +1373,7 @@
         "rules": ["message.items"],
         "input": {"things": [{"id": "t1", "commits": [{"kind": "code", "signed": true}, null, 5, "s"]}]},
         "results": [
-          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of commits", "locations": ["/things/0/commits/1"], "path": "item 2 of commits", "value": null}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 3 of commits", "locations": ["/things/0/commits/2"], "path": "item 3 of commits", "value": 5}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 4 of commits", "locations": ["/things/0/commits/3"], "path": "item 4 of commits", "value": "s"}], "inputs": [{"locations": ["/things/0/commits/0", "/things/0/commits/1", "/things/0/commits/2", "/things/0/commits/3"], "name": "commits[]", "value": [{"kind": "code", "signed": true}, null, 5, "s"]}], "message": "item 2 of commits: it is null, which isn't an object; item 3 of commits: it is 5, which isn't an object; item 4 of commits: it is \"s\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of commits", "locations": ["/things/0/commits/1"], "path": "item 2 of commits", "value": null}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 3 of commits", "locations": ["/things/0/commits/2"], "path": "item 3 of commits", "value": 5}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 4 of commits", "locations": ["/things/0/commits/3"], "path": "item 4 of commits", "value": "s"}], "inputs": [{"locations": ["/things/0/commits/0", "/things/0/commits/1", "/things/0/commits/2", "/things/0/commits/3"], "name": "commits[]", "value": [{"kind": "code", "signed": true}, null, 5, "s"]}], "message": "item 2 of commits is null, which isn't an object; item 3 of commits is 5, which isn't an object; item 4 of commits is \"s\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -1401,7 +1401,7 @@
         "rules": ["message.items"],
         "input": {"things": [{"id": "t1", "d": {"items": [{"x": 5}, null, 5, "s"]}}]},
         "results": [
-          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "l.x is 1", "cause": "value", "inputs": [{"locations": ["/things/0/d/items/0/x"], "name": "l.x", "value": 5}]}], "item": "item 1 of lst", "locations": ["/things/0/d/items/0"], "path": "item 1 of lst", "value": {"x": 5}}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of lst", "locations": ["/things/0/d/items/1"], "path": "item 2 of lst", "value": null}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 3 of lst", "locations": ["/things/0/d/items/2"], "path": "item 3 of lst", "value": 5}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 4 of lst", "locations": ["/things/0/d/items/3"], "path": "item 4 of lst", "value": "s"}], "inputs": [{"locations": ["/things/0/d/items/0", "/things/0/d/items/1", "/things/0/d/items/2", "/things/0/d/items/3"], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": [{"x": 5}, null, 5, "s"]}], "message": "item 1 of lst: x is 5; item 2 of lst: it is null, which isn't an object; item 3 of lst: it is 5, which isn't an object; and 1 more", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "l.x is 1", "cause": "value", "inputs": [{"locations": ["/things/0/d/items/0/x"], "name": "l.x", "value": 5}]}], "item": "item 1 of lst", "locations": ["/things/0/d/items/0"], "path": "item 1 of lst", "value": {"x": 5}}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of lst", "locations": ["/things/0/d/items/1"], "path": "item 2 of lst", "value": null}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 3 of lst", "locations": ["/things/0/d/items/2"], "path": "item 3 of lst", "value": 5}, {"cause": "not_an_object", "failed_assertions": [], "item": "item 4 of lst", "locations": ["/things/0/d/items/3"], "path": "item 4 of lst", "value": "s"}], "inputs": [{"locations": ["/things/0/d/items/0", "/things/0/d/items/1", "/things/0/d/items/2", "/things/0/d/items/3"], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": [{"x": 5}, null, 5, "s"]}], "message": "item 1 of lst: x is 5; item 2 of lst is null, which isn't an object; item 3 of lst is 5, which isn't an object; and 1 more", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -1819,8 +1819,8 @@
         "input": {"things": [{"k": 1}, 3, null]},
         "results": [
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": {"k": 1}, "type": "t"}},
-          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/1"], "name": "k", "value": null}], "message": "it is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 3, "type": "t"}},
-          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/2"], "name": "k", "value": null}], "message": "it is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": null, "type": "t"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/1"], "name": "k", "value": null}], "message": "t is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 3, "type": "t"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/2"], "name": "k", "value": null}], "message": "t is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": null, "type": "t"}},
           {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0"], "name": "x", "value": null}], "message": "x is missing", "passed": false, "requirement": "s", "subject": {"id": {"k": 1}, "type": "t"}}
         ]
       }
@@ -1836,8 +1836,8 @@
         "input": {"things": [{"id": "a", "ws": [{"lo": 2}, 4, null]}]},
         "results": [
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/0/lo"], "name": "lo", "value": 2}], "passed": true, "requirement": "s", "subject": {"id": {"lo": 2}, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}},
-          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/1"], "name": "lo", "value": null}], "message": "it is 4, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 4, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}},
-          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/2"], "name": "lo", "value": null}], "message": "it is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": null, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/1"], "name": "lo", "value": null}], "message": "w is 4, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 4, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/things/0/ws/2"], "name": "lo", "value": null}], "message": "w is null, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": null, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}},
           {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/ws/0"], "name": "x", "value": null}], "message": "x is missing", "passed": false, "requirement": "s", "subject": {"id": {"lo": 2}, "in": {"t": {"id": "a", "ws": [{"lo": 2}, 4, null]}}, "type": "w"}}
         ]
       }

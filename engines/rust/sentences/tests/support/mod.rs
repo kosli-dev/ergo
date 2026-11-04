@@ -36,7 +36,7 @@ pub fn dot(name: &str) -> Step {
 pub fn it() -> Path {
     Path {
         position: None,
-        start: Start::It,
+        start: Start::That,
         steps: Vec::new(),
     }
 }

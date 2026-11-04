@@ -15,15 +15,37 @@ pub struct PartDef {
     pub id: Option<Vec<Step>>,
 }
 
+pub fn in_place(place: &str, problem: &str) -> String {
+    if !problem.contains(FOLLOW_MARK) {
+        return format!("{place}{problem}");
+    }
+    let kept = match place.rfind("line ") {
+        Some(at)
+            if place[at + 5..]
+                .strip_suffix(": ")
+                .is_some_and(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit())) =>
+        {
+            &place[..at]
+        }
+        _ => place,
+    };
+    let kept = kept.strip_suffix("for: ").unwrap_or(kept);
+    format!("{kept}{problem}")
+}
+
+const FOLLOW_MARK: &str = ", which means the subject: for a field called ";
+
 #[derive(Debug, Clone, Default)]
 pub struct Scope {
     left_reads_parents: bool,
     as_left: bool,
     item: bool,
+    from_line: bool,
     parts: BTreeMap<String, PartDef>,
     parents: BTreeMap<String, BTreeMap<String, PartDef>>,
     for_aliases: BTreeSet<String>,
     pending: BTreeSet<String>,
+    subject: Option<String>,
 }
 
 fn not_a_position(number: &str) -> Vec<String> {
@@ -126,9 +148,10 @@ pub fn part_steps(path: &s::Path) -> Result<Vec<Step>, Vec<String>> {
                     .to_string(),
             ]);
         }
-        s::Start::It => {
+        s::Start::That => {
             return Err(vec![
-                "it can only start an assertion: write it first, like it is not empty".to_string(),
+                "that can only start a condition: write that first, like that is not empty"
+                    .to_string(),
             ]);
         }
         s::Start::Unknown(name) => return Err(vec![format!("{UNKNOWN_NAME}{name}")]),
@@ -163,6 +186,56 @@ impl Scope {
         self
     }
 
+    pub fn with_subject(mut self, name: &str) -> Scope {
+        self.subject = Some(name.to_string());
+        self
+    }
+
+    pub fn whose_left(&self, condition: &s::Condition) -> s::Condition {
+        match &self.subject {
+            Some(name) if self.item || self.from_line => left_dotted(condition, name),
+            _ => condition.clone(),
+        }
+    }
+
+    pub fn left_print_names(&self) -> Vec<String> {
+        let mut names = self.parent_names();
+        if self.from_line {
+            names.extend(self.subject.iter().cloned());
+        }
+        names
+    }
+
+    pub fn for_from_line(mut self) -> Scope {
+        self.from_line = true;
+        self
+    }
+
+    pub fn item_scope_for_sort_key(&self, written: &s::Path) -> Scope {
+        let named_like_subject = match &written.start {
+            s::Start::Field { key, dot: false } | s::Start::Quoted(key) => {
+                self.subject.as_deref() == Some(key.as_str())
+            }
+            _ => false,
+        };
+        let mut scope = self.clone();
+        if named_like_subject {
+            scope.subject = None;
+        }
+        scope
+    }
+
+    pub fn sort_key_path(&self, written: &s::Path) -> s::Path {
+        match &written.start {
+            s::Start::Field { key, dot: false } | s::Start::Quoted(key)
+                if self.parents.contains_key(key) =>
+            {
+                name_dotted(written, key)
+            }
+            _ => written.clone(),
+        }
+    }
+
     pub fn with_for_alias(mut self, alias: &str) -> Scope {
         self.for_aliases.insert(alias.to_string());
         self
@@ -181,6 +254,7 @@ impl Scope {
         let mut names: BTreeSet<String> = self.parts.keys().cloned().collect();
         names.extend(self.parents.keys().cloned());
         names.extend(self.for_aliases.iter().cloned());
+        names.extend(self.subject.iter().cloned());
         names.into_iter().collect()
     }
 
@@ -190,6 +264,11 @@ impl Scope {
             s::Step::Index(number) => index_of(number).map(Step::Index),
             s::Step::NamedBy(reference) | s::Step::Brackets(reference) => match reference {
                 s::Reference::Name(name) => {
+                    if self.subject.as_deref() == Some(name.as_str()) {
+                        return Err(vec![format!(
+                            "named by {name}: {name} is the whole subject, so it can't name a key"
+                        )]);
+                    }
                     if self.pending.contains(name) {
                         return Err(vec![format!("unknown alias {name}")]);
                     }
@@ -289,6 +368,45 @@ impl Scope {
         }
     }
 
+    fn follow_problem(&self, written: &s::Path, parts: bool) -> Option<String> {
+        if self.from_line {
+            return None;
+        }
+        let subject = self.subject.as_deref()?;
+        let key = match &written.start {
+            s::Start::Field { key, dot: false } | s::Start::Quoted(key) if key == subject => key,
+            _ => return None,
+        };
+        if !parts || written.steps.is_empty() {
+            return None;
+        }
+        let mut names: Vec<&str> = self.aliases_ref();
+        names.push(subject);
+        let text = s::print_path_as_written(written, s::Side::Left, &names);
+        let field = s::print_path_as_written(
+            &s::Path {
+                position: None,
+                start: s::Start::Field {
+                    key: key.clone(),
+                    dot: true,
+                },
+                steps: written.steps.clone(),
+            },
+            s::Side::Left,
+            &names,
+        );
+        Some(format!(
+            "{text}: nothing can follow {subject}{FOLLOW_MARK}{subject}, write {field}"
+        ))
+    }
+
+    fn aliases_ref(&self) -> Vec<&str> {
+        let mut names: BTreeSet<&str> = self.parts.keys().map(String::as_str).collect();
+        names.extend(self.parents.keys().map(String::as_str));
+        names.extend(self.for_aliases.iter().map(String::as_str));
+        names.into_iter().collect()
+    }
+
     fn read_path(
         &self,
         written: &s::Path,
@@ -298,6 +416,7 @@ impl Scope {
     ) -> Result<path::Path, Vec<String>> {
         let mut problems = Vec::new();
         let mut steps = Vec::new();
+        problems.extend(self.follow_problem(written, parts));
         for step in &written.steps {
             match self.step(step) {
                 Ok(step) => steps.push(step),
@@ -313,7 +432,7 @@ impl Scope {
             return Err(problems);
         }
         let (start, steps) = match &written.start {
-            s::Start::It => (Start::Subject, steps),
+            s::Start::That => (Start::Subject, steps),
             s::Start::Params => (Start::Params, steps),
             s::Start::Input => (Start::Input, steps),
             s::Start::Unknown(name) => return Err(vec![format!("{UNKNOWN_NAME}{name}")]),
@@ -335,6 +454,13 @@ impl Scope {
         mut steps: Vec<Step>,
     ) -> (Start, Vec<Step>) {
         if !dot {
+            if parts && self.subject.as_deref() == Some(key) {
+                let whole = PartDef {
+                    steps: Vec::new(),
+                    id: None,
+                };
+                return (part_start(key, self.base(), &whole), steps);
+            }
             if parts && let Some(part) = self.parts.get(key) {
                 return (part_start(key, self.base(), part), steps);
             }
@@ -360,6 +486,7 @@ impl Scope {
         if self.parents.contains_key(key)
             || self.parts.contains_key(key)
             || self.for_aliases.contains(key)
+            || ((dot || !parts) && self.subject.as_deref() == Some(key))
         {
             steps.insert(0, Step::Key(key.to_string()));
             return (Start::Own, steps);
@@ -601,6 +728,68 @@ pub fn tally_condition_problems(condition: &s::Condition) -> Vec<String> {
     problems
 }
 
+pub fn name_dotted(path: &s::Path, name: &str) -> s::Path {
+    match &path.start {
+        s::Start::Field { key, dot: false } | s::Start::Quoted(key) if key == name => s::Path {
+            start: s::Start::Field {
+                key: key.clone(),
+                dot: true,
+            },
+            ..path.clone()
+        },
+        _ => path.clone(),
+    }
+}
+
+pub fn quoted_name_dotted(path: &s::Path, name: &str) -> s::Path {
+    match &path.start {
+        s::Start::Quoted(key) if key == name => name_dotted(path, name),
+        _ => path.clone(),
+    }
+}
+
+pub fn quoted_name_dotted_condition(condition: &s::FromCondition, name: &str) -> s::FromCondition {
+    match condition {
+        s::FromCondition::Condition(inner) => {
+            s::FromCondition::Condition(left_mapped(inner, |path| quoted_name_dotted(path, name)))
+        }
+        s::FromCondition::Quantified {
+            quantifier,
+            path,
+            if_any,
+            phrase,
+        } => s::FromCondition::Quantified {
+            quantifier: *quantifier,
+            path: quoted_name_dotted(path, name),
+            if_any: *if_any,
+            phrase: phrase.clone(),
+        },
+    }
+}
+
+pub fn left_dotted(condition: &s::Condition, name: &str) -> s::Condition {
+    left_mapped(condition, |path| name_dotted(path, name))
+}
+
+fn left_mapped(condition: &s::Condition, map: impl Fn(&s::Path) -> s::Path) -> s::Condition {
+    let left = match &condition.left {
+        s::Left::Path(path) => s::Left::Path(map(path)),
+        s::Left::Derived(derived) => s::Left::Derived(s::Derived {
+            path: map(&derived.path),
+            ..derived.clone()
+        }),
+        s::Left::Elapsed(elapsed) => s::Left::Elapsed(s::Elapsed {
+            from: map(&elapsed.from),
+            to: map(&elapsed.to),
+            ..elapsed.clone()
+        }),
+    };
+    s::Condition {
+        left,
+        ..condition.clone()
+    }
+}
+
 pub fn lower_tally_condition(
     condition: &s::Condition,
     scope: &Scope,
@@ -631,6 +820,7 @@ fn with_problems(
 }
 
 pub fn lower_condition(condition: &s::Condition, scope: &Scope) -> Result<Check, Vec<String>> {
+    let condition = &scope.whose_left(condition);
     with_problems(
         lower_condition_phrase(condition, scope),
         argument_problems(&condition.phrase)
@@ -768,7 +958,7 @@ pub fn lower_quantified(
     }
     let on_item = s::Path {
         position: None,
-        start: s::Start::It,
+        start: s::Start::That,
         steps: Vec::new(),
     };
     let check = match phrase {
@@ -841,7 +1031,7 @@ mod tests {
     fn it(position: Option<s::Position>) -> s::Path {
         s::Path {
             position,
-            start: s::Start::It,
+            start: s::Start::That,
             steps: Vec::new(),
         }
     }
@@ -1055,7 +1245,7 @@ mod tests {
     }
 
     #[test]
-    fn a_part_path_keeps_its_first_key_and_rejects_params_input_and_it() {
+    fn a_part_path_keeps_its_first_key_and_rejects_params_input_and_that() {
         let steps = part_steps(&path("d.b[1]")).unwrap();
         assert_eq!(steps, [key("d"), key("b"), Step::Index(1)]);
         assert_eq!(
@@ -1068,7 +1258,7 @@ mod tests {
         );
         assert_eq!(
             part_steps(&it(None)).unwrap_err(),
-            ["it can only start an assertion: write it first, like it is not empty"]
+            ["that can only start a condition: write that first, like that is not empty"]
         );
         assert_eq!(
             part_steps(&path("a1 named by foo")).unwrap_err(),

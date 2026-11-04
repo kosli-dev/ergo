@@ -520,7 +520,10 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             part: None,
             state: crate::path::Outcome::Found,
         };
-        let (entries, located) = counted_entries(counted, &result, list, Vec::new(), ctx);
+        let whose: Vec<&Check> = counted.whose.iter().collect();
+        let mut outside = walk::outside_inputs_of(&whose, &outer);
+        outside.sort_by(|a, b| a.name.cmp(&b.name));
+        let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
             entries,
             located,
@@ -533,7 +536,6 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         Options {
             if_any: false,
             empty_adds_nothing: true,
-            own_dot: false,
         },
     );
     let whose: Vec<&Check> = counted.whose.iter().collect();
@@ -561,6 +563,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
     let mut at = outer.clone();
     for item in &walked.items {
         at.subject = item.item.clone();
+        at.label = None;
         let verdicts: Vec<Cause> = counted
             .whose
             .iter()
@@ -836,7 +839,7 @@ fn term_text(term: &s::Term, names: &[&str], left: Option<&[&str]>) -> String {
 }
 
 fn lower_term(term: &s::Term, scope: &Scope, names: &[&str]) -> Result<Option<Term>, Vec<String>> {
-    let parent_names = scope.parent_names();
+    let parent_names = scope.left_print_names();
     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
     let scope_left = scope.prints_left().then_some(parent_refs.as_slice());
     match term {
@@ -874,7 +877,7 @@ fn lower_counted(
     scope: &Scope,
     names: &[&str],
 ) -> Result<Option<Term>, Vec<String>> {
-    let parent_names = scope.parent_names();
+    let parent_names = scope.left_print_names();
     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
     let scope_left = scope.prints_left().then_some(parent_refs.as_slice());
     let mut problems = Vec::new();
@@ -917,7 +920,7 @@ fn lower_side(
     scope: &Scope,
     names: &[&str],
 ) -> Result<Option<Side>, Vec<String>> {
-    let parent_names = scope.parent_names();
+    let parent_names = scope.left_print_names();
     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
     let scope_left = scope.prints_left().then_some(parent_refs.as_slice());
     let mut lowered = Vec::new();
@@ -1147,7 +1150,6 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             Options {
                 if_any: false,
                 empty_adds_nothing: true,
-                own_dot: false,
             },
         );
         if let Some(outcome) = walked.unreadable {
@@ -1190,6 +1192,7 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
         let mut at = outer.clone();
         for item in &walked.items {
             at.subject = item.item.clone();
+            at.label = None;
             let name = walked.item_name(&item.item_segs);
             let mut undecided = false;
             for check in &counted.whose {
@@ -1293,6 +1296,7 @@ mod tests {
     fn verdict_of(sentence: &str, subject: Value) -> Verdict {
         let input = json!({"things": [subject]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -1870,6 +1874,7 @@ mod tests {
             map.extend(rest.clone());
         }
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2410,6 +2415,7 @@ mod tests {
     fn failed_items_of(sentence: &str, items: Value, params: Value) -> Vec<Value> {
         let input = json!({"things": [{"items": items}]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2586,6 +2592,7 @@ mod tests {
         let tree = s::parse_check(sentence).unwrap();
         let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2648,6 +2655,7 @@ mod tests {
         let tree = s::parse_check(sentence).unwrap();
         let check = crate::lower::lower_assertion(&tree.assertions[0], scope).unwrap();
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
@@ -2803,5 +2811,70 @@ mod tests {
             first_entry_part(&scope, "count of pa.items whose w is pa.w is 1"),
             json!({"name": "pa", "id": null})
         );
+    }
+
+    fn named_row(subject: &str, has: Value, check: &str, input: Value) -> Value {
+        let mut found = json!({"from": "every xs"});
+        if !has.is_null() {
+            found["has"] = has;
+        }
+        let policy = json!({
+            "ergo_spec": "v0.5-dev",
+            "subjects": {subject: found},
+            "requirements": {"r": {"subject": subject, "checks": {"c": check}}}
+        });
+        let report = crate::report(&input, &policy, &json!({}));
+        report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == "c")
+            .unwrap()
+            .clone()
+    }
+
+    #[test]
+    fn a_count_of_a_field_named_like_the_subject_says_an_unusable_field_once() {
+        let row = named_row(
+            "kid",
+            Value::Null,
+            "count of .kid is 1",
+            json!({"xs": [{"kid": 1}]}),
+        );
+        assert_eq!(row["cause"], "unusable");
+        assert_eq!(row["message"], ".kid is 1, which isn't a list or an object");
+        assert_eq!(row["inputs"][1]["name"], ".kid");
+    }
+
+    #[test]
+    fn a_whose_names_the_field_it_reads_with_a_dot_when_the_subject_has_that_name() {
+        let row = named_row(
+            "thing",
+            json!({"p": "thing"}),
+            "count of ys whose thing is p is 1",
+            json!({"xs": [{"thing": {"x": 1}, "ys": [{"thing": 1}]}]}),
+        );
+        assert_eq!(
+            row["message"],
+            "item 1 of ys: .thing is 1, which isn't an object"
+        );
+    }
+
+    #[test]
+    fn a_count_on_a_subject_that_is_not_an_object_lists_the_part_its_whose_reads() {
+        let row = named_row(
+            "thing",
+            json!({"p": "thing"}),
+            "count of ys whose thing is p is 1",
+            json!({"xs": [[1, 2]]}),
+        );
+        assert_eq!(row["cause"], "not_an_object");
+        let names: Vec<&str> = row["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|input| input["name"].as_str().unwrap())
+            .collect();
+        assert_eq!(names, ["count of ys whose thing equals p", "ys", "p"]);
     }
 }

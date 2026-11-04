@@ -335,6 +335,7 @@ These have no sentence form, so `as_sentences` leaves them as they are:
 - A literal list of keys after `each_as`. `named by each of $params.x` reads the keys from the params.
 - `inputs` on a check. A row shows the fields its sentence reads.
 - A name, a `description` or a `meta` on an `applies_to` filter. A `whose` condition has none of them, so a subject with one keeps its `applies_to`, which is written wrong.
+- A check with an empty path, `[]`, which reads the whole subject. Write it with the subject's name, like `region is "x"`.
 - A side written as `count`, `sum`, `add` or `literal`. Write it as `count of`, `sum of` or `plus`.
 - A check that compares a field with itself, because that sentence is written wrong.
 - A check of a subject read from or built on another subject, like `from: artifact.pull_requests` or an old `of`. A sentence there reads `artifact` as that subject.

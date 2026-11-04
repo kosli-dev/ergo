@@ -1,0 +1,1652 @@
+[
+  {
+    "description": "a list of strings read as subjects, checked against the params",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every deployment.regions"}}, "requirements": {"allowed": {"subject": "region", "checks": {"allowed": "region is one of $params.allowed_regions"}}}},
+    "params": {"allowed_regions": ["eu-west-1"]},
+    "cases": [
+      {
+        "description": "each string is a subject, and the name means the string itself",
+        "rules": ["sentence.path.subject", "sentence.check", "subjects.every", "subjects.id", "path.inputs"],
+        "input": {"deployment": {"id": "d-17", "regions": ["eu-west-1", "us-east-1"]}},
+        "results": [
+          {"cause": "satisfied", "check": "allowed", "inputs": [{"locations": ["/deployment/regions/0"], "name": "region", "value": "eu-west-1"}], "passed": true, "requirement": "allowed", "subject": {"id": "eu-west-1", "type": "region"}},
+          {"cause": "value", "check": "allowed", "inputs": [{"locations": ["/deployment/regions/1"], "name": "region", "value": "us-east-1"}], "message": "region is \"us-east-1\", and $params.allowed_regions is [\"eu-west-1\"]", "passed": false, "requirement": "allowed", "subject": {"id": "us-east-1", "type": "region"}}
+        ],
+        "expressions": {"allowed": {"allowed": "region is in $params.allowed_regions"}},
+        "refs": {"allowed": {"allowed": [{"locations": ["$params:/allowed_regions"], "name": "$params.allowed_regions", "value": ["eu-west-1"]}]}}
+      }
+    ]
+  },
+  {
+    "description": "region is checked like a field that holds the same value",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region is a string"}}}},
+    "cases": [
+      {
+        "description": "a string passes, null fails as null and a number as value",
+        "rules": ["sentence.path.subject", "sentence.phrase.type", "path.null"],
+        "input": {"xs": ["a", null, 3]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "a"}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": 3}], "message": "region is 3", "passed": false, "requirement": "allowed", "subject": {"id": 3, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region is a non-empty string",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region is a non-empty string"}}}},
+    "cases": [
+      {
+        "description": "an empty string and null fail",
+        "rules": ["sentence.path.subject", "sentence.phrase.type", "path.null"],
+        "input": {"xs": ["a", "", null]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "a"}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": ""}], "message": "region is \"\"", "passed": false, "requirement": "allowed", "subject": {"id": "", "type": "region"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region exists",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region exists"}}}},
+    "cases": [
+      {
+        "description": "null fails as value, as a field holding null does",
+        "rules": ["sentence.path.subject", "sentence.phrase.exists", "present.missing"],
+        "input": {"xs": ["a", null]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "a"}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region is not empty",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region is not empty"}}}},
+    "cases": [
+      {
+        "description": "a string and a non-empty list pass, an empty string, an empty list and null fail",
+        "rules": ["sentence.path.subject", "sentence.phrase.empty"],
+        "input": {"xs": ["a", ["x"], "", [], null]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "a"}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": ["x"]}], "passed": true, "requirement": "allowed", "subject": {"id": ["x"], "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": ""}], "message": "region is \"\"", "passed": false, "requirement": "allowed", "subject": {"id": "", "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "region", "value": []}], "message": "region is []", "passed": false, "requirement": "allowed", "subject": {"id": [], "type": "region"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/4"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region compared with a number",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region is at least 2"}}}},
+    "cases": [
+      {
+        "description": "a string is unusable and null fails as null",
+        "rules": ["sentence.path.subject", "sentence.phrase.order", "path.unusable", "path.null"],
+        "input": {"xs": [1, 3, "a", null]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": 1}], "message": "region is 1", "passed": false, "requirement": "allowed", "subject": {"id": 1, "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": 3}], "passed": true, "requirement": "allowed", "subject": {"id": 3, "type": "region"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": "a"}], "message": "region is \"a\", which isn't a number", "passed": false, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region matched against a pattern",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region starts with 'a'"}}}},
+    "cases": [
+      {
+        "description": "a number is unusable",
+        "rules": ["sentence.path.subject", "sentence.phrase.starts", "path.unusable"],
+        "input": {"xs": ["ab", "b", 3, null]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "ab"}], "passed": true, "requirement": "allowed", "subject": {"id": "ab", "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": "b"}], "message": "region is \"b\"", "passed": false, "requirement": "allowed", "subject": {"id": "b", "type": "region"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": 3}], "message": "region is 3, which isn't text", "passed": false, "requirement": "allowed", "subject": {"id": 3, "type": "region"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region is an object",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region is an object"}}}},
+    "cases": [
+      {
+        "description": "the name works for an object subject, and a string, a number, a list and null fail",
+        "rules": ["sentence.path.subject", "sentence.phrase.type", "path.null"],
+        "input": {"xs": [{"a": 1}, "s", 3, [1], null]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": {"a": 1}}], "passed": true, "requirement": "allowed", "subject": {"id": {"a": 1}, "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": "s"}], "message": "region is \"s\"", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": 3}], "message": "region is 3", "passed": false, "requirement": "allowed", "subject": {"id": 3, "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "region", "value": [1]}], "message": "region is [1]", "passed": false, "requirement": "allowed", "subject": {"id": [1], "type": "region"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/4"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region is a list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region is a list"}}}},
+    "cases": [
+      {
+        "description": "a subject that is a list passes",
+        "rules": ["sentence.path.subject", "sentence.phrase.type"],
+        "input": {"xs": [["a"], [], "s"]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": ["a"]}], "passed": true, "requirement": "allowed", "subject": {"id": ["a"], "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": []}], "passed": true, "requirement": "allowed", "subject": {"id": [], "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": "s"}], "message": "region is \"s\"", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every and some on a subject that is a list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"e": "every region is a string", "s": "some region is a string"}}}},
+    "cases": [
+      {
+        "description": "each item of the list is read, and the rows name the subject with [] and its items by position",
+        "rules": ["sentence.path.subject", "walk.every", "walk.some", "walk.inputs", "walk.failed_items"],
+        "input": {"xs": [["a", "b"], [1, "a"], [1, 2], [], null, "s"]},
+        "results": [
+          {"cause": "satisfied", "check": "e", "failed_items": [], "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": ["a", "b"]}], "passed": true, "requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}},
+          {"cause": "satisfied", "check": "s", "failed_items": [], "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": ["a", "b"]}], "passed": true, "requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}},
+          {"cause": "value", "check": "e", "failed_items": [{"cause": "value", "item": "item 1 of region", "locations": ["/xs/1/0"], "path": "item 1 of region", "value": 1}], "inputs": [{"locations": ["/xs/1/0", "/xs/1/1"], "name": "region[]", "value": [1, "a"]}], "message": "item 1 of region is 1", "passed": false, "requirement": "allowed", "subject": {"id": [1, "a"], "type": "region"}},
+          {"cause": "satisfied", "check": "s", "failed_items": [], "inputs": [{"locations": ["/xs/1/0", "/xs/1/1"], "name": "region[]", "value": [1, "a"]}], "passed": true, "requirement": "allowed", "subject": {"id": [1, "a"], "type": "region"}},
+          {"cause": "value", "check": "e", "failed_items": [{"cause": "value", "item": "item 1 of region", "locations": ["/xs/2/0"], "path": "item 1 of region", "value": 1}, {"cause": "value", "item": "item 2 of region", "locations": ["/xs/2/1"], "path": "item 2 of region", "value": 2}], "inputs": [{"locations": ["/xs/2/0", "/xs/2/1"], "name": "region[]", "value": [1, 2]}], "message": "item 1 of region is 1; item 2 of region is 2", "passed": false, "requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "value", "check": "s", "failed_items": [{"cause": "value", "item": "item 1 of region", "locations": ["/xs/2/0"], "path": "item 1 of region", "value": 1}, {"cause": "value", "item": "item 2 of region", "locations": ["/xs/2/1"], "path": "item 2 of region", "value": 2}], "inputs": [{"locations": ["/xs/2/0", "/xs/2/1"], "name": "region[]", "value": [1, 2]}], "message": "item 1 of region is 1; item 2 of region is 2", "passed": false, "requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "value", "check": "e", "failed_items": [{"cause": "value", "item": "region", "locations": ["/xs/3"], "path": "region", "value": []}], "inputs": [{"locations": [], "name": "region[]", "value": []}], "message": "region is []", "passed": false, "requirement": "allowed", "subject": {"id": [], "type": "region"}},
+          {"cause": "value", "check": "s", "failed_items": [{"cause": "value", "item": "region", "locations": ["/xs/3"], "path": "region", "value": []}], "inputs": [{"locations": [], "name": "region[]", "value": []}], "message": "region is []", "passed": false, "requirement": "allowed", "subject": {"id": [], "type": "region"}},
+          {"cause": "null", "check": "e", "failed_items": [{"cause": "null", "item": "region", "locations": ["/xs/4"], "path": "region", "value": null}], "inputs": [{"locations": [], "name": "region", "value": []}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}},
+          {"cause": "null", "check": "s", "failed_items": [{"cause": "null", "item": "region", "locations": ["/xs/4"], "path": "region", "value": null}], "inputs": [{"locations": [], "name": "region", "value": []}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}},
+          {"cause": "unusable", "check": "e", "failed_items": [{"cause": "unusable", "item": "region", "locations": ["/xs/5"], "path": "region", "value": "s"}], "inputs": [{"locations": [], "name": "region", "value": []}], "message": "region is \"s\", which isn't a list or an object", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}},
+          {"cause": "unusable", "check": "s", "failed_items": [{"cause": "unusable", "item": "region", "locations": ["/xs/5"], "path": "region", "value": "s"}], "inputs": [{"locations": [], "name": "region", "value": []}], "message": "region is \"s\", which isn't a list or an object", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of and sum of on a subject that is a list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"n": "count of region is 2", "t": "sum of region is 3"}}}},
+    "cases": [
+      {
+        "description": "the list is counted and summed",
+        "rules": ["sentence.path.subject", "tally.count", "tally.sum", "tally.inputs"],
+        "input": {"xs": [[1, 2], ["a", "b"], [1], null, "s"]},
+        "results": [
+          {"cause": "satisfied", "check": "n", "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "count of region", "value": 2}, {"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": [1, 2]}], "passed": true, "requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "satisfied", "check": "t", "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "sum of region", "value": 3}, {"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": [1, 2]}], "passed": true, "requirement": "allowed", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "satisfied", "check": "n", "inputs": [{"locations": ["/xs/1/0", "/xs/1/1"], "name": "count of region", "value": 2}, {"locations": ["/xs/1/0", "/xs/1/1"], "name": "region[]", "value": ["a", "b"]}], "passed": true, "requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}},
+          {"cause": "unusable", "check": "t", "inputs": [{"locations": ["/xs/1/0", "/xs/1/1"], "name": "sum of region", "value": null}, {"locations": ["/xs/1/0", "/xs/1/1"], "name": "region[]", "value": ["a", "b"]}], "message": "item 1 of region is \"a\", which isn't a number; item 2 of region is \"b\", which isn't a number", "passed": false, "requirement": "allowed", "subject": {"id": ["a", "b"], "type": "region"}},
+          {"cause": "value", "check": "n", "inputs": [{"locations": ["/xs/2/0"], "name": "count of region", "value": 1}, {"locations": ["/xs/2/0"], "name": "region[]", "value": [1]}], "message": "count of region is 1", "passed": false, "requirement": "allowed", "subject": {"id": [1], "type": "region"}},
+          {"cause": "value", "check": "t", "inputs": [{"locations": ["/xs/2/0"], "name": "sum of region", "value": 1}, {"locations": ["/xs/2/0"], "name": "region[]", "value": [1]}], "message": "sum of region is 1", "passed": false, "requirement": "allowed", "subject": {"id": [1], "type": "region"}},
+          {"cause": "null", "check": "n", "inputs": [{"locations": [], "name": "count of region", "value": null}, {"locations": [], "name": "region", "value": []}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}},
+          {"cause": "null", "check": "t", "inputs": [{"locations": [], "name": "sum of region", "value": null}, {"locations": [], "name": "region", "value": []}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}},
+          {"cause": "unusable", "check": "n", "inputs": [{"locations": [], "name": "count of region", "value": null}, {"locations": [], "name": "region", "value": []}], "message": "region is \"s\", which isn't a list or an object", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}},
+          {"cause": "unusable", "check": "t", "inputs": [{"locations": [], "name": "sum of region", "value": null}, {"locations": [], "name": "region", "value": []}], "message": "region is \"s\", which isn't a list or an object", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field called region",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": ".region is 1"}}}},
+    "cases": [
+      {
+        "description": "is written with a dot and reads the field, and the row names it .region",
+        "rules": ["sentence.words", "sentence.path.start", "name.keys"],
+        "input": {"xs": [{"id": "a", "region": 1}, {"id": "b", "region": 2}, {"id": "c"}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/region"], "name": ".region", "value": 1}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/1/region"], "name": ".region", "value": 2}], "message": ".region is 2", "passed": false, "requirement": "allowed", "subject": {"id": "b", "type": "region"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": ".region", "value": null}], "message": ".region is missing", "passed": false, "requirement": "allowed", "subject": {"id": "c", "type": "region"}}
+        ],
+        "expressions": {"allowed": {"c": ".region is 1"}}
+      }
+    ]
+  },
+  {
+    "description": "a field called region and the subject itself in one check",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": ".region is 1 and region is an object"}}}},
+    "cases": [
+      {
+        "description": "the dot picks the field and the bare word picks the subject",
+        "rules": ["sentence.words", "sentence.path.subject", "name.keys"],
+        "input": {"xs": [{"id": "a", "region": 1}, {"id": "b", "region": 2}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/xs/0/region"], "name": ".region", "value": 1}, {"locations": ["/xs/0"], "name": "region", "value": {"id": "a", "region": 1}}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "value", "check": "c", "failed_assertions": [{"assertion": ".region is 1", "cause": "value"}], "inputs": [{"locations": ["/xs/1/region"], "name": ".region", "value": 2}, {"locations": ["/xs/1"], "name": "region", "value": {"id": "b", "region": 2}}], "message": ".region is 2", "passed": false, "requirement": "allowed", "subject": {"id": "b", "type": "region"}}
+        ],
+        "expressions": {"allowed": {"c": ".region is 1 and region is an object"}}
+      }
+    ]
+  },
+  {
+    "description": "a field called region, written in quotes",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "\"region\" is 1"}}}},
+    "cases": [
+      {
+        "description": "is read as the field and printed with a dot",
+        "rules": ["sentence.words", "sentence.print.canonical", "name.keys"],
+        "input": {"xs": [{"id": "a", "region": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": {"id": "a", "region": 1}}], "message": "region is {\"id\": \"a\", \"region\": 1}, which isn't a number", "passed": false, "requirement": "allowed", "subject": {"id": "a", "type": "region"}}
+        ],
+        "expressions": {"allowed": {"c": "region is 1"}}
+      }
+    ]
+  },
+  {
+    "description": "a bare region where a field called region used to be read",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region is an object"}}}},
+    "cases": [
+      {
+        "description": "reads the subject, not its field region",
+        "rules": ["sentence.words", "sentence.path.subject"],
+        "input": {"xs": [{"id": "a", "region": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": {"id": "a", "region": 1}}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region in a check with and",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region is 1 and region is a number"}}}},
+    "cases": [
+      {
+        "description": "each assertion reads the subject, and failed_assertions name them with the subject name",
+        "rules": ["sentence.path.subject", "sentence.assert.and", "all_of.failed_assertions"],
+        "input": {"xs": [1, 2]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/xs/0"], "name": "region", "value": 1}], "passed": true, "requirement": "allowed", "subject": {"id": 1, "type": "region"}},
+          {"cause": "value", "check": "c", "failed_assertions": [{"assertion": "region is 1", "cause": "value"}], "inputs": [{"locations": ["/xs/1"], "name": "region", "value": 2}], "message": "region is 2", "passed": false, "requirement": "allowed", "subject": {"id": 2, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region in the options of an any_of",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"any_of": {"num": "region is a number", "str": ["region is a string", "region is 'a'"]}}}}}},
+    "cases": [
+      {
+        "description": "an option passes when its sentences pass",
+        "rules": ["sentence.path.subject", "sentence.any_of", "any_of.pass"],
+        "input": {"xs": [1, "a", null]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": 1}], "passed": true, "requirement": "allowed", "subject": {"id": 1, "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": "a"}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": null}], "message": "num: region is null; str: region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region after a for line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every l as e", "assert": ["region is an object", "e is 1"]}}}}},
+    "cases": [
+      {
+        "description": "is still the subject, and the alias is the item",
+        "rules": ["sentence.path.subject", "sentence.for.scope", "for.pass"],
+        "input": {"xs": [{"id": "a", "l": [1, 1]}, {"id": "b", "l": [1, 2]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/xs/0/l/0", "/xs/0/l/1"], "name": "l[]", "value": [1, 1]}, {"locations": ["/xs/0"], "name": "region", "value": {"id": "a", "l": [1, 1]}}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "e is 1", "cause": "value", "inputs": [{"locations": ["/xs/1/l/1"], "name": "e", "value": 2}]}], "item": "item 2 of l", "locations": ["/xs/1/l/1"], "path": "item 2 of l", "value": 2}], "inputs": [{"locations": ["/xs/1/l/0", "/xs/1/l/1"], "name": "l[]", "value": [1, 2]}, {"locations": ["/xs/1"], "name": "region", "value": {"id": "b", "l": [1, 2]}}], "message": "item 2 of l is 2", "passed": false, "requirement": "allowed", "subject": {"id": "b", "type": "region"}}
+        ],
+        "expressions": {"allowed": {"c": "for every l as e: region is an object and e is 1"}}
+      }
+    ]
+  },
+  {
+    "description": "two equal strings read as subjects",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region is a string"}}}},
+    "cases": [
+      {
+        "description": "fail $unique_ids, and each is still checked",
+        "rules": ["sentence.path.subject", "unique_ids", "subjects.id"],
+        "input": {"xs": ["a", "a", "b"]},
+        "results": [
+          {"cause": "value", "check": "$unique_ids", "inputs": [{"locations": ["/xs/0", "/xs/1"], "name": "repeated region ids", "value": ["a"]}], "message": "repeated region ids is [\"a\"]", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "a"}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": "a"}], "passed": true, "requirement": "allowed", "subject": {"id": "a", "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": "b"}], "passed": true, "requirement": "allowed", "subject": {"id": "b", "type": "region"}}
+        ],
+        "status": {"allowed": "not_met"},
+        "compliant": false
+      }
+    ]
+  },
+  {
+    "description": "region followed by a field",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region.name is 1"}}}},
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "name": "n"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}], "message": "checks.c: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region followed by a quoted field",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region.\"x y\" is 1"}}}},
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "name": "n"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["region.\"x y\": nothing can follow region, which means the subject: for a field called region, write .region.\"x y\""]}], "message": "checks.c: region.\"x y\": nothing can follow region, which means the subject: for a field called region, write .region.\"x y\"", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region followed by named by",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region named by $params.k is 1"}}}},
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "name": "n"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["region named by $params.k: nothing can follow region, which means the subject: for a field called region, write .region named by $params.k"]}], "message": "checks.c: region named by $params.k: nothing can follow region, which means the subject: for a field called region, write .region named by $params.k", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position of region written in words",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "first of region is 1"}}}},
+    "cases": [
+      {
+        "description": "reads one item of a subject that is a list, as for a field's list, and names it item 1 of the subject name",
+        "rules": ["sentence.path.subject", "sentence.path.index", "name.index"],
+        "input": {"xs": [[1, "x"], [], "s", null]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/0"], "name": "item 1 of region", "value": 1}], "passed": true, "requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "allowed", "subject": {"id": [], "type": "region"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "item 1 of region", "value": null}], "message": "region is \"s\", which isn't a list", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ],
+        "expressions": {"allowed": {"c": "first of region is 1"}}
+      }
+    ]
+  },
+  {
+    "description": "item 2 of region",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "item 2 of region is 'x'"}}}},
+    "cases": [
+      {
+        "description": "reads the second item",
+        "rules": ["sentence.path.subject", "sentence.path.index", "name.index"],
+        "input": {"xs": [[1, "x"], [1], "s", null]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/1"], "name": "item 2 of region", "value": "x"}], "passed": true, "requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "allowed", "subject": {"id": [1], "type": "region"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "item 2 of region", "value": null}], "message": "region is \"s\", which isn't a list", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ],
+        "expressions": {"allowed": {"c": "item 2 of region is \"x\""}}
+      }
+    ]
+  },
+  {
+    "description": "every on a position of region",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "every first of region is 1"}}}},
+    "cases": [
+      {
+        "description": "names the item and the list it came from",
+        "rules": ["sentence.path.subject", "sentence.path.index", "walk.failed_items"],
+        "input": {"xs": [[1, "x"], [2], [], "s"]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "item 1 of region", "locations": ["/xs/0/0"], "path": "item 1 of region", "value": 1}], "inputs": [{"locations": [], "name": "region[0]", "value": []}], "message": "item 1 of region is 1, which isn't a list or an object", "passed": false, "requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}},
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "item 1 of region", "locations": ["/xs/1/0"], "path": "item 1 of region", "value": 2}], "inputs": [{"locations": [], "name": "region[0]", "value": []}], "message": "item 1 of region is 2, which isn't a list or an object", "passed": false, "requirement": "allowed", "subject": {"id": [2], "type": "region"}},
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "item": "item 1 of region", "locations": ["/xs/2"], "path": "item 1 of region", "value": null}], "inputs": [{"locations": [], "name": "region[0]", "value": []}], "message": "item 1 of region is missing", "passed": false, "requirement": "allowed", "subject": {"id": [], "type": "region"}},
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "region", "locations": ["/xs/3"], "path": "region", "value": "s"}], "inputs": [{"locations": [], "name": "region[0]", "value": []}], "message": "region is \"s\", which isn't a list or an object", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position of the subject on the right side reads an item of the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "x is first of region"}}}},
+    "cases": [
+      {
+        "description": "the position picks the item, and a subject that is not a list is unusable",
+        "rules": ["sentence.path.subject.right", "sentence.path.index"],
+        "input": {"xs": [{"id": "a", "name": "n"}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "allowed", "subject": {"id": null, "type": "region"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "x", "value": null}, {"locations": ["/xs/0"], "name": "item 1 of region", "value": null}], "message": "region is {\"id\": \"a\", \"name\": \"n\"}, which isn't a list", "passed": false, "requirement": "allowed", "subject": {"id": {"id": "a", "name": "n"}, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position of region followed by a field",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "first of region.name is 1"}}}},
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "name": "n"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["first of region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}], "message": "checks.c: first of region.name: nothing can follow region, which means the subject: for a field called region, write .region.name", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region in brackets followed by a field",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "region[0].name is 1"}}}},
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "name": "n"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["region[0].name: nothing can follow region, which means the subject: for a field called region, write .region[0].name"]}], "message": "checks.c: region[0].name: nothing can follow region, which means the subject: for a field called region, write .region[0].name", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region as the key of a named by",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": "$params.m named by region is 1"}}}},
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": ["sentence.path.subject.right", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "name": "n"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["named by region: region is the whole subject, so it can't name a key"]}], "message": "checks.c: named by region: region is the whole subject, so it can't name a key", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "region as a for alias",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"allowed": {"subject": "region", "checks": {"c": {"for": "every l as region", "assert": "region is 1"}}}}},
+    "cases": [
+      {
+        "description": "fails $well_formed, which says why, and the requirement gets no other row",
+        "rules": ["sentence.words", "sentence.path.subject.right", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "name": "n"}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["region can't be an alias: it's a subject's name"]}], "message": "checks.c: region can't be an alias: it's a subject's name", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject called b that another requirement doesn't use",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"it": {"from": "xs"}, "b": {"from": "xs"}}, "requirements": {"r": {"subject": "b", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "a requirement that doesn't use the subject called it is read as usual",
+        "rules": ["sentence.path.subject.name"],
+        "input": {"xs": [{"x": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"x": 1}, "type": "b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "subjects called It, items and items x",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"It": {"from": "xs"}, "items": {"from": "xs"}, "it x": {"from": "xs"}}, "requirements": {"r": {"subject": "items", "checks": {"c": "x exists"}}}},
+    "cases": [
+      {
+        "description": "a requirement that doesn't use the subject called it is read as usual",
+        "rules": ["sentence.path.subject.name"],
+        "input": {"xs": [{"x": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"x": 1}, "type": "items"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a check that reads plain, on a plain value, a list and a from line that keeps lists",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"plain": {"from": "every values"}, "list": {"from": "every lists"}, "kept": {"from": "every sets that contains 1"}}, "requirements": {"p": {"subject": "plain", "checks": {"c": "plain is 1"}}, "l": {"subject": "list", "checks": {"all": "every plain is 1", "size": "count of plain is 2"}}, "k": {"subject": "kept", "checks": {"c": "plain is not empty"}}}},
+    "cases": [
+      {
+        "description": "has the location of the subject itself for its name, one for each item for every and count of the subject name, and where each failed item was read",
+        "rules": ["location.read", "location.each", "location.worked_out", "location.failed_items"],
+        "input": {"values": [1, 2], "lists": [[1, 2]], "sets": [[1, 2], [3]]},
+        "requirements": {"k": {"status": "not_met"}, "l": {"status": "not_met"}, "p": {"status": "not_met"}},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/sets/0"], "name": "kept", "value": [1, 2]}], "passed": true, "requirement": "k", "subject": {"id": [1, 2], "type": "kept"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/sets/1"], "name": "kept", "value": [3]}], "message": "kept is [3]", "passed": false, "requirement": "k", "subject": {"id": [3], "type": "kept"}},
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/sets/0"], "name": "plain", "value": null}], "message": "kept is [1, 2], which isn't an object", "passed": false, "requirement": "k", "subject": {"id": [1, 2], "type": "kept"}},
+          {"cause": "not_an_object", "check": "all", "failed_items": [], "inputs": [], "message": "list is [1, 2], which isn't an object", "passed": false, "requirement": "l", "subject": {"id": [1, 2], "type": "list"}},
+          {"cause": "not_an_object", "check": "size", "inputs": [{"locations": [], "name": "count of plain", "value": null}, {"locations": [], "name": "plain", "value": []}], "message": "list is [1, 2], which isn't an object", "passed": false, "requirement": "l", "subject": {"id": [1, 2], "type": "list"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/values/0"], "name": "plain", "value": 1}], "passed": true, "requirement": "p", "subject": {"id": 1, "type": "plain"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/values/1"], "name": "plain", "value": 2}], "message": "plain is 2", "passed": false, "requirement": "p", "subject": {"id": 2, "type": "plain"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject name on the right side of a phrase reads the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"c": "$params.wanted equals region", "d": "region is $params.wanted", "e": "region is in $params.allowed"}}}},
+    "params": {"wanted": "eu", "allowed": ["eu", "us"]},
+    "cases": [
+      {
+        "description": "each string is compared with the param, and a missing or null value fails the way a field does",
+        "rules": ["sentence.path.subject.right", "sentence.phrase.is"],
+        "input": {"xs": ["eu", "us", null, 3]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}, {"locations": ["/xs/0"], "name": "region", "value": "eu"}], "passed": true, "requirement": "r", "subject": {"id": "eu", "type": "region"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "eu"}, {"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}], "passed": true, "requirement": "r", "subject": {"id": "eu", "type": "region"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "eu"}], "passed": true, "requirement": "r", "subject": {"id": "eu", "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}, {"locations": ["/xs/1"], "name": "region", "value": "us"}], "message": "$params.wanted is \"eu\", and region is \"us\"", "passed": false, "requirement": "r", "subject": {"id": "us", "type": "region"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": "us"}, {"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}], "message": "region is \"us\", and $params.wanted is \"eu\"", "passed": false, "requirement": "r", "subject": {"id": "us", "type": "region"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": "us"}], "passed": true, "requirement": "r", "subject": {"id": "us", "type": "region"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}, {"locations": ["/xs/2"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
+          {"cause": "null", "check": "d", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": null}, {"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}], "message": "region is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
+          {"cause": "null", "check": "e", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}, {"locations": ["/xs/3"], "name": "region", "value": 3}], "message": "$params.wanted is \"eu\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "region"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/xs/3"], "name": "region", "value": 3}, {"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}], "message": "region is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "region"}},
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/xs/3"], "name": "region", "value": 3}], "message": "region is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject name as the value after a count of and as a term of plus",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"c": "count of region is $params.n", "d": "sum of region is 1 plus count of region"}}}},
+    "params": {"n": 2},
+    "cases": [
+      {
+        "description": "the subject is read on the right side, a list is counted and a string is unusable",
+        "rules": ["sentence.path.subject.right"],
+        "input": {"xs": [[1, 2], [1], "a"]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "count of region", "value": 2}, {"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": [1, 2]}, {"locations": ["$params:/n"], "name": "$params.n", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "sum of region", "value": 3}, {"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": [1, 2]}, {"locations": ["/xs/0/0", "/xs/0/1"], "name": "1 plus count of region", "value": 3}, {"locations": ["/xs/0/0", "/xs/0/1"], "name": "count of region", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/1/0"], "name": "count of region", "value": 1}, {"locations": ["/xs/1/0"], "name": "region[]", "value": [1]}, {"locations": ["$params:/n"], "name": "$params.n", "value": 2}], "message": "count of region is 1, and $params.n is 2", "passed": false, "requirement": "r", "subject": {"id": [1], "type": "region"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/xs/1/0"], "name": "sum of region", "value": 1}, {"locations": ["/xs/1/0"], "name": "region[]", "value": [1]}, {"locations": ["/xs/1/0"], "name": "1 plus count of region", "value": 2}, {"locations": ["/xs/1/0"], "name": "count of region", "value": 1}], "message": "sum of region is 1, and 1 plus count of region is 2", "passed": false, "requirement": "r", "subject": {"id": [1], "type": "region"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of region", "value": null}, {"locations": [], "name": "region", "value": []}, {"locations": ["$params:/n"], "name": "$params.n", "value": 2}], "message": "region is \"a\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": [], "name": "sum of region", "value": null}, {"locations": [], "name": "region", "value": []}, {"locations": [], "name": "1 plus count of region", "value": null}, {"locations": [], "name": "count of region", "value": null}], "message": "region is \"a\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject name on the right side of a whose in a check reads the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"c": "count of $input.ws whose ref is region is 1"}}}},
+    "cases": [
+      {
+        "description": "the items whose ref equals the subject are counted",
+        "rules": ["sentence.path.subject.right", "sentence.whose.item"],
+        "input": {"xs": ["p", "q"], "ws": [{"ref": "p"}, {"ref": "q"}, {"ref": "p"}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/ws/0", "/ws/1", "/ws/2"], "name": "count of $input.ws whose ref equals region", "value": 2}, {"locations": ["/ws/0", "/ws/1", "/ws/2"], "name": "$input.ws[]", "value": [{"ref": "p"}, {"ref": "q"}, {"ref": "p"}]}, {"locations": ["/xs/0"], "name": "region", "value": "p"}], "message": "count of $input.ws whose ref equals region is 2", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ws/0", "/ws/1", "/ws/2"], "name": "count of $input.ws whose ref equals region", "value": 1}, {"locations": ["/ws/0", "/ws/1", "/ws/2"], "name": "$input.ws[]", "value": [{"ref": "p"}, {"ref": "q"}, {"ref": "p"}]}, {"locations": ["/xs/1"], "name": "region", "value": "q"}], "passed": true, "requirement": "r", "subject": {"id": "q", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "on the right side of a whose in a check, the subject name reads the subject and a dot reads the item's field",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": "every xs"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "count of $input.ys whose k is s is 1", "d": "count of $input.ys whose k is .s is 2"}}}},
+    "cases": [
+      {
+        "description": "c counts the items whose k is the subject, and d the items whose k is their own s",
+        "rules": ["sentence.path.subject.right", "sentence.whose.item", "name.dot"],
+        "input": {"xs": ["a", "q"], "ys": [{"k": "a", "s": "z"}, {"k": "b", "s": "b"}, {"k": "c", "s": "c"}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0", "/xs/1"], "name": "in-scope s count", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ys/0", "/ys/1", "/ys/2"], "name": "count of $input.ys whose k equals s", "value": 1}, {"locations": ["/ys/0", "/ys/1", "/ys/2"], "name": "$input.ys[]", "value": [{"k": "a", "s": "z"}, {"k": "b", "s": "b"}, {"k": "c", "s": "c"}]}, {"locations": ["/xs/0"], "name": "s", "value": "a"}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "s"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/ys/0", "/ys/1", "/ys/2"], "name": "count of $input.ys whose k equals .s", "value": 2}, {"locations": ["/ys/0", "/ys/1", "/ys/2"], "name": "$input.ys[]", "value": [{"k": "a", "s": "z"}, {"k": "b", "s": "b"}, {"k": "c", "s": "c"}]}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "s"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/ys/0", "/ys/1", "/ys/2"], "name": "count of $input.ys whose k equals s", "value": 0}, {"locations": ["/ys/0", "/ys/1", "/ys/2"], "name": "$input.ys[]", "value": [{"k": "a", "s": "z"}, {"k": "b", "s": "b"}, {"k": "c", "s": "c"}]}, {"locations": ["/xs/1"], "name": "s", "value": "q"}], "message": "count of $input.ys whose k equals s is 0", "passed": false, "requirement": "r", "subject": {"id": "q", "type": "s"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/ys/0", "/ys/1", "/ys/2"], "name": "count of $input.ys whose k equals .s", "value": 2}, {"locations": ["/ys/0", "/ys/1", "/ys/2"], "name": "$input.ys[]", "value": [{"k": "a", "s": "z"}, {"k": "b", "s": "b"}, {"k": "c", "s": "c"}]}], "passed": true, "requirement": "r", "subject": {"id": "q", "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject name on the left side of a whose in a check is a field of the item",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"c": "count of $input.ws whose region is 1 is 1"}}}},
+    "cases": [
+      {
+        "description": "the items are filtered by their own field with the subject name",
+        "rules": ["sentence.path.start", "sentence.whose.item"],
+        "input": {"xs": ["p"], "ws": [{"region": 1}, {"region": 2}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ws/0", "/ws/1"], "name": "count of $input.ws whose region is 1", "value": 1}, {"locations": ["/ws/0", "/ws/1"], "name": "$input.ws[]", "value": [{"region": 1}, {"region": 2}]}], "passed": true, "requirement": "r", "subject": {"id": "p", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject name is read as the subject when the subject has a field of the same name",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "region", "checks": {"c": "region is an object"}}}},
+    "cases": [
+      {
+        "description": "the subject is the object and its field region is not read",
+        "rules": ["sentence.words", "sentence.path.subject"],
+        "input": {"xs": [{"id": "a", "region": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": {"id": "a", "region": 1}}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name reads the subject, whatever the name is",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"tag list": {"from": "every xs"}}, "requirements": {"r": {"subject": "tag list", "checks": {"a": "\"tag list\" is not empty", "b": "every \"tag list\" is a string"}}}},
+    "cases": [
+      {
+        "description": "a name with a space is written in double quotes",
+        "rules": ["sentence.path.subject"],
+        "input": {"xs": [["v1"], ["v2", 3], []]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/xs/0"], "name": "tag list", "value": ["v1"]}], "passed": true, "requirement": "r", "subject": {"id": ["v1"], "type": "tag list"}},
+          {"cause": "satisfied", "check": "b", "failed_items": [], "inputs": [{"locations": ["/xs/0/0"], "name": "tag list[]", "value": ["v1"]}], "passed": true, "requirement": "r", "subject": {"id": ["v1"], "type": "tag list"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/xs/1"], "name": "tag list", "value": ["v2", 3]}], "passed": true, "requirement": "r", "subject": {"id": ["v2", 3], "type": "tag list"}},
+          {"cause": "value", "check": "b", "failed_items": [{"cause": "value", "item": "item 2 of tag list", "locations": ["/xs/1/1"], "path": "item 2 of tag list", "value": 3}], "inputs": [{"locations": ["/xs/1/0", "/xs/1/1"], "name": "tag list[]", "value": ["v2", 3]}], "message": "item 2 of tag list is 3", "passed": false, "requirement": "r", "subject": {"id": ["v2", 3], "type": "tag list"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/xs/2"], "name": "tag list", "value": []}], "message": "tag list is []", "passed": false, "requirement": "r", "subject": {"id": [], "type": "tag list"}},
+          {"cause": "value", "check": "b", "failed_items": [{"cause": "value", "item": "tag list", "locations": ["/xs/2"], "path": "tag list", "value": []}], "inputs": [{"locations": [], "name": "tag list[]", "value": []}], "message": "tag list is []", "passed": false, "requirement": "r", "subject": {"id": [], "type": "tag list"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the grammar reads the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"item": {"from": "every xs"}}, "requirements": {"r": {"subject": "item", "checks": {"a": "\"item\" is a string"}}}},
+    "cases": [
+      {
+        "description": "item is a word of the grammar, so the subject is written in double quotes",
+        "rules": ["sentence.path.subject", "sentence.words"],
+        "input": {"xs": ["a", 3]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/xs/0"], "name": "item", "value": "a"}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "item"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/xs/1"], "name": "item", "value": 3}], "message": "item is 3", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field with the same name as the subject is written with a dot",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "region", "checks": {"a": ".region is 1", "b": ".region is 1 and region is an object", "c": ".region.name is \"n\""}}}},
+    "cases": [
+      {
+        "description": "the dot reads the field and the bare name reads the subject",
+        "rules": ["sentence.words", "sentence.path.start", "sentence.path.subject", "name.keys"],
+        "input": {"xs": [{"id": "a", "region": 1}, {"id": "b", "region": {"name": "n"}}, {"id": "c"}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/xs/0/region"], "name": ".region", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "region"}},
+          {"cause": "satisfied", "check": "b", "failed_assertions": [], "inputs": [{"locations": ["/xs/0/region"], "name": ".region", "value": 1}, {"locations": ["/xs/0"], "name": "region", "value": {"id": "a", "region": 1}}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "region"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0/region"], "name": ".region.name", "value": null}], "message": ".region is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}},
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/xs/1/region"], "name": ".region", "value": {"name": "n"}}], "message": ".region is {\"name\": \"n\"}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "b", "type": "region"}},
+          {"cause": "unusable", "check": "b", "failed_assertions": [{"assertion": ".region is 1", "cause": "unusable"}], "inputs": [{"locations": ["/xs/1/region"], "name": ".region", "value": {"name": "n"}}, {"locations": ["/xs/1"], "name": "region", "value": {"id": "b", "region": {"name": "n"}}}], "message": ".region is {\"name\": \"n\"}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "b", "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/1/region/name"], "name": ".region.name", "value": "n"}], "passed": true, "requirement": "r", "subject": {"id": "b", "type": "region"}},
+          {"cause": "absent", "check": "a", "inputs": [{"locations": ["/xs/2"], "name": ".region", "value": null}], "message": ".region is missing", "passed": false, "requirement": "r", "subject": {"id": "c", "type": "region"}},
+          {"cause": "absent", "check": "b", "failed_assertions": [{"assertion": ".region is 1", "cause": "absent"}], "inputs": [{"locations": ["/xs/2"], "name": ".region", "value": null}, {"locations": ["/xs/2"], "name": "region", "value": {"id": "c"}}], "message": ".region is missing", "passed": false, "requirement": "r", "subject": {"id": "c", "type": "region"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": ".region.name", "value": null}], "message": ".region.name is missing", "passed": false, "requirement": "r", "subject": {"id": "c", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted field with the same name as the subject is read as the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "region", "checks": {"c": "\"region\" is 1"}}}},
+    "cases": [
+      {
+        "description": "the quotes do not make it a field",
+        "rules": ["sentence.path.subject"],
+        "input": {"xs": [{"id": "a", "region": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": {"id": "a", "region": 1}}], "message": "region is {\"id\": \"a\", \"region\": 1}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "nothing can follow the subject name in a check, on an object subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"a": "region.name is 1", "b": "region.\"x y\" is 1", "c": "region named by $params.k is 1", "d": "every region.items is 1", "e": "count of region.items is 1", "f": "some region.name is 1", "g": "sum of region.n is 1", "h": "region.name exists", "i": "first of region.name is 1", "j": "region[0].name is 1", "k": "every region.items whose a is 1 is 2"}}}},
+    "cases": [
+      {
+        "description": "every check is written wrong, and each problem says to write a dot for a field",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "name": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 11}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}, {"locations": [], "name": "checks.b", "value": ["region.\"x y\": nothing can follow region, which means the subject: for a field called region, write .region.\"x y\""]}, {"locations": [], "name": "checks.c", "value": ["region named by $params.k: nothing can follow region, which means the subject: for a field called region, write .region named by $params.k"]}, {"locations": [], "name": "checks.d", "value": ["region.items: nothing can follow region, which means the subject: for a field called region, write .region.items"]}, {"locations": [], "name": "checks.e", "value": ["region.items: nothing can follow region, which means the subject: for a field called region, write .region.items"]}, {"locations": [], "name": "checks.f", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}, {"locations": [], "name": "checks.g", "value": ["region.n: nothing can follow region, which means the subject: for a field called region, write .region.n"]}, {"locations": [], "name": "checks.h", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}, {"locations": [], "name": "checks.i", "value": ["first of region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}, {"locations": [], "name": "checks.j", "value": ["region[0].name: nothing can follow region, which means the subject: for a field called region, write .region[0].name"]}, {"locations": [], "name": "checks.k", "value": ["a is a word of the grammar: write .a"]}], "message": "checks.a: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name; checks.b: region.\"x y\": nothing can follow region, which means the subject: for a field called region, write .region.\"x y\"; checks.c: region named by $params.k: nothing can follow region, which means the subject: for a field called region, write .region named by $params.k; checks.d: region.items: nothing can follow region, which means the subject: for a field called region, write .region.items; checks.e: region.items: nothing can follow region, which means the subject: for a field called region, write .region.items; checks.f: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name; checks.g: region.n: nothing can follow region, which means the subject: for a field called region, write .region.n; checks.h: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name; checks.i: first of region.name: nothing can follow region, which means the subject: for a field called region, write .region.name; checks.j: region[0].name: nothing can follow region, which means the subject: for a field called region, write .region[0].name; checks.k: a is a word of the grammar: write .a", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "nothing can follow the subject name in a check, on a list subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"a": "region.name is 1", "b": "region[0].name is 1", "c": "every region.name is 1"}}}},
+    "cases": [
+      {
+        "description": "a list subject is written wrong in the same way",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [[1, 2]]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 3}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}, {"locations": [], "name": "checks.b", "value": ["region[0].name: nothing can follow region, which means the subject: for a field called region, write .region[0].name"]}, {"locations": [], "name": "checks.c", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}], "message": "checks.a: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name; checks.b: region[0].name: nothing can follow region, which means the subject: for a field called region, write .region[0].name; checks.c: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position in words directly after the subject name reads an item of a list subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"b": "first of region is 1", "c": "item 2 of region is 2"}}}},
+    "cases": [
+      {
+        "description": "first of and item N of read the item, and a subject that is not a list is unusable",
+        "rules": ["sentence.path.subject", "sentence.path.index", "name.index"],
+        "input": {"xs": [[1, 2], [], "a", null]},
+        "results": [
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/xs/0/0"], "name": "item 1 of region", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/1"], "name": "item 2 of region", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/xs/1"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "r", "subject": {"id": [], "type": "region"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "r", "subject": {"id": [], "type": "region"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/xs/2"], "name": "item 1 of region", "value": null}], "message": "region is \"a\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "item 2 of region", "value": null}], "message": "region is \"a\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/xs/3"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "nothing can follow the subject name in the options of an any_of",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"c": {"any_of": {"a": "region.name is 1", "b": ["region is an object", "region.x is 1"]}}}}}},
+    "cases": [
+      {
+        "description": "an option that reads a field after the subject is written wrong",
+        "rules": ["sentence.path.subject.step", "sentence.any_of", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"name": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option a: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name", "option b: region.x: nothing can follow region, which means the subject: for a field called region, write .region.x"]}], "message": "checks.c: option a: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name; checks.c: option b: region.x: nothing can follow region, which means the subject: for a field called region, write .region.x", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "nothing can follow the subject name in a for line or after a for line",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"a": {"for": "every region.items as e", "assert": "e is 1"}, "b": {"for": "every l as e", "assert": "region.name is 1"}, "c": {"for": "every l as e", "assert": "e is region.name"}}}}},
+    "cases": [
+      {
+        "description": "the path of a for line and an assertion with a field after the subject are written wrong",
+        "rules": ["sentence.path.subject.step", "sentence.for.scope", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "l": [1]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 3}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["region.items: nothing can follow region, which means the subject: for a field called region, write .region.items"]}, {"locations": [], "name": "checks.b", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}, {"locations": [], "name": "checks.c", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}], "message": "checks.a: region.items: nothing can follow region, which means the subject: for a field called region, write .region.items; checks.b: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name; checks.c: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "nothing can follow the subject name on the right side",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"a": "x is region.name", "b": "x is one of region.names", "c": "x is 1 plus region.n", "d": "x equals region[0].y"}}}},
+    "cases": [
+      {
+        "description": "a field after the subject on the right side is written wrong",
+        "rules": ["sentence.path.subject.step", "sentence.path.subject.right", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"x": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}, {"locations": [], "name": "checks.b", "value": ["region.names: nothing can follow region, which means the subject: for a field called region, write .region.names"]}, {"locations": [], "name": "checks.c", "value": ["region.n: nothing can follow region, which means the subject: for a field called region, write .region.n"]}, {"locations": [], "name": "checks.d", "value": ["region[0].y: nothing can follow region, which means the subject: for a field called region, write .region[0].y"]}], "message": "checks.a: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name; checks.b: region.names: nothing can follow region, which means the subject: for a field called region, write .region.names; checks.c: region.n: nothing can follow region, which means the subject: for a field called region, write .region.n; checks.d: region[0].y: nothing can follow region, which means the subject: for a field called region, write .region[0].y", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "nothing can follow the subject name inside a whose of a check",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"a": "every ws whose x is region.name is 1", "b": "count of ws whose x is region[0].y is 1"}}}},
+    "cases": [
+      {
+        "description": "a field after the subject on the right of a whose is written wrong",
+        "rules": ["sentence.path.subject.step", "sentence.whose.item", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"name": 1}], "ws": [{"x": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["region.name: nothing can follow region, which means the subject: for a field called region, write .region.name"]}, {"locations": [], "name": "checks.b", "value": ["region[0].y: nothing can follow region, which means the subject: for a field called region, write .region[0].y"]}], "message": "checks.a: region.name: nothing can follow region, which means the subject: for a field called region, write .region.name; checks.b: region[0].y: nothing can follow region, which means the subject: for a field called region, write .region[0].y", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "named by the subject is written wrong",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"a": "$params.m named by region is 1", "b": "$input.m named by region is 1", "c": "m named by region is 1"}}}},
+    "cases": [
+      {
+        "description": "the whole subject can not name a key",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": ["a"], "m": {"a": 1}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 3}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["named by region: region is the whole subject, so it can't name a key"]}, {"locations": [], "name": "checks.b", "value": ["named by region: region is the whole subject, so it can't name a key"]}, {"locations": [], "name": "checks.c", "value": ["named by region: region is the whole subject, so it can't name a key"]}], "message": "checks.a: named by region: region is the whole subject, so it can't name a key; checks.b: named by region: region is the whole subject, so it can't name a key; checks.c: named by region: region is the whole subject, so it can't name a key", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias named like the subject is written wrong",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"c": {"for": "every l as region", "assert": "region is 1"}}}}},
+    "cases": [
+      {
+        "description": "a name always means one thing",
+        "rules": ["sentence.for.alias", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "l": [1]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["region can't be an alias: it's a subject's name"]}], "message": "checks.c: region can't be an alias: it's a subject's name", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for alias called it is an ordinary name",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "region", "checks": {"c": {"for": "every l as it", "assert": ["it is 1", "region is an object"]}}}}},
+    "cases": [
+      {
+        "description": "the alias is read as the item and the subject keeps its own name",
+        "rules": ["sentence.for.alias", "sentence.words"],
+        "input": {"xs": [{"id": "a", "l": [1, 2]}]},
+        "results": [
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "it is 1", "cause": "value", "inputs": [{"locations": ["/xs/0/l/1"], "name": "it", "value": 2}]}], "item": "item 2 of l", "locations": ["/xs/0/l/1"], "path": "item 2 of l", "value": 2}], "inputs": [{"locations": ["/xs/0/l/0", "/xs/0/l/1"], "name": "l[]", "value": [1, 2]}, {"locations": ["/xs/0"], "name": "region", "value": {"id": "a", "l": [1, 2]}}], "message": "item 2 of l is 2", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject called it is read like any other subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"it": {"from": "every xs"}}, "requirements": {"r": {"subject": "it", "checks": {"a": "it is a string", "b": "it is not empty", "c": "$params.p equals it", "d": ".it is 1"}}}},
+    "params": {"p": "a"},
+    "cases": [
+      {
+        "description": "the name it reads the subject on the left and on the right, and .it reads a field",
+        "rules": ["sentence.path.subject", "sentence.path.subject.name", "sentence.path.subject.right"],
+        "input": {"xs": ["a", 3]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/xs/0"], "name": "it", "value": "a"}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "it"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/xs/0"], "name": "it", "value": "a"}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "it"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["$params:/p"], "name": "$params.p", "value": "a"}, {"locations": ["/xs/0"], "name": "it", "value": "a"}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "it"}},
+          {"cause": "not_an_object", "check": "d", "inputs": [{"locations": ["/xs/0"], "name": ".it", "value": null}], "message": "it is \"a\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "it"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/xs/1"], "name": "it", "value": 3}], "message": "it is 3", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "it"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/xs/1"], "name": "it", "value": 3}], "message": "it is 3, which isn't text or a list", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "it"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/p"], "name": "$params.p", "value": "a"}, {"locations": ["/xs/1"], "name": "it", "value": 3}], "message": "$params.p is \"a\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "it"}},
+          {"cause": "not_an_object", "check": "d", "inputs": [{"locations": ["/xs/1"], "name": ".it", "value": null}], "message": "it is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "it"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject called it with fields, and nothing can follow it",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"it": {"from": "every xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "it", "checks": {"a": "it.name is 1", "b": ".name is 1", "c": ".it is 1"}}}},
+    "cases": [
+      {
+        "description": "a check that reads a field after it is written wrong like after any subject name",
+        "rules": ["sentence.path.subject.name", "sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"xs": [{"id": "a", "name": 1, "it": 1}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 3}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["it.name: nothing can follow it, which means the subject: for a field called it, write .it.name"]}], "message": "checks.a: it.name: nothing can follow it, which means the subject: for a field called it, write .it.name", "passed": false, "requirement": "r", "subject": {"id": null, "type": "it"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field called it is read as a field",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "region", "checks": {"c": "it is 1", "d": ".it is 1"}}}},
+    "cases": [
+      {
+        "description": "it is not a word of the grammar any more, so the bare word is the field",
+        "rules": ["sentence.words", "sentence.path.start"],
+        "input": {"xs": [{"id": "a", "it": 1}, {"id": "b", "it": 2}, {"id": "c"}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/it"], "name": "it", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "region"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/xs/0/it"], "name": "it", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/1/it"], "name": "it", "value": 2}], "message": "it is 2", "passed": false, "requirement": "r", "subject": {"id": "b", "type": "region"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/xs/1/it"], "name": "it", "value": 2}], "message": "it is 2", "passed": false, "requirement": "r", "subject": {"id": "b", "type": "region"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "it", "value": null}], "message": "it is missing", "passed": false, "requirement": "r", "subject": {"id": "c", "type": "region"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/xs/2"], "name": "it", "value": null}], "message": "it is missing", "passed": false, "requirement": "r", "subject": {"id": "c", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part called it is an ordinary name",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs", "identified_by": "id", "has": {"it": "v"}}}, "requirements": {"r": {"subject": "region", "checks": {"c": "it is 1"}}}},
+    "cases": [
+      {
+        "description": "the part reads the value at its path",
+        "rules": ["parts.alias", "sentence.words"],
+        "input": {"xs": [{"id": "a", "v": 1}, {"id": "b", "v": 2}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/v"], "name": "it", "part": {"id": null, "name": "it"}, "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "region"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/xs/1/v"], "name": "it", "part": {"id": null, "name": "it"}, "value": 2}], "message": "it is 2", "passed": false, "requirement": "r", "subject": {"id": "b", "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the subject name is read in every position of a one-line check on a list subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"region": {"from": "every xs"}}, "requirements": {"r": {"subject": "region", "checks": {"a": "every region is 1", "b": "some region is 1", "c": "count of region is 2", "d": "sum of region is 3", "e": "every first of region is 1"}}}},
+    "cases": [
+      {
+        "description": "a list subject is walked, counted and summed as a field that holds the list would be",
+        "rules": ["sentence.path.subject", "walk.every", "walk.some", "tally.count", "tally.sum"],
+        "input": {"xs": [[1, 2], [1, 1]]},
+        "results": [
+          {"cause": "value", "check": "a", "failed_items": [{"cause": "value", "item": "item 2 of region", "locations": ["/xs/0/1"], "path": "item 2 of region", "value": 2}], "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": [1, 2]}], "message": "item 2 of region is 2", "passed": false, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "satisfied", "check": "b", "failed_items": [], "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": [1, 2]}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "count of region", "value": 2}, {"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": [1, 2]}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "sum of region", "value": 3}, {"locations": ["/xs/0/0", "/xs/0/1"], "name": "region[]", "value": [1, 2]}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "unusable", "check": "e", "failed_items": [{"cause": "unusable", "item": "item 1 of region", "locations": ["/xs/0/0"], "path": "item 1 of region", "value": 1}], "inputs": [{"locations": [], "name": "region[0]", "value": []}], "message": "item 1 of region is 1, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": [1, 2], "type": "region"}},
+          {"cause": "satisfied", "check": "a", "failed_items": [], "inputs": [{"locations": ["/xs/1/0", "/xs/1/1"], "name": "region[]", "value": [1, 1]}], "passed": true, "requirement": "r", "subject": {"id": [1, 1], "type": "region"}},
+          {"cause": "satisfied", "check": "b", "failed_items": [], "inputs": [{"locations": ["/xs/1/0", "/xs/1/1"], "name": "region[]", "value": [1, 1]}], "passed": true, "requirement": "r", "subject": {"id": [1, 1], "type": "region"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/1/0", "/xs/1/1"], "name": "count of region", "value": 2}, {"locations": ["/xs/1/0", "/xs/1/1"], "name": "region[]", "value": [1, 1]}], "passed": true, "requirement": "r", "subject": {"id": [1, 1], "type": "region"}},
+          {"cause": "value", "check": "d", "inputs": [{"locations": ["/xs/1/0", "/xs/1/1"], "name": "sum of region", "value": 2}, {"locations": ["/xs/1/0", "/xs/1/1"], "name": "region[]", "value": [1, 1]}], "message": "sum of region is 2", "passed": false, "requirement": "r", "subject": {"id": [1, 1], "type": "region"}},
+          {"cause": "unusable", "check": "e", "failed_items": [{"cause": "unusable", "item": "item 1 of region", "locations": ["/xs/1/0"], "path": "item 1 of region", "value": 1}], "inputs": [{"locations": [], "name": "region[0]", "value": []}], "message": "item 1 of region is 1, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": [1, 1], "type": "region"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "an object holding values of different kinds on the right side of a list check",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": "x is in thing", "b": "x is not in thing", "c": "x is one of thing", "d": "x is in $input.o"}, "subject": "thing"}}, "subjects": {"thing": {"from": "every xs"}}},
+    "cases": [
+      {
+        "description": "the subject and a path that are objects are not lists, whatever their values are",
+        "rules": ["sentence.path.subject", "in.values", "in.fail"],
+        "input": {"o": {"a": 0, "b": [0]}, "xs": [{"thing": [0], "x": 0}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/xs/0"], "name": "thing", "value": {"thing": [0], "x": 0}}], "message": "thing is {\"thing\": [0], \"x\": 0}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/xs/0"], "name": "thing", "value": {"thing": [0], "x": 0}}], "message": "thing is {\"thing\": [0], \"x\": 0}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/xs/0"], "name": "thing", "value": {"thing": [0], "x": 0}}], "message": "thing is {\"thing\": [0], \"x\": 0}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}},
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}], "message": "$input.o is {\"a\": 0, \"b\": [0]}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose reads a field named like the subject with a dot",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": ".x is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "every kids whose .kid is 1"}}},
+    "cases": [
+      {
+        "description": "the dot reads the item's own field kid, not the subject",
+        "rules": ["name.dot", "subjects.sentence"],
+        "input": {"kids": [{"kid": 1, "x": 1}, {"kid": 2, "x": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/kids/0/kid"], "name": ".kid", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"kid": 1, "x": 1}, "type": "kid"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/kids/1/kid"], "name": ".kid", "value": 2}], "message": ".kid is 2", "passed": false, "requirement": "r", "subject": {"id": {"kid": 2, "x": 1}, "type": "kid"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/kids/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"kid": 1, "x": 1}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "an item without the field is left out as absent and the report gives the dot",
+        "rules": ["name.dot", "subjects.sentence"],
+        "input": {"kids": [{"x": 1}]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/kids/0"], "name": ".kid", "value": null}], "message": ".kid is missing", "passed": false, "requirement": "r", "subject": {"id": {"x": 1}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a field named like the subject, written with a dot",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of .kid is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "every kids"}}},
+    "cases": [
+      {
+        "description": "a field that isn't a list or an object is said once, as the walk says it",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"kids": [{"kid": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of .kid", "value": null}, {"locations": [], "name": ".kid", "value": []}], "message": ".kid is 1, which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": {"kid": 1}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "a missing field is named with its dot in the inputs and in the message",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"kids": [{"x": 1}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": [], "name": "count of .kid", "value": null}, {"locations": [], "name": ".kid", "value": []}], "message": ".kid is missing", "passed": false, "requirement": "r", "subject": {"id": {"x": 1}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count whose reads a field named like the subject and a part",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of ys whose thing is p is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "every xs", "has": {"p": "thing"}}}},
+    "cases": [
+      {
+        "description": "an item that isn't an object is named with the dot of the field the whose reads",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"xs": [{"thing": {"x": 1}, "x": 2, "ys": [{"thing": 1}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0/ys/0"], "name": "count of ys whose thing equals p", "value": null}, {"locations": ["/xs/0/ys/0"], "name": "ys[]", "value": [{"thing": 1}]}, {"locations": ["/xs/0/thing"], "name": "p", "part": {"id": null, "name": "p"}, "value": {"x": 1}}], "message": "item 1 of ys: .thing is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"thing": {"x": 1}, "x": 2, "ys": [{"thing": 1}]}, "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a subject that isn't an object still lists the part the whose reads",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"xs": [[1, 2]]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": [], "name": "count of ys whose thing equals p", "value": null}, {"locations": [], "name": "ys", "value": []}, {"locations": ["/xs/0"], "name": "p", "part": {"id": null, "name": "p"}, "value": null}], "message": "thing is [1, 2], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [1, 2], "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a field named like the subject inside a count whose names the field with its dot",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of ys whose count of s is 1 is 1", "d": "count of ys whose s[0] is 1 is 1"}, "subject": "s"}}, "subjects": {"s": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "an item with no s is named item 3 of ys, and its field .s",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"things": [{"id": "t1", "ys": [{"k": 1, "s": [1]}, {"k": 2, "s": [1, 2]}, {"k": 3}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/0"], "name": "in-scope s count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/ys/0", "/things/0/ys/1", "/things/0/ys/2"], "name": "count of ys whose count of s is 1", "value": null}, {"locations": ["/things/0/ys/0", "/things/0/ys/1", "/things/0/ys/2"], "name": "ys[]", "value": [{"k": 1, "s": [1]}, {"k": 2, "s": [1, 2]}, {"k": 3}]}], "message": "item 3 of ys: .s is missing", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "s"}},
+          {"cause": "absent", "check": "d", "inputs": [{"locations": ["/things/0/ys/0", "/things/0/ys/1", "/things/0/ys/2"], "name": "count of ys whose item 1 of s is 1", "value": null}, {"locations": ["/things/0/ys/0", "/things/0/ys/1", "/things/0/ys/2"], "name": "ys[]", "value": [{"k": 1, "s": [1]}, {"k": 2, "s": [1, 2]}, {"k": 3}]}], "message": "item 3 of ys: item 1 of .s is missing", "passed": false, "requirement": "r", "subject": {"id": "t1", "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose that reads a field named like the item's alias reads the item's own field",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": ".x is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "rel.kids whose kid.x is 1"}, "rel": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "a kid whose own kid field has x 1 is the subject, whatever its own x",
+        "rules": ["subjects.from", "sentence.subject.from"],
+        "input": {"rels": [{"id": "r1", "kids": [{"id": "k1", "kid": {"x": 1}, "x": 1}], "rel": 1, "w": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rels/0/kids/0/kid/x"], "name": ".kid.x", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"id": "k1", "kid": {"x": 1}, "x": 1}, "in": {"rel": {"id": "r1", "kids": [{"id": "k1", "kid": {"x": 1}, "x": 1}], "rel": 1, "w": 1}}, "type": "kid"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rels/0/kids/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"id": "k1", "kid": {"x": 1}, "x": 1}, "in": {"rel": {"id": "r1", "kids": [{"id": "k1", "kid": {"x": 1}, "x": 1}], "rel": 1, "w": 1}}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "a kid whose own kid field has x 2 isn't a subject, even when its own x is 1",
+        "rules": ["subjects.from", "sentence.subject.from"],
+        "input": {"rels": [{"id": "r1", "kids": [{"id": "k1", "kid": {"x": 2}, "x": 1}], "rel": 1, "w": 1}]},
+        "results": [
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rels/0/kids/0/kid/x"], "name": ".kid.x", "value": 2}], "message": ".kid.x is 2", "passed": false, "requirement": "r", "subject": {"id": {"id": "k1", "kid": {"x": 2}, "x": 1}, "in": {"rel": {"id": "r1", "kids": [{"id": "k1", "kid": {"x": 2}, "x": 1}], "rel": 1, "w": 1}}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "a kid whose own kid field isn't an object fails, named with its dot",
+        "rules": ["subjects.from", "sentence.subject.from", "name.dot"],
+        "input": {"rels": [{"id": "r1", "kids": [{"id": "k1", "kid": 1, "x": 1}], "rel": 1, "w": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/rels/0/kids/0/kid"], "name": ".kid.x", "value": null}], "message": ".kid is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"id": "k1", "kid": 1, "x": 1}, "in": {"rel": {"id": "r1", "kids": [{"id": "k1", "kid": 1, "x": 1}], "rel": 1, "w": 1}}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose that reads a field named like the subject being defined reads the item's own field",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": ".w is 1"}, "subject": "rel"}}, "subjects": {"rel": {"from": "every rels whose rel.w is 1"}}},
+    "cases": [
+      {
+        "description": "a rel whose own rel field has w 1 is the subject, whatever its own w",
+        "rules": ["subjects.from", "sentence.subject.from"],
+        "input": {"rels": [{"id": "r1", "rel": {"w": 1}, "w": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rels/0/rel/w"], "name": ".rel.w", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"id": "r1", "rel": {"w": 1}, "w": 1}, "type": "rel"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rels/0/w"], "name": "w", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"id": "r1", "rel": {"w": 1}, "w": 1}, "type": "rel"}}
+        ]
+      },
+      {
+        "description": "a rel whose own rel field has w 2 isn't a subject, even when its own w is 1",
+        "rules": ["subjects.from", "sentence.subject.from"],
+        "input": {"rels": [{"id": "r1", "rel": {"w": 2}, "w": 1}]},
+        "results": [
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/rels/0/rel/w"], "name": ".rel.w", "value": 2}], "message": ".rel.w is 2", "passed": false, "requirement": "r", "subject": {"id": {"id": "r1", "rel": {"w": 2}, "w": 1}, "type": "rel"}}
+        ]
+      },
+      {
+        "description": "a rel whose own rel field isn't an object fails, named with its dot",
+        "rules": ["subjects.from", "sentence.subject.from", "name.dot"],
+        "input": {"rels": [{"id": "r1", "rel": 1, "w": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/rels/0/rel"], "name": ".rel.w", "value": null}], "message": ".rel is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"id": "r1", "rel": 1, "w": 1}, "type": "rel"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line of a child whose whose reads a field named like the parent reads the kid's field",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": ".x is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "rel.kids whose rel.w is 1"}, "rel": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "a kid with a rel field whose w is 1 is a subject",
+        "rules": ["subjects.from", "sentence.subject.from"],
+        "input": {"rels": [{"id": "r1", "kids": [{"id": "k1", "rel": {"w": 1}, "x": 1}], "rel": 1, "w": 2}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rels/0/kids/0/rel/w"], "name": ".rel.w", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"id": "k1", "rel": {"w": 1}, "x": 1}, "in": {"rel": {"id": "r1", "kids": [{"id": "k1", "rel": {"w": 1}, "x": 1}], "rel": 1, "w": 2}}, "type": "kid"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rels/0/kids/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"id": "k1", "rel": {"w": 1}, "x": 1}, "in": {"rel": {"id": "r1", "kids": [{"id": "k1", "rel": {"w": 1}, "x": 1}], "rel": 1, "w": 2}}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "a kid without a rel field isn't a subject, whatever the parent's w",
+        "rules": ["subjects.from", "sentence.subject.from"],
+        "input": {"rels": [{"id": "r1", "kids": [{"id": "k1", "kid": 1, "x": 1}], "rel": 1, "w": 1}]},
+        "results": [
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/rels/0/kids/0"], "name": ".rel.w", "value": null}], "message": ".rel.w is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "k1", "kid": 1, "x": 1}, "in": {"rel": {"id": "r1", "kids": [{"id": "k1", "kid": 1, "x": 1}], "rel": 1, "w": 1}}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the syntax can be compared with its own field",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "\"item\" is .\"item\""}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "cases": [
+      {
+        "description": "the subject isn't equal to its field",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"releases": [{"id": "a", "item": 1, "name": "b", "xs": [{"item": 1, "v": 1}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/releases/0"], "name": "item", "value": {"id": "a", "item": 1, "name": "b", "xs": [{"item": 1, "v": 1}]}}, {"locations": ["/releases/0/item"], "name": ".item", "value": 1}], "message": "item is {\"id\": \"a\", \"item\": 1, \"name\": \"b\", \"xs\": [{\"item\": 1, \"v\": 1}]}, which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"id": "a", "item": 1, "name": "b", "xs": [{"item": 1, "v": 1}]}, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the syntax is printed as written when something can't follow it: \"item\".name is \"a\"",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "\"item\".name is \"a\""}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "cases": [
+      {
+        "description": "the path is printed as written, with the quotes",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"releases": [{"id": "a", "item": 1, "name": "b", "xs": [{"item": 1, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["\"item\".name: nothing can follow item, which means the subject: for a field called item, write .item.name"]}], "message": "checks.c: \"item\".name: nothing can follow item, which means the subject: for a field called item, write .item.name", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the syntax is printed as written when something can't follow it: first of \"item\".name is \"a\"",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "first of \"item\".name is \"a\""}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "cases": [
+      {
+        "description": "the path is printed as written, with the quotes",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"releases": [{"id": "a", "item": 1, "name": "b", "xs": [{"item": 1, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["first of \"item\".name: nothing can follow item, which means the subject: for a field called item, write .item.name"]}], "message": "checks.c: first of \"item\".name: nothing can follow item, which means the subject: for a field called item, write .item.name", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the syntax is printed as written when something can't follow it: \"item\".\"x\" is 1",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "\"item\".\"x\" is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "cases": [
+      {
+        "description": "the path is printed as written, with the quotes",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"releases": [{"id": "a", "item": 1, "name": "b", "xs": [{"item": 1, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["\"item\".x: nothing can follow item, which means the subject: for a field called item, write .item.x"]}], "message": "checks.c: \"item\".x: nothing can follow item, which means the subject: for a field called item, write .item.x", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the syntax is printed as written when something can't follow it: \"item\"[0].x is 1",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "\"item\"[0].x is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "cases": [
+      {
+        "description": "the path is printed as written, with the quotes",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"releases": [{"id": "a", "item": 1, "name": "b", "xs": [{"item": 1, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["\"item\"[0].x: nothing can follow item, which means the subject: for a field called item, write .item[0].x"]}], "message": "checks.c: \"item\"[0].x: nothing can follow item, which means the subject: for a field called item, write .item[0].x", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the syntax is printed as written when something can't follow it: count of \"item\".xs is 1",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of \"item\".xs is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "cases": [
+      {
+        "description": "the path is printed as written, with the quotes",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"releases": [{"id": "a", "item": 1, "name": "b", "xs": [{"item": 1, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["\"item\".xs: nothing can follow item, which means the subject: for a field called item, write .item.xs"]}], "message": "checks.c: \"item\".xs: nothing can follow item, which means the subject: for a field called item, write .item.xs", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the syntax is printed as written in an any_of option",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"any_of": {"a": "\"item\".name is \"b\"", "b": "\"item\".name is \"c\""}}}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "cases": [
+      {
+        "description": "the option is printed as written, with the quotes",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"releases": [{"id": "a", "item": 1, "name": "b", "xs": [{"item": 1, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["option a: \"item\".name: nothing can follow item, which means the subject: for a field called item, write .item.name", "option b: \"item\".name: nothing can follow item, which means the subject: for a field called item, write .item.name"]}], "message": "checks.c: option a: \"item\".name: nothing can follow item, which means the subject: for a field called item, write .item.name; checks.c: option b: \"item\".name: nothing can follow item, which means the subject: for a field called item, write .item.name", "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the syntax is printed as written in a count whose and a sum whose",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of xs whose \"item\" is 1 is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "cases": [
+      {
+        "description": "the field the whose reads is printed with its quotes and no dot",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"releases": [{"id": "a", "item": 2, "name": "a", "xs": [{"item": 3, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/releases/0/xs/0"], "name": "count of xs whose \"item\" is 1", "value": 0}, {"locations": ["/releases/0/xs/0"], "name": "xs[]", "value": [{"item": 3, "v": 1}]}], "message": "count of xs whose \"item\" is 1 is 0", "passed": false, "requirement": "r", "subject": {"id": {"id": "a", "item": 2, "name": "a", "xs": [{"item": 3, "v": 1}]}, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name that is a word of the syntax is printed as written in a sum whose",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "sum of xs whose \"item\" is 1 is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "cases": [
+      {
+        "description": "the field the whose reads is printed with its quotes and no dot",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"releases": [{"id": "a", "item": 2, "name": "a", "xs": [{"item": 3, "v": 1}]}]},
+        "results": [
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/releases/0/xs/0"], "name": "sum of xs whose \"item\" is 1", "value": 0}, {"locations": ["/releases/0/xs/0"], "name": "xs[]", "value": [{"item": 3, "v": 1}]}], "message": "sum of xs whose \"item\" is 1 is 0", "passed": false, "requirement": "r", "subject": {"id": {"id": "a", "item": 2, "name": "a", "xs": [{"item": 3, "v": 1}]}, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sort key named like the subject sorts by the item's field, not by the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "x.id is \"b\"", "for": "first of xs sorted by rel as x"}}, "subject": "rel"}}, "subjects": {"rel": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "the item with the lowest rel comes first, whatever the subject's rel",
+        "rules": ["for.pick", "name.dot"],
+        "input": {"rels": [{"id": "s1", "rel": 7, "xs": [{"id": "a", "rel": 3}, {"id": "b", "rel": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/rels/0/xs/1"], "name": "item 2 of xs", "value": {"id": "b", "rel": 1}}], "passed": true, "requirement": "r", "subject": {"id": {"id": "s1", "rel": 7, "xs": [{"id": "a", "rel": 3}, {"id": "b", "rel": 1}]}, "type": "rel"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sort key named like a parent subject sorts by the item's field, not by the parent",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.v is 2", "for": "first of ys sorted by s as y"}}, "subject": "t"}}, "subjects": {"s": {"from": "every ps"}, "t": {"from": "s.items"}}},
+    "cases": [
+      {
+        "description": "the item with the lowest s comes first",
+        "rules": ["sentence.for.pick", "for.pick"],
+        "input": {"ps": [{"id": 1, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/ps/0/items/0/ys/1"], "name": "item 2 of ys", "value": {"s": 1, "v": 2}}], "passed": true, "requirement": "r", "subject": {"id": {"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}, "in": {"s": {"id": 1, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}}, "type": "t"}}
+        ]
+      },
+      {
+        "description": "an item without the field fails as absent, named with its dot",
+        "rules": ["sentence.for.pick", "for.pick", "name.dot"],
+        "input": {"ps": [{"id": 1, "items": [{"ys": [{"v": 3}, {"s": 1, "v": 2}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/ps/0/items/0/ys/0"], "path": "item 1 of ys", "value": null}], "inputs": [{"locations": ["/ps/0/items/0/ys/0", "/ps/0/items/0/ys/1"], "name": "ys[]", "value": [{"v": 3}, {"s": 1, "v": 2}]}], "message": "item 1 of ys: .s is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"v": 3}, {"s": 1, "v": 2}]}, "in": {"s": {"id": 1, "items": [{"ys": [{"v": 3}, {"s": 1, "v": 2}]}]}}, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sort key named like a grandparent subject sorts by the item's field, not by the grandparent",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.v is 2", "for": "first of ys sorted by s as y"}}, "subject": "t"}}, "subjects": {"s": {"from": "every ps"}, "t": {"from": "u.items"}, "u": {"from": "s.mids"}}},
+    "cases": [
+      {
+        "description": "the item with the lowest s comes first",
+        "rules": ["sentence.for.pick", "for.pick"],
+        "input": {"ps": [{"id": 1, "mids": [{"id": 2, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/ps/0/mids/0/items/0/ys/1"], "name": "item 2 of ys", "value": {"s": 1, "v": 2}}], "passed": true, "requirement": "r", "subject": {"id": {"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}, "in": {"s": {"id": 1, "mids": [{"id": 2, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}]}, "u": {"id": 2, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}}, "type": "t"}}
+        ]
+      },
+      {
+        "description": "a field that isn't a number, a time or a date fails as unusable, named with its dot",
+        "rules": ["sentence.for.pick", "for.pick", "name.dot"],
+        "input": {"ps": [{"id": 1, "mids": [{"id": 2, "items": [{"ys": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/ps/0/mids/0/items/0/ys/0/s"], "path": "item 1 of ys", "value": [1]}], "inputs": [{"locations": ["/ps/0/mids/0/items/0/ys/0", "/ps/0/mids/0/items/0/ys/1"], "name": "ys[]", "value": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}], "message": "item 1 of ys: .s is [1], which isn't a number, a time or a date", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}, "in": {"s": {"id": 1, "mids": [{"id": 2, "items": [{"ys": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}]}]}, "u": {"id": 2, "items": [{"ys": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}]}}, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose that reads a quoted word of the syntax named like the subject reads the item's own field: \"item\"",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": ".k is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every xs whose \"item\" is 1"}}},
+    "cases": [
+      {
+        "description": "the item's own item field decides, and an item that isn't an object is named by the subject's name",
+        "rules": ["sentence.path.start", "subjects.sentence", "name.dot"],
+        "input": {"xs": [{"first": 1, "item": 1, "k": 1}, {"first": [1, 2], "item": 2, "k": 2}, {"k": 3}, "a"]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/xs/0/item"], "name": ".item", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"first": 1, "item": 1, "k": 1}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/xs/1/item"], "name": ".item", "value": 2}], "message": ".item is 2", "passed": false, "requirement": "r", "subject": {"id": {"first": [1, 2], "item": 2, "k": 2}, "type": "item"}},
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/xs/2"], "name": ".item", "value": null}], "message": ".item is missing", "passed": false, "requirement": "r", "subject": {"id": {"k": 3}, "type": "item"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/xs/3"], "name": ".item", "value": null}], "message": "item is \"a\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "item"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"first": 1, "item": 1, "k": 1}, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose that reads a quoted word of the syntax named like the subject reads the item's own field: \"first\"",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": ".k is 1"}, "subject": "first"}}, "subjects": {"first": {"from": "every xs whose \"first\" is 1"}}},
+    "cases": [
+      {
+        "description": "the item's own first field decides, and an item that isn't an object is named by the subject's name",
+        "rules": ["sentence.path.start", "subjects.sentence", "name.dot"],
+        "input": {"xs": [{"first": 1, "item": 1, "k": 1}, {"first": [1, 2], "item": 2, "k": 2}, {"k": 3}, "a"]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "first"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope first count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "first"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/xs/0/first"], "name": ".first", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"first": 1, "item": 1, "k": 1}, "type": "first"}},
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/xs/1/first"], "name": ".first", "value": [1, 2]}], "message": ".first is [1, 2], which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"first": [1, 2], "item": 2, "k": 2}, "type": "first"}},
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/xs/2"], "name": ".first", "value": null}], "message": ".first is missing", "passed": false, "requirement": "r", "subject": {"id": {"k": 3}, "type": "first"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/xs/3"], "name": ".first", "value": null}], "message": "first is \"a\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "first"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"first": 1, "item": 1, "k": 1}, "type": "first"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the expression of a from line whose that reads a field named like the subject is the condition as written",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"q": {"checks": {"c": ".k is 1"}, "subject": "my t"}, "r": {"checks": {"c": ".k is 1"}, "subject": "t"}, "w": {"checks": {"c": ".k is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "s.items whose \"item\" is 1"}, "my t": {"from": "s.items whose \"my t\" is 1"}, "s": {"from": "every ps"}, "t": {"from": "s.items whose t is 1 and whose .t is 1"}}},
+    "cases": [
+      {
+        "description": "the subject's name stays as written, bare or with its dot, a quoted name stays quoted, and a quoted word of the syntax has a dot, while the inputs and messages name the field with its dot",
+        "rules": ["sentence.subject.applies", "sentence.print.canonical", "name.dot"],
+        "input": {"ps": [{"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}]},
+        "expressions": {"q": {"$applies": "\"my t\" is 1"}, "r": {"$applies": "t is 1 and .t is 1"}, "w": {"$applies": ".item is 1"}},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/ps/0/items/0/my t"], "name": ".\"my t\"", "value": 1}], "passed": true, "requirement": "q", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "my t"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/ps/0/items/1/my t"], "name": ".\"my t\"", "value": 2}], "message": ".\"my t\" is 2", "passed": false, "requirement": "q", "subject": {"id": {"item": 2, "k": 2, "my t": 2, "t": 2}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "my t"}},
+          {"cause": "satisfied", "check": "$applies", "failed_assertions": [], "inputs": [{"locations": ["/ps/0/items/0/t"], "name": ".t", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "t"}},
+          {"cause": "value", "check": "$applies", "failed_assertions": [{"assertion": "t is 1", "cause": "value"}, {"assertion": ".t is 1", "cause": "value"}], "inputs": [{"locations": ["/ps/0/items/1/t"], "name": ".t", "value": 2}], "message": ".t is 2", "passed": false, "requirement": "r", "subject": {"id": {"item": 2, "k": 2, "my t": 2, "t": 2}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "t"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/ps/0/items/0/item"], "name": ".item", "value": 1}], "passed": true, "requirement": "w", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/ps/0/items/1/item"], "name": ".item", "value": 2}], "message": ".item is 2", "passed": false, "requirement": "w", "subject": {"id": {"item": 2, "k": 2, "my t": 2, "t": 2}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "item"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ps/0/items/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "q", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "my t"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ps/0/items/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "t"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ps/0/items/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "w", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose that counts a quoted word of the syntax named like the subject counts the item's own field",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": ".k is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every xs whose count of \"item\" is 1"}}},
+    "cases": [
+      {
+        "description": "the count of the item's own item field decides",
+        "rules": ["sentence.path.start", "subjects.sentence", "name.dot"],
+        "input": {"xs": [{"item": [1], "k": 1}, {"item": [1, 2], "k": 2}, {"k": 3}, "a"]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/xs/0/item/0"], "name": ".item[]", "value": [1]}, {"locations": ["/xs/0/item/0"], "name": "count of .item", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"item": [1], "k": 1}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/xs/1/item/0", "/xs/1/item/1"], "name": ".item[]", "value": [1, 2]}, {"locations": ["/xs/1/item/0", "/xs/1/item/1"], "name": "count of .item", "value": 2}], "message": "count of .item is 2", "passed": false, "requirement": "r", "subject": {"id": {"item": [1, 2], "k": 2}, "type": "item"}},
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": [], "name": ".item", "value": []}, {"locations": [], "name": "count of .item", "value": null}], "message": ".item is missing", "passed": false, "requirement": "r", "subject": {"id": {"k": 3}, "type": "item"}},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": [], "name": ".item", "value": []}, {"locations": [], "name": "count of .item", "value": null}], "message": "item is \"a\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "item"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"item": [1], "k": 1}, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every on a quoted subject name that is a word of the syntax names the subject in its message",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "every \"item\" is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every xs"}}},
+    "cases": [
+      {
+        "description": "a subject that isn't a list is named item, and so are the items of one that is",
+        "rules": ["sentence.path.subject"],
+        "input": {"xs": ["a", [1], [2]]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0", "/xs/1", "/xs/2"], "name": "in-scope item count", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "item", "locations": ["/xs/0"], "path": "item", "value": "a"}], "inputs": [{"locations": [], "name": "item", "value": []}], "message": "item is \"a\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "item"}},
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/xs/1/0"], "name": "item[]", "value": [1]}], "passed": true, "requirement": "r", "subject": {"id": [1], "type": "item"}},
+          {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of item", "locations": ["/xs/2/0"], "path": "item 1 of item", "value": 2}], "inputs": [{"locations": ["/xs/2/0"], "name": "item[]", "value": [2]}], "message": "item 1 of item is 2", "passed": false, "requirement": "r", "subject": {"id": [2], "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line whose that walks a field named like the subject walks the item's own field",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "rel is not empty"}, "subject": "rel"}}, "subjects": {"rel": {"from": "every xs whose every rel is 1"}}},
+    "cases": [
+      {
+        "description": "items that aren't objects have no rel field, so none is a subject",
+        "rules": ["sentence.path.start", "subjects.sentence"],
+        "input": {"xs": ["a", "bb", ""]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "rel"}},
+          {"cause": "value", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope rel count", "value": 0}], "message": "in-scope rel count is 0", "passed": false, "requirement": "r", "subject": {"id": null, "type": "rel"}},
+          {"cause": "not_an_object", "check": "$applies", "failed_items": [], "inputs": [], "message": "rel is \"a\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "rel"}},
+          {"cause": "not_an_object", "check": "$applies", "failed_items": [], "inputs": [], "message": "rel is \"bb\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "bb", "type": "rel"}},
+          {"cause": "not_an_object", "check": "$applies", "failed_items": [], "inputs": [], "message": "rel is \"\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "", "type": "rel"}}
+        ]
+      },
+      {
+        "description": "the item's own rel list decides, and its items are named with the dot",
+        "rules": ["sentence.path.start", "subjects.sentence", "name.dot"],
+        "input": {"xs": [{"rel": [1]}, {"rel": [2]}, {"x": 1}]},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "rel"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope rel count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "rel"}},
+          {"cause": "satisfied", "check": "$applies", "failed_items": [], "inputs": [{"locations": ["/xs/0/rel/0"], "name": ".rel[]", "value": [1]}], "passed": true, "requirement": "r", "subject": {"id": {"rel": [1]}, "type": "rel"}},
+          {"cause": "value", "check": "$applies", "failed_items": [{"cause": "value", "item": "item 1 of .rel", "locations": ["/xs/1/rel/0"], "path": "item 1 of .rel", "value": 2}], "inputs": [{"locations": ["/xs/1/rel/0"], "name": ".rel[]", "value": [2]}], "message": "item 1 of .rel is 2", "passed": false, "requirement": "r", "subject": {"id": {"rel": [2]}, "type": "rel"}},
+          {"cause": "absent", "check": "$applies", "failed_items": [{"cause": "absent", "item": ".rel", "locations": ["/xs/2"], "path": ".rel", "value": null}], "inputs": [{"locations": [], "name": ".rel", "value": []}], "message": ".rel is missing", "passed": false, "requirement": "r", "subject": {"id": {"x": 1}, "type": "rel"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0"], "name": "rel", "value": {"rel": [1]}}], "message": "rel is {\"rel\": [1]}, which isn't text or a list", "passed": false, "requirement": "r", "subject": {"id": {"rel": [1]}, "type": "rel"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sort key that is a quoted word of the syntax and the subject's name sorts by the item's field",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "x.id is \"b\"", "for": "first of xs sorted by \"item\" as x"}}, "subject": "item"}}, "subjects": {"item": {"from": "every items"}}},
+    "cases": [
+      {
+        "description": "the item with the lowest item comes first, whatever the subject's item",
+        "rules": ["for.pick", "name.dot"],
+        "input": {"items": [{"id": "s1", "item": 7, "xs": [{"id": "a", "item": 3}, {"id": "b", "item": 1}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/items/0/xs/1"], "name": "item 2 of xs", "value": {"id": "b", "item": 1}}], "passed": true, "requirement": "r", "subject": {"id": {"id": "s1", "item": 7, "xs": [{"id": "a", "item": 3}, {"id": "b", "item": 1}]}, "type": "item"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject name with \"a<b\" can't be followed by a step, as the name of any subject",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "\"a<b\".x is 1"}, "subject": "a<b"}}, "subjects": {"a<b": {"from": "every things"}}},
+    "cases": [
+      {
+        "description": "the sentence is written wrong and says how to read the field",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"things": [{"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["\"a<b\".x: nothing can follow a<b, which means the subject: for a field called a<b, write .\"a<b\".x"]}], "message": "checks.c: \"a<b\".x: nothing can follow a<b, which means the subject: for a field called a<b, write .\"a<b\".x", "passed": false, "requirement": "r", "subject": {"id": null, "type": "a<b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count whose reads a field named like a subject with \"a<b\" with its dot",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of ys whose \"a<b\" is 1 is 1"}, "subject": "a<b"}}, "subjects": {"a<b": {"from": "every things"}}},
+    "cases": [
+      {
+        "description": "the field the whose reads is named with its dot",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"things": [{"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/ys/0", "/things/0/ys/1"], "name": "count of ys whose \"a<b\" is 1", "value": null}, {"locations": ["/things/0/ys/0", "/things/0/ys/1"], "name": "ys[]", "value": [{"v": 1}, {"v": 2}]}], "message": "item 1 of ys: .\"a<b\" is missing; item 2 of ys: .\"a<b\" is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}, "type": "a<b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject name with \"a\\\"b\" can't be followed by a step, as the name of any subject",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "\"a\\\"b\".x is 1"}, "subject": "a\"b"}}, "subjects": {"a\"b": {"from": "every things"}}},
+    "cases": [
+      {
+        "description": "the sentence is written wrong and says how to read the field",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"things": [{"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["\"a\\\"b\".x: nothing can follow a\"b, which means the subject: for a field called a\"b, write .\"a\\\"b\".x"]}], "message": "checks.c: \"a\\\"b\".x: nothing can follow a\"b, which means the subject: for a field called a\"b, write .\"a\\\"b\".x", "passed": false, "requirement": "r", "subject": {"id": null, "type": "a\"b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count whose reads a field named like a subject with \"a\\\"b\" with its dot",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of ys whose \"a\\\"b\" is 1 is 1"}, "subject": "a\"b"}}, "subjects": {"a\"b": {"from": "every things"}}},
+    "cases": [
+      {
+        "description": "the field the whose reads is named with its dot",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"things": [{"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/ys/0", "/things/0/ys/1"], "name": "count of ys whose \"a\\\"b\" is 1", "value": null}, {"locations": ["/things/0/ys/0", "/things/0/ys/1"], "name": "ys[]", "value": [{"v": 1}, {"v": 2}]}], "message": "item 1 of ys: .\"a\\\"b\" is missing; item 2 of ys: .\"a\\\"b\" is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}, "type": "a\"b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a subject name with \"a\\\\b\" can't be followed by a step, as the name of any subject",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "\"a\\\\b\".x is 1"}, "subject": "a\\b"}}, "subjects": {"a\\b": {"from": "every things"}}},
+    "cases": [
+      {
+        "description": "the sentence is written wrong and says how to read the field",
+        "rules": ["name.dot", "sentence.path.subject.name"],
+        "input": {"things": [{"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["\"a\\\\b\".x: nothing can follow a\\b, which means the subject: for a field called a\\b, write .\"a\\\\b\".x"]}], "message": "checks.c: \"a\\\\b\".x: nothing can follow a\\b, which means the subject: for a field called a\\b, write .\"a\\\\b\".x", "passed": false, "requirement": "r", "subject": {"id": null, "type": "a\\b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count whose reads a field named like a subject with \"a\\\\b\" with its dot",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": "count of ys whose \"a\\\\b\" is 1 is 1"}, "subject": "a\\b"}}, "subjects": {"a\\b": {"from": "every things"}}},
+    "cases": [
+      {
+        "description": "the field the whose reads is named with its dot",
+        "rules": ["name.dot", "tally.whose"],
+        "input": {"things": [{"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/things/0/ys/0", "/things/0/ys/1"], "name": "count of ys whose \"a\\\\b\" is 1", "value": null}, {"locations": ["/things/0/ys/0", "/things/0/ys/1"], "name": "ys[]", "value": [{"v": 1}, {"v": 2}]}], "message": "item 1 of ys: .\"a\\\\b\" is missing; item 2 of ys: .\"a\\\\b\" is missing", "passed": false, "requirement": "r", "subject": {"id": {"id": "t1", "x": 1, "ys": [{"v": 1}, {"v": 2}]}, "type": "a\\b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the subject name followed by [0] is written wrong, whatever the check says",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": "rel[0] is 1", "b": "rel[1] is 2", "c": "rel[0].k is 1", "d": "every rel[0] is 1", "e": "count of rel[0] is 1", "f": "x is rel[0]", "g": "rel[0] exists", "h": "rel[0][1] is 1", "i": "some rel[0] is 1", "j": "every items whose k is rel[0] is 1"}, "subject": "rel"}}, "subjects": {"rel": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "a list subject: each check says to write a dot for a field",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"items": [{"k": 1}], "rels": [[1, 2]], "x": 1},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 10}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.b", "value": ["rel[1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[1]"]}, {"locations": [], "name": "checks.c", "value": ["rel[0].k: nothing can follow rel, which means the subject: for a field called rel, write .rel[0].k"]}, {"locations": [], "name": "checks.d", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.e", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.f", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.g", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.h", "value": ["rel[0][1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0][1]"]}, {"locations": [], "name": "checks.i", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.j", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}], "message": "checks.a: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.b: rel[1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[1]; checks.c: rel[0].k: nothing can follow rel, which means the subject: for a field called rel, write .rel[0].k; checks.d: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.e: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.f: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.g: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.h: rel[0][1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0][1]; checks.i: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.j: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]", "passed": false, "requirement": "r", "subject": {"id": null, "type": "rel"}}
+        ]
+      },
+      {
+        "description": "an object subject: the same problems",
+        "rules": ["sentence.path.subject.step", "sentence.written_wrong.slot", "written_wrong", "written_wrong.row"],
+        "input": {"items": [{"k": 1}], "rels": [{"a": 1}], "x": 1},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 10}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.b", "value": ["rel[1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[1]"]}, {"locations": [], "name": "checks.c", "value": ["rel[0].k: nothing can follow rel, which means the subject: for a field called rel, write .rel[0].k"]}, {"locations": [], "name": "checks.d", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.e", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.f", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.g", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.h", "value": ["rel[0][1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0][1]"]}, {"locations": [], "name": "checks.i", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}, {"locations": [], "name": "checks.j", "value": ["rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]"]}], "message": "checks.a: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.b: rel[1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[1]; checks.c: rel[0].k: nothing can follow rel, which means the subject: for a field called rel, write .rel[0].k; checks.d: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.e: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.f: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.g: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.h: rel[0][1]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0][1]; checks.i: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]; checks.j: rel[0]: nothing can follow rel, which means the subject: for a field called rel, write .rel[0]", "passed": false, "requirement": "r", "subject": {"id": null, "type": "rel"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "first of and item N of the subject name are read as positions",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": "first of rel is 1", "b": "item 2 of rel is 2"}, "subject": "rel"}}, "subjects": {"rel": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "on a list subject they pass",
+        "rules": ["sentence.path.index", "sentence.path.subject.name"],
+        "input": {"rels": [[1, 2]]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/rels/0/0"], "name": "item 1 of rel", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "rel"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/rels/0/1"], "name": "item 2 of rel", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": [1, 2], "type": "rel"}}
+        ]
+      },
+      {
+        "description": "on an object subject they fail because it isn't a list",
+        "rules": ["sentence.path.index", "sentence.path.subject.name"],
+        "input": {"rels": [{"a": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/rels/0"], "name": "item 1 of rel", "value": null}], "message": "rel is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"a": 1}, "type": "rel"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/rels/0"], "name": "item 2 of rel", "value": null}], "message": "rel is {\"a\": 1}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"a": 1}, "type": "rel"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name followed by [0] after count of says to write a dot, and on the right side it is text",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": "count of \"my rel\"[0] is 1", "b": "x is \"my rel\"[0]"}, "subject": "my rel"}}, "subjects": {"my rel": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "the count says what count of rel[0] says, and text followed by [0] doesn't parse",
+        "rules": ["sentence.path.subject.step", "sentence.path.subject.right", "written_wrong"],
+        "input": {"rels": [[1, 2]], "x": 1},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["\"my rel\"[0]: nothing can follow my rel, which means the subject: for a field called my rel, write .\"my rel\"[0]"]}, {"locations": [], "name": "checks.b", "value": ["doesn't parse"]}], "message": "checks.a: \"my rel\"[0]: nothing can follow my rel, which means the subject: for a field called my rel, write .\"my rel\"[0]; checks.b: doesn't parse", "passed": false, "requirement": "r", "subject": {"id": null, "type": "my rel"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a quoted subject name followed by [0] is written wrong, and first of it is read",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": "\"a b\"[0] is 1", "b": "first of \"a b\" is 1", "c": "\"a b\"[0].k is 1"}, "subject": "a b"}}, "subjects": {"a b": {"from": "every rels"}}},
+    "cases": [
+      {
+        "description": "the problem prints the name as written and the field with its dot",
+        "rules": ["sentence.path.subject.step", "name.dot"],
+        "input": {"rels": [[1, 2]]},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 3}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["\"a b\"[0]: nothing can follow a b, which means the subject: for a field called a b, write .\"a b\"[0]"]}, {"locations": [], "name": "checks.c", "value": ["\"a b\"[0].k: nothing can follow a b, which means the subject: for a field called a b, write .\"a b\"[0].k"]}], "message": "checks.a: \"a b\"[0]: nothing can follow a b, which means the subject: for a field called a b, write .\"a b\"[0]; checks.c: \"a b\"[0].k: nothing can follow a b, which means the subject: for a field called a b, write .\"a b\"[0].k", "passed": false, "requirement": "r", "subject": {"id": null, "type": "a b"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a field or a part named like the subject can take [0]",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"a": ".rel[0] is 1", "b": "p[0] is 1"}, "subject": "rel"}}, "subjects": {"rel": {"from": "every rels", "has": {"p": "ps"}}}},
+    "cases": [
+      {
+        "description": "none of them is written wrong",
+        "rules": ["sentence.path.subject.step", "parts.alias"],
+        "input": {"rels": [{"ps": [1], "rel": [1]}]},
+        "results": [
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/rels/0/rel/0"], "name": "item 1 of .rel", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"ps": [1], "rel": [1]}, "type": "rel"}},
+          {"cause": "satisfied", "check": "b", "inputs": [{"locations": ["/rels/0/ps/0"], "name": "item 1 of p", "part": {"id": null, "name": "p"}, "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"ps": [1], "rel": [1]}, "type": "rel"}}
+        ]
+      }
+    ]
+  }
+]

@@ -334,13 +334,6 @@ fn read_subject(name: &str, value: &Value) -> Subject {
             None
         }
     };
-    if name == "it" {
-        add_problem(
-            &mut problems,
-            field_name(&["subjects", name]),
-            "it is a word of the grammar, so a subject can't be called it",
-        );
-    }
     for problem in written_name_problems(name) {
         add_problem(&mut problems, field_name(&["subjects", name]), problem);
     }
@@ -994,15 +987,9 @@ mod tests {
     }
 
     #[test]
-    fn a_subject_called_it_is_written_wrong() {
+    fn a_subject_called_it_is_written_right_like_any_other_name() {
         let policy = json!({"ergo_spec": "v0.5-dev", "subjects": {"it": {"from": "t"}}, "requirements": {"s": {"subject": "it", "checks": {"c": "x"}}}});
-        assert_eq!(
-            requirement_problems(policy, "s"),
-            [problem(
-                "subjects.it",
-                &["it is a word of the grammar, so a subject can't be called it"]
-            )]
-        );
+        assert!(requirement_problems(policy, "s").is_empty());
     }
 
     #[test]

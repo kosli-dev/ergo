@@ -98,7 +98,7 @@ const follow = () => {
 
 const drawSource = () => {
   const blocks = last?.blocks ?? [];
-  const located = markdownSentences(src.value, blocks);
+  const located = markdownSentences(src.value, blocks, last?.policy ?? null);
   markdownSubjects = located.subjects;
   markdownEntries = markdownAnalyser(located);
   paint(hl, decorateLines(highlightMarkdown(src.value, blocks), src.value, markdownEntries));

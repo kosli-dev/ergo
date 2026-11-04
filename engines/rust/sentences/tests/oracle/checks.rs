@@ -360,7 +360,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("\"$schema\" is \"v1\"", "\"$schema\" is \"v1\"", &[], &[]),
     ("\"a/b\".\"c~d\" is 1", "\"a/b\".\"c~d\" is 1", &[], &[]),
-    ("\"it\" is 1", ".it is 1", &[], &[]),
     (
         "\"q r\" is .\"a.b\" named by kk named by k plus count of zz[$params.k] plus days elapsed from last of x.\"é\"._k to item 3 of y",
         "\"q r\" equals .\"a.b\" named by kk named by k plus count of zz named by $params.k plus days elapsed from last of x.\"é\"._k to item 3 of y",
@@ -470,12 +469,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
-        ".\"a.b\" named by $params.k plus count of .\"a.b\" plus $params.p is \"a\\u00e9\" and sum of .it.z.q is not $input.i named by kk named by k plus count of .it._k plus sum of \"q r\"",
-        ".\"a.b\" named by $params.k plus count of \"a.b\" plus $params.p is \"aé\" and sum of .it.z.q does not equal $input.i named by kk named by k plus count of .it._k plus sum of \"q r\"",
-        &[],
-        &[],
-    ),
-    (
         ".\"a.b\"[\"s t\"] is not empty",
         "\"a.b\".\"s t\" is not empty",
         &[],
@@ -572,26 +565,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (".empty is 1", ".empty is 1", &[], &[]),
     (".empty is an object", ".empty is an object", &[], &[]),
     (
-        ".it contains none of 1, true",
-        ".it contains none of 1, true",
-        &[],
-        &[],
-    ),
-    (".it is 'b\\c'", ".it is 'b\\c'", &[], &[]),
-    (".it is 1", ".it is 1", &[], &[]),
-    (
-        ".it is 1 and it is an object",
-        ".it is 1 and it is an object",
-        &[],
-        &[],
-    ),
-    (
-        ".true is 1 and some .it equals sum of $input.i and item 2 from last of .true.\"\" equals 1e2",
-        ".true is 1 and some .it equals sum of $input.i and item 2 from last of .true.\"\" is 100",
-        &[],
-        &[],
-    ),
-    (
         ".true named by k.q equals null",
         ".true named by k.q is null",
         &[],
@@ -606,12 +579,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         ".true.\"é\".\"é\" equals 0.10",
         ".true.\"é\".\"é\" is 0.1",
-        &[],
-        &[],
-    ),
-    (
-        ".true._k plus hours elapsed from .it.q to .true plus ._x-1 is less than days elapsed from .it.q to zz",
-        ".true._k plus hours elapsed from .it.q to .true plus _x-1 is less than days elapsed from .it.q to zz",
         &[],
         &[],
     ),
@@ -1021,18 +988,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("count of it is 2", "count of it is 2", &[], &[]),
     (
-        "count of item 2 from last of .it is days elapsed from x.\"w v\" to .true",
-        "count of item 2 from last of .it equals days elapsed from x.\"w v\" to .true",
-        &[],
-        &[],
-    ),
-    (
-        "count of item 3 of .it whose last of x is \"s\" is \"a\\u00e9\" and item 3 of zz.q.\"w v\" is between 2.5 and 4e2 and .it is sum of \"$s\".\"é\"[$params.k]",
-        "count of item 3 of .it whose last of x is \"s\" is \"aé\" and item 3 of zz.q.\"w v\" is between 2.5 and 400 and .it equals sum of \"$s\".\"é\" named by $params.k",
-        &[],
-        &[],
-    ),
-    (
         "count of items is at least 0.000e5",
         "count of items is at least 0",
         &[],
@@ -1389,18 +1344,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every .\"a.b\" is between -1 and 4e2",
         "every \"a.b\" is between -1 and 400",
-        &[],
-        &[],
-    ),
-    (
-        "every .it is null and .\"a.b\" is not one of \"s\"",
-        "every .it is null and \"a.b\" is not one of \"s\"",
-        &[],
-        &[],
-    ),
-    (
-        "every .it.z, if any, is between 1 and 4e2",
-        "every .it.z, if any, is between 1 and 400",
         &[],
         &[],
     ),
@@ -2567,12 +2510,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("first of \"q r\" is 1", "first of \"q r\" is 1", &[], &[]),
-    (
-        "first of .it.q.\"é\" is less than 0.10",
-        "first of .it.q.\"é\" is less than 0.1",
-        &[],
-        &[],
-    ),
     ("first of b is \"x\"", "first of b is \"x\"", &[], &[]),
     ("first of it is 1", "first of it is 1", &[], &[]),
     ("first of xs is \"a\"", "first of xs is \"a\"", &[], &[]),
@@ -2698,7 +2635,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("item 3 of x.q is 1", "item 3 of x.q is 1", &[], &[]),
-    ("k1 is in .it", "k1 is in .it", &[], &[]),
     ("k1 is in last of .true", "k1 is in last of .true", &[], &[]),
     (
         "k1 plus 5 is between 1 and 3 and first of .\"a.b\" named by $params.\"x y\" is a list",
@@ -2712,12 +2648,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("l contains w", "l contains w", &[], &[]),
     ("l contains y.z", "l contains y.z", &[], &[]),
     ("l does not contain w", "l does not contain w", &[], &[]),
-    (
-        "last of .it[0] is between 2.5 and 4e2",
-        "last of .it[0] is between 2.5 and 400",
-        &[],
-        &[],
-    ),
     (
         "last of .true.\"é\" is between -1 and 3",
         "last of .true.\"é\" is between -1 and 3",
@@ -3021,12 +2951,6 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "some ._x-1 whose count of .\"a.b\".\"\" named by k equals 1 matches \"a\\u00e9\"",
         "some _x-1 whose count of \"a.b\".\"\" named by k is 1 matches \"aé\"",
-        &[],
-        &[],
-    ),
-    (
-        "some .it does not equal 1e2",
-        "some .it is not 100",
         &[],
         &[],
     ),
@@ -5227,6 +5151,469 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("zz contains $input.y.v", "zz contains $input.y.v", &[], &[]),
     ("zz contains $params.v", "zz contains $params.v", &[], &[]),
     ("zz contains y.v", "zz contains y.v", &[], &[]),
+    ("\"it\" is 1", "it is 1", &[], &[]),
+    (
+        ".\"a.b\" named by $params.k plus count of .\"a.b\" plus $params.p is \"a\\u00e9\" and sum of .it.z.q is not $input.i named by kk named by k plus count of .it._k plus sum of \"q r\"",
+        ".\"a.b\" named by $params.k plus count of \"a.b\" plus $params.p is \"aé\" and sum of it.z.q does not equal $input.i named by kk named by k plus count of it._k plus sum of \"q r\"",
+        &[],
+        &[],
+    ),
+    (
+        ".it contains none of 1, true",
+        "it contains none of 1, true",
+        &[],
+        &[],
+    ),
+    (".it is 'b\\c'", "it is 'b\\c'", &[], &[]),
+    (".it is 1", "it is 1", &[], &[]),
+    (
+        ".it is 1 and it is an object",
+        "it is 1 and it is an object",
+        &[],
+        &[],
+    ),
+    (
+        ".true is 1 and some .it equals sum of $input.i and item 2 from last of .true.\"\" equals 1e2",
+        ".true is 1 and some it equals sum of $input.i and item 2 from last of .true.\"\" is 100",
+        &[],
+        &[],
+    ),
+    (
+        ".true._k plus hours elapsed from .it.q to .true plus ._x-1 is less than days elapsed from .it.q to zz",
+        ".true._k plus hours elapsed from it.q to .true plus _x-1 is less than days elapsed from it.q to zz",
+        &[],
+        &[],
+    ),
+    (
+        "count of item 2 from last of .it is days elapsed from x.\"w v\" to .true",
+        "count of item 2 from last of it equals days elapsed from x.\"w v\" to .true",
+        &[],
+        &[],
+    ),
+    (
+        "count of item 3 of .it whose last of x is \"s\" is \"a\\u00e9\" and item 3 of zz.q.\"w v\" is between 2.5 and 4e2 and .it is sum of \"$s\".\"é\"[$params.k]",
+        "count of item 3 of it whose last of x is \"s\" is \"aé\" and item 3 of zz.q.\"w v\" is between 2.5 and 400 and it equals sum of \"$s\".\"é\" named by $params.k",
+        &[],
+        &[],
+    ),
+    (
+        "every .it is null and .\"a.b\" is not one of \"s\"",
+        "every it is null and \"a.b\" is not one of \"s\"",
+        &[],
+        &[],
+    ),
+    (
+        "every .it.z, if any, is between 1 and 4e2",
+        "every it.z, if any, is between 1 and 400",
+        &[],
+        &[],
+    ),
+    (
+        "first of .it.q.\"é\" is less than 0.10",
+        "first of it.q.\"é\" is less than 0.1",
+        &[],
+        &[],
+    ),
+    ("k1 is in .it", "k1 is in it", &[], &[]),
+    (
+        "last of .it[0] is between 2.5 and 4e2",
+        "last of it[0] is between 2.5 and 400",
+        &[],
+        &[],
+    ),
+    (
+        "some .it does not equal 1e2",
+        "some it is not 100",
+        &[],
+        &[],
+    ),
+    ("x is in thing", "x is in thing", &[], &[]),
+    ("x is not in thing", "x is not in thing", &[], &[]),
+    ("x is one of thing", "x is in thing", &[], &[]),
+    ("x is in $input.o", "x is in $input.o", &[], &[]),
+    (".x is 1", "x is 1", &[], &[]),
+    ("k is 1", "k is 1", &[], &[]),
+    ("count of .kid is 1", "count of kid is 1", &[], &[]),
+    (
+        "count of ys whose thing is p is 1",
+        "count of ys whose thing equals p is 1",
+        &[],
+        &[],
+    ),
+    ("\"item\" is a string", ".item is a string", &[], &[]),
+    ("\"item\" is not empty", ".item is not empty", &[], &[]),
+    ("\"my w\" is not empty", "\"my w\" is not empty", &[], &[]),
+    ("\"region\" is 1", "region is 1", &[], &[]),
+    (
+        "\"tag list\" is not empty",
+        "\"tag list\" is not empty",
+        &[],
+        &[],
+    ),
+    ("\"that\" is not empty", ".that is not empty", &[], &[]),
+    (
+        "$input.m named by region is 1",
+        "$input.m named by region is 1",
+        &[],
+        &[],
+    ),
+    (
+        "$params.m named by it is 1",
+        "$params.m named by it is 1",
+        &[],
+        &[],
+    ),
+    (
+        "$params.m named by region is 1",
+        "$params.m named by region is 1",
+        &[],
+        &[],
+    ),
+    ("$params.p equals it", "$params.p equals it", &[], &[]),
+    (
+        "$params.wanted equals region",
+        "$params.wanted equals region",
+        &[],
+        &[],
+    ),
+    (".name is 1", "name is 1", &[], &[]),
+    (".region is 1", "region is 1", &[], &[]),
+    (
+        ".region is 1 and region is an object",
+        "region is 1 and region is an object",
+        &[],
+        &[],
+    ),
+    (".region.name is \"n\"", "region.name is \"n\"", &[], &[]),
+    ("c exists", "c exists", &[], &[]),
+    (
+        "count of $input.ws whose ref is region is 1",
+        "count of $input.ws whose ref equals region is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of $input.ws whose region is 1 is 1",
+        "count of $input.ws whose region is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of l whose it is 1 is 2",
+        "count of l whose it is 1 is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of name is 1 plus it",
+        "count of name equals 1 plus it",
+        &[],
+        &[],
+    ),
+    ("count of plain is 2", "count of plain is 2", &[], &[]),
+    (
+        "count of region is $params.n",
+        "count of region equals $params.n",
+        &[],
+        &[],
+    ),
+    ("count of region is 2", "count of region is 2", &[], &[]),
+    (
+        "count of region.items is 1",
+        "count of region.items is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of ws whose x is region[0].y is 1",
+        "count of ws whose x equals region[0].y is 1",
+        &[],
+        &[],
+    ),
+    ("e is region.name", "e equals region.name", &[], &[]),
+    (
+        "every \"tag list\" is a string",
+        "every \"tag list\" is a string",
+        &[],
+        &[],
+    ),
+    (
+        "every first of region is 1",
+        "every first of region is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every name whose it is 1 is 2",
+        "every name whose it is 1 is 2",
+        &[],
+        &[],
+    ),
+    (
+        "every name whose x is it is 2",
+        "every name whose x equals it is 2",
+        &[],
+        &[],
+    ),
+    ("every plain is 1", "every plain is 1", &[], &[]),
+    ("every region is 1", "every region is 1", &[], &[]),
+    (
+        "every region is a string",
+        "every region is a string",
+        &[],
+        &[],
+    ),
+    (
+        "every region.items is 1",
+        "every region.items is 1",
+        &[],
+        &[],
+    ),
+    ("every region.name is 1", "every region.name is 1", &[], &[]),
+    (
+        "every ws whose x is region.name is 1",
+        "every ws whose x equals region.name is 1",
+        &[],
+        &[],
+    ),
+    ("first of it.name is 1", "first of it.name is 1", &[], &[]),
+    ("first of region is 1", "first of region is 1", &[], &[]),
+    (
+        "first of region.name is 1",
+        "first of region.name is 1",
+        &[],
+        &[],
+    ),
+    (
+        "it is 1 and name is it",
+        "it is 1 and name equals it",
+        &[],
+        &[],
+    ),
+    (
+        "it named by $params.k is 1",
+        "it named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    ("it named by k is 1", "it named by k is 1", &[], &[]),
+    ("it.\"x y\" is 1", "it.\"x y\" is 1", &[], &[]),
+    ("it.name is 1", "it.name is 1", &[], &[]),
+    ("it[0] is 1", "item 1 of it is 1", &[], &[]),
+    ("it[0].name is 1", "it[0].name is 1", &[], &[]),
+    (
+        "item 2 of region is 'x'",
+        "item 2 of region is \"x\"",
+        &[],
+        &[],
+    ),
+    ("item 2 of region is 2", "item 2 of region is 2", &[], &[]),
+    ("kid is 1", "kid is 1", &[], &[]),
+    ("m named by region is 1", "m named by region is 1", &[], &[]),
+    ("name is it", "name equals it", &[], &[]),
+    ("name is one of it", "name is in it", &[], &[]),
+    ("plain is 1", "plain is 1", &[], &[]),
+    ("plain is not empty", "plain is not empty", &[], &[]),
+    ("region exists", "region exists", &[], &[]),
+    (
+        "region is $params.wanted",
+        "region equals $params.wanted",
+        &[],
+        &[],
+    ),
+    ("region is 'a'", "region is \"a\"", &[], &[]),
+    ("region is 1", "region is 1", &[], &[]),
+    (
+        "region is 1 and region is a number",
+        "region is 1 and region is a number",
+        &[],
+        &[],
+    ),
+    ("region is a list", "region is a list", &[], &[]),
+    (
+        "region is a non-empty string",
+        "region is a non-empty string",
+        &[],
+        &[],
+    ),
+    ("region is a number", "region is a number", &[], &[]),
+    ("region is a string", "region is a string", &[], &[]),
+    ("region is an object", "region is an object", &[], &[]),
+    ("region is at least 2", "region is at least 2", &[], &[]),
+    (
+        "region is in $params.allowed",
+        "region is in $params.allowed",
+        &[],
+        &[],
+    ),
+    ("region is not empty", "region is not empty", &[], &[]),
+    (
+        "region is one of $params.allowed_regions",
+        "region is in $params.allowed_regions",
+        &[],
+        &[],
+    ),
+    (
+        "region named by $params.k is 1",
+        "region named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "region starts with 'a'",
+        "region starts with \"a\"",
+        &[],
+        &[],
+    ),
+    ("region.\"x y\" is 1", "region.\"x y\" is 1", &[], &[]),
+    ("region.name exists", "region.name exists", &[], &[]),
+    ("region.name is 1", "region.name is 1", &[], &[]),
+    ("region.x is 1", "region.x is 1", &[], &[]),
+    ("region[0] is 1", "item 1 of region is 1", &[], &[]),
+    ("region[0].name is 1", "region[0].name is 1", &[], &[]),
+    ("s exists", "s exists", &[], &[]),
+    ("some region is 1", "some region is 1", &[], &[]),
+    (
+        "some region is a string",
+        "some region is a string",
+        &[],
+        &[],
+    ),
+    ("some region.name is 1", "some region.name is 1", &[], &[]),
+    (
+        "sum of region is 1 plus count of region",
+        "sum of region equals 1 plus count of region",
+        &[],
+        &[],
+    ),
+    ("sum of region is 3", "sum of region is 3", &[], &[]),
+    ("sum of region.n is 1", "sum of region.n is 1", &[], &[]),
+    ("word is a string", "word is a string", &[], &[]),
+    ("x equals region[0].y", "x equals region[0].y", &[], &[]),
+    ("x is 1 plus region.n", "x equals 1 plus region.n", &[], &[]),
+    ("x is first of it", "x equals first of it", &[], &[]),
+    ("x is first of region", "x equals first of region", &[], &[]),
+    ("x is one of it", "x is in it", &[], &[]),
+    ("x is one of region.names", "x is in region.names", &[], &[]),
+    ("x is region.name", "x equals region.name", &[], &[]),
+    (
+        "\"item\" is .\"item\"",
+        ".item equals .item",
+        &[".item is compared with itself"],
+        &[".item is compared with itself"],
+    ),
+    ("\"item\".\"x\" is 1", ".item.x is 1", &[], &[]),
+    ("\"item\".name is \"a\"", ".item.name is \"a\"", &[], &[]),
+    ("\"item\".name is \"b\"", ".item.name is \"b\"", &[], &[]),
+    ("\"item\".name is \"c\"", ".item.name is \"c\"", &[], &[]),
+    ("\"item\"[0].x is 1", ".item[0].x is 1", &[], &[]),
+    (".w is 1", "w is 1", &[], &[]),
+    (
+        "count of \"item\".xs is 1",
+        "count of .item.xs is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose \"item\" is 1 is 1",
+        "count of xs whose .item is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "first of \"item\".name is \"a\"",
+        "first of .item.name is \"a\"",
+        &[],
+        &[],
+    ),
+    (
+        "sum of xs whose \"item\" is 1 is 1",
+        "sum of xs whose .item is 1 is 1",
+        &[],
+        &[],
+    ),
+    ("x.id is \"b\"", "x.id is \"b\"", &[], &[]),
+    ("\"a<b\".x is 1", "\"a<b\".x is 1", &[], &[]),
+    ("\"a\\\"b\".x is 1", "\"a\\\"b\".x is 1", &[], &[]),
+    ("\"a\\\\b\".x is 1", "\"a\\\\b\".x is 1", &[], &[]),
+    (
+        "count of ys whose \"a<b\" is 1 is 1",
+        "count of ys whose \"a<b\" is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose \"a\\\"b\" is 1 is 1",
+        "count of ys whose \"a\\\"b\" is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose \"a\\\\b\" is 1 is 1",
+        "count of ys whose \"a\\\\b\" is 1 is 1",
+        &[],
+        &[],
+    ),
+    ("\"a b\"[0] is 1", "item 1 of \"a b\" is 1", &[], &[]),
+    ("\"a b\"[0].k is 1", "\"a b\"[0].k is 1", &[], &[]),
+    (".rel[0] is 1", "item 1 of rel is 1", &[], &[]),
+    (
+        "count of rel[0] is 1",
+        "count of item 1 of rel is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every items whose k is rel[0] is 1",
+        "every items whose k equals item 1 of rel is 1",
+        &[],
+        &[],
+    ),
+    ("every rel[0] is 1", "every item 1 of rel is 1", &[], &[]),
+    ("first of \"a b\" is 1", "first of \"a b\" is 1", &[], &[]),
+    ("first of rel is 1", "first of rel is 1", &[], &[]),
+    ("item 2 of rel is 2", "item 2 of rel is 2", &[], &[]),
+    ("p[0] is 1", "item 1 of p is 1", &[], &[]),
+    ("rel[0] exists", "item 1 of rel exists", &[], &[]),
+    ("rel[0] is 1", "item 1 of rel is 1", &[], &[]),
+    ("rel[0].k is 1", "rel[0].k is 1", &[], &[]),
+    ("rel[0][1] is 1", "item 2 of rel[0] is 1", &[], &[]),
+    ("rel[1] is 2", "item 2 of rel is 2", &[], &[]),
+    ("some rel[0] is 1", "some item 1 of rel is 1", &[], &[]),
+    ("x is rel[0]", "x equals item 1 of rel", &[], &[]),
+    (
+        "count of \"my rel\"[0] is 1",
+        "count of item 1 of \"my rel\" is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of $input.ys whose k is s is 1",
+        "count of $input.ys whose k equals s is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of $input.ys whose k is .s is 2",
+        "count of $input.ys whose k equals s is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose count of s is 1 is 1",
+        "count of ys whose count of s is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of ys whose s[0] is 1 is 1",
+        "count of ys whose item 1 of s is 1 is 1",
+        &[],
+        &[],
+    ),
+    ("every \"item\" is 1", "every .item is 1", &[], &[]),
+    ("rel is not empty", "rel is not empty", &[], &[]),
+    ("y.v is 2", "y.v is 2", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -5296,10 +5683,6 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     (
         "$params.p does not equal y named by $params.k[0] plus \"$s\".y named by $params.\"x y\" plus count of k1",
         &["doesn't parse"],
-    ),
-    (
-        "$params.p equals it",
-        &["it can only start an assertion: write it first, like it is not empty"],
     ),
     (
         "$params.p is a list and count of \"$s\"._k.\"é\" whose some ._x-1 named by $params.\"x y\", if any, is not sum of x plus count of k1 within 2 and y contains none of true is between 1 and 3 and count of .it.z does not equal \"a\\u00e9\" plus 5",
@@ -5612,10 +5995,6 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     (
         "count of last of $input.i whose some $input.i is 'b\\c' and k1 is not -2.50 plus count of x.q.\"é\" plus 5 within 2 is at most -2.50 and sum of .it.y whose every .true is true is on or after sum of $params.p named by kk.z and some item 0 of zz whose count of .\"a.b\" equals .it, if any, is true",
         &["a condition after and starts with whose or that"],
-    ),
-    (
-        "count of name is 1 plus it",
-        &["it can only start an assertion: write it first, like it is not empty"],
     ),
     ("count of x is count of y whose a is 1", &["doesn't parse"]),
     (
@@ -6043,47 +6422,11 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ("every items whose x.y matches true", &["doesn't parse"]),
     ("every items.x.y equals item 0 of l", &["doesn't parse"]),
     (
-        "every name whose x is it is 2",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
-    (
         "every v\".z, if any, is less than 5",
         &["unclosed quote at column 8"],
     ),
     ("every x equals item 0 of l", &["doesn't parse"]),
     ("every x[0]._k equals", &["doesn't parse"]),
-    (
-        "first of it.name is 1",
-        &["it is the whole subject: write name, not it.name"],
-    ),
-    (
-        "it is 1 and name is it",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
-    (
-        "it named by $params.k is 1",
-        &["it is the whole subject: nothing can follow it"],
-    ),
-    (
-        "it named by k is 1",
-        &["it is the whole subject: nothing can follow it"],
-    ),
-    (
-        "it.\"x y\" is 1",
-        &["it is the whole subject: write \"x y\", not it.\"x y\""],
-    ),
-    (
-        "it.name is 1",
-        &["it is the whole subject: write name, not it.name"],
-    ),
-    (
-        "it[0] is 1",
-        &["it is the whole subject: nothing can follow it"],
-    ),
-    (
-        "it[0].name is 1",
-        &["it is the whole subject: nothing can follow it"],
-    ),
     (
         "item 0 of x[\"s t\"].q does not contain sum of item 0 of $input.i and count of y._k[\"s equals true",
         &["unclosed quote at column 83"],
@@ -6119,14 +6462,6 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     (
         "months elapsed from started to ended is 1",
         &["doesn't parse"],
-    ),
-    (
-        "name is it",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
-    (
-        "name is one of it",
-        &["it can only start an assertion: write it first, like it is not empty"],
     ),
     ("of .\"a.b\".z equals 1", &["doesn't parse"]),
     (
@@ -6268,19 +6603,11 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ("x is 1 within", &["\"within\" needs a number after it"]),
     ("x is a thing", &["doesn't parse"]),
     (
-        "x is first of it",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
-    (
         "x is more than count of .true plus hours elapsed from \"$s\" to .it[\"s t\"] plus sum of k1 and sum of $input.i.\"w v\" whose days elapsed from \"q r\" to $params.p is a string equals item 2 from last of y.q.q and count of y does not match \"a\\u00e9\"",
         &[
             "does not match can't follow a count of, a sum of or a plus",
             "is a can't follow a count of, a sum of or a plus",
         ],
-    ),
-    (
-        "x is one of it",
-        &["it can only start an assertion: write it first, like it is not empty"],
     ),
     (
         "x named by $params.k.q is x plus hours elapsed from k1 to .true.\"é\" plus ._x-1 and some zz whose $input.i equals \"$s\".y.\"w v\" plus count of x plus item 2 from last of $input.i[\"s t\"], if any, is not \"a\\u00e9\" within 2",
@@ -6383,6 +6710,12 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         "every that is not empty",
         &["that is a word of the grammar: write .that"],
     ),
+    ("x is \"my rel\"[0]", &["doesn't parse"]),
+    ("a exists", &["a is a word of the grammar: write .a"]),
+    (
+        "every region.items whose a is 1 is 2",
+        &["a is a word of the grammar: write .a"],
+    ),
 ];
 
 pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
@@ -6404,7 +6737,6 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         "$input.i[0].q is on or after \"s\" and ._x-1 plus x named by $input.q is not 'b\\c' and \"$s\" is in zz",
         &["\"is on or after\" takes a time or a number"],
     ),
-    ("$params.m named by it is 1", &["it can't name a key"]),
     ("$params.p._k.q matches -2.50", &["invalid pattern -2.5"]),
     (
         "$params.p.q equals 1 and sum of item 3 of .empty whose $params.p.\"é\".q equals \"s\" equals 1 and some last of \"$s\", if any, is .true named by $params.\"x y\"",
@@ -6511,10 +6843,6 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     (
         "count of items whose k is 1 is between 1e2 and 99",
         &["min above max"],
-    ),
-    (
-        "count of l whose it is 1 is 2",
-        &["it can only start an assertion: write it first, like it is not empty"],
     ),
     (
         "count of x is days elapsed from zz.z named by k to .\"a.b\"._k[0] and item 2 from last of k1 matches 1",
@@ -6847,10 +7175,6 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     (
         "every items.x.y matches \"a?+\"",
         &["invalid pattern \"a?+\""],
-    ),
-    (
-        "every name whose it is 1 is 2",
-        &["it can only start an assertion: write it first, like it is not empty"],
     ),
     (
         "every pull_requests.labels does not contain \"hotfix\"",
@@ -7666,24 +7990,6 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
-    (
-        "every .empty[0] as k1, every last of y.z.y whose count of ._x-1.\"é\".\"é\" is less than .it.y.\"w v\" plus 1e2 as j",
-        "every item 1 of .empty as k1, every last of y.z.y whose count of _x-1.\"é\".\"é\" is less than .it.y.\"w v\" plus 100 as j",
-        &[],
-        &[],
-    ),
-    (
-        "every .it.\"\", if any, as k1, some k1.y as i",
-        "every .it.\"\", if any, as k1, some k1.y as i",
-        &[],
-        &[],
-    ),
-    (
-        "every .it.z.\"é\", if any, as pr",
-        "every .it.z.\"é\", if any, as pr",
-        &[],
-        &[],
-    ),
     ("every approvers as ap", "every approvers as ap", &[], &[]),
     (
         "every approvers as approver, every commits.files as file",
@@ -8079,12 +8385,6 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every y.q[3] as pr", "every item 4 of y.q as pr", &[], &[]),
-    (
-        "every y[$params.k] as pr, some .it whose days elapsed from .empty to .it equals $input.i named by k named by $params.k as i",
-        "every y named by $params.k as pr, some .it whose days elapsed from .empty to .it equals $input.i named by k named by $params.k as i",
-        &[],
-        &[],
-    ),
     ("every ys as cap", "every ys as cap", &[], &[]),
     (
         "every zz, if any, as pr",
@@ -8124,12 +8424,6 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "first of zz._k.\"\" whose sum of \"q r\"[k] equals 1 sorted by .true named by $params.k alphabetically as pr",
         "first of zz._k.\"\" whose sum of \"q r\" named by k is 1 sorted by .true named by $params.k alphabetically as pr",
-        &[],
-        &[],
-    ),
-    (
-        "first of zz.q whose .it is y plus $input.i.\"\" plus first of $params.p.\"\".y sorted by .it as l",
-        "first of zz.q whose .it equals y plus $input.i.\"\" plus first of $params.p.\"\".y sorted by .it as l",
         &[],
         &[],
     ),
@@ -8704,6 +8998,175 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every $params as p", "every $params as p", &[], &[]),
     ("every $params.v as p", "every $params.v as p", &[], &[]),
+    (
+        "every .empty[0] as k1, every last of y.z.y whose count of ._x-1.\"é\".\"é\" is less than .it.y.\"w v\" plus 1e2 as j",
+        "every item 1 of .empty as k1, every last of y.z.y whose count of _x-1.\"é\".\"é\" is less than it.y.\"w v\" plus 100 as j",
+        &[],
+        &[],
+    ),
+    (
+        "every .it.\"\", if any, as k1, some k1.y as i",
+        "every it.\"\", if any, as k1, some k1.y as i",
+        &[],
+        &[],
+    ),
+    (
+        "every .it.z.\"é\", if any, as pr",
+        "every it.z.\"é\", if any, as pr",
+        &[],
+        &[],
+    ),
+    ("every thing as k", "every thing as k", &[], &[]),
+    (
+        "every xs whose k is 1 as x",
+        "every xs whose k is 1 as x",
+        &[],
+        &[],
+    ),
+    (
+        "every ys whose k is 1 as y",
+        "every ys whose k is 1 as y",
+        &[],
+        &[],
+    ),
+    (
+        "every y[$params.k] as pr, some .it whose days elapsed from .empty to .it equals $input.i named by k named by $params.k as i",
+        "every y named by $params.k as pr, some it whose days elapsed from .empty to it equals $input.i named by k named by $params.k as i",
+        &[],
+        &[],
+    ),
+    (
+        "first of zz.q whose .it is y plus $input.i.\"\" plus first of $params.p.\"\".y sorted by .it as l",
+        "first of zz.q whose it equals y plus $input.i.\"\" plus first of $params.p.\"\".y sorted by it as l",
+        &[],
+        &[],
+    ),
+    (
+        "every \"$s\" named by $params.\"x y\" as it",
+        "every \"$s\" named by $params.\"x y\" as it",
+        &[],
+        &[],
+    ),
+    (
+        "every ._x-1.y as j, every $input.i named by $params.\"x y\".\"\" as it",
+        "every _x-1.y as j, every $input.i named by $params.\"x y\".\"\" as it",
+        &[],
+        &[],
+    ),
+    (
+        "every .it whose .\"a.b\" is between 1 and 3 as it, item 2 of $input.i as j",
+        "every it whose \"a.b\" is between 1 and 3 as it, item 2 of $input.i as j",
+        &[],
+        &[],
+    ),
+    (
+        "every .it whose days elapsed from .it to k1 equals \"a\\u00e9\", if any, as it, every .it named by k as j",
+        "every it whose days elapsed from it to k1 is \"aé\", if any, as it, every .it named by k as j",
+        &[],
+        &[],
+    ),
+    ("every it as e", "every it as e", &[], &[]),
+    ("every it as i", "every it as i", &[], &[]),
+    (
+        "every item 2 from last of .empty as it",
+        "every item 2 from last of .empty as it",
+        &[],
+        &[],
+    ),
+    ("every items as it", "every items as it", &[], &[]),
+    (
+        "every items as y, every .y.zs whose it is 0 as z",
+        "every items as y, every .y.zs whose it is 0 as z",
+        &[],
+        &[],
+    ),
+    (
+        "every items whose count of it is 1 as i",
+        "every items whose count of it is 1 as i",
+        &[],
+        &[],
+    ),
+    (
+        "every items whose it is 1 as i",
+        "every items whose it is 1 as i",
+        &[],
+        &[],
+    ),
+    ("every l as it", "every l as it", &[], &[]),
+    ("every l as region", "every l as region", &[], &[]),
+    (
+        "every l whose it is 1 as e",
+        "every l whose it is 1 as e",
+        &[],
+        &[],
+    ),
+    (
+        "every region.items as e",
+        "every region.items as e",
+        &[],
+        &[],
+    ),
+    (
+        "first of \"$s\".y as l, every .\"a.b\" whose .empty is null and whose y is not in 0.10, 1e2, 0.10 as it",
+        "first of \"$s\".y as l, every \"a.b\" whose .empty is null and whose y is not one of 0.1, 100, 0.1 as it",
+        &[],
+        &[],
+    ),
+    (
+        "item 2 from last of zz.\"w v\" sorted by zz as j, some $params.p whose .it is alphabetically after 'b\\c' as it",
+        "item 2 from last of zz.\"w v\" sorted by zz as j, some $params.p whose it is alphabetically after 'b\\c' as it",
+        &[],
+        &[],
+    ),
+    (
+        "last of .\"a.b\".\"w v\" whose sum of k1 equals null sorted by i as j, every y.y as it",
+        "last of \"a.b\".\"w v\" whose sum of k1 is null sorted by i as j, every y.y as it",
+        &[],
+        &[],
+    ),
+    ("last of it as i", "last of it as i", &[], &[]),
+    (
+        "last of l sorted by it as e",
+        "last of l sorted by it as e",
+        &[],
+        &[],
+    ),
+    (
+        "last of other sorted by it as l",
+        "last of other sorted by it as l",
+        &[],
+        &[],
+    ),
+    (
+        "some ._x-1[$params.k] as it",
+        "some _x-1 named by $params.k as it",
+        &[],
+        &[],
+    ),
+    (
+        "some last of $params.p as it",
+        "some last of $params.p as it",
+        &[],
+        &[],
+    ),
+    (
+        "first of xs sorted by \"item\" as x",
+        "first of xs sorted by .item as x",
+        &[],
+        &[],
+    ),
+    (
+        "first of xs sorted by rel as x",
+        "first of xs sorted by rel as x",
+        &[],
+        &[],
+    ),
+    (
+        "first of ys sorted by s as y",
+        "first of ys sorted by s as y",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
@@ -8800,14 +9263,6 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
         "every commits sorted by timestamp as commit",
         &["\"sorted by\" goes after a position, like \"last of\", not after every or some"],
     ),
-    (
-        "every it as e",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
-    (
-        "every it as i",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
     ("every item 0 of .it.z, if any, as k1", &["doesn't parse"]),
     (
         "every item 0 of t\"].\"w v\" as j",
@@ -8865,13 +9320,6 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
     (
         "every items i",
         &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
-    ),
-    (
-        "every items sorted by it as i",
-        &[
-            "\"sorted by\" goes after a position, like \"last of\", not after every or some",
-            "it can only start an assertion: write it first, like it is not empty",
-        ],
     ),
     (
         "every items sorted by k as i",
@@ -9042,10 +9490,6 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
         &["if any can't go with a position"],
     ),
     (
-        "last of it as i",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
-    (
         "last of items sorted by $input.x as l",
         &["\"sorted by\" reads a field of each item"],
     ),
@@ -9072,14 +9516,6 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
     (
         "last of items, if any, as i",
         &["if any can't go with a position"],
-    ),
-    (
-        "last of l sorted by it as e",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
-    (
-        "last of other sorted by it as l",
-        &["it can only start an assertion: write it first, like it is not empty"],
     ),
     (
         "some \"$s\" whose every $input.i is .empty, if any, as j, first of .true.z named by $input.q, if any, as x",
@@ -9143,13 +9579,13 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
         "every ys as \" y\"",
         &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
     ),
+    (
+        "every items sorted by it as i",
+        &["\"sorted by\" goes after a position, like \"last of\", not after every or some"],
+    ),
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
-    (
-        "every items as y, every .y.zs whose it is 0 as z",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
     (
         "every .cov.xs as a, every cov.xs as b",
         &["a can't be an alias"],
@@ -9160,10 +9596,6 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ),
     ("some .cov.xs as a", &["a can't be an alias"]),
     ("every xs whose zz is $foo as x", &["unknown name $foo"]),
-    (
-        "every \"$s\" named by $params.\"x y\" as it",
-        &["it can't be an alias"],
-    ),
     (
         "every \"$s\" named by $params.k, if any, as params",
         &["params can't be an alias"],
@@ -9181,24 +9613,8 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["if any can't go with some"],
     ),
     (
-        "every ._x-1.y as j, every $input.i named by $params.\"x y\".\"\" as it",
-        &["it can't be an alias"],
-    ),
-    (
         "every .it as params, some .\"a.b\".q as pr",
         &["params can't be an alias"],
-    ),
-    (
-        "every .it whose .\"a.b\" is between 1 and 3 as it, item 2 of $input.i as j",
-        &["it can't be an alias"],
-    ),
-    (
-        "every .it whose days elapsed from .it to k1 equals \"a\\u00e9\", if any, as it, every .it named by k as j",
-        &["it can't be an alias"],
-    ),
-    (
-        "every item 2 from last of .empty as it",
-        &["it can't be an alias"],
     ),
     (
         "every item 3 of y whose .\"a.b\" equals null and whose x is a string as params",
@@ -9216,16 +9632,7 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ),
     ("every items as i, some other as i", &["i is given twice"]),
     ("every items as input", &["input can't be an alias"]),
-    ("every items as it", &["it can't be an alias"]),
     ("every items as params", &["params can't be an alias"]),
-    (
-        "every items whose count of it is 1 as i",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
-    (
-        "every items whose it is 1 as i",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
     (
         "every items whose k is at least \"a\" as i",
         &["\"is at least\" takes a number"],
@@ -9258,15 +9665,6 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         "every items[9007199254740992] as i",
         &["9007199254740992 can't be a list position"],
     ),
-    ("every l as it", &["it can't be an alias"]),
-    (
-        "every l whose it is 1 as e",
-        &["it can only start an assertion: write it first, like it is not empty"],
-    ),
-    (
-        "every x as j, some \"$s\" whose .true named by kk is not in $input.i and whose k1 is days elapsed from .true to \"$s\", if any, as it",
-        &["if any can't go with some", "it can't be an alias"],
-    ),
     ("every xs as empty", &["empty can't be an alias"]),
     ("every xs as input", &["input can't be an alias"]),
     ("every xs as params", &["params can't be an alias"]),
@@ -9284,14 +9682,6 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["params can't be an alias"],
     ),
     (
-        "first of \"$s\".y as l, every .\"a.b\" whose .empty is null and whose y is not in 0.10, 1e2, 0.10 as it",
-        &["it can't be an alias"],
-    ),
-    (
-        "item 2 from last of zz.\"w v\" sorted by zz as j, some $params.p whose .it is alphabetically after 'b\\c' as it",
-        &["it can't be an alias"],
-    ),
-    (
         "item 2 of .it whose $input.i is less than true as x",
         &["\"is less than\" takes a number"],
     ),
@@ -9304,10 +9694,6 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["9007199254740992 can't be a list position"],
     ),
     (
-        "last of .\"a.b\".\"w v\" whose sum of k1 equals null sorted by i as j, every y.y as it",
-        &["it can't be an alias"],
-    ),
-    (
         "last of items sorted by i as l, last of other as i",
         &["\"sorted by\" reads a field of the item, not i: write .i"],
     ),
@@ -9316,13 +9702,6 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         &["\"sorted by\" reads a field of the item, not l: write .l"],
     ),
     ("some \"$s\" as params", &["params can't be an alias"]),
-    (
-        "some \"$s\" whose $input.i is count of zz plus item 3 of $params.p.\"\".\"w v\" plus $params.p and whose .it[$params.k] is alphabetically after 1e2 as it, every item 2 from last of k1.q as j",
-        &[
-            "\"is alphabetically after\" takes text",
-            "it can't be an alias",
-        ],
-    ),
     (
         "some \"$s\".\"w v\" whose .empty.\"w v\"[3] is more than \"s\" as pr",
         &["\"is more than\" takes a number"],
@@ -9346,11 +9725,6 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
     ),
     ("some .\"a.b\" as params", &["params can't be an alias"]),
     (
-        "some ._x-1, if any, as pr, every .it named by kk whose k1 is not one of k1 named by $params.k._k as it",
-        &["if any can't go with some", "it can't be an alias"],
-    ),
-    ("some ._x-1[$params.k] as it", &["it can't be an alias"]),
-    (
         "some .empty named by $params.\"x y\".y as params, last of $input.i named by kk sorted by y.q as x",
         &["params can't be an alias"],
     ),
@@ -9362,26 +9736,33 @@ pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
         "some .true whose sum of zz named by kk[k] is between -1 and 3 as params, every .empty.\"\" as i",
         &["params can't be an alias"],
     ),
-    (
-        "some item 2 from last of zz whose .empty.q.z is between 2.5 and 3, if any, as it, every .true.\"é\" as it",
-        &[
-            "if any can't go with some",
-            "it can't be an alias",
-            "it is given twice",
-        ],
-    ),
-    (
-        "some item 3 of zz, if any, as it, some \"q r\".y as j",
-        &["if any can't go with some", "it can't be an alias"],
-    ),
     ("some items, if any, as i", &["if any can't go with some"]),
     ("some k1.z, if any, as i", &["if any can't go with some"]),
-    ("some last of $params.p as it", &["it can't be an alias"]),
     (
         "some y named by $params.k as pr, every $params.p, if any, as params",
         &["params can't be an alias"],
     ),
     ("some zz, if any, as i", &["if any can't go with some"]),
+    (
+        "every x as j, some \"$s\" whose .true named by kk is not in $input.i and whose k1 is days elapsed from .true to \"$s\", if any, as it",
+        &["if any can't go with some"],
+    ),
+    (
+        "some \"$s\" whose $input.i is count of zz plus item 3 of $params.p.\"\".\"w v\" plus $params.p and whose .it[$params.k] is alphabetically after 1e2 as it, every item 2 from last of k1.q as j",
+        &["\"is alphabetically after\" takes text"],
+    ),
+    (
+        "some ._x-1, if any, as pr, every .it named by kk whose k1 is not one of k1 named by $params.k._k as it",
+        &["if any can't go with some"],
+    ),
+    (
+        "some item 2 from last of zz whose .empty.q.z is between 2.5 and 3, if any, as it, every .true.\"é\" as it",
+        &["if any can't go with some", "it is given twice"],
+    ),
+    (
+        "some item 3 of zz, if any, as it, some \"q r\".y as j",
+        &["if any can't go with some"],
+    ),
 ];
 
 pub const PATTERNS: &[(&str, bool)] = &[

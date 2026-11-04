@@ -5984,7 +5984,7 @@
               "id": "text"
             },
             "check": "c",
-            "message": "it is \"text\", which isn't an object",
+            "message": "thing is \"text\", which isn't an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [],
@@ -13416,13 +13416,13 @@
   },
   {
     "description": "more for lines that read own fields named like aliases or parts",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r00": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every items as y", "assert": "p is at least 2"}}}, "r01": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every cov.xs as q", "assert": "p is at least 2"}}}, "r02": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every items whose n is p as q", "assert": "q.n is 9"}}}, "r03": {"subject": "round", "checks": {"c": {"for": "some .cov.xs as p", "assert": "p is 9"}}}, "r04": {"subject": "round", "checks": {"c": {"for": "every items as cov, every .cov.zs as z", "assert": "z is at least 1"}}}, "r05": {"subject": "round", "checks": {"c": {"for": "every items as y, some .y.zs as z", "assert": "z is 9"}}}, "r06": {"subject": "round", "checks": {"c": {"for": "every items as y, every .y.zs whose it is 0 as z", "assert": "z is 9"}}}, "r07": {"subject": "round", "checks": {"c": {"for": "every items as y, every y.zs as z", "assert": ".y.k is 9"}}}}},
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}}, "requirements": {"r00": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every items as y", "assert": "p is at least 2"}}}, "r01": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every cov.xs as q", "assert": "p is at least 2"}}}, "r02": {"subject": "round", "checks": {"c": {"for": "every .cov.xs as p, every items whose n is p as q", "assert": "q.n is 9"}}}, "r03": {"subject": "round", "checks": {"c": {"for": "some .cov.xs as p", "assert": "p is 9"}}}, "r04": {"subject": "round", "checks": {"c": {"for": "every items as cov, every .cov.zs as z", "assert": "z is at least 1"}}}, "r05": {"subject": "round", "checks": {"c": {"for": "every items as y, some .y.zs as z", "assert": "z is 9"}}}, "r07": {"subject": "round", "checks": {"c": {"for": "every items as y, every y.zs as z", "assert": ".y.k is 9"}}}}},
     "cases": [
       {
         "description": "names the own fields with the dot in the failed items, inputs and assertions",
         "rules": ["name.dot", "for.failure_inputs"],
         "input": {"rounds": [{"id": "r1", "y": {"k": 1, "zs": [5, 0]}, "cov": {"k": 1, "xs": [1, 2], "zs": [0]}, "d": {"b": {"k": 5, "xs": [1], "zs": [7]}}, "items": [{"id": "i1", "n": 1, "cov": 1, "zs": [1], "y": {"k": 0}, "ws": [0]}, {"id": "i2", "n": 3, "cov": 2, "zs": [2], "y": {"k": 9}, "ws": [4]}], "rs": [{"cov": 1, "y": 3}]}]},
-        "status": {"r00": "not_met", "r01": "not_met", "r02": "not_met", "r03": "not_met", "r04": "not_met", "r05": "not_met", "r06": "not_met", "r07": "not_met"},
+        "status": {"r00": "not_met", "r01": "not_met", "r02": "not_met", "r03": "not_met", "r04": "not_met", "r05": "not_met", "r07": "not_met"},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r00", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r01", "subject": {"id": null, "type": "round"}},
@@ -13430,7 +13430,6 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r03", "subject": {"id": null, "type": "round"}},
           {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["cov can't be an alias: it's a part of round"]}], "message": "checks.c: cov can't be an alias: it's a part of round", "passed": false, "requirement": "r04", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r05", "subject": {"id": null, "type": "round"}},
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["for: it can only start an assertion: write it first, like it is not empty"]}], "message": "checks.c: for: it can only start an assertion: write it first, like it is not empty", "passed": false, "requirement": "r06", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r07", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r00", "subject": {"id": null, "type": "round"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0"], "name": "in-scope round count", "value": 1}], "passed": true, "requirement": "r01", "subject": {"id": null, "type": "round"}},
@@ -24008,6 +24007,72 @@
               "type": "thing"
             }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose item path is the subject's own name, on a subject that isn't an object",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "k is 1", "for": "every thing as k"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "every xs"}}},
+    "cases": [
+      {
+        "description": "a list subject is not an object, whatever it holds",
+        "rules": ["for.flaws"],
+        "input": {"xs": [[1, 2]]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is [1, 2], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [1, 2], "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a text subject is not an object",
+        "rules": ["for.flaws"],
+        "input": {"xs": ["text"]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is \"text\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "text", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "an empty list subject is not an object",
+        "rules": ["for.flaws"],
+        "input": {"xs": [[]]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is [], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [], "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a list of objects as the subject is not an object",
+        "rules": ["for.flaws"],
+        "input": {"xs": [[{"k": 1}]]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is [{\"k\": 1}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [{"k": 1}], "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line on a subject that isn't an object names the subject",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.k is 1", "for": "every ys whose k is 1 as y"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "every xs"}}},
+    "cases": [
+      {
+        "description": "the message names thing, never the subject",
+        "rules": ["for.flaws", "message.items"],
+        "input": {"xs": [3]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [], "inputs": [], "message": "thing is 3, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line's whose on an item that isn't an object names the item",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "x.k is 1", "for": "every xs whose k is 1 as x"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "$input"}}},
+    "cases": [
+      {
+        "description": "the message says the item is the value, with no colon and no subject",
+        "rules": ["message.items"],
+        "input": {"xs": [1]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/xs/0"], "path": "item 1 of xs", "value": 1}], "inputs": [{"locations": ["/xs/0"], "name": "xs[]", "value": [1]}], "message": "item 1 of xs is 1, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": {"xs": [1]}, "type": "thing"}}
         ]
       }
     ]

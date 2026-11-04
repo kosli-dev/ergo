@@ -4993,7 +4993,7 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
+            "message": "$input is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -5054,7 +5054,7 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
+            "message": "$input is null",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -6621,7 +6621,7 @@
               "type": "s"
             },
             "check": "$min_subjects",
-            "message": "it is \"text\", which isn't a list or an object",
+            "message": "$input is \"text\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -6928,7 +6928,7 @@
         "r": {
           "subject": "c",
           "checks": {
-            "c1": "it exists"
+            "c1": "c exists"
           }
         }
       }
@@ -6969,7 +6969,7 @@
               "type": "c"
             },
             "check": "$min_subjects",
-            "message": "it is missing",
+            "message": "k is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -6992,7 +6992,7 @@
               "type": "c"
             },
             "check": "c1",
-            "message": "it is missing",
+            "message": "c is missing",
             "passed": false,
             "cause": "value",
             "inputs": [
@@ -7000,7 +7000,7 @@
                 "locations": [
                   "/things"
                 ],
-                "name": "it",
+                "name": "c",
                 "value": null
               }
             ]
@@ -17894,7 +17894,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
+            "message": "artifact is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -17933,7 +17933,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is 5, which isn't a list or an object",
+            "message": "artifact is 5, which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -17976,7 +17976,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "item 1 of $input: pulls is null, which isn't a list or an object",
+            "message": "item 1 of artifact: pulls is null, which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -18015,7 +18015,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is true, which isn't a list or an object",
+            "message": "artifact is true, which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -18054,7 +18054,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
+            "message": "artifact is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -18242,7 +18242,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
+            "message": "artifact is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [
@@ -18281,7 +18281,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
+            "message": "artifact is null",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -18343,7 +18343,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is null, which isn't a list or an object",
+            "message": "item 1 of p is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18463,7 +18463,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is missing",
+            "message": "item 1 of p is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18525,7 +18525,7 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of $input is null, which isn't a list or an object",
+            "message": "item 2 of p is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18649,7 +18649,7 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of $input is missing",
+            "message": "item 2 of p is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18715,7 +18715,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is null, which isn't a list or an object",
+            "message": "item 1 of p is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18835,7 +18835,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is missing",
+            "message": "item 1 of p is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -18897,7 +18897,7 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of $input is null, which isn't a list or an object",
+            "message": "item 2 of p is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19021,7 +19021,7 @@
                 "value": 0
               }
             ],
-            "message": "item 2 of $input is missing",
+            "message": "item 2 of p is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19117,7 +19117,7 @@
                 "value": 0
               }
             ],
-            "message": "it is missing",
+            "message": "p is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -19233,7 +19233,7 @@
                 "value": 0
               }
             ],
-            "message": "it is missing",
+            "message": "p is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20011,7 +20011,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input is missing",
+            "message": "item 1 of artifact is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20050,7 +20050,7 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
+            "message": "artifact is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20089,7 +20089,7 @@
                 "value": 0
               }
             ],
-            "message": "it is \"s\", which isn't a list or an object",
+            "message": "artifact is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -20387,7 +20387,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
+            "message": "pr is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20409,7 +20409,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
+            "message": "pr is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20475,7 +20475,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
+            "message": "artifact is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20514,7 +20514,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
+            "message": "artifact is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20583,7 +20583,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
+            "message": "artifact is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20622,7 +20622,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
+            "message": "artifact is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20692,7 +20692,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
+            "message": "artifact is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20731,7 +20731,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is null",
+            "message": "artifact is null",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -20803,7 +20803,7 @@
               }
             },
             "check": "$min_subjects",
-            "message": "it is \"x\", which isn't a list or an object",
+            "message": "open is \"x\", which isn't a list or an object",
             "passed": false,
             "cause": "not_an_object",
             "inputs": [
@@ -21169,7 +21169,7 @@
                 "value": 0
               }
             ],
-            "message": "it is \"s\", which isn't a list or an object",
+            "message": "artifact is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21190,7 +21190,7 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
+            "message": "artifact is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21211,7 +21211,7 @@
                 "value": 0
               }
             ],
-            "message": "it is 5, which isn't a list or an object",
+            "message": "artifact is 5, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21255,7 +21255,7 @@
                 "value": 0
               }
             ],
-            "message": "it is true, which isn't a list or an object",
+            "message": "artifact is true, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21535,7 +21535,7 @@
                 "value": 0
               }
             ],
-            "message": "it is \"s\", which isn't a list or an object",
+            "message": "artifact is \"s\", which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21556,7 +21556,7 @@
                 "value": 0
               }
             ],
-            "message": "it is null",
+            "message": "artifact is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21577,7 +21577,7 @@
                 "value": 0
               }
             ],
-            "message": "it is 5, which isn't a list or an object",
+            "message": "artifact is 5, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21598,7 +21598,7 @@
                 "value": 0
               }
             ],
-            "message": "item 1 of $input: x is null, which isn't a list or an object",
+            "message": "item 1 of artifact: x is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21621,7 +21621,7 @@
                 "value": 0
               }
             ],
-            "message": "it is true, which isn't a list or an object",
+            "message": "artifact is true, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21768,7 +21768,7 @@
                 "value": 2
               }
             ],
-            "message": "it is {\"id\": \"a1\"}, which isn't a list",
+            "message": "artifact is {\"id\": \"a1\"}, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -21792,7 +21792,7 @@
                 "value": 2
               }
             ],
-            "message": "it is {\"id\": \"a2\"}, which isn't a list",
+            "message": "artifact is {\"id\": \"a2\"}, which isn't a list",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -22256,7 +22256,7 @@
                 "value": 0
               }
             ],
-            "message": "it is missing",
+            "message": "k is missing",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23091,7 +23091,7 @@
                 "value": 1
               }
             ],
-            "message": "item 1 of $input is null, which isn't a list or an object",
+            "message": "item 1 of artifact is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23241,7 +23241,7 @@
                 "value": 1
               }
             ],
-            "message": "item 1 of $input is null, which isn't a list or an object",
+            "message": "item 1 of artifact is null, which isn't a list or an object",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -23713,7 +23713,7 @@
               "type": "k"
             },
             "check": "$min_subjects",
-            "message": "it is \"text\", which isn't a list or an object",
+            "message": "p is \"text\", which isn't a list or an object",
             "passed": false,
             "cause": "unusable",
             "inputs": [

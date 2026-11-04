@@ -600,9 +600,6 @@ fn source_of(
             let path = scope.path(&sentence_path)?;
             let each_of = match &line.named_by_each_of {
                 None => None,
-                Some(each) if each.start == s::Start::It => {
-                    return Err(vec![format!("{name}: it can't name keys")]);
-                }
                 Some(each) => Some(scope.path(each)?),
             };
             Ok(Source::Child { path, each_of })
@@ -622,8 +619,8 @@ fn source_of(
                             each_steps.insert(0, Step::Key(key.clone()));
                             Start::Subject
                         }
-                        s::Start::It => {
-                            return Err(vec![format!("{name}: it can't name keys")]);
+                        s::Start::That => {
+                            return Err(vec![format!("{name}: that can't name keys")]);
                         }
                         s::Start::Unknown(unknown) => {
                             return Err(vec![format!("{}{unknown}", lower::UNKNOWN_NAME)]);
@@ -802,6 +799,8 @@ impl Reading {
                     let mut aliases = scope.aliases();
                     aliases.extend(own_part_names(name, &raw));
                     let alias_refs: Vec<&str> = aliases.iter().map(String::as_str).collect();
+                    let mut printed_aliases = alias_refs.clone();
+                    printed_aliases.push(name.as_str());
                     let parent_names = scope.parent_names();
                     let parent_refs: Vec<&str> = parent_names.iter().map(String::as_str).collect();
                     let syntax_problems = s::from_problems(line);
@@ -822,7 +821,7 @@ impl Reading {
                             let reduced = scope.clone().without_parent(ancestor);
                             let wide = parent_is_self_compared(name, &raw);
                             if reads_alias(
-                                &s::print_from_condition(condition, &alias_refs, &parent_refs),
+                                &s::print_from_condition(condition, &printed_aliases, &parent_refs),
                                 ancestor,
                             ) && right_side_text(condition, &reduced, wide)
                                 != right_side_text(condition, &scope, wide)
@@ -833,8 +832,11 @@ impl Reading {
                                     .push(format!("unknown alias ${ancestor}"));
                             }
                         }
-                        let mut text =
-                            s::print_from_condition(condition, &alias_refs, &parent_refs);
+                        let mut text = s::print_from_condition(
+                            &lower::quoted_name_dotted_condition(condition, name),
+                            &printed_aliases,
+                            &parent_refs,
+                        );
                         match condition {
                             s::FromCondition::Condition(condition) => {
                                 found_problems.extend(lower::condition_elapsed_problems(condition));
@@ -862,7 +864,10 @@ impl Reading {
                                         ),
                                     )
                                 } else {
-                                    lower::lower_condition(condition, &scope)
+                                    lower::lower_condition(
+                                        condition,
+                                        &scope.clone().with_subject(name).for_from_line(),
+                                    )
                                 };
                                 match lowered {
                                     Ok(check) => filters.push(Filter { text, check }),
@@ -878,11 +883,11 @@ impl Reading {
                                 phrase,
                             } => match lower::lower_quantified(
                                 *quantifier,
-                                path,
+                                &lower::name_dotted(path, name),
                                 &[],
                                 *if_any,
                                 phrase,
-                                &scope,
+                                &scope.clone().with_subject(name).for_from_line(),
                             ) {
                                 Ok(check) => filters.push(Filter { text, check }),
                                 Err(found) => found_problems.extend(lower::in_from_line(found)),
@@ -1329,6 +1334,44 @@ mod tests {
         let lowered = r.lowered("d").unwrap();
         assert_eq!(lowered.from_text, "data.deployments");
         assert!(matches!(lowered.source, Source::Root { every: false, .. }));
+    }
+
+    #[test]
+    fn a_whose_dot_on_a_field_named_like_the_subject_stays_in_the_from_text() {
+        let policy = json!({
+            "ergo_spec": "v0.5-dev",
+            "subjects": {"kid": {"from": "every kids whose .kid is 1"}},
+            "requirements": {"r": {"subject": "kid", "checks": {"c": ".x is 1"}}}
+        });
+        let input = json!({"kids": [{"kid": 1, "x": 1}, {"kid": 2, "x": 1}, {"x": 1}]});
+        let report = crate::report(&input, &policy, &json!({}));
+        let applies: Vec<(String, String)> = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|row| row["check"] == "$applies" && row["cause"] != "satisfied")
+            .map(|row| {
+                (
+                    row["cause"].as_str().unwrap().to_string(),
+                    row["message"].as_str().unwrap().to_string(),
+                )
+            })
+            .collect();
+        assert_eq!(
+            applies,
+            [
+                ("value".to_string(), ".kid is 2".to_string()),
+                ("absent".to_string(), ".kid is missing".to_string())
+            ]
+        );
+        let checked = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|row| row["check"] == "c")
+            .map(|row| row["passed"].clone())
+            .collect::<Vec<_>>();
+        assert_eq!(checked, [json!(true)]);
     }
 
     #[test]

@@ -1,4 +1,4 @@
-pub(crate) const WORDS: [&str; 43] = [
+pub(crate) const WORDS: [&str; 42] = [
     "a",
     "after",
     "alphabetically",
@@ -18,7 +18,6 @@ pub(crate) const WORDS: [&str; 43] = [
     "first",
     "hours",
     "in",
-    "it",
     "item",
     "last",
     "less",

@@ -109,10 +109,10 @@ fn item_zero_does_not_parse() {
 }
 
 #[test]
-fn it_as_the_path_of_a_from_line_does_not_parse() {
-    assert!(parse_from("it").is_err());
-    assert!(parse_from("every it").is_err());
-    assert!(parse_from("first of it").is_err());
+fn it_as_the_path_of_a_from_line_is_a_key() {
+    assert!(parse_from("it").is_ok());
+    assert!(parse_from("every it").is_ok());
+    assert!(parse_from("first of it").is_ok());
 }
 
 #[test]

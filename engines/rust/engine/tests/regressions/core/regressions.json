@@ -12564,7 +12564,7 @@
     }
   },
   {
-    "description": "chain n broken=0 root=aa whose it.x is 1 ms=0 (a broken from up the chain makes the requirement written wrong)",
+    "description": "chain n broken=0 root=aa whose whose is 1 ms=0 (a broken from up the chain makes the requirement written wrong)",
     "input": {
       "aa": [
         {
@@ -12605,7 +12605,7 @@
       },
       "subjects": {
         "A": {
-          "from": "aa whose it.x is 1"
+          "from": "aa whose whose is 1"
         },
         "B": {
           "from": "A whose env is \"prod\""
@@ -12682,7 +12682,7 @@
               "locations": [],
               "name": "subjects.A.from",
               "value": [
-                "it is the whole subject: write x, not it.x"
+                "whose is a word of the grammar: write .whose"
               ]
             }
           ],
@@ -12711,7 +12711,7 @@
     }
   },
   {
-    "description": "chain n broken=0 root=aa whose it.x is 1 ms=None (a broken from up the chain makes the requirement written wrong)",
+    "description": "chain n broken=0 root=aa whose whose is 1 ms=None (a broken from up the chain makes the requirement written wrong)",
     "input": {
       "aa": [
         {
@@ -12751,7 +12751,7 @@
       },
       "subjects": {
         "A": {
-          "from": "aa whose it.x is 1"
+          "from": "aa whose whose is 1"
         },
         "B": {
           "from": "A whose env is \"prod\""
@@ -12828,7 +12828,7 @@
               "locations": [],
               "name": "subjects.A.from",
               "value": [
-                "it is the whole subject: write x, not it.x"
+                "whose is a word of the grammar: write .whose"
               ]
             }
           ],
@@ -13874,7 +13874,7 @@
     }
   },
   {
-    "description": "chain nd broken=0 root=aa whose it.x is 1 ms=0 (a broken from up the chain makes the requirement written wrong)",
+    "description": "chain nd broken=0 root=aa whose whose is 1 ms=0 (a broken from up the chain makes the requirement written wrong)",
     "input": {
       "aa": [
         {
@@ -13915,7 +13915,7 @@
       },
       "subjects": {
         "A": {
-          "from": "aa whose it.x is 1"
+          "from": "aa whose whose is 1"
         },
         "B": {
           "from": "A whose env is \"prod\""
@@ -13990,7 +13990,7 @@
               "locations": [],
               "name": "subjects.A.from",
               "value": [
-                "it is the whole subject: write x, not it.x"
+                "whose is a word of the grammar: write .whose"
               ]
             }
           ],
@@ -14928,7 +14928,7 @@
     }
   },
   {
-    "description": "chain nn broken=0 root=aa whose it.x is 1 ms=0 (a broken from up the chain makes the requirement written wrong)",
+    "description": "chain nn broken=0 root=aa whose whose is 1 ms=0 (a broken from up the chain makes the requirement written wrong)",
     "input": {
       "aa": [
         {
@@ -14969,7 +14969,7 @@
       },
       "subjects": {
         "A": {
-          "from": "aa whose it.x is 1"
+          "from": "aa whose whose is 1"
         },
         "B": {
           "from": "A whose env is \"prod\""
@@ -15049,7 +15049,7 @@
               "locations": [],
               "name": "subjects.A.from",
               "value": [
-                "it is the whole subject: write x, not it.x"
+                "whose is a word of the grammar: write .whose"
               ]
             }
           ],
@@ -50160,7 +50160,6 @@
               "locations": [],
               "name": "subjects.x.from",
               "value": [
-                "it is the whole subject: write x, not it.x",
                 "whose is a word of the grammar: write .whose"
               ]
             }

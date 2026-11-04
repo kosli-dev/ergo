@@ -57,6 +57,7 @@ mod tests {
     fn outcome(subject: &str, min: &str, max: &str, outside: bool) -> Cause {
         let input = json!({"things": [serde_json::from_str::<Value>(subject).unwrap()]});
         let ctx = Ctx {
+            label: None,
             subject: Located {
                 value: &input["things"][0],
                 location: Location::input_root().key("things").index(0),
