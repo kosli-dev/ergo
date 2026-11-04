@@ -136,18 +136,12 @@ jobs:
 
   tests-compiled-policy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        part: [1, 2, 3, 4]
-    env:
-      PART: ${{ matrix.part }}
-      PARTS: ${{ strategy.job-total }}
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.22.0
-      - name: Run this part of the tests with every report made from a compiled policy
+      - name: Run the tests with every report made from a compiled policy
         run: .github/compiled-tests.sh
 
   tests-wasm-js:
