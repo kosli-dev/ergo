@@ -1842,5 +1842,75 @@
         ]
       }
     ]
+  },
+  {
+    "description": "contains with text on the left and a field of a number on the right",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "zz contains y.v"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "fails as unusable and names the field it read on the right first, then the left side",
+        "rules": ["path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t", "y": 3, "zz": "v"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/zz"], "name": "zz", "value": "v"}, {"locations": ["/things/0/y"], "name": "y.v", "value": null}], "message": "y is 3, which isn't an object, and zz is \"v\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains with text on the left and a key of a number in the input on the right",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "zz contains $input.y.v"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "fails as unusable and names the left side first, then the input",
+        "rules": ["path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t", "zz": "v"}], "y": 3},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/zz"], "name": "zz", "value": "v"}], "message": "zz is \"v\", which isn't a list, and $input.y is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a field in a position of a field that holds objects",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of y[0].v is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "fails as unusable and names the item once",
+        "rules": ["path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t", "y": [{"v": 1}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of y[0].v", "value": null}, {"locations": [], "name": "y[0].v", "value": []}], "message": "item 1 of y: v is 1, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a key in a position of the input that holds objects",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of $input.y[0].v is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "fails as unusable and names the item once",
+        "rules": ["path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t"}], "y": [{"v": 1}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of $input.y[0].v", "value": null}, {"locations": [], "name": "$input.y[0].v", "value": []}], "message": "item 1 of $input.y: v is 1, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position and a key of the input on the right of is in, with the input as a list",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "id is in $input[0].id"}, "subject": "thing"}}, "subjects": {"thing": {"from": "$input", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "fails as unusable and says the right side isn't a list",
+        "rules": ["walk.right", "message.cause"],
+        "input": [{"id": "a"}],
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "$input[0].id is \"a\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+        ]
+      }
+    ]
   }
 ]
