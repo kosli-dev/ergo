@@ -216,7 +216,10 @@ pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
         .steps
         .iter()
         .all(|step| matches!(step, Step::Key(_) | Step::Index(_)));
-    if !simple || path::read(path, ctx).outcome != Outcome::Unusable {
+    let params_that_arent_an_object = path.start == crate::path::Start::Params
+        && ctx.params.is_some_and(|params| !params.is_object());
+    if !simple || params_that_arent_an_object || path::read(path, ctx).outcome != Outcome::Unusable
+    {
         return None;
     }
     let options = Options {

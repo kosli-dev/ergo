@@ -918,6 +918,27 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "things named by each of $params.k",
     ),
     (
+        "things named by each of $params.ks",
+        "things named by each of $params.ks",
+    ),
+    (
+        "things named by each of $params[0]",
+        "things named by each of item 1 of $params",
+    ),
+    (
+        "things named by each of $params[0].ks",
+        "things named by each of $params[0].ks",
+    ),
+    (
+        "things named by $params.env named by each of $params.ks",
+        "things named by $params.env named by each of $params.ks",
+    ),
+    ("things named by $params.env", "things named by $params.env"),
+    (
+        "every things named by $params.env",
+        "every things named by $params.env",
+    ),
+    (
         "things whose build.fingerprint exists",
         "things whose build.fingerprint exists",
     ),

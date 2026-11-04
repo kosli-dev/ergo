@@ -3563,9 +3563,9 @@ test_null_params_are_no_params_and_fail_nothing_a_policy_does_not_read if {
 	}
 }
 
-test_a_whole_params_read_with_null_params_fails_as_null_and_with_an_object_reads_it if {
+test_a_whole_params_read_with_null_params_fails_as_absent_and_with_an_object_reads_it if {
 	check := "$params exists"
-	params_rows({"items": [{"id": 1}]}, check) == [[false, "null", [{"name": "$params", "value": null, "locations": ["$params:"]}]]] with data.params as null
+	params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [{"name": "$params", "value": null, "locations": ["$params:"]}]]] with data.params as null
 	params_rows({"items": [{"id": 1}]}, check) == [[true, "satisfied", [{"name": "$params", "value": {}, "locations": ["$params:"]}]]] with data.params as {}
 	params_rows({"items": [{"id": 1}]}, check) == [[false, "unusable", [{"name": "$params", "value": "x", "locations": ["$params:"]}]]] with data.params as "x"
 }
@@ -11303,6 +11303,83 @@ test_message_of_a_count_names_an_item_whose_field_cant_hold_the_next_step if {
 	row.message == "item 1 of xs: n is 5, which isn't an object"
 }
 
+_count_message(assertion, thing, params) := row.message if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": assertion}}}}
+	r := ergo.report({"things": [object.union({"id": "t"}, thing)]}, policy, params)
+	some row in r.results
+	row.check == "c"
+}
+
+test_message_of_a_count_names_the_list_in_a_list_item_it_not_an_empty_name if {
+	_count_message("count of x[0] named by zz is 1", {"x": [[1]], "zz": "a"}, {}) == "item 1 of x: item 1 of it is 1, which isn't an object"
+	_count_message("count of x[0] named by zz is 1", {"x": [[{"a": 1}, 3]], "zz": "a"}, {}) == "item 1 of x: item 2 of it is 3, which isn't an object"
+	_count_message("count of x[0] named by zz is 1", {"x": [[[]]], "zz": "a"}, {}) == "item 1 of x: item 1 of it is [], which isn't an object"
+	_count_message("count of x[0] named by zz is 1", {"x": [[]], "zz": "a"}, {}) == "count of x[0] named by zz is 0"
+	_count_message("count of x[0] named by zz is 5", {"x": [[{"a": 1}]], "zz": "a"}, {}) == "count of x[0] named by zz is 1"
+	_count_message("count of x[0][0] named by zz is 1", {"x": [[[1]]], "zz": "a"}, {}) == "item 1 of x: item 1 of it: item 1 of it is 1, which isn't an object"
+}
+
+test_message_of_a_count_names_the_list_in_a_list_item_it_with_a_for_alias if {
+	_count_message_for("count of w[0] named by zz is 1", {"ws": [[{"a": 1}, 3]], "zz": "a"}) == "item 1 of ws: item 1 of w: .a is 1, which isn't a list or an object"
+}
+
+test_message_of_a_count_names_the_list_in_a_list_item_it_in_params if {
+	_count_message("count of $params.p[0] named by zz is 1", {"zz": "a"}, {"p": [[1]]}) == "item 1 of $params.p: item 1 of it is 1, which isn't an object"
+	_count_message("count of $params.p[0][0] named by zz is 1", {"zz": "a"}, {"p": [[[1]]]}) == "item 1 of $params.p: item 1 of it: item 1 of it is 1, which isn't an object"
+}
+
+_count_message_for(assertion, thing) := row.message if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": assertion, "for": "every ws as w"}}}}}
+	r := ergo.report({"things": [object.union({"id": "t"}, thing)]}, policy, {})
+	some row in r.results
+	row.check == "c"
+}
+
+_row_of(assertion, thing, params) := row if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": assertion}}}}
+	r := ergo.report({"things": [object.union({"id": "t"}, thing)]}, policy, params)
+	some row in r.results
+	row.check == "c"
+}
+
+test_does_not_exist_fails_when_the_key_from_a_field_cant_be_read_whatever_the_path_before_it_holds if {
+	every thing in [{}, {"zz": null}, {"zz": 3}, {"zz": ["k"]}, {"x": null}, {"x": null, "zz": 3}, {"x": 3, "zz": 3}, {"x": [[]], "zz": null}, {"x": {"k": 1}}] {
+		every assertion in ["x named by zz does not exist", "x[0] named by zz does not exist", "x.a named by zz does not exist"] {
+			row := _row_of(assertion, thing, {})
+			row.passed == false
+		}
+	}
+	every thing in [{}, {"zz": null}, {"zz": 3}, {"zz": ["k"]}] {
+		every params in [{}, {"p": null}, {"p": [[]]}, {"p": 3}] {
+			row := _row_of("$params.p named by zz does not exist", thing, params)
+			row.passed == false
+		}
+	}
+}
+
+test_does_not_exist_with_a_key_from_a_field_that_can_be_read_passes_when_the_path_is_missing if {
+	_row_of("x[0] named by zz does not exist", {"x": null, "zz": "k"}, {}).passed
+	_row_of("x.a named by zz does not exist", {"x": {"k": 1}, "zz": "k"}, {}).passed
+	_row_of("$params.p[0] named by zz does not exist", {"zz": "k"}, {"p": []}).passed
+}
+
+test_does_not_exist_with_a_key_from_a_field_that_cant_be_read_fails_as_absent_with_its_message if {
+	row := _row_of("x[0] named by zz does not exist", {}, {})
+	row.cause == "absent"
+	row.message == "zz is missing"
+	row2 := _row_of("x[0] named by zz does not exist", {"zz": 3}, {})
+	row2.cause == "absent"
+	row2.message == "x[0] named by zz is missing"
+}
+
+test_message_of_a_count_with_a_key_from_a_field_names_the_value_once if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of x named by zz is 1"}}}}
+	r := ergo.report({"things": [{"id": "t", "x": {"k": 1}, "zz": "k"}]}, policy, {})
+	some row in r.results
+	row.check == "c"
+	row.message == "x.k is 1, which isn't a list or an object"
+}
+
 test_message_names_an_item_by_the_part_of_the_subject_it_goes_through if {
 	marker := ergo._p_marker("cov", 0, null, false)
 	ergo._m_item_name(["xs", marker, "z"], set()) == "cov.z"
@@ -11685,6 +11762,41 @@ test_named_by_each_of_params_or_input_is_still_read_in_a_child_from_line if {
 	rows == [["p", "satisfied"]]
 }
 
+_from_params_rows(line, params) := [[r.check, r.cause, r.message] |
+	some r in ergo.report({"things": {"k": {"id": "t"}}}, {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": line}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}}, params).results
+	not r.check in {"$well_formed", "$unique_ids"}
+]
+
+test_a_from_line_that_reads_params_that_are_not_an_object_names_the_params_and_not_the_object if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"], [[], "[]"], [[3], "[3]"], [[[1]], "[[1]]"], [[{"v": 1}], "[{\"v\": 1}]"], [[["k"]], "[[\"k\"]]"]] {
+		message := concat("", ["$params is ", case[1], ", which isn't an object"])
+		_from_params_rows("things named by each of $params.ks", case[0]) == [["$min_subjects", "unusable", message]]
+		_from_params_rows("things named by $params.env named by each of $params.ks", case[0]) == [["$min_subjects", "unusable", message]]
+		_from_params_rows("every things named by $params.env", case[0]) == [["$min_subjects", "unusable", message]]
+	}
+}
+
+test_a_from_line_that_reads_a_position_of_the_params_names_what_it_found_there if {
+	_from_params_rows("things named by each of $params[0]", 3) == [["$min_subjects", "unusable", "$params is 3, which isn't a list"]]
+	_from_params_rows("things named by each of $params[0]", [3]) == [["$min_subjects", "unusable", "item 1 of $params is 3, which isn't a list of text"]]
+	_from_params_rows("things named by each of $params[0].ks", [3]) == [["$min_subjects", "unusable", "item 1 of $params is 3, which isn't an object"]]
+	_from_params_rows("things named by each of $params[0].ks", [{"ks": 3}]) == [["$min_subjects", "unusable", "$params[0].ks is 3, which isn't a list of text"]]
+}
+
+test_a_from_line_that_reads_the_input_and_params_that_are_not_an_object_names_both if {
+	_from_params_rows("things named by $input.nope named by each of $params.ks", 3) == [["$min_subjects", "unusable", "$input.nope is missing; $params is 3, which isn't an object"]]
+}
+
+test_a_from_line_makes_no_subjects_from_keys_in_params_that_are_not_an_object if {
+	_from_params_rows("things named by each of $params[0]", [["k"]]) == [["$min_subjects", "unusable", "$params is [[\"k\"]], which isn't an object"]]
+	_from_params_rows("things named by each of $params[0].ks", [{"ks": ["k"]}]) == [["$min_subjects", "unusable", "$params is [{\"ks\": [\"k\"]}], which isn't an object"]]
+}
+
+test_a_from_line_that_reads_null_params_says_the_param_is_missing if {
+	_from_params_rows("things named by each of $params.ks", null) == [["$min_subjects", "absent", "$params.ks is missing"]]
+	_from_params_rows("things named by $params.env", null) == [["$min_subjects", "absent", "$params.env is missing"]]
+}
+
 params_position_messages := {row.check: row.message |
 	some row in report(
 		{"items": [{"id": 1, "zz": "a"}]},
@@ -11702,18 +11814,137 @@ params_position_messages := {row.check: row.message |
 	row.check != "$min_subjects"
 }
 
-test_a_params_path_that_starts_with_a_position_says_the_check_failed_not_the_item if {
-	every params in [[1], [[1]], [[true]], [["x"]]] {
+test_a_params_path_that_starts_with_a_position_names_the_item_that_is_not_an_object if {
+	every case in [[[1], "1"], [[[1]], "[1]"], [[[true]], "[true]"], [[["x"]], "[\"x\"]"]] {
 		params_position_messages == {
-			"c": "$params[0].a does not exist is false",
-			"d": "$params[0].a exists is false",
-			"e": "$params[0] named by zz does not exist is false",
-		} with data.params as params
+			"c": concat("", ["item 1 of $params is ", case[1], ", which isn't an object"]),
+			"d": concat("", ["item 1 of $params is ", case[1], ", which isn't an object"]),
+			"e": concat("", ["item 1 of $params is ", case[1], ", which isn't an object"]),
+		} with data.params as case[0]
 	}
 }
 
-test_a_params_path_that_starts_with_a_position_on_a_value_that_is_not_a_list_says_the_check_failed if {
-	every params in [3, "s", true] {
-		params_position_messages.e == "$params[0] named by zz does not exist is false" with data.params as params
+test_a_params_path_that_starts_with_a_position_names_the_params_that_are_not_a_list if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"]] {
+		params_position_messages == {
+			"c": concat("", ["$params is ", case[1], ", which isn't a list"]),
+			"d": concat("", ["$params is ", case[1], ", which isn't a list"]),
+			"e": concat("", ["$params is ", case[1], ", which isn't a list"]),
+		} with data.params as case[0]
+	}
+}
+
+params_key_messages := {row.check: row.message |
+	some row in report(
+		{"items": [{"id": 1, "zz": "a"}]},
+		{"s": {
+			"subject_type": "thing",
+			"from": "items",
+			"identified_by": "id",
+			"checks": {
+				"c": {"assert": "$params.a is 1"},
+				"d": {"assert": "$params[0].a named by zz is 1"},
+				"e": {"assert": "zz is in $params.a"},
+				"f": {"assert": "zz is in $params[0].a"},
+				"g": {"assert": "count of $params[0] is 1"},
+			},
+		}},
+	).results
+	row.check != "$min_subjects"
+}
+
+test_a_params_path_that_starts_with_a_key_names_the_params_that_are_not_an_object if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"], [false, "false"], [[], "[]"]] {
+		params_key_messages.c == concat("", ["$params is ", case[1], ", which isn't an object"]) with data.params as case[0]
+		params_key_messages.e == concat("", ["$params is ", case[1], ", which isn't an object"]) with data.params as case[0]
+	}
+}
+
+test_a_params_path_through_params_that_are_not_a_list_or_an_object_names_them_on_every_side if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"], [false, "false"]] {
+		params_key_messages.d == concat("", ["$params is ", case[1], ", which isn't a list"]) with data.params as case[0]
+		params_key_messages.f == concat("", ["$params is ", case[1], ", which isn't a list"]) with data.params as case[0]
+	}
+}
+
+test_a_count_of_a_position_in_params_that_are_an_empty_list_names_the_params if {
+	params_key_messages.g == "$params is [], which isn't an object" with data.params as []
+}
+
+test_null_params_fail_a_walk_or_a_count_as_absent_like_a_plain_path if {
+	rows := [r |
+		some r in report(
+			{"items": [{"id": 1, "zz": "a"}]},
+			{"s": {
+				"subject_type": "thing",
+				"from": "items",
+				"identified_by": "id",
+				"checks": {
+					"c": {"assert": "every $params.a is 1"},
+					"d": {"assert": "count of $params.a is 1"},
+					"e": {"assert": "zz is in $params"},
+				},
+			}},
+		).results
+		not startswith(r.check, "$")
+	] with data.params as null
+	count(rows) == 3
+	every r in rows {
+		r.cause == "absent"
+		r.message == "$params is missing"
+	}
+}
+
+test_null_params_fail_params_exists_as_absent_like_a_path_into_them if {
+	rows := [r |
+		some r in report(
+			{"items": [{"id": 1}]},
+			{"s": {
+				"subject_type": "thing",
+				"from": "items",
+				"identified_by": "id",
+				"checks": {"c": {"assert": "$params exists"}},
+			}},
+		).results
+		r.check == "c"
+	] with data.params as null
+	[[r.cause, r.message] | some r in rows] == [["absent", "$params is missing"]]
+}
+
+params_for_line_messages := {row.check: row.message |
+	some row in report(
+		{"items": [{"id": 1, "ws": [1]}]},
+		{"s": {
+			"subject_type": "thing",
+			"from": "items",
+			"identified_by": "id",
+			"checks": {
+				"c": {"for": "every $params as p", "assert": "p.v is 1"},
+				"d": {"for": "every $params.v as p", "assert": "p is 1"},
+				"e": {"for": "every ws as w", "assert": "w is in $params.v"},
+				"f": {"assert": "sum of $params.v is 1"},
+				"g": {"assert": "count of $params whose v is 1 is 1"},
+			},
+		}},
+	).results
+	not startswith(row.check, "$")
+}
+
+test_a_for_line_that_reads_params_that_are_not_an_object_names_them if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"], [false, "false"]] {
+		object.filter(params_for_line_messages, ["c", "d", "e"]) == {
+			"c": concat("", ["$params is ", case[1], ", which isn't an object"]),
+			"d": concat("", ["$params is ", case[1], ", which isn't an object"]),
+			"e": concat("", ["$params is ", case[1], ", which isn't an object"]),
+		} with data.params as case[0]
+	}
+}
+
+test_a_sum_or_count_that_reads_params_that_are_a_list_names_them_not_the_digits if {
+	every case in [[[3], "[3]"], [[[1]], "[[1]]"]] {
+		object.filter(params_for_line_messages, ["f", "g"]) == {
+			"f": concat("", ["$params is ", case[1], ", which isn't an object"]),
+			"g": concat("", ["$params is ", case[1], ", which isn't an object"]),
+		} with data.params as case[0]
 	}
 }

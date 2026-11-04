@@ -1,6 +1,6 @@
 use super::{Verdict, read_path, verdict};
 use crate::cause::Cause;
-use crate::path::{self, Ctx, Outcome, Path, Start};
+use crate::path::{self, Ctx, Outcome, Path, Start, Step};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Present {
@@ -17,8 +17,14 @@ impl Present {
 pub fn run(check: &Present, ctx: &Ctx) -> Verdict {
     let read = read_path(&check.path, ctx);
     let no_params = check.path.start == Start::Params && ctx.params.is_none();
+    let key_unreadable = check
+        .path
+        .steps
+        .iter()
+        .any(|step| matches!(step, Step::Field(_)) && path::resolve(step, ctx).is_err());
     let cause = match read.outcome {
         outcome if read.step_unreadable => outcome.cause().unwrap_or(Cause::Unusable),
+        Outcome::Absent | Outcome::Null if key_unreadable => Cause::Absent,
         Outcome::Found => verdict(!check.missing),
         Outcome::Absent | Outcome::Null if no_params => Cause::Absent,
         Outcome::Absent | Outcome::Null => verdict(check.missing),
@@ -156,5 +162,38 @@ mod tests {
             run_on(&subject, None, &check(&["x", "y"], Start::Subject, true)).cause,
             Cause::Unusable
         );
+    }
+
+    fn with_key_field(key: &str, start: Start, steps: &[&str], missing: bool) -> Present {
+        let mut found = check(steps, start, missing);
+        found.path.steps.push(Step::Field(Box::new(Path {
+            start: Start::Subject,
+            steps: vec![Step::Key(key.to_string())],
+        })));
+        found
+    }
+
+    #[test]
+    fn a_key_from_a_field_that_cant_be_read_fails_missing_whatever_the_path_before_it_holds() {
+        for subject in [
+            json!({}),
+            json!({"zz": null}),
+            json!({"zz": 3}),
+            json!({"zz": ["k"]}),
+            json!({"x": null}),
+        ] {
+            let v = run_on(
+                &subject,
+                None,
+                &with_key_field("zz", Start::Subject, &["x"], true),
+            );
+            assert_eq!(v.cause, Cause::Absent, "{subject}");
+        }
+        let v = run_on(
+            &json!({"x": null, "zz": "k"}),
+            None,
+            &with_key_field("zz", Start::Subject, &["x"], true),
+        );
+        assert_eq!(v.cause, Cause::Satisfied);
     }
 }
