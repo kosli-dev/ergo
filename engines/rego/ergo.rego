@@ -8368,8 +8368,7 @@ _s_check(lines, wording, problems, parts) := object.union(wording, object.union(
 	assertions := [a | some p in parsed; some a in p.assertions]
 	count({u | some a in assertions; some u in _s_assertion_unsupported(a)}) == 0
 	marked := [_s_aliased(a, _s_names(set(), parts)) | some a in assertions]
-	count(_s_self_problems(marked)) == 0
-	count(_s_distinct_problems(marked)) == 0
+	count(_s_self_problems(marked) | _s_distinct_problems(marked)) == 0
 	model := _s_model_of(marked)
 } else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable((((problems | _s_lines_problems(lines)) | _s_lines_self(lines, _s_names(set(), parts))) | _s_lines_distinct(lines, _s_names(set(), parts)))))})
 
@@ -9393,9 +9392,15 @@ _s_check_for(lines, ftext, wording, problems, parts) := object.union(wording, {
 	count(_s_for_unsupported(fl, assertions)) == 0
 	items := _s_marked_items(fl, parts)
 	marked := [_s_aliased(a, _s_names(names, parts)) | some a in assertions]
-	count(_s_self_problems(marked) | _s_whose_self_problems(items)) == 0
+	count(((_s_self_problems(marked) | _s_distinct_problems(marked)) | _s_whose_self_problems(items))) == 0
 	texts := [_s_assertion_text(a) | some a in marked]
-} else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable(((problems | _s_for_problems(lines, ftext)) | _s_for_self(lines, ftext, parts))))})
+} else := object.union(wording, {"expression": _s_for_written_text(lines, ftext), "$sentence": sort(_s_or_unrunnable((((problems | _s_for_problems(lines, ftext)) | _s_for_self(lines, ftext, parts)) | _s_for_distinct(lines, ftext, parts))))})
+
+_s_for_distinct(lines, ftext, parts) := _s_lines_distinct(lines, _s_names({item.as | some item in fl.items}, parts)) if {
+	is_string(ftext)
+	fl := _for_line(ftext)
+	"items" in object.keys(fl)
+} else := set()
 
 _s_marked_items(fl, parts) := [_s_sort_marked(_s_aliased_item(item, _s_names({earlier.as | some earlier in array.slice(fl.items, 0, i)}, parts)), _s_names({i.as | some i in fl.items}, parts)) | some i, item in fl.items]
 

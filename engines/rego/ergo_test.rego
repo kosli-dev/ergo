@@ -12031,3 +12031,31 @@ test_a_dot_in_a_from_whose_reads_the_field_named_like_the_subject if {
 	[[r.cause, r.message] | some r in rep.results; r.check == "$applies"; r.cause != "satisfied"] == [["value", ".kid is 2"], ["absent", ".kid is missing"]]
 	[r.passed | some r in rep.results; r.check == "c"] == [true]
 }
+
+test_a_distinct_phrase_that_reads_the_item_is_written_wrong_wherever_the_sentence_stands if {
+	every sentence in [`every distinct xs.k is at least lo`, `some distinct xs.k is in ok`, `every distinct xs.k is at least .lo`, `every distinct xs.k whose lo is 1 is at least lo`, `every distinct xs.k is lo plus 4`] {
+		every check in [
+			sentence,
+			{"assert": ["xs exists", sentence]},
+			{"for": "every ys as y", "assert": sentence},
+			{"for": "every ys as y", "assert": ["y exists", sentence]},
+			{"any_of": {"x": sentence, "y": "xs exists"}},
+		] {
+			_distinct_scope_problem({"c": check})
+		}
+	}
+	problems := _from_problems(_from_report({"rs": [{"fs": [{"k": 5, "lo": 1}]}]}, {"w": {"from": "every rs whose some distinct fs.k is at least lo"}}, {"c": "w exists"}, {}))
+	some i in problems
+	some p in i.value
+	startswith(p, "whose: distinct is about the value its path points at")
+}
+
+_distinct_scope_problem(checks) if {
+	rep := _from_report({"s": {"xs": [{"k": 5, "lo": 1}, {"k": 5, "lo": 9}], "ys": [1]}}, {"s": {}}, checks, {})
+	some r in rep.results
+	r.check == "$well_formed"
+	some i in r.inputs
+	i.name == "checks.c"
+	some p in i.value
+	contains(p, "distinct is about the value its path points at, but the phrase also reads ")
+}
