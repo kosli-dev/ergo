@@ -113,6 +113,8 @@ fn lowered_plan(
     Some(Plan { items, all_of })
 }
 
+const COMPARED_WITH_ITSELF: &str = " is compared with itself";
+
 fn read_one(
     check: &crate::policy::Check,
     scope: &Scope,
@@ -167,10 +169,12 @@ fn read_one(
             let mut names: Vec<String> = aliases_owned.clone();
             let mut for_tree = None;
             let mut for_ok = true;
+            let mut for_unread = false;
             if let Some(text) = for_line {
                 match s::parse_for(text) {
                     Ok(tree) => {
                         for problem in s::for_problems(&tree, &aliases) {
+                            for_unread |= !problem.contains(COMPARED_WITH_ITSELF);
                             problems.insert(format!("for: {problem}"));
                             for_ok = false;
                         }
@@ -190,6 +194,7 @@ fn read_one(
                     }
                     Err(errors) => {
                         for_ok = false;
+                        for_unread = true;
                         for message in messages(errors) {
                             problems.insert(format!("for: {message}"));
                         }
@@ -207,7 +212,7 @@ fn read_one(
                         &aliases,
                         &mut problems,
                     );
-                    if for_line.is_some() {
+                    if for_unread {
                         problems.retain(|problem| !problem.contains(lower::DISTINCT_ITEM));
                     }
                     if !parsed.ok || !for_ok || !problems.is_empty() {
@@ -250,6 +255,9 @@ fn read_one(
                             None
                         }
                     };
+                    if for_unread {
+                        problems.retain(|problem| !problem.contains(lower::DISTINCT_ITEM));
+                    }
                     if !parsed.ok || !for_ok || !problems.is_empty() {
                         return wrong(problems);
                     }

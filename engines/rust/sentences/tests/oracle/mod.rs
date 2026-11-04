@@ -7,6 +7,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("c whose type is \"library\"", "c whose type is \"library\""),
     ("c.licenses", "c.licenses"),
     ("lic.terms", "lic.terms"),
+    ("los", "los"),
     ("ok", "ok"),
     (
         "p.gs whose some distinct hs.k is in p.ok",

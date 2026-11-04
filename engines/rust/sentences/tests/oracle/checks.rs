@@ -5042,6 +5042,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("who is \"ann\"", "who is \"ann\"", &[], &[]),
     ("version exists", "version exists", &[], &[]),
     (
+        "every distinct xs.k is in ok",
+        "every distinct xs.k is in ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct xs.k is in lo",
+        "some distinct xs.k is in lo",
+        &[],
+        &[],
+    ),
+    (
         "every distinct hs.k is not in p.ok",
         "every distinct hs.k is not in p.ok",
         &[],
@@ -8127,6 +8139,36 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t",
+        "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t",
+        &[],
+        &[],
+    ),
+    ("every ts as pp", "every ts as pp", &[], &[]),
+    ("every ts as s", "every ts as s", &[], &[]),
+    (
+        "every ts named by zz as t",
+        "every ts named by zz as t",
+        &[],
+        &[],
+    ),
+    (
+        "every ts whose k equals k as t",
+        "every ts whose k equals k as t",
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+    ),
+    (
+        "every ts whose k is last of zs as t",
+        "every ts whose k equals last of zs as t",
+        &[],
+        &[],
+    ),
     ("every ts as t", "every ts as t", &[], &[]),
     (
         "every ts as t, every t.fs as f",
@@ -9495,6 +9537,18 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
     (
+        "every ts",
+        &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
+    ),
+    (
+        "every ts as a1, every ts as a2, every ts as a3",
+        &["a for line holds two items at most"],
+    ),
+    (
+        "every ts sorted by k as t",
+        &["\"sorted by\" goes after a position, like \"last of\", not after every or some"],
+    ),
+    (
         "every ys as y whose y is 1",
         &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
     ),
@@ -9918,6 +9972,9 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("every ts as every", &["every can't be an alias"]),
+    ("every ts as t, every t.fs as t", &["t is given twice"]),
+    ("every ts as t, every ts as t", &["t is given twice"]),
     (
         "every .cov.xs as a, every cov.xs as b",
         &["a can't be an alias"],
