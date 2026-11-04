@@ -977,7 +977,7 @@ The path is in the check's `$refs` as `$input.sbom.components[].name`, with the 
 
 The thing on the right is a value when it's in quotes, a number, `true`, `false` or `null`, and a field otherwise. A list of values is separated by `, `. A string can be in single quotes, which keep backslashes as written, so `'^\s*FROM'` needs no doubled backslash.
 
-A path is keys joined by `.`, like `build.commit.sha`. A key with anything but letters, digits, `_` and `-` goes in double quotes, like `labels."app.kubernetes.io/name"`. `$params.regions` reads the params and `$input.repo` the input. `artifacts named by $params.name` reads the key the param holds, and so does `artifacts[$params.name]`. `named by` a bare field reads the key the subject holds, as below. `item 2 of commits`, `first of commits` and `commits[1]` read one item of a list. A position above 9007199254740991, the largest whole number a 64-bit float holds exactly, is written wrong, with `9007199254740992 can't be a list position`. A param or input value after `named by` or in brackets has to hold a string: a number never picks a position, so `commits[$params.n]` with `n` holding `1` fails the check as `unusable`, and so does a boolean, a list or an object. A `null` one fails it as `null` and a missing one as `absent`. A path can't start with a word the sentences use, like `empty`, `count`, `true` or `it`. Put a dot in front, `.empty is 1`, to read a field with that name. `it` is the [subject itself](#the-subject-itself), so a field called `it` is `.it`.
+A path is keys joined by `.`, like `build.commit.sha`. A key with anything but letters, digits, `_` and `-` goes in double quotes, like `labels."app.kubernetes.io/name"`. `$params.regions` reads the params and `$input.repo` the input. `artifacts named by $params.name` reads the key the param holds, and so does `artifacts[$params.name]`. `named by` a bare field reads the key the subject holds, as below. `item 2 of commits`, `first of commits` and `commits[1]` read one item of a list. A position above 9007199254740991, the largest whole number a 64-bit float holds exactly, is written wrong, with `9007199254740992 can't be a list position`. A param or input value after `named by` or in brackets has to hold a string: a number never picks a position, so `commits[$params.n]` with `n` holding `1` fails the check as `unusable`, and so does a boolean, a list or an object. A `null` one fails it as `null` and a missing one as `absent`. A path can't start with a word the sentences use, like `empty`, `count` or `true`. Put a dot in front, `.empty is 1`, to read a field with that name. The subject's own name is the [subject itself](#the-subject-itself), so a field called like the subject is written with a dot too.
 
 `named by` a bare field picks the key from the subject, so a limit can depend on a field like the severity. With the params `{"max_days": {"critical": 1, "high": 5}}`, this policy:
 
@@ -1410,7 +1410,7 @@ Any other `$<word>`, like `$foo`, is written wrong with `unknown name $foo`, in 
 
 ### The subject itself
 
-A list of plain values, like ids, regions or tags, can be a subject, and `it` is how a check says something about the value. With these params:
+A list of plain values, like ids, regions or tags, can be a subject, and the subject's name is how a check says something about the value. With these params:
 
 ```json
 {"allowed_regions": ["eu-west-1"]}
@@ -1433,57 +1433,55 @@ requirements:
   allowed:
     subject: region
     checks:
-      allowed: it is one of $params.allowed_regions
+      allowed: region is one of $params.allowed_regions
 ```
 
-each region is a subject, with the region as its id, and the one that isn't allowed fails. The check's `expression` is `it is in $params.allowed_regions`, and the rows are:
+each region is a subject, with the region as its id, and the one that isn't allowed fails. The check's `expression` is `region is in $params.allowed_regions`, and the rows are:
 
 ```json
 {"check": "allowed", "subject": {"id": "eu-west-1", "type": "region"}, "passed": true, "cause": "satisfied",
- "inputs": [{"name": "it", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}], "requirement": "allowed"}
-{"check": "allowed", "subject": {"id": "us-east-1", "type": "region"}, "passed": false, "cause": "value", "message": "it is \"us-east-1\", and $params.allowed_regions is [\"eu-west-1\"]",
- "inputs": [{"name": "it", "value": "us-east-1", "locations": ["/deployment/regions/1"]}], "requirement": "allowed"}
+ "inputs": [{"name": "region", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}], "requirement": "allowed"}
+{"check": "allowed", "subject": {"id": "us-east-1", "type": "region"}, "passed": false, "cause": "value", "message": "region is \"us-east-1\", and $params.allowed_regions is [\"eu-west-1\"]",
+ "inputs": [{"name": "region", "value": "us-east-1", "locations": ["/deployment/regions/1"]}], "requirement": "allowed"}
 ```
 
-`it` is the whole subject, whatever it holds. `it is an object` passes for an object, and a subject that is `null` or the wrong type for the phrase fails the way the same phrase fails on a field holding that value: `it is a string` on `null` fails as `null`, on `3` as `value`, and `it is at least 2` on `"a"` as `unusable`. Two regions with the same name still fail `$unique_ids`, because ids are the values.
+The subject's name, as the requirement's `subject` gives it, means the subject itself, whatever it holds. `region is an object` passes for an object, and a subject that is `null` or the wrong type for the phrase fails the way the same phrase fails on a field holding that value: `region is a string` on `null` fails as `null`, on `3` as `value`, and `region is at least 2` on `"a"` as `unusable`. Two regions with the same name still fail `$unique_ids`, because ids are the values.
 
-`it` is also the path after `every`, `some`, `count of` and `sum of`, so a subject that is a list can be checked item by item. With `from: every releases.tags` and the input `{"releases": {"tags": [["a", "b"], [1, "x"]]}}`, `every it is a string` passes the first tag list and fails the second, with the row:
+The name is also the path after `every`, `some`, `count of` and `sum of`, so a subject that is a list can be checked item by item. With the subject `tags`, `from: every releases.tags` and the input `{"releases": {"tags": [["a", "b"], [1, "x"]]}}`, `every tags is a string` passes the first tag list and fails the second, with the row:
 
 ```json
-{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "value", "message": "item 1 of it is 1",
- "failed_items": [{"cause": "value", "item": "item 1 of it", "path": "item 1 of it", "value": 1, "locations": ["/releases/tags/1/0"]}],
- "inputs": [{"name": "it[]", "value": [1, "x"], "locations": ["/releases/tags/1/0", "/releases/tags/1/1"]}], "requirement": "r"}
+{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "value", "message": "item 1 of tags is 1",
+ "failed_items": [{"cause": "value", "item": "item 1 of tags", "path": "item 1 of tags", "value": 1, "locations": ["/releases/tags/1/0"]}],
+ "inputs": [{"name": "tags[]", "value": [1, "x"], "locations": ["/releases/tags/1/0", "/releases/tags/1/1"]}], "requirement": "r"}
 ```
 
-A position is written in words, as for a field. With the input `{"releases": {"tags": [["a", "b"], [1, "x"], []]}}` and the same `from`, `first of it is "a"` gives:
+A position is written in words, as for a field. With the input `{"releases": {"tags": [["a", "b"], [1, "x"], []]}}` and the same `from`, `first of tags is "a"` gives:
 
 ```json
 {"check": "c", "subject": {"id": ["a", "b"], "type": "tags"}, "passed": true, "cause": "satisfied",
- "inputs": [{"name": "item 1 of it", "value": "a", "locations": ["/releases/tags/0/0"]}], "requirement": "r"}
-{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "unusable", "message": "item 1 of it is 1, which isn't text",
- "inputs": [{"name": "item 1 of it", "value": 1, "locations": ["/releases/tags/1/0"]}], "requirement": "r"}
-{"check": "c", "subject": {"id": [], "type": "tags"}, "passed": false, "cause": "absent", "message": "item 1 of it is missing",
- "inputs": [{"name": "item 1 of it", "value": null, "locations": ["/releases/tags/2"]}], "requirement": "r"}
+ "inputs": [{"name": "item 1 of tags", "value": "a", "locations": ["/releases/tags/0/0"]}], "requirement": "r"}
+{"check": "c", "subject": {"id": [1, "x"], "type": "tags"}, "passed": false, "cause": "unusable", "message": "item 1 of tags is 1, which isn't text",
+ "inputs": [{"name": "item 1 of tags", "value": 1, "locations": ["/releases/tags/1/0"]}], "requirement": "r"}
+{"check": "c", "subject": {"id": [], "type": "tags"}, "passed": false, "cause": "absent", "message": "item 1 of tags is missing",
+ "inputs": [{"name": "item 1 of tags", "value": null, "locations": ["/releases/tags/2"]}], "requirement": "r"}
 ```
 
-`1` can't be compared with `"a"`, so the second list fails as `unusable`, and the empty one has no first item, so it fails as `absent`, as `first of v` does on a field. Brackets, like `it[0]`, are written wrong.
+`1` can't be compared with `"a"`, so the second list fails as `unusable`, and the empty one has no first item, so it fails as `absent`, as `first of v` does on a field.
 
-`it` goes where an assertion starts: the left side of a check, after `and`, in an `any_of` option, and in a `whose` condition of a `from` line, like `from: every ws whose it starts with "b"`, where it reads each value the `from` line finds. Its `$applies` row names it `it`. After a `for` line it's still the subject, not the item of the `for`. Everywhere else it's written wrong, and the `$well_formed` row says how:
+Four rules say what the name can do:
 
-| Sentence                     | `$well_formed` says                                                    |
-| ---------------------------- | ---------------------------------------------------------------------- |
-| `it.name is 1`               | `it is the whole subject: write name, not it.name`                     |
-| `it[0] is 1`                 | `it is the whole subject: nothing can follow it`                       |
-| `x is it`                    | `it can only start an assertion: write it first, like it is not empty` |
-| `$params.m named by it is 1` | `it can't name a key`                                                  |
+- **Nothing follows it.** The subject's fields are bare words already, so `region.name` means nothing and is written wrong, and so are `region."x"`, `region named by $params.k` and `first of region.name`. With the subject `lib` and the check `lib.name is 1`, the `$well_formed` row says `lib.name: nothing can follow lib, which means the subject: for a field called lib, write .lib.name`. A position straight after the name, like `lib[0]`, is read as it is on a field. The name can't be the key of a `named by` either: `$params.m named by lib is 1` says `named by lib: lib is the whole subject, so it can't name a key`.
+- **A dot reaches the field.** When an item has a field with the subject's name, the bare name is the subject and `.name` is the field. With the subject `build` from `builds` and the input `{"builds": [{"id": "b1", "build": "x"}, {"id": "b2", "build": "y"}]}`, `.build is "x"` reads each item's `build` field and `build is an object` reads the item. The row for `b2` says `.build is "y"`, with the input named `.build`, and the row of `build is an object` names its input `build`.
+- **On the right side it reads the subject too.** With the subject `lib` from `every libs`, `some $input.deps whose name is lib exists` keeps the dependencies whose `name` is the library. With the input `{"libs": ["a", "b"], "deps": [{"name": "a"}]}`, `a` passes, and `b` fails with `$input.deps is [{"name": "a"}]`. A name in double quotes on the right is a plain value, like any quoted text, so it never reads the subject there.
+- **A name with a space goes in double quotes.** With a subject called `production deployment`, the check is `"production deployment" is an object`, written in YAML as `'"production deployment" is an object'`. A quoted name that is a word of the grammar, like `"item"` for a subject called `item`, reads the subject too: `"item" is a string` on `{"items": ["a", 2]}` passes for `a` and fails for `2` with `item is 2`.
 
-`that` picks items by the value itself, where `whose` picks them by a field: `from: every ws that starts with "b"` keeps the values of `ws` that start with `b`, and means what `from: every ws whose it starts with "b"` does. It works wherever `whose` does, on a `from` line, after `every`, `some`, `count of` and `sum of` in a check, and in an item of a `for` line, and the two mix in one chain, like `ws that starts with "b" and whose it ends with "y"`. What follows `that` is a phrase about the item, and a field called `that` is written `.that`, like `every items whose .that is "x"`.
+A subject can be called anything, `it` included. `it` isn't a word of the grammar, so it is an ordinary name for a subject, a field, a `for` alias or a part.
+
+The name goes where an assertion starts: the left side of a check, after `and`, in an `any_of` option, and in a `whose` condition of a `from` line, like `from: every ws whose w starts with "b"` for a subject called `w`, where it reads each value the `from` line finds. Its `$applies` row names it `w`. After a `for` line it's still the subject, not the item of the `for`.
+
+`that` picks items by the value itself, where `whose` picks them by a field: `from: every ws that starts with "b"` keeps the values of `ws` that start with `b`, and means what `from: every ws whose w starts with "b"` does for a subject called `w`. It works wherever `whose` does, on a `from` line, after `every`, `some`, `count of` and `sum of` in a check, and in an item of a `for` line, and the two mix in one chain, like `ws that starts with "b" and whose w ends with "y"`. What follows `that` is a phrase about the item, and a field called `that` is written `.that`, like `every items whose .that is "x"`.
 
 On a `from` line, the `$applies` row names an item by the subject's name. With `from: every ws that starts with "b"`, a subject called `w` and the input `{"ws": ["bay", "apple"]}`, the row for `apple` has the input `{"name": "w", "value": "apple", "locations": ["/ws/1"]}` and the message `w is "apple"`. In a check, `count of ws that starts with "b" is 2` lists `count of ws that starts with "b"` and `ws[]` in its inputs, as `whose` does.
-
-A subject can't be called `it`. A requirement that uses one is written wrong, and `$well_formed` says `it is a word of the grammar, so a subject can't be called it` under `subjects.it`.
-
-Reading the subject from the right side of a phrase, like `x equals it`, is left out for now.
 
 ## The report
 
@@ -1624,16 +1622,16 @@ Passing and failing rows have the same fields, and a failing row also has a [`me
 
 A failed row has a `message`: one line of plain text that says what Ergo found, so a reader who doesn't read policies can follow it. A passed row has none. The message says what was found, never what was expected, because the check's `expression` already says that. It comes from the policy and the input only, so the same report always has the same messages.
 
-| Cause           | Message                                           | Example                                  |
-| --------------- | ------------------------------------------------- | ---------------------------------------- |
-| `value`         | each value compared, joined with `, and `         | `x is 4`                                 |
-| `absent`        | the inputs that are missing                       | `gone is missing`                        |
-| `null`          | the inputs that are `null`                        | `n is null`                              |
-| `unusable`      | the value, and the kind it isn't                  | `s is "3", which isn't a number`         |
-| `not_an_object` | the subject, called `it`                          | `it is "str", which isn't an object`     |
-| `ambiguous`     | the items that tie, and the key they tie on       | `item 1 and item 2 of commits tie on ts` |
+| Cause           | Message                                     | Example                                      |
+| --------------- | ------------------------------------------- | -------------------------------------------- |
+| `value`         | each value compared, joined with `, and `   | `x is 4`                                     |
+| `absent`        | the inputs that are missing                 | `gone is missing`                            |
+| `null`          | the inputs that are `null`                  | `n is null`                                  |
+| `unusable`      | the value, and the kind it isn't            | `s is "3", which isn't a number`             |
+| `not_an_object` | the subject, by its name                    | `deployment is "str", which isn't an object` |
+| `ambiguous`     | the items that tie, and the key they tie on | `item 1 and item 2 of commits tie on ts`     |
 
-A number Ergo works out is named after the words that asked for it, like `count of l is 5`. How values are printed:
+Where a row has no name for the subject, the message says `the subject`. A number Ergo works out is named after the words that asked for it, like `count of l is 5`. How values are printed:
 
 - Text is in quotes. Text over 60 characters keeps the first 60 and ends with `…"`.
 - A list over 3 items shows the first 3 and then `and N more`, like `l is ["a", "b", "c", and 2 more]`.
