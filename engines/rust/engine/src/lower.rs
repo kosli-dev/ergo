@@ -208,6 +208,7 @@ impl Scope {
         let mut names: BTreeSet<String> = self.parts.keys().cloned().collect();
         names.extend(self.parents.keys().cloned());
         names.extend(self.for_aliases.iter().cloned());
+        names.extend(self.subject.iter().cloned());
         names.into_iter().collect()
     }
 

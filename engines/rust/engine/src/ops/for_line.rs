@@ -2371,6 +2371,27 @@ mod tests {
     }
 
     #[test]
+    fn a_failed_assertion_keeps_the_dot_of_a_field_named_like_the_subject() {
+        let policy = json!({
+            "ergo_spec": "v0.5-dev",
+            "subjects": {"thing": {"from": "every xs"}},
+            "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every ys as k", "assert": ".thing is 1"}}}}
+        });
+        let input = json!({"xs": [{"thing": 2, "ys": [1]}]});
+        let report = crate::report(&input, &policy, &json!({}));
+        let found = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == "c")
+            .unwrap();
+        assert_eq!(
+            found["failed_items"][0]["failed_assertions"][0]["assertion"],
+            ".thing is 1"
+        );
+    }
+
+    #[test]
     fn a_whose_leaves_an_item_out_on_value_and_fails_the_check_when_it_cannot_decide() {
         let line = "every xs whose kind is \"code\" as x";
         let sentence = json!("x.ok is true");
