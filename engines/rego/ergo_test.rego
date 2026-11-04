@@ -3563,9 +3563,9 @@ test_null_params_are_no_params_and_fail_nothing_a_policy_does_not_read if {
 	}
 }
 
-test_a_whole_params_read_with_null_params_fails_as_null_and_with_an_object_reads_it if {
+test_a_whole_params_read_with_null_params_fails_as_absent_and_with_an_object_reads_it if {
 	check := "$params exists"
-	params_rows({"items": [{"id": 1}]}, check) == [[false, "null", [{"name": "$params", "value": null, "locations": ["$params:"]}]]] with data.params as null
+	params_rows({"items": [{"id": 1}]}, check) == [[false, "absent", [{"name": "$params", "value": null, "locations": ["$params:"]}]]] with data.params as null
 	params_rows({"items": [{"id": 1}]}, check) == [[true, "satisfied", [{"name": "$params", "value": {}, "locations": ["$params:"]}]]] with data.params as {}
 	params_rows({"items": [{"id": 1}]}, check) == [[false, "unusable", [{"name": "$params", "value": "x", "locations": ["$params:"]}]]] with data.params as "x"
 }
@@ -11857,5 +11857,59 @@ test_null_params_fail_a_walk_or_a_count_as_absent_like_a_plain_path if {
 	every r in rows {
 		r.cause == "absent"
 		r.message == "$params is missing"
+	}
+}
+
+test_null_params_fail_params_exists_as_absent_like_a_path_into_them if {
+	rows := [r |
+		some r in report(
+			{"items": [{"id": 1}]},
+			{"s": {
+				"subject_type": "thing",
+				"from": "items",
+				"identified_by": "id",
+				"checks": {"c": {"assert": "$params exists"}},
+			}},
+		).results
+		r.check == "c"
+	] with data.params as null
+	[[r.cause, r.message] | some r in rows] == [["absent", "$params is missing"]]
+}
+
+params_for_line_messages := {row.check: row.message |
+	some row in report(
+		{"items": [{"id": 1, "ws": [1]}]},
+		{"s": {
+			"subject_type": "thing",
+			"from": "items",
+			"identified_by": "id",
+			"checks": {
+				"c": {"for": "every $params as p", "assert": "p.v is 1"},
+				"d": {"for": "every $params.v as p", "assert": "p is 1"},
+				"e": {"for": "every ws as w", "assert": "w is in $params.v"},
+				"f": {"assert": "sum of $params.v is 1"},
+				"g": {"assert": "count of $params whose v is 1 is 1"},
+			},
+		}},
+	).results
+	not startswith(row.check, "$")
+}
+
+test_a_for_line_that_reads_params_that_are_not_an_object_names_them if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"], [false, "false"]] {
+		object.filter(params_for_line_messages, ["c", "d", "e"]) == {
+			"c": concat("", ["$params is ", case[1], ", which isn't an object"]),
+			"d": concat("", ["$params is ", case[1], ", which isn't an object"]),
+			"e": concat("", ["$params is ", case[1], ", which isn't an object"]),
+		} with data.params as case[0]
+	}
+}
+
+test_a_sum_or_count_that_reads_params_that_are_a_list_names_them_not_the_digits if {
+	every case in [[[3], "[3]"], [[[1]], "[[1]]"]] {
+		object.filter(params_for_line_messages, ["f", "g"]) == {
+			"f": concat("", ["$params is ", case[1], ", which isn't an object"]),
+			"g": concat("", ["$params is ", case[1], ", which isn't an object"]),
+		} with data.params as case[0]
 	}
 }
