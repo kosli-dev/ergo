@@ -720,7 +720,7 @@ pub fn params_that_arent_an_object(check: &Check, ctx: &Ctx) -> Option<String> {
     }
 }
 
-fn params_break(path: &Path, params: &Value, ctx: &Ctx) -> Option<String> {
+pub fn params_break(path: &Path, params: &Value, ctx: &Ctx) -> Option<String> {
     let mut at = params;
     for (i, step) in path.steps.iter().enumerate() {
         let key = match step {
