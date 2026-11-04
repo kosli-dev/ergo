@@ -924,7 +924,7 @@ _filter_eval(req, check, subj, flaw) := object.union(
 	w := _walk_row(check, subj)
 }
 
-_filter_eval(req, check, subj, flaw) := _m_filter(check, subj, {
+_filter_eval(req, check, subj, flaw) := _m_filter(_named_check(check, req, subj), subj, {
 	"passed": passed,
 	"cause": _filter_cause(check, subj, flaw),
 	"assertion_cause": _filter_assertion_cause(passed, check, subj, flaw),
@@ -969,14 +969,26 @@ _labelled_for(check, req, subj) := _labelled(check, req) if not is_object(subj)
 
 _labelled_for(check, _, subj) := check if is_object(subj)
 
+_named_check(check, req, subj) := c if {
+	c := _labelled_for(check, req, subj)
+} else := check
+
 _walk_labelled(check, req, subj) := _labelled(check, req) if {
 	not is_object(subj)
 	_walks(check)
 }
 
+_walk_labelled(check, req, subj) := _labelled(check, req) if {
+	not is_object(subj)
+	check.op == "for"
+}
+
 _walk_labelled(check, _, subj) := check if is_object(subj)
 
-_walk_labelled(check, _, _) := check if not _walks(check)
+_walk_labelled(check, _, _) := check if {
+	not _walks(check)
+	object.get(check, "op", "") != "for"
+}
 
 _tagged_outcome(raw, _, req, _) := raw if not _tagging(req)
 
@@ -6335,7 +6347,7 @@ _s_unlifted_path_of(text, pat) := object.union(_s_position_of(m[1], m[2], m[3]),
 	m := regex.find_all_string_submatch_n(pat.path_parts, text, 1)[0]
 }
 
-_s_lifted(path) := object.union(object.union(object.remove(path, ["steps"]), object.remove(last, ["index"])), {"position": last.index + 1, "steps": array.slice(path.steps, 0, count(path.steps) - 1)}) if {
+_s_lifted(path) := object.union(object.union(object.remove(path, ["steps"]), object.remove(last, ["index"])), {"bracketed": true, "position": last.index + 1, "steps": array.slice(path.steps, 0, count(path.steps) - 1)}) if {
 	not "position" in object.keys(path)
 	not _s_itself(path)
 	last := path.steps[count(path.steps) - 1]
@@ -7666,14 +7678,23 @@ _p_for_clash(check, _) := set() if not is_string(object.get(check, "for", ""))
 
 _p_for_items(check) := object.get(_for_line(check.for), "items", []) if is_string(check.for)
 
-_p_subject_follow_problems(check, lines, ftext, pc) := {concat("", [_s_path_text(object.union(node, {"quoted": true}), "left"), ": nothing can follow ", pc.subject, ", which means the subject: for a field called ", pc.subject, ", write ", concat("", [_s_step_text(st) | some st in node.steps])]) |
+_p_subject_follow_problems(check, lines, ftext, pc) := {concat("", [_s_path_text(object.union(written, {"quoted": true}), "left"), ": nothing can follow ", pc.subject, ", which means the subject: for a field called ", pc.subject, ", write ", concat("", [_s_step_text(st) | some st in written.steps])]) |
 	_s_text_has(json.marshal(check), pc.subject)
 	some node in _p_subject_nodes(lines, ftext)
 	node.steps[0] == pc.subject
-	count(node.steps) > 1
+	_p_followed(node)
 	object.get(node, "dot", false) != true
 	not "start" in object.keys(node)
+	written := _p_as_written(node)
 } if is_string(object.get(pc, "subject", null))
+
+_p_followed(node) if count(node.steps) > 1
+
+_p_followed(node) if object.get(node, "bracketed", false) == true
+
+_p_as_written(node) := object.union(object.remove(node, ["bracketed", "position"]), {"steps": array.concat(node.steps, [{"index": node.position - 1}])}) if object.get(node, "bracketed", false) == true
+
+_p_as_written(node) := node if object.get(node, "bracketed", false) != true
 
 _p_subject_follow_problems(_, _, _, pc) := set() if not is_string(object.get(pc, "subject", null))
 
@@ -11241,6 +11262,8 @@ _for_why(item, e, names, wh, failure) := object.union(failure, {"why": [ms[0]]})
 
 _m_why_text(name, c, m) := concat("", [name, " ", trim_prefix(m, "the subject ")]) if _m_itself(c)
 
+else := concat("", [name, " ", trim_prefix(m, "the subject ")]) if startswith(m, "the subject ")
+
 else := concat("", [name, ": ", m])
 
 _m_itself(c) if object.get(c, "path", null) == []
@@ -11636,15 +11659,21 @@ _m_from_message(doc, req, false, cause) := {"message": m} if {
 	_every_failed_items(doc, req)
 	fails := _every_walk(doc, _from_keys(req)).fails
 	count(fails) > 0
-	m := _m_joined([_m_named_fail(object.union(f, {"path": _m_input_item_name(f.path)})) | some p in sort({f.path | some f in fails}); some f in fails; f.path == p])
+	m := _m_joined([_m_named_fail(object.union(f, {"path": _m_from_item_name(req, f.path)})) | some p in sort({f.path | some f in fails}); some f in fails; f.path == p])
 } else := {}
 
-_m_input_item_name(path) := concat(": ", [_input_path_name([path[0]]), _m_item_name(array.slice(path, 1, count(path)), set())]) if {
+_m_from_root(req) := data.ergo_subject_sentences.chains[req.subject] if _chained(req)
+
+else := "$input"
+
+_m_from_item_name(req, []) := _m_from_root(req)
+
+_m_from_item_name(req, path) := concat(": ", [_visible_path_name([path[0]], _m_from_root(req)), _m_item_name(array.slice(path, 1, count(path)), set())]) if {
 	is_number(path[0])
 	count(path) > 1
-} else := _input_path_name(path) if {
+} else := _visible_path_name(path, _m_from_root(req)) if {
 	is_number(path[0])
-} else := _m_item_name(path, set())
+} else := _m_item_name(path, set()) if path != []
 
 _m_from_refs(req, cause) := ms if {
 	ms := [m | some r in _m_from_ref_list(req); m := _m_from_ref_text(r, cause)]
@@ -11699,4 +11728,4 @@ _m_applies(_, _, true) := {}
 _m_applies(evals, req, false) := {"message": concat("; ", ms)} if {
 	ms := _once([evals[n].message | some n in _applies_to_names(req); not evals[n].passed])
 	ms != []
-} else := {"message": "the subject doesn't match"}
+} else := {"message": concat("", [_text(object.get(req, "subject", null)), " doesn't match"])}

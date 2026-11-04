@@ -3928,7 +3928,7 @@ test_a_count_with_a_whose_keeps_the_whose_on_the_assertion_and_plus_inside_the_c
 
 test_a_path_reads_params_input_lookups_positions_and_quoted_keys if {
 	_read(`$params.k."b c"[2].d is 1`).assertions[0].path == {"start": "params", "steps": ["k", "b c", {"index": 2}, "d"]}
-	_read(`$params.k."b c"[2] is 1`).assertions[0].path == {"start": "params", "position": 3, "steps": ["k", "b c"]}
+	_read(`$params.k."b c"[2] is 1`).assertions[0].path == {"start": "params", "position": 3, "steps": ["k", "b c"], "bracketed": true}
 	_read(`item 3 of k."b c" is 1`).assertions[0].path == {"position": 3, "steps": ["k", "b c"]}
 	_read(`item 3 of k[0] is 1`).assertions[0].path == {"position": 3, "steps": ["k", {"index": 0}]}
 	_read(`$input.x named by persona.y is 1`).assertions[0].path == {"start": "input", "steps": ["x", {"named_by": {"steps": ["persona"]}}, "y"]}
@@ -4035,7 +4035,20 @@ test_the_report_prints_one_spelling_for_each_phrase if {
 	_printed(`count of x whose n is 1 is 2`) == "count of x whose n is 1 is 2"
 	_printed(`sum of x.n plus 1 plus count of y is 2`) == "sum of x.n plus 1 plus count of y is 2"
 	_printed(`count of x[0] is 1 and y equals sum of z[1].n`) == "count of item 1 of x is 1 and y equals sum of z[1].n"
-	_read(_printed(`count of x[0] is 1`)) == _read(`count of x[0] is 1`)
+	_read(`count of x[0] is 1`).assertions[0].terms[0].count == {"bracketed": true, "position": 1, "steps": ["x"]}
+	_read(_printed(`count of x[0] is 1`)).assertions[0].terms[0].count == {"position": 1, "steps": ["x"]}
+}
+
+test_a_position_in_brackets_is_read_like_one_in_words_but_remembers_how_it_was_written if {
+	_read(`x[0] is 1`).assertions[0].path == {"bracketed": true, "position": 1, "steps": ["x"]}
+	_read(`first of x is 1`).assertions[0].path == {"position": "first", "steps": ["x"]}
+	_read(`item 1 of x is 1`).assertions[0].path == {"position": 1, "steps": ["x"]}
+	_printed(`x[0] is 1`) == "item 1 of x is 1"
+}
+
+test_a_check_on_an_item_that_isnt_an_object_keeps_its_words_when_the_requirement_names_no_subject if {
+	ergo._named_check({"op": "exists"}, {}, 3) == {"op": "exists"}
+	ergo._named_check({"op": "exists"}, {"subject": "t"}, 3) == {"op": "exists", "label": "t"}
 }
 
 test_a_for_line_reads_its_items if {
@@ -10221,6 +10234,8 @@ _subject_report(doc, from, checks, params) := ergo.report(doc, _subject_policy(f
 
 _subject_rows(doc, from, check, params) := [[r.subject.id, r.passed, r.cause, r.inputs] | some r in _subject_report(doc, from, {"c": check}, params).results; r.check == "c"]
 
+_subject_has_no_problem(from, checks) if count([i | some i in _subject_report({"xs": []}, from, checks, {}).results[0].inputs; i.name == "checks.c"]) == 0
+
 _subject_problems(from, checks) := [i.value | some i in _subject_report({"xs": []}, from, checks, {}).results[0].inputs; i.name == "checks.c"][0]
 
 test_subject_is_the_subject_itself_when_the_subject_is_a_string if {
@@ -10363,6 +10378,19 @@ test_nothing_can_follow_a_subjects_name_and_the_problem_says_to_write_a_dot_for_
 	_subject_problems("every xs", {"c": "count of s.k is 1"}) == ["s.k: nothing can follow s, which means the subject: for a field called s, write .s.k"]
 	_subject_problems("every xs", {"c": "s[0].k is 1"}) == ["s[0].k: nothing can follow s, which means the subject: for a field called s, write .s[0].k"]
 	_subject_problems("every xs", {"c": "first of s.k is 1"}) == ["first of s.k: nothing can follow s, which means the subject: for a field called s, write .s.k"]
+}
+
+test_the_subjects_name_followed_by_brackets_is_written_wrong_but_first_of_and_item_n_of_are_read if {
+	_subject_problems("every xs", {"c": "s[0] is 1"}) == ["s[0]: nothing can follow s, which means the subject: for a field called s, write .s[0]"]
+	_subject_problems("every xs", {"c": "s[1] is 1"}) == ["s[1]: nothing can follow s, which means the subject: for a field called s, write .s[1]"]
+	_subject_problems("every xs", {"c": "every s[0] is 1"}) == ["s[0]: nothing can follow s, which means the subject: for a field called s, write .s[0]"]
+	_subject_problems("every xs", {"c": "count of s[0] is 1"}) == ["s[0]: nothing can follow s, which means the subject: for a field called s, write .s[0]"]
+	_subject_problems("every xs", {"c": "x is s[0]"}) == ["s[0]: nothing can follow s, which means the subject: for a field called s, write .s[0]"]
+	_subject_problems("every xs", {"c": "s[0][1] is 1"}) == ["s[0][1]: nothing can follow s, which means the subject: for a field called s, write .s[0][1]"]
+	_subject_has_no_problem("every xs", {"c": `"a b"[0] is 1`})
+	_subject_has_no_problem("every xs", {"c": "first of s is 1"})
+	_subject_has_no_problem("every xs", {"c": "item 2 of s is 1"})
+	_subject_has_no_problem("every xs", {"c": ".s[0] is 1"})
 }
 
 test_the_subjects_name_on_the_right_of_a_phrase_reads_the_subject if {
@@ -11218,7 +11246,7 @@ test_message_ties_in_different_lists_are_joined_with_and if {
 }
 
 test_message_of_a_subject_that_does_not_match_without_a_filter_message if {
-	ergo._m_applies({}, {}, false) == {"message": "the subject doesn't match"}
+	ergo._m_applies({}, {"subject": "thing"}, false) == {"message": "thing doesn't match"}
 }
 
 test_message_names_the_object_that_cant_hold_a_key_read_from_a_field if {
@@ -11740,7 +11768,7 @@ test_a_for_line_that_walks_a_list_subject_fails_as_not_an_object_like_any_for_li
 		[[r[1], r[2]] | some r in rows] == [[false, "not_an_object"], [false, "not_an_object"]]
 	}
 	rep := _subject_report(doc, "every xs", {"c": {"for": "last of s as e", "assert": "e is 1"}}, {})
-	[r.message | some r in rep.results; r.check == "c"] == ["the subject is [1, 2], which isn't an object", "the subject is [3], which isn't an object"]
+	[r.message | some r in rep.results; r.check == "c"] == ["s is [1, 2], which isn't an object", "s is [3], which isn't an object"]
 	object_rows := _subject_rows({"xs": [{"id": "a"}]}, "every xs", {"for": "last of s as e", "assert": "e is 1"}, {})
 	[[r[1], r[2]] | some r in object_rows] == [[false, "unusable"]]
 }
