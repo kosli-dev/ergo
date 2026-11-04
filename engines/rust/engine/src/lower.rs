@@ -439,7 +439,7 @@ impl Scope {
         if self.parents.contains_key(key)
             || self.parts.contains_key(key)
             || self.for_aliases.contains(key)
-            || (dot && self.subject.as_deref() == Some(key))
+            || ((dot || !parts) && self.subject.as_deref() == Some(key))
         {
             steps.insert(0, Step::Key(key.to_string()));
             return (Start::Own, steps);

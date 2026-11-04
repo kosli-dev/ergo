@@ -520,7 +520,10 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             part: None,
             state: crate::path::Outcome::Found,
         };
-        let (entries, located) = counted_entries(counted, &result, list, Vec::new(), ctx);
+        let whose: Vec<&Check> = counted.whose.iter().collect();
+        let mut outside = walk::outside_inputs_of(&whose, &outer);
+        outside.sort_by(|a, b| a.name.cmp(&b.name));
+        let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
             entries,
             located,
@@ -2802,5 +2805,70 @@ mod tests {
             first_entry_part(&scope, "count of pa.items whose w is pa.w is 1"),
             json!({"name": "pa", "id": null})
         );
+    }
+
+    fn named_row(subject: &str, has: Value, check: &str, input: Value) -> Value {
+        let mut found = json!({"from": "every xs"});
+        if !has.is_null() {
+            found["has"] = has;
+        }
+        let policy = json!({
+            "ergo_spec": "v0.5-dev",
+            "subjects": {subject: found},
+            "requirements": {"r": {"subject": subject, "checks": {"c": check}}}
+        });
+        let report = crate::report(&input, &policy, &json!({}));
+        report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == "c")
+            .unwrap()
+            .clone()
+    }
+
+    #[test]
+    fn a_count_of_a_field_named_like_the_subject_says_an_unusable_field_once() {
+        let row = named_row(
+            "kid",
+            Value::Null,
+            "count of .kid is 1",
+            json!({"xs": [{"kid": 1}]}),
+        );
+        assert_eq!(row["cause"], "unusable");
+        assert_eq!(row["message"], "kid is 1, which isn't a list or an object");
+        assert_eq!(row["inputs"][1]["name"], ".kid");
+    }
+
+    #[test]
+    fn a_whose_names_the_field_it_reads_with_a_dot_when_the_subject_has_that_name() {
+        let row = named_row(
+            "thing",
+            json!({"p": "thing"}),
+            "count of ys whose thing is p is 1",
+            json!({"xs": [{"thing": {"x": 1}, "ys": [{"thing": 1}]}]}),
+        );
+        assert_eq!(
+            row["message"],
+            "item 1 of ys: .thing is 1, which isn't an object"
+        );
+    }
+
+    #[test]
+    fn a_count_on_a_subject_that_is_not_an_object_lists_the_part_its_whose_reads() {
+        let row = named_row(
+            "thing",
+            json!({"p": "thing"}),
+            "count of ys whose thing is p is 1",
+            json!({"xs": [[1, 2]]}),
+        );
+        assert_eq!(row["cause"], "not_an_object");
+        let names: Vec<&str> = row["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|input| input["name"].as_str().unwrap())
+            .collect();
+        assert_eq!(names, ["count of ys whose thing equals p", "ys", "p"]);
     }
 }

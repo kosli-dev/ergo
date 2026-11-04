@@ -3698,6 +3698,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("x is in $input.o", "x is in $input.o", &[], &[]),
     (".x is 1", "x is 1", &[], &[]),
     ("k is 1", "k is 1", &[], &[]),
+    ("count of .kid is 1", "count of kid is 1", &[], &[]),
+    (
+        "count of ys whose thing is p is 1",
+        "count of ys whose thing equals p is 1",
+        &[],
+        &[],
+    ),
     ("x is less than 5", "x is less than 5", &[], &[]),
     ("x is less than y", "x is less than y", &[], &[]),
     ("x is more than 5", "x is more than 5", &[], &[]),

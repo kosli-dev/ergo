@@ -680,6 +680,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ),
     ("every things.xs", "every things.xs"),
     ("every kids whose .kid is 1", "every kids whose kid is 1"),
+    ("every kids", "every kids"),
+    ("thing", "thing"),
     ("every values", "every values"),
     (
         "every ws whose it is a string and whose it starts with 'b'",
@@ -2813,6 +2815,7 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("thing", "thing"),
     ("owner.name", "owner.name"),
     ("y", "y"),
     ("n", "n"),
