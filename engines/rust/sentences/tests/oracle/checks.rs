@@ -5469,6 +5469,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("every \"item\" is 1", "every .item is 1", &[], &[]),
     ("rel is not empty", "rel is not empty", &[], &[]),
+    ("y.v is 2", "y.v is 2", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -9011,6 +9012,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "first of xs sorted by rel as x",
         "first of xs sorted by rel as x",
+        &[],
+        &[],
+    ),
+    (
+        "first of ys sorted by s as y",
+        "first of ys sorted by s as y",
         &[],
         &[],
     ),

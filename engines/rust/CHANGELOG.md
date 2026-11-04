@@ -34,7 +34,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 - A check `count of .kid is 1` on a subject `kid` says `kid is 1, which isn't a list or an object` once, as `ergo.rego` does, where it said it twice, once with a dot. The input is named `count of .kid`.
 - A `whose` in a check that reads a field named like the subject, like `count of ys whose thing is p` for the subject `thing`, names that field with its dot in a message, `.thing is 1, which isn't an object`, as `ergo.rego` does.
 - A `whose` on a `from` line reads the item's field when its left side starts with a subject's name, like `kid.x` in `rel.kids whose kid.x is 1` or `rel.w` in `rels whose rel.w is 1`, where the engine wrote the policy wrong with `nothing can follow kid`.
-- `first of xs sorted by rel` sorts by the item's field `rel` when `rel` is the subject's name, as `ergo.rego` does, where it sorted by the subject. `"item" is ."item"` is no longer said to compare a field with itself when `item` is the subject's name.
+- `first of xs sorted by rel` sorts by the item's field `rel` when `rel` is the subject's name or a parent's or grandparent's name, as `ergo.rego` does, where it sorted by the subject or the parent and failed as `unusable`. `"item" is ."item"` is no longer said to compare a field with itself when `item` is the subject's name.
 - A `count of ys whose thing is p` on a subject that isn't an object lists the part `p` in `inputs`, as `ergo.rego` does, where it left it out.
 
 ## 0.2.0

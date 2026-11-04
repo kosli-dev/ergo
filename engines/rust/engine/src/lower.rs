@@ -225,6 +225,17 @@ impl Scope {
         scope
     }
 
+    pub fn sort_key_path(&self, written: &s::Path) -> s::Path {
+        match &written.start {
+            s::Start::Field { key, dot: false } | s::Start::Quoted(key)
+                if self.parents.contains_key(key) =>
+            {
+                name_dotted(written, key)
+            }
+            _ => written.clone(),
+        }
+    }
+
     pub fn with_for_alias(mut self, alias: &str) -> Scope {
         self.for_aliases.insert(alias.to_string());
         self
@@ -730,16 +741,46 @@ pub fn name_dotted(path: &s::Path, name: &str) -> s::Path {
     }
 }
 
+pub fn quoted_name_dotted(path: &s::Path, name: &str) -> s::Path {
+    match &path.start {
+        s::Start::Quoted(key) if key == name => name_dotted(path, name),
+        _ => path.clone(),
+    }
+}
+
+pub fn quoted_name_dotted_condition(condition: &s::FromCondition, name: &str) -> s::FromCondition {
+    match condition {
+        s::FromCondition::Condition(inner) => {
+            s::FromCondition::Condition(left_mapped(inner, |path| quoted_name_dotted(path, name)))
+        }
+        s::FromCondition::Quantified {
+            quantifier,
+            path,
+            if_any,
+            phrase,
+        } => s::FromCondition::Quantified {
+            quantifier: *quantifier,
+            path: quoted_name_dotted(path, name),
+            if_any: *if_any,
+            phrase: phrase.clone(),
+        },
+    }
+}
+
 pub fn left_dotted(condition: &s::Condition, name: &str) -> s::Condition {
+    left_mapped(condition, |path| name_dotted(path, name))
+}
+
+fn left_mapped(condition: &s::Condition, map: impl Fn(&s::Path) -> s::Path) -> s::Condition {
     let left = match &condition.left {
-        s::Left::Path(path) => s::Left::Path(name_dotted(path, name)),
+        s::Left::Path(path) => s::Left::Path(map(path)),
         s::Left::Derived(derived) => s::Left::Derived(s::Derived {
-            path: name_dotted(&derived.path, name),
+            path: map(&derived.path),
             ..derived.clone()
         }),
         s::Left::Elapsed(elapsed) => s::Left::Elapsed(s::Elapsed {
-            from: name_dotted(&elapsed.from, name),
-            to: name_dotted(&elapsed.to, name),
+            from: map(&elapsed.from),
+            to: map(&elapsed.to),
             ..elapsed.clone()
         }),
     };

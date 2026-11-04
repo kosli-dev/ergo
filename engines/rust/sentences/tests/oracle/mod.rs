@@ -1818,6 +1818,16 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every xs whose every rel is 1",
         "every xs whose every rel is 1",
     ),
+    ("every ps", "every ps"),
+    ("s.items", "s.items"),
+    ("s.mids", "s.mids"),
+    ("u.items", "u.items"),
+    ("s.items whose \"item\" is 1", "s.items whose .item is 1"),
+    ("s.items whose \"my t\" is 1", "s.items whose \"my t\" is 1"),
+    (
+        "s.items whose t is 1 and whose .t is 1",
+        "s.items whose t is 1 and whose t is 1",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

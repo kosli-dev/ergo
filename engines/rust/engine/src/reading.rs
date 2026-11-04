@@ -832,8 +832,11 @@ impl Reading {
                                     .push(format!("unknown alias ${ancestor}"));
                             }
                         }
-                        let mut text =
-                            s::print_from_condition(condition, &printed_aliases, &parent_refs);
+                        let mut text = s::print_from_condition(
+                            &lower::quoted_name_dotted_condition(condition, name),
+                            &printed_aliases,
+                            &parent_refs,
+                        );
                         match condition {
                             s::FromCondition::Condition(condition) => {
                                 found_problems.extend(lower::condition_elapsed_problems(condition));
