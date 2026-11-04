@@ -1398,7 +1398,14 @@ impl For {
 
     pub fn run(&self, ctx: &Ctx) -> Run {
         let first = &self.items[0];
-        if walk::path_needs_an_object_subject(&first.path, ctx) {
+        let whole_subject = !ctx.subject.value.is_object()
+            && first.path.steps.is_empty()
+            && match &first.path.start {
+                Start::Subject => true,
+                Start::Part(part) => part.base == Start::Subject && part.steps.is_empty(),
+                _ => false,
+            };
+        if whole_subject || walk::path_needs_an_object_subject(&first.path, ctx) {
             return Run {
                 verdict: Verdict {
                     cause: Cause::NotAnObject,
@@ -2339,6 +2346,28 @@ mod tests {
         assert_eq!(found["cause"], "not_an_object");
         assert_eq!(found["inputs"], json!([]));
         assert_eq!(found["failed_items"], json!([]));
+    }
+
+    #[test]
+    fn a_for_line_over_the_subject_by_its_name_fails_as_not_an_object_on_a_subject_that_is_not_an_object()
+     {
+        for subject in [json!(["a"]), json!("text"), json!([]), json!([{"k": 1}])] {
+            let policy = json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {"thing": {"from": "every xs"}},
+                "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every thing as k", "assert": "k is 1"}}}}
+            });
+            let report = crate::report(&json!({"xs": [subject]}), &policy, &json!({}));
+            let found = report["results"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|row| row["check"] == "c")
+                .unwrap();
+            assert_eq!(found["cause"], "not_an_object");
+            assert_eq!(found["inputs"], json!([]));
+            assert_eq!(found["failed_items"], json!([]));
+        }
     }
 
     #[test]

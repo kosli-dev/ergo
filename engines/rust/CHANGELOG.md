@@ -26,6 +26,8 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A `from` line whose `named by each of` list starts at a field or a subject, like `t named by each of t.keys`, is written wrong, as the spec says, where the engine read the parent's field. Its `$well_formed` row lists `named by each of takes a list from $params or $input, so it can't start at a field or a subject`, like `ergo.rego`.
 - A tie in the second list of a `for` line names the second item's key, like `item 1 and item 2 of p.items tie on hi`, where it named the first item's.
+- A `for` line whose first item is the subject's own name, like `every thing as k`, fails as `not_an_object` on a subject that is a list, text, a number or `null`, as `ergo.rego` does, where it read a list subject as the list.
+- The `from` the report gives for a subject keeps the `.` of a `whose` that reads a field named like the subject, like `every kids whose .kid is 1` for the subject `kid`.
 
 ## 0.2.0
 

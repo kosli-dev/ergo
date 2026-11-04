@@ -679,6 +679,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every sets whose some it is 1",
     ),
     ("every things.xs", "every things.xs"),
+    ("every kids whose .kid is 1", "every kids whose kid is 1"),
     ("every values", "every values"),
     (
         "every ws whose it is a string and whose it starts with 'b'",
