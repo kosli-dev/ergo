@@ -1287,6 +1287,50 @@
     ]
   },
   {
+    "description": "a sort key named like a parent subject sorts by the item's field, not by the parent",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.v is 2", "for": "first of ys sorted by s as y"}}, "subject": "t"}}, "subjects": {"s": {"from": "every ps"}, "t": {"from": "s.items"}}},
+    "cases": [
+      {
+        "description": "the item with the lowest s comes first",
+        "rules": ["sentence.for.pick", "for.pick"],
+        "input": {"ps": [{"id": 1, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/ps/0/items/0/ys/1"], "name": "item 2 of ys", "value": {"s": 1, "v": 2}}], "passed": true, "requirement": "r", "subject": {"id": {"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}, "in": {"s": {"id": 1, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}}, "type": "t"}}
+        ]
+      },
+      {
+        "description": "an item without the field fails as absent, named with its dot",
+        "rules": ["sentence.for.pick", "for.pick", "name.dot"],
+        "input": {"ps": [{"id": 1, "items": [{"ys": [{"v": 3}, {"s": 1, "v": 2}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/ps/0/items/0/ys/0"], "path": "item 1 of ys", "value": null}], "inputs": [{"locations": ["/ps/0/items/0/ys/0", "/ps/0/items/0/ys/1"], "name": "ys[]", "value": [{"v": 3}, {"s": 1, "v": 2}]}], "message": "item 1 of ys: .s is missing", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"v": 3}, {"s": 1, "v": 2}]}, "in": {"s": {"id": 1, "items": [{"ys": [{"v": 3}, {"s": 1, "v": 2}]}]}}, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a sort key named like a grandparent subject sorts by the item's field, not by the grandparent",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.v is 2", "for": "first of ys sorted by s as y"}}, "subject": "t"}}, "subjects": {"s": {"from": "every ps"}, "t": {"from": "u.items"}, "u": {"from": "s.mids"}}},
+    "cases": [
+      {
+        "description": "the item with the lowest s comes first",
+        "rules": ["sentence.for.pick", "for.pick"],
+        "input": {"ps": [{"id": 1, "mids": [{"id": 2, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/ps/0/mids/0/items/0/ys/1"], "name": "item 2 of ys", "value": {"s": 1, "v": 2}}], "passed": true, "requirement": "r", "subject": {"id": {"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}, "in": {"s": {"id": 1, "mids": [{"id": 2, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}]}, "u": {"id": 2, "items": [{"ys": [{"s": 2, "v": 3}, {"s": 1, "v": 2}]}]}}, "type": "t"}}
+        ]
+      },
+      {
+        "description": "a field that isn't a number, a time or a date fails as unusable, named with its dot",
+        "rules": ["sentence.for.pick", "for.pick", "name.dot"],
+        "input": {"ps": [{"id": 1, "mids": [{"id": 2, "items": [{"ys": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of ys", "locations": ["/ps/0/mids/0/items/0/ys/0/s"], "path": "item 1 of ys", "value": [1]}], "inputs": [{"locations": ["/ps/0/mids/0/items/0/ys/0", "/ps/0/mids/0/items/0/ys/1"], "name": "ys[]", "value": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}], "message": "item 1 of ys: .s is [1], which isn't a number, a time or a date", "passed": false, "requirement": "r", "subject": {"id": {"ys": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}, "in": {"s": {"id": 1, "mids": [{"id": 2, "items": [{"ys": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}]}]}, "u": {"id": 2, "items": [{"ys": [{"s": [1], "v": 3}, {"s": 1, "v": 2}]}]}}, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a from line whose that reads a quoted word of the syntax named like the subject reads the item's own field: \"item\"",
     "policy": {"ergo_spec": "v0.5-dev", "requirements": {"r": {"checks": {"c": ".k is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every xs whose \"item\" is 1"}}},
     "cases": [
@@ -1322,6 +1366,29 @@
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/xs/2"], "name": ".first", "value": null}], "message": ".first is missing", "passed": false, "requirement": "r", "subject": {"id": {"k": 3}, "type": "first"}},
           {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/xs/3"], "name": ".first", "value": null}], "message": "first is \"a\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "first"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"first": 1, "item": 1, "k": 1}, "type": "first"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "the expression of a from line whose that reads a field named like the subject is the condition as written",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"q": {"checks": {"c": ".k is 1"}, "subject": "my t"}, "r": {"checks": {"c": ".k is 1"}, "subject": "t"}, "w": {"checks": {"c": ".k is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "s.items whose \"item\" is 1"}, "my t": {"from": "s.items whose \"my t\" is 1"}, "s": {"from": "every ps"}, "t": {"from": "s.items whose t is 1 and whose .t is 1"}}},
+    "cases": [
+      {
+        "description": "the subject's name stays as written, bare or with its dot, a quoted name stays quoted, and a quoted word of the syntax has a dot, while the inputs and messages name the field with its dot",
+        "rules": ["sentence.subject.applies", "sentence.print.canonical", "name.dot"],
+        "input": {"ps": [{"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}]},
+        "expressions": {"q": {"$applies": "\"my t\" is 1"}, "r": {"$applies": "t is 1 and .t is 1"}, "w": {"$applies": ".item is 1"}},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/ps/0/items/0/my t"], "name": ".\"my t\"", "value": 1}], "passed": true, "requirement": "q", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "my t"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/ps/0/items/1/my t"], "name": ".\"my t\"", "value": 2}], "message": ".\"my t\" is 2", "passed": false, "requirement": "q", "subject": {"id": {"item": 2, "k": 2, "my t": 2, "t": 2}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "my t"}},
+          {"cause": "satisfied", "check": "$applies", "failed_assertions": [], "inputs": [{"locations": ["/ps/0/items/0/t"], "name": ".t", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "t"}},
+          {"cause": "value", "check": "$applies", "failed_assertions": [{"assertion": "t is 1", "cause": "value"}, {"assertion": ".t is 1", "cause": "value"}], "inputs": [{"locations": ["/ps/0/items/1/t"], "name": ".t", "value": 2}], "message": ".t is 2", "passed": false, "requirement": "r", "subject": {"id": {"item": 2, "k": 2, "my t": 2, "t": 2}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "t"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/ps/0/items/0/item"], "name": ".item", "value": 1}], "passed": true, "requirement": "w", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "item"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/ps/0/items/1/item"], "name": ".item", "value": 2}], "message": ".item is 2", "passed": false, "requirement": "w", "subject": {"id": {"item": 2, "k": 2, "my t": 2, "t": 2}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "item"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ps/0/items/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "q", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "my t"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ps/0/items/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "t"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ps/0/items/0/k"], "name": "k", "value": 1}], "passed": true, "requirement": "w", "subject": {"id": {"item": 1, "k": 1, "my t": 1, "t": 1}, "in": {"s": {"id": 1, "items": [{"item": 1, "k": 1, "my t": 1, "t": 1}, {"item": 2, "k": 2, "my t": 2, "t": 2}]}}, "type": "item"}}
         ]
       }
     ]
