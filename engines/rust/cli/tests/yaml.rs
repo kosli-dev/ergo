@@ -199,7 +199,6 @@ fn a_tag_outside_the_core_schema_keeps_the_text_as_opa_does() {
         ("!custom 1", json!("1")),
         ("!foo 010", json!("010")),
         ("!foo yes", json!("yes")),
-        ("! 5", json!("5")),
         ("!<!foo> 5", json!("5")),
         ("!!foo 5", json!("5")),
         ("!!set a", json!("a")),
@@ -506,6 +505,78 @@ fn the_same_alias_twice_as_a_key_is_an_error_as_in_opa_1_22() {
 }
 
 #[test]
+fn an_alias_key_is_repeated_by_the_anchor_name_as_opa_1_22_compares_them() {
+    for text in [
+        "a: &k foo\nm:\n  *k : 1\n  x: &k bar\n  *k : 2\n",
+        "x: &k foo\nm:\n  *k : 1\n  *k : 2\n",
+        "a: &k foo\nb: &k foo\nm:\n  *k : 1\n  *k : 2\n",
+        "&k foo: 1\nm:\n  *k : 1\n  *k : 2\n",
+        "m:\n  x: &k foo\n  *k : 1\n  y: &k bar\n  *k : 2\n",
+        "a: &k [1]\nm:\n  *k : 1\n  *k : 2\n",
+        "a: &k foo\nm: {*k : 1, *k : 2}\n",
+        "é: &k foo\nm:\n  *k : 1\n  *k : 2\n",
+    ] {
+        assert!(parse(text).is_err(), "{text:?}");
+    }
+    for (text, expected) in [
+        ("m:\n  &k foo: 1\n  *k : 2\n", json!({"m": {"foo": 2}})),
+        (
+            "a: &k foo\nb: &j foo\nm:\n  *k : 1\n  *j : 2\n",
+            json!({"a": "foo", "b": "foo", "m": {"foo": 2}}),
+        ),
+        (
+            "a: &k foo\nm:\n  *k : 1\n  n:\n    *k : 2\n",
+            json!({"a": "foo", "m": {"foo": 1, "n": {"foo": 2}}}),
+        ),
+        (
+            "é: &kk foo\nm:\n  *kk : 1\n  x: &k foo\n  *k : 2\n",
+            json!({"é": "foo", "m": {"foo": 2, "x": "foo"}}),
+        ),
+    ] {
+        assert_eq!(parse(text).unwrap(), expected, "{text:?}");
+    }
+}
+
+#[test]
+fn a_bare_exclamation_mark_tag_reads_a_plain_value_as_if_it_had_no_tag_as_in_opa_1_21() {
+    for (text, expected) in [
+        ("! 5", json!(5)),
+        ("! true", json!(true)),
+        ("! ~", Value::Null),
+        ("! null", Value::Null),
+        ("!", Value::Null),
+        ("! 0x10", json!(16)),
+        ("! 010", json!(8)),
+        ("! 1.5", json!(1.5)),
+        ("! 9223372036854775808", json!(9223372036854775808u64)),
+        ("! yes", json!("yes")),
+        ("! 2001-12-14", json!("2001-12-14")),
+        ("&a ! 5", json!(5)),
+        ("! &a 5", json!(5)),
+        ("! ''", json!("")),
+        ("! '5'", json!("5")),
+        ("! \"true\"", json!("true")),
+        ("! |\n  5\n", json!("5\n")),
+        ("! [1, true]", json!([1, true])),
+        ("! {a: 1}", json!({"a": 1})),
+    ] {
+        same(text, expected);
+    }
+    assert_eq!(
+        parse("a: &x ! 5\nb: *x\n").unwrap(),
+        json!({"a": 5, "b": 5})
+    );
+    assert_eq!(parse("! 5\n").unwrap(), json!(5));
+    assert_eq!(parse("! ~\n").unwrap(), Value::Null);
+    assert_eq!(parse("v: !\n  - 1\n").unwrap(), json!({"v": [1]}));
+    assert_eq!(parse("! 5: a\n").unwrap(), json!({"5": "a"}));
+    assert_eq!(parse("! .inf: a\n").unwrap(), json!({".inf": "a"}));
+    assert_eq!(parse("! '<<': 1\n").unwrap(), json!({"<<": 1}));
+    assert!(parse("v: ! .inf\n").is_err());
+    assert!(parse("! ~: 1\n").is_err());
+}
+
+#[test]
 fn an_empty_file_is_null_and_a_top_level_list_or_scalar_is_kept() {
     assert_eq!(parse("").unwrap(), Value::Null);
     assert_eq!(parse("# nothing\n").unwrap(), Value::Null);
@@ -702,15 +773,42 @@ fn characters_yaml_allows_are_read() {
 
 #[test]
 fn a_yaml_version_other_than_1_1_is_refused_as_opa_refuses_it() {
-    for version in ["1.2", "1.0", "2.0"] {
+    for version in [
+        "1.2", "1.0", "2.0", "1.10", "1.1.1", "1", "1.1x", "+1.1", "001.1", "1.001", "",
+    ] {
         refused(&format!("%YAML {version}\n---\na: 1\n"), "%YAML");
     }
     refused("# c\n\n%YAML 1.2\n---\na: 1\n", "%YAML");
 }
 
 #[test]
+fn a_directive_other_than_yaml_and_tag_is_refused_as_opa_refuses_it() {
+    for text in [
+        "%FOO bar\n---\na: 1\n",
+        "%FOO\n---\na: 1\n",
+        "%YAMLX 1.1\n---\na: 1\n",
+        "%TAGS a b\n---\na: 1\n",
+        "%yaml 1.1\n---\na: 1\n",
+        "%YAML 1.1\n%FOO\n---\na: 1\n",
+        "a: 1\n...\n%FOO bar\n---\nb: 1\n",
+    ] {
+        assert!(matches!(parse(text), Err(Error::Invalid(_))), "{text:?}");
+    }
+}
+
+#[test]
 fn yaml_1_1_is_read() {
-    assert_eq!(parse("%YAML 1.1\n---\na: 1\n").unwrap(), json!({"a": 1}));
+    for version in ["1.1", "01.1", "1.01", "01.01", "1.1 # c", "\t1.1"] {
+        assert_eq!(
+            parse(&format!("%YAML {version}\n---\na: 1\n")).unwrap(),
+            json!({"a": 1}),
+            "{version}"
+        );
+    }
+    assert_eq!(
+        parse("%TAG !e! tag:example.com,2000:\n---\na: 1\n").unwrap(),
+        json!({"a": 1})
+    );
     assert_eq!(
         parse("a: '%YAML 1.2'\n").unwrap(),
         json!({"a": "%YAML 1.2"})

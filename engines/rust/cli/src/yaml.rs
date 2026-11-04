@@ -1,7 +1,7 @@
-//! Reads YAML the way OPA 1.22.0 does: only `true` and `false` are booleans, so `yes`, `no`, `on` and `off` are strings, YAML 1.1 numbers like `010`, `<<` merge keys where a key written in the map wins, the last of a repeated key, only the first document while the others must still be valid, and most of the files OPA refuses. Numbers keep the digits they were written with, so `1e400` is a number here and the string `"1e400"` in OPA. CLI.md lists the other known differences: a few malformed files OPA refuses are read here, and a few files OPA reads are refused.
+//! Reads YAML the way OPA 1.21 and later do: only `true` and `false` are booleans, so `yes`, `no`, `on` and `off` are strings, YAML 1.1 numbers like `010`, `<<` merge keys where a key written in the map wins, the last of a repeated key, only the first document while the others must still be valid, and most of the files OPA refuses. Numbers keep the digits they were written with, so `1e400` is a number here and the string `"1e400"` in OPA. CLI.md lists the other known differences: a few malformed files OPA refuses are read here, and a few files OPA reads are refused.
 
 use crate::number::number;
-use saphyr_parser::{Event, Parser, ScalarStyle, Tag};
+use saphyr_parser::{Event, Parser, ScalarStyle, Span, Tag};
 use serde_json::{Map, Value};
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
@@ -25,7 +25,7 @@ fn invalid(message: impl Into<String>) -> Error {
 
 const MAX_DEPTH: usize = 10_000;
 
-/// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error in any document, on `.inf` and `.nan`, on a core tag that doesn't fit its value, on a key that isn't a scalar, is `null` or is a `!!timestamp`, on the same alias used twice as a key of one mapping, on an alias with no anchor, on more than 10,000 levels of nesting, on more aliases than OPA reads, on control characters, and on a `%YAML` version other than 1.1.
+/// Reads the first document of `text` as a JSON value. An empty file is `null`. It fails on a syntax error in any document, on `.inf` and `.nan`, on a core tag that doesn't fit its value, on a key that isn't a scalar, is `null` or is a `!!timestamp`, on the same alias used twice as a key of one mapping, on an alias with no anchor, on more than 10,000 levels of nesting, on more aliases than OPA reads, on control characters, on a directive other than `%YAML` and `%TAG`, and on a `%YAML` version other than 1.1.
 pub fn parse(text: &str) -> Result<Value, Error> {
     characters(text)?;
     version(text)?;
@@ -60,7 +60,7 @@ fn read(text: &str) -> Result<Value, Stop> {
             Event::StreamStart | Event::Nothing => {}
             Event::StreamEnd => return Ok(Value::Null),
             Event::DocumentStart(_) => {
-                let value = Reader::default().document(&mut events)?;
+                let value = Reader::default().document(&mut events, text)?;
                 rest(&mut events)?;
                 return Ok(value);
             }
@@ -175,11 +175,21 @@ fn directives(text: &str) -> Result<(), Error> {
             return Ok(());
         };
         let mut words = directive.split_whitespace();
-        if words.next() == Some("YAML") {
-            let version = words.next().unwrap_or("");
-            if version != "1.1" {
-                return Err(Error::Refused(format!(
-                    "it says %YAML {version}, and only YAML 1.1 is read"
+        match words.next() {
+            Some("YAML") => {
+                let version = words.next().unwrap_or("");
+                let rest = words.next().is_none_or(|word| word.starts_with('#'));
+                if !rest || !one_one(version) {
+                    return Err(Error::Refused(format!(
+                        "it says %YAML {version}, and only YAML 1.1 is read"
+                    )));
+                }
+            }
+            Some("TAG") => {}
+            name => {
+                return Err(invalid(format!(
+                    "the directive %{} isn't %YAML or %TAG",
+                    name.unwrap_or("")
                 )));
             }
         }
@@ -187,9 +197,24 @@ fn directives(text: &str) -> Result<(), Error> {
     Ok(())
 }
 
+fn one_one(version: &str) -> bool {
+    let part = |digits: &str| {
+        (1..=2).contains(&digits.len())
+            && digits.bytes().all(|b| b.is_ascii_digit())
+            && digits.parse() == Ok(1)
+    };
+    version
+        .split_once('.')
+        .is_some_and(|(major, minor)| part(major) && part(minor))
+}
+
 fn next<'a>(events: &mut Events<'a>) -> Result<Event<'a>, Stop> {
+    spanned(events).map(|(event, _)| event)
+}
+
+fn spanned<'a>(events: &mut Events<'a>) -> Result<(Event<'a>, Span), Stop> {
     match events.next_event() {
-        Some(Ok((event, _))) => Ok(event),
+        Some(Ok(pair)) => Ok(pair),
         Some(Err(e)) if e.info() == "invalid indentation in quoted scalar" => {
             Err(Stop::Quoted(e.marker().index(), invalid(e.to_string())))
         }
@@ -208,7 +233,7 @@ struct Node {
     value: Result<Rc<Tree>, Error>,
     key: Result<String, Error>,
     size: u64,
-    alias: Option<usize>,
+    alias: Option<String>,
 }
 
 struct Anchor {
@@ -229,7 +254,7 @@ enum Slot {
 struct Entries {
     written: Vec<(String, Rc<Tree>)>,
     merged: Vec<Rc<Tree>>,
-    alias_keys: HashSet<usize>,
+    alias_keys: HashSet<String>,
     slot: Slot,
 }
 
@@ -250,13 +275,15 @@ struct Reader {
     frames: Vec<Frame>,
     decoded: u64,
     aliased: u64,
+    cursor: (usize, usize),
 }
 
 impl Reader {
-    fn document<'a>(mut self, events: &mut Events<'a>) -> Result<Value, Stop> {
+    fn document<'a>(mut self, events: &mut Events<'a>, source: &str) -> Result<Value, Stop> {
         self.decoded = 1;
         loop {
-            let node = match next(events)? {
+            let (event, span) = spanned(events)?;
+            let node = match event {
                 Event::Scalar(text, style, anchor, tag) => {
                     if self.expects_key() && merge_key(&text, style, tag.as_deref()) {
                         self.expect(Slot::Merge);
@@ -283,11 +310,17 @@ impl Reader {
                     if excessive(self.decoded, self.aliased) {
                         return Err(Error::Refused("it uses too many aliases".to_string()).into());
                     }
-                    Node {
+                    let node = Node {
                         value: anchor.value.clone(),
                         key: anchor.key.clone(),
                         size: 1 + anchor.size,
-                        alias: Some(id),
+                        alias: None,
+                    };
+                    let start = self.byte(source, span.start.index());
+                    let end = self.byte(source, span.end.index());
+                    Node {
+                        alias: Some(source.get(start + 1..end).unwrap_or("").to_string()),
+                        ..node
                     }
                 }
                 Event::SequenceStart(anchor, _) => {
@@ -369,6 +402,19 @@ impl Reader {
         Ok(())
     }
 
+    fn byte(&mut self, source: &str, index: usize) -> usize {
+        let (chars, bytes) = &mut self.cursor;
+        if index < *chars {
+            *chars = 0;
+            *bytes = 0;
+        }
+        for c in source[*bytes..].chars().take(index - *chars) {
+            *bytes += c.len_utf8();
+            *chars += 1;
+        }
+        *bytes
+    }
+
     fn remember(&mut self, anchor: usize, node: &Node) {
         if anchor != 0 {
             let remembered = Anchor {
@@ -418,8 +464,8 @@ fn place(collection: &mut Collection, node: Node) -> Result<(), Error> {
         Collection::List(items) => items.push(node.value?),
         Collection::Map(entries) => match std::mem::take(&mut entries.slot) {
             Slot::Key => {
-                if let Some(id) = node.alias
-                    && !entries.alias_keys.insert(id)
+                if let Some(name) = &node.alias
+                    && !entries.alias_keys.insert(name.clone())
                 {
                     return Err(Error::Refused(
                         "the same alias is a key twice in one mapping".to_string(),
@@ -600,7 +646,7 @@ fn shortest(f: f32) -> String {
 }
 
 fn scalar(text: &str, style: ScalarStyle, tag: Option<&Tag>) -> Result<Scalar, Error> {
-    let Some(tag) = tag else {
+    let Some(tag) = tag.filter(|tag| !non_specific(tag)) else {
         return Ok(if style == ScalarStyle::Plain {
             resolve(text)
         } else {

@@ -573,6 +573,85 @@ fn deep_nesting_and_an_alias_bomb_fail_without_crashing() {
     }
 }
 
+const YAML_WORDS_POLICY: &str = r#"ergo_spec: v0.5-dev
+subjects:
+  deployment:
+    from: deployments
+    identified_by: id
+requirements:
+  approved:
+    description: Every deployment is approved
+    subject: deployment
+    checks:
+      approved: approved is true
+      state: state is one of "yes", "on"
+"#;
+
+#[test]
+fn yes_and_on_in_a_yaml_input_are_strings_as_opa_1_21_reads_them() {
+    let dir = dir("yaml-words");
+    let policy = write(&dir, "policy.yaml", YAML_WORDS_POLICY);
+    let input = write(
+        &dir,
+        "deployments.yaml",
+        "deployments:\n  - id: d-1\n    approved: yes\n    state: on\n  - id: d-2\n    approved: true\n    state: yes\n",
+    );
+    let output = ergo(&["report", "--policy", &policy, "--input", &input]);
+    assert!(output.status.success(), "{}", err(&output));
+    let report: Value = serde_json::from_str(&out(&output)).unwrap();
+    let mut got = rows(&report);
+    got.sort();
+    let mut expected = vec![
+        (
+            "d-1".to_string(),
+            "approved".to_string(),
+            false,
+            "unusable".to_string(),
+        ),
+        (
+            "d-1".to_string(),
+            "state".to_string(),
+            true,
+            "satisfied".to_string(),
+        ),
+        (
+            "d-2".to_string(),
+            "approved".to_string(),
+            true,
+            "satisfied".to_string(),
+        ),
+        (
+            "d-2".to_string(),
+            "state".to_string(),
+            true,
+            "satisfied".to_string(),
+        ),
+    ];
+    expected.sort();
+    assert_eq!(
+        got.into_iter()
+            .filter(|row| !row.0.is_empty())
+            .collect::<Vec<_>>(),
+        expected
+    );
+    let output = ergo(&["violations", "--policy", &policy, "--input", &input]);
+    assert!(output.status.success(), "{}", err(&output));
+    let violations: Value = serde_json::from_str(&out(&output)).unwrap();
+    assert_eq!(
+        violations,
+        json!([{
+            "cause": "unusable",
+            "check": "approved",
+            "description": "",
+            "expression": "approved is true",
+            "inputs": [{"name": "approved", "value": "yes", "locations": ["/deployments/0/approved"]}],
+            "message": "approved is \"yes\", which isn't true or false",
+            "requirement": "approved",
+            "subject": {"id": "d-1", "type": "deployment"}
+        }])
+    );
+}
+
 #[test]
 fn an_unknown_extension_fails_and_names_the_file() {
     let (policy, _) = readme("extension");
