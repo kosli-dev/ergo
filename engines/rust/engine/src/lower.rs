@@ -1008,7 +1008,8 @@ pub fn lower_quantified(
     }
 }
 
-const DISTINCT_ITEM: &str = "distinct can't go with a phrase that also reads ";
+const DISTINCT_ITEM: &str =
+    "distinct is about the value its path points at, but the phrase also reads ";
 
 fn distinct_item_problem(check: &Check) -> Option<String> {
     let mut names: Vec<String> = check
@@ -1022,7 +1023,7 @@ fn distinct_item_problem(check: &Check) -> Option<String> {
     names.dedup();
     (!names.is_empty()).then(|| {
         format!(
-            "{DISTINCT_ITEM}{} from each item, and copies of the value can differ there: leave distinct out, or put the items on a for line",
+            "{DISTINCT_ITEM}{} outside that value: leave distinct out, or put the items on a for line",
             names.join(", ")
         )
     })
