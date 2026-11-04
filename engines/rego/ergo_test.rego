@@ -11748,3 +11748,9 @@ test_a_for_line_that_walks_a_list_subject_fails_as_not_an_object_like_any_for_li
 	object_rows := _subject_rows({"xs": [{"id": "a"}]}, "every xs", {"for": "last of s as e", "assert": "e is 1"}, {})
 	[[r[1], r[2]] | some r in object_rows] == [[false, "unusable"]]
 }
+
+test_a_failed_walk_item_message_names_the_item_and_not_the_subject if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"x": "k1.k2"}}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every x.z is 1"}}}}
+	rep := ergo.report({"things": [{"id": "t2", "k1": {"k2": {"z": [1, 2]}}}]}, policy, {})
+	[r.message | some r in rep.results; r.check == "c"] == ["item 2 of x.z is 2"]
+}

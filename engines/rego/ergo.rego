@@ -10935,9 +10935,9 @@ _m_undecided("missing") := "absent"
 
 _m_undecided(c) := c if c != "missing"
 
-_m_leaf(item, m) := concat("", [_m_item_name(item, set()), substring(m, 2, -1)]) if startswith(m, "it ")
+_m_leaf(item, m) := concat("", [_m_item_name(item, set()), substring(m, 11, -1)]) if startswith(m, "the subject ")
 
-_m_leaf(item, m) := concat("", [_m_item_name(item, set()), ": ", m]) if not startswith(m, "it ")
+_m_leaf(item, m) := concat("", [_m_item_name(item, set()), ": ", m]) if not startswith(m, "the subject ")
 
 _m_item_name(path, _) := _input_name(_as_subject_part(array.slice(path, k, count(path)))) if {
 	k := min({k | some k, step in path; _subject_part([step])})
@@ -11240,7 +11240,7 @@ _for_why(item, e, names, wh, failure) := object.union(failure, {"why": [ms[0]]})
 	count(ms) > 0
 } else := failure
 
-_m_why_text(name, c, m) := concat("", [name, " ", trim_prefix(m, "it ")]) if _m_itself(c)
+_m_why_text(name, c, m) := concat("", [name, " ", trim_prefix(m, "the subject ")]) if _m_itself(c)
 
 else := concat("", [name, ": ", m])
 
