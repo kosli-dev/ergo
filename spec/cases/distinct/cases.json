@@ -611,5 +611,56 @@
         ]
       }
     ]
+  },
+  {
+    "description": "distinct with a list read through an alias or a part",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"has": {"lim": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"aliasin": {"for": "every ts as t", "assert": "some distinct t.fs.k is in t.ok"}, "aliasone": {"for": "every ts as t", "assert": "some distinct t.fs.k is one of t.ok"}, "aliasnot": {"for": "every ts as t", "assert": "every distinct t.fs.k is not in t.ok"}, "aliasmatch": {"for": "every ts as t", "assert": "every distinct t.fs.k matches t.pats"}, "partin": "some distinct ts.fs.k is in lim", "partmatch": "every distinct ts.fs.k matches lim"}}}},
+    "cases": [
+      {
+        "description": "the list is outside the item, so it reads even when copies differ in their own ok",
+        "rules": ["sentence.distinct.place", "walk.distinct"],
+        "input": {"s": {"ok": [5], "ts": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}},
+        "results": [
+          {"cause": "satisfied", "check": "aliasin", "failed_items": [], "inputs": [{"locations": ["/s/ts/0"], "name": "ts[]", "value": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}], "passed": true, "requirement": "r", "subject": {"id": {"ok": [5], "ts": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}, "type": "s"}},
+          {"cause": "unusable", "check": "aliasmatch", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "every distinct t.fs.k matches t.pats", "cause": "unusable", "inputs": [{"locations": ["/s/ts/0/fs/0/k", "/s/ts/0/fs/1/k"], "name": "t.fs[].k", "value": [5, 5]}, {"locations": ["/s/ts/0/pats"], "name": "t.pats", "value": ["5"]}]}], "item": "item 1 of ts", "locations": ["/s/ts/0"], "path": "item 1 of ts", "value": {"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}}], "inputs": [{"locations": ["/s/ts/0"], "name": "ts[]", "value": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}], "message": "item 1 of ts: item 1 of fs: k is 5, which isn't text", "passed": false, "requirement": "r", "subject": {"id": {"ok": [5], "ts": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}, "type": "s"}},
+          {"cause": "value", "check": "aliasnot", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "every distinct t.fs.k is not in t.ok", "cause": "value", "inputs": [{"locations": ["/s/ts/0/fs/0/k", "/s/ts/0/fs/1/k"], "name": "t.fs[].k", "value": [5, 5]}, {"locations": ["/s/ts/0/ok"], "name": "t.ok", "value": [5]}]}], "item": "item 1 of ts", "locations": ["/s/ts/0"], "path": "item 1 of ts", "value": {"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}}], "inputs": [{"locations": ["/s/ts/0"], "name": "ts[]", "value": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}], "message": "item 1 of ts: item 1 of fs: k is 5, and ok is [5]", "passed": false, "requirement": "r", "subject": {"id": {"ok": [5], "ts": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}, "type": "s"}},
+          {"cause": "satisfied", "check": "aliasone", "failed_items": [], "inputs": [{"locations": ["/s/ts/0"], "name": "ts[]", "value": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}], "passed": true, "requirement": "r", "subject": {"id": {"ok": [5], "ts": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}, "type": "s"}},
+          {"cause": "satisfied", "check": "partin", "failed_items": [], "inputs": [{"locations": ["/s/ok"], "name": "lim", "part": {"id": null, "name": "lim"}, "value": [5]}, {"locations": ["/s/ts/0/fs/0/k", "/s/ts/0/fs/1/k"], "name": "ts[].fs[].k", "value": [5, 5]}], "passed": true, "requirement": "r", "subject": {"id": {"ok": [5], "ts": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}, "type": "s"}},
+          {"cause": "unusable", "check": "partmatch", "failed_items": [{"cause": "unusable", "item": "item 1 of ts[0].fs", "locations": ["/s/ts/0/fs/0/k", "/s/ts/0/fs/1/k"], "path": "ts[0].fs[0].k", "value": 5}], "inputs": [{"locations": ["/s/ok"], "name": "lim", "part": {"id": null, "name": "lim"}, "value": [5]}, {"locations": ["/s/ts/0/fs/0/k", "/s/ts/0/fs/1/k"], "name": "ts[].fs[].k", "value": [5, 5]}], "message": "item 1 of ts: item 1 of fs: k is 5, which isn't text, and lim is [5], which isn't a list of patterns", "passed": false, "requirement": "r", "subject": {"id": {"ok": [5], "ts": [{"fs": [{"k": 5, "lo": 9, "ok": []}, {"k": 5, "lo": 1, "ok": [5]}], "ok": [5], "pats": ["5"]}]}, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "distinct with a list read on the item",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {"has": {"lim": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"itemin": "some distinct ts.fs.k is in ok", "itemdot": "some distinct ts.fs.k is in .lim", "first": "every distinct ts.fs.k is at least first of lol", "last": "every distinct ts.fs.k is at least last of lol", "badfor": {"for": "every ys as y whose y is 1", "assert": ["y exists", "every distinct ts.fs.k is at least lo"]}}}}},
+    "cases": [
+      {
+        "description": "it is written wrong, and a for line that doesn't read gives only its own problem",
+        "rules": ["sentence.distinct.place"],
+        "input": {"s": {"ok": [5], "ts": [{"fs": [{"k": 5, "lol": [1], "ok": []}, {"k": 5, "lol": [9], "ok": [5]}]}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 5}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.badfor", "value": ["for: an item ends with \"as\" and a name, like \"every pull_requests as pr\""]}, {"locations": [], "name": "checks.first", "value": ["distinct is about the value its path points at, but the phrase also reads item 1 of lol outside that value: leave distinct out, or put the items on a for line"]}, {"locations": [], "name": "checks.itemdot", "value": ["distinct is about the value its path points at, but the phrase also reads .lim outside that value: leave distinct out, or put the items on a for line"]}, {"locations": [], "name": "checks.itemin", "value": ["distinct is about the value its path points at, but the phrase also reads ok outside that value: leave distinct out, or put the items on a for line"]}, {"locations": [], "name": "checks.last", "value": ["last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\""]}], "message": "checks.badfor: for: an item ends with \"as\" and a name, like \"every pull_requests as pr\"; checks.first: distinct is about the value its path points at, but the phrase also reads item 1 of lol outside that value: leave distinct out, or put the items on a for line; checks.itemdot: distinct is about the value its path points at, but the phrase also reads .lim outside that value: leave distinct out, or put the items on a for line; checks.itemin: distinct is about the value its path points at, but the phrase also reads ok outside that value: leave distinct out, or put the items on a for line; checks.last: last of isn't supported yet here: pick the item on a for line, like \"for: last of commits as commit\"", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "distinct with a list read on a parent subject",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"p": {"from": "rs", "identified_by": "name", "has": {"pl": "ok"}}, "w": {"from": "p.gs whose some distinct hs.k is in p.ok"}}, "requirements": {"r": {"subject": "w", "checks": {"in": "some distinct hs.k is in p.ok", "one": "some distinct hs.k is one of p.ok", "not": "every distinct hs.k is not in p.ok", "part": "some distinct hs.k is in p.pl"}}}},
+    "cases": [
+      {
+        "description": "it reads, in a check and in the from line",
+        "rules": ["sentence.distinct.place", "subjects.chain"],
+        "input": {"rs": [{"gs": [{"hs": [{"k": 5}, {"k": 5}]}], "name": "a", "ok": [5]}]},
+        "results": [
+          {"cause": "satisfied", "check": "$applies", "failed_items": [], "inputs": [{"locations": ["/rs/0/gs/0/hs/0/k", "/rs/0/gs/0/hs/1/k"], "name": "hs[].k", "value": [5, 5]}, {"locations": ["/rs/0/ok"], "name": "p.ok", "value": [5]}], "passed": true, "requirement": "r", "subject": {"id": {"hs": [{"k": 5}, {"k": 5}]}, "in": {"p": "a"}, "type": "w"}},
+          {"cause": "satisfied", "check": "in", "failed_items": [], "inputs": [{"locations": ["/rs/0/gs/0/hs/0/k", "/rs/0/gs/0/hs/1/k"], "name": "hs[].k", "value": [5, 5]}, {"locations": ["/rs/0/ok"], "name": "p.ok", "value": [5]}], "passed": true, "requirement": "r", "subject": {"id": {"hs": [{"k": 5}, {"k": 5}]}, "in": {"p": "a"}, "type": "w"}},
+          {"cause": "value", "check": "not", "failed_items": [{"cause": "value", "item": "item 1 of hs", "locations": ["/rs/0/gs/0/hs/0/k", "/rs/0/gs/0/hs/1/k"], "path": "hs[0].k", "value": 5}], "inputs": [{"locations": ["/rs/0/gs/0/hs/0/k", "/rs/0/gs/0/hs/1/k"], "name": "hs[].k", "value": [5, 5]}, {"locations": ["/rs/0/ok"], "name": "p.ok", "value": [5]}], "message": "item 1 of hs: k is 5, and p.ok is [5]", "passed": false, "requirement": "r", "subject": {"id": {"hs": [{"k": 5}, {"k": 5}]}, "in": {"p": "a"}, "type": "w"}},
+          {"cause": "satisfied", "check": "one", "failed_items": [], "inputs": [{"locations": ["/rs/0/gs/0/hs/0/k", "/rs/0/gs/0/hs/1/k"], "name": "hs[].k", "value": [5, 5]}, {"locations": ["/rs/0/ok"], "name": "p.ok", "value": [5]}], "passed": true, "requirement": "r", "subject": {"id": {"hs": [{"k": 5}, {"k": 5}]}, "in": {"p": "a"}, "type": "w"}},
+          {"cause": "satisfied", "check": "part", "failed_items": [], "inputs": [{"locations": ["/rs/0/gs/0/hs/0/k", "/rs/0/gs/0/hs/1/k"], "name": "hs[].k", "value": [5, 5]}, {"locations": ["/rs/0/ok"], "name": "p.pl", "part": {"id": null, "name": "p.pl"}, "value": [5]}], "passed": true, "requirement": "r", "subject": {"id": {"hs": [{"k": 5}, {"k": 5}]}, "in": {"p": "a"}, "type": "w"}}
+        ]
+      }
+    ]
   }
 ]

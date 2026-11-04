@@ -6932,14 +6932,9 @@ _s_marked_term(t, names) := object.union(t, {f: _s_marked(t[f], names, false) |
 
 _s_marked_phrase(ph, names) := object.union(ph, {"terms": [_s_marked_term(t, names) | some t in ph.terms]}) if is_array(object.get(ph, "terms", null))
 
-else := object.union(ph, {"path": _s_marked_dot(ph.path, names)}) if is_object(object.get(ph, "path", null))
+else := object.union(ph, {"path": _s_marked(ph.path, names, false)}) if is_object(object.get(ph, "path", null))
 
 else := ph
-
-_s_marked_dot(p, names) := object.union(p, {"field": true, "own": false}) if {
-	_s_markable(p, names.all)
-	object.get(p, "dot", false) == true
-} else := p
 
 _s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, true), "phrase": _s_marked_phrase(c.phrase, names)}) if "path" in object.keys(c)
 
@@ -8396,6 +8391,7 @@ _s_phrase_paths(ph) := array.concat([t | some t in object.get(ph, "terms", []); 
 
 _s_item_read(p) if {
 	not "start" in object.keys(p)
+	not _s_from_last(p)
 	object.get(p, "alias", false) != true
 	object.get(p, "part", false) != true
 }
