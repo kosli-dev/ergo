@@ -8385,7 +8385,7 @@ _s_line_distinct(line, names) := _s_distinct_problems([_s_aliased(a, names) | so
 	"assertions" in object.keys(parsed)
 } else := set()
 
-_s_distinct_problems(marked) := {concat("", ["distinct can't go with a phrase that also reads ", concat(", ", names), " from each item, and copies of the value can differ there: leave distinct out, or put the items on a for line"]) |
+_s_distinct_problems(marked) := {concat("", ["distinct is about the value its path points at, but the phrase also reads ", concat(", ", names), " outside that value: leave distinct out, or put the items on a for line"]) |
 	some a in marked
 	object.get(a, "distinct", false) == true
 	_s_quantifier_of(a) in {"every", "some"}
