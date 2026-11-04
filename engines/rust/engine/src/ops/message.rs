@@ -334,11 +334,6 @@ fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
         paths
             .into_iter()
             .filter(|path| !rights.contains(path) || lists::walked(path, ctx).is_none())
-            .filter(|path| {
-                !(rights.contains(path)
-                    && path.start == Start::Params
-                    && ctx.params.is_some_and(|params| !params.is_object()))
-            })
             .flat_map(|path| blocked_of(path, ctx))
             .collect(),
     )
@@ -349,16 +344,6 @@ fn key_unreadable_off_alias(path: &Path, ctx: &Ctx) -> bool {
         || path.steps.iter().any(|step| {
             matches!(step, Step::Ref(reference) if !matches!(reference.start, Start::Alias(_)))
                 && path::resolve(step, ctx).is_err()
-        })
-}
-
-fn key_into_params_that_arent_an_object(path: &Path, ctx: &Ctx) -> bool {
-    path.start == Start::Params
-        && ctx.params.is_some_and(|params| {
-            !params.is_object()
-                && (matches!(path.steps.first(), Some(Step::Key(_)))
-                    || path.steps.iter().any(|step| matches!(step, Step::Field(_)))
-                    || (params.is_array() && path.steps.len() > 1))
         })
 }
 
@@ -382,7 +367,6 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
     let read = path::read(path, ctx);
     if read.outcome != Outcome::Unusable
         || (read.step_unreadable && key_unreadable_off_alias(path, ctx))
-        || key_into_params_that_arent_an_object(path, ctx)
     {
         return Vec::new();
     }
@@ -696,11 +680,26 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             once.push(clause);
         }
     }
+    if once.is_empty() && verdict.cause == Cause::Unusable {
+        once.extend(params_that_arent_an_object(check, ctx));
+    }
     if once.is_empty() {
         FALLBACK.to_string()
     } else {
         once.join(", and ")
     }
+}
+
+fn params_that_arent_an_object(check: &Check, ctx: &Ctx) -> Option<String> {
+    let params = ctx.params.filter(|p| !p.is_object() && !p.is_null())?;
+    let mut paths = side_paths(check);
+    if let Check::Walk(walk) = check {
+        paths.push(&walk.path);
+    }
+    paths
+        .iter()
+        .any(|path| path.start == Start::Params)
+        .then(|| isnt("$params", params, "an object"))
 }
 
 pub fn stated(name: &str, cause: Cause, value: &Value, kind: &str) -> String {

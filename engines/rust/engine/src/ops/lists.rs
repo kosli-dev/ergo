@@ -216,7 +216,13 @@ pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
         .steps
         .iter()
         .all(|step| matches!(step, Step::Key(_) | Step::Index(_)));
-    if !simple || path::read(path, ctx).outcome != Outcome::Unusable {
+    let key_into_params_that_arent_an_object = path.start == crate::path::Start::Params
+        && matches!(path.steps.first(), Some(Step::Key(_)))
+        && ctx.params.is_some_and(|params| !params.is_object());
+    if !simple
+        || key_into_params_that_arent_an_object
+        || path::read(path, ctx).outcome != Outcome::Unusable
+    {
         return None;
     }
     let options = Options {
@@ -835,10 +841,7 @@ fn rights_of(check: &super::Check) -> Vec<&Right> {
 
 pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
     rights_of(check).into_iter().find_map(|right| match right {
-        Right::Ref(path) | Right::Field(path)
-            if !(path.start == crate::path::Start::Params
-                && ctx.params.is_some_and(|params| !params.is_object())) =>
-        {
+        Right::Ref(path) | Right::Field(path) => {
             walked(path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
         }
         _ => None,
