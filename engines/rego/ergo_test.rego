@@ -11779,18 +11779,83 @@ params_position_messages := {row.check: row.message |
 	row.check != "$min_subjects"
 }
 
-test_a_params_path_that_starts_with_a_position_says_the_check_failed_not_the_item if {
-	every params in [[1], [[1]], [[true]], [["x"]]] {
+test_a_params_path_that_starts_with_a_position_names_the_item_that_is_not_an_object if {
+	every case in [[[1], "1"], [[[1]], "[1]"], [[[true]], "[true]"], [[["x"]], "[\"x\"]"]] {
 		params_position_messages == {
-			"c": "$params[0].a does not exist is false",
-			"d": "$params[0].a exists is false",
-			"e": "$params[0] named by zz does not exist is false",
-		} with data.params as params
+			"c": concat("", ["item 1 of $params is ", case[1], ", which isn't an object"]),
+			"d": concat("", ["item 1 of $params is ", case[1], ", which isn't an object"]),
+			"e": concat("", ["item 1 of $params is ", case[1], ", which isn't an object"]),
+		} with data.params as case[0]
 	}
 }
 
-test_a_params_path_that_starts_with_a_position_on_a_value_that_is_not_a_list_says_the_check_failed if {
-	every params in [3, "s", true] {
-		params_position_messages.e == "$params[0] named by zz does not exist is false" with data.params as params
+test_a_params_path_that_starts_with_a_position_names_the_params_that_are_not_a_list if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"]] {
+		params_position_messages == {
+			"c": concat("", ["$params is ", case[1], ", which isn't a list"]),
+			"d": concat("", ["$params is ", case[1], ", which isn't a list"]),
+			"e": concat("", ["$params is ", case[1], ", which isn't a list"]),
+		} with data.params as case[0]
+	}
+}
+
+params_key_messages := {row.check: row.message |
+	some row in report(
+		{"items": [{"id": 1, "zz": "a"}]},
+		{"s": {
+			"subject_type": "thing",
+			"from": "items",
+			"identified_by": "id",
+			"checks": {
+				"c": {"assert": "$params.a is 1"},
+				"d": {"assert": "$params[0].a named by zz is 1"},
+				"e": {"assert": "zz is in $params.a"},
+				"f": {"assert": "zz is in $params[0].a"},
+				"g": {"assert": "count of $params[0] is 1"},
+			},
+		}},
+	).results
+	row.check != "$min_subjects"
+}
+
+test_a_params_path_that_starts_with_a_key_names_the_params_that_are_not_an_object if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"], [false, "false"], [[], "[]"]] {
+		params_key_messages.c == concat("", ["$params is ", case[1], ", which isn't an object"]) with data.params as case[0]
+		params_key_messages.e == concat("", ["$params is ", case[1], ", which isn't an object"]) with data.params as case[0]
+	}
+}
+
+test_a_params_path_through_params_that_are_not_a_list_or_an_object_names_them_on_every_side if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"], [false, "false"]] {
+		params_key_messages.d == concat("", ["$params is ", case[1], ", which isn't a list"]) with data.params as case[0]
+		params_key_messages.f == concat("", ["$params is ", case[1], ", which isn't a list"]) with data.params as case[0]
+	}
+}
+
+test_a_count_of_a_position_in_params_that_are_an_empty_list_names_the_params if {
+	params_key_messages.g == "$params is [], which isn't an object" with data.params as []
+}
+
+test_null_params_fail_a_walk_or_a_count_as_absent_like_a_plain_path if {
+	rows := [r |
+		some r in report(
+			{"items": [{"id": 1, "zz": "a"}]},
+			{"s": {
+				"subject_type": "thing",
+				"from": "items",
+				"identified_by": "id",
+				"checks": {
+					"c": {"assert": "every $params.a is 1"},
+					"d": {"assert": "count of $params.a is 1"},
+					"e": {"assert": "zz is in $params"},
+				},
+			}},
+		).results
+		not startswith(r.check, "$")
+	] with data.params as null
+	count(rows) == 3
+	every r in rows {
+		r.cause == "absent"
+		r.message == "$params is missing"
 	}
 }
