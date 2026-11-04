@@ -10907,13 +10907,17 @@ _m_unreached_or(path, roots) := _m_part_name(path) if _m_part_unreached(path)
 else := _failed_name(path, roots)
 
 _m_item_name(path, roots) := concat(": ", array.concat(
-	array.concat([_failed_name(array.slice(path, 0, idx[0] + 1), roots)], [concat("", ["item ", _literal_text(path[idx[k]] + 1), " of ", _plain_steps_name(array.slice(path, idx[k - 1] + 1, idx[k]))]) | some k in numbers.range(1, count(idx) - 1)]),
+	array.concat([_failed_name(array.slice(path, 0, idx[0] + 1), roots)], [concat("", ["item ", _literal_text(path[idx[k]] + 1), " of ", _m_inner_name(array.slice(path, idx[k - 1] + 1, idx[k]))]) | some k in numbers.range(1, count(idx) - 1)]),
 	[_plain_steps_name(tail) | tail := array.slice(path, idx[count(idx) - 1] + 1, count(path)); tail != []],
 )) if {
 	idx := [j | some j, step in path; is_number(step)]
 	count(idx) > 0
 	not _m_off_item_path(path)
 }
+
+_m_inner_name([]) := "it"
+
+_m_inner_name(steps) := _plain_steps_name(steps) if steps != []
 
 _m_off_item_path(path) if {
 	some k, step in path

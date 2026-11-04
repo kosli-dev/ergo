@@ -5083,6 +5083,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("w ends with \"y\"", "w ends with \"y\"", &[], &[]),
+    (
+        "count of w named by zz is 1",
+        "count of w named by zz is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of x named by zz is 1",
+        "count of x named by zz is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of x[0] named by zz is 1",
+        "count of x[0] named by zz is 1",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

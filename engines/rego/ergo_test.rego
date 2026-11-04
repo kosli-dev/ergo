@@ -11303,6 +11303,24 @@ test_message_of_a_count_names_an_item_whose_field_cant_hold_the_next_step if {
 	row.message == "item 1 of xs: n is 5, which isn't an object"
 }
 
+test_message_of_a_count_names_the_list_in_a_list_item_it_not_an_empty_name if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of x[0] named by zz is 1"}}}}
+	every zz in [{"zz": "a"}, {}, {"zz": null}, {"zz": 3}] {
+		r := ergo.report({"things": [object.union({"id": "t", "x": [[1]]}, zz)]}, policy, {})
+		some row in r.results
+		row.check == "c"
+		not contains(row.message, "of  ")
+	}
+}
+
+test_message_of_a_count_with_a_key_from_a_field_names_the_value_once if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "count of x named by zz is 1"}}}}
+	r := ergo.report({"things": [{"id": "t", "x": {"k": 1}, "zz": "k"}]}, policy, {})
+	some row in r.results
+	row.check == "c"
+	row.message == "x.k is 1, which isn't a list or an object"
+}
+
 test_message_names_an_item_by_the_part_of_the_subject_it_goes_through if {
 	marker := ergo._p_marker("cov", 0, null, false)
 	ergo._m_item_name(["xs", marker, "z"], set()) == "cov.z"

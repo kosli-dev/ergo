@@ -894,8 +894,11 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         any = true;
                     }
                 }
+                let counted_said = tally::counted_texts(derived, ctx, Cause::Unusable);
                 for path in counted {
                     if let Some(input) = first_input(path, ctx)
+                        && (counted_said.is_empty()
+                            || !path.steps.iter().any(|s| matches!(s, Step::Field(_))))
                         && input.state == Outcome::Found
                         && !input.value.is_array()
                         && !input.value.is_object()
@@ -904,7 +907,6 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         any = true;
                     }
                 }
-                let counted_said = tally::counted_texts(derived, ctx, Cause::Unusable);
                 if !counted_said.is_empty() {
                     out.extend(counted_said);
                     any = true;

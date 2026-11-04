@@ -823,6 +823,64 @@
     ]
   },
   {
+    "description": "a count of a list in a list, read by a position and a key from a field, names the list that isn't an object",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of x[0] named by zz is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "the inner item is named it, as a list of the subject is",
+        "rules": ["message.items", "message.cause", "path.field_step"],
+        "input": {"things": [{"id": "t", "x": [[1]], "zz": "a"}]},
+        "results": [
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/x/0/0"], "name": "count of x[0] named by zz", "value": null}, {"locations": ["/things/0/x/0/0"], "name": "x[0][] named by zz", "value": [null]}, {"locations": ["/things/0/zz"], "name": "zz", "value": "a"}], "message": "item 1 of x: item 1 of it is 1, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "the same with the key field missing",
+        "rules": ["message.items", "message.cause", "path.field_step"],
+        "input": {"things": [{"id": "t", "x": [[1]]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": [], "name": "count of x[0] named by zz", "value": null}, {"locations": [], "name": "x[0] named by zz", "value": []}, {"locations": ["/things/0"], "name": "zz", "value": null}], "message": "zz is missing", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a path with a key from a field names the value once",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of x named by zz is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a value that isn't a list or an object is named after the key it was read at",
+        "rules": ["message.cause", "path.field_step"],
+        "input": {"things": [{"id": "t", "x": {"k": 1}, "zz": "k"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of x named by zz", "value": null}, {"locations": [], "name": "x named by zz", "value": []}, {"locations": ["/things/0/zz"], "name": "zz", "value": "k"}], "message": "x.k is 1, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "a number is named the same way",
+        "rules": ["message.cause", "path.field_step"],
+        "input": {"things": [{"id": "t", "x": {"k": 5}, "zz": "k"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of x named by zz", "value": null}, {"locations": [], "name": "x named by zz", "value": []}, {"locations": ["/things/0/zz"], "name": "zz", "value": "k"}], "message": "x.k is 5, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a count of a path with a key from a field, in a for line, names the value once",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "count of w named by zz is 1", "for": "every ws as w"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "a value that isn't a list or an object is named after the key it was read at",
+        "rules": ["message.cause", "path.field_step", "message.alias"],
+        "input": {"things": [{"id": "t", "ws": [{"k": 1}], "zz": "k"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of w named by zz is 1", "cause": "unusable", "inputs": [{"locations": [], "name": "count of w named by zz", "value": null}, {"locations": [], "name": "w named by zz", "value": []}, {"locations": ["/things/0/zz"], "name": "zz", "value": "k"}]}], "item": "item 1 of ws", "locations": ["/things/0/ws/0"], "path": "item 1 of ws", "value": {"k": 1}}], "inputs": [{"locations": ["/things/0/ws/0"], "name": "ws[]", "value": [{"k": 1}]}, {"locations": ["/things/0/zz"], "name": "zz", "value": "k"}], "message": "item 1 of ws: w.k is 1, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "a for line over two lists",
     "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": {"assert": "every z.k is 9", "for": "every zs as z"}}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
     "cases": [
