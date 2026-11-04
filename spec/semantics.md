@@ -36,7 +36,7 @@ Reading a path ends in one of these outcomes. Each one except `found` is also a 
 | `unusable`      | A step comes after a value that can't hold it, or a number can't be read or compared exactly, see [Values](#values).     |
 | `not_an_object` | The path reads a field of a subject that isn't an object.                                                                |
 
-**[path.start]** A path starts at the subject, the input, the params or an alias. With no params, a path into the params ends `absent`. Params that are there but aren't an object fail the whole report, as [REFERENCE.md](../REFERENCE.md#params) says.
+**[path.start]** A path starts at the subject, the input, the params or an alias. With no params, a path into the params ends `absent`. Params that are there but aren't an object fail the whole report, as [REFERENCE.md](../REFERENCE.md#params) says. A path that starts with a position in them, like `every $params[0].a is 1`, names them in its message when they aren't a list, `$params is 3, which isn't a list`, while one that starts with a key, like `$params.a is 1`, says the check is false.
 
 **[path.not_an_object]** A path with steps that starts at a subject that isn't an object ends `not_an_object`, `null` subjects included, unless its first step is a position. A position reads the subject as a list, as [path.absent](#reading-a-path) and [path.unusable](#reading-a-path) say, so `first of it` ends `absent` on `[]` and on `null`, and `unusable` on `"s"`. A path that starts at a `for` alias is read the same way.
 

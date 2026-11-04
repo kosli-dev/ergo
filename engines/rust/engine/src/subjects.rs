@@ -1302,7 +1302,7 @@ pub fn find_subjects(
         subject,
         checks: read_checks(reading, requirement),
         input,
-        params: params.as_object().map(|_| params),
+        params: (!params.is_null()).then_some(params),
         unreadable: unreadable_params(params),
     };
     let empty = &path::ABSENT;

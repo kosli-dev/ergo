@@ -5095,6 +5095,33 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("$params[0].a is 1", "$params[0].a is 1", &[], &[]),
+    (
+        "count of $params[0] is 1",
+        "count of item 1 of $params is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every $params[0] is 1",
+        "every item 1 of $params is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every $params[0].a is 1",
+        "every $params[0].a is 1",
+        &[],
+        &[],
+    ),
+    ("some $params[0].a is 1", "some $params[0].a is 1", &[], &[]),
+    ("$params[0] is 1", "item 1 of $params is 1", &[], &[]),
+    (
+        "$params[0].a does not exist",
+        "$params[0].a does not exist",
+        &[],
+        &[],
+    ),
     (
         "count of x[0] named by zz is 1",
         "count of x[0] named by zz is 1",

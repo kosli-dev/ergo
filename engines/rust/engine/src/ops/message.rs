@@ -334,6 +334,11 @@ fn blocked(check: &Check, ctx: &Ctx) -> Vec<String> {
         paths
             .into_iter()
             .filter(|path| !rights.contains(path) || lists::walked(path, ctx).is_none())
+            .filter(|path| {
+                !(rights.contains(path)
+                    && path.start == Start::Params
+                    && ctx.params.is_some_and(|params| !params.is_object()))
+            })
             .flat_map(|path| blocked_of(path, ctx))
             .collect(),
     )
@@ -347,12 +352,37 @@ fn key_unreadable_off_alias(path: &Path, ctx: &Ctx) -> bool {
         })
 }
 
+fn key_into_params_that_arent_an_object(path: &Path, ctx: &Ctx) -> bool {
+    path.start == Start::Params
+        && ctx.params.is_some_and(|params| {
+            !params.is_object()
+                && (matches!(path.steps.first(), Some(Step::Key(_)))
+                    || path.steps.iter().any(|step| matches!(step, Step::Field(_)))
+                    || (params.is_array() && path.steps.len() > 1))
+        })
+}
+
+fn params_position_fault(check: &Check, ctx: &Ctx) -> Vec<String> {
+    let Check::Walk(walk) = check else {
+        return Vec::new();
+    };
+    match (&walk.path.start, walk.path.steps.first(), ctx.params) {
+        (Start::Params, Some(Step::Index(_)), Some(params))
+            if !params.is_array() && !params.is_null() =>
+        {
+            vec![isnt("$params", params, "a list")]
+        }
+        _ => Vec::new(),
+    }
+}
+
 pub const FALLBACK: &str = "the check is false";
 
 pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
     let read = path::read(path, ctx);
     if read.outcome != Outcome::Unusable
         || (read.step_unreadable && key_unreadable_off_alias(path, ctx))
+        || key_into_params_that_arent_an_object(path, ctx)
     {
         return Vec::new();
     }
@@ -618,6 +648,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         Cause::Unusable => {
             let mut all = key_faults(check, ctx);
             all.extend(blocked(check, ctx));
+            all.extend(params_position_fault(check, ctx));
             all.extend(faults(check, ctx, verdict));
             all.extend(
                 lists::walk_fault(check, ctx)
@@ -885,7 +916,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                         any = true;
                     }
                 }
-                for path in plain {
+                for path in &plain {
                     if let Some(input) = first_input(path, ctx)
                         && input.state == Outcome::Found
                         && !input.value.is_number()
@@ -895,7 +926,7 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                     }
                 }
                 let counted_said = tally::counted_texts(derived, ctx, Cause::Unusable);
-                for path in counted {
+                for path in &counted {
                     if let Some(input) = first_input(path, ctx)
                         && (counted_said.is_empty()
                             || !path.steps.iter().any(|s| matches!(s, Step::Field(_))))
@@ -911,7 +942,10 @@ fn tally_faults(check: &tally::Tally, ctx: &Ctx) -> Vec<String> {
                     out.extend(counted_said);
                     any = true;
                 }
-                if !any && tally::derived_value(derived, ctx).is_err() {
+                let all_found = counted.iter().chain(plain.iter()).all(|path| {
+                    first_input(path, ctx).is_none_or(|input| input.state == Outcome::Found)
+                });
+                if !any && all_found && tally::derived_value(derived, ctx).is_err() {
                     out.push(format!("{} needs more than 15 digits", derived.text));
                 }
             }

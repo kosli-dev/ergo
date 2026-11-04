@@ -22590,6 +22590,171 @@
     ]
   },
   {
+    "description": "every on a position of the params, with params as a number",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "every $params[0].a is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": 3,
+    "cases": [
+      {
+        "description": "fails as unusable and names the params and what they are",
+        "rules": ["path.start", "path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": [], "name": "$params[0].a", "value": []}], "message": "$params is 3, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every on a position of the params, with params as text",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "every $params[0].a is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": "s",
+    "cases": [
+      {
+        "description": "fails as unusable and names the params and what they are",
+        "rules": ["path.start", "path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": [], "name": "$params[0].a", "value": []}], "message": "$params is \"s\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every on a position of the params, with params as true",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "every $params[0].a is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": true,
+    "cases": [
+      {
+        "description": "fails as unusable and names the params and what they are",
+        "rules": ["path.start", "path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": [], "name": "$params[0].a", "value": []}], "message": "$params is true, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every on a position of the params, with params as false",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "every $params[0].a is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": false,
+    "cases": [
+      {
+        "description": "fails as unusable and names the params and what they are",
+        "rules": ["path.start", "path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": [], "name": "$params[0].a", "value": []}], "message": "$params is false, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "some on a position of the params, with params as a number",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "some $params[0].a is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": 3,
+    "cases": [
+      {
+        "description": "fails as unusable and names the params and what they are",
+        "rules": ["path.start", "path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": [], "name": "$params[0].a", "value": []}], "message": "$params is 3, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every on a position of the params with nothing after it, with params as a number",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "every $params[0] is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": 3,
+    "cases": [
+      {
+        "description": "fails as unusable and names the params and what they are",
+        "rules": ["path.start", "path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": [], "name": "$params[0]", "value": []}], "message": "$params is 3, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "count of a position of the params, with params as an empty list",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "count of $params[0] is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": [],
+    "cases": [
+      {
+        "description": "fails as unusable, saying the check is false",
+        "rules": ["path.start", "path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": [], "name": "count of item 1 of $params", "value": null}, {"locations": [], "name": "$params[0]", "value": []}], "message": "count of item 1 of $params is 1 is false", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a key after a position of the params, with params as a list holding a number",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "$params[0].a is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": [3],
+    "cases": [
+      {
+        "description": "fails as unusable, saying the check is false",
+        "rules": ["path.start", "path.unusable", "message.cause"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/0"], "name": "$params[0].a", "value": null}], "message": "$params[0].a is 1 is false", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position of the params, with params as a list",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "$params[0] is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": [{"a": 1}],
+    "cases": [
+      {
+        "description": "fails as unusable and points at the position it read",
+        "rules": ["path.start", "path.unusable", "location.read"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/0"], "name": "item 1 of $params", "value": {"a": 1}}], "message": "item 1 of $params is {\"a\": 1}, which isn't a number", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position and a key of the params, with params as a list",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "$params[0].a is 1"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": [{"a": 1}],
+    "cases": [
+      {
+        "description": "fails as unusable and points at the key it read",
+        "rules": ["path.start", "path.unusable", "location.read"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/0/a"], "name": "$params[0].a", "value": 1}], "message": "$params[0].a is 1 is false", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position and a key of the params, with params as a list holding a number",
+    "policy": {"ergo_spec": "v0.5-dev", "requirements": {"s": {"checks": {"c": "$params[0].a does not exist"}, "subject": "thing"}}, "subjects": {"thing": {"from": "things", "identified_by": "id"}}},
+    "params": [3],
+    "cases": [
+      {
+        "description": "fails as unusable and points at the position it read",
+        "rules": ["path.start", "path.unusable", "location.read"],
+        "input": {"things": [{"id": "t"}]},
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/0"], "name": "$params[0].a", "value": null}], "message": "$params[0].a does not exist is false", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "$params read by a position and then by a key, with params as a number",
     "policy": {
       "ergo_spec": "v0.5-dev",

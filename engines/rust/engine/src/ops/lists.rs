@@ -835,7 +835,10 @@ fn rights_of(check: &super::Check) -> Vec<&Right> {
 
 pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
     rights_of(check).into_iter().find_map(|right| match right {
-        Right::Ref(path) | Right::Field(path) => {
+        Right::Ref(path) | Right::Field(path)
+            if !(path.start == crate::path::Start::Params
+                && ctx.params.is_some_and(|params| !params.is_object())) =>
+        {
             walked(path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
         }
         _ => None,
