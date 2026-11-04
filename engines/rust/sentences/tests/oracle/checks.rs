@@ -5187,6 +5187,46 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("$params exists", "$params exists", &[], &[]),
+    (
+        "count of $input.y[0].v is 1",
+        "count of $input.y[0].v is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of $params whose v is 1 is 1",
+        "count of $params whose v is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of $params[0].v is 1",
+        "count of $params[0].v is 1",
+        &[],
+        &[],
+    ),
+    ("count of y[0].v is 1", "count of y[0].v is 1", &[], &[]),
+    (
+        "every ws whose x is $params.v is 1",
+        "every ws whose x equals $params.v is 1",
+        &[],
+        &[],
+    ),
+    ("id is in $input[0].id", "id is in $input[0].id", &[], &[]),
+    ("p.v is 1", "p.v is 1", &[], &[]),
+    ("sum of $params.v is 1", "sum of $params.v is 1", &[], &[]),
+    ("w is in $params.v", "w is in $params.v", &[], &[]),
+    ("x is in $params[0].v", "x is in $params[0].v", &[], &[]),
+    (
+        "x named by $params.v is 1",
+        "x named by $params.v is 1",
+        &[],
+        &[],
+    ),
+    ("zz contains $input.y.v", "zz contains $input.y.v", &[], &[]),
+    ("zz contains $params.v", "zz contains $params.v", &[], &[]),
+    ("zz contains y.v", "zz contains y.v", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8662,6 +8702,8 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every $params as p", "every $params as p", &[], &[]),
+    ("every $params.v as p", "every $params.v as p", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

@@ -1101,7 +1101,15 @@ fn check_rows(env: &Env, judged: &Judged, anc: &[Anc]) -> Vec<Row> {
             read.plan.as_ref().map(|plan| {
                 let mut row = check_row(env, name, plan, &ctx, judged, anc);
                 if row.message.as_deref() == Some(ops::message::FALLBACK) {
-                    row.message = Some(format!("{} is false", read.expression));
+                    let named = (row.cause == Cause::Unusable)
+                        .then(|| {
+                            plan.items.iter().find_map(|item| {
+                                ops::message::params_that_arent_an_object(&item.check, &ctx)
+                            })
+                        })
+                        .flatten();
+                    row.message =
+                        Some(named.unwrap_or_else(|| format!("{} is false", read.expression)));
                 }
                 row
             })
@@ -2852,5 +2860,109 @@ mod tests {
         );
         assert_eq!(r["subjects"]["thing"]["from"], json!("<invalid from>"));
         assert_eq!(r["subjects"]["w"]["from"], json!("<invalid from>"));
+    }
+
+    fn message_of(check: Value, input: Value, params: Value) -> Value {
+        let r = report(
+            &input,
+            &json!({
+                "ergo_spec": "v0.5-dev",
+                "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+                "requirements": {"s": {"subject": "thing", "checks": {"c": check}}}
+            }),
+            &params,
+        );
+        rows(&r, "c")[0]["message"].clone()
+    }
+
+    #[test]
+    fn a_for_line_that_reads_params_that_arent_an_object_names_them() {
+        let input = json!({"things": [{"id": "t", "ws": [1]}]});
+        for check in [
+            json!({"for": "every $params as p", "assert": "p.v is 1"}),
+            json!({"for": "every $params.v as p", "assert": "p is 1"}),
+            json!({"for": "every ws as w", "assert": "w is in $params.v"}),
+        ] {
+            assert_eq!(
+                message_of(check, input.clone(), json!(3)),
+                json!("$params is 3, which isn't an object")
+            );
+        }
+    }
+
+    #[test]
+    fn a_named_by_or_a_whose_that_reads_params_that_arent_an_object_names_them() {
+        let input = json!({"things": [{"id": "t", "x": {"a": 1}, "ws": [{"x": 1}]}]});
+        for check in [
+            "x named by $params.v is 1",
+            "every ws whose x is $params.v is 1",
+        ] {
+            assert_eq!(
+                message_of(json!(check), input.clone(), json!("s")),
+                json!("$params is \"s\", which isn't an object")
+            );
+        }
+    }
+
+    #[test]
+    fn a_count_whose_whose_reads_params_that_are_a_list_names_them_not_the_digits() {
+        assert_eq!(
+            message_of(
+                json!("count of $params whose v is 1 is 1"),
+                json!({"things": [{"id": "t"}]}),
+                json!([3])
+            ),
+            json!("$params is [3], which isn't an object")
+        );
+    }
+
+    #[test]
+    fn a_ref_on_the_right_is_named_after_the_left_side_and_a_subject_field_before_it() {
+        let input = json!({"things": [{"id": "t", "zz": "v", "y": 3}], "y": 3});
+        assert_eq!(
+            message_of(json!("zz contains $params.v"), input.clone(), json!(3)),
+            json!("zz is \"v\", which isn't a list, and $params is 3, which isn't an object")
+        );
+        assert_eq!(
+            message_of(json!("zz contains $input.y.v"), input.clone(), json!({})),
+            json!("zz is \"v\", which isn't a list, and $input.y is 3, which isn't an object")
+        );
+        assert_eq!(
+            message_of(json!("zz contains y.v"), input, json!({})),
+            json!("y is 3, which isn't an object, and zz is \"v\", which isn't a list")
+        );
+    }
+
+    #[test]
+    fn a_key_after_a_position_of_params_holding_a_list_names_the_item() {
+        assert_eq!(
+            message_of(
+                json!("x is in $params[0].v"),
+                json!({"things": [{"id": "t", "x": 1}]}),
+                json!([[1]])
+            ),
+            json!("item 1 of $params is [1], which isn't an object")
+        );
+    }
+
+    #[test]
+    fn a_count_through_a_position_names_the_item_once() {
+        let input = json!({"things": [{"id": "t", "y": [{"v": 1}]}], "y": [{"v": 1}]});
+        assert_eq!(
+            message_of(json!("count of y[0].v is 1"), input.clone(), json!({})),
+            json!("item 1 of y: v is 1, which isn't a list or an object")
+        );
+        assert_eq!(
+            message_of(json!("count of $input.y[0].v is 1"), input, json!({})),
+            json!("item 1 of $input.y: v is 1, which isn't a list or an object")
+        );
+        assert_eq!(
+            message_of(
+                json!("count of $params[0].v is 1"),
+                json!({"things": [{"id": "t"}]}),
+                json!([{"v": 1}])
+            ),
+            json!("item 1 of $params: v is 1, which isn't a list or an object")
+        );
     }
 }
