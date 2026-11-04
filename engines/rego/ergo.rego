@@ -10736,6 +10736,7 @@ _m_right_kind(cmp, r) := "a list with at least one value" if {
 }
 
 _m_right_kind(cmp, r) := "a list of one kind of value" if {
+	is_array(r)
 	_mixed_types(r)
 	cmp in ({"in", "not_in"} | _all_cmps)
 }

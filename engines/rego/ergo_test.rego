@@ -11754,3 +11754,11 @@ test_a_failed_walk_item_message_names_the_item_and_not_the_subject if {
 	rep := ergo.report({"things": [{"id": "t2", "k1": {"k2": {"z": [1, 2]}}}]}, policy, {})
 	[r.message | some r in rep.results; r.check == "c"] == ["item 2 of x.z is 2"]
 }
+
+test_an_object_with_values_of_different_kinds_on_the_right_fails_as_not_a_list_and_does_not_crash if {
+	every c in ["x is in thing", "x is not in thing", "x is one of thing", "x is in $input.o"] {
+		policy := {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": c}}}}
+		rep := ergo.report({"things": [{"x": 0, "thing": [0]}], "o": {"a": 0, "b": [0]}}, policy, {})
+		[[r.passed, r.cause] | some r in rep.results; r.check == "c"] == [[false, "unusable"]]
+	}
+}
