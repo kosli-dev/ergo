@@ -183,7 +183,7 @@ jobs:
       - name: Check ergo-policy-sentences builds for Wasm
         run: cargo build --locked -p ergo-policy-sentences --target wasm32-unknown-unknown
       - name: Install the wasm-bindgen tool, at the version of the crate
-        run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
+        run: cargo install wasm-bindgen-cli --version 0.2.130 --locked
       - name: Install Binaryen
         run: |
           curl -fsSL -o "$RUNNER_TEMP/binaryen.tar.gz" https://github.com/WebAssembly/binaryen/releases/download/version_133/binaryen-version_133-x86_64-linux.tar.gz
