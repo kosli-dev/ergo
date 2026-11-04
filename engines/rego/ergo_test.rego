@@ -10221,11 +10221,7 @@ _subject_report(doc, from, checks, params) := ergo.report(doc, _subject_policy(f
 
 _subject_rows(doc, from, check, params) := [[r.subject.id, r.passed, r.cause, r.inputs] | some r in _subject_report(doc, from, {"c": check}, params).results; r.check == "c"]
 
-_subject_problems(from, checks) := [i.value | some i in _subject_report({"xs": []}, from, checks, {}).results[0].inputs; i.name == _subject_problem_name(from)][0]
-
-_subject_problem_name(from) := "subjects.s.from" if from != "every xs"
-
-_subject_problem_name("every xs") := "checks.c"
+_subject_problems(from, checks) := [i.value | some i in _subject_report({"xs": []}, from, checks, {}).results[0].inputs; i.name == "checks.c"][0]
 
 test_subject_is_the_subject_itself_when_the_subject_is_a_string if {
 	_subject_rows(

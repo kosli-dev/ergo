@@ -965,8 +965,6 @@ _labelled(check, req) := object.union(check, {"label": req.subject}) if {
 	not is_array(object.get(check, "checks", null))
 }
 
-_labelled(check, req) := check if not is_string(object.get(req, "subject", null))
-
 _labelled_for(check, req, subj) := _labelled(check, req) if not is_object(subj)
 
 _labelled_for(check, _, subj) := check if is_object(subj)
@@ -3613,8 +3611,6 @@ _reads_itself(path) if _keys_of(path) == []
 
 _reads_subject(path) if path == []
 
-_reads_subject(path) if _list_subject_path(path)
-
 _reads_subject(path) if {
 	_subject_part(path)
 	_part_of(path).n == 0
@@ -3625,12 +3621,6 @@ _reads_subject(path) if {
 	_subject_part(path)
 	_part_of(path).n == 0
 	_index_step(path[1])
-}
-
-_list_subject_path(path) if {
-	is_array(path)
-	count(path) > 0
-	_index_step(path[0])
 }
 
 _position_first(path) if _index_step(_keys_of(path)[0])
@@ -6999,6 +6989,13 @@ _s_quoted_start(p) if {
 	object.get(p, "quoted", false) == true
 }
 
+_s_quoted_start(p) if {
+	p.steps[0] in _s_words
+	object.get(p, "dot", false) != true
+	object.get(p, "field", false) == true
+	object.get(p, "own", false) == true
+}
+
 _s_start_dot(p, side) := "." if {
 	object.get(p, "field", false) == true
 	object.get(p, "own", false) != true
@@ -7372,7 +7369,13 @@ _s_whose_context(name, c, pc) := pc if not _s_text_has(json.marshal(c), name)
 
 _s_text_has(text, name) if {
 	is_string(name)
-	contains(text, name)
+	quoted := json.marshal(name)
+	contains(text, substring(quoted, 1, count(quoted) - 2))
+}
+
+_s_text_has(text, name) if {
+	is_string(name)
+	contains(text, "\\\\")
 }
 
 _whose_problem(p) := p if p == "every and some over more than ten steps aren't supported yet"
@@ -7663,8 +7666,8 @@ _p_for_clash(check, _) := set() if not is_string(object.get(check, "for", ""))
 
 _p_for_items(check) := object.get(_for_line(check.for), "items", []) if is_string(check.for)
 
-_p_subject_follow_problems(check, lines, ftext, pc) := {concat("", [_s_path_text(node, "left"), ": nothing can follow ", pc.subject, ", which means the subject: for a field called ", pc.subject, ", write ", concat("", [_s_step_text(st) | some st in node.steps])]) |
-	contains(json.marshal(check), pc.subject)
+_p_subject_follow_problems(check, lines, ftext, pc) := {concat("", [_s_path_text(object.union(node, {"quoted": true}), "left"), ": nothing can follow ", pc.subject, ", which means the subject: for a field called ", pc.subject, ", write ", concat("", [_s_step_text(st) | some st in node.steps])]) |
+	_s_text_has(json.marshal(check), pc.subject)
 	some node in _p_subject_nodes(lines, ftext)
 	node.steps[0] == pc.subject
 	count(node.steps) > 1
@@ -7937,7 +7940,7 @@ _p_requirement(req, chains, parts) := object.union(object.remove(req, ["checks"]
 
 _p_check_aliases(check, aliases, req) := aliases | {req.subject} if {
 	is_string(object.get(req, "subject", null))
-	contains(json.marshal(check), req.subject)
+	_s_text_has(json.marshal(check), req.subject)
 }
 
 else := aliases
@@ -9080,12 +9083,6 @@ _walk_root_name([]) := ["the subject"]
 _walk_root_name(path) := [] if {
 	not _named(path)
 	not _reads_subject(path)
-}
-
-_walk_root_name(path) := ["the subject"] if {
-	not _named(path)
-	path != []
-	_reads_subject(path)
 }
 
 _walk_steps(path) := array.slice(path, count(_walk_root(path)), count(path))
@@ -10324,7 +10321,7 @@ _m_has_sides(check) if is_array(check["$sides"])
 _m_with_sides(check) := object.union(check, {"$sides": sides}) if {
 	is_object(check)
 	sides := _m_found_sides(check)
-} else := check
+}
 
 _message(check, subj, cause) := _m_message(_m_with_sides(_m_walked(check, subj)), subj, cause)
 
