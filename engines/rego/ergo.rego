@@ -7352,10 +7352,11 @@ _s_from_read_of(name, fl, subjects, chains) := object.union(object.union({"probl
 	every_list := object.get(fl, "every", false) == true
 }
 
-_s_from_filter(name, c, names, keep, pc) := _p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc_named), keep), names), pc_named) if {
+_s_from_filter(name, c, names, keep, pc) := _p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc_named), keep_named), names), pc_named) if {
 	not _s_that(c)
+	keep_named := keep | {name}
 	pc_named := _s_whose_context(name, c, pc)
-	t := _s_cond_body(_s_from_cond(c, names, keep))
+	t := _s_cond_body(_s_from_cond(c, names, keep_named))
 }
 
 _s_from_filter(name, c, names, keep, pc) := _p_applied(_s_parent_named(t, _s_check([t], {}, _p_part_walk_problems([t], "", pc_named), keep_named), names), pc_named) if {

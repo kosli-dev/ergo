@@ -11762,3 +11762,10 @@ test_an_object_with_values_of_different_kinds_on_the_right_fails_as_not_a_list_a
 		[[r.passed, r.cause] | some r in rep.results; r.check == "c"] == [[false, "unusable"]]
 	}
 }
+
+test_a_dot_in_a_from_whose_reads_the_field_named_like_the_subject if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"kid": {"from": "every kids whose .kid is 1"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": ".x is 1"}}}}
+	rep := ergo.report({"kids": [{"kid": 1, "x": 1}, {"kid": 2, "x": 1}, {"x": 1}]}, policy, {})
+	[[r.cause, r.message] | some r in rep.results; r.check == "$applies"; r.cause != "satisfied"] == [["value", ".kid is 2"], ["absent", ".kid is missing"]]
+	[r.passed | some r in rep.results; r.check == "c"] == [true]
+}
