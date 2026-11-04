@@ -4478,9 +4478,20 @@ _first_read(xs, x) := min({j | some j, y in xs; y.name == x.name; y.value == x.v
 
 _anchored_inputs(xs, at) := _once(_tie_sorted(_anchored_all(xs, at)))
 
-_anchored_all(xs, at) := [object.union(x, {"locations": [replace(l, "~~", at) | some l in x.locations]}) | some x in xs]
+_anchored_all(xs, at) := [object.union(x, {"locations": [replace(l, "~~", at) | some l in x.locations]}) | some x in xs] if is_string(at)
 
-_subject_rows(entry, ref, req, req_name, flaws, prepared) := [_entry_copied(row, entry) |
+else := [object.union(x, {"locations": [m | some l in x.locations; some m in _anchored_copies(l, at)]}) | some x in xs]
+
+_anchored_copies(l, ats) := [replace(l, "~~", a) | some a in ats] if contains(l, "~~")
+
+else := [l]
+
+_entry_anchor(entry) := entry.at if object.get(entry, "ats", null) == null
+
+else := entry.ats
+
+_subject_rows(entry, ref, req, req_name, flaws, prepared) := [row |
+	anchor := _entry_anchor(entry)
 	some check_name in _names(prepared)
 	row := object.union(
 		{
@@ -4488,13 +4499,9 @@ _subject_rows(entry, ref, req, req_name, flaws, prepared) := [_entry_copied(row,
 			"subject": ref,
 			"check": check_name,
 		},
-		_anchored(_outcome(req, prepared[check_name], flaws[check_name], entry.subject), entry.at),
+		_anchored(_outcome(req, prepared[check_name], flaws[check_name], entry.subject), anchor),
 	)
 ]
-
-_entry_copied(row, entry) := _copied_row(row, entry.ats) if is_array(object.get(entry, "ats", null))
-
-else := row
 
 _well_formed_row(req, name, parts) := v if {
 	v := parts.well_formed
@@ -4607,19 +4614,16 @@ _applies_rows(_, _, _, req, _) := [] if {
 	_size(_applies_to_of(req)) == 0
 }
 
-_applies_row(ref, entry, evals, req, req_name) := _entry_copied(
-	object.union(
-		{
-			"requirement": req_name,
-			"subject": ref,
-			"check": "$applies",
-			"inputs": _tie_sorted(_anchored_all(_applies_inputs(evals, req), entry.at)),
-			"passed": matched,
-			"cause": _applies_cause(evals, matched),
-		},
-		object.union(_applies_failures(evals, req, entry.at), _m_applies(evals, req, matched)),
-	),
-	entry,
+_applies_row(ref, entry, evals, req, req_name) := object.union(
+	{
+		"requirement": req_name,
+		"subject": ref,
+		"check": "$applies",
+		"inputs": _tie_sorted(_anchored_all(_applies_inputs(evals, req), _entry_anchor(entry))),
+		"passed": matched,
+		"cause": _applies_cause(evals, matched),
+	},
+	object.union(_applies_failures(evals, req, _entry_anchor(entry)), _m_applies(evals, req, matched)),
 ) if {
 	matched := _subject_matches(evals, req)
 }
@@ -5284,16 +5288,19 @@ _grand_branch(req, name, _, grand, g, fixed) := [_parent_evaluation(req, name, g
 
 _grand_branch(req, name, parent, grand, g, fixed) := _grand_children(req, name, parent, grand, g, pick, fixed) if {
 	"subject" in object.keys(g)
-	pick := _parent_pick_of(g.subject, {"subject": parent, "checks": {}}) with data.ergo_in as {grand: g.id} with data.ergo_parent as {grand: g.subject} with input as {"ergo/names": {"$at": {"doc": g.at, "names": {grand: g.at}}}}
+	gat := _copy_base(g, "~g")
+	pick := _parent_pick_of(g.subject, {"subject": parent, "checks": {}}) with data.ergo_in as {grand: g.id} with data.ergo_parent as {grand: g.subject} with input as {"ergo/names": {"$at": {"doc": gat, "names": {grand: gat}}}}
 }
 
 _grand_children(req, name, _, grand, g, pick, fixed) := [_parent_evaluation(req, name, grand, {"id": g.id, "cause": pick.cause}, fixed)] if "cause" in object.keys(pick)
 
 _grand_children(req, name, parent, grand, g, pick, fixed) := [_grandchild_evaluation(req, name, parent, grand, g, p, fixed) | some p in pick.parents] if "parents" in object.keys(pick)
 
-_grandchild_evaluation(req, name, parent, grand, g, p, fixed) := _copied_evaluation(_copied_evaluation(e, p), g) if {
+_grandchild_evaluation(req, name, parent, grand, g, p, fixed) := _copied_evaluation(_copied_evaluation(e, p, "~p"), g, "~g") if {
 	"subject" in object.keys(p)
-	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {grand: g.id, parent: p.id} with data.ergo_parent as {grand: g.subject, parent: p.subject} with input as {"ergo/names": {"$at": {"doc": p.at, "names": {grand: g.at, parent: p.at}}}}
+	gat := _copy_base(g, "~g")
+	pat := _copy_base(p, "~p")
+	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {grand: g.id, parent: p.id} with data.ergo_parent as {grand: g.subject, parent: p.subject} with input as {"ergo/names": {"$at": {"doc": pat, "names": {grand: gat, parent: pat}}}}
 }
 
 _grandchild_evaluation(req, name, parent, grand, g, p, _) := {
@@ -5333,10 +5340,15 @@ _no_parent_evaluation(req, name, cause, parts) := object.union(_evaluation({}, r
 	"rows_complete": true,
 })
 
-_parent_evaluation(req, name, parent, p, fixed) := _copied_evaluation(e, p) if {
+_parent_evaluation(req, name, parent, p, fixed) := _copied_evaluation(e, p, "~p") if {
 	"subject" in object.keys(p)
-	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {parent: p.id} with data.ergo_parent as {parent: p.subject} with input as {"ergo/names": {"$at": {"doc": p.at, "names": {parent: p.at}}}}
+	pat := _copy_base(p, "~p")
+	e := _evaluation_with(p.subject, req, name, fixed) with data.ergo_in as {parent: p.id} with data.ergo_parent as {parent: p.subject} with input as {"ergo/names": {"$at": {"doc": pat, "names": {parent: pat}}}}
 }
+
+_copy_base(p, token) := p.at if object.get(p, "ats", null) == null
+
+else := token
 
 _parent_evaluation(req, name, parent, p, _) := {
 	"min_subjects": [row],
@@ -5352,22 +5364,24 @@ _parent_evaluation(req, name, parent, p, _) := {
 	row := _parent_min_subjects_row(req, name, p.cause) with data.ergo_in as {parent: p.id}
 }
 
-_copied_evaluation(e, p) := e if object.get(p, "ats", null) == null
+_copied_evaluation(e, p, token) := e if object.get(p, "ats", null) == null
 
 else := object.union(e, {
-	"min_subjects": [_copied_row(r, p.ats) | some r in e.min_subjects],
-	"unique_ids": [_copied_row(r, p.ats) | some r in e.unique_ids],
-	"applies": [_copied_row(r, p.ats) | some r in e.applies],
-	"subject_rows": [[_copied_row(r, p.ats) | some r in group] | some group in e.subject_rows],
-})
+	"min_subjects": [_copied_row(r, c) | some r in e.min_subjects],
+	"unique_ids": [_copied_row(r, c) | some r in e.unique_ids],
+	"applies": [_copied_row(r, c) | some r in e.applies],
+	"subject_rows": [[_copied_row(r, c) | some r in group] | some group in e.subject_rows],
+}) if {
+	c := {"from": token, "to": p.ats}
+}
 
-_copied_row(row, ats) := object.union(row, object.union({"inputs": _copied_inputs(row.inputs, ats)}, {"failed_items": [_copied_failed(f, ats) | some f in row.failed_items] | "failed_items" in object.keys(row)}))
+_copied_row(row, c) := object.union(row, object.union({"inputs": _copied_inputs(row.inputs, c)}, {"failed_items": [_copied_failed(f, c) | some f in row.failed_items] | "failed_items" in object.keys(row)}))
 
-_copied_failed(f, ats) := object.union(f, object.union(
-	{"locations": _copied_locations(f.locations, ats)},
+_copied_failed(f, c) := object.union(f, object.union(
+	{"locations": _copied_locations(f.locations, c)},
 	object.union(
-		{"failed_items": _copied_inputs(f.failed_items, ats) | "failed_items" in object.keys(f)},
-		{"failed_assertions": [_copied_line(l, ats) | some l in f.failed_assertions] | "failed_assertions" in object.keys(f)},
+		{"failed_items": _copied_inputs(f.failed_items, c) | "failed_items" in object.keys(f)},
+		{"failed_assertions": [_copied_line(l, c) | some l in f.failed_assertions] | "failed_assertions" in object.keys(f)},
 	),
 ))
 
@@ -8355,8 +8369,37 @@ _s_check(lines, wording, problems, parts) := object.union(wording, object.union(
 	count({u | some a in assertions; some u in _s_assertion_unsupported(a)}) == 0
 	marked := [_s_aliased(a, _s_names(set(), parts)) | some a in assertions]
 	count(_s_self_problems(marked)) == 0
+	count(_s_distinct_problems(marked)) == 0
 	model := _s_model_of(marked)
-} else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable(((problems | _s_lines_problems(lines)) | _s_lines_self(lines, _s_names(set(), parts)))))})
+} else := object.union(wording, {"expression": concat(" and ", [_s_written_text(line) | some line in lines]), "$sentence": sort(_s_or_unrunnable((((problems | _s_lines_problems(lines)) | _s_lines_self(lines, _s_names(set(), parts))) | _s_lines_distinct(lines, _s_names(set(), parts)))))})
+
+_s_lines_distinct([line], names) := _s_line_distinct(line, names)
+
+_s_lines_distinct(lines, names) := {concat("", ["line ", _literal_text(i + 1), ": ", p]) | some i, line in lines; some p in _s_line_distinct(line, names)} if count(lines) > 1
+
+_s_lines_distinct([], _) := set()
+
+_s_line_distinct(line, names) := _s_distinct_problems([_s_aliased(a, names) | some a in parsed.assertions]) if {
+	is_string(line)
+	parsed := _sentence(line)
+	"assertions" in object.keys(parsed)
+} else := set()
+
+_s_distinct_problems(marked) := {concat("", ["distinct can't go with a phrase that also reads ", concat(", ", names), " from each item, and copies of the value can differ there: leave distinct out, or put the items on a for line"]) |
+	some a in marked
+	object.get(a, "distinct", false) == true
+	_s_quantifier_of(a) in {"every", "some"}
+	names := sort({_path_name(_s_model_path(p)) | some p in _s_phrase_paths(a.phrase); _s_item_read(p)})
+	count(names) > 0
+}
+
+_s_phrase_paths(ph) := array.concat([t | some t in object.get(ph, "terms", []); is_object(t); "steps" in object.keys(t)], [ph.path | is_object(object.get(ph, "path", null))])
+
+_s_item_read(p) if {
+	not "start" in object.keys(p)
+	object.get(p, "alias", false) != true
+	object.get(p, "part", false) != true
+}
 
 _s_check_mixed(lines, wording, problems, parts) := m if {
 	m := _s_check(lines, wording, problems, parts)
@@ -9835,15 +9878,15 @@ _for_copied(j, i, w, copies) := object.union(j, {"failure": _copied_failure(j.fa
 	i in object.keys(copies.groups)
 } else := j
 
-_copied_failure(f, ats) := object.union(f, {"ats": ats, "lines": [_copied_line(l, ats) | some l in f.lines], "inner": [object.union(g, {"ats": _copied_locations(_fail_locations(g), ats)}) | some g in object.get(f, "inner", [])]})
+_copied_failure(f, ats) := object.union(f, {"ats": ats})
 
-_copied_line(l, ats) := object.union(l, object.union({"inputs": _copied_inputs(l.inputs, ats) | "inputs" in object.keys(l)}, {"items": [object.union(x, {"inputs": _copied_inputs(x.inputs, ats)}) | some x in l.items] | "items" in object.keys(l)}))
+_copied_line(l, c) := object.union(l, object.union({"inputs": _copied_inputs(l.inputs, c) | "inputs" in object.keys(l)}, {"items": [object.union(x, {"inputs": _copied_inputs(x.inputs, c)}) | some x in l.items] | "items" in object.keys(l)}))
 
-_copied_inputs(xs, ats) := [object.union(x, {"locations": _copied_locations(x.locations, ats)}) | some x in xs]
+_copied_inputs(xs, c) := [object.union(x, {"locations": _copied_locations(x.locations, c)}) | some x in xs]
 
-_copied_locations(ls, ats) := [m | some l in ls; some m in _copied_location(l, ats)]
+_copied_locations(ls, c) := [m | some l in ls; some m in _copied_location(l, c)]
 
-_copied_location(l, ats) := [concat("", [a, substring(l, count(ats[0]), -1)]) | some a in ats] if _under_location(l, ats[0])
+_copied_location(l, c) := [concat("", [a, substring(l, count(c.from), -1)]) | some a in c.to] if _under_location(l, c.from)
 
 else := [l]
 
