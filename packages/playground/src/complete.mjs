@@ -6,7 +6,7 @@ const WORDS = [...new Set([...GRAMMAR_WORDS, "any"])].sort();
 const PROBES = [
   "", " x", " 1", ' "x"', " x.y", " $params.x", " x, y", " 1, 2", " x is 1", " x exists", " x is empty", " is 1", " exists", " is empty",
   " x as y", " as y", " by x", " x by y", " of x", " of x is 1", " of 1", " all of 1", " least 1", " most 1", " than 1", " than x",
-  " to y", " from x to y", " elapsed from x to y", " from last of x", " last of x", " 1 of x", " x whose y is 1", " whose y is 1", " that is 1", " x that is 1", " and whose y is 1", " and that is 1",
+  " to y", " from x to y", " elapsed from x to y", " from last of x", " last of x", " 1 of x", " x whose y is 1", " whose y is 1", " that is 1", " x that is 1", " distinct x is 1", " distinct x as y", " and whose y is 1", " and that is 1",
   " x whose y is 1 exists", " x, if any, exists", " any, exists", " any, is 1", " and x is 1", " and 2", " 2", " string", " list", " x is 1 and y is 2",
   " x named by y", " named by y", " x of y is 1", " x plus 1", " plus 1", " with 1", " within 1", " or after x", " or before x", " x or after y",
   " empty", " non-empty string", " a list", " x is a list", " is a list", " one of 1", " of 1, 2", " not x", " not 1", " not exist", " not empty",
