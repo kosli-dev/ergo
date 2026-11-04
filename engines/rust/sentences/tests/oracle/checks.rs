@@ -4989,6 +4989,72 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("w[1] named by zz is 1", "w[1] named by zz is 1", &[], &[]),
     (".that is \"x\"", ".that is \"x\"", &[], &[]),
     (
+        "\"distinct\" is an object",
+        ".distinct is an object",
+        &[],
+        &[],
+    ),
+    (".distinct is 1", ".distinct is 1", &[], &[]),
+    (
+        "count of distinct commits.author is at least 2",
+        "count of distinct commits.author is at least 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of distinct commits.author whose verified is true is 2",
+        "count of distinct commits.author whose verified is true is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of distinct xs.distinct is 1",
+        "count of distinct xs.distinct is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct commits.author is \"ann\"",
+        "every distinct commits.author is \"ann\"",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct commits.author whose verified is true is \"ann\"",
+        "every distinct commits.author whose verified is true is \"ann\"",
+        &[],
+        &[],
+    ),
+    ("every xs.distinct is 2", "every xs.distinct is 2", &[], &[]),
+    (
+        "some distinct commits.author is \"cid\"",
+        "some distinct commits.author is \"cid\"",
+        &[],
+        &[],
+    ),
+    (
+        "sum of distinct stages.usd is 3.5",
+        "sum of distinct stages.usd is 3.5",
+        &[],
+        &[],
+    ),
+    ("review is \"ok\"", "review is \"ok\"", &[], &[]),
+    ("who is \"ann\"", "who is \"ann\"", &[], &[]),
+    ("version exists", "version exists", &[], &[]),
+    (
+        "every notes is \"fine\"",
+        "every notes is \"fine\"",
+        &[],
+        &[],
+    ),
+    ("r.ok is true", "r.ok is true", &[], &[]),
+    (
+        "version is not $input.banned",
+        "version does not equal $input.banned",
+        &[],
+        &[],
+    ),
+    (
         "count of ws that starts with \"b\" and that ends with \"y\" is 1",
         "count of ws that starts with \"b\" and that ends with \"y\" is 1",
         &[],
@@ -6706,6 +6772,17 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         &["a condition after and starts with whose or that"],
     ),
     ("every ws that is not empty", &["doesn't parse"]),
+    (
+        "distinct is 1",
+        &["distinct is a word of the grammar: write .distinct"],
+    ),
+    ("distinct xs is 1", &["doesn't parse"]),
+    ("count of distinct xs is", &["doesn't parse"]),
+    ("every distinct xs is", &["doesn't parse"]),
+    (
+        "every xs whose distinct y is 1",
+        &["distinct goes after every, some, count of or sum of"],
+    ),
     (
         "every that is not empty",
         &["that is a word of the grammar: write .that"],
@@ -8996,6 +9073,24 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every distinct commits as commit, some commit.reviews as review",
+        "every distinct commits as commit, some commit.reviews as review",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct commits as commit, first of reviewers whose by is commit.author as r",
+        "every distinct commits as commit, first of reviewers whose by equals commit.author as r",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct commits.author as who",
+        "every distinct commits.author as who",
+        &[],
+        &[],
+    ),
     ("every $params as p", "every $params as p", &[], &[]),
     ("every $params.v as p", "every $params.v as p", &[], &[]),
     (
@@ -9170,6 +9265,10 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "every xs as x, distinct first of ys as y",
+        &["distinct goes after every, some, count of or sum of"],
+    ),
     (
         "every items as y, every .y.zs as z, every .cov.xs as w",
         &["a for line holds two items at most"],

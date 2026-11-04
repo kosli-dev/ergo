@@ -142,6 +142,7 @@ pub(crate) fn from_base(line: &FromLine) -> BTreeSet<String> {
                 path,
                 if_any,
                 phrase,
+                ..
             } => {
                 walk.if_any_with_some(*quantifier, *if_any);
                 walk.path(path);
@@ -571,6 +572,7 @@ impl Walk {
                 whose,
                 if_any,
                 phrase,
+                ..
             } => {
                 self.if_any_with_some(*quantifier, *if_any);
                 self.path(path);

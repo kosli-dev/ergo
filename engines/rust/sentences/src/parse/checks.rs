@@ -22,6 +22,7 @@ pub(crate) const ITEM_START: &str =
 pub(crate) const SORTED_AFTER: &str =
     r#""sorted by" goes after a position, like "last of", not after every or some"#;
 pub(crate) const IF_ANY_POSITION: &str = "if any can't go with a position";
+pub(crate) const DISTINCT_PLACE: &str = "distinct goes after every, some, count of or sum of";
 
 fn flatten<T: Clone>(chain: &Chain<Noted<T>>) -> (Vec<T>, Notes) {
     let mut items = Vec::new();
@@ -105,7 +106,7 @@ impl Parser {
         if let Some((quantifier, j)) = self.quantifier(i)
             && let Some(k) = self.ws(j)
         {
-            for (path, m) in self.path_left(k) {
+            for ((distinct, path), m) in self.distinct_path(k, Side::Left) {
                 for (whose, w) in self.whose_opt(m) {
                     for (if_any, n) in self.if_any_opt(w) {
                         let Some(p) = self.ws(n) else { continue };
@@ -113,6 +114,7 @@ impl Parser {
                             let assertion = Assertion::Quantified {
                                 quantifier,
                                 path: path.clone(),
+                                distinct,
                                 whose: chain_items(&whose),
                                 if_any,
                                 phrase,
@@ -216,13 +218,14 @@ impl Parser {
         if let Some((quantifier, j)) = self.quantifier(i)
             && let Some(k) = self.ws(j)
         {
-            for (path, m) in self.path(k, Side::Left) {
+            for ((distinct, path), m) in self.distinct_path(k, Side::Left) {
                 for (whose, w) in self.whose_opt(m) {
                     for (if_any, n) in self.if_any_opt(w) {
                         if let Some((alias, end)) = self.alias_after(n) {
                             let item = ForItem::Walk {
                                 quantifier,
                                 path: path.clone(),
+                                distinct,
                                 whose: chain_items(&whose),
                                 if_any,
                                 alias,
@@ -264,7 +267,7 @@ impl Parser {
         heads.push((None, i));
         let mut out = Vec::new();
         for (quantifier, k) in heads {
-            for (path, m) in self.path(k, Side::Left) {
+            for ((distinct, path), m) in self.distinct_path(k, Side::Left) {
                 for (whose, w) in self.whose_opt(m) {
                     for (sorted_by, s) in self.sorted_opt(w) {
                         for (if_any, n) in self.if_any_opt(s) {
@@ -276,11 +279,15 @@ impl Parser {
                                 (Some(quantifier), None) => ForItem::Walk {
                                     quantifier,
                                     path: path.clone(),
+                                    distinct,
                                     whose: chain_items(&whose),
                                     if_any,
                                     alias,
                                 },
                                 (q, sorted_by) => {
+                                    if q.is_none() && distinct {
+                                        notes.push(Note::Text(DISTINCT_PLACE));
+                                    }
                                     if q.is_some() {
                                         notes.push(Note::Text(SORTED_AFTER));
                                     } else if path.position.is_none() {

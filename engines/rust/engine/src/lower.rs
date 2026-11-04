@@ -756,11 +756,13 @@ pub fn quoted_name_dotted_condition(condition: &s::FromCondition, name: &str) ->
         s::FromCondition::Quantified {
             quantifier,
             path,
+            distinct,
             if_any,
             phrase,
         } => s::FromCondition::Quantified {
             quantifier: *quantifier,
             path: quoted_name_dotted(path, name),
+            distinct: *distinct,
             if_any: *if_any,
             phrase: phrase.clone(),
         },
@@ -883,10 +885,11 @@ fn lower_assertion_phrase(assertion: &s::Assertion, scope: &Scope) -> Result<Che
         s::Assertion::Quantified {
             quantifier,
             path,
+            distinct,
             whose,
             if_any,
             phrase,
-        } => lower_quantified(*quantifier, path, whose, *if_any, phrase, &scope),
+        } => lower_quantified(*quantifier, path, *distinct, whose, *if_any, phrase, &scope),
         s::Assertion::Derived { .. } => tally::lower_assertion(assertion, &scope)
             .unwrap_or_else(|| Err(unsupported_assertion(assertion, &scope))),
     }
@@ -929,6 +932,7 @@ pub fn walk_too_long(path: &path::Path) -> Option<String> {
 pub fn lower_quantified(
     quantifier: s::Quantifier,
     path: &s::Path,
+    distinct: bool,
     whose: &[s::Condition],
     if_any: bool,
     phrase: &s::Phrase,
@@ -991,6 +995,7 @@ pub fn lower_quantified(
                 s::Quantifier::Some => Quantifier::Some,
             },
             path,
+            distinct,
             whose: conditions,
             if_any,
             check: Box::new(check),

@@ -13,6 +13,7 @@ const WORDS: &[&str] = &[
     "between",
     "count",
     "days",
+    "distinct",
     "each",
     "empty",
     "equal",

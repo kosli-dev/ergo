@@ -34,6 +34,44 @@ struct Anc<'a> {
 struct Entry<'a> {
     at: Located<'a>,
     key: Option<String>,
+    copies: Vec<String>,
+}
+
+fn merged_copies(entries: Vec<Entry<'_>>) -> Vec<Entry<'_>> {
+    let mut out: Vec<Entry> = Vec::new();
+    let mut seen: BTreeMap<String, usize> = BTreeMap::new();
+    for entry in entries {
+        let key = value::copy_key(entry.at.value);
+        match seen.get(&key) {
+            Some(&at) => out[at].copies.push(entry.at.location.render()),
+            None => {
+                seen.insert(key, out.len());
+                out.push(entry);
+            }
+        }
+    }
+    out
+}
+
+fn copied_row(row: &mut Row, first: &str, copies: &[String]) {
+    for input in &mut row.inputs {
+        value::copy_locations(input, first, copies);
+    }
+    if let Some(items) = &mut row.failed_items {
+        value::copy_locations(items, first, copies);
+    }
+}
+
+fn copied_evaluation(evaluation: &mut Evaluation, first: &str, copies: &[String]) {
+    for row in evaluation
+        .min_subjects
+        .iter_mut()
+        .chain(evaluation.unique_ids.iter_mut())
+        .chain(evaluation.applies.iter_mut())
+        .chain(evaluation.subject_rows.iter_mut().flatten())
+    {
+        copied_row(row, first, copies);
+    }
 }
 
 struct Broken {
@@ -110,11 +148,13 @@ fn plain_entries<'a>(read: &path::Read<'a>) -> Result<Vec<Entry<'a>>, Cause> {
                     location: location.index(at as u64),
                 },
                 key: None,
+                copies: Vec::new(),
             })
             .collect()),
         Value::Object(_) => Ok(vec![Entry {
             at: Located { value, location },
             key: None,
+            copies: Vec::new(),
         }]),
         _ => Err(Cause::Unusable),
     }
@@ -184,6 +224,7 @@ fn each_of_entries<'a>(
             Entry {
                 at,
                 key: Some(key.to_string()),
+                copies: Vec::new(),
             }
         })
         .collect();
@@ -282,6 +323,7 @@ fn walk_from<'a>(env: &Env<'a>, path: &Path, anc: &[Anc<'a>], base: Located<'a>)
                     location: item.end_location.clone(),
                 },
                 key: None,
+                copies: Vec::new(),
             }),
             _ => {
                 let miss = if item.miss == Cause::NotAnObject {
@@ -386,8 +428,15 @@ fn read_entries<'a>(
         Source::Root {
             path,
             every: true,
+            distinct,
             each_of: None,
-        } => walk_every(env, path, anc),
+        } => match walk_every(env, path, anc) {
+            Read::Entries { entries, broken } if *distinct => Read::Entries {
+                entries: merged_copies(entries),
+                broken,
+            },
+            other => other,
+        },
         Source::Root {
             path,
             each_of: Some(each_of),
@@ -1002,7 +1051,13 @@ fn repeated_ids(judged: &[Judged]) -> (Vec<Value>, Vec<String>) {
         ids.push(group[0].1.id.clone());
         group.sort_by_key(|(index, _)| *index);
         for (_, item) in group.iter() {
-            locations.extend(item.id_location.iter().cloned());
+            if let Some(at) = &item.id_location {
+                locations.extend(value::copied_locations(
+                    std::slice::from_ref(at),
+                    &item.entry.at.location.render(),
+                    &item.entry.copies,
+                ));
+            }
         }
     }
     (ids, locations)
@@ -1062,7 +1117,9 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     let in_scope: Vec<&Judged> = judged.iter().filter(|j| j.in_scope()).collect();
     let locations: Vec<String> = in_scope
         .iter()
-        .map(|j| j.entry.at.location.render())
+        .flat_map(|j| {
+            std::iter::once(j.entry.at.location.render()).chain(j.entry.copies.iter().cloned())
+        })
         .collect();
     let every = matches!(&lowered.source, Source::Root { every: true, .. });
     let read = Cause::worst(broken.iter().map(|b| b.cause));
@@ -1112,11 +1169,27 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     );
     let applies = judged
         .iter()
-        .filter_map(|j| j.applied.as_ref().map(|a| applies_row(env, j, a, anc)))
+        .filter_map(|j| {
+            j.applied.as_ref().map(|a| {
+                let mut row = applies_row(env, j, a, anc);
+                if !j.entry.copies.is_empty() {
+                    copied_row(&mut row, &j.entry.at.location.render(), &j.entry.copies);
+                }
+                row
+            })
+        })
         .collect();
     let subject_rows = in_scope
         .iter()
-        .map(|j| check_rows(env, j, anc))
+        .map(|j| {
+            let mut rows = check_rows(env, j, anc);
+            if !j.entry.copies.is_empty() {
+                for row in &mut rows {
+                    copied_row(row, &j.entry.at.location.render(), &j.entry.copies);
+                }
+            }
+            rows
+        })
         .filter(|rows| !rows.is_empty())
         .collect();
     Evaluation {
@@ -1285,8 +1358,15 @@ fn descend<'a>(
         };
         if cause == Cause::Satisfied {
             anc.push(here);
-            out.extend(descend(env, &chain[1..], anc, empty));
+            let mut below = descend(env, &chain[1..], anc, empty);
             anc.pop();
+            if !judged.entry.copies.is_empty() {
+                let first = judged.entry.at.location.render();
+                for evaluation in &mut below {
+                    copied_evaluation(evaluation, &first, &judged.entry.copies);
+                }
+            }
+            out.extend(below);
         } else if cause != Cause::Value {
             here.name = parent.clone();
             anc.push(here);

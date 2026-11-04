@@ -34,6 +34,7 @@ pub enum How {
 pub struct Item {
     pub how: How,
     pub path: Path,
+    pub distinct: bool,
     pub whose: Vec<Check>,
     pub alias: String,
 }
@@ -196,6 +197,7 @@ pub fn lower_for(
                 whose,
                 if_any,
                 alias,
+                ..
             } => (
                 path,
                 whose,
@@ -265,6 +267,7 @@ pub fn lower_for(
             items.push(Item {
                 how,
                 path,
+                distinct: matches!(item, s::ForItem::Walk { distinct: true, .. }),
                 whose: checks,
                 alias: alias.clone(),
             });
@@ -308,6 +311,23 @@ struct Live<'a> {
     order: Vec<Seg>,
     shown: Value,
     location: Location,
+    copies: Vec<String>,
+}
+
+fn merged_live(live: Vec<Live<'_>>) -> Vec<Live<'_>> {
+    let mut out: Vec<Live> = Vec::new();
+    let mut seen: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
+    for entry in live {
+        let key = crate::value::copy_key(entry.at.value);
+        match seen.get(&key) {
+            Some(&at) => out[at].copies.push(entry.location.render()),
+            None => {
+                seen.insert(key, out.len());
+                out.push(entry);
+            }
+        }
+    }
+    out
 }
 
 struct Dead {
@@ -559,6 +579,7 @@ impl For {
                     order: w.item_segs.clone(),
                     shown: end.clone(),
                     location: w.end_location.clone(),
+                    copies: Vec::new(),
                 }),
                 None => dead.push(dead_item(
                     if matches!(w.miss, Cause::Absent | Cause::NotAnObject) {
@@ -568,6 +589,9 @@ impl For {
                     },
                 )),
             }
+        }
+        if item.distinct {
+            live = merged_live(live);
         }
         if depth > 0 {
             let first = &self.items[0].alias;
@@ -875,6 +899,7 @@ struct Child {
     entry: Dead,
     failed: Option<Outcome>,
     sfails: Vec<Sfail>,
+    copies: Vec<String>,
 }
 
 struct Outcome {
@@ -1108,11 +1133,26 @@ impl For {
             if outcome.is_none() {
                 passed += 1;
             }
+            let (mut outcome, mut sfails) = (outcome, sfails);
+            if !live.copies.is_empty() {
+                let first = live.location.render();
+                for sfail in &mut sfails {
+                    for input in &mut sfail.inputs {
+                        crate::value::copy_locations(input, &first, &live.copies);
+                    }
+                }
+                if let Some(found) = &mut outcome {
+                    for assertion in &mut found.assertions {
+                        crate::value::copy_locations(assertion, &first, &live.copies);
+                    }
+                }
+            }
             children.push(Child {
                 order: live.order,
                 entry,
                 failed: outcome,
                 sfails,
+                copies: live.copies,
             });
         }
         let _ = list_name;
@@ -1770,6 +1810,7 @@ impl For {
                 order,
                 mut entry,
                 failed: outcome,
+                copies,
                 ..
             } = child;
             let Some(outcome) = outcome else {
@@ -1812,8 +1853,27 @@ impl For {
             } else {
                 outcome.cause
             };
+            let first = entry.location.as_ref().map(Location::render);
             let inner = inner.iter().map(Dead::plain).collect();
-            failed.push((order, entry.json(outcome.assertions, inner)));
+            let mut json = entry.json(outcome.assertions, inner);
+            if let Some(first) = first.filter(|_| !copies.is_empty()) {
+                for key in ["locations", "failed_items"] {
+                    if let Some(found) = json.get_mut(key) {
+                        let mut wrapped = json!({ "locations": found.take() });
+                        if key == "locations" {
+                            crate::value::copy_locations(&mut wrapped, &first, &copies);
+                        } else {
+                            crate::value::copy_locations(
+                                &mut wrapped["locations"],
+                                &first,
+                                &copies,
+                            );
+                        }
+                        *found = wrapped["locations"].take();
+                    }
+                }
+            }
+            failed.push((order, json));
         }
         let hoisted_ties: Vec<&Dead> = hoisted
             .iter()

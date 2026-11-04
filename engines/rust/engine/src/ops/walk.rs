@@ -16,6 +16,7 @@ pub enum Quantifier {
 pub struct Walk {
     pub quantifier: Quantifier,
     pub path: Path,
+    pub distinct: bool,
     pub whose: Vec<Check>,
     pub if_any: bool,
     pub check: Box<Check>,
@@ -70,6 +71,7 @@ pub struct Failure {
     pub cause: Cause,
     pub value: Value,
     pub location: Option<Location>,
+    pub copies: Vec<String>,
     pub msg: String,
 }
 
@@ -109,7 +111,8 @@ fn rank_of_path(path: &Path) -> Vec<Rank> {
 
 impl Failure {
     pub fn to_json(&self) -> Value {
-        let locations: Vec<String> = self.location.iter().map(Location::render).collect();
+        let mut locations: Vec<String> = self.location.iter().map(Location::render).collect();
+        locations.extend(self.copies.iter().cloned());
         json!({
             "path": self.path,
             "item": self.item,
@@ -592,6 +595,7 @@ pub fn walk<'a>(path: &Path, ctx: &Ctx<'a>, options: Options) -> Walked<'a> {
             cause: raw.cause,
             value: raw.value,
             location: Some(raw.location),
+            copies: Vec::new(),
         })
         .collect();
     failures.sort_by(|a, b| a.order.cmp(&b.order));
@@ -751,7 +755,34 @@ fn named_side<'a>(check: &'a Check, ctx: &Ctx<'a>) -> Option<(&'a Path, path::Re
 struct Judged {
     kept: bool,
     passed: bool,
+    decided: bool,
     failure: Option<Failure>,
+}
+
+fn merged_copies(walked: &Walked, judged: Vec<Judged>) -> Vec<Judged> {
+    let mut out: Vec<Judged> = Vec::new();
+    let mut seen: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
+    for (item, j) in walked.items.iter().zip(judged) {
+        let key = match item.end {
+            Some(end) if j.kept && j.decided => crate::value::copy_key(end),
+            _ => {
+                out.push(j);
+                continue;
+            }
+        };
+        match seen.get(&key) {
+            Some(&at) => {
+                if let Some(failure) = &mut out[at].failure {
+                    failure.copies.push(item.end_location.render());
+                }
+            }
+            None => {
+                seen.insert(key, out.len());
+                out.push(j);
+            }
+        }
+    }
+    out
 }
 
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
@@ -827,6 +858,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                         .and_then(|r| r.value.cloned())
                         .unwrap_or(Value::Null),
                     location: read.and_then(|r| r.location),
+                    copies: Vec::new(),
                 })
             } else if kept && !passed {
                 let off = message::off_item(&leaf_check, ctx, leaf.cause);
@@ -848,6 +880,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     cause: leaf.cause,
                     value: item.shown(),
                     location: Some(item.end_location.clone()),
+                    copies: Vec::new(),
                 })
             } else {
                 None
@@ -855,6 +888,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
             Judged {
                 kept,
                 passed,
+                decided: undecided.is_none(),
                 failure,
             }
         })
@@ -932,6 +966,11 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
         };
     }
     let judged = judge(walk, &walked, &outer);
+    let judged = if walk.distinct {
+        merged_copies(&walked, judged)
+    } else {
+        judged
+    };
     let mut fails: Vec<&Failure> = walked.failures.iter().collect();
     fails.extend(judged.iter().filter_map(|j| j.failure.as_ref()));
     let cause = cause_of(walk, &walked, &judged, &fails);
@@ -1075,6 +1114,7 @@ mod tests {
         Walk {
             quantifier: Quantifier::Every,
             path: at(Start::Subject, steps),
+            distinct: false,
             whose,
             if_any,
             check: Box::new(check),
@@ -1514,6 +1554,7 @@ mod tests {
         let walk = Walk {
             quantifier: Quantifier::Every,
             path,
+            distinct: false,
             whose: vec![],
             if_any: false,
             check: Box::new(equals(json!(2))),
@@ -1543,6 +1584,7 @@ mod tests {
                 start,
                 steps: vec![key("s")],
             },
+            distinct: false,
             whose: vec![],
             if_any: false,
             check: Box::new(equals(json!("bad"))),
