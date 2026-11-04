@@ -11762,6 +11762,41 @@ test_named_by_each_of_params_or_input_is_still_read_in_a_child_from_line if {
 	rows == [["p", "satisfied"]]
 }
 
+_from_params_rows(line, params) := [[r.check, r.cause, r.message] |
+	some r in ergo.report({"things": {"k": {"id": "t"}}}, {"ergo_spec": "v0.5-dev", "subjects": {"s": {"from": line}}, "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}}, params).results
+	not r.check in {"$well_formed", "$unique_ids"}
+]
+
+test_a_from_line_that_reads_params_that_are_not_an_object_names_the_params_and_not_the_object if {
+	every case in [[3, "3"], ["s", "\"s\""], [true, "true"], [[], "[]"], [[3], "[3]"], [[[1]], "[[1]]"], [[{"v": 1}], "[{\"v\": 1}]"], [[["k"]], "[[\"k\"]]"]] {
+		message := concat("", ["$params is ", case[1], ", which isn't an object"])
+		_from_params_rows("things named by each of $params.ks", case[0]) == [["$min_subjects", "unusable", message]]
+		_from_params_rows("things named by $params.env named by each of $params.ks", case[0]) == [["$min_subjects", "unusable", message]]
+		_from_params_rows("every things named by $params.env", case[0]) == [["$min_subjects", "unusable", message]]
+	}
+}
+
+test_a_from_line_that_reads_a_position_of_the_params_names_what_it_found_there if {
+	_from_params_rows("things named by each of $params[0]", 3) == [["$min_subjects", "unusable", "$params is 3, which isn't a list"]]
+	_from_params_rows("things named by each of $params[0]", [3]) == [["$min_subjects", "unusable", "item 1 of $params is 3, which isn't a list of text"]]
+	_from_params_rows("things named by each of $params[0].ks", [3]) == [["$min_subjects", "unusable", "item 1 of $params is 3, which isn't an object"]]
+	_from_params_rows("things named by each of $params[0].ks", [{"ks": 3}]) == [["$min_subjects", "unusable", "$params[0].ks is 3, which isn't a list of text"]]
+}
+
+test_a_from_line_that_reads_the_input_and_params_that_are_not_an_object_names_both if {
+	_from_params_rows("things named by $input.nope named by each of $params.ks", 3) == [["$min_subjects", "unusable", "$input.nope is missing; $params is 3, which isn't an object"]]
+}
+
+test_a_from_line_makes_no_subjects_from_keys_in_params_that_are_not_an_object if {
+	_from_params_rows("things named by each of $params[0]", [["k"]]) == [["$min_subjects", "unusable", "$params is [[\"k\"]], which isn't an object"]]
+	_from_params_rows("things named by each of $params[0].ks", [{"ks": ["k"]}]) == [["$min_subjects", "unusable", "$params is [{\"ks\": [\"k\"]}], which isn't an object"]]
+}
+
+test_a_from_line_that_reads_null_params_says_the_param_is_missing if {
+	_from_params_rows("things named by each of $params.ks", null) == [["$min_subjects", "absent", "$params.ks is missing"]]
+	_from_params_rows("things named by $params.env", null) == [["$min_subjects", "absent", "$params.env is missing"]]
+}
+
 params_position_messages := {row.check: row.message |
 	some row in report(
 		{"items": [{"id": 1, "zz": "a"}]},

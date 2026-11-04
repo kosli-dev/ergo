@@ -707,7 +707,10 @@ _from_unreadable(req) if {
 	not is_string(k)
 }
 
-_from_cause(req) := flaws[0] if {
+_from_cause(req) := "unusable" if {
+	some r in _m_from_ref_list(req)
+	_m_from_params_unread(r.ref)
+} else := flaws[0] if {
 	flaws := _from_path_flaws(req)
 	count(flaws) > 0
 } else := _worst_of(unread) if {
@@ -11696,10 +11699,31 @@ _m_input_item_name(path) := concat(": ", [_input_path_name([path[0]]), _m_item_n
 	is_number(path[0])
 } else := _m_item_name(path, set())
 
-_m_from_refs(req, cause) := ms if {
+_m_from_refs(req, cause) := _once([m | some r in _m_from_ref_list(req); m := _m_from_ref_said(r)]) if {
+	some r in _m_from_ref_list(req)
+	_m_from_params_unread(r.ref)
+} else := ms if {
 	ms := [m | some r in _m_from_ref_list(req); m := _m_from_ref_text(r, cause)]
 	count(ms) > 0
 } else := [m | some r in _m_from_ref_list(req); m := _m_from_ref_text(r, _m_from_ref_cause(r))]
+
+_m_from_ref_said(r) := _m_from_params_text(r) if _m_from_params_unread(r.ref)
+
+_m_from_ref_said(r) := _m_from_ref_text(r, _m_from_ref_cause(r)) if not _m_from_params_unread(r.ref)
+
+_m_from_params_unread(ref) if {
+	ref[0] == "$$params"
+	not is_object(data.ergo_params)
+	data.ergo_params != null
+}
+
+_m_from_params_text(r) := _m_isnt(_ref_name(r.ref), v, r.kind) if {
+	_ref_state(r.ref) == "value"
+	v := _ref_read(r.ref)
+	not _m_from_ref_fits(v, r.kind)
+} else := c if {
+	some c in _m_params_break(r.ref)
+} else := _m_isnt("$params", data.ergo_params, "an object")
 
 _m_from_ref_list(req) := array.concat(
 	[{"ref": r, "kind": "text"} | some r in sort({seg.ref | some seg in _from_path(req); _is_ref(seg)})],
