@@ -2,7 +2,7 @@
   {
     "description": "any_of",
     "policy": {
-      "ergo_spec": "v0.5-dev",
+      "ergo_spec": "v0.5",
       "subjects": {
         "thing": {
           "from": "things",
@@ -72,7 +72,7 @@
   {
     "description": "any_of with a present check in an option",
     "policy": {
-      "ergo_spec": "v0.5-dev",
+      "ergo_spec": "v0.5",
       "subjects": {
         "thing": {
           "from": "things",
@@ -100,7 +100,7 @@
   {
     "description": "any_of with a name that starts like another",
     "policy": {
-      "ergo_spec": "v0.5-dev",
+      "ergo_spec": "v0.5",
       "subjects": {
         "thing": {
           "from": "things",
@@ -160,7 +160,7 @@
   {
     "description": "any_of with a ref to a missing param",
     "policy": {
-      "ergo_spec": "v0.5-dev",
+      "ergo_spec": "v0.5",
       "subjects": {
         "thing": {
           "from": "things",
@@ -239,7 +239,7 @@
   {
     "description": "any_of with a ref to a param of the wrong type",
     "policy": {
-      "ergo_spec": "v0.5-dev",
+      "ergo_spec": "v0.5",
       "subjects": {
         "thing": {
           "from": "things",
@@ -297,7 +297,7 @@
   },
   {
     "description": "a check with several assertions that read the same field",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x exists", "x is 1"]}}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x exists", "x is 1"]}}}}},
     "cases": [
       {
         "description": "lists the field once, with its location",

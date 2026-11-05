@@ -2170,7 +2170,7 @@ mod tests {
 
     fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.5-dev",
+            "ergo_spec": "v0.5",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertions}}}}
         });
@@ -2200,7 +2200,7 @@ mod tests {
 
     fn problems(for_line: &str) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.5-dev",
+            "ergo_spec": "v0.5",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": "x exists"}}}}
         });
@@ -2363,7 +2363,7 @@ mod tests {
     #[test]
     fn a_subject_that_is_not_an_object_fails_as_not_an_object_with_nothing_listed() {
         let policy = json!({
-            "ergo_spec": "v0.5-dev",
+            "ergo_spec": "v0.5",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": "x is 1"}}}}
         });
@@ -2384,7 +2384,7 @@ mod tests {
      {
         for subject in [json!(["a"]), json!("text"), json!([]), json!([{"k": 1}])] {
             let policy = json!({
-                "ergo_spec": "v0.5-dev",
+                "ergo_spec": "v0.5",
                 "subjects": {"thing": {"from": "every xs"}},
                 "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every thing as k", "assert": "k is 1"}}}}
             });
@@ -2404,7 +2404,7 @@ mod tests {
     #[test]
     fn a_failed_assertion_keeps_the_dot_of_a_field_named_like_the_subject() {
         let policy = json!({
-            "ergo_spec": "v0.5-dev",
+            "ergo_spec": "v0.5",
             "subjects": {"thing": {"from": "every xs"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every ys as k", "assert": ".thing is 1"}}}}
         });
@@ -2533,7 +2533,7 @@ mod tests {
     #[test]
     fn a_failed_count_whose_whose_reads_a_part_lists_the_parts_value_with_its_location() {
         let policy = json!({
-            "ergo_spec": "v0.5-dev",
+            "ergo_spec": "v0.5",
             "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {
                 "for": "every groups as g",

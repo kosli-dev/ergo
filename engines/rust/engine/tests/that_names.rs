@@ -4,7 +4,7 @@ fn report(name: &str, from: &str) -> Value {
     ergo_policy_engine::report(
         &json!({"ws": ["bay", "apple"], "items": [{"kind": "a"}, "x"]}),
         &json!({
-            "ergo_spec": "v0.5-dev",
+            "ergo_spec": "v0.5",
             "subjects": {name: {"from": from}},
             "requirements": {"r": {"subject": name, "checks": {"c": "it is not empty"}}}
         }),
@@ -48,7 +48,7 @@ fn a_subject_named_like_a_field_its_whose_reads_lists_the_field_and_the_item_apa
     let report = ergo_policy_engine::report(
         &json!({"ws": [null]}),
         &json!({
-            "ergo_spec": "v0.5-dev",
+            "ergo_spec": "v0.5",
             "subjects": {"x": {"from": "every ws whose x is 1 and that is not empty"}},
             "requirements": {"r": {"subject": "x", "checks": {"c": "it is not empty"}}}
         }),

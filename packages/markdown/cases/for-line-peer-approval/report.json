@@ -5,7 +5,7 @@
     "name": "ergo-rego",
     "version": "ergo.rego's version"
   },
-  "ergo": "v0.5-dev",
+  "ergo": "v0.5",
   "meta": {},
   "requirements": {
     "release": {
