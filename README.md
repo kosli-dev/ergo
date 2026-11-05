@@ -158,6 +158,7 @@ The report holds every row, passed or failed. To tell someone only what went wro
         "value": null
       }
     ],
+    "message": "approved_by is missing",
     "requirement": "prod_deploy",
     "subject": {
       "id": "d-2",
