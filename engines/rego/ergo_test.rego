@@ -11485,6 +11485,133 @@ test_a_param_that_walks_a_list_of_objects_compares_with_what_it_reads_from_each_
 	]
 }
 
+test_a_ref_that_starts_at_a_list_input_walks_its_items if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {"c": {"description": "d", "assert": "id is in $input.id"}}}}}
+	report := ergo.report([{"id": "a"}, {"id": "b"}], policy, {})
+	[[r.passed, r.cause] | some r in report.results; r.check == "c"] == [[true, "satisfied"], [true, "satisfied"]]
+	report.requirements.r.checks.c["$refs"] == [{"name": "$input[].id", "value": ["a", "b"], "locations": ["/0/id", "/1/id"]}]
+}
+
+test_a_ref_that_starts_at_a_list_input_fails_when_an_item_cant_be_read if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {"c": {"description": "d", "assert": "id is in $input.id"}}}}}
+	every doc, want in {
+		`[{"id": "a"}, {}]`: [[false, "absent", "item 2 of $input: id is missing"], [false, "absent", "id is missing, and item 2 of $input: id is missing"]],
+		`[{"id": null}]`: [[false, "null", "id is null, and item 1 of $input: id is null"]],
+		`[1]`: [[false, "unusable", "item 1 of $input is 1, which isn't an object"]],
+		`[[{"id": "a"}]]`: [[false, "unusable", "item 1 of $input is [{\"id\": \"a\"}], which isn't an object"]],
+	} {
+		[[r.passed, r.cause, r.message] | some r in ergo.report(json.unmarshal(doc), policy, {}).results; r.check == "c"] == want
+	}
+}
+
+_list_key_policy(subj, check) := {"ergo_spec": "v0.5-dev", "subjects": {"t": subj}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {"c": {"description": "d", "assert": check}}}}}
+
+test_named_by_each_of_a_ref_into_a_list_input_reads_one_list_and_does_not_walk_the_items if {
+	m := {"x": {"v": 1}, "y": {"v": 2}}
+	every doc in [[{"id": "a", "k": "x", "m": m}, {"id": "b", "k": "y"}], [{"id": "a", "k": "x", "m": m}]] {
+		rep := ergo.report(doc, _list_key_policy({"from": "$input[0].m named by each of $input.k"}, "v is 1"), {})
+		[[r.passed, r.cause] | some r in rep.results; r.check in {"$min_subjects", "c"}] == [[false, "unusable"]]
+		rep.requirements.r.subjects == {"matching": 0, "total": 0}
+	}
+}
+
+test_a_named_by_key_read_from_a_list_input_is_not_walked if {
+	policy := _list_key_policy({"from": "$input", "identified_by": "id"}, "m named by $input.k exists")
+	every doc in [[{"id": "a", "k": "x", "m": {"x": 1}}, {"id": "b"}], [{"id": "a", "k": null, "m": {"x": 1}}], [{"id": "a", "k": 3, "m": {"x": 1}}]] {
+		rows := [[r.passed, r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"]
+		count(rows) > 0
+		every row in rows {
+			row == [false, "unusable", concat("", ["$input is ", ergo._text(doc), ", which isn't an object"])]
+		}
+	}
+}
+
+test_a_right_side_walks_a_list_input_whatever_another_check_reads_as_a_key if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {
+		"c": {"description": "d", "assert": "id is in $input.k"},
+		"d": {"description": "d", "assert": "m named by $input.k exists"},
+	}}}}
+	doc := [{"id": "x", "k": "x", "m": {"x": 1}}]
+	rep := ergo.report(doc, policy, {})
+	[[r.check, r.passed, r.cause] | some r in rep.results; r.check in {"c", "d"}] == [["c", true, "satisfied"], ["d", false, "unusable"]]
+	rep.requirements.r.checks.c["$refs"] == [{"name": "$input[].k", "value": ["x"], "locations": ["/0/k"]}]
+	rep.requirements.r.checks.d["$refs"] == [{"name": "$input.k", "value": null, "locations": [""]}]
+}
+
+test_every_list_phrase_walks_a_list_input_on_its_right_side if {
+	doc := [{"id": "a", "k": "x", "p": "^a", "tags": ["x"], "nest": [["x"]]}, {"id": "b", "k": "y", "p": "^b", "tags": ["z"], "nest": [["z"]]}]
+	every check, want in {
+		"id is one of $input.id": [true, true],
+		"id is not one of $input.id": [false, false],
+		"nest contains $input.k": [false, false],
+		"nest does not contain $input.k": [true, true],
+		"tags contains all of $input.k": [false, false],
+		"tags contains none of $input.k": [false, true],
+		"tags contains some of $input.k": [true, false],
+		"tags does not contain all of $input.k": [true, true],
+		"id matches $input.p": [true, true],
+		"id does not match $input.p": [false, false],
+	} {
+		rows := [r | some r in ergo.report(doc, _list_key_policy({"from": "$input", "identified_by": "id"}, check), {}).results; r.check == "c"]
+		[r.passed | some r in rows] == want
+		every r in rows {
+			r.cause in {"satisfied", "value"}
+		}
+	}
+}
+
+test_a_count_whose_right_side_walks_a_list_input_fails_with_the_first_cause_in_order if {
+	every check in ["count of m whose v is in $input.v is 1", "sum of m.v whose v is in $input.v is 1"] {
+		policy := _list_key_policy({"from": "$input", "identified_by": "id"}, check)
+		every m in [{"v": 1}, "s", 3] {
+			[[r.subject.id, r.cause] | some r in ergo.report([{"id": "a", "v": 1, "m": m}, {"id": "b"}], policy, {}).results; r.check == "c"] == [["a", "unusable"], ["b", "absent"]]
+		}
+		[[r.subject.id, r.cause] | some r in ergo.report([{"id": "a", "v": 1, "m": "s"}, {"id": "b", "v": null}], policy, {}).results; r.check == "c"] == [["a", "unusable"], ["b", "absent"]]
+	}
+}
+
+test_a_position_after_a_walked_ref_names_the_value_that_isnt_a_list if {
+	every check, doc in {
+		"id is in $input.l[0]": [{"id": "a", "l": ["a"]}, {"id": "b", "l": "ab"}],
+		"id is in $input.o[0]": [{"id": "a", "o": {"x": 1}, "l": ["a"]}, {"id": "b", "o": {"x": 1}}],
+	} {
+		rows := [[r.passed, r.cause, r.message] | some r in ergo.report(doc, _list_key_policy({"from": "$input", "identified_by": "id"}, check), {}).results; r.check == "c"]
+		count(rows) == 2
+		every row in rows {
+			row[0] == false
+			row[1] == "unusable"
+			endswith(row[2], "which isn't a list")
+		}
+	}
+	rows := [[r.cause, r.message] | some r in ergo.report({"w": [{"id": "a"}], "things": [{"id": "a"}]}, _list_key_policy({"from": "things", "identified_by": "id"}, "id is in $input.w.id[0]"), {}).results; r.check == "c"]
+	rows == [["unusable", "item 1 of $input.w: id is \"a\", which isn't a list"]]
+	past := [[r.cause, r.message] | some r in ergo.report([{"id": "a", "l": [{"x": "a"}]}, {"id": "b", "l": ["b"]}], _list_key_policy({"from": "$input", "identified_by": "id"}, "id is in $input.l[0].x"), {}).results; r.check == "c"]
+	count(past) == 2
+	every row in past {
+		row[0] == "unusable"
+		endswith(row[1], "is \"b\", which isn't an object")
+	}
+}
+
+test_a_named_by_key_read_from_an_object_input_reads_one_key if {
+	policy := _list_key_policy({"from": "$input.things", "identified_by": "id"}, "m named by $input.k exists")
+	rows := [[r.passed, r.cause] | some r in ergo.report({"k": "x", "things": [{"id": "a", "m": {"x": 1}}]}, policy, {}).results; r.check == "c"]
+	rows == [[true, "satisfied"]]
+}
+
+test_a_ref_that_starts_at_params_that_are_a_list_is_not_walked if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {"c": {"description": "d", "assert": "id is in $params.id"}}}}}
+	report := ergo.report([{"id": "a"}], policy, [{"id": "a"}])
+	[[r.passed, r.cause, r.message] | some r in report.results; r.check == "c"] == [[false, "unusable", "$params is [{\"id\": \"a\"}], which isn't an object"]]
+	report.requirements.r.checks.c["$refs"] == [{"name": "$params.id", "value": null, "locations": ["$params:"]}]
+}
+
+test_a_ref_that_starts_at_an_alias_that_is_a_list_is_not_walked if {
+	policy := {"ergo_spec": "v0.5-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {"c": {"description": "d", "for": "every deps as d", "assert": "id is in d.name"}}}}}
+	doc := {"things": [{"id": "a", "deps": [[{"name": "a"}]]}]}
+	[[r.passed, r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"] == [[false, "not_an_object", "item 1 of deps is [{\"name\": \"a\"}], which isn't an object"]]
+}
+
 test_every_list_phrase_fails_every_row_as_absent_when_an_item_has_no_value_even_the_rows_that_would_pass if {
 	every _, words in _list_phrases {
 		every row in _walk_right_rows(concat("", ["x ", words, " $input.sbom.components.name"]), _walk_right_doc([{"name": "click"}, {}]), {}) {

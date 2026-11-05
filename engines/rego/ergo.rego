@@ -1147,9 +1147,18 @@ _once_shaped(check) if {
 _ref_cause(check) := check["$ref_cause"] if {
 	is_object(check)
 	"$ref_cause" in object.keys(check)
-} else := _worst_of({_used_ref_state(check, r) | some r in _check_refs(check)}) if {
+} else := _worst_of(states) if {
 	_unreadable_ref(check)
+	states := {s | some r in _unwhosed_refs(check); s := _used_ref_state(check, r); s != "value"}
+	count(states) > 0
 } else := ""
+
+_unwhosed_refs(check) := {x.ref |
+	walk(check, [p, x])
+	_is_ref(x)
+	not _under_literal(check, p)
+	not "whose" in p
+}
 
 _derived_eval(check, subj) := {"passed": passed, "cause": cause, "inputs": array.concat(l.inputs, r.inputs)} if {
 	l := _side_eval(subj, check.left)
@@ -1500,6 +1509,8 @@ _start_of(subj, path) := subj if not _named(path)
 
 _start_of(_, path) := data.ergo_document if path[0] == "$$input"
 
+_start_of(_, path) := data.ergo_document if path[0] == "$$input[]"
+
 _start_of(_, path) := data.ergo_params if path[0] == "$$params"
 
 _start_of(_, path) := input["ergo/names"][substring(path[0], 1, -1)] if {
@@ -1567,6 +1578,8 @@ _row_input(at) := {"ergo/names": {"$at": {"names": _parent_ats, "subject": at}}}
 _start_at(path) := _subject_at if not _named(path)
 
 _start_at(path) := "" if path[0] == "$$input"
+
+_start_at(path) := "" if path[0] == "$$input[]"
 
 _start_at(path) := "$params:" if path[0] == "$$params"
 
@@ -1911,6 +1924,17 @@ _rwalks(x, path) if {
 	is_array(object.get(start, array.slice(keys, 0, i), _absent))
 }
 
+_rwalks(_, path) if {
+	path[0] == "$$input[]"
+	is_array(data.ergo_document)
+	keys := _rkeys(path)
+	doc := {"start": data.ergo_document}
+	object.get(doc, array.concat(["start"], keys), _absent) == _absent
+	some i, k in keys
+	is_string(k)
+	is_array(object.get(doc, array.concat(["start"], array.slice(keys, 0, i)), _absent))
+}
+
 _rwalk_run(x, path) := _walk(_walk_start({"path": path}, x), _rkeys(path), false)
 
 _rwalk_item_states(e) := {"unusable"} if {
@@ -1950,7 +1974,7 @@ _rwalk_item_fails(e, roots) := [{"path": e.i, "item": e.i, "cause": "unusable", 
 	not is_object(e.iv)
 }
 
-_rwalk_item_fails(e, roots) := [{"path": broken, "item": e.i, "cause": "unusable", "value": v, "msg": _m_isnt(_m_item_name(broken, roots), v, "an object")}] if {
+_rwalk_item_fails(e, roots) := [{"path": broken, "item": e.i, "cause": "unusable", "value": v, "msg": _m_isnt(_m_item_name(broken, roots), v, _rwalk_wants(e.r[i]))}] if {
 	e.v == _unusable_mark
 	is_object(e.iv)
 	i := _rwalk_break(e)
@@ -1963,9 +1987,22 @@ _rwalk_break(e) := min({i |
 	v := object.get(e.iv, array.slice(e.r, 0, i), _absent)
 	v != _absent
 	v != null
-	not is_object(v)
-	is_string(k)
+	not _rwalk_holds(v, k)
 })
+
+_rwalk_holds(v, k) if {
+	is_string(k)
+	is_object(v)
+}
+
+_rwalk_holds(v, k) if {
+	is_number(k)
+	is_array(v)
+}
+
+_rwalk_wants(k) := "an object" if is_string(k)
+
+_rwalk_wants(k) := "a list" if is_number(k)
 
 _walked_side(r) if {
 	is_object(r)
@@ -2116,12 +2153,14 @@ _nameable_step(p) if {
 
 _plain_step_name(0, "$$input") := "$input"
 
+_plain_step_name(0, "$$input[]") := "$input"
+
 _plain_step_name(0, "$$params") := "$params"
 
 _plain_step_name(0, step) := step if {
 	is_string(step)
 	startswith(step, "$")
-	not step in {"$$input", "$$params", "$input", "$params"}
+	not step in {"$$input", "$$input[]", "$$params", "$input", "$params"}
 	not _parent_name(step)
 	not _for_alias_step(step)
 }
@@ -3462,7 +3501,7 @@ _refs_problem(node) := {"invalid ref" |
 
 _known_ref(r) if {
 	is_array(r)
-	r[0] in {"$$input", "$$params"}
+	r[0] in {"$$input", "$$input[]", "$$params"}
 	every seg in array.slice(r, 1, count(r)) {
 		_is_key(seg)
 	}
@@ -3507,7 +3546,7 @@ _unknown_name_problem(node, names) := {concat("", ["unknown alias ", p[0]]) |
 	not _name_known(p[0], names)
 }
 
-_name_known(start, _) if start in {"$$input", "$$params"}
+_name_known(start, _) if start in {"$$input", "$$input[]", "$$params"}
 
 _name_known(start, names) if {
 	_part_start([start])
@@ -3522,7 +3561,7 @@ _name_known(start, names) if {
 }
 
 _name_known(start, names) if {
-	not start in {"$$input", "$$params"}
+	not start in {"$$input", "$$input[]", "$$params"}
 	substring(start, 1, -1) in names
 }
 
@@ -8692,11 +8731,15 @@ _s_term_side(t) := {concat("", [k, "_of"]): _s_model_path(t[k]), "whose": [], "t
 
 _s_one(ph) := ph.value if "value" in object.keys(ph)
 
-_s_one(ph) := {"ref": _s_model_path(ph.terms[0])} if "terms" in object.keys(ph)
+_s_one(ph) := {"ref": _s_walked(_s_model_path(ph.terms[0]))} if "terms" in object.keys(ph)
 
 _s_list(ph) := ph.values if "values" in object.keys(ph)
 
-_s_list(ph) := {"ref": _s_model_path(ph.path)} if "path" in object.keys(ph)
+_s_list(ph) := {"ref": _s_walked(_s_model_path(ph.path))} if "path" in object.keys(ph)
+
+_s_walked(p) := array.concat(["$$input[]"], array.slice(p, 1, count(p))) if p[0] == "$$input"
+
+else := p
 
 _s_model_path(p) := array.concat(array.concat(_s_model_start(p), [_s_model_step(s) | some s in array.slice(p.steps, _s_first_step(p), count(p.steps))]), _s_model_position(p))
 

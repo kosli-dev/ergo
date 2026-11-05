@@ -326,6 +326,162 @@
     ]
   },
   {
+    "description": "a ref on the right side that starts at an input that is a list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id is in $input.id"}}}},
+    "cases": [
+      {
+        "description": "walks the items of the input",
+        "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.inputs"],
+        "input": [{"id": "a"}, {"id": "b"}],
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ],
+        "refs": {"s": {"c": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}]}}
+      },
+      {
+        "description": "fails every row as absent when an item of the input has no value",
+        "rules": ["walk.right", "walk.right.fail", "walk.right.inputs"],
+        "input": [{"id": "a"}, {}],
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "item 2 of $input: id is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/1"], "name": "id", "value": null}], "message": "id is missing, and item 2 of $input: id is missing", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ],
+        "refs": {"s": {"c": [{"locations": ["/0/id", "/1"], "name": "$input[].id", "value": ["a", null]}]}}
+      },
+      {
+        "description": "fails every row as unusable when an item of the input is not an object",
+        "rules": ["walk.right", "walk.right.fail"],
+        "input": [{"id": "a"}, 1],
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "item 2 of $input is 1, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/1"], "name": "id", "value": null}], "message": "item 2 of $input is 1, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 1, "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a position after a ref on the right side that walks an input that is a list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id is in $input.l[0]"}}}},
+    "cases": [
+      {
+        "description": "fails every row as unusable and names the value when an item holds text where the position needs a list",
+        "rules": ["walk.right", "walk.right.fail", "path.unusable"],
+        "input": [{"id": "a", "l": ["a"]}, {"id": "b", "l": "ab"}],
+        "results": [
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "item 2 of $input: l is \"ab\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "item 2 of $input: l is \"ab\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "every phrase that takes a list, with a ref on the right side that starts at an input that is a list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"one_of": "id is one of $input.id", "not_one_of": "id is not one of $input.id", "contains": "nest contains $input.k", "not_contains": "nest does not contain $input.k", "all_of": "tags contains all of $input.k", "none_of": "tags contains none of $input.k", "some_of": "tags contains some of $input.k", "not_all_of": "tags does not contain all of $input.k", "matches": "id matches $input.p", "not_matches": "id does not match $input.p"}}}},
+    "cases": [
+      {
+        "description": "compares with what each item of the input holds, with every phrase that takes a list",
+        "rules": ["walk.right", "compare.list", "walk.right.inputs", "sentence.phrase.one_of", "sentence.phrase.contains", "sentence.phrase.contains_all", "sentence.phrase.matches"],
+        "input": [{"id": "a", "k": "x", "p": "^a", "tags": ["x"], "nest": [["x"]]}, {"id": "b", "k": "y", "p": "^b", "tags": ["z"], "nest": [["z"]]}],
+        "results": [
+          {"cause": "value", "check": "all_of", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "message": "tags is [\"x\"], and $input[].k is [\"x\", \"y\"]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "contains", "inputs": [{"locations": ["/0/nest"], "name": "nest", "value": [["x"]]}], "message": "nest is [[\"x\"]], and $input[].k is [\"x\", \"y\"]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "matches", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "none_of", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "message": "tags is [\"x\"], and $input[].k is [\"x\", \"y\"]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "not_all_of", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "not_contains", "inputs": [{"locations": ["/0/nest"], "name": "nest", "value": [["x"]]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "not_matches", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "id is \"a\", and $input[].p is [\"^a\", \"^b\"]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "not_one_of", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "id is \"a\", and $input[].id is [\"a\", \"b\"]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "one_of", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "some_of", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "all_of", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "message": "tags is [\"z\"], and $input[].k is [\"x\", \"y\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "contains", "inputs": [{"locations": ["/1/nest"], "name": "nest", "value": [["z"]]}], "message": "nest is [[\"z\"]], and $input[].k is [\"x\", \"y\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "matches", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "none_of", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "not_all_of", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "not_contains", "inputs": [{"locations": ["/1/nest"], "name": "nest", "value": [["z"]]}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "not_matches", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "id is \"b\", and $input[].p is [\"^a\", \"^b\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "not_one_of", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "id is \"b\", and $input[].id is [\"a\", \"b\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "one_of", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "some_of", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "message": "tags is [\"z\"], and $input[].k is [\"x\", \"y\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ],
+        "refs": {"s": {"all_of": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}], "contains": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}], "matches": [{"locations": ["/0/p", "/1/p"], "name": "$input[].p", "value": ["^a", "^b"]}], "none_of": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}], "not_all_of": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}], "not_contains": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}], "not_matches": [{"locations": ["/0/p", "/1/p"], "name": "$input[].p", "value": ["^a", "^b"]}], "not_one_of": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}], "one_of": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}], "some_of": [{"locations": ["/0/k", "/1/k"], "name": "$input[].k", "value": ["x", "y"]}]}}
+      },
+      {
+        "description": "fails every phrase that reads a missing value as absent, and is one of passes when every item has its value",
+        "rules": ["walk.right", "walk.right.fail"],
+        "input": [{"id": "a", "k": "x", "p": "^a", "tags": ["x"], "nest": [["x"]]}, {"id": "b", "tags": ["z"], "nest": [["z"]]}],
+        "results": [
+          {"cause": "absent", "check": "all_of", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "contains", "inputs": [{"locations": ["/0/nest"], "name": "nest", "value": [["x"]]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "matches", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "item 2 of $input: p is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "none_of", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "not_all_of", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "not_contains", "inputs": [{"locations": ["/0/nest"], "name": "nest", "value": [["x"]]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "not_matches", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "item 2 of $input: p is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "not_one_of", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "id is \"a\", and $input[].id is [\"a\", \"b\"]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "satisfied", "check": "one_of", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "some_of", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "all_of", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "absent", "check": "contains", "inputs": [{"locations": ["/1/nest"], "name": "nest", "value": [["z"]]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "absent", "check": "matches", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "item 2 of $input: p is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "absent", "check": "none_of", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "absent", "check": "not_all_of", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "absent", "check": "not_contains", "inputs": [{"locations": ["/1/nest"], "name": "nest", "value": [["z"]]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "absent", "check": "not_matches", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "item 2 of $input: p is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "value", "check": "not_one_of", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "id is \"b\", and $input[].id is [\"a\", \"b\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "one_of", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "absent", "check": "some_of", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "message": "item 2 of $input: k is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ],
+        "refs": {"s": {"all_of": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}], "contains": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}], "matches": [{"locations": ["/0/p", "/1"], "name": "$input[].p", "value": ["^a", null]}], "none_of": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}], "not_all_of": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}], "not_contains": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}], "not_matches": [{"locations": ["/0/p", "/1"], "name": "$input[].p", "value": ["^a", null]}], "not_one_of": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}], "one_of": [{"locations": ["/0/id", "/1/id"], "name": "$input[].id", "value": ["a", "b"]}], "some_of": [{"locations": ["/0/k", "/1"], "name": "$input[].k", "value": ["x", null]}]}}
+      }
+    ]
+  },
+  {
+    "description": "a ref in a whose of a from line that starts at an input that is a list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input whose id is in $input.ok.id", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "walks the items of the input to decide which subjects are in scope",
+        "rules": ["walk.right", "compare.list", "scope.filters"],
+        "input": [{"id": "a", "ok": {"id": "a"}}, {"id": "b", "ok": {"id": "c"}}],
+        "results": [
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/0"], "name": "in-scope thing count", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "id is \"b\", and $input[].ok.id is [\"a\", \"c\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+        ],
+        "requirements": {"s": {"subjects": {"matching": 1, "total": 2}}}
+      },
+      {
+        "description": "can't decide the scope of any subject when an item has no value",
+        "rules": ["walk.right", "walk.right.fail", "scope.unreadable"],
+        "input": [{"id": "a", "ok": {"id": "a"}}, {"id": "b", "ok": {}}],
+        "results": [
+          {"cause": "value", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope thing count", "value": 0}], "message": "in-scope thing count is 0", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}},
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "item 2 of $input: ok.id is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "item 2 of $input: ok.id is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ],
+        "requirements": {"s": {"subjects": {"matching": 0, "total": 2}}}
+      }
+    ]
+  },
+  {
+    "description": "a named by step whose key is read from an input that is a list",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input[0].m named by $input.k"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "v is 1"}}}},
+    "cases": [
+      {
+        "description": "reads one key and doesn't walk the items, so it can't read one from a list",
+        "rules": ["path.ref_step", "path.unusable"],
+        "input": [{"id": "a", "k": "x", "m": {"x": {"v": 1}, "y": {"v": 2}}}, {"id": "b", "k": "y"}],
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope thing count", "value": 0}], "message": "in-scope thing count is 0", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
+        ],
+        "requirements": {"s": {"subjects": {"matching": 0, "total": 0}}}
+      }
+    ]
+  },
+  {
     "description": "a field on the right side that walks a list of objects",
     "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in deps.name", "all": "tags contains all of deps.name"}}}},
     "cases": [
@@ -445,6 +601,24 @@
         "results": [
           {"cause": "absent", "check": "a", "inputs": [{"locations": ["/repos/0/deps/0"], "name": "count of deps whose name is in $input.sbom.components.name", "value": null}, {"locations": ["/repos/0/deps/0"], "name": "deps[]", "value": [{"n": 2, "name": "click"}]}], "message": "item 1 of deps: item 2 of $input.sbom.components: name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
           {"cause": "absent", "check": "b", "inputs": [{"locations": ["/repos/0/deps/0/n"], "name": "sum of deps.n whose name is in $input.sbom.components.name", "value": null}, {"locations": ["/repos/0/deps/0/n"], "name": "deps[].n", "value": [2]}], "message": "item 1 of deps: item 2 of $input.sbom.components: name is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "fails as unusable when what it counts isn't a list, though an item of the list on the right has no value, because unusable comes first",
+        "rules": ["walk.right.fail", "tally.walk"],
+        "input": {"sbom": {"components": [{"name": "click"}, {}]}, "repos": [{"id": "r1", "deps": {"name": "click", "n": 2}}]},
+        "results": [
+          {"cause": "unusable", "check": "a", "inputs": [{"locations": [], "name": "count of deps whose name is in $input.sbom.components.name", "value": null}, {"locations": [], "name": "deps", "value": []}], "message": "deps is {\"n\": 2, \"name\": \"click\"}, which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": [], "name": "sum of deps.n whose name is in $input.sbom.components.name", "value": null}, {"locations": [], "name": "deps.n", "value": []}], "message": "deps.n is 2, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
+        ]
+      },
+      {
+        "description": "fails as absent when what it counts is missing, though an item of the list on the right is null, because absent comes first",
+        "rules": ["walk.right.fail", "tally.walk"],
+        "input": {"sbom": {"components": [{"name": null}]}, "repos": [{"id": "r1"}]},
+        "results": [
+          {"cause": "absent", "check": "a", "inputs": [{"locations": [], "name": "count of deps whose name is in $input.sbom.components.name", "value": null}, {"locations": [], "name": "deps", "value": []}], "message": "deps is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": [], "name": "sum of deps.n whose name is in $input.sbom.components.name", "value": null}, {"locations": [], "name": "deps.n", "value": []}], "message": "deps is missing", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "repo"}}
         ]
       }
     ]
