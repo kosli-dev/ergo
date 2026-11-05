@@ -9537,6 +9537,14 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
     (
+        "every ts as t, distinct first of ts as u",
+        &["distinct goes after every, some, count of or sum of"],
+    ),
+    (
+        "every ts whose distinct is 1 as t",
+        &["distinct is a word of the grammar: write .distinct"],
+    ),
+    (
         "every ts",
         &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
     ),

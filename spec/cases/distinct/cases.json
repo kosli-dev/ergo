@@ -912,5 +912,19 @@
         ]
       }
     ]
+  },
+  {
+    "description": "distinct under a for line with a misplaced distinct or a word of the grammar in it",
+    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"misplaced": {"for": "every ts as t, distinct first of ts as u", "assert": "every distinct xs.k is in ok"}, "word": {"for": "every ts whose distinct is 1 as t", "assert": "every distinct xs.k is in ok"}}}}},
+    "cases": [
+      {
+        "description": "the for line doesn't read, so the lines under it get only its problem",
+        "rules": ["sentence.distinct.place"],
+        "input": {"s": {"ts": [{"k": 1}], "xs": [{"k": "a", "ok": ["a"]}, {"k": "a", "ok": ["z"]}]}},
+        "results": [
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.misplaced", "value": ["for: distinct goes after every, some, count of or sum of"]}, {"locations": [], "name": "checks.word", "value": ["for: distinct is a word of the grammar: write .distinct"]}], "message": "checks.misplaced: for: distinct goes after every, some, count of or sum of; checks.word: for: distinct is a word of the grammar: write .distinct", "passed": false, "requirement": "r", "subject": {"id": null, "type": "s"}}
+        ]
+      }
+    ]
   }
 ]
