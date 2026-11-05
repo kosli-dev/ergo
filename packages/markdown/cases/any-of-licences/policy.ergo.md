@@ -1,5 +1,5 @@
 ---
-ergo_spec: v0.5-dev
+ergo_spec: v0.5
 ---
 
 # Component licences

@@ -1,7 +1,7 @@
 [
   {
     "description": "in a list",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"b\", \"a\""}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"b\", \"a\""}}}},
     "cases": [
       {
         "description": "passes when the field is one of the values",
@@ -34,7 +34,7 @@
   },
   {
     "description": "in a list of numbers",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1, 2"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1, 2"}}}},
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
@@ -56,7 +56,7 @@
   },
   {
     "description": "in a list holding null",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", null"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of \"a\", null"}}}},
     "cases": [
       {
         "description": "fails as absent on a missing field",
@@ -86,7 +86,7 @@
   },
   {
     "description": "in values read through a ref",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
     "params": {"allowed": ["a", "b"]},
     "cases": [
       {
@@ -102,7 +102,7 @@
   },
   {
     "description": "in values read through a ref that isn't a list",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
     "params": {"allowed": "a"},
     "cases": [
       {
@@ -117,7 +117,7 @@
   },
   {
     "description": "in values read through a ref that holds values of mixed types",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
     "params": {"allowed": ["a", 1]},
     "cases": [
       {
@@ -133,7 +133,7 @@
   },
   {
     "description": "is not one of a list",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not one of \"prod\", \"staging\""}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is not one of \"prod\", \"staging\""}}}},
     "cases": [
       {
         "description": "passes on a string that is none of them, fails as value on one of them, and fails as unusable on another type",
@@ -149,7 +149,7 @@
   },
   {
     "description": "in values read through a ref that holds an object like a ref",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of $params.allowed"}}}},
     "params": {"allowed": [{"ref": ["q"]}]},
     "cases": [
       {
@@ -164,7 +164,7 @@
   },
   {
     "description": "a list read through a ref",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.allowed"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.allowed"}}}},
     "params": {"allowed": ["p", "q"]},
     "cases": [
       {
@@ -183,7 +183,7 @@
   },
   {
     "description": "a ref on the right side that walks a list of objects",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in $input.sbom.components.name", "not_in": "x is not in $input.sbom.components.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in $input.sbom.components.name", "not_in": "x is not in $input.sbom.components.name"}}}},
     "cases": [
       {
         "description": "compares with the list of what it reads from each item, and lists it in $refs and in the violation's inputs",
@@ -276,7 +276,7 @@
   },
   {
     "description": "a ref on the right side that walks two lists, or reads past what the items hold",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in $input.a.b.c", "deep": "x is in $input.a.b.c.d"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in $input.a.b.c", "deep": "x is in $input.a.b.c.d"}}}},
     "cases": [
       {
         "description": "lists a list for each list it walks",
@@ -311,7 +311,7 @@
   },
   {
     "description": "a param on the right side that walks a list of objects",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.deps.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.deps.name"}}}},
     "params": {"deps": [{"name": "a"}, {"name": "b"}]},
     "cases": [
       {
@@ -327,7 +327,7 @@
   },
   {
     "description": "a ref on the right side that starts at an input that is a list",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id is in $input.id"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id is in $input.id"}}}},
     "cases": [
       {
         "description": "walks the items of the input",
@@ -362,7 +362,7 @@
   },
   {
     "description": "a position after a ref on the right side that walks an input that is a list",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id is in $input.l[0]"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id is in $input.l[0]"}}}},
     "cases": [
       {
         "description": "fails every row as unusable and names the value when an item holds text where the position needs a list",
@@ -377,7 +377,7 @@
   },
   {
     "description": "every phrase that takes a list, with a ref on the right side that starts at an input that is a list",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"one_of": "id is one of $input.id", "not_one_of": "id is not one of $input.id", "contains": "nest contains $input.k", "not_contains": "nest does not contain $input.k", "all_of": "tags contains all of $input.k", "none_of": "tags contains none of $input.k", "some_of": "tags contains some of $input.k", "not_all_of": "tags does not contain all of $input.k", "matches": "id matches $input.p", "not_matches": "id does not match $input.p"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"one_of": "id is one of $input.id", "not_one_of": "id is not one of $input.id", "contains": "nest contains $input.k", "not_contains": "nest does not contain $input.k", "all_of": "tags contains all of $input.k", "none_of": "tags contains none of $input.k", "some_of": "tags contains some of $input.k", "not_all_of": "tags does not contain all of $input.k", "matches": "id matches $input.p", "not_matches": "id does not match $input.p"}}}},
     "cases": [
       {
         "description": "compares with what each item of the input holds, with every phrase that takes a list",
@@ -439,7 +439,7 @@
   },
   {
     "description": "a ref in a whose of a from line that starts at an input that is a list",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input whose id is in $input.ok.id", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "$input whose id is in $input.ok.id", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "walks the items of the input to decide which subjects are in scope",
@@ -468,7 +468,7 @@
   },
   {
     "description": "a named by step whose key is read from an input that is a list",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "$input[0].m named by $input.k"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "v is 1"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "$input[0].m named by $input.k"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "v is 1"}}}},
     "cases": [
       {
         "description": "reads one key and doesn't walk the items, so it can't read one from a list",
@@ -483,7 +483,7 @@
   },
   {
     "description": "a field on the right side that walks a list of objects",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in deps.name", "all": "tags contains all of deps.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"in": "x is in deps.name", "all": "tags contains all of deps.name"}}}},
     "cases": [
       {
         "description": "compares with the list of what it reads from each item, and lists it in the row's inputs",
@@ -527,7 +527,7 @@
   },
   {
     "description": "every phrase that takes a list on the right",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"not_in": "x is not in $input.names.n", "has": "tags contains $input.names.n", "all": "tags contains all of $input.names.n", "none": "tags contains none of $input.names.n", "some": "tags contains some of $input.names.n", "not_all": "tags does not contain all of $input.names.n", "no_has": "tags does not contain $input.names.n", "matches": "x matches $input.names.n", "not_matches": "x does not match $input.names.n"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"not_in": "x is not in $input.names.n", "has": "tags contains $input.names.n", "all": "tags contains all of $input.names.n", "none": "tags contains none of $input.names.n", "some": "tags contains some of $input.names.n", "not_all": "tags does not contain all of $input.names.n", "no_has": "tags does not contain $input.names.n", "matches": "x matches $input.names.n", "not_matches": "x does not match $input.names.n"}}}},
     "cases": [
       {
         "description": "give the verdict and cause they give for the same list written out",
@@ -574,7 +574,7 @@
   },
   {
     "description": "a ref that walks, read by a whose inside count of and sum of",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"a": "count of deps whose name is in $input.sbom.components.name is 1", "b": "sum of deps.n whose name is in $input.sbom.components.name is 2"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"a": "count of deps whose name is in $input.sbom.components.name is 1", "b": "sum of deps.n whose name is in $input.sbom.components.name is 2"}}}},
     "cases": [
       {
         "description": "counts the items whose value is in the list it reads",
@@ -625,7 +625,7 @@
   },
   {
     "description": "a path that starts at a parent or a grandparent walks",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}, "file": {"from": "dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "dep", "checks": {"a": "name is in repo.allowed.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}, "file": {"from": "dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "dep", "checks": {"a": "name is in repo.allowed.name"}}}},
     "cases": [
       {
         "description": "compares with the list of what it reads from each item of the parent",
@@ -651,7 +651,7 @@
   },
   {
     "description": "a path that starts at a grandparent walks",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}, "file": {"from": "dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "file", "checks": {"a": "path is in repo.allowed.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}, "file": {"from": "dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "file", "checks": {"a": "path is in repo.allowed.name"}}}},
     "cases": [
       {
         "description": "compares with the list of what it reads from each item of the grandparent",
@@ -666,7 +666,7 @@
   },
   {
     "description": "a path that starts at a part walks",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"a": "id is in lock.pkgs.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"a": "id is in lock.pkgs.name"}}}},
     "cases": [
       {
         "description": "compares with the list of what it reads from each item and tags the entry with the part",
@@ -692,7 +692,7 @@
   },
   {
     "description": "a path that walks on the right of a for line",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"f": {"for": "every deps as d", "assert": "d.name is in $input.sbom.components.name"}, "g": {"for": "every deps as d", "assert": "d.name is in allowed.name"}}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"f": {"for": "every deps as d", "assert": "d.name is in $input.sbom.components.name"}, "g": {"for": "every deps as d", "assert": "d.name is in allowed.name"}}}}},
     "cases": [
       {
         "description": "says which item of which list could not be read",
@@ -716,7 +716,7 @@
   },
   {
     "description": "a leading dot on a right side that walks reads the field and not the part",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name", "part": "x is in lock.pkgs.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name", "part": "x is in lock.pkgs.name"}}}},
     "cases": [
       {
         "description": "reads the field after a dot and the part without one",
@@ -731,7 +731,7 @@
   },
   {
     "description": "a leading dot on a right side that walks, with a part and a field of the same name",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name"}}}},
     "cases": [
       {
         "description": "is satisfied by the field, and fails as value when it does not hold the name",
@@ -779,7 +779,7 @@
   },
   {
     "description": "a leading dot on a right side only keeps its dot in a name when a part, an alias or a parent has that name",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "repo", "checks": {"missing": "x is in .lock.pkgs.name", "text": "x contains all of .x", "list": "x is one of .tags"}}, "t": {"subject": "dep", "checks": {"missing": "name is in .allowed.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "repo", "checks": {"missing": "x is in .lock.pkgs.name", "text": "x contains all of .x", "list": "x is one of .tags"}}, "t": {"subject": "dep", "checks": {"missing": "name is in .allowed.name"}}}},
     "cases": [
       {
         "description": "names the path without the dot when nothing has its name",
@@ -796,7 +796,7 @@
   },
   {
     "description": "a leading dot on the right of a for line",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"alias": {"for": "every items as p", "assert": "p.name is in .p.name"}, "alias_list": {"for": "every items as q", "assert": "q.name is in .q.name"}, "other": {"for": "every items as i", "assert": "i.name is in .q.name"}}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"alias": {"for": "every items as p", "assert": "p.name is in .p.name"}, "alias_list": {"for": "every items as q", "assert": "q.name is in .q.name"}, "other": {"for": "every items as i", "assert": "i.name is in .q.name"}}}}},
     "cases": [
       {
         "description": "keeps the alias on the item and the dot on a field called like the alias",
@@ -822,7 +822,7 @@
   },
   {
     "description": "a leading dot on a right side that walks keeps its dot when an item is not an object, with a part of the same name",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name", "plain": "x is in lock.pkgs.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name", "plain": "x is in lock.pkgs.name"}}}},
     "cases": [
       {
         "description": "names the list of the field with the dot and the list of the part without it",
@@ -846,7 +846,7 @@
   },
   {
     "description": "a leading dot on a right side without a part of the same name leaves the dot out when an item is not an object",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"dot": "x is in .lock.pkgs.name"}}}},
     "cases": [
       {
         "description": "names the list without the dot",
@@ -860,7 +860,7 @@
   },
   {
     "description": "a leading dot on the right of a for line keeps its dot when an item of the field is not an object",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"every": {"for": "every items as p", "assert": "p.name is in .p.name"}, "some": {"for": "some items as q", "assert": "q.name is in .q.name"}}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"every": {"for": "every items as p", "assert": "p.name is in .p.name"}, "some": {"for": "some items as q", "assert": "q.name is in .q.name"}}}}},
     "cases": [
       {
         "description": "names the field with the dot and the item with its alias",
@@ -875,7 +875,7 @@
   },
   {
     "description": "a leading dot on a right side that walks keeps its dot when a parent subject has the name",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "dep", "checks": {"dot": "name is in .repo.pkgs.name"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "dep", "checks": {"dot": "name is in .repo.pkgs.name"}}}},
     "cases": [
       {
         "description": "names the field of the dep with the dot when it is empty, has an item that is not an object, or has no name",
@@ -891,7 +891,7 @@
   },
   {
     "description": "count of and sum of read the field named like a part and list it with the dot",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"count": "count of .lock.pkgs is 1", "sum": "sum of .lock.pkgs.n is 1", "sum_plain": "sum of lock.pkgs.n is 1"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id", "has": {"lock": "lockfile"}}}, "requirements": {"s": {"subject": "repo", "checks": {"count": "count of .lock.pkgs is 1", "sum": "sum of .lock.pkgs.n is 1", "sum_plain": "sum of lock.pkgs.n is 1"}}}},
     "cases": [
       {
         "description": "lists the field with the dot and the part without it, and names the item of the part",
@@ -907,7 +907,7 @@
   },
   {
     "description": "a field that is on both sides of a phrase is named once in the message",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"plain": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "plain", "checks": {"bare": "tags contains none of tags", "dot": "tags contains none of .tags"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"plain": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "plain", "checks": {"bare": "tags contains none of tags", "dot": "tags contains none of .tags"}}}},
     "cases": [
       {
         "description": "says the value once",
@@ -922,7 +922,7 @@
   },
   {
     "description": "a count of or a sum of that is on both sides of a comparison is named once when its list is missing or null",
-    "policy": {"ergo_spec": "v0.5-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"count": "count of xs is more than count of xs", "sum": "sum of xs.n is more than sum of xs.n"}}}},
+    "policy": {"ergo_spec": "v0.5", "subjects": {"repo": {"from": "repos", "identified_by": "id"}}, "requirements": {"s": {"subject": "repo", "checks": {"count": "count of xs is more than count of xs", "sum": "sum of xs.n is more than sum of xs.n"}}}},
     "cases": [
       {
         "description": "says the list is missing once",

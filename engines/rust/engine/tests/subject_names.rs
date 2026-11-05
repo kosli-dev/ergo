@@ -4,7 +4,7 @@ fn report(subject: &str, from: &str, check: &str, input: Value) -> Value {
     ergo_policy_engine::report(
         &input,
         &json!({
-            "ergo_spec": "v0.5-dev",
+            "ergo_spec": "v0.5",
             "subjects": {subject: {"from": from}},
             "requirements": {"r": {"subject": subject, "checks": {"c": check}}}
         }),
