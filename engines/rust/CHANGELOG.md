@@ -10,6 +10,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 - A path on the right side of `is one of`, `contains`, `matches` and the other phrases that take a list walks lists, as the spec says, from the input, the params, the subject, a parent, a part or an alias and inside `whose`, `count of`, `sum of` and `for` lines: `pin is in $input.sbom.components.name` compares `pin` with the names of the components. A list it can't read from every item fails every row, with the cause and words `every` uses. A leading dot on that path reads the subject's field, and a message and an input name keep the dot only when a part, a parent subject or an alias has the same first name. A `$input` path or a field on the right that reads into text now says which value can't hold the next step, where it said `the check is false`.
 - `that` picks items by the value itself, where `whose` picks them by a field, as the spec says: `from: every ws that starts with "b"`. It works on a `from` line, in a check and on a `for` line, and a field called `that` is written `.that`.
+- `distinct` drops exact copies after `every`, `some`, `count of` and `sum of`, as the spec says, and a bare field called `distinct` is written `.distinct`.
 
 ### Changed
 
