@@ -151,10 +151,21 @@ test_the_in_cases_pass if {
 	_compiled_differences("in") == set()
 }
 
-test_the_subject_name_cases_pass if {
-	_topic_failures("subject_name") == _known_in("subject_name")
-	_compiled_differences("subject_name") == set()
-}
+test_the_subject_name_cases_pass_part_1_of_4 if _part_passes("subject_name", 0, 4)
+
+test_the_subject_name_cases_pass_part_2_of_4 if _part_passes("subject_name", 1, 4)
+
+test_the_subject_name_cases_pass_part_3_of_4 if _part_passes("subject_name", 2, 4)
+
+test_the_subject_name_cases_pass_part_4_of_4 if _part_passes("subject_name", 3, 4)
+
+test_the_subject_name_cases_pass_compiled_part_1_of_4 if _differences_compiled("subject_name", _part("subject_name", 0, 4)) == set()
+
+test_the_subject_name_cases_pass_compiled_part_2_of_4 if _differences_compiled("subject_name", _part("subject_name", 1, 4)) == set()
+
+test_the_subject_name_cases_pass_compiled_part_3_of_4 if _differences_compiled("subject_name", _part("subject_name", 2, 4)) == set()
+
+test_the_subject_name_cases_pass_compiled_part_4_of_4 if _differences_compiled("subject_name", _part("subject_name", 3, 4)) == set()
 
 test_the_that_cases_pass if {
 	_topic_failures("that") == _known_in("that")
