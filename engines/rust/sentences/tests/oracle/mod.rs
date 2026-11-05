@@ -4,6 +4,36 @@ pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
     ("every ws that is not empty", "every ws that is not empty"),
+    ("c whose type is \"library\"", "c whose type is \"library\""),
+    ("c.licenses", "c.licenses"),
+    ("lic.terms", "lic.terms"),
+    ("los", "los"),
+    ("ok", "ok"),
+    (
+        "p.gs whose some distinct hs.k is in p.ok",
+        "p.gs whose some distinct hs.k is in p.ok",
+    ),
+    ("rs", "rs"),
+    ("every distinct xs", "every distinct xs"),
+    (
+        "every rels whose some distinct files.kind is at least lo",
+        "every rels whose some distinct files.kind is at least lo",
+    ),
+    ("limits.lo", "limits.lo"),
+    ("distinct sbom.components", "distinct sbom.components"),
+    ("every distinct items", "every distinct items"),
+    (
+        "every distinct sbom.components",
+        "every distinct sbom.components",
+    ),
+    (
+        "every distinct sbom.components whose type is \"library\"",
+        "every distinct sbom.components whose type is \"library\"",
+    ),
+    (
+        "every distinct sboms.components",
+        "every distinct sboms.components",
+    ),
     ("round.items whose .cov is 1", "round.items whose cov is 1"),
     ("y", "y"),
     ("t.ws whose t is t", "t.ws whose t equals t"),
@@ -2916,6 +2946,9 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("d.q", "d.q"),
     ("fingerprint", "fingerprint"),
     ("id", "id"),
+    ("ok", "ok"),
+    ("t", "t"),
+    ("limits.lo", "limits.lo"),
     ("info.who", "info.who"),
     ("item 3 of d.items", "item 3 of d.items"),
     ("k1", "k1"),

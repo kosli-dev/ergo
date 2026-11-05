@@ -56,9 +56,9 @@ fn messages(text: &str, kind: Kind) -> Vec<String> {
     if text.ends_with(" within") {
         return vec![r#""within" needs a number after it"#.to_string()];
     }
-    if let Some((path, start)) = lone_path(text) {
+    if let Some((path, leading)) = lone_path(text) {
         let found = rules::path_base(&path);
-        if start == 0 && !found.is_empty() {
+        if leading && !found.is_empty() {
             return found.into_iter().collect();
         }
         return vec![format!(
@@ -72,12 +72,30 @@ fn messages(text: &str, kind: Kind) -> Vec<String> {
     if bare_and(&c) {
         return vec![BARE_AND.to_string()];
     }
+    if distinct_misplaced(&c) {
+        return vec![parse::DISTINCT_PLACE.to_string()];
+    }
     vec!["doesn't parse".to_string()]
 }
 
 const BARE_AND: &str = "a condition after and starts with whose or that";
 
-fn bare_and(c: &[char]) -> bool {
+fn distinct_misplaced(c: &[char]) -> bool {
+    let blanked = blanked(c);
+    let tokens: Vec<&str> = blanked
+        .split(' ')
+        .filter(|token| !token.is_empty())
+        .collect();
+    tokens.iter().enumerate().any(|(i, token)| {
+        *token == "distinct"
+            && i > 0
+            && i + 1 < tokens.len()
+            && !["every", "some"].contains(&tokens[i - 1])
+            && !(i >= 2 && ["count", "sum"].contains(&tokens[i - 2]) && tokens[i - 1] == "of")
+    })
+}
+
+fn blanked(c: &[char]) -> String {
     let mut blanked = String::new();
     let mut i = 0;
     while i < c.len() {
@@ -92,6 +110,11 @@ fn bare_and(c: &[char]) -> bool {
             }
         }
     }
+    blanked
+}
+
+fn bare_and(c: &[char]) -> bool {
+    let blanked = blanked(c);
     let tokens: Vec<&str> = blanked
         .split(' ')
         .filter(|token| !token.is_empty())
@@ -219,19 +242,29 @@ fn two_quantifiers(c: &[char]) -> bool {
     c.get(k) == Some(&' ')
 }
 
-fn lone_path(text: &str) -> Option<(Path, usize)> {
+fn after_distinct(c: &[char], i: usize) -> Option<usize> {
+    word_at(c, i, "distinct").and_then(|j| spaces(c, j))
+}
+
+fn lone_path(text: &str) -> Option<(Path, bool)> {
     let parser = Parser::new(text, true);
     let c: Vec<char> = text.chars().collect();
-    let mut starts = vec![0];
-    if let Some(i) = quantifier_word(&c, 0).and_then(|i| spaces(&c, i)) {
-        starts.push(i);
+    let mut starts = vec![(0, true)];
+    if let Some(i) = after_distinct(&c, 0) {
+        starts.push((i, true));
     }
-    starts.into_iter().find_map(|i| {
+    if let Some(i) = quantifier_word(&c, 0).and_then(|i| spaces(&c, i)) {
+        starts.push((i, false));
+        if let Some(j) = after_distinct(&c, i) {
+            starts.push((j, false));
+        }
+    }
+    starts.into_iter().find_map(|(i, leading)| {
         parser
             .path(i, Side::Left)
             .into_iter()
             .find(|(_, end)| *end == parser.len())
-            .map(|(path, _)| (path, i))
+            .map(|(path, _)| (path, leading))
     })
 }
 

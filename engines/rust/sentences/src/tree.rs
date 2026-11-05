@@ -33,6 +33,9 @@ pub enum Assertion {
         quantifier: Quantifier,
         /// The list walked.
         path: Path,
+        /// True when `distinct` is written before the path, so that items exactly the same count once.
+        #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
+        distinct: bool,
         /// The `whose` conditions that pick items.
         whose: Vec<Condition>,
         /// True when `if any` is written.
@@ -132,6 +135,9 @@ pub struct Derived {
     pub kind: DerivedKind,
     /// The list.
     pub path: Path,
+    /// True when `distinct` is written before the path, so that values exactly the same count once.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
+    pub distinct: bool,
     /// The `whose` conditions that pick items.
     pub whose: Vec<Condition>,
 }
@@ -574,6 +580,9 @@ pub enum ForItem {
         quantifier: Quantifier,
         /// The list walked.
         path: Path,
+        /// True when `distinct` is written before the path, so that items exactly the same count once.
+        #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
+        distinct: bool,
         /// The `whose` conditions that pick items.
         whose: Vec<Condition>,
         /// True when `if any` is written.
@@ -620,6 +629,9 @@ pub struct SortedBy {
 pub struct FromLine {
     /// True when the line starts with `every`.
     pub every: bool,
+    /// True when `distinct` is written before the path, so that items exactly the same make one subject.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
+    pub distinct: bool,
     /// The path to the items.
     pub path: Path,
     /// The path of the names, if `named by each of` is written.
@@ -645,11 +657,19 @@ pub enum FromCondition {
         quantifier: Quantifier,
         /// The list.
         path: Path,
+        /// True when `distinct` is written before the path.
+        #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "is_false"))]
+        distinct: bool,
         /// True when `if any` is written.
         if_any: bool,
         /// What must hold.
         phrase: Phrase,
     },
+}
+
+#[cfg(feature = "serde")]
+fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 /// Where a path is printed. It has no ABNF rule.

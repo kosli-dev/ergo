@@ -59,6 +59,7 @@ pub struct Counted {
     pub text: String,
     pub kind: Kind,
     pub path: Path,
+    pub distinct: bool,
     pub whose: Vec<Check>,
 }
 
@@ -583,6 +584,10 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             None => causes.push(item.miss),
         }
     }
+    if counted.distinct {
+        let mut seen = std::collections::BTreeSet::new();
+        numbers.retain(|value| seen.insert(crate::value::copy_key(value)));
+    }
     let total = match counted.kind {
         Kind::Count => Ok(Number::from(numbers.len() as u64)),
         Kind::Sum => summed(&numbers),
@@ -910,6 +915,7 @@ fn lower_counted(
                 s::DerivedKind::Sum => Kind::Sum,
             },
             path,
+            distinct: derived.distinct,
             whose,
         })
     }))

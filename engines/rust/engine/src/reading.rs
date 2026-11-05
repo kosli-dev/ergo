@@ -44,6 +44,7 @@ pub enum Source {
     Root {
         path: path::Path,
         every: bool,
+        distinct: bool,
         each_of: Option<path::Path>,
     },
     Child {
@@ -293,6 +294,7 @@ fn with_kept_dot(text: String, every: bool) -> String {
 fn synthesized(name: &str) -> s::FromLine {
     s::FromLine {
         every: false,
+        distinct: false,
         path: s::Path {
             position: None,
             start: s::Start::Field {
@@ -492,6 +494,9 @@ fn scope_of(
     scope
 }
 
+const DISTINCT_ON_FROM: &str =
+    r#"on a from line, distinct goes after every, like "every distinct sbom.components""#;
+
 fn from_problems(
     name: &str,
     line: &s::FromLine,
@@ -529,6 +534,9 @@ fn from_problems(
     }
     if line.every && line.named_by_each_of.is_some() {
         problems.push("every can't go with named by each of: start the from line at a subject to read its names one subject at a time".to_string());
+    }
+    if line.distinct && !line.every {
+        problems.push(DISTINCT_ON_FROM.to_string());
     }
     if line.path.start == s::Start::Params {
         problems.push("a from reads the input, so it can't start at $params".to_string());
@@ -569,7 +577,7 @@ fn plain_text(steps: &[Step]) -> String {
 
 fn read_id(text: &str) -> Option<(Vec<Step>, String)> {
     let line = s::parse_from(text).ok()?;
-    if line.every || line.named_by_each_of.is_some() || !line.whose.is_empty() {
+    if line.every || line.distinct || line.named_by_each_of.is_some() || !line.whose.is_empty() {
         return None;
     }
     let steps = lower::part_steps(&line.path).ok()?;
@@ -638,6 +646,7 @@ fn source_of(
                     steps,
                 },
                 every: line.every,
+                distinct: line.every && line.distinct,
                 each_of,
             })
         }
@@ -646,8 +655,17 @@ fn source_of(
 
 fn source_text(source: &Source) -> String {
     match source {
-        Source::Root { path, every, .. } => {
-            let words = if *every { "every " } else { "" };
+        Source::Root {
+            path,
+            every,
+            distinct,
+            ..
+        } => {
+            let words = match (*every, *distinct) {
+                (true, true) => "every distinct ",
+                (true, false) => "every ",
+                _ => "",
+            };
             let from_input = matches!(path.steps.first(), Some(Step::Index(_) | Step::Ref(_)));
             let text = if from_input {
                 name::name(&path::Path {
@@ -879,11 +897,13 @@ impl Reading {
                             s::FromCondition::Quantified {
                                 quantifier,
                                 path,
+                                distinct,
                                 if_any,
                                 phrase,
                             } => match lower::lower_quantified(
                                 *quantifier,
                                 &lower::name_dotted(path, name),
+                                *distinct,
                                 &[],
                                 *if_any,
                                 phrase,

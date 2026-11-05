@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 mod checks;
 
-pub(crate) use checks::{ITEM_START, Note, Notes};
+pub(crate) use checks::{DISTINCT_PLACE, ITEM_START, Note, Notes};
 
 pub(crate) type Reads<T> = Vec<(T, usize)>;
 pub(crate) type Noted<T> = (T, Notes);
@@ -103,6 +103,7 @@ pub(crate) fn chain_reads<T: Clone>(
 
 pub(crate) struct FromRead {
     every: bool,
+    distinct: bool,
     path: Path,
     named_by_each_of: Option<Path>,
     whose: Chain<FromCondition>,
@@ -112,6 +113,7 @@ impl FromRead {
     pub(crate) fn build(self) -> FromLine {
         FromLine {
             every: self.every,
+            distinct: self.distinct,
             path: self.path,
             named_by_each_of: self.named_by_each_of,
             whose: chain_items(&self.whose),
@@ -597,6 +599,15 @@ impl Parser {
         self.path(i, Side::Left)
     }
 
+    pub(crate) fn distinct_path(&self, i: usize, side: Side) -> Reads<(bool, Path)> {
+        let mut out = Vec::new();
+        if let Some(j) = self.lead(i, "distinct") {
+            out.extend(self.path(j, side).into_iter().map(|(p, k)| ((true, p), k)));
+        }
+        out.extend(self.path(i, side).into_iter().map(|(p, k)| ((false, p), k)));
+        out
+    }
+
     fn derived(&self, i: usize) -> Reads<Derived> {
         let mut out = Vec::new();
         for (spelling, kind) in [
@@ -604,11 +615,12 @@ impl Parser {
             ("sum of", DerivedKind::Sum),
         ] {
             if let Some(j) = self.lead(i, spelling) {
-                for (path, end) in self.path_left(j) {
+                for ((distinct, path), end) in self.distinct_path(j, Side::Left) {
                     out.push((
                         Derived {
                             kind,
                             path,
+                            distinct,
                             whose: Vec::new(),
                         },
                         end,
@@ -1089,7 +1101,7 @@ impl Parser {
             && let Some((quantifier, j)) = self.quantifier(w)
             && let Some(k) = self.ws(j)
         {
-            for (path, m) in self.path_left(k) {
+            for ((distinct, path), m) in self.distinct_path(k, Side::Left) {
                 let mut ends = Vec::new();
                 if let Some(n) = self.if_any(m) {
                     ends.push((true, n));
@@ -1102,6 +1114,7 @@ impl Parser {
                                 FromCondition::Quantified {
                                     quantifier,
                                     path: path.clone(),
+                                    distinct,
                                     if_any,
                                     phrase,
                                 },
@@ -1131,7 +1144,7 @@ impl Parser {
 
     pub(crate) fn read_from_core(&self, i: usize, every: bool) -> Reads<FromRead> {
         let mut out = Vec::new();
-        for (path, j) in self.path(i, Side::Left) {
+        for ((distinct, path), j) in self.distinct_path(i, Side::Left) {
             let mut eaches: Reads<Option<Path>> = Vec::new();
             if let Some(k) = self.ws(j).and_then(|m| self.lead(m, "named by each of")) {
                 for (each, end) in self.path(k, Side::Right) {
@@ -1145,6 +1158,7 @@ impl Parser {
                         out.push((
                             FromRead {
                                 every,
+                                distinct,
                                 path: path.clone(),
                                 named_by_each_of: each.clone(),
                                 whose,
@@ -1156,6 +1170,7 @@ impl Parser {
                 out.push((
                     FromRead {
                         every,
+                        distinct,
                         path: path.clone(),
                         named_by_each_of: each,
                         whose: None,

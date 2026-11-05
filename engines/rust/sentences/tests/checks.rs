@@ -13,6 +13,7 @@ fn is(value: Value) -> Phrase {
 
 fn count(path: Path) -> Derived {
     Derived {
+        distinct: false,
         kind: DerivedKind::Count,
         path,
         whose: vec![],
@@ -42,6 +43,7 @@ fn a_quantified_assertion_keeps_its_whose_and_if_any() {
     assert_eq!(
         assertion("every items.x whose k is 1, if any, is empty"),
         Assertion::Quantified {
+            distinct: false,
             quantifier: Quantifier::Every,
             path: with_steps(key("items"), vec![dot("x")]),
             whose: vec![Condition {
@@ -142,6 +144,7 @@ fn a_count_with_a_whose_is_a_derived_assertion() {
         assertion("count of items whose k is 1 is at least 2"),
         Assertion::Derived {
             terms: vec![Term::Derived(Derived {
+                distinct: false,
                 kind: DerivedKind::Count,
                 path: key("items"),
                 whose: vec![Condition {

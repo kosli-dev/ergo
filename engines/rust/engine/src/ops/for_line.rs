@@ -34,6 +34,7 @@ pub enum How {
 pub struct Item {
     pub how: How,
     pub path: Path,
+    pub distinct: bool,
     pub whose: Vec<Check>,
     pub alias: String,
 }
@@ -196,6 +197,7 @@ pub fn lower_for(
                 whose,
                 if_any,
                 alias,
+                ..
             } => (
                 path,
                 whose,
@@ -265,6 +267,7 @@ pub fn lower_for(
             items.push(Item {
                 how,
                 path,
+                distinct: matches!(item, s::ForItem::Walk { distinct: true, .. }),
                 whose: checks,
                 alias: alias.clone(),
             });
@@ -308,6 +311,23 @@ struct Live<'a> {
     order: Vec<Seg>,
     shown: Value,
     location: Location,
+    copies: Vec<String>,
+}
+
+fn merged_live(live: Vec<Live<'_>>) -> Vec<Live<'_>> {
+    let mut out: Vec<Live> = Vec::new();
+    let mut seen: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
+    for entry in live {
+        let key = crate::value::copy_key(entry.at.value);
+        match seen.get(&key) {
+            Some(&at) => out[at].copies.push(entry.location.render()),
+            None => {
+                seen.insert(key, out.len());
+                out.push(entry);
+            }
+        }
+    }
+    out
 }
 
 struct Dead {
@@ -559,6 +579,7 @@ impl For {
                     order: w.item_segs.clone(),
                     shown: end.clone(),
                     location: w.end_location.clone(),
+                    copies: Vec::new(),
                 }),
                 None => dead.push(dead_item(
                     if matches!(w.miss, Cause::Absent | Cause::NotAnObject) {
@@ -568,6 +589,9 @@ impl For {
                     },
                 )),
             }
+        }
+        if item.distinct {
+            live = merged_live(live);
         }
         if depth > 0 {
             let first = &self.items[0].alias;
@@ -875,6 +899,7 @@ struct Child {
     entry: Dead,
     failed: Option<Outcome>,
     sfails: Vec<Sfail>,
+    copies: Vec<String>,
 }
 
 struct Outcome {
@@ -1113,6 +1138,7 @@ impl For {
                 entry,
                 failed: outcome,
                 sfails,
+                copies: live.copies,
             });
         }
         let _ = list_name;
@@ -1770,6 +1796,7 @@ impl For {
                 order,
                 mut entry,
                 failed: outcome,
+                copies,
                 ..
             } = child;
             let Some(outcome) = outcome else {
@@ -1813,7 +1840,11 @@ impl For {
                 outcome.cause
             };
             let inner = inner.iter().map(Dead::plain).collect();
-            failed.push((order, entry.json(outcome.assertions, inner)));
+            let mut json = entry.json(outcome.assertions, inner);
+            if let Some(Value::Array(locations)) = json.get_mut("locations") {
+                locations.extend(copies.into_iter().map(Value::String));
+            }
+            failed.push((order, json));
         }
         let hoisted_ties: Vec<&Dead> = hoisted
             .iter()

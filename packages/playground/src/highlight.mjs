@@ -1,7 +1,7 @@
 /** The words a check sentence is built from, like `every`, `is` and `more`. They are shown as keywords. */
 export const GRAMMAR_WORDS = new Set([
   "a", "after", "all", "alphabetically", "an", "and", "as", "at", "before", "between", "boolean", "by",
-  "contain", "contains", "count", "days", "does", "each", "elapsed", "empty", "end", "ends", "equal", "equals",
+  "contain", "contains", "count", "days", "distinct", "does", "each", "elapsed", "empty", "end", "ends", "equal", "equals",
   "every", "exist", "exists", "false", "first", "followed", "from", "hours", "if", "in", "is", "item", "last",
   "least", "less", "list", "match", "matches", "minutes", "more", "most", "named", "non-empty", "none",
   "not", "null", "number", "object", "of", "on", "one", "or", "plus", "seconds", "some", "sorted",

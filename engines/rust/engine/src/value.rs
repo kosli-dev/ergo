@@ -234,6 +234,48 @@ pub fn equal(a: &Value, b: &Value) -> Option<bool> {
     }
 }
 
+pub fn copy_key(value: &Value) -> String {
+    match value {
+        Value::Null => "null".to_string(),
+        Value::Bool(b) => b.to_string(),
+        Value::Number(n) => match decimal_of(n) {
+            Some(d) => {
+                let (negative, digits, exponent) = d.parts();
+                format!("#{}{digits}e{exponent}", if negative { "-" } else { "" })
+            }
+            None => format!("#?{n}"),
+        },
+        Value::String(s) => Value::String(s.clone()).to_string(),
+        Value::Array(items) => {
+            let parts: Vec<String> = items.iter().map(copy_key).collect();
+            format!("[{}]", parts.join(","))
+        }
+        Value::Object(map) => {
+            let mut parts: Vec<(String, String)> = map
+                .iter()
+                .map(|(k, v)| (Value::String(k.clone()).to_string(), copy_key(v)))
+                .collect();
+            parts.sort();
+            let joined: Vec<String> = parts.into_iter().map(|(k, v)| format!("{k}:{v}")).collect();
+            format!("{{{}}}", joined.join(","))
+        }
+    }
+}
+
+pub fn copied_locations(locations: &[String], first: &str, copies: &[String]) -> Vec<String> {
+    let mut out = Vec::new();
+    for location in locations {
+        match location.strip_prefix(first) {
+            Some(rest) if rest.is_empty() || rest.starts_with('/') => {
+                out.push(location.clone());
+                out.extend(copies.iter().map(|copy| format!("{copy}{rest}")));
+            }
+            _ => out.push(location.clone()),
+        }
+    }
+    out
+}
+
 pub fn all_equal(pairs: impl Iterator<Item = Option<bool>>) -> Option<bool> {
     let pairs: Vec<Option<bool>> = pairs.collect();
     if pairs.contains(&Some(false)) {

@@ -48,7 +48,8 @@ pub fn print_left_term(term: &Term, aliases: &[&str], parents: &[&str]) -> Strin
                 DerivedKind::Sum => "sum of",
             };
             format!(
-                "{word} {}{}",
+                "{word} {}{}{}",
+                distinct_text(derived.distinct),
                 left_of_whose(&derived.path, aliases, parents, true),
                 whose_text(&derived.whose, aliases)
             )
@@ -116,11 +117,13 @@ fn from_condition_text(
         FromCondition::Quantified {
             quantifier,
             path,
+            distinct,
             if_any,
             phrase,
         } => format!(
-            "{} {}{} {}",
+            "{} {}{}{} {}",
             quantifier_text(*quantifier),
+            distinct_text(*distinct),
             left_of_whose(path, aliases, parents, false),
             if_any_text(*if_any),
             phrase_text(phrase, aliases)
@@ -148,6 +151,7 @@ pub fn print_from(line: &FromLine, aliases: &[&str], parents: &[&str]) -> String
     if line.every {
         out.push_str("every ");
     }
+    out.push_str(distinct_text(line.distinct));
     out.push_str(&path_text(&line.path, Side::Left, aliases, false));
     if let Some(each) = &line.named_by_each_of {
         out.push_str(" named by each of ");
@@ -169,6 +173,10 @@ pub fn print_from(line: &FromLine, aliases: &[&str], parents: &[&str]) -> String
         out.push_str(&parts.join(" and "));
     }
     out
+}
+
+fn distinct_text(distinct: bool) -> &'static str {
+    if distinct { "distinct " } else { "" }
 }
 
 fn quantifier_text(quantifier: Quantifier) -> &'static str {
@@ -387,7 +395,8 @@ fn derived_text(derived: &Derived, aliases: &[&str], own: bool) -> String {
         DerivedKind::Sum => "sum of",
     };
     format!(
-        "{word} {}{}",
+        "{word} {}{}{}",
+        distinct_text(derived.distinct),
         path_text(&derived.path, Side::Left, aliases, own),
         whose_text(&derived.whose, aliases)
     )
@@ -598,12 +607,14 @@ pub fn print_assertion(assertion: &Assertion, aliases: &[&str]) -> String {
         Assertion::Quantified {
             quantifier,
             path,
+            distinct,
             whose,
             if_any,
             phrase,
         } => format!(
-            "{} {}{}{} {}",
+            "{} {}{}{}{} {}",
             quantifier_text(*quantifier),
+            distinct_text(*distinct),
             path_text(path, Side::Left, aliases, false),
             whose_text(whose, aliases),
             if_any_text(*if_any),
@@ -641,12 +652,14 @@ fn for_item_text(item: &ForItem, names: &[&str], sorted_names: &[&str]) -> Strin
         ForItem::Walk {
             quantifier,
             path,
+            distinct,
             whose,
             if_any,
             alias,
         } => format!(
-            "{} {}{}{} as {alias}",
+            "{} {}{}{}{} as {alias}",
             quantifier_text(*quantifier),
+            distinct_text(*distinct),
             path_text(path, Side::Left, names, false),
             whose_text(whose, names),
             if_any_text(*if_any)

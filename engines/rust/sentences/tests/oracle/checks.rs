@@ -5041,6 +5041,304 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("w[1] named by zz is 1", "w[1] named by zz is 1", &[], &[]),
     (".that is \"x\"", ".that is \"x\"", &[], &[]),
     (
+        "\"distinct\" is an object",
+        ".distinct is an object",
+        &[],
+        &[],
+    ),
+    (".distinct is 1", ".distinct is 1", &[], &[]),
+    (
+        "count of distinct commits.author is at least 2",
+        "count of distinct commits.author is at least 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of distinct commits.author whose verified is true is 2",
+        "count of distinct commits.author whose verified is true is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of distinct xs.distinct is 1",
+        "count of distinct xs.distinct is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct commits.author is \"ann\"",
+        "every distinct commits.author is \"ann\"",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct commits.author whose verified is true is \"ann\"",
+        "every distinct commits.author whose verified is true is \"ann\"",
+        &[],
+        &[],
+    ),
+    ("every xs.distinct is 2", "every xs.distinct is 2", &[], &[]),
+    (
+        "some distinct commits.author is \"cid\"",
+        "some distinct commits.author is \"cid\"",
+        &[],
+        &[],
+    ),
+    (
+        "sum of distinct stages.usd is 3.5",
+        "sum of distinct stages.usd is 3.5",
+        &[],
+        &[],
+    ),
+    ("review is \"ok\"", "review is \"ok\"", &[], &[]),
+    ("who is \"ann\"", "who is \"ann\"", &[], &[]),
+    ("version exists", "version exists", &[], &[]),
+    (
+        "every distinct xs.k is in ok",
+        "every distinct xs.k is in ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct xs.k is in lo",
+        "some distinct xs.k is in lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct hs.k is not in p.ok",
+        "every distinct hs.k is not in p.ok",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k is not in t.ok",
+        "every distinct t.fs.k is not in t.ok",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k matches t.pats",
+        "every distinct t.fs.k matches t.pats",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is at least first of lol",
+        "every distinct ts.fs.k is at least first of lol",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is at least last of lol",
+        "every distinct ts.fs.k is at least last of lol",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k matches lim",
+        "every distinct ts.fs.k matches lim",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct hs.k is in p.ok",
+        "some distinct hs.k is in p.ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct hs.k is in p.pl",
+        "some distinct hs.k is in p.pl",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct hs.k is one of p.ok",
+        "some distinct hs.k is in p.ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct t.fs.k is in t.ok",
+        "some distinct t.fs.k is in t.ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct t.fs.k is one of t.ok",
+        "some distinct t.fs.k is in t.ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct ts.fs.k is in .lim",
+        "some distinct ts.fs.k is in lim",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct ts.fs.k is in lim",
+        "some distinct ts.fs.k is in lim",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct ts.fs.k is in ok",
+        "some distinct ts.fs.k is in ok",
+        &[],
+        &[],
+    ),
+    ("y exists", "y exists", &[], &[]),
+    (
+        "every distinct $input.s.ts[0].fs.k is at least lo",
+        "every distinct $input.s.ts[0].fs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct f.ok is at least lo",
+        "every distinct f.ok is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k is at least .lo",
+        "every distinct t.fs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k is at least lo",
+        "every distinct t.fs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k is at least t.lo",
+        "every distinct t.fs.k is at least t.lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct t.fs.k whose lo is 1 is at least lo",
+        "every distinct t.fs.k whose lo is 1 is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is at least lo",
+        "every distinct ts.fs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is at least lo plus 0",
+        "every distinct ts.fs.k is at least lo plus 0",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct ts.fs.k is lo plus 4",
+        "every distinct ts.fs.k equals lo plus 4",
+        &[],
+        &[],
+    ),
+    ("lo exists", "lo exists", &[], &[]),
+    (
+        "some distinct t.fs.k is in ok",
+        "some distinct t.fs.k is in ok",
+        &[],
+        &[],
+    ),
+    ("t exists", "t exists", &[], &[]),
+    ("c is an object", "c is an object", &[], &[]),
+    ("note is \"fine\"", "note is \"fine\"", &[], &[]),
+    ("c.version is \"1\"", "c.version is \"1\"", &[], &[]),
+    (
+        "every distinct xs.k is at least $input.lo",
+        "every distinct xs.k is at least $input.lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k is at least .lo",
+        "every distinct xs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k is at least lim",
+        "every distinct xs.k is at least lim",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k is at least lo",
+        "every distinct xs.k is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k is lo",
+        "every distinct xs.k equals lo",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.k whose lo is 1 is 5",
+        "every distinct xs.k whose lo is 1 is 5",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct xs.ys.k is lo",
+        "every distinct xs.ys.k equals lo",
+        &[],
+        &[],
+    ),
+    ("every vs is 1", "every vs is 1", &[], &[]),
+    (
+        "ok is $input.sbom.components[0].licenses[0].ok",
+        "ok equals $input.sbom.components[0].licenses[0].ok",
+        &[],
+        &[],
+    ),
+    (
+        "some distinct xs.k is in allowed",
+        "some distinct xs.k is in allowed",
+        &[],
+        &[],
+    ),
+    ("version is \"1\"", "version is \"1\"", &[], &[]),
+    (
+        "version is $input.sbom.components[0].version",
+        "version equals $input.sbom.components[0].version",
+        &[],
+        &[],
+    ),
+    (
+        "version is $input.sbom.components[2].version",
+        "version equals $input.sbom.components[2].version",
+        &[],
+        &[],
+    ),
+    ("x.k is at least x.lo", "x.k is at least x.lo", &[], &[]),
+    ("xs exists", "xs exists", &[], &[]),
+    (
+        "every notes is \"fine\"",
+        "every notes is \"fine\"",
+        &[],
+        &[],
+    ),
+    ("r.ok is true", "r.ok is true", &[], &[]),
+    (
+        "version is not $input.banned",
+        "version does not equal $input.banned",
+        &[],
+        &[],
+    ),
+    (
         "count of ws that starts with \"b\" and that ends with \"y\" is 1",
         "count of ws that starts with \"b\" and that ends with \"y\" is 1",
         &[],
@@ -6759,6 +7057,17 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
     ),
     ("every ws that is not empty", &["doesn't parse"]),
     (
+        "distinct is 1",
+        &["distinct is a word of the grammar: write .distinct"],
+    ),
+    ("distinct xs is 1", &["doesn't parse"]),
+    ("count of distinct xs is", &["doesn't parse"]),
+    ("every distinct xs is", &["doesn't parse"]),
+    (
+        "every xs whose distinct y is 1",
+        &["distinct goes after every, some, count of or sum of"],
+    ),
+    (
         "every that is not empty",
         &["that is a word of the grammar: write .that"],
     ),
@@ -7882,6 +8191,45 @@ pub const CHECK_WRITTEN_WRONG: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t",
+        "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t",
+        &[],
+        &[],
+    ),
+    ("every ts as pp", "every ts as pp", &[], &[]),
+    ("every ts as s", "every ts as s", &[], &[]),
+    (
+        "every ts named by zz as t",
+        "every ts named by zz as t",
+        &[],
+        &[],
+    ),
+    (
+        "every ts whose k equals k as t",
+        "every ts whose k equals k as t",
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+        &[
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+        ],
+    ),
+    (
+        "every ts whose k is last of zs as t",
+        "every ts whose k equals last of zs as t",
+        &[],
+        &[],
+    ),
+    ("every ts as t", "every ts as t", &[], &[]),
+    (
+        "every ts as t, every t.fs as f",
+        "every ts as t, every t.fs as f",
+        &[],
+        &[],
+    ),
+    ("every notes as note", "every notes as note", &[], &[]),
+    ("every distinct xs as x", "every distinct xs as x", &[], &[]),
     (
         "every items that is not empty and whose kind is \"a\" as i",
         "every items that is not empty and whose kind is \"a\" as i",
@@ -9048,6 +9396,24 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "every distinct commits as commit, some commit.reviews as review",
+        "every distinct commits as commit, some commit.reviews as review",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct commits as commit, first of reviewers whose by is commit.author as r",
+        "every distinct commits as commit, first of reviewers whose by equals commit.author as r",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct commits.author as who",
+        "every distinct commits.author as who",
+        &[],
+        &[],
+    ),
     ("every $params as p", "every $params as p", &[], &[]),
     ("every $params.v as p", "every $params.v as p", &[], &[]),
     (
@@ -9222,6 +9588,34 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
+    (
+        "every ts as t, distinct first of ts as u",
+        &["distinct goes after every, some, count of or sum of"],
+    ),
+    (
+        "every ts whose distinct is 1 as t",
+        &["distinct is a word of the grammar: write .distinct"],
+    ),
+    (
+        "every ts",
+        &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
+    ),
+    (
+        "every ts as a1, every ts as a2, every ts as a3",
+        &["a for line holds two items at most"],
+    ),
+    (
+        "every ts sorted by k as t",
+        &["\"sorted by\" goes after a position, like \"last of\", not after every or some"],
+    ),
+    (
+        "every ys as y whose y is 1",
+        &["an item ends with \"as\" and a name, like \"every pull_requests as pr\""],
+    ),
+    (
+        "every xs as x, distinct first of ys as y",
+        &["distinct goes after every, some, count of or sum of"],
+    ),
     (
         "every items as y, every .y.zs as z, every .cov.xs as w",
         &["a for line holds two items at most"],
@@ -9638,6 +10032,9 @@ pub const FOR_ERRORS: &[(&str, &[&str])] = &[
 ];
 
 pub const FOR_WRITTEN_WRONG: &[(&str, &[&str])] = &[
+    ("every ts as every", &["every can't be an alias"]),
+    ("every ts as t, every t.fs as t", &["t is given twice"]),
+    ("every ts as t, every ts as t", &["t is given twice"]),
     (
         "every .cov.xs as a, every cov.xs as b",
         &["a can't be an alias"],
