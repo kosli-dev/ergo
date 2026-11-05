@@ -77,7 +77,7 @@ docker run --rm -v "$PWD":/src -v ergo-rust-target:/target -v ergo-cargo-registr
 
 The `wasm` profile in `Cargo.toml` builds for size, and `wasm-opt` from [Binaryen](https://github.com/WebAssembly/binaryen) shrinks the result further. Together they take the Wasm file from about 2.9 MB to about 1.5 MB, and from about 840 KB to about 550 KB gzipped. Without `wasm-opt` the file is 1.6 MB, and a little smaller gzipped, at about 510 KB. The `release` profile stays as it was, because the other builds and the timings use it.
 
-The `wasm-bindgen` tool has to be the same version as the `wasm-bindgen` crate, `=0.2.129` in `wasm/Cargo.toml`. The version is also in the `Dockerfile` and in the `tests-rust` job of `.github/workflows/test.yml`, so change all three together. The same goes for the Binaryen version, `version_133`, which is in the `Dockerfile` and in that job, together with the SHA-256 of each tarball. Both check the download against it before they unpack it.
+The `wasm-bindgen` tool has to be the same version as the `wasm-bindgen` crate, `=0.2.130` in `wasm/Cargo.toml`. The version is also in the `Dockerfile` and in the `tests-rust` job of `.github/workflows/test.yml`, so change all three together. The same goes for the Binaryen version, `version_133`, which is in the `Dockerfile` and in that job, together with the SHA-256 of each tarball. Both check the download against it before they unpack it.
 
 `ergo-policy-sentences-wasm` builds the same way, with its own folder and no engine. It comes to about 740 KB, or 256 KB gzipped:
 
