@@ -1818,6 +1818,10 @@ mod tests {
     }
 
     fn position_walk(w: Value) -> Walked {
+        steps_walk(w, vec![Step::Index(0)])
+    }
+
+    fn steps_walk(w: Value, after_x: Vec<Step>) -> Walked {
         let input = json!({"things": [{"x": "a", "w": w}]});
         let ctx = Ctx {
             label: None,
@@ -1829,9 +1833,11 @@ mod tests {
             params: None,
             aliases: BTreeMap::new(),
         };
+        let mut steps = vec![Step::Key("w".into()), Step::Key("X".into())];
+        steps.extend(after_x);
         let path = Path {
             start: Start::Subject,
-            steps: vec![Step::Key("w".into()), Step::Key("X".into()), Step::Index(0)],
+            steps,
         };
         walked(&path, &ctx).unwrap()
     }
@@ -1865,6 +1871,42 @@ mod tests {
     #[test]
     fn a_position_on_lists_in_every_item_walks_without_a_fault() {
         let walk = position_walk(json!([{"X": ["a"]}, {"X": ["b"]}]));
+        assert_eq!(walk.cause, None);
+    }
+
+    #[test]
+    fn a_position_after_a_position_fails_as_unusable_and_names_the_value_that_is_not_a_list() {
+        let steps = || vec![Step::Index(0), Step::Index(0)];
+        let walk = steps_walk(json!([{"X": [["a"]]}, {"X": ["x"]}]), steps());
+        assert_eq!(walk.cause, Some(Cause::Unusable));
+        assert_eq!(
+            walk.text,
+            "item 2 of w: item 1 of X is \"x\", which isn't a list"
+        );
+        let walk = steps_walk(json!([{"X": [["a"]]}, {"X": "x"}]), steps());
+        assert_eq!(walk.cause, Some(Cause::Unusable));
+        assert_eq!(walk.text, "item 2 of w: X is \"x\", which isn't a list");
+        let walk = steps_walk(json!([{"X": [["a"]]}, {"X": [["b"]]}]), steps());
+        assert_eq!(walk.cause, None);
+    }
+
+    #[test]
+    fn a_key_after_a_position_fails_as_unusable_when_another_item_holds_no_object_there() {
+        let key = |name: &str| Step::Key(name.into());
+        let walk = steps_walk(
+            json!([{"X": [{"k": ["a"]}]}, {"X": ["x"]}]),
+            vec![Step::Index(0), key("k")],
+        );
+        assert_eq!(walk.cause, Some(Cause::Unusable));
+        let walk = steps_walk(
+            json!([{"X": [{"k": [["a"]]}]}, {"X": [{"k": "s"}]}]),
+            vec![Step::Index(0), key("k"), Step::Index(0)],
+        );
+        assert_eq!(walk.cause, Some(Cause::Unusable));
+        let walk = steps_walk(
+            json!([{"X": [{"k": ["a"]}]}, {"X": [{"k": ["b"]}]}]),
+            vec![Step::Index(0), key("k")],
+        );
         assert_eq!(walk.cause, None);
     }
 }
