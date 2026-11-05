@@ -149,13 +149,17 @@ impl Walked {
     }
 }
 
-fn broken_at(item: &walk::WalkItem) -> Option<(Vec<Seg>, Value)> {
+fn broken_at(item: &walk::WalkItem) -> Option<(Vec<Seg>, Value, &'static str)> {
     let mut current = item.item.value;
     for (at, seg) in item.rest.iter().enumerate() {
-        if matches!(seg, Seg::Key(_)) && !current.is_object() && !current.is_null() {
+        let (holds, wants) = match seg {
+            Seg::Key(_) => (current.is_object(), "an object"),
+            Seg::Index(_) => (current.is_array(), "a list"),
+        };
+        if !holds && !current.is_null() {
             let mut segs = item.item_segs.clone();
             segs.extend(item.rest[..at].iter().cloned());
-            return Some((segs, current.clone()));
+            return Some((segs, current.clone(), wants));
         }
         current = match (current, seg) {
             (Value::Object(map), Seg::Key(key)) => map.get(key)?,
@@ -200,11 +204,11 @@ fn item_fault(walked: &walk::Walked, item: &walk::WalkItem) -> Option<(Cause, Ve
                     "an object",
                 ),
             )),
-            _ => broken_at(item).map(|(segs, value)| {
+            _ => broken_at(item).map(|(segs, value, wants)| {
                 (
                     Cause::Unusable,
                     segs.clone(),
-                    isnt(&walked.item_name(&segs), &value, "an object"),
+                    isnt(&walked.item_name(&segs), &value, wants),
                 )
             }),
         },
@@ -1811,5 +1815,56 @@ mod tests {
         );
         assert_eq!(walk.cause, Some(Cause::Absent));
         assert_eq!(walk.text, "item 2 of deps: name is missing");
+    }
+
+    fn position_walk(w: Value) -> Walked {
+        let input = json!({"things": [{"x": "a", "w": w}]});
+        let ctx = Ctx {
+            label: None,
+            subject: Located {
+                value: &input["things"][0],
+                location: Location::input_root().key("things").index(0),
+            },
+            input: &input,
+            params: None,
+            aliases: BTreeMap::new(),
+        };
+        let path = Path {
+            start: Start::Subject,
+            steps: vec![Step::Key("w".into()), Step::Key("X".into()), Step::Index(0)],
+        };
+        walked(&path, &ctx).unwrap()
+    }
+
+    #[test]
+    fn a_position_on_a_value_that_is_not_a_list_fails_as_unusable_and_names_the_value() {
+        for (held, shown) in [
+            (json!("ab"), "\"ab\""),
+            (json!(3), "3"),
+            (json!({"y": 1}), "{\"y\": 1}"),
+            (json!(true), "true"),
+        ] {
+            let walk = position_walk(json!([{"X": ["a"]}, {"X": held}]));
+            assert_eq!(walk.cause, Some(Cause::Unusable));
+            assert_eq!(
+                walk.text,
+                format!("item 2 of w: X is {shown}, which isn't a list")
+            );
+        }
+    }
+
+    #[test]
+    fn a_position_on_a_missing_or_null_value_fails_as_absent_like_the_rego_engine() {
+        for held in [json!({}), json!({"X": null})] {
+            let walk = position_walk(json!([{"X": ["a"]}, held]));
+            assert_eq!(walk.cause, Some(Cause::Absent));
+            assert_eq!(walk.text, "item 2 of w: item 1 of X is missing");
+        }
+    }
+
+    #[test]
+    fn a_position_on_lists_in_every_item_walks_without_a_fault() {
+        let walk = position_walk(json!([{"X": ["a"]}, {"X": ["b"]}]));
+        assert_eq!(walk.cause, None);
     }
 }
