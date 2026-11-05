@@ -5056,7 +5056,7 @@ _has_requirements(policy) if {
 	policy.requirements != null
 }
 
-version := "0.5.0-dev"
+version := "0.5.1-dev"
 
 _engine := {"name": "ergo-rego", "version": version}
 
