@@ -11,7 +11,7 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v7
         with:
@@ -66,7 +66,7 @@ jobs:
 
   tests-rego:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 4
     strategy:
       matrix:
         part: [1, 2, 3, 4]
@@ -95,7 +95,7 @@ jobs:
   tests-rego-coverage:
     needs: tests-rego
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 4
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -123,24 +123,17 @@ jobs:
 
   tests-wasm:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 2
     strategy:
       matrix:
         part: [1, 2, 3, 4]
-    env:
-      PART: ${{ matrix.part }}
-      PARTS: ${{ strategy.job-total }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: open-policy-agent/setup-opa@v2
-        with:
-          version: 1.22.0
-      - name: Run this part of the tests compiled to Wasm
-        run: .github/wasm-tests.sh
+      - name: Paused until OPA closes the engines of Wasm tests (open-policy-agent/opa#9513)
+        run: echo "Wasm tests are paused"
 
   tests-compiled-policy:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
@@ -167,7 +160,7 @@ jobs:
 
   tests-rust:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 6
     defaults:
       run:
         working-directory: engines/rust
@@ -217,7 +210,7 @@ jobs:
   playground:
     needs: tests-rust
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 4
     defaults:
       run:
         working-directory: packages
@@ -276,7 +269,7 @@ jobs:
 
   site:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 4
     env:
       HUGO_VERSION: 0.157.0
     steps:
