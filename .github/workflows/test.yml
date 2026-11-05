@@ -11,6 +11,7 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
         with:
@@ -65,6 +66,7 @@ jobs:
 
   tests-rego:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     strategy:
       matrix:
         part: [1, 2, 3, 4]
@@ -93,6 +95,7 @@ jobs:
   tests-rego-coverage:
     needs: tests-rego
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -120,6 +123,7 @@ jobs:
 
   tests-wasm:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         part: [1, 2, 3, 4]
@@ -136,6 +140,7 @@ jobs:
 
   tests-compiled-policy:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
@@ -146,6 +151,7 @@ jobs:
 
   tests-wasm-js:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
@@ -161,6 +167,7 @@ jobs:
 
   tests-rust:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     defaults:
       run:
         working-directory: engines/rust
@@ -210,6 +217,7 @@ jobs:
   playground:
     needs: tests-rust
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     defaults:
       run:
         working-directory: packages
@@ -241,6 +249,7 @@ jobs:
 
   spec:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
       - uses: open-policy-agent/setup-opa@v2
@@ -267,6 +276,7 @@ jobs:
 
   site:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       HUGO_VERSION: 0.157.0
     steps:
