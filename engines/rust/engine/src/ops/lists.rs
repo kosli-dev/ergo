@@ -158,16 +158,21 @@ impl Walked {
 }
 
 fn broken_at(item: &walk::WalkItem) -> Option<(Vec<Seg>, Value, &'static str)> {
-    let mut current = item.item.value;
-    for (at, seg) in item.rest.iter().enumerate() {
+    let (rest, value, wants) = broken_in(item.item.value, &item.rest)?;
+    let mut segs = item.item_segs.clone();
+    segs.extend(rest);
+    Some((segs, value, wants))
+}
+
+fn broken_in(start: &Value, order: &[Seg]) -> Option<(Vec<Seg>, Value, &'static str)> {
+    let mut current = start;
+    for (at, seg) in order.iter().enumerate() {
         let (holds, wants) = match seg {
             Seg::Key(_) => (current.is_object(), "an object"),
             Seg::Index(_) => (current.is_array(), "a list"),
         };
         if !holds && !current.is_null() {
-            let mut segs = item.item_segs.clone();
-            segs.extend(item.rest[..at].iter().cloned());
-            return Some((segs, current.clone(), wants));
+            return Some((order[..at].to_vec(), current.clone(), wants));
         }
         current = match (current, seg) {
             (Value::Object(map), Seg::Key(key)) => map.get(key)?,
@@ -238,10 +243,25 @@ pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
     if walked.unreadable.is_some() || !walked.walked.iter().any(|level| *level < walked.steps) {
         return None;
     }
+    let base = match &path.start {
+        Start::Part(part) => &part.base,
+        start => start,
+    };
+    let start = path::start_of(base, ctx).ok().map(|(value, _, _)| value);
     let mut faults: Vec<(Cause, Vec<Seg>, String)> = walked
         .failures
         .iter()
-        .map(|f| (f.cause, f.order.clone(), f.msg.clone()))
+        .map(|f| {
+            if f.cause == Cause::Unusable
+                && f.value.is_null()
+                && let Some((segs, value, wants)) =
+                    start.and_then(|start| broken_in(start, &f.order))
+            {
+                let text = super::message::isnt(&walked.item_name(&segs), &value, wants);
+                return (Cause::Unusable, segs, text);
+            }
+            (f.cause, f.order.clone(), f.msg.clone())
+        })
         .collect();
     faults.extend(
         walked
@@ -278,7 +298,7 @@ fn walked_read(walk: Walked, inputs: Vec<Input>) -> RightRead {
     }
 }
 
-fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
+fn read_right(right: &Right, ctx: &Ctx, walks: bool) -> RightRead {
     match right {
         Right::Written(value) => RightRead {
             outcome: Outcome::Found,
@@ -286,19 +306,24 @@ fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
             inputs: Vec::new(),
             forced: None,
         },
-        Right::Ref(path) => match walked(path, ctx) {
+        Right::Ref(path) => match walked(path, ctx).filter(|_| walks) {
             Some(walk) => walked_read(walk, Vec::new()),
             None => {
                 let read = read_path(path, ctx);
+                let outcome = if !walks && path.start == Start::Input && ctx.input.is_array() {
+                    Outcome::NotAnObject
+                } else {
+                    read.outcome
+                };
                 RightRead {
-                    outcome: read.outcome,
+                    outcome,
                     value: read.value,
                     inputs: read.inputs.into_iter().skip(1).collect(),
                     forced: None,
                 }
             }
         },
-        Right::Field(path) => match walked(path, ctx) {
+        Right::Field(path) => match walked(path, ctx).filter(|_| walks) {
             Some(walk) => {
                 let input = walk.input();
                 walked_read(walk, vec![input])
@@ -314,7 +339,7 @@ fn read_right(right: &Right, ctx: &Ctx) -> RightRead {
             }
         },
         Right::Join(pieces) => {
-            let reads: Vec<RightRead> = pieces.iter().map(|p| read_right(p, ctx)).collect();
+            let reads: Vec<RightRead> = pieces.iter().map(|p| read_right(p, ctx, walks)).collect();
             let inputs = reads
                 .iter()
                 .flat_map(|r| r.inputs.iter().cloned())
@@ -364,11 +389,11 @@ fn one_type<'a>(values: impl Iterator<Item = &'a Value>) -> Result<Option<&'stat
     Ok(kind)
 }
 
-fn judged<F>(path: &Path, right: &Right, ctx: &Ctx, decide: F) -> Verdict
+fn judged<F>(path: &Path, right: &Right, ctx: &Ctx, walks: bool, decide: F) -> Verdict
 where
     F: FnOnce(&Value, &Outcome, Option<&Value>) -> Cause,
 {
-    let read = read_right(right, ctx);
+    let read = read_right(right, ctx, walks);
     let left = read_path(path, ctx);
     let inputs = left.inputs.into_iter().chain(read.inputs).collect();
     let cause = match (read.forced.or(read.outcome.cause()), &read.value) {
@@ -441,28 +466,34 @@ impl Matches {
 }
 
 pub fn run_in(check: &In, ctx: &Ctx) -> Verdict {
-    judged(&check.path, &check.values, ctx, |values, outcome, found| {
-        let Value::Array(values) = values else {
-            return Cause::Unusable;
-        };
-        let Ok(kind) = one_type(values.iter()) else {
-            return Cause::Unusable;
-        };
-        let found = match left_cause(outcome, found) {
-            Ok(v) => v,
-            Err(cause) => return cause,
-        };
-        if values.is_empty() {
-            return verdict(check.not);
-        }
-        if kind.is_some_and(|k| k != value::type_name(&found)) {
-            return Cause::Unusable;
-        }
-        let Some(hit) = value::any_equal(values.iter().map(|v| value::equal(&found, v))) else {
-            return Cause::Unusable;
-        };
-        verdict(hit != check.not)
-    })
+    judged(
+        &check.path,
+        &check.values,
+        ctx,
+        true,
+        |values, outcome, found| {
+            let Value::Array(values) = values else {
+                return Cause::Unusable;
+            };
+            let Ok(kind) = one_type(values.iter()) else {
+                return Cause::Unusable;
+            };
+            let found = match left_cause(outcome, found) {
+                Ok(v) => v,
+                Err(cause) => return cause,
+            };
+            if values.is_empty() {
+                return verdict(check.not);
+            }
+            if kind.is_some_and(|k| k != value::type_name(&found)) {
+                return Cause::Unusable;
+            }
+            let Some(hit) = value::any_equal(values.iter().map(|v| value::equal(&found, v))) else {
+                return Cause::Unusable;
+            };
+            verdict(hit != check.not)
+        },
+    )
 }
 
 pub fn run_contains(check: &Contains, ctx: &Ctx) -> Verdict {
@@ -470,7 +501,7 @@ pub fn run_contains(check: &Contains, ctx: &Ctx) -> Verdict {
         Wanted::One(right) => (right, false),
         Wanted::All(right) | Wanted::Some(right) => (right, true),
     };
-    judged(&check.path, right, ctx, |wanted, outcome, found| {
+    judged(&check.path, right, ctx, all, |wanted, outcome, found| {
         let wanted: Vec<Value> = if all {
             match wanted {
                 Value::Array(values) if !values.is_empty() => values.clone(),
@@ -513,6 +544,7 @@ pub fn run_matches(check: &Matches, ctx: &Ctx) -> Verdict {
         &check.path,
         &check.patterns,
         ctx,
+        true,
         |patterns, outcome, found| {
             let Value::Array(patterns) = patterns else {
                 return Cause::Unusable;
@@ -675,16 +707,16 @@ fn right_text(right: &Right) -> String {
     }
 }
 
-fn right_shown(right: &Right, ctx: &Ctx) -> Vec<Input> {
+fn right_shown(right: &Right, ctx: &Ctx, walks: bool) -> Vec<Input> {
     match right {
         Right::Written(_) => Vec::new(),
-        Right::Ref(path) | Right::Field(path) => match walked(path, ctx) {
+        Right::Ref(path) | Right::Field(path) => match walked(path, ctx).filter(|_| walks) {
             Some(walk) if walk.cause.is_none() => vec![walk.input()],
             Some(_) => Vec::new(),
             None => read_path(path, ctx).inputs.into_iter().take(1).collect(),
         },
         Right::Join(pieces) => {
-            let read = read_right(right, ctx);
+            let read = read_right(right, ctx, walks);
             match (read.outcome, read.value) {
                 (Outcome::Found, Some(value)) => vec![Input {
                     name: right_text(right),
@@ -693,7 +725,10 @@ fn right_shown(right: &Right, ctx: &Ctx) -> Vec<Input> {
                     part: None,
                     state: Outcome::Found,
                 }],
-                _ => pieces.iter().flat_map(|p| right_shown(p, ctx)).collect(),
+                _ => pieces
+                    .iter()
+                    .flat_map(|p| right_shown(p, ctx, walks))
+                    .collect(),
             }
         }
     }
@@ -701,13 +736,12 @@ fn right_shown(right: &Right, ctx: &Ctx) -> Vec<Input> {
 
 pub fn right_inputs(check: &super::Check, ctx: &Ctx) -> Vec<Input> {
     match check {
-        super::Check::In(c) => right_shown(&c.values, ctx),
+        super::Check::In(c) => right_shown(&c.values, ctx, true),
         super::Check::Contains(c) => match &c.wanted {
-            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => {
-                right_shown(right, ctx)
-            }
+            Wanted::One(right) => right_shown(right, ctx, false),
+            Wanted::All(right) | Wanted::Some(right) => right_shown(right, ctx, true),
         },
-        super::Check::Matches(c) => right_shown(&c.patterns, ctx),
+        super::Check::Matches(c) => right_shown(&c.patterns, ctx, true),
         _ => Vec::new(),
     }
 }
@@ -825,8 +859,8 @@ fn ref_fault(
     }
 }
 
-fn right_value(right: &Right, ctx: &Ctx) -> Option<Value> {
-    let read = read_right(right, ctx);
+fn right_value(right: &Right, ctx: &Ctx, walks: bool) -> Option<Value> {
+    let read = read_right(right, ctx, walks);
     match (read.outcome, read.forced) {
         (Outcome::Found, None) => read.value,
         _ => None,
@@ -837,11 +871,50 @@ fn rights_of(check: &super::Check) -> Vec<&Right> {
     match check {
         super::Check::In(c) => vec![&c.values],
         super::Check::Contains(c) => match &c.wanted {
-            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => vec![right],
+            Wanted::One(_) => Vec::new(),
+            Wanted::All(right) | Wanted::Some(right) => vec![right],
         },
         super::Check::Matches(c) => vec![&c.patterns],
         _ => Vec::new(),
     }
+}
+
+pub fn one_rights(check: &super::Check) -> Vec<&Path> {
+    fn of<'a>(right: &'a Right, out: &mut Vec<&'a Path>) {
+        match right {
+            Right::Ref(path) | Right::Field(path) => out.push(path),
+            Right::Join(pieces) => pieces.iter().for_each(|piece| of(piece, out)),
+            Right::Written(_) => {}
+        }
+    }
+    let mut out = Vec::new();
+    if let super::Check::Contains(Contains {
+        wanted: Wanted::One(right),
+        ..
+    }) = check
+    {
+        of(right, &mut out);
+    }
+    out
+}
+
+pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
+    match check {
+        super::Check::Contains(Contains {
+            wanted: Wanted::One(Right::Ref(path)),
+            ..
+        }) if path.start == Start::Input && ctx.input.is_array() => {
+            vec![super::message::isnt("$input", ctx.input, "an object")]
+        }
+        _ => Vec::new(),
+    }
+}
+
+pub fn walked_in(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked> {
+    if one_rights(check).contains(&path) {
+        return None;
+    }
+    walked(path, ctx)
 }
 
 pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
@@ -865,7 +938,7 @@ pub fn in_faults(check: &In, ctx: &Ctx) -> Vec<String> {
     let mut out = Vec::new();
     if let (Some((name, found)), Some(Value::Array(values))) = (
         left_found(&check.path, ctx),
-        right_value(&check.values, ctx),
+        right_value(&check.values, ctx, true),
     ) {
         let mixed = one_type(values.iter()).is_err();
         let fits = match one_type(values.iter()) {
@@ -919,7 +992,7 @@ fn join_faults(check: &Contains, pieces: &[Right], ctx: &Ctx) -> Vec<String> {
     }
     if broken.is_empty() {
         let joined = Right::Join(pieces.to_vec());
-        if let Some(value @ Value::String(_)) = right_value(&joined, ctx) {
+        if let Some(value @ Value::String(_)) = right_value(&joined, ctx, false) {
             out.push(super::message::isnt(&join_name(pieces), &value, "a number"));
         }
     } else {
@@ -937,7 +1010,7 @@ pub fn contains_faults(check: &Contains, ctx: &Ctx) -> Vec<String> {
         Wanted::All(right) | Wanted::Some(right) => (right, true),
     };
     let mut out = Vec::new();
-    let wanted: Option<Vec<Value>> = right_value(right, ctx).and_then(|w| {
+    let wanted: Option<Vec<Value>> = right_value(right, ctx, all).and_then(|w| {
         if all {
             match w {
                 Value::Array(values) => Some(values),

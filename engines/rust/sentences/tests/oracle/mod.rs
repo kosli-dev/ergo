@@ -75,6 +75,18 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "$input named by each of $params.k",
         "$input named by each of $params.k",
     ),
+    (
+        "$input named by each of $input.ks",
+        "$input named by each of $input.ks",
+    ),
+    (
+        "$input.things[0].m named by each of $input.a.k",
+        "$input.things[0].m named by each of $input.a.k",
+    ),
+    (
+        "m named by each of $params.a.k",
+        "m named by each of $params.a.k",
+    ),
     ("$input whose x is 1", "$input whose x is 1"),
     (
         "$input whose id is in $input.ok.id",

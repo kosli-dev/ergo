@@ -1051,7 +1051,54 @@ requirements:
 }
 ```
 
-The path is in the check's `$refs` as `$input.sbom.components[].name`, with the location of each name, and a path from the subject is in the row's `inputs` instead. It works after every phrase above. Ergo can't tell whether the names are complete when one can't be read, so every row fails: a component with no name fails as `absent`, with the message `item 2 of $input.sbom.components: name is missing`, one with a `null` name as `null`, something that isn't an object in the list or after the name as `unusable`, and an empty list as `value`, even after `is not in`, with the message `$input.sbom.components is []`. A path that meets no list is read as before, so a list that is `null` or missing fails as `null` or `absent`, and text fails as `unusable` with `$input.sbom.components is "x", which isn't an object`. A phrase that takes one value, like `is` or `starts with`, doesn't read its right side this way.
+The path is in the check's `$refs` as `$input.sbom.components[].name`, with the location of each name, and a path from the subject is in the row's `inputs` instead. It works after every phrase above but `contains` and `does not contain`, which take one value. Ergo can't tell whether the names are complete when one can't be read, so every row fails: a component with no name fails as `absent`, with the message `item 2 of $input.sbom.components: name is missing`, one with a `null` name as `null`, something that isn't an object in the list or after the name as `unusable`, and an empty list as `value`, even after `is not in`, with the message `$input.sbom.components is []`. A path that meets no list is read as before, so a list that is `null` or missing fails as `null` or `absent`, and text fails as `unusable` with `$input.sbom.components is "x", which isn't an object`. A phrase that takes one value, like `is` or `starts with`, doesn't read its right side this way.
+
+`contains` and `does not contain` look for one value in a list, so the path after them never walks a list. A list it ends at is one value, so a list of pairs can be searched for a pair. A list it meets on the way fails the row as `unusable` and names that list, and a path from `$input` on an input that is a list fails as `not_an_object`. To check a list of values, use `contains all of`, `contains some of` or `contains none of`. With this policy and this input:
+
+```yaml
+ergo_spec: v0.6-dev
+subjects:
+  repo:
+    from: repos
+    identified_by: id
+requirements:
+  pinned:
+    subject: repo
+    checks:
+      has_pair: pins contains wanted
+      every_team: teams contains all of $input.owners.team
+      one_team: teams contains $input.owners.team
+```
+
+```json
+{
+  "owners": [{"team": "web"}, {"team": "ops"}],
+  "repos": [
+    {
+      "id": "api",
+      "pins": [["click", "8.1"], ["jinja2", "3.1"]],
+      "wanted": ["click", "8.1"],
+      "teams": ["web", "ops"]
+    }
+  ]
+}
+```
+
+`has_pair` passes, because `["click", "8.1"]` is one of the pins. `every_team` passes, because `teams` holds both names. `one_team` fails as `unusable`, because `$input.owners` is a list and `contains` reads one value:
+
+```json
+{
+  "cause": "unusable",
+  "check": "one_team",
+  "inputs": [
+    {"locations": ["/repos/0/teams"], "name": "teams", "value": ["web", "ops"]}
+  ],
+  "message": "$input.owners is [{\"team\": \"web\"}, {\"team\": \"ops\"}], which isn't an object",
+  "passed": false,
+  "requirement": "pinned",
+  "subject": {"id": "api", "type": "repo"}
+}
+```
 
 The thing on the right is a value when it's in quotes, a number, `true`, `false` or `null`, and a field otherwise. A list of values is separated by `, `. A string can be in single quotes, which keep backslashes as written, so `'^\s*FROM'` needs no doubled backslash.
 

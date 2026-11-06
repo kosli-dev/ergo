@@ -955,7 +955,7 @@ fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
         .chain(listed_refs(check))
         .filter(|path| from_a_root(path))
         .find_map(|path| {
-            if let Some(listed) = super::lists::walked(path, ctx) {
+            if let Some(listed) = super::lists::walked_in(check, path, ctx) {
                 return (listed.cause == Some(cause)).then_some(listed.text);
             }
             let read = path::read(path, ctx);

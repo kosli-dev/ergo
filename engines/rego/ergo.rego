@@ -1905,7 +1905,7 @@ _start_of(_, path) := data.ergo_document if path[0] == "$$input"
 
 _start_of(_, path) := data.ergo_document if path[0] == "$$input[]"
 
-_start_of(_, path) := data.ergo_params if path[0] == "$$params"
+_start_of(_, path) := data.ergo_params if path[0] in _params_starts
 
 _start_of(_, path) := input["ergo/names"][substring(path[0], 1, -1)] if {
 	_named(path)
@@ -1975,7 +1975,7 @@ _start_at(path) := "" if path[0] == "$$input"
 
 _start_at(path) := "" if path[0] == "$$input[]"
 
-_start_at(path) := "$params:" if path[0] == "$$params"
+_start_at(path) := "$params:" if path[0] in _params_starts
 
 _start_at(path) := _name_at(substring(path[0], 1, -1)) if {
 	_named(path)
@@ -2277,7 +2277,12 @@ _ref_read(path) := v if {
 	start != null
 }
 
-_ref_walks(path) if _rwalks(null, path)
+_ref_walks(path) if {
+	path[0] in {"$$input[]", "$$params[]"}
+	_rwalks(null, path)
+}
+
+_params_starts := {"$$params", "$$params[]"}
 
 _ref_walk(path) := _rwalk(null, path)
 
@@ -2377,8 +2382,26 @@ _rwalk(x, path) := {"state": _worst_or_value(states), "failed": count(states) > 
 
 _rwalk_text(x, path) := _m_joined(_m_fail_parts("unusable", fails, _dotted_roots([path]))) if {
 	w := _rwalk_run(x, path)
-	fails := array.concat(array.concat(w.fails, [f | some e in w.items; some f in _rwalk_item_fails(e, _dotted_roots([path]))]), _walk_stop(w))
+	fails := array.concat(array.concat([_rwalk_broken(x, path, f) | some f in w.fails], [f | some e in w.items; some f in _rwalk_item_fails(e, _dotted_roots([path]))]), _walk_stop(w))
 }
+
+_rwalk_broken(x, path, f) := {"path": broken, "item": broken, "cause": "unusable", "value": v, "msg": _m_isnt(_m_item_name(broken, _dotted_roots([path])), v, _rwalk_wants(rest[j]))} if {
+	f.cause == "unusable"
+	f.value == null
+	start := _walk_start({"path": path}, x)
+	n := count(start.c)
+	array.slice(f.path, 0, n) == start.c
+	rest := array.slice(f.path, n, count(f.path))
+	j := min({i |
+		some i, k in rest
+		v := object.get({"v": start.v}, array.concat(["v"], array.slice(rest, 0, i)), _absent)
+		v != _absent
+		v != null
+		not _rwalk_holds(v, k)
+	})
+	v := object.get({"v": start.v}, array.concat(["v"], array.slice(rest, 0, j)), null)
+	broken := array.slice(f.path, 0, n + j)
+} else := f
 
 _rwalk_item_fails(e, _) := [{"path": e.c, "item": e.i, "cause": state, "value": null, "msg": ""} | some state in _rwalk_item_states(e)] if {
 	e.v != _unusable_mark
@@ -2461,15 +2484,33 @@ _rfound(x, r) := _found(x, r) if not _rwalking(x, r)
 _right_walks(check, x) if {
 	check.op == "compare"
 	_list_cmp(check)
+	not _one_right(check)
 	is_array(check.right)
 	_rwalks(x, check.right)
 }
 
-_state_at(check, x, p) := _rstate(x, p) if {
+_state_at(check, x, p) := _lstate(check, x) if {
 	_list_cmp(check)
 	p == check.right
 	p != check.left
 } else := _read_state(x, p)
+
+default _one_right(_) := false
+
+_one_right(leaf) if leaf.cmp in {"includes", "excludes"}
+
+_lfailed(leaf, x) if {
+	not _one_right(leaf)
+	_rfailed(x, leaf.right)
+}
+
+_lstate(leaf, x) := _rstate(x, leaf.right) if not _one_right(leaf)
+
+_lstate(leaf, x) := _read_state(x, leaf.right) if _one_right(leaf)
+
+_lvalue(leaf, x) := _rvalue(x, leaf.right) if not _one_right(leaf)
+
+_lvalue(leaf, x) := _value_at(x, leaf.right) if _one_right(leaf)
 
 _ref_name(path) := "<invalid ref>" if not _builtin(path)
 
@@ -2573,10 +2614,12 @@ _plain_step_name(0, "$$input[]") := "$input"
 
 _plain_step_name(0, "$$params") := "$params"
 
+_plain_step_name(0, "$$params[]") := "$params"
+
 _plain_step_name(0, step) := step if {
 	is_string(step)
 	startswith(step, "$")
-	not step in {"$$input", "$$input[]", "$$params", "$input", "$params"}
+	not step in {"$$input", "$$input[]", "$$params", "$$params[]", "$input", "$params"}
 	not _parent_name(step)
 	not _for_alias_step(step)
 }
@@ -3116,9 +3159,9 @@ _leaf_op_passed("compare", check, subj) if {
 	_compared(check, l, r)
 }
 
-_right_value(subj, check) := _rvalue(subj, check.right) if {
+_right_value(subj, check) := _lvalue(check, subj) if {
 	_list_cmp(check)
-	not _rfailed(subj, check.right)
+	not _lfailed(check, subj)
 }
 
 _right_value(subj, check) := _simple_value(subj, check.right) if not _list_cmp(check)
@@ -3352,7 +3395,7 @@ _unusable(leaf, x) if {
 	_list_cmp(leaf)
 	leaf.cmp in {"includes", "excludes"}
 	l := _found(x, leaf.left)
-	r := _rfound(x, leaf.right)
+	r := _found(x, leaf.right)
 	is_array(l)
 	not _items_fit(l, [r])
 }
@@ -3611,22 +3654,22 @@ _list_cmp(leaf) if {
 
 default _list_flaw(_, _) := set()
 
-_list_flaw(leaf, x) := {_rstate(x, leaf.right)} if {
+_list_flaw(leaf, x) := {_lstate(leaf, x)} if {
 	_list_cmp(leaf)
-	_rstate(x, leaf.right) != "value"
+	_lstate(leaf, x) != "value"
 }
 
 _list_flaw(leaf, x) := {"value"} if {
 	_list_cmp(leaf)
-	_rfailed(x, leaf.right)
-	_rstate(x, leaf.right) == "value"
+	_lfailed(leaf, x)
+	_lstate(leaf, x) == "value"
 }
 
 _list_flaw(leaf, x) := {"unusable"} if {
 	_list_cmp(leaf)
-	_rstate(x, leaf.right) == "value"
-	not _rfailed(x, leaf.right)
-	not _list_right_usable(leaf.cmp, _rvalue(x, leaf.right))
+	_lstate(leaf, x) == "value"
+	not _lfailed(leaf, x)
+	not _list_right_usable(leaf.cmp, _lvalue(leaf, x))
 }
 
 _list_flawed(leaf, x) if count(_list_flaw(leaf, x)) > 0
@@ -3919,7 +3962,7 @@ _refs_problem(node) := {"invalid ref" |
 
 _known_ref(r) if {
 	is_array(r)
-	r[0] in {"$$input", "$$input[]", "$$params"}
+	r[0] in {"$$input", "$$input[]", "$$params", "$$params[]"}
 	every seg in array.slice(r, 1, count(r)) {
 		_is_key(seg)
 	}
@@ -3964,7 +4007,7 @@ _unknown_name_problem(node, names) := {concat("", ["unknown alias ", p[0]]) |
 	not _name_known(p[0], names)
 }
 
-_name_known(start, _) if start in {"$$input", "$$input[]", "$$params"}
+_name_known(start, _) if start in {"$$input", "$$input[]", "$$params", "$$params[]"}
 
 _name_known(start, _) if start == _root_marker
 
@@ -3981,7 +4024,7 @@ _name_known(start, names) if {
 }
 
 _name_known(start, names) if {
-	not start in {"$$input", "$$input[]", "$$params"}
+	not start in {"$$input", "$$input[]", "$$params", "$$params[]"}
 	substring(start, 1, -1) in names
 }
 
@@ -4329,7 +4372,7 @@ _asks_presence(check, x) if {
 }
 
 _params_not_given(path) if {
-	path[0] == "$$params"
+	path[0] in _params_starts
 	not is_object(data.ergo_params)
 }
 
@@ -4376,9 +4419,19 @@ _step_refs(check) := {x.ref |
 	is_number(p[count(p) - 1])
 }
 
-_used_ref_state(check, r) := "unusable" if _wrong_step(check, r)
+_used_ref_state(check, r) := "unusable" if {
+	_wrong_step(check, r)
+} else := "not_an_object" if {
+	_one_input_ref(check, r)
+	is_array(data.ergo_document)
+} else := _ref_state(r)
 
-_used_ref_state(check, r) := _ref_state(r) if not _wrong_step(check, r)
+_one_input_ref(check, r) if {
+	check.op in {"includes", "excludes"}
+	_is_ref(object.get(check, "value", null))
+	check.value.ref == r
+	r[0] == "$$input"
+}
 
 _wrong_step(check, r) if {
 	r in _step_refs(check)
@@ -4399,7 +4452,7 @@ default _ref_state(_) := "absent"
 _ref_state(r) := _ref_state_read(r) if not _params_null(r)
 
 _params_null(r) if {
-	r[0] == "$$params"
+	r[0] in _params_starts
 	data.ergo_params == null
 }
 
@@ -9412,13 +9465,15 @@ _s_term_side(t) := object.union({concat("", [k, "_of"]): _s_model_path(t[k]), "w
 
 _s_one(ph) := ph.value if "value" in object.keys(ph)
 
-_s_one(ph) := {"ref": _s_walked(_s_model_path(ph.terms[0]))} if "terms" in object.keys(ph)
+_s_one(ph) := {"ref": _s_model_path(ph.terms[0])} if "terms" in object.keys(ph)
 
 _s_list(ph) := ph.values if "values" in object.keys(ph)
 
 _s_list(ph) := {"ref": _s_walked(_s_model_path(ph.path))} if "path" in object.keys(ph)
 
 _s_walked(p) := array.concat(["$$input[]"], array.slice(p, 1, count(p))) if p[0] == "$$input"
+
+else := array.concat(["$$params[]"], array.slice(p, 1, count(p))) if p[0] == "$$params"
 
 else := p
 
@@ -10975,8 +11030,14 @@ _c_reads_back(text, model) if {
 	count(parsed.assertions) == 1
 	count(_s_unsupported(parsed)) == 0
 	_s_line_self(text, set()) == set()
-	_s_model(parsed.assertions[0]) == model
+	_s_model(parsed.assertions[0]) == _c_params_walked(model)
 }
+
+_c_params_walked(model) := object.union(model, {f: {"ref": array.concat(["$$params[]"], array.slice(model[f].ref, 1, count(model[f].ref)))} |
+	some f in ["values", "patterns"]
+	_is_ref(object.get(model, f, null))
+	model[f].ref[0] == "$$params"
+})
 
 _c_path(p) := _path_name(p) if is_array(p)
 
@@ -11410,13 +11471,13 @@ _m_message(check, subj, "unusable") := m if {
 _m_reads_params(check) if {
 	walk(check, [_, v])
 	is_array(v)
-	v[0] == "$$params"
+	v[0] in _params_starts
 }
 
 _m_params_break(path) := [c |
 	is_array(path)
 	count(path) > 1
-	path[0] == "$$params"
+	path[0] in _params_starts
 	i := min({j |
 		some j in numbers.range(1, count(path) - 1)
 		not _m_params_holds(path, j)
@@ -11449,6 +11510,12 @@ _m_params_unread(check) if {
 
 _m_message(check, subj, "not_an_object") := _m_isnt(_m_label(check), subj, "an object") if not is_object(subj)
 
+_m_input_one_refs(check) := [_m_isnt("$input", data.ergo_document, "an object") |
+	some r in _check_refs(check)
+	_one_input_ref(check, r)
+	is_array(data.ergo_document)
+]
+
 _m_label(check) := check.label if {
 	is_object(check)
 	is_string(object.get(check, "label", null))
@@ -11456,7 +11523,7 @@ _m_label(check) := check.label if {
 
 _m_message(check, subj, "not_an_object") := m if {
 	is_object(subj)
-	clauses := _once(array.concat(_m_aliases_blocked(check), _m_tallies(subj, check, "not_an_object")))
+	clauses := _once(array.concat(array.concat(_m_aliases_blocked(check), _m_input_one_refs(check)), _m_tallies(subj, check, "not_an_object")))
 	count(clauses) > 0
 	m := concat(", and ", clauses)
 } else := _m_fallback(check) if is_object(subj)
@@ -11549,7 +11616,7 @@ _m_blocked(subj, check) := [c |
 _m_params_faults(subj, check) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
 	some side in _m_sides(check)
 	is_array(side)
-	side[0] == "$$params"
+	side[0] in _params_starts
 	some i in numbers.range(count(side) - 1, 1)
 	prefix := array.slice(side, 0, i)
 	v := _m_resolved_prefix(subj, prefix)
@@ -11575,7 +11642,7 @@ _m_resolved_prefix(subj, prefix) := _resolved(subj, prefix) if not _params_prefi
 
 _m_resolved_prefix(subj, prefix) := _read_from(_start_of(subj, prefix), _keys_in(subj, prefix)) if _params_prefix(prefix)
 
-_params_prefix(prefix) if prefix[0] == "$$params"
+_params_prefix(prefix) if prefix[0] in _params_starts
 
 default _m_part_unreached(_) := false
 
@@ -11635,10 +11702,14 @@ _m_faults(subj, check) := [_m_isnt(s.name, s.value, kind) |
 	kind := f[1]
 ]
 
-_m_ref_blocked(check) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
+_m_ref_blocked(check) := [m |
 	some r in sort(_check_refs(check))
 	_ref_state(r) == "unusable"
 	not _ref_walks(r)
+	some m in _m_ref_breaks(r)
+]
+
+_m_ref_breaks(r) := [_m_isnt(_ref_name(prefix), v, _m_holder(k)) |
 	some i in numbers.range(count(r) - 1, 1)
 	prefix := array.slice(r, 0, i)
 	v := _m_prefix_read(prefix)
@@ -11733,9 +11804,9 @@ _m_fault_9(subj, check) := fs if {
 } else := []
 
 _m_list_right(subj, check) := [[check.right, _m_right_kind(check.cmp, r)]] if {
-	_rstate(subj, check.right) == "value"
-	not _rfailed(subj, check.right)
-	r := _rvalue(subj, check.right)
+	_lstate(check, subj) == "value"
+	not _lfailed(check, subj)
+	r := _lvalue(check, subj)
 	not _list_right_usable(check.cmp, r)
 } else := []
 
@@ -11779,7 +11850,7 @@ _m_list_left(subj, check) := [[check.left, "text"]] if {
 } else := [[check.left, _m_list_of([r])]] if {
 	check.cmp in {"includes", "excludes"}
 	l := _found(subj, check.left)
-	r := _rfound(subj, check.right)
+	r := _found(subj, check.right)
 	is_array(l)
 	not _items_fit(l, [r])
 } else := []
@@ -13011,7 +13082,7 @@ _m_from_ref_said(r) := _m_from_params_text(r) if _m_from_params_unread(r.ref)
 _m_from_ref_said(r) := _m_from_ref_text(r, _m_from_ref_cause(r)) if not _m_from_params_unread(r.ref)
 
 _m_from_params_unread(ref) if {
-	ref[0] == "$$params"
+	ref[0] in _params_starts
 	not is_object(data.ergo_params)
 	data.ergo_params != null
 }
@@ -13040,6 +13111,12 @@ _m_from_ref_text(r, "unusable") := _m_isnt(_ref_name(r.ref), v, r.kind) if {
 	_ref_state(r.ref) == "value"
 	v := _ref_read(r.ref)
 	not _m_from_ref_fits(v, r.kind)
+}
+
+_m_from_ref_text(r, "unusable") := _m_ref_breaks(r.ref)[0] if {
+	_ref_state(r.ref) == "unusable"
+	is_object(_start_of(null, r.ref))
+	not _ref_walks(r.ref)
 }
 
 _m_from_ref_fits(v, "text") if is_string(v)
