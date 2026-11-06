@@ -316,7 +316,8 @@
 "training_valid_until is on or after $input.evaluated_at",
 "count of x is at least y",
 "count of x whose field is \"v\" equals y plus z",
-"sum of x.usd whose stage is \"v\" equals total within 0.000001",
+"every x whose stage is \"v\" as s",
+"s.usd equals total within 0.000001",
 "x contains all of y"
 ]
 }

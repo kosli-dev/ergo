@@ -1581,7 +1581,7 @@
     ]
   },
   {
-    "description": "a one-line some whose parent path is named by the item",
+    "description": "a one-line some whose parent path is named by a bare name, read from the subject",
     "policy": {
       "ergo_spec": "v0.6-dev",
       "subjects": {
@@ -1605,7 +1605,7 @@
     },
     "cases": [
       {
-        "description": "lists the part before the name, and leaves out the path named by the item, since it changes with each item",
+        "description": "fails as absent when the subject has no such field, even when each item has one, and lists the path and the key",
         "rules": [
           "sentence.resolve.root",
           "sentence.some.walk",
@@ -1651,23 +1651,35 @@
         },
         "results": [
           {
-            "cause": "satisfied",
+            "cause": "absent",
             "check": "c",
-            "failed_items": [],
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of files",
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner"
+                ],
+                "path": "files[0].owner",
+                "value": "bob"
+              },
+              {
+                "cause": "absent",
+                "item": "item 2 of files",
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/1/owner"
+                ],
+                "path": "files[1].owner",
+                "value": "ann"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
                   "/trail/artifacts/0/atts"
                 ],
-                "name": "artifact.atts",
-                "value": {
-                  "x": {
-                    "owner": "ann"
-                  },
-                  "y": {
-                    "owner": "zed"
-                  }
-                }
+                "name": "artifact.atts named by k.owner",
+                "value": null
               },
               {
                 "locations": [
@@ -1679,9 +1691,17 @@
                   "bob",
                   "ann"
                 ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0"
+                ],
+                "name": "k",
+                "value": null
               }
             ],
-            "passed": true,
+            "message": "k is missing",
+            "passed": false,
             "requirement": "s",
             "subject": {
               "id": "r1",
@@ -1697,6 +1717,89 @@
             "c": "some files.owner equals artifact.atts named by k.owner"
           }
         }
+      },
+      {
+        "description": "passes on the subject's key, even when the item's key names another value",
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "atts": {
+                  "x": {
+                    "owner": "ann"
+                  },
+                  "y": {
+                    "owner": "zed"
+                  }
+                },
+                "id": "a1",
+                "releases": [
+                  {
+                    "files": [
+                      {
+                        "k": "y",
+                        "owner": "ann"
+                      }
+                    ],
+                    "id": "r1",
+                    "k": "x"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/atts/x/owner"
+                ],
+                "name": "artifact.atts named by k.owner",
+                "value": "ann"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/files/0/owner"
+                ],
+                "name": "files[].owner",
+                "value": [
+                  "ann"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/releases/0/k"
+                ],
+                "name": "k",
+                "value": "x"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "r1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "release"
+            }
+          }
+        ],
+        "rules": [
+          "sentence.resolve.root",
+          "sentence.some.walk",
+          "walk.lists",
+          "walk.items",
+          "walk.some",
+          "walk.inputs",
+          "walk.failed_items",
+          "sentence.phrase.is"
+        ]
       }
     ]
   },
@@ -2757,7 +2860,7 @@
     ]
   },
   {
-    "description": "a walk whose parent path is named by a field of each item",
+    "description": "a walk whose parent path is named by a bare name, read from the subject",
     "policy": {
       "ergo_spec": "v0.6-dev",
       "subjects": {
@@ -2785,7 +2888,7 @@
     },
     "cases": [
       {
-        "description": "lists the part before the name and not the path it names, which changes with each item",
+        "description": "fails as absent when the subject has no such field, even when each item has one",
         "rules": [
           "walk.inputs",
           "for.inputs",
@@ -2825,19 +2928,66 @@
         },
         "results": [
           {
-            "cause": "satisfied",
+            "cause": "absent",
             "check": "for",
-            "failed_items": [],
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "some rows.n is at least artifact.nums named by key",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/nums"
+                        ],
+                        "name": "artifact.nums named by key",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0"
+                        ],
+                        "name": "key",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0/rows/0/n",
+                          "/trail/artifacts/0/prs/0/rows/1/n"
+                        ],
+                        "name": "rows[].n",
+                        "value": [
+                          1,
+                          2
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of keys",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "path": "item 1 of keys",
+                "value": "k1"
+              }
+            ],
             "inputs": [
               {
                 "locations": [
                   "/trail/artifacts/0/nums"
                 ],
-                "name": "artifact.nums",
-                "value": {
-                  "a": 1,
-                  "b": 2
-                }
+                "name": "artifact.nums named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0"
+                ],
+                "name": "key",
+                "value": null
               },
               {
                 "locations": [
@@ -2860,7 +3010,8 @@
                 ]
               }
             ],
-            "passed": true,
+            "message": "item 1 of keys: key is missing",
+            "passed": false,
             "requirement": "s",
             "subject": {
               "id": "p1",
@@ -2871,19 +3022,42 @@
             }
           },
           {
-            "cause": "satisfied",
+            "cause": "absent",
             "check": "plain",
-            "failed_items": [],
+            "failed_items": [
+              {
+                "cause": "absent",
+                "item": "item 1 of rows",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n"
+                ],
+                "path": "rows[0].n",
+                "value": 1
+              },
+              {
+                "cause": "absent",
+                "item": "item 2 of rows",
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/1/n"
+                ],
+                "path": "rows[1].n",
+                "value": 2
+              }
+            ],
             "inputs": [
               {
                 "locations": [
                   "/trail/artifacts/0/nums"
                 ],
-                "name": "artifact.nums",
-                "value": {
-                  "a": 1,
-                  "b": 2
-                }
+                "name": "artifact.nums named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0"
+                ],
+                "name": "key",
+                "value": null
               },
               {
                 "locations": [
@@ -2897,7 +3071,8 @@
                 ]
               }
             ],
-            "passed": true,
+            "message": "key is missing",
+            "passed": false,
             "requirement": "s",
             "subject": {
               "id": "p1",
@@ -2916,7 +3091,7 @@
         }
       },
       {
-        "description": "fails as absent when the parent has none of the names",
+        "description": "fails as absent when the subject has no such field, whatever the parent and the items hold",
         "rules": [
           "walk.inputs",
           "for.inputs",
@@ -2969,10 +3144,15 @@
                         "locations": [
                           "/trail/artifacts/0/nums"
                         ],
-                        "name": "artifact.nums",
-                        "value": {
-                          "z": 1
-                        }
+                        "name": "artifact.nums named by key",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/trail/artifacts/0/prs/0"
+                        ],
+                        "name": "key",
+                        "value": null
                       },
                       {
                         "locations": [
@@ -3001,10 +3181,15 @@
                 "locations": [
                   "/trail/artifacts/0/nums"
                 ],
-                "name": "artifact.nums",
-                "value": {
-                  "z": 1
-                }
+                "name": "artifact.nums named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0"
+                ],
+                "name": "key",
+                "value": null
               },
               {
                 "locations": [
@@ -3027,7 +3212,7 @@
                 ]
               }
             ],
-            "message": "item 1 of keys: item 1 of rows: artifact.nums named by key is missing; item 1 of keys: item 2 of rows: artifact.nums named by key is missing",
+            "message": "item 1 of keys: key is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3066,10 +3251,15 @@
                 "locations": [
                   "/trail/artifacts/0/nums"
                 ],
-                "name": "artifact.nums",
-                "value": {
-                  "z": 1
-                }
+                "name": "artifact.nums named by key",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0"
+                ],
+                "name": "key",
+                "value": null
               },
               {
                 "locations": [
@@ -3083,7 +3273,7 @@
                 ]
               }
             ],
-            "message": "item 1 of rows: artifact.nums named by key is missing; item 2 of rows: artifact.nums named by key is missing",
+            "message": "key is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3101,6 +3291,132 @@
             "for": "for every keys as k: some rows.n is at least artifact.nums named by key"
           }
         }
+      },
+      {
+        "description": "passes on the subject's key, even when the item's key names another value",
+        "input": {
+          "trail": {
+            "artifacts": [
+              {
+                "id": "a1",
+                "nums": {
+                  "a": 1,
+                  "b": 2
+                },
+                "prs": [
+                  {
+                    "id": "p1",
+                    "key": "a",
+                    "keys": [
+                      "k1"
+                    ],
+                    "rows": [
+                      {
+                        "key": "b",
+                        "n": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "for",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums/a"
+                ],
+                "name": "artifact.nums named by key",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/key"
+                ],
+                "name": "key",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/keys/0"
+                ],
+                "name": "keys[]",
+                "value": [
+                  "k1"
+                ]
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "satisfied",
+            "check": "plain",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/trail/artifacts/0/nums/a"
+                ],
+                "name": "artifact.nums named by key",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/key"
+                ],
+                "name": "key",
+                "value": "a"
+              },
+              {
+                "locations": [
+                  "/trail/artifacts/0/prs/0/rows/0/n"
+                ],
+                "name": "rows[].n",
+                "value": [
+                  1
+                ]
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": "p1",
+              "in": {
+                "artifact": "a1"
+              },
+              "type": "pr"
+            }
+          }
+        ],
+        "rules": [
+          "walk.inputs",
+          "for.inputs",
+          "sentence.some.walk",
+          "sentence.resolve.root"
+        ]
       }
     ]
   }

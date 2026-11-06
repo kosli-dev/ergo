@@ -3887,7 +3887,7 @@ test_every_corpus_line_parses_and_prints_back_unchanged if {
 	every text in data.spec.sentence_corpus {
 		_prints_back(text)
 	}
-	count(data.spec.sentence_corpus) == 318
+	count(data.spec.sentence_corpus) == 319
 }
 
 _prints_back(text) if _printed(text) == text
@@ -6164,9 +6164,9 @@ _atts_rows(checks, params) := {r.check: [i.name | some i in r.inputs] |
 	r.check in object.keys(checks)
 }
 
-test_a_walk_whose_named_by_reads_the_item_lists_the_part_before_the_name_and_not_the_path_it_names if {
+test_a_walk_named_by_the_subjects_field_lists_the_path_it_names_and_the_key_like_a_plain_check if {
 	_atts_rows({"item": "some commits.author is artifact.atts named by k.owner", "param": "some commits.author is artifact.atts named by $params.n.owner"}, {"n": "x"}) == {
-		"item": ["artifact.atts", "commits[].author"],
+		"item": ["artifact.atts named by k.owner", "commits[].author", "k"],
 		"param": ["artifact.atts named by $params.n.owner", "commits[].author"],
 	}
 }
@@ -6179,18 +6179,18 @@ test_a_count_whose_named_by_reads_the_item_lists_the_part_before_the_name_and_no
 	]}
 }
 
-test_a_for_line_walk_named_by_the_item_or_the_alias_lists_the_part_before_the_name_and_not_the_path_it_names if {
+test_a_for_line_walk_named_by_the_subject_lists_the_key_and_named_by_the_alias_lists_the_part_before_the_name if {
 	checks := {
 		"item": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by k.owner"},
 		"alias": {"for": "every files as f", "assert": "some commits.author is artifact.atts named by f.k.owner"},
 	}
-	_atts_rows(checks, {}) == {"item": ["artifact.atts", "commits[].author", "files[]"], "alias": ["artifact.atts", "commits[].author", "files[]"]}
+	_atts_rows(checks, {}) == {"item": ["artifact.atts named by k.owner", "commits[].author", "files[]", "k"], "alias": ["artifact.atts", "commits[].author", "files[]"]}
 }
 
-test_the_applies_row_of_a_from_condition_named_by_the_item_lists_the_part_before_the_name_and_not_the_path_it_names if {
+test_the_applies_row_of_a_from_condition_named_by_the_subjects_field_lists_the_key_like_a_plain_check if {
 	subjects := object.union(_atts_subjects, {"pr": {"from": "artifact.pull_requests whose some commits.author is artifact.atts named by k.owner", "identified_by": "id"}})
 	rep := ergo.report(_atts_doc, {"ergo_spec": "v0.6-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {"c": "id exists"}}}}, {})
-	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "$applies"] == [["artifact.atts", "commits[].author"]]
+	[[i.name | some i in r.inputs] | some r in rep.results; r.check == "$applies"] == [["artifact.atts named by k.owner", "commits[].author", "k"]]
 }
 
 test_a_count_under_a_for_line_still_lists_the_parent_it_reads if {
@@ -6655,10 +6655,13 @@ test_named_by_a_field_works_with_exists_every_count_and_plus if {
 	_sentence_rows({"c": {"assert": ["xs named by k exists", "every xs named by k is 1"]}}, doc, {}) == [["c", true, "satisfied", [{"name": "k", "value": "a", "locations": ["/things/0/k"]}, {"name": "xs named by k", "value": [1], "locations": ["/things/0/xs/a"]}, {"name": "xs named by k[]", "value": [1], "locations": ["/things/0/xs/a/0"]}]]]
 }
 
-test_named_by_a_field_in_a_whose_or_the_phrase_of_a_one_line_every_reads_the_items_field if {
-	doc := {"things": [{"id": 1, "items": [{"kind": "a", "n": 3}, {"kind": "b", "n": 1}]}]}
-	params := {"min": {"a": 2, "b": 2}}
-	_walk_rows({"c": "every items.n is at least $params.min named by kind"}, doc, params) == [[1, "c", "value", [{"cause": "value", "item": "item 2 of items", "path": "items[1].n", "value": 1, "locations": ["/things/0/items/1/n"]}]]]
+test_named_by_a_field_in_a_whose_reads_the_items_field_and_in_the_phrase_of_a_one_line_every_the_subjects if {
+	doc := {"things": [{"id": 1, "kind": "b", "items": [{"kind": "a", "n": 3}, {"kind": "b", "n": 1}]}]}
+	params := {"min": {"a": 2, "b": 4}}
+	_walk_rows({"c": "every items.n is at least $params.min named by kind"}, doc, params) == [[1, "c", "value", [
+		{"cause": "value", "item": "item 1 of items", "path": "items[0].n", "value": 3, "locations": ["/things/0/items/0/n"]},
+		{"cause": "value", "item": "item 2 of items", "path": "items[1].n", "value": 1, "locations": ["/things/0/items/1/n"]},
+	]]]
 	_sentence_rows({"c": "count of items whose n is at least $params.min named by kind is 1"}, doc, params)[0][2] == "satisfied"
 }
 
@@ -10586,29 +10589,24 @@ test_a_walk_through_a_for_alias_fails_like_a_count_when_the_alias_is_null_or_a_n
 	}
 }
 
-test_a_walk_keyed_by_an_item_field_lists_the_part_before_the_name_and_never_the_keyed_value if {
+test_a_walk_keyed_by_the_subjects_field_reads_it_like_a_plain_check_and_one_keyed_by_an_item_field_lists_the_part_before_the_name if {
 	nums := {"a": 1, "b": 2}
-	rows := [{"key": "a", "n": 1}, {"key": "b", "n": 2}]
-	doc := {"artifacts": [{"name": "x", "nums": nums, "prs": [{"id": 1, "keys": ["k1"], "rows": rows, "groups": [{"items": rows}]}]}]}
-	artifact_nums := {"name": "artifact.nums", "value": nums, "locations": ["/artifacts/0/nums"]}
+	rows := [{"key": "a", "n": 1}]
+	doc := {"artifacts": [{"name": "x", "nums": nums, "prs": [{"id": 1, "key": "b", "keys": ["k1"], "rows": rows, "groups": [{"items": rows}]}]}]}
 	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
 	policy := {"ergo_spec": "v0.6-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": {
 		"plain": "some rows.n is at least artifact.nums named by key",
-		"whose": "some rows.n whose n is artifact.nums named by key is at least 1",
+		"whose": "count of rows whose n is at least artifact.nums named by key is 1",
 		"for": {"for": "every keys as k", "assert": "some rows.n is at least artifact.nums named by key"},
 		"alias": {"for": "every groups as g", "assert": "some g.items.n is at least artifact.nums named by key"},
 	}}}}
-	results := ergo.report(doc, policy, {}).results
-	every check in {"plain", "whose", "for", "alias"} {
-		inputs := [i | some r in results; r.check == check; some i in r.inputs]
-		artifact_nums in inputs
-		count([i | some i in inputs; contains(i.name, "named by")]) == 0
+	got := {r.check: [r.cause, [i.name | some i in r.inputs], object.get(r, "message", "")] | some r in ergo.report(doc, policy, {}).results; not startswith(r.check, "$")}
+	got == {
+		"plain": ["value", ["artifact.nums named by key", "key", "rows[].n"], "item 1 of rows: n is 1, and artifact.nums named by key is 2"],
+		"whose": ["satisfied", ["count of rows whose n is at least artifact.nums named by key", "rows[]", "artifact.nums"], ""],
+		"for": ["value", ["artifact.nums named by key", "key", "keys[]", "rows[].n"], "item 1 of keys: item 1 of rows: n is 1, and artifact.nums named by key is 2"],
+		"alias": ["value", ["artifact.nums named by key", "groups[]", "key"], "item 1 of groups: item 1 of g.items: n is 1, and artifact.nums named by key is 2"],
 	}
-	subjects_applies := object.union(subjects, {"pr": {"from": "artifact.prs whose some rows.n is at least artifact.nums named by key", "identified_by": "id"}})
-	applies := ergo.report(doc, object.union(policy, {"subjects": subjects_applies}), {}).results
-	applies_inputs := [i | some r in applies; r.check == "$applies"; some i in r.inputs]
-	artifact_nums in applies_inputs
-	count([i | some i in applies_inputs; contains(i.name, "named by")]) == 0
 }
 
 test_a_walk_through_a_for_name_whose_part_before_the_name_walks_a_list_lists_nothing_of_it if {
@@ -10680,12 +10678,12 @@ test_a_count_keyed_by_an_item_field_fails_as_before_when_the_key_is_missing_null
 	}
 }
 
-test_a_walk_keyed_by_an_item_field_whose_part_before_the_name_walks_a_list_lists_nothing_of_it if {
-	doc := {"artifacts": [{"name": "x", "ls": [{"m": {"a": 1}}], "prs": [{"id": 1, "rows": [{"key": "a", "n": 1}]}]}]}
+test_a_walk_keyed_by_the_subjects_field_whose_part_before_the_name_is_a_list_fails_as_unusable_and_lists_the_key if {
+	doc := {"artifacts": [{"name": "x", "ls": [{"m": {"a": 1}}], "prs": [{"id": 1, "key": "a", "rows": [{"key": "a", "n": 1}]}]}]}
 	subjects := {"artifact": {"from": "artifacts", "identified_by": "name"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}
 	checks := {"c": "some rows.n is at least artifact.ls.m named by key"}
 	rows := ergo.report(doc, {"ergo_spec": "v0.6-dev", "subjects": subjects, "requirements": {"r": {"subject": "pr", "checks": checks}}}, {}).results
-	[[i.name | some i in r.inputs] | some r in rows; r.check == "c"] == [["rows[].n"]]
+	[[r.cause, [i.name | some i in r.inputs]] | some r in rows; r.check == "c"] == [["unusable", ["artifact.ls.m named by key", "key", "rows[].n"]]]
 }
 
 _part_for_subjects(has) := {
@@ -12173,11 +12171,17 @@ test_a_named_by_field_on_the_right_of_every_reads_the_subjects_key_and_never_an_
 	_rooted_field_rows({"id": 1, "k": "m", "m": 3, "rows": [{"n": 3, "k": "n"}, {"n": 4}]}) == [["p", "unusable", "m is 3, which isn't an object"], ["w", "unusable", "m is 3, which isn't an object"]]
 }
 
-test_a_field_compared_with_itself_in_a_requirement_without_a_subject_says_the_subject if {
+test_an_alias_named_by_the_subjects_field_on_the_right_of_every_lists_the_key_and_never_the_alias if {
+	doc := {"things": [{"id": 1, "k": "z", "ys": [{"z": 1}], "xs": [{"v": 1}]}]}
+	rows := _sentence_rows({"c": {"for": "every ys as y", "assert": "every xs.v equals y named by k"}}, doc, {})
+	[i.name | some i in rows[0][3]] == ["k", "xs[].v", "ys[]"]
+}
+
+test_a_field_compared_with_itself_in_a_requirement_without_a_subject_gives_no_advice if {
 	rep := ergo.report({}, {"ergo_spec": "v0.6-dev", "subjects": {}, "requirements": {"r": {"checks": {"c": "count of xs whose x equals x is 2"}}}}, {})
 	some r in rep.results
 	r.check == "$well_formed"
 	some i in r.inputs
 	i.name == "checks.c"
-	i.value == ["x is compared with itself, because in a whose it's read from the item: to read the subject's x, write the subject.x"]
+	i.value == ["x is compared with itself, because in a whose it's read from the item"]
 }

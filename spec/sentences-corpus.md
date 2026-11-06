@@ -765,15 +765,15 @@ Not used anywhere: `is not one of`, `does not exist`, `contains none of`, `start
 
 ## pr-reviewer's custom operators
 
-| operator               | uses | written as                                                                            |
-| ---------------------- | ---: | ------------------------------------------------------------------------------------- |
-| `min_length`           | 8    | with `min: 1`, `count of x is at least 1`. With `min: 0`, `x is a list`               |
-| `min_length_at`        | 2    | `count of x is at least y`                                                            |
-| `length_eq_difference` | 1    | `count of x plus z equals y`, moving the minus across                                 |
-| `count_where_eq_sum`   | 2    | `count of x whose field is "v" equals y plus z`                                       |
-| `sum_eq`               | 2    | `sum of x.usd whose stage is "v" equals total within 0.000001`                        |
-| `contains_all`         | 1    | `x contains all of y`                                                                 |
-| `keys_match`           | 1    | `for: every x as persona` with `assert: y named by persona matches "..."`, since #213 |
+| operator               | uses | written as                                                                             |
+| ---------------------- | ---: | -------------------------------------------------------------------------------------  |
+| `min_length`           | 8    | with `min: 1`, `count of x is at least 1`. With `min: 0`, `x is a list`                |
+| `min_length_at`        | 2    | `count of x is at least y`                                                             |
+| `length_eq_difference` | 1    | `count of x plus z equals y`, moving the minus across                                  |
+| `count_where_eq_sum`   | 2    | `count of x whose field is "v" equals y plus z`                                        |
+| `sum_eq`               | 2    | `for: every x whose stage is "v" as s`<br>`assert: s.usd equals total within 0.000001` |
+| `contains_all`         | 1    | `x contains all of y`                                                                  |
+| `keys_match`           | 1    | `for: every x as persona` with `assert: y named by persona matches "..."`, since #213  |
 
 All seven run today: the five numeric ones since #173, as it found, `keys_match` since #213 and `contains_all` since #224. The sentences also drop the `expression` and `inputs` each custom check had to carry.
 

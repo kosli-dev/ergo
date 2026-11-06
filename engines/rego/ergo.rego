@@ -863,6 +863,17 @@ _names_subject_of(req) if _names_subject_in(req)
 
 _names_subject_of(req) if _names_subject_in(_applies_to_of(req))
 
+_names_subject_of(req) if _has_root_field(req)
+
+_names_subject_of(req) if _has_root_field(_applies_to_of(req))
+
+_has_root_field(x) if {
+	contains(json.marshal(x), "\\u0002")
+	walk(x, [_, s])
+	is_string(s)
+	startswith(s, _root_key)
+}
+
 _names_subject_in(req) if {
 	contains(json.marshal(req), "\\\"of\\\":null")
 	walk(req, [_, s])
@@ -928,6 +939,8 @@ _scoped_of(req) if {
 _reads_whole_subject(req) if _has_old_marker(req)
 
 _reads_whole_subject(req) if _has_old_marker(_applies_to_of(req))
+
+_reads_whole_subject(req) if _has_root_field(req)
 
 _has_old_marker(x) if {
 	walk(x, [_, s])
@@ -1814,13 +1827,31 @@ _keys_in(_, path) := _keys_of(path) if not _has_field_step(path)
 _keys_in(subj, path) := ks if {
 	_has_field_step(path)
 	steps := _path_steps(path)
-	ks := [k | some seg in steps; k := _field_step_key(_field_base(subj, path), seg)]
+	ks := [k | some seg in steps; k := _field_step_key(subj, seg)]
 	count(ks) == count(steps)
 }
 
-_field_base(_, path) := input["ergo/names"]["ergo/subject"] if _root_path(path)
+_root_key := "\u0002"
 
-_field_base(subj, path) := subj if not _root_path(path)
+_subject_key := "\u0003"
+
+_fk(seg) := substring(seg.named_by_field, count(_root_key), -1) if startswith(seg.named_by_field, _root_key)
+
+else := split(seg.named_by_field, _subject_key)[2] if startswith(seg.named_by_field, _subject_key)
+
+else := seg.named_by_field
+
+_fk_text(seg) := concat(".", [_s_key_text(split(seg.named_by_field, _subject_key)[1]), _s_key_text(_fk(seg))]) if startswith(seg.named_by_field, _subject_key)
+
+else := _s_key_text(_fk(seg))
+
+_from_root(seg) if startswith(seg.named_by_field, _root_key)
+
+_from_root(seg) if startswith(seg.named_by_field, _subject_key)
+
+_fb(_, seg) := input["ergo/names"]["ergo/subject"] if _from_root(seg)
+
+_fb(subj, seg) := subj if not _from_root(seg)
 
 _path_steps(path) := array.slice(path, 1, count(path)) if _named(path)
 
@@ -1828,8 +1859,8 @@ _path_steps(path) := path if not _named(path)
 
 _field_step_key(subj, seg) := v if {
 	_field_step(seg)
-	is_object(subj)
-	v := subj[seg.named_by_field]
+	is_object(_fb(subj, seg))
+	v := _fb(subj, seg)[_fk(seg)]
 	is_string(v)
 }
 
@@ -2153,7 +2184,7 @@ _step_name(i, p) := concat("", [" named by ", _s_key_text(p.named_by)]) if {
 	_name_step(p)
 }
 
-_step_name(i, p) := concat("", [" named by ", _s_key_text(p.named_by_field)]) if {
+_step_name(i, p) := concat("", [" named by ", _fk_text(p)]) if {
 	i > 0
 	_field_step(p)
 }
@@ -3703,7 +3734,7 @@ _field_unusable_after_read(subj, path) if {
 	some i, seg in path
 	_field_step(seg)
 	_read_before_field(_resolved(subj, array.slice(path, 0, i)))
-	not is_string(object.get(_field_base(subj, path), seg.named_by_field, null))
+	not is_string(object.get(_fb(subj, seg), _fk(seg), null))
 }
 
 _reads_itself(path) if _keys_of(path) == []
@@ -3738,7 +3769,7 @@ _path_read_state(subj, path) := _field_step_state(subj, path)
 
 _field_step_state(subj, path) := "not_an_object" if {
 	_has_field_step(path)
-	not is_object(_field_base(subj, path))
+	not is_object(_fb(subj, path[_first_field_step(path)]))
 } else := s if {
 	prefix := array.slice(path, 0, _first_field_step(path))
 	not _read_before_field(_resolved(subj, prefix))
@@ -3748,12 +3779,12 @@ _field_step_state(subj, path) := "not_an_object" if {
 	some i, seg in path
 	_field_step(seg)
 	_read_before_field(_resolved(subj, array.slice(path, 0, i)))
-	_field_base(subj, path)[seg.named_by_field] == null
+	_fb(subj, seg)[_fk(seg)] == null
 } else := "unusable" if {
 	some i, seg in path
 	_field_step(seg)
 	_read_before_field(_resolved(subj, array.slice(path, 0, i)))
-	v := _field_base(subj, path)[seg.named_by_field]
+	v := _fb(subj, seg)[_fk(seg)]
 	not is_string(v)
 }
 
@@ -3780,13 +3811,13 @@ _read_before_field(v) if v != _absent
 _walk_read_state(subj, path) := _worst_of(flaws) if {
 	flaws := {f | some seg in path; f := _ref_step_flaw(seg)}
 	flaws != set()
-} else := _key_state(object.get(_field_base(subj, path), path[i].named_by_field, _absent)) if {
-	is_object(_field_base(subj, path))
+} else := _key_state(object.get(_fb(subj, path[i]), _fk(path[i]), _absent)) if {
 	i := _bad_field_at(subj, path)
+	is_object(_fb(subj, path[i]))
 	_walks_before_field(subj, array.slice(path, 0, i))
 } else := "null" if {
-	is_object(_field_base(subj, path))
 	i := _bad_field_at(subj, path)
+	is_object(_fb(subj, path[i]))
 	_null_before_field(subj, array.slice(path, 0, i))
 } else := _read_state(subj, path)
 
@@ -3800,7 +3831,7 @@ _ref_step_flaw(seg) := "unusable" if {
 	s != "value"
 }
 
-_bad_field_at(subj, path) := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(_field_base(subj, path), seg.named_by_field, null))})
+_bad_field_at(subj, path) := min({j | some j, seg in path; _field_step(seg); not is_string(object.get(_fb(subj, seg), _fk(seg), null))})
 
 _null_prefix_fails(item, subj) := array.concat(w.fails, _walk_stop(w)) if {
 	is_object(subj)
@@ -4211,12 +4242,12 @@ _field_paths(check) := [p |
 	count(_own_key_fields(p)) > 0
 ]
 
-_own_key_fields(path) := [seg.named_by_field |
+_own_key_fields(path) := [_fk(seg) |
 	some seg in path
 	_field_step(seg)
 ]
 
-_key_fields(check) := sort({seg.named_by_field |
+_key_fields(check) := sort({_fk(seg) |
 	is_object(check)
 	some p in array.concat([object.get(check, "path", [])], array.concat(_side_paths(object.get(check, "left", null)), _side_paths(object.get(check, "right", null))))
 	is_array(p)
@@ -6936,12 +6967,21 @@ _s_self_problems(assertions) := ({concat("", [_s_path_text(a.path, "left"), " is
 
 _s_sum_whose_problems(assertions) := {concat("", ["whose ", names[0], ": sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose"]) |
 	some a in assertions
+	_s_sums(a)
+	names := [n | some c in object.get(a, "where", []); not _s_that(c); some n in _s_focus_names(c)]
+	count(names) > 0
+} | {concat("", ["that ", names[0], ": sum of adds up numbers, which have no fields, so ", names[0], " can't be read from one: to read the subject's ", names[0], ", write ", _s_subject_mark, ".", names[0]]) |
+	some a in assertions
+	_s_sums(a)
+	names := [n | some c in object.get(a, "where", []); _s_that(c); some n in _s_focus_names(c)]
+	count(names) > 0
+}
+
+_s_sums(a) if {
 	terms := object.get(a, "terms", [])
 	count(terms) > 0
 	is_object(terms[count(terms) - 1])
 	"sum" in object.keys(terms[count(terms) - 1])
-	names := [n | some c in object.get(a, "where", []); some n in _s_focus_names(c)]
-	count(names) > 0
 }
 
 _s_focus_names(c) := array.concat(
@@ -7910,11 +7950,22 @@ _p_aliases(req, _) := set() if not is_string(object.get(req, "subject", null))
 
 _p_named_by_problems(lines, ftext, aliases, subject) := {_p_named_by_message(ref.steps[0], subject) |
 	aliases != set()
-	some node in array.concat([n | some line in lines; is_string(line); some n in _s_nodes(_sentence(line))], [n | is_string(ftext); some n in _s_nodes(_for_line(ftext))])
+	some tree in array.concat([_sentence(line) | some line in lines; is_string(line)], [_for_line(ftext) | is_string(ftext)])
+	walk(tree, [at, node])
 	is_object(node)
 	ref := object.get(node, "named_by", {"start": ""})
 	not "start" in object.keys(ref)
 	ref.steps[0] in aliases
+	not _p_subject_keyed(tree, at, ref, subject)
+}
+
+_p_subject_keyed(tree, at, ref, subject) if {
+	ref.steps[0] == subject
+	"where" in at
+	count(at) > 0
+	is_number(at[count(at) - 1])
+	steps := object.get(tree, array.slice(at, 0, count(at) - 1), [])
+	is_string(steps[at[count(at) - 1] + 1])
 }
 
 _p_named_by_message(name, subject) := concat("", ["named by ", name, ": ", name, " is the whole subject, so it can't name a key"]) if name == subject
@@ -8154,12 +8205,17 @@ _p_item_side(f, side, pc, mode) := _p_item_path(side, pc) if {
 	is_object(side)
 } else := _p_side(side, pc, mode)
 
-_p_item_path(path, pc) := _p_path(_p_own_named(path), pc, "o") if {
+_p_item_path(path, pc) := _p_subject_key(_p_path(_p_own_named(path), pc, "o"), pc) if {
 	count(path) > 0
 	is_string(path[0])
 	not startswith(path[0], "$")
 	path[0] in object.keys(pc.own)
 } else := _p_path(path, pc, "i")
+
+_p_subject_key(p, pc) := array.concat(array.concat(array.slice(p, 0, i), [{"named_by_field": concat("", [_subject_key, pc.subject, _subject_key, p[i + 1]])}]), array.slice(p, i + 2, count(p))) if {
+	is_string(object.get(pc, "subject", null))
+	i := min({j | some j, step in p; step == {"named_by_field": pc.subject}; j + 1 < count(p); is_string(p[j + 1])})
+} else := p
 
 _p_item_right(side, pc) := object.union(side, {"add": [_p_item_right_one(o, pc) | some o in side.add]}) if is_array(object.get(side, "add", null))
 
@@ -8227,20 +8283,19 @@ _p_requirement(req, chains, parts) := object.union(object.remove(req, ["checks"]
 
 _root_marker := _p_marker("", -1, null, true)
 
-_subject_marked(req, m) := object.union(m, {"$sentence": [replace(p, _s_subject_mark, _s_subject_written(req)) | some p in m["$sentence"]]}) if {
+_subject_marked(req, m) := object.union(m, {"$sentence": [_s_with_subject(p, req) | some p in m["$sentence"]]}) if {
 	is_object(m)
 	is_array(object.get(m, "$sentence", null))
 } else := m
 
-_s_subject_written(req) := _s_path_text({"steps": [req.subject], "quoted": true}, "left") if is_string(object.get(req, "subject", null))
+_s_with_subject(p, req) := replace(p, _s_subject_mark, written) if {
+	contains(p, _s_subject_mark)
+	is_string(object.get(req, "subject", null))
+	written := _s_path_text({"steps": [req.subject], "quoted": true}, "left")
+	not startswith(written, "\"")
+} else := substring(p, 0, indexof(p, ": to read the subject's ")) if contains(p, _s_subject_mark)
 
-else := "the subject"
-
-_root_path(path) if {
-	is_array(path)
-	count(path) > 0
-	path[0] == _root_marker
-}
+else := p
 
 _rooted(m) := object.union(m, {"checks": [_rooted_leaf(c) | some c in m.checks]}) if {
 	is_object(m)
@@ -8255,15 +8310,27 @@ _rooted_leaf(m) := object.union(m, {"check": object.union(m.check, {"right": _ro
 	is_array(object.get(m.check, "right", null))
 } else := m
 
-_rooted_side(p) := array.concat([_root_marker], p) if {
+_rooted_side(p) := array.concat([_root_marker], _root_fields(p)) if {
 	count(p) > 0
 	is_string(p[0])
 	not startswith(p[0], "$")
-} else := array.concat([_root_marker], p) if {
+} else := array.concat([_root_marker], _root_fields(p)) if {
 	count(p) > 0
 	_is_literal(p[0])
 	is_string(p[0].literal)
-} else := p
+} else := _root_fields(p)
+
+_root_fields(p) := [_root_keyed_step(step) | some step in p]
+
+_root_keyed_step(step) := {"named_by_field": concat("", [_root_key, step.named_by_field])} if _field_step(step)
+
+else := step
+
+_root_read_fields(p) if {
+	some step in p
+	_field_step(step)
+	_from_root(step)
+}
 
 _p_check_aliases(check, aliases, req) := aliases | {req.subject} if {
 	is_string(object.get(req, "subject", null))
@@ -9093,17 +9160,24 @@ _field_named_inputs(subj, paths) := array.concat(
 		some p in paths
 		_read_off_item(p)
 		_has_field_step(p)
-		not _root_path(p)
+		not _root_read_fields(p)
 		shown := _as_subject_part(_before_field_step(p))
 		not _through_list(subj, shown)
 	],
 	[x |
 		some p in paths
-		_root_path(p)
-		_has_field_step(p)
-		some x in array.concat([_path_input(subj, _as_subject_part(p))], [_path_input(subj, [f]) | some f in _own_key_fields(p)])
+		_root_read_fields(p)
+		some x in array.concat([_path_input(subj, _as_subject_part(p)) | not _builtin(p); not _alias_start(p)], [_path_input(subj, [f]) | some f in _own_key_fields(p)])
 	],
 )
+
+_alias_start(p) if {
+	is_string(p[0])
+	startswith(p[0], "$")
+	not startswith(p[0], "$$")
+	not startswith(p[0], "${")
+	not _parent_name(p[0])
+}
 
 _before_field_step(p) := array.slice(p, 0, min([j | some j, step in p; j > 0; _field_step(step)]))
 
@@ -9719,7 +9793,7 @@ _m_unread_names(path, subj, f) := {"msg": ms} if {
 
 _m_step_name(seg, _) := [seg.named_by, object.get(input, ["ergo/names", seg.named_by], _absent)] if _name_step(seg)
 
-_m_step_name(seg, subj) := [seg.named_by_field, object.get(subj, seg.named_by_field, _absent)] if {
+_m_step_name(seg, subj) := [_fk(seg), object.get(_fb(subj, seg), _fk(seg), _absent)] if {
 	_field_step(seg)
 	is_object(subj)
 }
@@ -9773,7 +9847,7 @@ _for_walk(item, subj, names) := _for_picked(item, w, names) if {
 	w := _walk(_walk_start(item, subj), keys, _for_empty_ok(item)) with input as {"ergo/names": names}
 } else := object.union({"items": [], "fails": _for_null_fails(item, subj, names), "walked": set(), "trail": [], "unread": _for_unread(subj, item.path, names)}, _unread_at(subj, item, names))
 
-_for_unread(subj, path, names) := _key_state(object.get(subj, path[i].named_by_field, _absent)) if {
+_for_unread(subj, path, names) := _key_state(object.get(_fb(subj, path[i]), _fk(path[i]), _absent)) if {
 	is_object(subj)
 	i := _bad_field_at(subj, path)
 	_open_before_field(subj, array.slice(path, 0, i)) with input as {"ergo/names": names}
@@ -10319,7 +10393,7 @@ _through_list(subj, path) if {
 	is_array(_value_at(subj, array.slice(path, 0, i)))
 }
 
-_for_key_fields(check) := {seg.named_by_field |
+_for_key_fields(check) := {_fk(seg) |
 	some item in check.items
 	some seg in item.path
 	_field_step(seg)
@@ -11006,21 +11080,21 @@ _m_key_state(_, step) := "null" if {
 _m_key_state(subj, step) := "null" if {
 	is_object(step)
 	is_object(subj)
-	subj[step.named_by_field] == null
+	_fb(subj, step)[_fk(step)] == null
 }
 
 _m_key_state(subj, step) := "absent" if {
 	is_object(step)
-	is_string(step.named_by_field)
+	is_string(_fk(step))
 	is_object(subj)
-	not step.named_by_field in object.keys(subj)
+	not _fk(step) in object.keys(_fb(subj, step))
 }
 
 _m_key_name(step) := _ref_name(step.ref) if _is_ref(step)
 
 _m_key_name(step) := step.named_by if object.keys(step) == {"named_by"}
 
-_m_key_name(step) := step.named_by_field if object.keys(step) == {"named_by_field"}
+_m_key_name(step) := _fk_text(step) if object.keys(step) == {"named_by_field"}
 
 _m_key_fault(_, step) := _m_isnt(_ref_name(step.ref), v, "text") if {
 	_is_ref(step)
@@ -11038,11 +11112,11 @@ _m_key_fault(_, step) := _m_isnt(step.named_by, v, "text") if {
 	not is_string(v)
 }
 
-_m_key_fault(subj, step) := _m_isnt(step.named_by_field, v, "text") if {
+_m_key_fault(subj, step) := _m_isnt(_fk_text(step), v, "text") if {
 	is_object(step)
-	is_string(step.named_by_field)
+	is_string(_fk(step))
 	is_object(subj)
-	v := subj[step.named_by_field]
+	v := _fb(subj, step)[_fk(step)]
 	v != null
 	not is_string(v)
 }
@@ -11127,7 +11201,7 @@ _m_step_key(_, step) := k if {
 _m_step_key(subj, step) := k if {
 	is_object(step)
 	is_object(subj)
-	k := subj[step.named_by_field]
+	k := _fb(subj, step)[_fk(step)]
 	is_string(k)
 }
 
@@ -11610,15 +11684,48 @@ _m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots),
 	cause == "not_an_object"
 	not is_object(e.iv)
 } else := concat(", and ", off) if {
-	off := _m_off_item(subj, c, cause)
+	off := _m_keyed_off(subj, c, cause)
 	off != []
 } else := _m_leaf_in(e.i, _m_cond_message(c, e.iv, cause), roots)
 
-_m_off_path(p) if _subject_part(p)
+_m_off_path(p) if {
+	_subject_part(p)
+	not _item_keyed(p)
+}
 
 _m_off_path(p) if {
 	_starts_at_name(p)
 	not _part_start(p)
+	not _item_keyed(p)
+}
+
+_item_keyed(p) if {
+	some step in p
+	_field_step(step)
+	not _from_root(step)
+}
+
+_m_keyed_off(subj, c, cause) := ks if {
+	ks := _once([_m_root_key_text(step, cause) |
+		some side in _m_sides(c)
+		some p in _m_side_paths(side)
+		is_array(p)
+		some step in p
+		_field_step(step)
+		_from_root(step)
+		_m_root_key_text(step, cause)
+	])
+	ks != []
+} else := _m_off_item(subj, c, cause)
+
+_m_root_key_text(step, cause) := concat("", [_fk_text(step), " is ", _m_state_word(cause)]) if {
+	cause in {"absent", "null"}
+	_key_state(object.get(_fb({}, step), _fk(step), _absent)) == cause
+} else := _m_isnt(_fk_text(step), v, "text") if {
+	cause == "unusable"
+	v := _fb({}, step)[_fk(step)]
+	v != null
+	not is_string(v)
 }
 
 _m_off_item(subj, c, "unusable") := _once([_m_isnt(_input_name(shown), v, "a list") |
@@ -12113,7 +12220,7 @@ _m_listed(names) := concat("", ["item ", concat(" and item ", [m[1] | some m in 
 
 _m_walk_leaf(e, leaf, cause, roots) := concat(", and ", off) if {
 	leaf != null
-	off := _m_off_item(object.get(input, ["ergo/names", "ergo/subject"], null), leaf, cause)
+	off := _m_keyed_off(object.get(input, ["ergo/names", "ergo/subject"], null), leaf, cause)
 	off != []
 } else := _m_leaf_in(e.i, _message(leaf, e.iv, cause), roots) if leaf != null
 
@@ -12135,7 +12242,9 @@ _m_root_alone(leaf, cause) := [m |
 	m := _m_root_problem(leaf, shown, subj, cause)
 ][0]
 
-_m_root_problem(leaf, shown, subj, cause) := _message({"op": "present", "path": shown}, subj, cause) if {
+_m_root_problem(leaf, shown, subj, cause) := _rwalk_text(subj, shown) if _rfailed(subj, shown)
+
+else := _message({"op": "present", "path": shown}, subj, cause) if {
 	cause in {"absent", "null", "unusable"}
 	_any_read_state(subj, shown) == cause
 } else := _m_isnt(_input_name(shown), v, kind) if {
