@@ -90,7 +90,7 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     ergo_spec: "v0.6-dev",
     subjects: {
       deployment: { from: 'deployments whose environment is "prod"', identified_by: "id" },
-      test: { from: "deployment.tests" },
+      test: { from: "every deployment.tests" },
     },
     requirements: { approved: { subject: "test", checks: { ok: "ok is true and deployment.approved_by exists" } } },
   };
