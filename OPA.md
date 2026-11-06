@@ -338,7 +338,7 @@ These have no sentence form, so `as_sentences` leaves them as they are:
 - A check with an empty path, `[]`, which reads the whole subject. Write it with the subject's name, like `region is "x"`.
 - A side written as `count`, `sum`, `add` or `literal`. Write it as `count of`, `sum of` or `plus`.
 - A check that compares a field with itself, because that sentence is written wrong.
-- A check of a subject read from or built on another subject, like `from: artifact.pull_requests` or an old `of`. A sentence there reads `artifact` as that subject.
+- A check of a subject read from or built on another subject, like `from: every artifact.pull_requests` or an old `of`. A sentence there reads `artifact` as that subject.
 
 The comments of a YAML file are lost, since OPA reads it as data.
 

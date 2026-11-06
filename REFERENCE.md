@@ -241,6 +241,9 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   A release with no `files` field at all isn't out of scope: Ergo can't tell, so the row fails as `absent` (`null` and `unusable` for a `null` or a wrong type), with the input `{"name": "files.path", "value": [], "locations": []}`, and the requirement isn't met. `every files.path matches "^docs/"` keeps the releases that only change documentation, and `every files.path, if any, matches "^docs/"` keeps the ones with no files too. `some` takes no `, if any,`. A bare name after `some` or `every` is the item's, and a parent subject's name on the right is the parent. The condition can't have a `whose` of its own, and a `whose` in a check or on a `for` line takes no `some` or `every` condition.
 - A subject's own name at the start of its `from` is the input field, so `lockfile` can have `from: lockfile whose status is "COMPLETE"`.
 - A `from` line that's another subject's name, with or without a `whose`, narrows that subject (a position after the name, like `p[1]` or `first of p`, doesn't narrow it: the subject reads that position inside each `p`, and fails `$min_subjects` as `unusable` when a `p` is an object), as in [a subject built on another](#a-subject-built-on-another): `critical defect` with `from: defect whose severity is "critical"` keeps the defects that pass `defect`'s conditions and its own. A name with a space goes in quotes, so the whole line goes in single quotes in YAML: `from: '"critical defect" whose team is "b"'`. It takes its id from the subject it narrows, so an `identified_by` of its own is written wrong, with `not allowed on a subject that narrows another`. When that subject is read with `every`, the narrowing subject takes its flat list of subjects and filters it, and its `$min_subjects` expression starts with `every` too.
+- A `from` line with one name, like `deployments` or `.deployments`, gives each item of a list as a subject. A line with more than one name needs `every` to read a list, wherever the list is: `$input`, another subject's name, each field and each key a `named by` reads count as names, and a position like `[0]` or `first of` doesn't. So `$input.deployments`, `build.tests`, `build named by $params.k` and `builds[0].tests` need `every` when the value they reach is a list, and `builds[0].tests[0]` doesn't. Without it, `$min_subjects` fails as `unusable` and says what to write, like `trails is a list: write every trails.r.prs to read each item`. The data decides whether a value is a list, so the line isn't written wrong.
+- A `from` line that ends at text, a number or true or false gives that value as one subject, and a check reads it by the subject's name: with `{"version": "1.2.0"}`, `version` with `from: version` is a subject, and `version is "1.2.0"` passes. An input that is itself text still fails `$min_subjects` as `unusable`.
+- All the subjects a `from` line gives must be of one type: objects, lists, text, numbers, or true or false. `from: tags` on `{"tags": ["a", {"x": 1}]}` fails `$min_subjects` as `unusable`, even with `min_subjects: 0`, with `item 1 of tags is text, item 2 of tags is an object`, and both are still subjects and are checked. An item that is `null` is a subject too and doesn't count as a type.
 - A `from` line that starts at another subject's name and goes on reads the rest of its path from that subject. With `{"params": {"artifact_name": "web"}}` and this input:
 
   ```json
@@ -258,7 +261,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
       from: trail.artifacts named by $params.artifact_name
       identified_by: fingerprint
     pull request:
-      from: artifact.pull_requests
+      from: every artifact.pull_requests
       identified_by: url
   ```
 
@@ -280,7 +283,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   ]}}}}
   ```
 
-  `from: artifact.pull_requests whose base is artifact.branch` keeps `pr/7` and leaves `pr/8` out of scope:
+  `from: every artifact.pull_requests whose base is artifact.branch` keeps `pr/7` and leaves `pr/8` out of scope:
 
   ```json
   {"check": "$applies", "subject": {"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "passed": false, "cause": "value", "message": "base is \"dev\", and artifact.branch is \"main\"",
@@ -305,10 +308,10 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
   ```yaml
   subjects:
     artifact:
-      from: trail.artifacts whose environment is "prod"
+      from: every trail.artifacts whose environment is "prod"
       identified_by: fingerprint
     pull request:
-      from: artifact.pull_requests
+      from: every artifact.pull_requests
       identified_by: url
   requirements:
     reviewed:
@@ -339,15 +342,48 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
   ```yaml
   commit:
-    from: '"pull request".commits'
+    from: 'every "pull request".commits'
     identified_by: sha
   ```
 
   Each commit row says which artifact and which pull request it belongs to, like `"in": {"artifact": "sha-1", "pull request": "pr/7"}`, and each pull request gets its own `$min_subjects` and `$unique_ids` rows. An artifact or a pull request that's out of scope leaves out everything below it. An artifact whose conditions can't be decided gets one failing `$min_subjects` row, with `"in": {"artifact": ...}`. A check reads any ancestor by its name, like `artifact.name` or `"pull request".title`, and its parts too. A fourth level is written wrong, with `a chain of more than three subjects isn't supported yet`, and so is a subject whose from line narrows a child subject. A chain that comes back to a subject already in it, like `b` with `from: kid.x` and `kid` with `from: b.kids`, is written wrong with `leads to a loop`, however many subjects it goes through.
 
-  A parent that isn't an object, a string or a `null` for instance, can't hold the child's field, so its `$min_subjects` row fails as `not_an_object`, with `in` up to the parent, even with `min_subjects: 0`. A parent that's an object without the field still gives `absent`, and a `from` that starts with a position, like `artifact[0].commits`, keeps the cause it had.
+  A parent that isn't an object, a string or a `null` for instance, can't hold the child's field, so its `$min_subjects` row fails as `not_an_object`, with `in` up to the parent, even with `min_subjects: 0`. A parent that's an object without the field still gives `absent`, and a `from` that starts with a position, like `artifact[0].commits`, keeps the cause it had. A parent that is a list is read with `every`: with `batch` read from `batches`, `every batch.owner` gives the owners in each batch, with the batch under `in`, and `batch.owner` fails as `not_an_object` with `batch is a list: write every batch.owner to read each item`. `every` never stands for the parent itself: `every batch` and `every batch whose size is 2` are written wrong, with `batch is a subject: write batch whose … to narrow it, without every`.
+
+  Use a child subject when something only makes sense inside another thing, like the test runs of a build. Its id only has to be unique inside its parent, so `unit` can appear in every build, and every row names the parent under `in`, so a reader knows which build a failing test run belongs to. With `{"params": {"kinds": ["unit", "integration"]}}` and this input:
+
+  ```json
+  {"builds": [
+    {"id": "b1", "test_runs": {"unit": {"passed": true}, "integration": {"passed": true}}},
+    {"id": "b2", "test_runs": {"unit": {"passed": true}, "integration": {"passed": false}}}
+  ]}
+  ```
+
+  and this policy:
+
+  ```yaml
+  subjects:
+    build:
+      from: builds
+      identified_by: id
+    test run:
+      from: build.test_runs named by each of $params.kinds
+  requirements:
+    tests pass:
+      subject: test run
+      checks:
+        passed: passed is true
+  ```
+
+  there are four test runs, `unit` and `integration` under each build, and only `integration` in `b2` fails:
+
+  ```json
+  {"check": "passed", "subject": {"type": "test run", "id": "integration", "in": {"build": "b2"}}, "passed": false, "cause": "value", "message": "passed is false"}
+  ```
+
+  `every` can't go with `named by each of`, so `every builds.test_runs named by each of $params.kinds` is written wrong: the keys would be the ids, and with two builds the rows wouldn't say which build they belong to. When a `from` line meets a list before `named by each of`, like `build.test_runs` with `test_runs` a list, `$min_subjects` fails as `unusable` with `build.test_runs is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it`, and each key is still a subject that fails its checks.
 - A `from` line that starts at another subject's name and ends with `named by each of`, like `artifact named by each of $params.keys`, is a child subject too: each key in the list is a subject read inside each parent, so the keys are looked up in the parent and not in an input field named like it, and every row carries the parent under `in`. `artifact.x named by each of $params.keys` reads the keys inside `x` of each parent. A parent that isn't an object fails `$min_subjects` as `not_an_object` and makes no subject of its keys. A missing, `null` or wrong-typed list fails `$min_subjects` of each parent as `absent`, `null` or `unusable`. A first key written with a dot, like `.artifact named by each of $params.keys` or `.artifact.pull_requests`, is always the input field, never the parent, so that line isn't a child subject. A position after the parent's name, like `artifact[0] named by each of $params.keys` or `first of artifact named by each of $params.keys`, reads the parent as a list: `$min_subjects` fails as `unusable` for each parent that's an object, and the keys are still subjects that fail their checks.
-- `every` in front of the path walks every list along it, the last one included, as [`every`](#checks) does in a check, and each value it ends at is a subject. With this input:
+- `every` in front of the path reads one list at each name along it, the last one included, and at the value it starts at, and each value it ends at is a subject. With this input:
 
   ```json
   {"artifacts": [
@@ -384,9 +420,11 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
   - Unlike a [child subject](#from-lines), these pull requests don't belong to an artifact. Their rows have no `in`, they're counted once, and their ids must be unique across all of them. A check can't read the artifact.
   - An empty list, like `sha-2`'s, adds nothing and fails nothing.
-  - A list that's missing, like `sha-3`'s, `null` or not a list fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`. The row's `failed_items` says where, and the pull requests that could be read are still checked. So does a value at the end that isn't an object, and a path with no list along it, as `every` does in a check.
-  - Without `every`, a path through a list reads nothing, and `$min_subjects` fails as `unusable`.
-  - `every` can't go with a path that starts at another subject's name or with `named by each of`. Both are written wrong. A path that starts with a dot, like `every .artifact.p`, reads the input field and is fine. A child subject reads names one parent at a time.
+  - A list that's missing, like `sha-3`'s, or `null` fails `$min_subjects` with the worst cause found, even with `min_subjects: 0`. The row's `failed_items` says where, and the pull requests that could be read are still checked. So does a path with no list along it: `every deps` on `{"deps": {"id": 1}}` fails with `deps is {"id": 1}, which isn't a list`.
+  - A value at the end can be an object, text, a number or true or false: `every builds.version` on `{"builds": [{"version": "1.0"}, {"version": "1.1"}]}` gives `"1.0"` and `"1.1"`.
+  - A name `every` reads as a list in one item must be a list in all of them. `every builds.tags` on `{"builds": [{"tags": ["a", "b"]}, {"tags": "c"}]}` gives `a`, `b` and `c`, and `$min_subjects` fails as `unusable` with `tags is a list in item 1 of builds but "c" in item 2`. A policy that expects both shapes can say so with a subject for each, like `listed build` with `from: build whose tags is a list` and `tag` with `from: every "listed build".tags`.
+  - A list directly inside a list is an item like any other, and `every` doesn't read into it. With `{"batches": [[{"owner": {"name": "ann"}}], [{"owner": {"name": "cy"}}]]}`, `every batches` gives two subjects, each a list, and `every batches.owner` fails as `not_an_object`, because a list has no `owner`. A subject for each level, `batch` and `every batch.owner`, reads the owners.
+  - `every` can start at another subject's name, like `every artifact.pull_requests`, which reads the pull requests of each artifact, with the artifact under `in`, as a [child subject](#from-lines) does. `every` can't go with `named by each of`, which is written wrong. A path that starts with a dot, like `every .artifact.p`, reads the input field.
 - `every distinct` makes one subject of items that are exactly the same, which SBOM tools often write twice. With this input:
 
   ```json
@@ -425,7 +463,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
   - Two values are the same when they're equal as JSON: `1` and `1.0` are the same, and so are two objects with the same keys in another order. Two lists with the same items in another order aren't.
   - Items that share an id but differ in anything else, like a third `click` with version `8.2`, are all kept, and `$unique_ids` fails on them and lists the location of every copy's id. Ergo never picks one of two pieces of evidence that disagree, so there's no `distinct by` a field.
-  - Copies are merged before the `whose` is read, so they get one `$applies` row, and the rows of a child subject, like `from: component.licenses`, list the location under every copy too. A path that starts at `$input`, like `version is $input.sbom.components[2].version`, lists only the location it names.
+  - Copies are merged before the `whose` is read, so they get one `$applies` row, and the rows of a child subject, like `from: every component.licenses`, list the location under every copy too. A path that starts at `$input`, like `version is $input.sbom.components[2].version`, lists only the location it names.
   - `distinct` goes after `every` on a `from` line. Without `every`, like `from: distinct sbom.components`, it is written wrong.
 - A `from` or `identified_by` that can't be read is written wrong, and the `$well_formed` row says why, like `{"name": "subjects.x.from", "value": ["doesn't parse"], "locations": []}`.
 - A `from` that can't be read fails `$min_subjects`, and its `message` says where the read stopped: `item 2 of things is missing`, or `things is 5, which isn't a list or an object`. A child subject names the path inside its parent, without the parent's name, like `ws is missing` or `item 1 of ws is missing`. When the read stops before its first step, the message names `$input`, like `$input is null`, or the parent, like `artifact is null` or `item 1 of artifact is missing` for a child of `artifact`.
@@ -563,7 +601,7 @@ and written out in full, its inputs are named `compliance_status.attestations_st
       has:
         cap: limit
     kid:
-      from: b.kids
+      from: every b.kids
       identified_by: id
   requirements:
     r:
@@ -597,7 +635,7 @@ and written out in full, its inputs are named `compliance_status.attestations_st
       has:
         pr_attestation: attestations_statuses.pull-request.attestation_data
     pull request:
-      from: artifact.pr_attestation.pull_requests
+      from: every artifact.pr_attestation.pull_requests
       identified_by: url
   requirements:
     approved:
@@ -725,7 +763,7 @@ With the pull request as the subject, the same sentence turns into "some pull re
 ergo_spec: v0.6-dev
 subjects:
   pull request:
-    from: commits[0].pull_requests
+    from: every commits[0].pull_requests
     identified_by: number
 requirements:
   reviewed:
@@ -1493,7 +1531,7 @@ Names that choose their own root, anywhere but right after `whose` or `sorted by
 | `$input`, `$params`     | nothing: always there                                                         | `author is in $params.staff`                                               | the input, the params                                                          |
 | a `for` alias           | `for: every approvers as approver`                                            | `approver.username is in $params.staff`                                    | each approver of the subject                                                   |
 | a part                  | subject `pr` with `has: {coverage: attestations.coverage}`                    | `coverage.pct is at least 80`                                              | the subject's `attestations.coverage`, so it reads `attestations.coverage.pct` |
-| a parent subject's name | subject `pr` with `from: artifact.pull_requests`, so `artifact` is its parent | `base equals artifact.branch`                                              | the artifact this pull request was read from                                   |
+| a parent subject's name | subject `pr` with `from: every artifact.pull_requests`, so `artifact` is its parent | `base equals artifact.branch`                                              | the artifact this pull request was read from                                   |
 | the subject's name      | the requirement's `subject: pr`                                               | `pr is an object`, and `approvers whose username does not equal pr.author` | the subject itself. `pr.author` only inside a relative clause                  |
 | a leading dot           | a field named like a grammar word or the subject, like `empty` or `pr`        | `.empty is true`, `.pr is "x"`                                             | no new root: escapes the clash and resolves where the bare name would          |
 
