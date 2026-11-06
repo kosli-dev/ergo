@@ -835,16 +835,26 @@ fn focus_names(condition: &Condition, aliases: &[&str]) -> Vec<String> {
     names
 }
 
-fn sum_whose(whose: &[Condition], aliases: &[&str]) -> Option<String> {
-    let names: Vec<String> = whose
-        .iter()
-        .flat_map(|condition| focus_names(condition, aliases))
-        .collect();
-    names.first().map(|name| {
-        format!(
+fn sum_whose(whose: &[Condition], aliases: &[&str]) -> Vec<String> {
+    let first = |that: bool| {
+        whose
+            .iter()
+            .filter(|condition| condition.that == that)
+            .flat_map(|condition| focus_names(condition, aliases))
+            .next()
+    };
+    let mut out = Vec::new();
+    if let Some(name) = first(false) {
+        out.push(format!(
             "whose {name}: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose"
-        )
-    })
+        ));
+    }
+    if let Some(name) = first(true) {
+        out.push(format!(
+            "that {name}: sum of adds up numbers, which have no fields, so {name} can't be read from one: to read the subject's {name}, write {SUBJECT_MARK}.{name}"
+        ));
+    }
+    out
 }
 
 fn whose_self(whose: &[Condition], aliases: &[&str]) -> BTreeSet<String> {

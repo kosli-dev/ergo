@@ -2416,7 +2416,7 @@
         "r1": {
           "causes": [
             {
-              "cause": "value",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -2513,15 +2513,15 @@
           }
         },
         {
-          "cause": "value",
+          "cause": "unusable",
           "check": "c",
           "failed_items": [
             {
-              "cause": "value",
+              "cause": "unusable",
               "failed_assertions": [
                 {
                   "assertion": "every items.v is at least $params.r named by k",
-                  "cause": "value",
+                  "cause": "unusable",
                   "inputs": [
                     {
                       "locations": [
@@ -2533,6 +2533,13 @@
                         3,
                         4
                       ]
+                    },
+                    {
+                      "locations": [
+                        "/things/0/k"
+                      ],
+                      "name": "k",
+                      "value": 1
                     }
                   ]
                 }
@@ -2590,6 +2597,13 @@
                 3,
                 4
               ]
+            },
+            {
+              "locations": [
+                "/things/0/k"
+              ],
+              "name": "k",
+              "value": 1
             }
           ],
           "passed": false,

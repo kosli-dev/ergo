@@ -161,6 +161,14 @@ pub fn is_root(start: &Start) -> bool {
             && part.base == Start::Alias(OUTER.to_string()))
 }
 
+pub fn names_the_subject(start: &Start) -> bool {
+    matches!(start, Start::Part(part)
+        if !part.name.is_empty()
+            && part.name != ROOT_OWN
+            && part.steps.is_empty()
+            && part.base == Start::Alias(OUTER.to_string()))
+}
+
 pub fn is_root_own(start: &Start) -> bool {
     is_root(start) && matches!(start, Start::Part(part) if part.name == ROOT_OWN)
 }

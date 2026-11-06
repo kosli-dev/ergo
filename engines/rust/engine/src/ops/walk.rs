@@ -20,6 +20,7 @@ pub struct Walk {
     pub whose: Vec<Check>,
     pub if_any: bool,
     pub check: Box<Check>,
+    pub for_aliases: Vec<String>,
 }
 
 impl Walk {
@@ -639,12 +640,33 @@ fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
         .chain(std::iter::once(&*walk.check))
         .collect();
     outside_inputs_of(&checks, ctx)
+        .into_iter()
+        .filter(|input| {
+            !walk.for_aliases.iter().any(|alias| {
+                input
+                    .name
+                    .strip_prefix(alias.as_str())
+                    .is_some_and(|rest| rest.starts_with(" named by "))
+                    && checks.iter().any(|check| {
+                        check.paths().into_iter().any(|path| {
+                            matches!(&path.start, Start::Alias(name) if name == alias)
+                                && has_root_field(path)
+                                && name::name(path) == input.name
+                        })
+                    })
+            })
+        })
+        .collect()
 }
 
 pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     let mut inputs = Vec::new();
     for check in checks {
-        for path in check.paths().into_iter().filter(|p| reads_outside(p)) {
+        for path in check
+            .paths()
+            .into_iter()
+            .filter(|p| reads_outside(p) || (p.start == Start::Params && has_root_field(p)))
+        {
             inputs.extend(path_inputs(path, ctx, &[], true));
         }
     }
@@ -663,16 +685,45 @@ pub(super) fn cut_at(path: &Path, hidden: &[&str], fields_read_items: bool) -> O
     })
 }
 
+pub(super) fn has_root_field(path: &Path) -> bool {
+    path.steps.iter().any(|step| {
+        matches!(step, Step::Field(field)
+            if path::is_root(&field.start) || path::names_the_subject(&field.start))
+    })
+}
+
+fn field_input(field: &Path, ctx: &Ctx) -> Option<Input> {
+    let mut input = read_path(field, ctx).inputs.into_iter().next()?;
+    if path::names_the_subject(&field.start) {
+        input.name = name::name(&Path {
+            start: path::root(false),
+            steps: field.steps.clone(),
+        });
+    }
+    Some(input)
+}
+
 pub(super) fn path_inputs(
     path: &Path,
     ctx: &Ctx,
     hidden: &[&str],
     fields_read_items: bool,
 ) -> Vec<Input> {
-    if path::is_root(&path.start) && fields_read_items {
-        let mut inputs = path_inputs(path, ctx, hidden, false);
+    let mut at = ctx.clone();
+    if !at.aliases.contains_key(OUTER) {
+        at.aliases.insert(OUTER.to_string(), ctx.subject.clone());
+    }
+    if fields_read_items
+        && (path::is_root(&path.start) || has_root_field(path))
+        && !hides(path, hidden)
+    {
+        let mut inputs = if matches!(path.start, Start::Params | Start::Input) {
+            Vec::new()
+        } else {
+            path_inputs(path, &at, hidden, false)
+        };
         inputs.extend(path.steps.iter().filter_map(|step| match step {
-            Step::Field(field) => read_path(field, ctx).inputs.into_iter().next(),
+            Step::Field(field) => field_input(field, &at),
             _ => None,
         }));
         return inputs;
@@ -682,7 +733,7 @@ pub(super) fn path_inputs(
             .steps
             .iter()
             .filter_map(|step| match step {
-                Step::Field(field) => Some(read_path(field, ctx).inputs),
+                Step::Field(field) => Some(read_path(field, &at).inputs),
                 _ => None,
             })
             .flatten()
@@ -899,6 +950,9 @@ fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
         .chain(listed_refs(check))
         .filter(|path| from_a_root(path))
         .find_map(|path| {
+            if let Some(listed) = super::lists::walked(path, ctx) {
+                return (listed.cause == Some(cause)).then_some(listed.text);
+            }
             let read = path::read(path, ctx);
             let state = read.outcome.cause();
             if matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
@@ -1031,14 +1085,17 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 };
                 let read = named.map(|(_, read)| read);
                 let off = message::off_item(check, ctx, verdict.cause);
-                let said = if off.is_empty() {
-                    message::prefixed(
-                        &walked.item_name(item_segs),
-                        &message::message(check, at, verdict),
-                    )
-                } else {
-                    off.join(", and ")
-                };
+                let said =
+                    if let Some(fault) = message::subject_key_fault(check, ctx, verdict.cause) {
+                        fault
+                    } else if off.is_empty() {
+                        message::prefixed(
+                            &walked.item_name(item_segs),
+                            &message::message(check, at, verdict),
+                        )
+                    } else {
+                        off.join(", and ")
+                    };
                 Some(Failure {
                     msg: said,
                     order,
@@ -1319,6 +1376,7 @@ mod tests {
             whose,
             if_any,
             check: Box::new(check),
+            for_aliases: Vec::new(),
         }
     }
 
@@ -1754,6 +1812,7 @@ mod tests {
             whose: vec![],
             if_any: false,
             check: Box::new(equals(json!(2))),
+            for_aliases: Vec::new(),
         };
         let out = run(&walk, &context);
         assert_eq!(
@@ -1784,6 +1843,7 @@ mod tests {
             whose: vec![],
             if_any: false,
             check: Box::new(equals(json!("bad"))),
+            for_aliases: Vec::new(),
         };
         let out = run(&walk, &context);
         assert_eq!(out.verdict.inputs[0].name, "prs[].rs[].s");

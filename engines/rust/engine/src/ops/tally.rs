@@ -1215,7 +1215,11 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                         )
                     } else {
                         let off = super::message::off_item(check, &outer, verdict.cause);
-                        if off.is_empty() {
+                        if let Some(fault) =
+                            super::message::subject_key_fault(check, &outer, verdict.cause)
+                        {
+                            fault
+                        } else if off.is_empty() {
                             super::message::prefixed(
                                 &walked.item_name(walk::focus_segs(item, check)),
                                 &super::message::message(check, &focus, &verdict),

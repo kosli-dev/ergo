@@ -1878,6 +1878,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every xs whose every rel is 1",
     ),
     ("every ps", "every ps"),
+    (
+        "every prs whose some xs.v equals m named by k",
+        "every prs whose some xs.v equals m named by k",
+    ),
     ("s.items", "s.items"),
     ("s.mids", "s.mids"),
     ("u.items", "u.items"),
@@ -1894,6 +1898,9 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "releases whose some files.owner equals steward",
     ),
     ("prs whose x equals x", "prs whose x equals x"),
+    ("art.kids", "art.kids"),
+    ("c", "c"),
+    ("every ls", "every ls"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
@@ -2996,6 +3003,7 @@ pub const PATH_OK: &[(&str, &str)] = &[
     ("it", "it"),
     ("it.x", "it.x"),
     ("v", "v"),
+    ("c", "c"),
 ];
 
 pub const PATH_ERRORS: &[&str] = &[

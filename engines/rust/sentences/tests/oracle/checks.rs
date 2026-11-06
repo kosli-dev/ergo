@@ -6709,6 +6709,130 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "count of $input.xs whose v equals l[0] is 1",
+        "count of $input.xs whose v equals item 1 of l is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals m named by pr is 1",
+        "count of xs whose v equals m named by pr is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals pr named by k is 1",
+        "count of xs whose v equals pr named by k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals pr named by pr.k is 1",
+        "count of xs whose v equals pr named by pr.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals v is 1",
+        "count of xs whose v equals v is 1",
+        &[
+            "v is compared with itself, because in a whose it's read from the item: to read the subject's v, write \u{1}.v",
+        ],
+        &[
+            "v is compared with itself, because in a whose it's read from the item: to read the subject's v, write \u{1}.v",
+        ],
+    ),
+    (
+        "every distinct xs.b is at least $params.m named by k",
+        "every distinct xs.b is at least $params.m named by k",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v equals pr named by k is an object",
+        "every xs whose v equals pr named by k is an object",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v equals v is an object",
+        "every xs whose v equals v is an object",
+        &[
+            "v is compared with itself, because in a whose it's read from the item: to read the subject's v, write \u{1}.v",
+        ],
+        &[
+            "v is compared with itself, because in a whose it's read from the item: to read the subject's v, write \u{1}.v",
+        ],
+    ),
+    (
+        "every xs.n is at least art.p named by k",
+        "every xs.n is at least art.p named by k",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.n is in $params.envs.name",
+        "every xs.n is in $params.envs.name",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v equals $input.m named by k",
+        "every xs.v equals $input.m named by k",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v equals $params.m named by k",
+        "every xs.v equals $params.m named by k",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v equals pl named by k",
+        "every xs.v equals pl named by k",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v equals y named by k",
+        "every xs.v equals y named by k",
+        &[],
+        &[],
+    ),
+    (
+        "sum of xs.n that equals k is 1",
+        "sum of xs.n that equals k is 1",
+        &[
+            "that k: sum of adds up numbers, which have no fields, so k can't be read from one: to read the subject's k, write \u{1}.k",
+        ],
+        &[
+            "that k: sum of adds up numbers, which have no fields, so k can't be read from one: to read the subject's k, write \u{1}.k",
+        ],
+    ),
+    (
+        "sum of xs.n that is at least $params.lo is 1",
+        "sum of xs.n that is at least $params.lo is 1",
+        &[],
+        &[],
+    ),
+    (
+        "sum of xs.n that is at least lo is 1",
+        "sum of xs.n that is at least lo is 1",
+        &[
+            "that lo: sum of adds up numbers, which have no fields, so lo can't be read from one: to read the subject's lo, write \u{1}.lo",
+        ],
+        &[
+            "that lo: sum of adds up numbers, which have no fields, so lo can't be read from one: to read the subject's lo, write \u{1}.lo",
+        ],
+    ),
+    (
+        "v equals pr named by pr.k",
+        "v equals pr named by pr.k",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -10382,6 +10506,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
             "type is compared with itself, because in a whose it's read from the item: to read the subject's type, write \u{1}.type",
         ],
     ),
+    ("every ys as y", "every ys as y", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

@@ -320,6 +320,21 @@ fn read_one(
     }
 }
 
+const SUBJECT_ADVICE: &str = ": to read the subject's ";
+
+fn with_subject(problem: String, written: Option<&str>) -> String {
+    if !problem.contains(s::SUBJECT_MARK) {
+        return problem;
+    }
+    match written {
+        Some(name) => problem.replace(s::SUBJECT_MARK, name),
+        None => match problem.find(SUBJECT_ADVICE) {
+            Some(at) => problem[..at].to_string(),
+            None => problem.replace(s::SUBJECT_MARK, ""),
+        },
+    }
+}
+
 pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<String, CheckRead> {
     let subject = match &requirement.subject {
         SubjectName::Named(name) => Some(name.as_str()),
@@ -329,7 +344,9 @@ pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<Str
         .and_then(|name| reading.infos.get(name))
         .map(|info| info.scope.clone())
         .unwrap_or_default();
-    let written = subject.map_or_else(|| "the subject".to_string(), crate::name::parent_key_text);
+    let written = subject
+        .map(crate::name::parent_key_text)
+        .filter(|text| !text.starts_with('"'));
     requirement
         .checks
         .iter()
@@ -338,7 +355,7 @@ pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<Str
             read.problems = read
                 .problems
                 .into_iter()
-                .map(|problem| problem.replace(s::SUBJECT_MARK, &written))
+                .map(|problem| with_subject(problem, written.as_deref()))
                 .collect();
             (check_name.clone(), read)
         })
@@ -620,6 +637,29 @@ mod tests {
         assert_eq!(
             problems(&read),
             [second.as_str(), "line 2: values of mixed types"]
+        );
+    }
+
+    #[test]
+    fn the_advice_to_write_the_subjects_name_is_left_out_when_the_name_needs_quotes() {
+        let policy = json!({
+            "ergo_spec": "v0.6-dev",
+            "subjects": {"my t": {"from": "things"}},
+            "requirements": {"r": {"subject": "my t", "checks": {
+                "c": "count of xs whose k equals k is 1",
+                "d": "sum of xs.v that is at least lo is 1"
+            }}}
+        });
+        let policy = Policy::read(&policy);
+        let reading = Reading::of(&policy);
+        let read = read_checks(&reading, &policy.requirements["r"]);
+        assert_eq!(
+            problems(&read["c"]),
+            ["k is compared with itself, because in a whose it's read from the item"]
+        );
+        assert_eq!(
+            problems(&read["d"]),
+            ["that lo: sum of adds up numbers, which have no fields, so lo can't be read from one"]
         );
     }
 

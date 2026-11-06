@@ -134,7 +134,8 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
                 let one_key = ((matches!(
                     reference.start,
                     Start::Input | Start::Params | Start::Subject | Start::Own
-                ) || crate::path::is_root(&reference.start))
+                ) || crate::path::is_root(&reference.start)
+                    || crate::path::names_the_subject(&reference.start))
                     && matches!(reference.steps.as_slice(), [Step::Key(_)]))
                     || (matches!(reference.start, Start::Alias(_)) && reference.steps.is_empty());
                 if one_key && !out.is_empty() {

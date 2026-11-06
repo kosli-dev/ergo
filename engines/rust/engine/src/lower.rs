@@ -300,6 +300,28 @@ impl Scope {
         }
     }
 
+    fn subject_key(&self, step: &s::Step, next: Option<&s::Step>) -> Option<Step> {
+        if !self.item || self.rooted {
+            return None;
+        }
+        let subject = self.subject.as_deref()?;
+        let (s::Step::NamedBy(s::Reference::Name(name)), Some(s::Step::Key(key))) = (step, next)
+        else {
+            return None;
+        };
+        if name != subject {
+            return None;
+        }
+        let whole = PartDef {
+            steps: Vec::new(),
+            id: None,
+        };
+        Some(Step::Field(Box::new(path::Path {
+            start: part_start(subject, self.base(), &whole),
+            steps: vec![Step::Key(key.clone())],
+        })))
+    }
+
     pub fn path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
         self.read_path(path, true, true, true)
     }
@@ -429,7 +451,13 @@ impl Scope {
         let mut problems = Vec::new();
         let mut steps = Vec::new();
         problems.extend(self.follow_problem(written, parts));
-        for step in &written.steps {
+        let mut written_steps = written.steps.iter().peekable();
+        while let Some(step) = written_steps.next() {
+            if let Some(key) = self.subject_key(step, written_steps.peek().copied()) {
+                written_steps.next();
+                steps.push(key);
+                continue;
+            }
             match self.step(step) {
                 Ok(step) => steps.push(step),
                 Err(found) => problems.extend(found),
@@ -452,11 +480,6 @@ impl Scope {
                 self.field_start(key, *dot, parents, parts, aliases, steps)
             }
             s::Start::Quoted(key) => self.field_start(key, false, parents, parts, aliases, steps),
-        };
-        let steps = if self.rooted && !path::is_root(&start) {
-            steps.into_iter().map(unrooted).collect()
-        } else {
-            steps
         };
         Ok(path::Path { start, steps })
     }
@@ -524,16 +547,6 @@ impl Scope {
             s::Value::Null => Ok(Value::Null),
             s::Value::Number(text) => number(text),
         }
-    }
-}
-
-fn unrooted(step: Step) -> Step {
-    match step {
-        Step::Field(field) if path::is_root(&field.start) => Step::Field(Box::new(path::Path {
-            start: Start::Subject,
-            steps: field.steps,
-        })),
-        other => other,
     }
 }
 
@@ -1030,6 +1043,7 @@ pub fn lower_quantified(
             whose: conditions,
             if_any,
             check: Box::new(check),
+            for_aliases: item.for_aliases.iter().cloned().collect(),
         }))),
         _ => Err(vec![format!("every or some{UNSUPPORTED_SUFFIX}")]),
     }

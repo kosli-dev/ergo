@@ -1194,6 +1194,34 @@ pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> String {
     }
 }
 
+pub fn subject_key_fault(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
+    check
+        .paths()
+        .into_iter()
+        .flat_map(|path| path.steps.iter())
+        .find_map(|step| {
+            let Step::Field(field) = step else {
+                return None;
+            };
+            if !path::names_the_subject(&field.start) {
+                return None;
+            }
+            let read = path::read(field, ctx);
+            match (read.outcome, read.value) {
+                (Outcome::Found, Some(value)) if !value.is_string() && cause == Cause::Unusable => {
+                    Some(isnt(&name::name(field), value, "text"))
+                }
+                (Outcome::Found, _) => None,
+                (outcome @ (Outcome::Absent | Outcome::Null), _)
+                    if outcome.cause() == Some(cause) =>
+                {
+                    Some(format!("{} is {}", name::name(field), state_word(outcome)))
+                }
+                _ => None,
+            }
+        })
+}
+
 pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
     let want = match cause {
         Cause::Absent => Outcome::Absent,

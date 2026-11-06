@@ -728,6 +728,16 @@ fn a_sum_whose_whose_reads_a_name_against_the_focus_names_the_first_one() {
         message("ls")
     );
     assert_eq!(problems("sum of xs.v that is 1 is 3"), none());
+    assert_eq!(
+        problems("sum of xs.v that is at least lo is 3"),
+        one(
+            "that lo: sum of adds up numbers, which have no fields, so lo can't be read from one: to read the subject's lo, write \u{1}.lo"
+        )
+    );
+    assert_eq!(
+        problems("sum of xs.v that is at least $params.lo is 3"),
+        none()
+    );
     assert_eq!(problems("sum of xs.v whose $params.k is 1 is 3"), none());
     assert_eq!(
         problems_with("sum of xs.v whose $params.k is pr is 3", &["pr"]),
