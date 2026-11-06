@@ -1205,7 +1205,10 @@ pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
         .paths()
         .into_iter()
         .filter(|path| matches!(path.start, Start::Alias(_) | Start::Part(_)))
-        .filter(|path| !path.steps.iter().any(|step| matches!(step, Step::Field(_))))
+        .filter(|path| {
+            path::is_root(&path.start)
+                || !path.steps.iter().any(|step| matches!(step, Step::Field(_)))
+        })
         .collect();
     paths.sort_by_key(|path| name::name(path));
     paths.dedup();

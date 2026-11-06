@@ -1,7 +1,7 @@
 use super::tally::{Side, Tally, Term};
 use super::time::{self, Time};
 use super::walk::{self, Failure, Options, Seg, WalkItem};
-use super::{Check, Input, Part, Verdict, run as run_check, run_full};
+use super::{Check, Input, Part, Verdict, run_full};
 use crate::cause::Cause;
 use crate::lower::{self, Scope};
 use crate::path::{self, Ctx, Located, Location, OUTER, Path, Start, Step};
@@ -307,6 +307,7 @@ pub fn lower_for(
 struct Live<'a> {
     at: Located<'a>,
     name: String,
+    focus: String,
     said: String,
     order: Vec<Seg>,
     shown: Value,
@@ -521,11 +522,14 @@ impl For {
         for w in &walked.items {
             at.subject = w.item.clone();
             at.label = None;
-            let verdicts: Vec<Verdict> = item
+            let focus = walk::focus_ctx(w, &outer);
+            let read: Vec<(Verdict, bool)> = item
                 .whose
                 .iter()
-                .map(|check| run_check(check, &at))
+                .map(|check| walk::focus_verdict(check, w, &at, &focus))
                 .collect();
+            let lost = read.iter().any(|(_, lost)| *lost);
+            let verdicts: Vec<Verdict> = read.into_iter().map(|(verdict, _)| verdict).collect();
             let causes: Vec<Cause> = verdicts.iter().map(|v| v.cause).collect();
             let name = walked.name_of(&w.item_segs, w.unaliased);
             let undecided = Cause::worst(
@@ -540,10 +544,19 @@ impl For {
                 .zip(&verdicts)
                 .find(|(_, verdict)| !matches!(verdict.cause, Cause::Satisfied | Cause::Value))
                 .map(|(check, verdict)| {
-                    super::message::prefixed(
-                        &walked.item_name_dotted(&w.item_segs),
-                        &super::message::message(check, &at, verdict),
-                    )
+                    if lost {
+                        let lost_check = walk::focus_check(w);
+                        let verdict = walk::lost_verdict(w, &at);
+                        super::message::prefixed(
+                            &walked.item_name_dotted(&w.item_segs),
+                            &super::message::message(&lost_check, &at, &verdict),
+                        )
+                    } else {
+                        super::message::prefixed(
+                            &walked.item_name_dotted(walk::focus_segs(w)),
+                            &super::message::message(check, &focus, verdict),
+                        )
+                    }
                 });
             let dead_item = |cause: Cause| Dead {
                 msg: if undecided.is_some() && depth == 0 && !matches!(item.how, How::Pick { .. }) {
@@ -575,6 +588,11 @@ impl For {
                         location: w.end_location.clone(),
                     },
                     said: walked.item_name_dotted(&w.item_segs),
+                    focus: if w.rest.is_empty() {
+                        name.clone()
+                    } else {
+                        walked.item_name(&w.end_segs)
+                    },
                     name,
                     order: w.item_segs.clone(),
                     shown: end.clone(),
@@ -674,13 +692,7 @@ impl For {
             let mut at = outer.clone();
             let mut checks: Vec<SortRead> = Vec::new();
             for found in live {
-                let holder = walked
-                    .items
-                    .iter()
-                    .find(|w| w.item_segs == found.order)
-                    .map(|w| w.item.clone())
-                    .unwrap_or_else(|| found.at.clone());
-                at.subject = holder;
+                at.subject = found.at.clone();
                 at.label = None;
                 let read = path::read(&sorted.path, &at);
                 let location = read.location.clone();
@@ -864,7 +876,14 @@ fn sort_failure(
     let said = if text.starts_with('$') {
         text.to_string()
     } else {
-        super::message::prefixed(&found.name, text)
+        super::message::prefixed(
+            if found.at.value.is_object() {
+                &found.focus
+            } else {
+                &found.name
+            },
+            text,
+        )
     };
     Dead {
         msg: Some(said),
@@ -2170,7 +2189,7 @@ mod tests {
 
     fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertions}}}}
         });
@@ -2200,7 +2219,7 @@ mod tests {
 
     fn problems(for_line: &str) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": "x exists"}}}}
         });
@@ -2363,7 +2382,7 @@ mod tests {
     #[test]
     fn a_subject_that_is_not_an_object_fails_as_not_an_object_with_nothing_listed() {
         let policy = json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": "x is 1"}}}}
         });
@@ -2384,7 +2403,7 @@ mod tests {
      {
         for subject in [json!(["a"]), json!("text"), json!([]), json!([{"k": 1}])] {
             let policy = json!({
-                "ergo_spec": "v0.5",
+                "ergo_spec": "v0.6-dev",
                 "subjects": {"thing": {"from": "every xs"}},
                 "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every thing as k", "assert": "k is 1"}}}}
             });
@@ -2404,7 +2423,7 @@ mod tests {
     #[test]
     fn a_failed_assertion_keeps_the_dot_of_a_field_named_like_the_subject() {
         let policy = json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {"thing": {"from": "every xs"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every ys as k", "assert": ".thing is 1"}}}}
         });
@@ -2533,7 +2552,7 @@ mod tests {
     #[test]
     fn a_failed_count_whose_whose_reads_a_part_lists_the_parts_value_with_its_location() {
         let policy = json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {
                 "for": "every groups as g",
@@ -2744,6 +2763,107 @@ mod tests {
         assert_eq!(
             cause("last of xs as x", json!("x is 1"), json!({"xs": []})),
             "absent"
+        );
+    }
+
+    #[test]
+    fn an_items_whose_reads_the_value_its_path_ends_at() {
+        let line = "every rs.m whose s is \"A\" as m";
+        assert_eq!(
+            cause(
+                line,
+                json!("m.by exists"),
+                json!({"rs": [{"m": {"s": "A", "by": "x"}}, {"s": "A", "m": {"s": "B"}}]})
+            ),
+            "satisfied"
+        );
+        let found = row(
+            line,
+            json!("m.by exists"),
+            json!({"rs": [{"s": "A", "m": {"t": 1}}, {"m": {"s": "A", "t": 1}}]}),
+        );
+        assert_eq!(found["cause"], "absent");
+        assert_eq!(
+            found["message"],
+            "item 1 of rs: m: s is missing; item 2 of rs: by is missing"
+        );
+    }
+
+    #[test]
+    fn an_items_whose_fails_as_absent_when_the_value_its_path_ends_at_is_missing() {
+        let found = row(
+            "every rs.m whose s is \"A\" as m",
+            json!("m.by exists"),
+            json!({"rs": [{"m": {"s": "A", "by": "x"}}, {"s": "A"}]}),
+        );
+        assert_eq!(found["cause"], "absent");
+        assert_eq!(found["message"], "item 2 of rs: m is missing");
+        assert_eq!(
+            found["failed_items"],
+            json!([{"path": "item 2 of rs", "item": "item 2 of rs", "cause": "absent", "value": null, "locations": ["/things/0/rs/1"], "failed_assertions": []}])
+        );
+    }
+
+    #[test]
+    fn an_items_whose_fails_as_not_an_object_when_the_value_its_path_ends_at_is_null() {
+        let found = row(
+            "every rs.m whose s is \"A\" as m",
+            json!("m.by exists"),
+            json!({"rs": [{"s": "A", "m": null}, {"m": {"s": "A", "by": "x"}}]}),
+        );
+        assert_eq!(found["cause"], "not_an_object");
+        assert_eq!(
+            found["message"],
+            "item 1 of rs: m is null, which isn't an object"
+        );
+    }
+
+    #[test]
+    fn a_pick_sorts_by_a_field_of_the_value_its_path_ends_at() {
+        let subject = json!({"rs": [
+            {"t": 9, "m": {"s": "A", "by": "x", "t": 2}},
+            {"t": 0, "m": {"s": "B", "by": "y", "t": 1}},
+            {"t": 1, "m": {"s": "A", "by": "z", "t": 3}}
+        ]});
+        assert_eq!(
+            cause(
+                "first of rs.m whose s is \"A\" sorted by t as m",
+                json!("m.by is \"x\""),
+                subject.clone()
+            ),
+            "satisfied"
+        );
+        assert_eq!(
+            cause(
+                "last of rs.m sorted by t as m",
+                json!("m.by is \"z\""),
+                subject
+            ),
+            "satisfied"
+        );
+        let found = row(
+            "last of rs.m sorted by t as m",
+            json!("m.by exists"),
+            json!({"rs": [{"t": 1, "m": {"t": "zz"}}, {"m": {"t": 1}}]}),
+        );
+        assert_eq!(found["cause"], "unusable");
+        assert_eq!(
+            found["message"],
+            "item 1 of rs: m: t is \"zz\", which isn't a number, a time or a date"
+        );
+    }
+
+    #[test]
+    fn a_sort_on_a_value_that_isnt_an_object_names_the_item() {
+        let found = row(
+            "last of rs.m sorted by t as m",
+            json!("m.by exists"),
+            json!({"rs": [{"t": 1, "m": null}, {"m": {"t": 1}}]}),
+        );
+        assert_eq!(found["cause"], "not_an_object");
+        assert_eq!(
+            found["message"],
+            "item 1 of rs is null, which isn't an object"
         );
     }
 
@@ -3199,7 +3319,7 @@ mod tests {
     fn an_inner_item_that_only_a_missing_param_stops_is_named_first_as_ergo_rego_does() {
         let found = row(
             "every ws as w",
-            json!("every w.items.status whose lo is at least $params.p is \"ok\""),
+            json!("every w.items whose lo is at least $params.p exists"),
             json!({"ws": [{"items": [{"hi": 2}, {"lo": 5}]}]}),
         );
         assert_eq!(

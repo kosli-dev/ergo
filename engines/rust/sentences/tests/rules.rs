@@ -640,16 +640,11 @@ fn an_alias_and_the_field_with_its_name_are_different_paths() {
 }
 
 #[test]
-fn after_every_or_some_the_item_is_compared_with_a_field_that_is_the_item() {
-    let message = |path: &str| {
-        one(&format!(
-            "{path} is compared with itself, because after every or some it's read from the item: to read the subject's {path}, put the list on the for line and compare under assert"
-        ))
-    };
-    assert_eq!(problems("every items.x equals x"), message("x"));
-    assert_eq!(problems("some items.x.y equals x.y"), message("x.y"));
-    assert_eq!(problems("every items.x.y equals y"), message("y"));
-    assert_eq!(problems("every items.x is at least x"), message("x"));
+fn after_every_or_some_a_field_on_the_right_is_the_subjects_so_it_is_not_compared_with_itself() {
+    assert_eq!(problems("every items.x equals x"), none());
+    assert_eq!(problems("some items.x.y equals x.y"), none());
+    assert_eq!(problems("every items.x.y equals y"), none());
+    assert_eq!(problems("every items.x is at least x"), none());
     assert_eq!(problems("every x equals x"), none());
     assert_eq!(problems("every x.y equals x"), none());
     assert_eq!(problems("every items.x equals y"), none());
@@ -662,10 +657,7 @@ fn after_every_or_some_the_item_is_compared_with_a_field_that_is_the_item() {
     );
     assert_eq!(problems("every items.x equals $params.x"), none());
     assert_eq!(problems_with("every items.pr equals pr", &["pr"]), none());
-    assert_eq!(
-        problems_with("every items.pr equals .pr", &["pr"]),
-        message("pr")
-    );
+    assert_eq!(problems_with("every items.pr equals .pr", &["pr"]), none());
 }
 
 #[test]

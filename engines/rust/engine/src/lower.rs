@@ -46,6 +46,7 @@ pub struct Scope {
     for_aliases: BTreeSet<String>,
     pending: BTreeSet<String>,
     subject: Option<String>,
+    rooted: bool,
 }
 
 fn not_a_position(number: &str) -> Vec<String> {
@@ -284,7 +285,11 @@ impl Scope {
                         })));
                     }
                     Ok(Step::Field(Box::new(path::Path {
-                        start: Start::Subject,
+                        start: if self.rooted {
+                            path::root(false)
+                        } else {
+                            Start::Subject
+                        },
                         steps: vec![Step::Key(name.clone())],
                     })))
                 }
@@ -345,6 +350,13 @@ impl Scope {
         }
     }
 
+    pub fn rooted(&self) -> Scope {
+        Scope {
+            rooted: true,
+            ..self.clone()
+        }
+    }
+
     pub fn in_tally_item(&self) -> Scope {
         Scope {
             item: true,
@@ -369,7 +381,7 @@ impl Scope {
     }
 
     fn follow_problem(&self, written: &s::Path, parts: bool) -> Option<String> {
-        if self.from_line {
+        if self.from_line || (self.item && !self.rooted) {
             return None;
         }
         let subject = self.subject.as_deref()?;
@@ -441,6 +453,11 @@ impl Scope {
             }
             s::Start::Quoted(key) => self.field_start(key, false, parents, parts, aliases, steps),
         };
+        let steps = if self.rooted && !path::is_root(&start) {
+            steps.into_iter().map(unrooted).collect()
+        } else {
+            steps
+        };
         Ok(path::Path { start, steps })
     }
 
@@ -489,10 +506,14 @@ impl Scope {
             || ((dot || !parts) && self.subject.as_deref() == Some(key))
         {
             steps.insert(0, Step::Key(key.to_string()));
-            return (Start::Own, steps);
+            return (self.field_root(Start::Own, true), steps);
         }
         steps.insert(0, Step::Key(key.to_string()));
-        (Start::Subject, steps)
+        (self.field_root(Start::Subject, false), steps)
+    }
+
+    fn field_root(&self, start: Start, own: bool) -> Start {
+        if self.rooted { path::root(own) } else { start }
     }
 
     pub fn value(&self, value: &s::Value) -> Result<Value, Vec<String>> {
@@ -503,6 +524,16 @@ impl Scope {
             s::Value::Null => Ok(Value::Null),
             s::Value::Number(text) => number(text),
         }
+    }
+}
+
+fn unrooted(step: Step) -> Step {
+    match step {
+        Step::Field(field) if path::is_root(&field.start) => Step::Field(Box::new(path::Path {
+            start: Start::Subject,
+            steps: field.steps,
+        })),
+        other => other,
     }
 }
 
@@ -977,7 +1008,7 @@ pub fn lower_quantified(
                 None
             }
         },
-        other => match lower_with_operator_modules(&on_item, other, &item) {
+        other => match lower_with_operator_modules(&on_item, other, &item.rooted()) {
             Some(Ok(check)) => Some(check),
             Some(Err(found)) => {
                 problems.extend(found);

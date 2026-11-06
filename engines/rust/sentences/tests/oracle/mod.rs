@@ -1887,6 +1887,12 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "s.items whose t is 1 and whose .t is 1",
         "s.items whose t is 1 and whose t is 1",
     ),
+    ("every ds whose x equals .dd", "every ds whose x equals dd"),
+    ("every ds whose x equals d", "every ds whose x equals d"),
+    (
+        "releases whose some files.owner is steward",
+        "releases whose some files.owner equals steward",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

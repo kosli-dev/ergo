@@ -750,17 +750,6 @@ fn self_term(phrase: &Phrase) -> Option<&Path> {
     }
 }
 
-fn full_steps(path: &Path) -> Vec<Step> {
-    let (_, steps) = lifted(path);
-    let mut all = Vec::new();
-    match &path.start {
-        Start::Field { key, .. } | Start::Quoted(key) => all.push(Step::Key(key.clone())),
-        _ => {}
-    }
-    all.extend(steps);
-    all
-}
-
 fn whose_self(whose: &[Condition], aliases: &[&str], derived_holder: bool) -> BTreeSet<String> {
     let mut out = BTreeSet::new();
     for condition in whose {
@@ -802,32 +791,8 @@ fn check_self(check: &Check, aliases: &[&str]) -> BTreeSet<String> {
                     ));
                 }
             }
-            Assertion::Quantified {
-                path,
-                whose,
-                phrase,
-                ..
-            } => {
+            Assertion::Quantified { whose, .. } => {
                 out.extend(whose_self(whose, aliases, false));
-                if let Some(term) = self_term(phrase)
-                    && first_key(term).is_none_or(|key| dot_of(term) || !aliases.contains(&key))
-                    && term.position.is_none()
-                    && term.start != Start::Params
-                    && term.start != Start::Input
-                    && !matches!(term.start, Start::Unknown(_))
-                    && !matches!(term.steps.last(), Some(Step::Index(_)))
-                {
-                    let walked = full_steps(path);
-                    let steps = full_steps(term);
-                    if steps.len() < walked.len()
-                        && walked[walked.len() - steps.len()..] == steps[..]
-                    {
-                        let text = print_path(term, Side::Left, &[]);
-                        out.insert(format!(
-                            "{text} is compared with itself, because after every or some it's read from the item: to read the subject's {text}, put the list on the for line and compare under assert"
-                        ));
-                    }
-                }
             }
             Assertion::Derived { terms, .. } => {
                 if let Some(Term::Derived(derived)) = terms.last() {

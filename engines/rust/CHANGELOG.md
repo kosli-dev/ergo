@@ -2,7 +2,15 @@
 
 Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](../../spec/CHANGELOG.md), and those of `ergo.rego` in [CHANGELOG.md](../../CHANGELOG.md).
 
-## 0.3.1 (not released yet)
+## 0.4.0 (not released yet)
+
+### Changed
+
+- Names resolve where spec 0.6 says, as in `ergo.rego` 0.6.0: a bare name on the right of the phrase after `every` or `some` reads the subject's field, `whose` and `that` read the value the path ends at, `pr.author` reads the subject's field inside a relative clause, and the right side of a `some` or `every` condition in a `from` line reads the candidate. Reports change for policies that write these, see [spec/CHANGELOG.md](../../spec/CHANGELOG.md). This version follows spec 0.6, so a policy says `ergo_spec: v0.6-dev`.
+
+### Fixed
+
+- A `count of` or `sum of` whose path runs into an item that isn't an object says so, like `item 1 of xs: m is "s", which isn't an object`, as `ergo.rego` does, where it said `m.v is null, which isn't a number`.
 
 ## 0.3.0
 
