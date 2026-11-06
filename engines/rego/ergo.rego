@@ -874,6 +874,13 @@ _has_root_field(x) if {
 	startswith(s, _root_key)
 }
 
+_has_root_field(x) if {
+	contains(json.marshal(x), "\\u0003")
+	walk(x, [_, s])
+	is_string(s)
+	startswith(s, _subject_key)
+}
+
 _names_subject_in(req) if {
 	contains(json.marshal(req), "\\\"of\\\":null")
 	walk(req, [_, s])
@@ -1339,7 +1346,15 @@ _check_outcome(check, subj, _) := object.union(
 
 _m_walk_outcome(_, _, r) := {} if r.cause == "satisfied"
 
-_m_walk_outcome(check, subj, r) := {"message": _walk_message(check, subj, r, r)} if r.cause != "satisfied"
+_m_walk_outcome(_, _, r) := {"message": _m_joined(r.root_msgs)} if {
+	r.cause != "satisfied"
+	"root_msgs" in object.keys(r)
+}
+
+_m_walk_outcome(check, subj, r) := {"message": _walk_message(check, subj, r, r)} if {
+	r.cause != "satisfied"
+	not "root_msgs" in object.keys(r)
+}
 
 _walk_run(check) if {
 	check.op in {"every", "some", "for"}
@@ -5970,7 +5985,7 @@ _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "v
 	judged := [_tally_judge(side, e, flaws) | some e in w.items]
 	kept := [e.v | some i, e in w.items; judged[i].kept]
 	read := [e.v | some i, e in w.items; judged[i].read]
-	states := ((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, _tally_distinct(side, read))) | {fl | some fl in flaws; fl != ""}
+	states := (((({x.cause | some x in w.fails} | {x.cause | some x in _walk_stop(w)}) | {c | some j in judged; some c in j.states}) | _tally_number_states(f, _tally_distinct(side, read))) | {fl | some fl in flaws; fl != ""}) | {fl | some c in side.whose; fl := _root_read_flaw(subj, c); fl != ""}
 	r := object.union({"states": states, "list": _walk_name(side[f], w.walked), "values": [_walk_shown(e.v) | some e in w.items], "locations": _walk_locations(w)}, _tally_value(f, _tally_distinct(side, kept), states))
 }
 
@@ -6989,7 +7004,31 @@ _s_focus_names(c) := array.concat(
 		[_s_unmarked_text(c.path) | is_object(object.get(c, "path", null)); not _s_that(c); not "start" in object.keys(c.path)],
 		[_s_unmarked_text(t[k]) | some t in object.get(c, "terms", []); is_object(t); some k in ["count", "sum", "elapsed_from", "elapsed_to"]; is_object(object.get(t, k, null)); not "start" in object.keys(t[k])],
 	),
-	[_s_unmarked_text(p) | some p in _s_cond_right_paths(c.phrase); _s_focus_read(p)],
+	array.concat(
+		[_s_unmarked_text(p) | some p in _s_cond_right_paths(c.phrase); _s_focus_read(p)],
+		[_s_unmarked_text(s.named_by) |
+			some p in _s_cond_paths(c)
+			some s in object.get(p, "steps", [])
+			is_object(s)
+			is_object(object.get(s, "named_by", null))
+			_s_focus_read(s.named_by)
+			not _s_named_key(s.named_by, object.get(c, "names", set()))
+		],
+	),
+)
+
+_s_named_key(key, names) if {
+	is_array(object.get(key, "steps", null))
+	key.steps[0] in names
+	object.get(key, "dot", false) != true
+}
+
+_s_cond_paths(c) := array.concat(
+	array.concat(
+		[c.path | is_object(object.get(c, "path", null))],
+		[t[k] | some t in object.get(c, "terms", []); is_object(t); some k in ["count", "sum", "elapsed_from", "elapsed_to"]; is_object(object.get(t, k, null))],
+	),
+	_s_cond_right_paths(object.get(c, "phrase", {})),
 )
 
 _s_cond_right_paths(ph) := array.concat(array.concat([t | some t in object.get(ph, "terms", []); is_object(t); "steps" in object.keys(t)], [t[k] | some t in object.get(ph, "terms", []); is_object(t); some k in ["count", "sum", "elapsed_from", "elapsed_to"]; is_object(object.get(t, k, null))]), [ph.path | is_object(object.get(ph, "path", null))])
@@ -7052,9 +7091,9 @@ else := object.union(ph, {"path": _s_marked(ph.path, names, false)}) if is_objec
 
 else := ph
 
-_s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, true), "phrase": _s_marked_phrase(c.phrase, names)}) if "path" in object.keys(c)
+_s_marked_cond(c, names) := object.union(c, {"path": _s_marked(c.path, names, true), "phrase": _s_marked_phrase(c.phrase, names), "names": names.all}) if "path" in object.keys(c)
 
-else := object.union(c, {"terms": [_s_own_term(t, names) | some t in c.terms], "phrase": _s_marked_phrase(c.phrase, names)})
+else := object.union(c, {"terms": [_s_own_term(t, names) | some t in c.terms], "phrase": _s_marked_phrase(c.phrase, names), "names": names.all})
 
 _s_own_term(t, names) := object.union(t, {f: _s_marked(t[f], names, true) |
 	some f in ["count", "sum", "elapsed_from", "elapsed_to"]
@@ -8210,7 +8249,7 @@ _p_item_path(path, pc) := _p_subject_key(_p_path(_p_own_named(path), pc, "o"), p
 	is_string(path[0])
 	not startswith(path[0], "$")
 	path[0] in object.keys(pc.own)
-} else := _p_path(path, pc, "i")
+} else := _p_subject_key(_p_path(path, pc, "i"), pc)
 
 _p_subject_key(p, pc) := array.concat(array.concat(array.slice(p, 0, i), [{"named_by_field": concat("", [_subject_key, pc.subject, _subject_key, p[i + 1]])}]), array.slice(p, i + 2, count(p))) if {
 	is_string(object.get(pc, "subject", null))
@@ -9098,7 +9137,9 @@ _walk_row(check, subj) := object.union(_walk_read_row(check, subj), {"cause": "u
 	not _off_subject(check.path)
 	not _reads_subject(check.path)
 	not is_object(subj)
-} else := _walk_read_row(check, subj)
+} else := _walk_rooted(check, subj, _walk_read_row(check, subj))
+
+_walk_rooted(check, subj, r) := _rooted_row(check, subj, r)
 
 _walk_flawed(check) if _param_broken(check, set())
 
@@ -9167,9 +9208,14 @@ _field_named_inputs(subj, paths) := array.concat(
 	[x |
 		some p in paths
 		_root_read_fields(p)
-		some x in array.concat([_path_input(subj, _as_subject_part(p)) | not _builtin(p); not _alias_start(p)], [_path_input(subj, [f]) | some f in _own_key_fields(p)])
+		some x in array.concat([_path_input(subj, _as_subject_part(p)) | not _alias_start(p); not _item_start(p)], [_path_input(subj, [f]) | some f in _own_key_fields(p)])
 	],
 )
+
+_item_start(p) if {
+	is_string(p[0])
+	not startswith(p[0], "$")
+}
 
 _alias_start(p) if {
 	is_string(p[0])
@@ -9736,7 +9782,7 @@ _for_row(check, subj) := r if {
 	r.cause == "satisfied"
 }
 
-_for_row(check, subj) := object.union(r, {"failed": [_m_strip(f) | some f in r.failed], "message": _for_message(check, subj, r)}) if {
+_for_row(check, subj) := object.union(object.remove(r, ["root_msgs"]), {"failed": [_m_strip(f) | some f in r.failed], "message": _for_row_message(check, subj, r)}) if {
 	r := _for_row_raw(check, subj)
 	r.cause != "satisfied"
 }
@@ -9747,7 +9793,13 @@ _for_row_raw(check, subj) := object.union(_for_outer(check, subj, _for_names), {
 	some item in check.items
 	not _off_subject(item.path)
 	not is_object(subj)
-} else := _for_outer(check, subj, _for_names)
+} else := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
+
+_for_rooted(check, subj, r) := _rooted_row(check, subj, r)
+
+_for_row_message(check, subj, r) := _m_joined(r.root_msgs) if "root_msgs" in object.keys(r)
+
+else := _for_message(check, subj, r)
 
 _for_outer(check, subj, names) := {"cause": w.unread, "inputs": _for_inputs(check, subj, names, check.items[0], w), "failed": _for_failed(check, w.unread, [object.union(f, {"lines": []}) | some f in w.fails])} if {
 	w := _for_walk(check.items[0], subj, names)
@@ -10313,7 +10365,7 @@ _for_failed(check, cause, fails) := [object.union(object.union({"path": _failed_
 
 _for_unchecked(_, []) := {}
 
-_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_unread_text(f)} |
+_for_unchecked(check, inner) := {"failed_items": [{"path": _for_item_name(check, f.path), "item": _for_item_name(check, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f), "msg": _m_rest_named(_m_for_item_name(check, f.path), f), "text": _m_root_why(f), "free": object.get(f, "free", false)} |
 	some p in sort({f.path | some f in inner})
 	some f in inner
 	f.path == p
@@ -10393,11 +10445,22 @@ _through_list(subj, path) if {
 	is_array(_value_at(subj, array.slice(path, 0, i)))
 }
 
-_for_key_fields(check) := {_fk(seg) |
+_for_key_fields(check) := ({_fk(seg) |
 	some item in check.items
 	some seg in item.path
 	_field_step(seg)
-} | {f | some c in check.checks; some f in _key_fields(c)}
+} | {f | some c in check.checks; some f in _key_fields(c)}) | {_fk(seg) |
+	some c in check.checks
+	contains(json.marshal(c), "\\u0003")
+	walk(c, [_, seg])
+	_subject_keyed_step(seg)
+}
+
+_subject_keyed_step(seg) if {
+	is_object(seg)
+	is_string(object.get(seg, "named_by_field", null))
+	startswith(seg.named_by_field, _subject_key)
+}
 
 _for_inner_pairs(check, _, _, _, _) := set() if count(check.items) == 1
 
@@ -11655,7 +11718,10 @@ _m_tally(subj, side) := [["unusable", c] | some c in _m_parent_clause(subj, {"op
 _m_tally(subj, side) := array.concat(
 	array.concat(
 		[[x.cause, _m_fail(x, roots)] | some x in array.concat(w.fails, _walk_stop(w))],
-		[[s, concat("", [_ref_name(r), " is ", _m_state_word(s)])] | some r in sort({r | some c in side.whose; some r in _check_refs(c)}); not _ref_failed_walk(r); s := _ref_state(r); s in {"absent", "null"}],
+		array.concat(
+			[[s, concat("", [_ref_name(r), " is ", _m_state_word(s)])] | some r in sort({r | some c in side.whose; some r in _check_refs(c)}); not _ref_failed_walk(r); s := _ref_state(r); s in {"absent", "null"}],
+			[[s, m] | some c in side.whose; s := _root_read_flaw(subj, c); s != ""; some m in _m_root_texts(subj, c, s)],
+		),
 	),
 	[x | some e in w.items; some x in array.concat(_m_whose_undecided(subj, side, e, flaws, roots), [y | _tally_judge(side, e, flaws).read; some y in _m_tally_item(f, e, roots)])],
 ) if {
@@ -11699,6 +11765,125 @@ _m_off_path(p) if {
 	not _item_keyed(p)
 }
 
+_m_off_path(p) if {
+	is_array(p)
+	count(p) > 1
+	_builtin(p)
+	not _item_keyed(p)
+}
+
+_root_read_flaw(subj, c) := _worst_of(states) if {
+	lists := {y[_basic_form(y)] | walk(c, [_, y]); _basic_form(y) in {"count_of", "sum_of"}}
+	states := {st |
+		some p in _root_reads(c)
+		st := _root_list_state(subj, p, lists)
+		st in {"absent", "null", "unusable", "not_an_object"}
+	}
+	count(states) > 0
+} else := ""
+
+_root_reads(c) := {x |
+	walk(c, [_, x])
+	_m_off_path(x)
+	not _presence_path(c, x)
+	not _m_key_ref_failed(x)
+	not _unbound_alias(x)
+	not _walking_root(x)
+}
+
+_walking_root(p) if {
+	_builtin(p)
+	_ref_walks(p)
+}
+
+_unbound_alias(p) if {
+	_alias_start(p)
+	not substring(p[0], 1, -1) in object.keys(object.get(input, "ergo/names", {}))
+}
+
+_presence_path(c, x) if {
+	object.get(c, "op", "") in {"present", "missing"}
+	c.path == x
+}
+
+_root_list_state(subj, p, lists) := _any_read_state(subj, array.slice(shown, 0, i)) if {
+	p in lists
+	not _builtin(p)
+	shown := _as_subject_part(p)
+	i := min({j | some j in numbers.range(1, count(shown)); _any_read_state(subj, array.slice(shown, 0, j)) in {"absent", "null", "unusable", "not_an_object"}})
+} else := _root_read_state(subj, p)
+
+_root_read_state(subj, p) := _key_state(v) if {
+	some step in p
+	_field_step(step)
+	_from_root(step)
+	v := object.get(_fb({}, step), _fk(step), _absent)
+	not is_string(v)
+} else := "" if {
+	some step in p
+	_field_step(step)
+	_from_root(step)
+} else := _ref_state([_ref_key_seg(seg) | some seg in p]) if {
+	_builtin(p)
+	some seg in p
+	_is_ref(seg)
+} else := _ref_state(p) if _builtin(p)
+
+else := _any_read_state(subj, _as_subject_part(p))
+
+_ref_key_seg(seg) := _ref_read(seg.ref) if _is_ref(seg)
+
+else := seg
+
+_walk_root_flaw(check, subj) := _worst_of(states) if {
+	states := {fl | some c in _walk_root_conds(check); fl := _root_read_flaw(subj, c); fl != ""}
+	count(states) > 0
+} else := ""
+
+_walk_root_conds(check) := array.concat(object.get(check, "whose", []), [c | check.op == "for"; some item in check.items; some c in object.get(item, "whose", [])])
+
+_walk_root_msgs(check, subj) := _once([m |
+	some c in _walk_root_conds(check)
+	fl := _root_read_flaw(subj, c)
+	fl != ""
+	some m in _m_root_texts(subj, c, fl)
+])
+
+_leaf_root_flaw(check, subj) := _root_read_flaw(subj, {"paths": paths}) if {
+	check.op in {"every", "some"}
+	is_object(object.get(check, "check", null))
+	paths := _m_root_paths(check.check)
+	count(paths) > 0
+} else := ""
+
+_leaf_root_msgs(check, flaw) := [m] if {
+	m := _m_root_alone(check.check, flaw)
+	is_string(m)
+}
+
+_rooted_row(check, subj, r) := object.union(r, object.union({"cause": flaw, "failed": _rooted_failed(r)}, {"root_msgs": ms | ms := _walk_root_msgs(check, subj); ms != []})) if {
+	flaw := _walk_root_flaw(check, subj)
+	flaw != ""
+	r.cause in {"satisfied", "value", flaw}
+} else := object.union(r, object.union({"cause": flaw, "failed": []}, {"root_msgs": ms | ms := _leaf_root_msgs(check, flaw); ms != []})) if {
+	r.cause in {"satisfied", "value"}
+	flaw := _leaf_root_flaw(check, subj)
+	flaw != ""
+} else := r
+
+_rooted_failed(r) := [] if r.cause in {"satisfied", "value"}
+
+else := r.failed
+
+_m_root_texts(subj, c, cause) := _m_keyed_off(subj, c, cause) if count(_m_keyed_off(subj, c, cause)) > 0
+
+else := [concat("", [_input_name(_as_subject_part(p)), " is ", _m_state_word(cause)]) | some p in sort(_root_reads(c))]
+
+_m_key_ref_failed(p) if {
+	some seg in p
+	_ref_step_flaw(seg)
+}
+
 _item_keyed(p) if {
 	some step in p
 	_field_step(step)
@@ -11728,21 +11913,33 @@ _m_root_key_text(step, cause) := concat("", [_fk_text(step), " is ", _m_state_wo
 	not is_string(v)
 }
 
-_m_off_item(subj, c, "unusable") := _once([_m_isnt(_input_name(shown), v, "a list") |
-	some side in _m_tally_sides(c)
-	_m_off_path(side[_basic_form(side)])
-	shown := _as_subject_part(side[_basic_form(side)])
-	v := _value_at(subj, shown)
-	not is_array(v)
-	v != null
-])
+_m_off_item(subj, c, "unusable") := _once(array.concat(
+	[_m_isnt(_input_name(shown), v, "a list") |
+		some side in _m_tally_sides(c)
+		_m_off_path(side[_basic_form(side)])
+		shown := _as_subject_part(side[_basic_form(side)])
+		v := _value_at(subj, shown)
+		not is_array(v)
+		v != null
+	],
+	[m |
+		some p in sort({x | walk(c, [_, x]); _m_off_path(x)})
+		shown := _as_subject_part(p)
+		some m in _m_parent_clause(subj, {"op": "present", "path": shown}, _input_name(shown))
+	],
+))
 
 _m_off_item(subj, c, cause) := _once([concat("", [_input_name(shown_at), " is ", _m_state_word(cause)]) |
 	some p in sort({x | walk(c, [_, x]); _m_off_path(x)})
+	not _m_key_ref_failed(p)
 	shown := _as_subject_part(p)
 	i := min({j | some j in numbers.range(1, count(shown)); _read_state(subj, array.slice(shown, 0, j)) == cause})
-	shown_at := array.slice(shown, 0, i)
+	shown_at := _m_shown_at(shown, i, cause)
 ]) if cause in {"absent", "null"}
+
+_m_shown_at(shown, _, "absent") := shown
+
+_m_shown_at(shown, i, "null") := array.slice(shown, 0, i)
 
 _m_cond_message(c, item, cause) := concat(", and ", cs) if {
 	cause in {"absent", "null"}
@@ -11887,6 +12084,31 @@ _m_unmarked(x) := strings.replace_n({"\u0001": ""}, x)
 
 _m_aliased(m) := strings.replace_n({"\u0002": ""}, m)
 
+_for_is_free(item, names) if _for_free(item, names)
+
+else := false
+
+_for_free(item, names) if {
+	aliases := {concat("", ["$", a]) | some a, _ in names; not startswith(a, "ergo/")}
+	not _for_reads_alias(item, aliases)
+}
+
+_for_reads_alias(item, aliases) if {
+	some c in item.whose
+	walk(c, [_, x])
+	is_array(x)
+	count(x) > 0
+	x[0] in aliases
+}
+
+_m_free_text(f, x, t) := t if object.get(x, "free", false) == true
+
+else := concat("", [object.get(f, "said", f.item), ": ", t])
+
+_m_root_why(f) := f.why if object.get(f, "root_why", false) == true
+
+else := _m_unread_text(f)
+
 _for_why(_, _, _, _, null) := null
 
 _for_why(_, _, _, wh, failure) := failure if {
@@ -11899,6 +12121,17 @@ _for_why(item, e, names, wh, failure) := object.union(failure, {"why": [_m_tally
 	wh.undecided != []
 	some c in item.whose
 	_focus_lost(e, c)
+} else := object.union(failure, {"why": [ms[0]], "root_why": true, "free": _for_is_free(item, names)}) if {
+	failure != null
+	wh.undecided != []
+	ms := [m |
+		some c in item.whose
+		cause := _focus_cause(c, e) with input as {"ergo/names": names}
+		not cause in {"satisfied", "value"}
+		off := [_m_aliased(t) | some t in _m_keyed_off(object.get(names, "ergo/subject", null), c, cause)] with input as {"ergo/names": names}
+		some m in off
+	]
+	count(ms) > 0
 } else := object.union(failure, {"why": [ms[0]]}) if {
 	failure != null
 	wh.undecided != []
@@ -11925,7 +12158,7 @@ _m_strip(f) := object.union(object.remove(f, ["msg", "said", "raw", "bare"]), ob
 
 else := object.remove(f, ["msg", "said", "raw", "bare"])
 
-_m_strip_items(f) := {"failed_items": [object.remove(x, ["msg", "text"]) | some x in f.failed_items]} if "failed_items" in object.keys(f)
+_m_strip_items(f) := {"failed_items": [object.remove(x, ["msg", "text", "free"]) | some x in f.failed_items]} if "failed_items" in object.keys(f)
 
 else := {}
 
@@ -12123,7 +12356,7 @@ _m_group_text(g) := g[0] if count(g) == 1
 
 else := concat(", and ", _m_first_marked(array.concat([g[0]], [_m_after_lead(_m_lead_of(g[0]), x) | some x in array.slice(g, 1, count(g))])))
 
-_m_for_fail(f) := [concat("", [object.get(f, "said", f.item), ": ", t]) | some x in f.failed_items; some t in _m_inner_fail(x)] if {
+_m_for_fail(f) := [_m_free_text(f, x, t) | some x in f.failed_items; some t in _m_inner_fail(x)] if {
 	not "msg" in object.keys(f)
 	not _m_bare_item(f)
 	f.failed_assertions == []
@@ -12244,7 +12477,13 @@ _m_root_alone(leaf, cause) := [m |
 
 _m_root_problem(leaf, shown, subj, cause) := _rwalk_text(subj, shown) if _rfailed(subj, shown)
 
-else := _message({"op": "present", "path": shown}, subj, cause) if {
+else := concat("", [_input_name(shown), " is missing"]) if {
+	cause == "absent"
+	_any_read_state(subj, shown) == cause
+	i := min({j | some j in numbers.range(1, count(shown)); _any_read_state(subj, array.slice(shown, 0, j)) == cause})
+	i < count(shown)
+	not _has_field_step(array.slice(shown, 0, i))
+} else := _message({"op": "present", "path": shown}, subj, cause) if {
 	cause in {"absent", "null", "unusable"}
 	_any_read_state(subj, shown) == cause
 } else := _m_isnt(_input_name(shown), v, kind) if {
@@ -12453,7 +12692,9 @@ _m_filter(check, subj, row) := object.union(row, {"message": _m_joined(_m_line(c
 
 _m_filter_walk(_, _, true, _, _) := {}
 
-_m_filter_walk(check, subj, false, cause, w) := {"message": _m_joined(_walk_parts(check, subj, {"cause": cause}, w))}
+_m_filter_walk(_, _, false, _, w) := {"message": _m_joined(w.root_msgs)} if "root_msgs" in object.keys(w)
+
+_m_filter_walk(check, subj, false, cause, w) := {"message": _m_joined(_walk_parts(check, subj, {"cause": cause}, w))} if not "root_msgs" in object.keys(w)
 
 _m_applies(_, _, true) := {}
 

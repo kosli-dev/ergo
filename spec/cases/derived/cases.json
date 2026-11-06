@@ -9886,25 +9886,25 @@
             "check": "c",
             "inputs": [
               {
-                "name": "count of xs whose k is in $params.missing",
-                "value": null,
                 "locations": [
                   "/things/0/xs/0"
-                ]
+                ],
+                "name": "count of xs whose k is in $params.missing",
+                "value": null
               },
               {
+                "locations": [
+                  "/things/0/xs/0"
+                ],
                 "name": "xs[]",
                 "value": [
                   {
                     "k": "a"
                   }
-                ],
-                "locations": [
-                  "/things/0/xs/0"
                 ]
               }
             ],
-            "message": "$params.missing is missing; item 1 of xs: $params.missing is missing",
+            "message": "$params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -9965,18 +9965,14 @@
             "check": "c",
             "inputs": [
               {
+                "locations": [],
                 "name": "count of xs whose k is in $params.missing",
-                "value": null,
-                "locations": [
-
-                ]
+                "value": null
               },
               {
+                "locations": [],
                 "name": "xs[]",
-                "value": [],
-                "locations": [
-
-                ]
+                "value": []
               }
             ],
             "message": "$params.missing is missing",
@@ -9992,25 +9988,25 @@
             "check": "c",
             "inputs": [
               {
-                "name": "count of xs whose k is in $params.missing",
-                "value": null,
                 "locations": [
                   "/things/1/xs/0"
-                ]
+                ],
+                "name": "count of xs whose k is in $params.missing",
+                "value": null
               },
               {
+                "locations": [
+                  "/things/1/xs/0"
+                ],
                 "name": "xs[]",
                 "value": [
                   {
                     "k": "a"
                   }
-                ],
-                "locations": [
-                  "/things/1/xs/0"
                 ]
               }
             ],
-            "message": "$params.missing is missing; item 1 of xs: $params.missing is missing",
+            "message": "$params.missing is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

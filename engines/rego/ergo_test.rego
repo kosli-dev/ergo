@@ -5562,6 +5562,12 @@ test_a_count_whose_whose_reads_a_missing_param_fails_even_when_it_would_count_ze
 	[row[1] | some row in _tally_rows("count of xs whose k is one of $params.v is 0", things, {"v": null})] == ["null", "null"]
 }
 
+test_a_key_from_the_subject_after_params_in_a_whose_never_reads_the_items_field_called_like_the_subject if {
+	things := [{"id": 1, "k": "w", "xs": [{"v": 1, "thing": "z"}]}]
+	[r[1] | some r in _tally_rows("count of xs whose v equals $params.m named by thing.k is 1", things, {"m": {"z": 1, "w": 2}})] == ["value"]
+	[r[1] | some r in _tally_rows("count of xs whose v equals $params.m named by thing.k is 1", [{"id": 1, "xs": [{"v": 1, "thing": "z"}]}], {"m": {"z": 1}})] == ["absent"]
+}
+
 test_an_and_list_of_counts_shows_each_count_once if {
 	rows := _tally_rows({"assert": ["count of findings is 3", "claude_found plus 1 is 3"]}, [_review], {})
 	rows == [["pr-7", "satisfied", [
@@ -9548,7 +9554,7 @@ test_a_failed_line_reads_the_second_items_name_in_a_whose_or_a_named_by_but_not_
 	rows := _for_rows(check, [{"id": 1, "m": {"a": 2}, "xs": [{"k": "b", "zs": []}], "ys": ["a"]}], {})
 	rows[0][2][0].failed_assertions == [
 		{"assertion": `x.k is "$y"`, "cause": "value"},
-		{"assertion": "count of x.zs whose k equals y.k is 1", "cause": "value", "items": [{"item": "item 1 of ys", "cause": "value"}]},
+		{"assertion": "count of x.zs whose k equals y.k is 1", "cause": "not_an_object", "items": [{"item": "item 1 of ys", "cause": "not_an_object"}]},
 		{"assertion": "m named by y is 1", "cause": "value", "items": [{"item": "item 1 of ys", "cause": "value"}]},
 	]
 }
@@ -11743,9 +11749,9 @@ test_a_whose_inside_count_of_and_sum_of_walks_a_ref_on_its_right_side if {
 	[row[1] | some row in _walk_right_rows("count of deps whose name is in $input.sbom.components.name is 1", object.union(doc, {"sbom": {"components": [{"name": "click"}, {}]}}), {})] == ["absent"]
 }
 
-test_a_whose_inside_count_of_says_which_value_cant_hold_the_next_step_of_a_ref if {
-	rows := _walk_right_rows("count of deps whose name is in $input.a.b is 1", {"a": "text", "things": [{"id": "t1", "deps": [{"name": "click"}]}]}, {})
-	rows == [[false, "unusable", "item 1 of deps: $input.a is \"text\", which isn't an object"]]
+test_a_whose_inside_count_of_says_once_which_value_cant_hold_the_next_step_of_a_ref if {
+	rows := _walk_right_rows("count of deps whose name is in $input.a.b is 1", {"a": "text", "things": [{"id": "t1", "deps": [{"name": "click"}, {"name": "jinja2"}]}]}, {})
+	rows == [[false, "unusable", "$input.a is \"text\", which isn't an object"]]
 }
 
 _walk_parent_policy := {

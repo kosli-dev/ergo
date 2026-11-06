@@ -1147,7 +1147,7 @@
         "rules": ["message.alias"],
         "input": {"things": [{"id": "t", "d": {"b": "no", "items": [{"x": 1}]}}]},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/d/items/0"], "name": "count of lst whose x equals cov.x", "part": {"id": null, "name": "lst"}, "value": null}, {"locations": ["/things/0/d/items/0"], "name": "lst[]", "part": {"id": null, "name": "lst"}, "value": [{"x": 1}]}, {"locations": ["/things/0/d/b"], "name": "cov.x", "part": {"id": null, "name": "cov"}, "value": null}], "message": "item 1 of lst: cov is \"no\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t"}, "check": "c", "message": "cov is \"no\", which isn't an object", "passed": false, "cause": "unusable", "inputs": [{"name": "count of lst whose x equals cov.x", "value": null, "part": {"id": null, "name": "lst"}, "locations": ["/things/0/d/items/0"]}, {"name": "lst[]", "value": [{"x": 1}], "part": {"id": null, "name": "lst"}, "locations": ["/things/0/d/items/0"]}, {"name": "cov.x", "value": null, "part": {"id": null, "name": "cov"}, "locations": ["/things/0/d/b"]}]}
         ]
       }
     ]
