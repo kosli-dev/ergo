@@ -81,9 +81,9 @@ test("a parse error without a column underlines the whole sentence", () => {
 });
 
 test("a for line and a check are read with the aliases of the for line", () => {
-  const source = policy(["`every deployments.env equals env`"], "`for every environments as env`\n  ");
+  const source = policy(["`count of deployments whose env equals env is 1`"], "`for every environments as env`\n  ");
   assert.deepEqual(sentenceProblems(markdownEntries(source)), []);
-  const without = policy(["`every deployments.env equals env`"]);
+  const without = policy(["`count of deployments whose env equals env is 1`"]);
   assert.equal(sentenceProblems(markdownEntries(without)).length, 1);
 });
 
