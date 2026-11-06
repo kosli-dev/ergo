@@ -98,6 +98,7 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
         Start::Input => "$input".to_string(),
         Start::Params => "$params".to_string(),
         Start::Alias(alias) => parent_key_text(alias),
+        Start::Part(_) if crate::path::is_root(&path.start) => String::new(),
         Start::Part(part) => part.name.clone(),
     };
     let last = path.steps.len().saturating_sub(1);
@@ -106,7 +107,10 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
         match step {
             Step::Key(key) => {
                 if out.is_empty() {
-                    if is_word(key) || (at == 0 && path.start == Start::Own) {
+                    if is_word(key)
+                        || (at == 0
+                            && (path.start == Start::Own || crate::path::is_root_own(&path.start)))
+                    {
                         out.push('.');
                     }
                 } else {
@@ -127,10 +131,12 @@ fn render(path: &Path, marks: Option<&BTreeSet<usize>>) -> String {
             }
             Step::Ref(reference) | Step::Field(reference) => {
                 let ref_name = name(reference);
-                let one_key = (matches!(
+                let one_key = ((matches!(
                     reference.start,
                     Start::Input | Start::Params | Start::Subject | Start::Own
-                ) && matches!(reference.steps.as_slice(), [Step::Key(_)]))
+                ) || crate::path::is_root(&reference.start)
+                    || crate::path::names_the_subject(&reference.start))
+                    && matches!(reference.steps.as_slice(), [Step::Key(_)]))
                     || (matches!(reference.start, Start::Alias(_)) && reference.steps.is_empty());
                 if one_key && !out.is_empty() {
                     out.push_str(&format!(" named by {ref_name}"));

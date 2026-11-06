@@ -13,7 +13,7 @@ const parser = makeParser(pkg);
 const corpus = JSON.parse(readFileSync(new URL("../../../spec/sentences-corpus.json", import.meta.url), "utf8")).sentence_corpus;
 
 const policy = (checks, forLine = "") => `---
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 ---
 
 # Items
@@ -81,9 +81,9 @@ test("a parse error without a column underlines the whole sentence", () => {
 });
 
 test("a for line and a check are read with the aliases of the for line", () => {
-  const source = policy(["`every deployments.env equals env`"], "`for every environments as env`\n  ");
+  const source = policy(["`count of deployments whose env equals env is 1`"], "`for every environments as env`\n  ");
   assert.deepEqual(sentenceProblems(markdownEntries(source)), []);
-  const without = policy(["`every deployments.env equals env`"]);
+  const without = policy(["`count of deployments whose env equals env is 1`"]);
   assert.equal(sentenceProblems(markdownEntries(without)).length, 1);
 });
 

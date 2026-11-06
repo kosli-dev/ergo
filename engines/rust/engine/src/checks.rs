@@ -113,8 +113,6 @@ fn lowered_plan(
     Some(Plan { items, all_of })
 }
 
-const COMPARED_WITH_ITSELF: &str = " is compared with itself";
-
 fn read_one(
     check: &crate::policy::Check,
     scope: &Scope,
@@ -169,12 +167,10 @@ fn read_one(
             let mut names: Vec<String> = aliases_owned.clone();
             let mut for_tree = None;
             let mut for_ok = true;
-            let mut for_unread = false;
             if let Some(text) = for_line {
                 match s::parse_for(text) {
                     Ok(tree) => {
                         for problem in s::for_problems(&tree, &aliases) {
-                            for_unread |= !problem.contains(COMPARED_WITH_ITSELF);
                             problems.insert(format!("for: {problem}"));
                             for_ok = false;
                         }
@@ -194,7 +190,6 @@ fn read_one(
                     }
                     Err(errors) => {
                         for_ok = false;
-                        for_unread = true;
                         for message in messages(errors) {
                             problems.insert(format!("for: {message}"));
                         }
@@ -212,9 +207,6 @@ fn read_one(
                         &aliases,
                         &mut problems,
                     );
-                    if for_unread {
-                        problems.retain(|problem| !problem.contains(lower::DISTINCT_ITEM));
-                    }
                     if !parsed.ok || !for_ok || !problems.is_empty() {
                         return wrong(problems);
                     }
@@ -255,9 +247,6 @@ fn read_one(
                             None
                         }
                     };
-                    if for_unread {
-                        problems.retain(|problem| !problem.contains(lower::DISTINCT_ITEM));
-                    }
                     if !parsed.ok || !for_ok || !problems.is_empty() {
                         return wrong(problems);
                     }
@@ -331,6 +320,21 @@ fn read_one(
     }
 }
 
+const SUBJECT_ADVICE: &str = ": to read the subject's ";
+
+fn with_subject(problem: String, written: Option<&str>) -> String {
+    if !problem.contains(s::SUBJECT_MARK) {
+        return problem;
+    }
+    match written {
+        Some(name) => problem.replace(s::SUBJECT_MARK, name),
+        None => match problem.find(SUBJECT_ADVICE) {
+            Some(at) => problem[..at].to_string(),
+            None => problem.replace(s::SUBJECT_MARK, ""),
+        },
+    }
+}
+
 pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<String, CheckRead> {
     let subject = match &requirement.subject {
         SubjectName::Named(name) => Some(name.as_str()),
@@ -340,14 +344,20 @@ pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<Str
         .and_then(|name| reading.infos.get(name))
         .map(|info| info.scope.clone())
         .unwrap_or_default();
+    let written = subject
+        .map(crate::name::parent_key_text)
+        .filter(|text| !text.starts_with('"'));
     requirement
         .checks
         .iter()
         .map(|(check_name, check)| {
-            (
-                check_name.clone(),
-                read_one(check, &scope, reading, subject),
-            )
+            let mut read = read_one(check, &scope, reading, subject);
+            read.problems = read
+                .problems
+                .into_iter()
+                .map(|problem| with_subject(problem, written.as_deref()))
+                .collect();
+            (check_name.clone(), read)
         })
         .collect()
 }
@@ -403,7 +413,7 @@ mod tests {
 
     fn read(subjects: Value, checks: Value) -> BTreeMap<String, CheckRead> {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": subjects,
             "requirements": {"r": {"subject": "t", "checks": checks}}
         }));
@@ -428,7 +438,7 @@ mod tests {
     #[test]
     fn a_part_that_clashes_with_its_parent_still_prints_the_dot_of_a_field_called_like_it() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items", "has": {"cov": "y"}}
@@ -443,7 +453,7 @@ mod tests {
     #[test]
     fn a_field_named_like_a_part_of_the_parent_only_prints_no_dot() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items"}
@@ -619,7 +629,7 @@ mod tests {
     #[test]
     fn values_of_mixed_types_are_listed_beside_a_field_compared_with_itself_in_a_whose() {
         let sentence = "every xs whose k is at least k is one of 1, 'a'";
-        let itself = "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert";
+        let itself = "k is compared with itself, because in a whose it's read from the item: to read the subject's k, write t.k";
         let read = one(json!({"c": sentence}));
         assert_eq!(problems(&read), [itself, "values of mixed types"]);
         let read = one(json!({"c": {"assert": ["x exists", sentence]}}));
@@ -627,6 +637,29 @@ mod tests {
         assert_eq!(
             problems(&read),
             [second.as_str(), "line 2: values of mixed types"]
+        );
+    }
+
+    #[test]
+    fn the_advice_to_write_the_subjects_name_is_left_out_when_the_name_needs_quotes() {
+        let policy = json!({
+            "ergo_spec": "v0.6-dev",
+            "subjects": {"my t": {"from": "things"}},
+            "requirements": {"r": {"subject": "my t", "checks": {
+                "c": "count of xs whose k equals k is 1",
+                "d": "sum of xs.v that is at least lo is 1"
+            }}}
+        });
+        let policy = Policy::read(&policy);
+        let reading = Reading::of(&policy);
+        let read = read_checks(&reading, &policy.requirements["r"]);
+        assert_eq!(
+            problems(&read["c"]),
+            ["k is compared with itself, because in a whose it's read from the item"]
+        );
+        assert_eq!(
+            problems(&read["d"]),
+            ["that lo: sum of adds up numbers, which have no fields, so lo can't be read from one"]
         );
     }
 

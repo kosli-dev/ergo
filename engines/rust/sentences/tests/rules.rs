@@ -640,16 +640,11 @@ fn an_alias_and_the_field_with_its_name_are_different_paths() {
 }
 
 #[test]
-fn after_every_or_some_the_item_is_compared_with_a_field_that_is_the_item() {
-    let message = |path: &str| {
-        one(&format!(
-            "{path} is compared with itself, because after every or some it's read from the item: to read the subject's {path}, put the list on the for line and compare under assert"
-        ))
-    };
-    assert_eq!(problems("every items.x equals x"), message("x"));
-    assert_eq!(problems("some items.x.y equals x.y"), message("x.y"));
-    assert_eq!(problems("every items.x.y equals y"), message("y"));
-    assert_eq!(problems("every items.x is at least x"), message("x"));
+fn after_every_or_some_a_field_on_the_right_is_the_subjects_so_it_is_not_compared_with_itself() {
+    assert_eq!(problems("every items.x equals x"), none());
+    assert_eq!(problems("some items.x.y equals x.y"), none());
+    assert_eq!(problems("every items.x.y equals y"), none());
+    assert_eq!(problems("every items.x is at least x"), none());
     assert_eq!(problems("every x equals x"), none());
     assert_eq!(problems("every x.y equals x"), none());
     assert_eq!(problems("every items.x equals y"), none());
@@ -662,17 +657,14 @@ fn after_every_or_some_the_item_is_compared_with_a_field_that_is_the_item() {
     );
     assert_eq!(problems("every items.x equals $params.x"), none());
     assert_eq!(problems_with("every items.pr equals pr", &["pr"]), none());
-    assert_eq!(
-        problems_with("every items.pr equals .pr", &["pr"]),
-        message("pr")
-    );
+    assert_eq!(problems_with("every items.pr equals .pr", &["pr"]), none());
 }
 
 #[test]
 fn in_a_whose_the_left_is_the_item_and_the_right_is_the_subject() {
     let message = |path: &str| {
         one(&format!(
-            "{path} is compared with itself, because in a whose it's read from the item: to read the subject's {path}, compare under assert"
+            "{path} is compared with itself, because in a whose it's read from the item: to read the subject's {path}, write \u{1}.{path}"
         ))
     };
     assert_eq!(
@@ -704,20 +696,64 @@ fn in_a_whose_the_left_is_the_item_and_the_right_is_the_subject() {
 }
 
 #[test]
-fn a_count_with_a_whose_cannot_read_the_subjects_field() {
+fn a_count_with_a_whose_that_compares_a_field_with_itself_says_to_write_the_subjects_name() {
     assert_eq!(
         problems("count of items whose x equals x is 1"),
         one(
-            "x is compared with itself, because in a whose it's read from the item, and a count or a sum can't read the subject's field there yet"
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x"
         )
     );
     assert_eq!(problems("count of items whose x equals y is 1"), none());
 }
 
 #[test]
+fn a_sum_whose_whose_reads_a_name_against_the_focus_names_the_first_one() {
+    let message = |name: &str| {
+        one(&format!(
+            "whose {name}: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose"
+        ))
+    };
+    assert_eq!(problems("sum of xs.v whose k is 1 is 3"), message("k"));
+    assert_eq!(problems("sum of xs whose k is 1 is 3"), message("k"));
+    assert_eq!(
+        problems("sum of xs.v whose $params.k is lo is 3"),
+        message("lo")
+    );
+    assert_eq!(
+        problems("sum of xs.v whose count of ys is 1 is 3"),
+        message("ys")
+    );
+    assert_eq!(
+        problems("sum of xs.v whose $params.k is in ls is 3"),
+        message("ls")
+    );
+    assert_eq!(problems("sum of xs.v that is 1 is 3"), none());
+    assert_eq!(
+        problems("sum of xs.v that is at least lo is 3"),
+        one(
+            "that lo: sum of adds up numbers, which have no fields, so lo can't be read from one: to read the subject's lo, write \u{1}.lo"
+        )
+    );
+    assert_eq!(
+        problems("sum of xs.v that is at least $params.lo is 3"),
+        none()
+    );
+    assert_eq!(problems("sum of xs.v whose $params.k is 1 is 3"), none());
+    assert_eq!(
+        problems_with("sum of xs.v whose $params.k is pr is 3", &["pr"]),
+        none()
+    );
+    assert_eq!(
+        problems_with("sum of xs.v whose $params.k is .pr is 3", &["pr"]),
+        message("pr")
+    );
+    assert_eq!(problems("count of xs whose k is 1 is 3"), none());
+}
+
+#[test]
 fn a_for_item_whose_is_compared_with_the_aliases_before_it() {
     let message = one(
-        "x is compared with itself, because in a whose it's read from the item: to read the subject's x, compare under assert",
+        "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
     );
     assert_eq!(
         for_problems(&for_line("every items whose x equals x as i"), &[]),
@@ -736,7 +772,7 @@ fn a_for_item_whose_is_compared_with_the_aliases_before_it() {
             &[]
         ),
         one(
-            "pr is compared with itself, because in a whose it's read from the item: to read the subject's pr, compare under assert"
+            "pr is compared with itself, because in a whose it's read from the item: to read the subject's pr, write \u{1}.pr"
         )
     );
     assert_eq!(

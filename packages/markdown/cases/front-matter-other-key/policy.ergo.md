@@ -1,5 +1,5 @@
 ---
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 owner: bakery
 ---
 

@@ -423,7 +423,11 @@ pub fn blocked_of(path: &Path, ctx: &Ctx) -> Vec<String> {
                 }
                 if let (Start::Part(part), false) = (&path.start, value.is_null()) {
                     let prefix = Path {
-                        start: part.base.clone(),
+                        start: if part.base == Start::Alias(path::OUTER.to_string()) {
+                            Start::Subject
+                        } else {
+                            part.base.clone()
+                        },
                         steps: part.steps[..at].to_vec(),
                     };
                     let holder = if matches!(resolved, Resolved::Index(_)) {
@@ -1194,6 +1198,200 @@ pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> String {
     }
 }
 
+pub fn subject_key_fault(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
+    check
+        .paths()
+        .into_iter()
+        .flat_map(|path| path.steps.iter())
+        .find_map(|step| {
+            let Step::Field(field) = step else {
+                return None;
+            };
+            if !path::names_the_subject(&field.start) {
+                return None;
+            }
+            let read = path::read(field, ctx);
+            match (read.outcome, read.value) {
+                (Outcome::Found, Some(value)) if !value.is_string() && cause == Cause::Unusable => {
+                    Some(isnt(&name::name(field), value, "text"))
+                }
+                (Outcome::Found, _) => None,
+                (outcome @ (Outcome::Absent | Outcome::Null), _)
+                    if outcome.cause() == Some(cause) =>
+                {
+                    Some(format!("{} is {}", name::name(field), state_word(outcome)))
+                }
+                _ => None,
+            }
+        })
+}
+
+pub fn reads_from_a_root(path: &Path) -> bool {
+    matches!(
+        path.start,
+        Start::Alias(_) | Start::Part(_) | Start::Params | Start::Input
+    ) && !path.steps.iter().any(|step| {
+        matches!(step, Step::Field(field) if matches!(field.start, Start::Subject | Start::Own))
+    })
+}
+
+fn key_text(step: &Step, ctx: &Ctx) -> Option<String> {
+    let key = match step {
+        Step::Field(key) | Step::Ref(key) => key,
+        _ => return None,
+    };
+    let read = path::read(key, ctx);
+    match (read.outcome, read.value) {
+        (Outcome::Found, Some(value)) if !value.is_string() => {
+            Some(isnt(&name::name(key), value, "text"))
+        }
+        (Outcome::Found, _) => None,
+        (Outcome::Absent, _) => Some(format!("{} is missing", name::name(key))),
+        (Outcome::Null, _) => Some(format!("{} is null", name::name(key))),
+        _ => {
+            let present = Check::Present(super::present::Present {
+                path: (**key).clone(),
+                missing: false,
+            });
+            let verdict = Verdict {
+                cause: read.outcome.cause().unwrap_or(Cause::Unusable),
+                inputs: Vec::new(),
+            };
+            Some(message(&present, ctx, &verdict))
+        }
+    }
+}
+
+pub fn root_text(path: &Path, ctx: &Ctx, cause: Cause) -> String {
+    for at in 0..path.steps.len() {
+        let step = &path.steps[at];
+        if !matches!(step, Step::Field(_) | Step::Ref(_)) || path::resolve(step, ctx).is_ok() {
+            continue;
+        }
+        let before = Path {
+            start: path.start.clone(),
+            steps: path.steps[..at].to_vec(),
+        };
+        let read = path::read(&before, ctx);
+        if matches!(read.outcome, Outcome::Found | Outcome::Null)
+            && let Some(text) = key_text(step, ctx)
+        {
+            return text;
+        }
+        break;
+    }
+    match cause {
+        Cause::Absent => format!("{} is missing", name::name(path)),
+        Cause::Null => format!("{} is null", name::name(path)),
+        _ => {
+            let present = Check::Present(super::present::Present {
+                path: path.clone(),
+                missing: false,
+            });
+            message(
+                &present,
+                ctx,
+                &Verdict {
+                    cause,
+                    inputs: Vec::new(),
+                },
+            )
+        }
+    }
+}
+
+pub fn root_fault(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
+    if let Some(fault) = subject_key_fault(check, ctx, cause) {
+        return Some(fault);
+    }
+    if !matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable) {
+        return None;
+    }
+    let mut paths = check.paths();
+    paths.extend(super::walk::listed_refs(check));
+    paths.into_iter().find_map(|path| {
+        if !reads_from_a_root(path) || path::read(path, ctx).outcome.cause() != Some(cause) {
+            return None;
+        }
+        Some(root_text(path, ctx, cause))
+    })
+}
+
+fn first_null_step(root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
+    for at in 0..root.steps.len() {
+        let prefix = Path {
+            start: root.start.clone(),
+            steps: root.steps[..at].to_vec(),
+        };
+        match path::read(&prefix, ctx).outcome {
+            Outcome::Found => continue,
+            Outcome::Null => {
+                return Some((Cause::Null, format!("{} is null", name::name(&prefix))));
+            }
+            _ => return None,
+        }
+    }
+    None
+}
+
+pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
+    let mut found: Vec<(Cause, String, bool)> = Vec::new();
+    for check in checks {
+        if matches!(check, Check::Present(_)) {
+            continue;
+        }
+        let mut paths = check.paths();
+        paths.extend(super::walk::listed_refs(check));
+        for path in paths {
+            let mut roots: Vec<(Path, bool)> = Vec::new();
+            for step in &path.steps {
+                if let Step::Field(field) = step
+                    && path::names_the_subject(&field.start)
+                {
+                    roots.push(((**field).clone(), true));
+                }
+            }
+            if reads_from_a_root(path) {
+                roots.push((path.clone(), false));
+            }
+            for (root, is_key) in roots {
+                if let Start::Alias(name) = &root.start
+                    && !ctx.aliases.contains_key(name)
+                {
+                    continue;
+                }
+                if lists::walked(&root, ctx).is_some() {
+                    continue;
+                }
+                let counted = match check {
+                    Check::Tally(tally) => tally.counted_paths().contains(&path),
+                    _ => false,
+                };
+                if counted && let Some(found) = first_null_step(&root, ctx) {
+                    return Some(found);
+                }
+                let read = path::read(&root, ctx);
+                if let Some(cause) = read.outcome.cause() {
+                    found.push((cause, root_text(&root, ctx, cause), is_key));
+                } else if is_key && let Some(value) = read.value.filter(|value| !value.is_string())
+                {
+                    found.push((
+                        Cause::Unusable,
+                        isnt(&name::name(&root), value, "text"),
+                        true,
+                    ));
+                }
+            }
+        }
+    }
+    let worst = Cause::worst(found.iter().map(|(cause, _, _)| *cause).collect::<Vec<_>>())?;
+    found
+        .into_iter()
+        .filter(|(cause, _, _)| *cause == worst)
+        .min_by_key(|(_, _, is_key)| !is_key)
+        .map(|(cause, text, _)| (cause, text))
+}
+
 pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
     let want = match cause {
         Cause::Absent => Outcome::Absent,
@@ -1205,7 +1403,10 @@ pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
         .paths()
         .into_iter()
         .filter(|path| matches!(path.start, Start::Alias(_) | Start::Part(_)))
-        .filter(|path| !path.steps.iter().any(|step| matches!(step, Step::Field(_))))
+        .filter(|path| {
+            path::is_root(&path.start)
+                || !path.steps.iter().any(|step| matches!(step, Step::Field(_)))
+        })
         .collect();
     paths.sort_by_key(|path| name::name(path));
     paths.dedup();

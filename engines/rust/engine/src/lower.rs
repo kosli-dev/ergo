@@ -46,6 +46,7 @@ pub struct Scope {
     for_aliases: BTreeSet<String>,
     pending: BTreeSet<String>,
     subject: Option<String>,
+    rooted: bool,
 }
 
 fn not_a_position(number: &str) -> Vec<String> {
@@ -284,7 +285,11 @@ impl Scope {
                         })));
                     }
                     Ok(Step::Field(Box::new(path::Path {
-                        start: Start::Subject,
+                        start: if self.rooted {
+                            path::root(false)
+                        } else {
+                            Start::Subject
+                        },
                         steps: vec![Step::Key(name.clone())],
                     })))
                 }
@@ -293,6 +298,28 @@ impl Scope {
                     .ok_or_else(Vec::new),
             },
         }
+    }
+
+    fn subject_key(&self, step: &s::Step, next: Option<&s::Step>) -> Option<Step> {
+        if !self.item || self.rooted {
+            return None;
+        }
+        let subject = self.subject.as_deref()?;
+        let (s::Step::NamedBy(s::Reference::Name(name)), Some(s::Step::Key(key))) = (step, next)
+        else {
+            return None;
+        };
+        if name != subject {
+            return None;
+        }
+        let whole = PartDef {
+            steps: Vec::new(),
+            id: None,
+        };
+        Some(Step::Field(Box::new(path::Path {
+            start: part_start(subject, self.base(), &whole),
+            steps: vec![Step::Key(key.clone())],
+        })))
     }
 
     pub fn path(&self, path: &s::Path) -> Result<path::Path, Vec<String>> {
@@ -345,6 +372,13 @@ impl Scope {
         }
     }
 
+    pub fn rooted(&self) -> Scope {
+        Scope {
+            rooted: true,
+            ..self.clone()
+        }
+    }
+
     pub fn in_tally_item(&self) -> Scope {
         Scope {
             item: true,
@@ -369,7 +403,7 @@ impl Scope {
     }
 
     fn follow_problem(&self, written: &s::Path, parts: bool) -> Option<String> {
-        if self.from_line {
+        if self.from_line || (self.item && !self.rooted) {
             return None;
         }
         let subject = self.subject.as_deref()?;
@@ -417,7 +451,13 @@ impl Scope {
         let mut problems = Vec::new();
         let mut steps = Vec::new();
         problems.extend(self.follow_problem(written, parts));
-        for step in &written.steps {
+        let mut written_steps = written.steps.iter().peekable();
+        while let Some(step) = written_steps.next() {
+            if let Some(key) = self.subject_key(step, written_steps.peek().copied()) {
+                written_steps.next();
+                steps.push(key);
+                continue;
+            }
             match self.step(step) {
                 Ok(step) => steps.push(step),
                 Err(found) => problems.extend(found),
@@ -489,10 +529,14 @@ impl Scope {
             || ((dot || !parts) && self.subject.as_deref() == Some(key))
         {
             steps.insert(0, Step::Key(key.to_string()));
-            return (Start::Own, steps);
+            return (self.field_root(Start::Own, true), steps);
         }
         steps.insert(0, Step::Key(key.to_string()));
-        (Start::Subject, steps)
+        (self.field_root(Start::Subject, false), steps)
+    }
+
+    fn field_root(&self, start: Start, own: bool) -> Start {
+        if self.rooted { path::root(own) } else { start }
     }
 
     pub fn value(&self, value: &s::Value) -> Result<Value, Vec<String>> {
@@ -671,8 +715,7 @@ fn has_elapsed(terms: &[s::Term]) -> bool {
 pub fn in_from_line(found: Vec<String>) -> Vec<String> {
     let mut out = Vec::new();
     for problem in found {
-        let argument = problem.ends_with(" can't take a count of, a sum of or a plus")
-            || problem.starts_with(DISTINCT_ITEM);
+        let argument = problem.ends_with(" can't take a count of, a sum of or a plus");
         if problem == ELAPSED_AFTER_QUANTIFIER {
             out.push(problem.clone());
         }
@@ -977,7 +1020,7 @@ pub fn lower_quantified(
                 None
             }
         },
-        other => match lower_with_operator_modules(&on_item, other, &item) {
+        other => match lower_with_operator_modules(&on_item, other, &item.rooted()) {
             Some(Ok(check)) => Some(check),
             Some(Err(found)) => {
                 problems.extend(found);
@@ -986,9 +1029,6 @@ pub fn lower_quantified(
             None => None,
         },
     };
-    if distinct {
-        problems.extend(distinct_item_problem(phrase, &item));
-    }
     if !problems.is_empty() {
         return Err(problems);
     }
@@ -1003,50 +1043,10 @@ pub fn lower_quantified(
             whose: conditions,
             if_any,
             check: Box::new(check),
+            for_aliases: item.for_aliases.iter().cloned().collect(),
         }))),
         _ => Err(vec![format!("every or some{UNSUPPORTED_SUFFIX}")]),
     }
-}
-
-pub const DISTINCT_ITEM: &str =
-    "distinct is about the value its path points at, but the phrase also reads ";
-
-fn phrase_paths(phrase: &s::Phrase) -> Vec<&s::Path> {
-    let mut paths: Vec<&s::Path> = phrase_terms(phrase)
-        .iter()
-        .filter_map(|term| match term {
-            s::Term::Path(path) => Some(path),
-            _ => None,
-        })
-        .collect();
-    if let s::Phrase::OneOf { list, .. }
-    | s::Phrase::Matches { list, .. }
-    | s::Phrase::ContainsAll(list)
-    | s::Phrase::ContainsNone(list)
-    | s::Phrase::ContainsSome(list)
-    | s::Phrase::NotContainsAll(list) = phrase
-        && let s::List::Path(path) = list
-    {
-        paths.push(path);
-    }
-    paths
-}
-
-fn distinct_item_problem(phrase: &s::Phrase, item: &Scope) -> Option<String> {
-    let mut names: Vec<String> = phrase_paths(phrase)
-        .into_iter()
-        .filter_map(|path| item.path(path).ok())
-        .filter(|path| matches!(path.start, Start::Subject | Start::Own) && !path.steps.is_empty())
-        .map(|path| crate::name::name(&path))
-        .collect();
-    names.sort();
-    names.dedup();
-    (!names.is_empty()).then(|| {
-        format!(
-            "{DISTINCT_ITEM}{} outside that value: leave distinct out, or put the items on a for line",
-            names.join(", ")
-        )
-    })
 }
 
 fn unsupported(condition: &s::Condition, names: &[&str]) -> Vec<String> {

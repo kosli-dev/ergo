@@ -750,18 +750,129 @@ fn self_term(phrase: &Phrase) -> Option<&Path> {
     }
 }
 
-fn full_steps(path: &Path) -> Vec<Step> {
-    let (_, steps) = lifted(path);
-    let mut all = Vec::new();
-    match &path.start {
-        Start::Field { key, .. } | Start::Quoted(key) => all.push(Step::Key(key.clone())),
-        _ => {}
+/// Stands for the subject's name in a problem, and the engine writes the name in its place.
+pub const SUBJECT_MARK: char = '\u{1}';
+
+fn phrase_operand_terms(phrase: &Phrase) -> &[Term] {
+    match phrase {
+        Phrase::Is { operand, .. }
+        | Phrase::Order { operand, .. }
+        | Phrase::Time { operand, .. }
+        | Phrase::Contains { operand, .. }
+        | Phrase::StartsWith(operand)
+        | Phrase::EndsWith(operand)
+        | Phrase::NotStartsWith(operand)
+        | Phrase::NotEndsWith(operand)
+        | Phrase::Alphabetically { operand, .. } => match operand {
+            Operand::Field(terms) => terms,
+            _ => &[],
+        },
+        _ => &[],
     }
-    all.extend(steps);
-    all
 }
 
-fn whose_self(whose: &[Condition], aliases: &[&str], derived_holder: bool) -> BTreeSet<String> {
+fn phrase_list_path(phrase: &Phrase) -> Option<&Path> {
+    match phrase {
+        Phrase::OneOf { list, .. }
+        | Phrase::Matches { list, .. }
+        | Phrase::ContainsAll(list)
+        | Phrase::ContainsNone(list)
+        | Phrase::ContainsSome(list)
+        | Phrase::NotContainsAll(list) => match list {
+            List::Path(path) => Some(path),
+            List::Values(_) => None,
+        },
+        _ => None,
+    }
+}
+
+fn term_paths(term: &Term) -> Vec<&Path> {
+    match term {
+        Term::Derived(derived) => vec![&derived.path],
+        Term::Elapsed(elapsed) => vec![&elapsed.from, &elapsed.to],
+        _ => Vec::new(),
+    }
+}
+
+fn rooted_start(path: &Path) -> bool {
+    matches!(
+        path.start,
+        Start::Params | Start::Input | Start::Unknown(_) | Start::That
+    )
+}
+
+fn focus_names(condition: &Condition, aliases: &[&str]) -> Vec<String> {
+    let text = |path: &Path| print_path(path, Side::Left, &[]);
+    let mut names = Vec::new();
+    match &condition.left {
+        Left::Path(path) if !condition.that && !rooted_start(path) => names.push(text(path)),
+        Left::Derived(derived) if !rooted_start(&derived.path) => names.push(text(&derived.path)),
+        Left::Elapsed(elapsed) => {
+            for path in [&elapsed.from, &elapsed.to] {
+                if !rooted_start(path) {
+                    names.push(text(path));
+                }
+            }
+        }
+        _ => {}
+    }
+    let terms = phrase_operand_terms(&condition.phrase);
+    let mut right: Vec<&Path> = terms
+        .iter()
+        .filter_map(|term| match term {
+            Term::Path(path) => Some(path),
+            _ => None,
+        })
+        .collect();
+    right.extend(terms.iter().flat_map(term_paths));
+    right.extend(phrase_list_path(&condition.phrase));
+    for path in &right {
+        let named = first_key(path).is_some_and(|key| aliases.contains(&key)) && !dot_of(path);
+        if !rooted_start(path) && !named {
+            names.push(text(path));
+        }
+    }
+    let mut every_path: Vec<&Path> = match &condition.left {
+        Left::Path(path) => vec![path],
+        Left::Derived(derived) => vec![&derived.path],
+        Left::Elapsed(elapsed) => vec![&elapsed.from, &elapsed.to],
+    };
+    every_path.extend(right);
+    for path in every_path {
+        for step in &path.steps {
+            if let Step::NamedBy(Reference::Name(key)) | Step::Brackets(Reference::Name(key)) = step
+                && !aliases.contains(&key.as_str())
+            {
+                names.push(key.clone());
+            }
+        }
+    }
+    names
+}
+
+fn sum_whose(whose: &[Condition], aliases: &[&str]) -> Vec<String> {
+    let first = |that: bool| {
+        whose
+            .iter()
+            .filter(|condition| condition.that == that)
+            .flat_map(|condition| focus_names(condition, aliases))
+            .next()
+    };
+    let mut out = Vec::new();
+    if let Some(name) = first(false) {
+        out.push(format!(
+            "whose {name}: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose"
+        ));
+    }
+    if let Some(name) = first(true) {
+        out.push(format!(
+            "that {name}: sum of adds up numbers, which have no fields, so {name} can't be read from one: to read the subject's {name}, write {SUBJECT_MARK}.{name}"
+        ));
+    }
+    out
+}
+
+fn whose_self(whose: &[Condition], aliases: &[&str]) -> BTreeSet<String> {
     let mut out = BTreeSet::new();
     for condition in whose {
         if condition.that {
@@ -775,13 +886,8 @@ fn whose_self(whose: &[Condition], aliases: &[&str], derived_holder: bool) -> BT
         };
         if same_path(path, term, aliases, true) {
             let text = print_path(path, Side::Left, &[]);
-            let advice = if derived_holder {
-                ", and a count or a sum can't read the subject's field there yet".to_string()
-            } else {
-                format!(": to read the subject's {text}, compare under assert")
-            };
             out.insert(format!(
-                "{text} is compared with itself, because in a whose it's read from the item{advice}"
+                "{text} is compared with itself, because in a whose it's read from the item: to read the subject's {text}, write {SUBJECT_MARK}.{text}"
             ));
         }
     }
@@ -802,36 +908,15 @@ fn check_self(check: &Check, aliases: &[&str]) -> BTreeSet<String> {
                     ));
                 }
             }
-            Assertion::Quantified {
-                path,
-                whose,
-                phrase,
-                ..
-            } => {
-                out.extend(whose_self(whose, aliases, false));
-                if let Some(term) = self_term(phrase)
-                    && first_key(term).is_none_or(|key| dot_of(term) || !aliases.contains(&key))
-                    && term.position.is_none()
-                    && term.start != Start::Params
-                    && term.start != Start::Input
-                    && !matches!(term.start, Start::Unknown(_))
-                    && !matches!(term.steps.last(), Some(Step::Index(_)))
-                {
-                    let walked = full_steps(path);
-                    let steps = full_steps(term);
-                    if steps.len() < walked.len()
-                        && walked[walked.len() - steps.len()..] == steps[..]
-                    {
-                        let text = print_path(term, Side::Left, &[]);
-                        out.insert(format!(
-                            "{text} is compared with itself, because after every or some it's read from the item: to read the subject's {text}, put the list on the for line and compare under assert"
-                        ));
-                    }
-                }
+            Assertion::Quantified { whose, .. } => {
+                out.extend(whose_self(whose, aliases));
             }
             Assertion::Derived { terms, .. } => {
                 if let Some(Term::Derived(derived)) = terms.last() {
-                    out.extend(whose_self(&derived.whose, aliases, true));
+                    out.extend(whose_self(&derived.whose, aliases));
+                    if derived.kind == DerivedKind::Sum {
+                        out.extend(sum_whose(&derived.whose, aliases));
+                    }
                 }
             }
         }
@@ -850,7 +935,7 @@ fn for_self(line: &ForLine, aliases: &[&str]) -> BTreeSet<String> {
         let whose = match item {
             ForItem::Walk { whose, .. } | ForItem::Pick { whose, .. } => whose,
         };
-        out.extend(whose_self(whose, &names, false));
+        out.extend(whose_self(whose, &names));
     }
     out
 }

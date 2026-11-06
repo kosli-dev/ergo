@@ -17,7 +17,7 @@ This page describes everything Ergo accepts and everything it returns, the same 
 A policy is an object with two sections and the version of the [spec](spec/README.md#versions) it's written for, and it can [describe itself](#describing-a-policy) too. `subjects` says what the policy checks and where to find it in the input, and `requirements` says what must be true of it. Each section maps names to definitions. A policy is plain data, so it usually lives in a YAML or JSON file with top-level `ergo_spec`, `subjects` and `requirements` keys:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   deployment: { ... }
   commit: { ... }
@@ -28,11 +28,11 @@ requirements:
 
 An engine takes the policy, the input and the [params](#params), and reads only those, so the same arguments always give the same report. How to hand them over is on the page of each engine.
 
-`ergo_spec` is the version of the spec the policy is written for, and this copy of Ergo follows `v0.5`. A policy without it, or with `null`, a number like `0.1`, or another version, is written wrong, so every requirement's `$well_formed` row fails and lists it with the policy's other problems, as an input named `policy ergo_spec`. Its value says what's wrong: `missing`, `not a string`, `not a version V0.1` for a string that isn't shaped like a version, or `unsupported version v0.1, expected v0.5` for one this copy of Ergo doesn't follow. When the policy is in a file, pass `ergo_spec` from that file, like `data.ergo_spec` above, and don't write it in the Rego that hands the policy over: a fixed value there would say the file follows `v0.5` whatever it was written for. A policy written in Rego says it in the policy itself, like `{"ergo_spec": "v0.5", "subjects": ...}`.
+`ergo_spec` is the version of the spec the policy is written for, and this copy of Ergo follows `v0.6-dev`. A policy without it, or with `null`, a number like `0.1`, or another version, is written wrong, so every requirement's `$well_formed` row fails and lists it with the policy's other problems, as an input named `policy ergo_spec`. Its value says what's wrong: `missing`, `not a string`, `not a version V0.1` for a string that isn't shaped like a version, or `unsupported version v0.1, expected v0.6-dev` for one this copy of Ergo doesn't follow. When the policy is in a file, pass `ergo_spec` from that file, like `data.ergo_spec` above, and don't write it in the Rego that hands the policy over: a fixed value there would say the file follows `v0.6-dev` whatever it was written for. A policy written in Rego says it in the policy itself, like `{"ergo_spec": "v0.6-dev", "subjects": ...}`.
 
 Because each name is an object key, two requirements can't share a name, and every row in the report points back to exactly one requirement.
 
-A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. Its report then has a requirement of Ergo's own, `$policy`, with one `$well_formed` row that fails and says what is wrong, so the violations don't come back empty. For the policy `{"ergo_spec": "v0.5"}` and the input `{}`, the row is:
+A policy with no requirements is never compliant: it doesn't check anything, so it can't vouch for anything either. The same goes for a policy that isn't an object, or whose `requirements` isn't one. Its report then has a requirement of Ergo's own, `$policy`, with one `$well_formed` row that fails and says what is wrong, so the violations don't come back empty. For the policy `{"ergo_spec": "v0.6-dev"}` and the input `{}`, the row is:
 
 ```json
 {
@@ -64,7 +64,7 @@ A policy with no requirements is never compliant: it doesn't check anything, so 
 A policy can have a `description` and a `meta` of its own, next to its sections. They work like a [requirement's](#requirements): `description` says what the policy asks for, `meta` keeps anything else, like the id of the control the policy checks, and Ergo copies both to the top of the report and never reads them. This is where a control with several requirements keeps its text:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 description: Production changes are reviewed and approved
 meta: {control: DEV-0401, title: Security testing and code review}
 subjects:
@@ -96,9 +96,9 @@ the report starts with:
   "description": "Production changes are reviewed and approved",
   "engine": {
     "name": "ergo-rego",
-    "version": "0.5.1-dev"
+    "version": "0.6.0-dev"
   },
-  "ergo": "v0.5",
+  "ergo": "v0.6-dev",
   "meta": {
     "control": "DEV-0401",
     "title": "Security testing and code review"
@@ -154,7 +154,7 @@ A few details:
 A `from` line is a path, and `whose` or `that` with conditions joined by `and` keeps the subjects they hold for. Each condition starts with its own `whose` or `that`, so a second one is `and whose` or `and that`, and `and` followed by a bare condition is written wrong. Paths and conditions are written as in [checks](#checks). `identified_by` is a path written the same way:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   emergency change:
     from: deployments whose environment is "prod" and whose change_type is "emergency"
@@ -435,7 +435,7 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 When requirements check different parts of the same list, give each part its own subject, built on one that says where the list is. Say the SBOM lists components, some pinned by the lockfile and some exempt from the licence rules:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   component:
     from: components
@@ -487,7 +487,7 @@ A from line that's another subject's name reads that subject's `from` and `ident
 Data often keeps what a check needs deep inside the subject. Kosli, for one, puts every attestation at `compliance_status.attestations_statuses.<name>.attestation_data`, so a policy that reads three attestations repeats that path in every check. A subject can give a path a name once, with `has`, and the checks use the name. Each entry of `has` is a **part**, and its key is the part's alias. An alias is a short word that stands for something longer, as `as pr` does on a `for` line.
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   round:
     from: trail
@@ -550,7 +550,7 @@ and written out in full, its inputs are named `compliance_status.attestations_st
 - A path is written as in a [from line](#from-lines): keys joined by `.`, keys in quotes, positions, and `named by` a key of `$params` or `$input`. It is a path inside the subject, so it can't start at `$params` or `$input`, and it can't have `whose`, `count of` or `named by each of`.
 - A part can be any path, even one that ends at a single value: `ratio: compliance_status.attestations_statuses.coverage.attestation_data.ratio` makes `ratio is at least 0.8` read the same.
 - Keep the data's own names, as `findings` and `coverage` do, because a reader who knows the data finds `coverage.attestation_data.hunks_total` where they'd look for it.
-- An alias is read wherever a bare first key reads the subject: in the subject's checks, in the assertions of a `for` line, and in the conditions of the subject's `from` line and of a subject that narrows it, where `.limit` reads the field instead. In a `whose` and after a one-line `every` or `some`, where a bare first key is a field of the item, it's read on the right side and never on the left of a `whose`, as a `for` line's name is: `every items.price is at most limit` reads the part `limit`, `whose limit is at least 4` reads the item's `limit`, and `.limit` on the right reads the item's. A term of a `plus` and the path of an elapsed time on the right read it the same way, so `whose lo is at least limit plus hi` reads the part `limit` and the item's `hi`. A `count of` or `sum of` is read the same way: in `every items.price whose n is count of limit.rows is 1` the right side counts the part's `limit.rows`, and in `count of items whose count of limit.rows is 1 is 3` the left side counts each item's own `limit.rows`. `named by` a part's alias is written wrong, with `named by coverage reads a part, which isn't supported yet`.
+- An alias is read wherever a bare first key reads the subject: in the subject's checks, in the assertions of a `for` line, and in the conditions of the subject's `from` line and of a subject that narrows it, where `.limit` reads the field instead. In a `whose`, where a bare first key is a field of the item, it's read on the right side and never right after `whose`, as a `for` line's name is: `whose limit is at least 4` reads the item's `limit`, and `.limit` on the right of a `whose` reads the item's. After a one-line `every` or `some`, the right side is read from the subject, so `every items.price is at most limit` reads the part `limit`, and `.limit` there reads the subject's own field. A term of a `plus` and the path of an elapsed time on the right read it the same way, so `whose lo is at least limit plus hi` reads the part `limit` and the item's `hi`. A `count of` or `sum of` is read the same way: in `count of items whose n is count of limit.rows is 1` the right side counts the part's `limit.rows`, and in `count of items whose count of limit.rows is 1 is 3` the left side counts each item's own `limit.rows`. `named by` a part's alias is written wrong, with `named by coverage reads a part, which isn't supported yet`.
 - An alias shadows a field of the subject with the same name. To read the field, put a dot in front: `.coverage` is the subject's field `coverage`, not the part. A row's `inputs` name a field read like that with the dot, like `.coverage.pct`, when the field is named like a part, a parent subject or a `for` alias, so it isn't taken for the part's `coverage.pct`. The list a `count of` or a walk reads keeps the dot too, like `.coverage.items[]`.
 - An alias is a bare word that isn't a word of the grammar, `params` or `input`, or it is written wrong with `invalid alias`. A part's alias named like a subject of the policy (its own, its parent or any other) is written wrong with `<alias> can't be an alias: it's a subject's name`, and one named like a part of a parent or grandparent subject, or like a part kept from a subject it narrows, with `<alias> can't be an alias: it's a part of <subject>`, which names the subject that declares the part and puts a name with a space in it in double quotes, like `"pull request"`. A name always means one thing, so nobody has to wonder whether it reads the subject or the alias. The problem is listed under the part, like `subjects.kid.has.x`.
 - An alias of a `for` line can't be named like a subject, the check's own, a parent or any other in the policy, or like a part of the check's own subject, of a parent or grandparent subject, or of a subject they narrow. Either is written wrong, so that a name always means one thing and a bare name never reads the parent when the item lacks the field. The problem is under the check, as `<alias> can't be an alias: it's a subject's name` or `<alias> can't be an alias: it's a part of <subject>`, and both are listed when both apply. With this policy and this input:
@@ -698,7 +698,7 @@ The subject is what each row is about, so it's the first choice to make, and it 
 With the commit as the subject, the check looks through its pull requests:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   commit:
     from: commits
@@ -722,7 +722,7 @@ The requirement is `not_met`: `a2` has no pull request.
 With the pull request as the subject, the same sentence turns into "some pull request was approved":
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   pull request:
     from: commits[0].pull_requests
@@ -758,7 +758,7 @@ A policy can hold several requirements with different subjects over the same inp
 A check is a sentence: one line of English. [spec/syntax.md](spec/syntax.md) has the full grammar. Write the sentence on its own, or under `assert` when the check has a `description` or `meta`:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   deployment:
     from: deployments
@@ -860,7 +860,7 @@ The time phrases can take a written time or number too, like `opened is before "
 The negative phrases need what the positive ones need, so a field that can't be read fails them with the same cause. With this policy:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   artifact:
     from: artifacts
@@ -897,7 +897,7 @@ every check fails on `api`, with `value`. `web` passes all four, `notes` being `
 Text can be joined on the right side with `followed by`, from written strings and fields, as many pieces as you like: `rego.version is tag.version followed by "-dev"`, or `rego.spec is "v" followed by tag.version`. It goes after `is`, `equals`, `is not`, `does not equal`, `starts with`, `ends with`, `does not start with`, `does not end with`, `contains`, `does not contain` and the alphabetical phrases, and the sentence asks what the phrase asks of the joined text. There is no `preceded by`, because `"v" followed by x` says it. Every piece must be a string: a written one that isn't, like `followed by 1`, is written wrong, and a field that isn't one fails the check as `unusable`. With this policy:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   release:
     from: releases
@@ -921,7 +921,7 @@ and this input:
 ]}
 ```
 
-both checks pass for `0.4`, fail as `value` for `0.5`, whose `rego.version` doesn't end with `-dev` and whose `rego.spec` isn't `v0.5`, fail as `unusable` for `5`, because `tag.version` is a number, and fail as `absent` for the last one, because it has no `tag.version`. The row of each check shows the left side and then each piece that is a field, in order: for `0.5` the `dev_version` row has `rego.version` with `"0.5"` and `tag.version` with `"0.5"`, and the joined text isn't one of them. When a piece can't be read, the check fails with the cause of the first piece that can't, left to right, even when the left side is missing too. `followed by` isn't run yet after `every` or `some`, in a `whose` or in a `from` line, where it is written wrong with `"followed by" isn't supported yet after every or some, or in a whose`. It is run in an assertion and under a `for` line, where a piece can be the alias. Text that spells the words, like `"a followed by b"`, is one string.
+both checks pass for `0.4`, fail as `value` for `0.5`, whose `rego.version` doesn't end with `-dev` and whose `rego.spec` isn't `v0.6-dev`, fail as `unusable` for `5`, because `tag.version` is a number, and fail as `absent` for the last one, because it has no `tag.version`. The row of each check shows the left side and then each piece that is a field, in order: for `0.5` the `dev_version` row has `rego.version` with `"0.5"` and `tag.version` with `"0.5"`, and the joined text isn't one of them. When a piece can't be read, the check fails with the cause of the first piece that can't, left to right, even when the left side is missing too. `followed by` isn't run yet after `every` or `some`, in a `whose` or in a `from` line, where it is written wrong with `"followed by" isn't supported yet after every or some, or in a whose`. It is run in an assertion and under a `for` line, where a piece can be the alias. Text that spells the words, like `"a followed by b"`, is one string.
 
 `is at least`, `is at most`, `is more than` and `is less than` only order numbers. Two strings fail as `unusable`, because a number held as a string would be ordered as text, and with this input:
 
@@ -934,7 +934,7 @@ both checks pass for `0.4`, fail as `value` for `0.5`, whose `rego.version` does
 After `is in`, `is not in`, `contains`, `does not contain`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match`, the thing on the right can be a field too, read like the field after `is at least`: from the subject, from the name of a `for` line or from the item of a one-line `every` or `some` and a `whose`. With this policy and this input:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   deployment:
     from: deployments
@@ -978,7 +978,7 @@ They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all
 A path on the right that goes through a list of objects is walked the way a path after `every` is, and the phrase compares with the list of what the path ends at in each item. With this policy and this input:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   pin:
     from: pins
@@ -1022,7 +1022,7 @@ A path is keys joined by `.`, like `build.commit.sha`. A key with anything but l
 `named by` a bare field picks the key from the subject, so a limit can depend on a field like the severity. With the params `{"max_days": {"critical": 1, "high": 5}}`, this policy:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   vuln:
     from: vulns
@@ -1055,7 +1055,7 @@ and this input:
  ]}
 ```
 
-A field that's missing fails the check as `absent`, a `null` one as `null`, and one that isn't a string, a number included, as `unusable`. The path before the field is read first, so when it's missing or can't be read, like `$params.max_days` missing from the params, the check fails as that path does, whatever the field holds. A field that can't be read never lets a check pass, `does not exist` included: `x[0] named by zz does not exist` with no `x` fails as `absent` when `zz` is missing, `null` or a number, and passes only when `zz` is text. A `null` before the field doesn't stop the path. In an `every`, `some`, `count of`, `sum of` or a `for` line, a list before the field is walked, so `every rows.w named by k is "xy"` fails as `null` when `k` is `null`. A `null` there, like `rows` being `null`, fails it as `null` whatever `k` holds, and `failed_items` names `rows`, as `every rows.w.k` does. Anywhere else, a list before the field fails the check as `unusable`, so `rows.w named by k is "xy"` does when `rows` is a list. A path that reads inside an item that isn't an object, like `w.k named by zz` with `w` a list, fails as `not_an_object` whatever `zz` holds. When nothing is read inside it, like `w named by zz` with `w` holding `3`, the field decides first, so the check fails as `absent`, `null` or `unusable` when `zz` is missing, `null` or not text, and as `not_an_object` when it is text. An alias that is a list, read by a position, like `w[0] named by zz`, is read as a list. A name from a [`for` line](#checks) hides a field with the same name. Inside a `whose`, and in the phrase of a one-line `every` or `some`, the field is the item's, as a bare key is there. A `from` line and `identified_by` can't use it, because they don't have a subject yet.
+A field that's missing fails the check as `absent`, a `null` one as `null`, and one that isn't a string, a number included, as `unusable`. The path before the field is read first, so when it's missing or can't be read, like `$params.max_days` missing from the params, the check fails as that path does, whatever the field holds. A field that can't be read never lets a check pass, `does not exist` included: `x[0] named by zz does not exist` with no `x` fails as `absent` when `zz` is missing, `null` or a number, and passes only when `zz` is text. A `null` before the field doesn't stop the path. In an `every`, `some`, `count of`, `sum of` or a `for` line, a list before the field is walked, so `every rows.w named by k is "xy"` fails as `null` when `k` is `null`. A `null` there, like `rows` being `null`, fails it as `null` whatever `k` holds, and `failed_items` names `rows`, as `every rows.w.k` does. Anywhere else, a list before the field fails the check as `unusable`, so `rows.w named by k is "xy"` does when `rows` is a list. A path that reads inside an item that isn't an object, like `w.k named by zz` with `w` a list, fails as `not_an_object` whatever `zz` holds. When nothing is read inside it, like `w named by zz` with `w` holding `3`, the field decides first, so the check fails as `absent`, `null` or `unusable` when `zz` is missing, `null` or not text, and as `not_an_object` when it is text. An alias that is a list, read by a position, like `w[0] named by zz`, is read as a list. A name from a [`for` line](#checks) hides a field with the same name. Inside a `whose` the field is the item's, as a bare key is there. In the phrase of a one-line `every` or `some` it's the subject's, whatever the path starts at, so `every xs.v equals $params.m named by k` reads the subject's `k` for every item, and when the subject has no `k` the check fails once as `absent`, with `k is missing`. A `from` line and `identified_by` can't use it, because they don't have a subject yet.
 
 In YAML, ` #` starts a comment, so `title does not match 'WIP' #, 'DRAFT'` loses everything after `'WIP'`. YAML also won't take a plain value that starts with a quote, or that has `: ` in it. Put the whole sentence in single quotes then, doubling any single quote inside: `'"$schema" exists'`.
 
@@ -1173,10 +1173,10 @@ An `any_of` takes `description` and `meta`, but not `for` or `assert`. An `any_o
 
 - `inputs` names the path with `[]` after each list walked, and holds the value each item's path ended at.
 - Each entry in `failed_items` gives the field that failed as `path`, and the item it belongs to as `item`, so a tool can show the item by reading the input there. A list that's missing, `null`, not a list or empty is listed in its items' place. When a `whose` that compares two fields can't decide for an item, the entry names the field it couldn't read, or the left one when it read neither or both, like `hi` for `whose lo is at least hi` on `{"lo": 1}`, with `value` `null`. A field that's `null` counts as not read, and so does the list of a `count of` that isn't a list.
-- `distinct` after `every` or `some` drops an item whose value is the same as an earlier one's: `every distinct commits.author is "ann"` on commits by `ann`, `bob` and `bob` fails with one entry in `failed_items`, for `item 2 of commits`, whose `locations` are `/commits/1/author` and `/commits/2/author`. The row's `inputs` still list all three authors. An item a `whose` can't decide, and a value that's missing, is never dropped. `distinct` is about the value its path points at, so a phrase that also reads another field of the item, outside that value, is written wrong. In `every distinct items.b is at least lo` on `{"items": [{"b": 5, "lo": 1}, {"b": 5, "lo": 9}]}`, `distinct` is about `b`, and `lo` is read one level up, as `items.lo`: the two items have the same `b` but differ in `lo`, and the dropped one could be the one that fails. On `{"items": {"b": [{"lo": 1}, {"lo": 1}]}}` the same sentence points at objects with `lo` inside them, which would be fine, but Ergo can't tell the two apart from the sentence alone, so both are written wrong with `distinct is about the value its path points at, but the phrase also reads lo outside that value: leave distinct out, or put the items on a for line`. A `whose` can read the item, because it is read on every item before copies are dropped, and so can a phrase that reads `$params`, `$input`, a part, a parent subject or a `for` alias. A `for` line takes it too, like `for: every distinct commits.author as author`: the alias stands for each different author once, and the entry of a failed one lists every copy. `distinct` goes right after `every`, `some`, `count of` or `sum of`, and anywhere else it is written wrong with `distinct goes after every, some, count of or sum of`. It is a word of the grammar, so a field called `distinct` is written `.distinct`, a subject called `distinct` is written `"distinct"`, and a bare `distinct`, like `distinct is 1`, `x is distinct` or `from: every xs whose distinct is 1`, is written wrong with `distinct is a word of the grammar: write .distinct`. Under a `for` line that doesn't read, because it doesn't parse or is written wrong in its own words, like an alias given twice, the lines under it get only the `for` line's problem. A `for` line that reads but is written wrong for another reason, like an alias named like the subject, keeps the `distinct` problem too. With the subject `release` and `{"release": {"tags": ["v1"], "files": [{"kind": "src", "allowed": ["src"]}, {"kind": "src", "allowed": []}]}}`, `{"for": "every tags as t, every tags as t", "assert": "every distinct files.kind is in allowed"}` lists only `for: t is given twice`, and `{"for": "every tags as release", "assert": "every distinct files.kind is in allowed"}` lists `release can't be an alias: it's a subject's name` and the `distinct` problem for `allowed`.
+- `distinct` after `every` or `some` drops an item whose value is the same as an earlier one's: `every distinct commits.author is "ann"` on commits by `ann`, `bob` and `bob` fails with one entry in `failed_items`, for `item 2 of commits`, whose `locations` are `/commits/1/author` and `/commits/2/author`. The row's `inputs` still list all three authors. An item a `whose` can't decide, and a value that's missing, is never dropped. A bare name on the right of the phrase is read from the subject, so it is the same for every copy: with `{"lo": 3, "items": [{"b": 5, "lo": 1}, {"b": 5, "lo": 9}]}`, `every distinct items.b is at least lo` passes, with `lo` read as the subject's 3. A `whose` reads the item before copies are dropped. A `for` line takes it too, like `for: every distinct commits.author as author`: the alias stands for each different author once, and the entry of a failed one lists every copy. `distinct` goes right after `every`, `some`, `count of` or `sum of`, and anywhere else it is written wrong with `distinct goes after every, some, count of or sum of`. It is a word of the grammar, so a field called `distinct` is written `.distinct`, a subject called `distinct` is written `"distinct"`, and a bare `distinct`, like `distinct is 1`, `x is distinct` or `from: every xs whose distinct is 1`, is written wrong with `distinct is a word of the grammar: write .distinct`. Under a `for` line that doesn't read, because it doesn't parse or is written wrong in its own words, like an alias given twice, the lines under it get only the `for` line's problem. 
 - An empty list fails `every` as `value`, because no commits isn't proof that every commit is signed. Write `, if any,` after the path to let empty lists pass: `every review.incidents, if any, is not empty`. A missing list still fails.
-- `whose` keeps the items that pass its conditions, read on each item: `some pull_requests.approvers whose state is "APPROVED" exists` passes above, with `bob`'s approval. An item a condition can't decide, because the field it reads is missing, fails the check rather than being left out.
-- In a one-line `every` or `some`, a field on the right of the phrase is the item's too, so `some approvers.timestamp whose state is "APPROVED" is after last_commit` reads both from each approver. To compare with a field of the subject, use a `for` line, below. A `for` alias is read on the right of a `whose` too, `count of` and `sum of` included, so with `for: every groups as g`, `count of rows whose n is count of g is 1` counts the group `g`, and `.g` reads each row's own `g`. A child subject's parent works the same way: with the parent `fam`, `count of rows whose n is count of fam.z is 1` counts the parent's `z`, `count of rows whose count of fam.z is 1 is 3` counts each row's own `fam.z`, and `.fam.z` on the right reads the row's. A parent whose `z` is missing, `null` or not a list fails the check as `absent`, `null` or `unusable`.
+- `whose` keeps the items that pass its conditions, read on the value the path ends at: `some pull_requests.approvers whose state is "APPROVED" exists` passes above, with `bob`'s approval. So `count of pull_requests.approvers.username whose state is "APPROVED" is 1` reads `state` on each username, and fails as `not_an_object` with `item 1 of pull_requests: item 1 of approvers: username is "bob", which isn't an object; item 2 of pull_requests: item 1 of approvers: username is "bob", which isn't an object`. To keep items by one field and check another, put them on a `for` line, below. An item a condition can't decide, because the field it reads is missing, fails the check rather than being left out.
+- In a one-line `every` or `some`, a field on the right of the phrase is the subject's, so `some approvers.timestamp is after last_commit` compares each approver's `timestamp` with the subject's `last_commit`, and so is a name written with a dot. When that field is missing, `null`, or something the phrase can't use, like text after `is at least`, the message says so once, like `last_commit is missing`, because no approver could pass. The same goes for `$params`, `$input`, an alias, a part or a parent there, and for a list they walk: with the params `{"envs": [{"name": "a"}, null]}`, `every xs.n is in $params.envs.name` fails as `unusable` with `item 2 of $params.envs is null, which isn't an object`, and names no item of `xs`. When the item's field and the field on the right have the same name, the message writes the item's path in full: `item 2 of conditions: conditions.type is "b", and type is "a"`. To compare two fields of the same item, use a `for` line, below. A `for` alias is read on the right of a `whose` too, `count of` and `sum of` included, so with `for: every groups as g`, `count of rows whose n is count of g is 1` counts the group `g`, and `.g` reads each row's own `g`. A child subject's parent works the same way: with the parent `fam`, `count of rows whose n is count of fam.z is 1` counts the parent's `z`, `count of rows whose count of fam.z is 1 is 3` counts each row's own `fam.z`, and `.fam.z` on the right reads the row's. A parent whose `z` is missing, `null` or not a list fails the check as `absent`, `null` or `unusable`.
 - `every`, `some`, `count of` and `sum of` paths can be ten steps long, wherever they stand, on the right of a phrase too. A `for` alias and a position like `first of` each count as a step, and `$input` and `$params` don't. A walk that starts at a part counts the part's own path instead of its alias, so with `has: {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9"}`, `every x.z is 1` is ten steps, and a part of ten names makes it eleven. A part read without a walk, like `x.z is 1`, has no limit. An item picked on a `for` line, like `first of reviews as review`, takes ten names, not counting its position ([sentence.walk.steps](spec/syntax.md#every-some-and-whose)).
 - `contains` and the other list phrases can't follow `every` or `some`, because the last list is walked too, so `every pull_requests.labels does not contain "hotfix"` would ask each label. It's written wrong, and the message says to put the walk on a `for` line.
 
@@ -1266,7 +1266,7 @@ reads "for every pull request, some approver approved it and isn't its author". 
 
   What fails the same way for every approver is listed once in the row's `failed_items` instead, in place of the approvers that failed only because of it. That's a missing `commits` list, `{"cause": "absent", "failed_assertions": [], "item": "commits", "locations": ["/releases/0"], "path": "commits", "value": null}`, or a commit that `whose kind is "code"` can't decide, because that `whose` doesn't read `approver`. An approver that's still listed has the cause of what's left under it. A list inside the first, like `pr.approvers`, is listed under each pull request, because each has its own.
 - `inputs` holds each list the `for` line walked, with its items, and every field of the subject or of a parent the sentences read, like `t.x`. A second list that starts at the first item's alias, like `z.subs` in `every items whose k is 1 as z, every z.subs as y`, shows only the items under the first items that `whose` kept. The first list still shows every item, the ones `whose` left out too. A field read through a `for` alias, like `pr.author`, isn't listed on its own.
-- In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field with the same name, the subject's or an item's, except on the left side of a `whose`: `whose env is "prod"` always reads the item's `env`, and so does `whose count of env is 2`. Write a dot in front to read the field a name hides: `.env`.
+- In `assert`, a bare first key is the subject's field, and a name reaches its item. Inside an item's own `whose`, a bare key is that item's field. A name hides a field with the same name, the subject's or an item's, except right after `whose`: `whose env is "prod"` always reads the item's `env`, and so does `whose count of env is 2`. Write a dot in front to read the field a name hides: `.env`.
 - Each list fails as a one-line `every` or `some` does: empty, missing, `null` or not a list, and `, if any,` lets an empty one pass.
 - Two items at most.
 - `named by` an alias from the `for` line reads the key its item holds. With `for: every personas_dispatched as persona`, `persona_blob_shas named by persona exists` reads `persona_blob_shas.security`, then `persona_blob_shas.style`, and so on. An item that's `null` fails as `null`, and any other item that isn't a string, a number included, as `unusable`, since it can't be a key. The row's inputs show `persona_blob_shas` itself.
@@ -1353,27 +1353,27 @@ and these checks on a `review` subject read from `reviews`:
 ```yaml
 some_persona: count of personas_ran is at least 1
 claude_findings: count of findings whose source is "claude" equals claude_found
-costs_add_up: sum of stages.usd whose kind is "model" equals total_usd within 0.01
+costs_add_up: sum of stages.usd that is more than 0 equals total_usd within 0.01
 all_findings: count of findings equals claude_found plus 1
 ```
 
 all four pass. Each row shows the number Ergo worked out, named after the words that asked for it as the report prints them, then the list it walked:
 
-| check             | inputs                                                                                                |
-| ----------------- | ----------------------------------------------------------------------------------------------------- |
-| `some_persona`    | `count of personas_ran = 1`, `personas_ran[] = ["security"]`                                          |
-| `claude_findings` | `count of findings whose source is "claude" = 2`, `findings[] = [...]`, `claude_found = 2`            |
-| `costs_add_up`    | `sum of stages.usd whose kind is "model" = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76` |
-| `all_findings`    | `count of findings = 3`, `findings[] = [...]`, `claude_found plus 1 = 3`, `claude_found = 2`          |
+| check             | inputs                                                                                              |
+| ----------------- | --------------------------------------------------------------------------------------------------- |
+| `some_persona`    | `count of personas_ran = 1`, `personas_ran[] = ["security"]`                                        |
+| `claude_findings` | `count of findings whose source is "claude" = 2`, `findings[] = [...]`, `claude_found = 2`          |
+| `costs_add_up`    | `sum of stages.usd that is more than 0 = 0.75`, `stages[].usd = [0.5, 0.25, 0]`, `total_usd = 0.76` |
+| `all_findings`    | `count of findings = 3`, `findings[] = [...]`, `claude_found plus 1 = 3`, `claude_found = 2`        |
 
-Each entry also has `locations`. A number Ergo worked out lists where what it came from was read: `count of findings = 3` lists the three findings it walked, `sum of stages.usd whose kind is "model" = 0.75` the `usd` of each of the three stages, and `claude_found plus 1 = 3` lists `/reviews/0/claude_found`.
+Each entry also has `locations`. A number Ergo worked out lists where what it came from was read: `count of findings = 3` lists the three findings it walked, `sum of stages.usd that is more than 0 = 0.75` the `usd` of each of the three stages, and `claude_found plus 1 = 3` lists `/reviews/0/claude_found`.
 
 - `count of` walks every list along its path, as `every` does, so `count of pull_requests.commits` counts the commits of every pull request. An empty list adds nothing, so `count of approvers` is 0 when there are none.
 - A list that's missing, `null` or not a list fails the check as `absent`, `null` or `unusable`, and so does a number to add that's missing, `null` or isn't a number.
-- An item that `whose` can't decide about fails the check with the `whose`'s own cause, as with `every`, and the rest of its path isn't read: `sum of items.x whose k is "a"` on an item with `k: null` fails as `null`, whatever its `x` holds.
+- An item that `whose` can't decide about fails the check with the `whose`'s own cause, as with `every`: `count of items whose k is "a"` on an item with `k: null` fails as `null`. A `sum of` adds numbers, which have no fields, so a `whose` that reads a name of the value it adds is written wrong: `sum of items.x whose k is "a" is 1` says `whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose`. Write `that` to keep numbers by their value, like `sum of items.x that is at least 1 is 3`. The right side of `that` can't read a field of the number either, so with the subject `pr`, `sum of items.x that equals k is 1` says `that k: sum of adds up numbers, which have no fields, so k can't be read from one: to read the subject's k, write pr.k`. A written value, `$params`, an alias, a part, a parent or `pr.k` there is fine. A `named by` key read against the number is written wrong the same way: `sum of items.x that equals $params.m named by k is 1` names `k`. A name a `whose` reads from a root, like `$params.q` in `count of items whose k equals $params.q is 0`, is read once, up front, so when it's missing the check fails as `absent` with `$params.q is missing`, once, even on an empty list. The same goes for a name on the right of the phrase after `every` or `some`.
 - `whose` goes after the last `count of` or `sum of`, and only on the left: `claude_found plus count of findings whose source is "gpt" is at least 3`.
 - A row shows each input once, so `count of approvals plus count of approvals is 4` lists `count of approvals` and `approvals[]` one time each.
-- `distinct` after `count of` or `sum of` takes each value once: on commits by `ann`, `ann` and `bob`, `count of distinct commits.author is at least 2` passes, and its row lists `count of distinct commits.author` with `2` and `commits[].author` with all three names. `sum of distinct stages.usd` adds each different amount once, so two stages that both cost `1.5` add `1.5`. With a `whose`, only the items it keeps are counted. A `null` author counts as one more value, as it does for `count of`. To leave it out, keep only the commits whose author exists: on commits by `ann`, `null`, `bob` and `ann`, `count of distinct commits.author` is 3, and `count of distinct commits.author whose author exists` is 2.
+- `distinct` after `count of` or `sum of` takes each value once: on commits by `ann`, `ann` and `bob`, `count of distinct commits.author is at least 2` passes, and its row lists `count of distinct commits.author` with `2` and `commits[].author` with all three names. `sum of distinct stages.usd` adds each different amount once, so two stages that both cost `1.5` add `1.5`. With a `whose`, only the items it keeps are counted. A `null` author counts as one more value, as it does for `count of`. To leave it out, keep only the commits whose author exists: on commits by `ann`, `null`, `bob` and `ann`, `count of distinct commits.author` is 3, and `count of distinct commits.author that exists` is 2.
 - Numbers are added as decimals, so `0.1` plus `0.2` is `0.3`. Take every number added, a count or a sum included, and the result, and let p be the most decimal places any of them has, counted on the value: `1.50` has 1, `1e2` has 0 and `1e-7` has 7. p has to be at most 15, and each of them times 10^p has to be a whole number below 10^15, or the check fails as `unusable` and the number is `null`. So the sum has to fit in 15 digits at one scale. That's stricter than 15 significant digits for big round numbers, because `1e20` plus `1e20` fails too. Every runtime can decide it exactly, so every runtime gives the same answer.
 
 With `x plus y is at most 1` on `{"x": 0.1, "y": 0.2}`, the row is satisfied:
@@ -1436,7 +1436,7 @@ A sentence that can't be read is [written wrong](#checks-ergo-adds), and the `$w
 {"name": "checks.prod", "value": ["unclosed quote at column 16"], "locations": []}
 ```
 
-for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. A sentence that compares a path with itself, like `x is at least x`, is written wrong too, because it could only pass or only fail. That happens most often in a `whose`, or after `every` or `some`, where a bare name is the item's: `every conditions.type equals type` compares each condition's `type` with itself. To compare an item with the subject, use a [`for` line](#checks) and put the comparison under `assert`. An object with `op`, the old way of writing a check, has no `assert` and is [written wrong](#policies-written-before-01).
+for `prod: environment is "prod`. `x is not null` is written wrong too, because it could only fail: write `x exists`. So is a value that isn't a number before `within`, like `x is "a" within 1`. A sentence that compares a path with itself, like `x is at least x`, is written wrong too, because it could only pass or only fail. That happens most often in a `whose`, where a bare name is the item's: with the subject `pr`, `count of conditions whose type equals type is 1` says `type is compared with itself, because in a whose it's read from the item: to read the subject's type, write pr.type`. When the subject's name has to be written in double quotes, like `"my pr"`, or there's no subject, the message stops after `read from the item`. After `every` or `some` the right side is the subject's, so `every conditions.type equals type` compares each condition's `type` with the subject's. An object with `op`, the old way of writing a check, has no `assert` and is [written wrong](#policies-written-before-01).
 
 Ergo doesn't run every sentence the spec describes yet. These are written wrong for now, with `isn't supported yet` in the `$well_formed` row: `last of` and `item <n> from last of` anywhere but at the start of a `for` item, a `sum of` or a `plus` in the `whose` of a `count of` or a `sum of`, a `plus` in the phrase of an `every` or `some`, and an elapsed time after `every` or `some` or in a `from` line. So `last_signed: last of commits.signed is true` gives:
 
@@ -1449,6 +1449,53 @@ Pick the item on a `for` line instead, as the message says.
 In a `from` line or an `identified_by`, `named by` a bare word is written wrong too, with `unknown name <word>`, because there's no subject to read it from yet.
 
 Any other `$<word>`, like `$foo`, is written wrong with `unknown name $foo`, in a sentence, a `for` line, a `from` line or the `identified_by` of a part. A subject's `identified_by` is only a path, so `$foo` there says `identified_by is a path, like "id" or "build.number"`. The line is still read by its grammar first, so a syntax error in it is the problem you get, with `doesn't parse` or its own message, and an unknown name never hides it.
+
+### Where a name resolves
+
+The sentence decides what each name reads, never the data. A relative clause starts at `whose` or `that` and ends where its condition ends, and inside one a name resolves against the focus, the thing the clause is about, like each approver. Everywhere else a name resolves from its root, which is the subject unless the name is `$input`, `$params`, a `for` name, a part, a parent subject's name or the subject's own name. The name right after `whose` is always the item's field. A dot in front of a name only gets round a clash with a word of the grammar or another name, and reads where the bare name would. [spec/syntax.md](spec/syntax.md#where-a-name-resolves) has the rules. With a pull request `pr` as the subject:
+
+The words that put something in focus:
+
+| word                                       | example                            | in focus                                    |
+| ------------------------------------------ | ---------------------------------- | ------------------------------------------- |
+| `every`, `some`                            | `every approvers.username …`       | each username                               |
+| `count of`, `sum of`                       | `count of approvers …`             | each approver                               |
+| `distinct` after one of those              | `every distinct xs.b …`            | each different `b`                          |
+| a `for` item (`every`, `some`, a position) | `for: every approvers as approver` | each approver, named `approver`             |
+| a `from` line                              | `from: deployments whose …`        | each deployment (each candidate subject)    |
+| one of these inside a relative clause      | `xs whose count of ys.k is 1`      | each `k` of each x's `ys`, inside the focus |
+
+Relative clauses, where names resolve against the focus:
+
+| word                                | example                                             | resolves                          |
+| ----------------------------------- | --------------------------------------------------- | --------------------------------- |
+| `whose`                             | `approvers whose state is "APPROVED"`               | `state`: each approver's          |
+| its right side                      | `deployments whose finished_at is after started_at` | `started_at`: each deployment's   |
+| `that`                              | `ws that starts with "b"`                           | each w itself                     |
+| `and whose`, `and that`             | `… and whose username …`                            | a new relative clause, same focus |
+| `named by <key>` inside one         | `xs whose t named by k is 1`                        | `k`: each x's                     |
+| `sorted by` (not a relative clause) | `last of commits sorted by timestamp`               | `timestamp`: each commit's        |
+
+Everywhere else, names resolve from their root:
+
+| place                                                     | example                                          | resolves                                                                                   |
+| --------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| the start of an assertion                                 | `author is "ann"`                                | the subject's `author`                                                                     |
+| the phrase after `every`, `count of` …                    | `every approvers.username does not equal author` | `author`: the subject's                                                                    |
+| `and` followed by a path or `every` …                     | `… and author is "ann"`                          | a new assertion from the root                                                              |
+| lines under a `for`                                       | `approver.username is in $params.staff`          | `approver`: the alias; bare names: the subject's                                           |
+| `plus` terms, `followed by` pieces, `elapsed from … to …` | `x is "v" followed by tag`                       | wherever they stand: from the root outside a relative clause, against the focus inside one |
+
+Names that choose their own root, anywhere but right after `whose` or `sorted by`:
+
+| name                    | set up by                                                                     | example                                                                    | root                                                                           |
+| ----------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `$input`, `$params`     | nothing: always there                                                         | `author is in $params.staff`                                               | the input, the params                                                          |
+| a `for` alias           | `for: every approvers as approver`                                            | `approver.username is in $params.staff`                                    | each approver of the subject                                                   |
+| a part                  | subject `pr` with `has: {coverage: attestations.coverage}`                    | `coverage.pct is at least 80`                                              | the subject's `attestations.coverage`, so it reads `attestations.coverage.pct` |
+| a parent subject's name | subject `pr` with `from: artifact.pull_requests`, so `artifact` is its parent | `base equals artifact.branch`                                              | the artifact this pull request was read from                                   |
+| the subject's name      | the requirement's `subject: pr`                                               | `pr is an object`, and `approvers whose username does not equal pr.author` | the subject itself. `pr.author` only inside a relative clause                  |
+| a leading dot           | a field named like a grammar word or the subject, like `empty` or `pr`        | `.empty is true`, `.pr is "x"`                                             | no new root: escapes the clash and resolves where the bare name would          |
 
 ### The subject itself
 
@@ -1467,7 +1514,7 @@ this input:
 and this policy:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   region:
     from: every deployment.regions
@@ -1512,14 +1559,14 @@ A position is written in words, as for a field. With the input `{"releases": {"t
 
 Four rules say what the name can do:
 
-- **Nothing follows it.** The subject's fields are bare words already, so `region.name` means nothing and is written wrong, and so are `region[0]`, `region."x"`, `region named by $params.k` and `first of region.name`. With the subject `lib` and the check `lib.name is 1`, the `$well_formed` row says `lib.name: nothing can follow lib, which means the subject: for a field called lib, write .lib.name`. Brackets straight after the name, like `lib[0]`, are written wrong in the same way, with `write .lib[0]`. To read one item of a subject that is a list, write the position in words, `first of lib` or `item 2 of lib`. The name can't be the key of a `named by` either: `$params.m named by lib is 1` says `named by lib: lib is the whole subject, so it can't name a key`.
+- **Nothing follows it, outside a relative clause.** A step, a position or `named by` after the name, like `pr.author`, `pr[0].y` or `pr named by k`, is allowed only inside a relative clause, and the name alone everywhere. Outside one, the subject's fields are bare words already, so `region.name` means nothing and is written wrong, and so are `region[0]`, `region."x"`, `region named by $params.k` and `first of region.name`. With the subject `lib` and the check `lib.name is 1`, the `$well_formed` row says `lib.name: nothing can follow lib, which means the subject: for a field called lib, write .lib.name`. Brackets straight after the name, like `lib[0]`, are written wrong in the same way, with `write .lib[0]`. To read one item of a subject that is a list, write the position in words, `first of lib` or `item 2 of lib`. The name can't be the key of a `named by` either: `$params.m named by lib is 1` says `named by lib: lib is the whole subject, so it can't name a key`. Inside a relative clause, after `whose` or `that`, a bare word is the item's field, so there `lib.name` reads the subject's `name`: with the subject `pr`, `count of approvers whose username does not equal pr.author is 1` counts the approvers who aren't the pull request's author. In `pr named by k` there, `k` is each approver's own field, and an approver without one fails as `absent`, with the approver named, like `item 2 of approvers: k is missing`. To take the key from the subject, write it with the subject's name after any path, like `pr named by pr.k` or `$params.m named by pr.k`: the key is the pull request's `k` whatever the approver holds, and when the pull request has no `k` the check fails as `absent` with `pr.k is missing`, once. A name read from a root inside a relative clause, like `pr.a.b`, `$params.a.b` or a part, is the same for every approver, so its problem is said once with no approver named: `pr.a is 3, which isn't an object`.
 - **A dot reaches the field.** When an item has a field with the subject's name, the bare name is the subject and `.name` is the field. With the subject `build` from `builds` and the input `{"builds": [{"id": "b1", "build": "x"}, {"id": "b2", "build": "y"}]}`, `.build is "x"` reads each item's `build` field and `build is an object` reads the item. The row for `b2` says `.build is "y"`, with the input named `.build`, and the row of `build is an object` names its input `build`.
 - **On the right side it reads the subject too.** With the subject `lib` from `every libs`, `some $input.deps whose name is lib exists` keeps the dependencies whose `name` is the library. With the input `{"libs": ["a", "b"], "deps": [{"name": "a"}]}`, `a` passes, and `b` fails with `$input.deps is [{"name": "a"}]`. A name in double quotes on the right is a plain value, like any quoted text, so it never reads the subject there. With a dot, `.lib` on the right of a `whose` is the item's own field: `some $input.deps whose name is .lib exists` keeps the dependencies whose `name` equals their own `lib`.
 - **A name with a space goes in double quotes.** With a subject called `production deployment`, the check is `"production deployment" is an object`, written in YAML as `'"production deployment" is an object'`. A quoted name that is a word of the grammar, like `"item"` for a subject called `item`, reads the subject too: `"item" is a string` on `{"items": ["a", 2]}` passes for `a` and fails for `2` with `item is 2`.
 
 A subject can be called anything, `it` included. `it` isn't a word of the grammar, so it is an ordinary name for a subject, a field, a `for` alias or a part.
 
-The name goes where an assertion starts: the left side of a check, after `and`, and in an `any_of` option. After a `for` line it's still the subject, not the item of the `for`. On the left of a `whose` and after `sorted by`, it's the item's field, like any bare word there, in a check, a `for` line and a `from` line alike. So `from: every ws whose w starts with "b"`, for a subject called `w`, keeps the items whose own `w` field starts with `b`, and its `$applies` row names that field `.w`. To pick items by the value itself, use `that`.
+The name goes where an assertion starts: the left side of a check, after `and`, and in an `any_of` option. After a `for` line it's still the subject, not the item of the `for`. Right after `whose` and after `sorted by`, it's the item's field, like any bare word there, in a check, a `for` line and a `from` line alike. So `from: every ws whose w starts with "b"`, for a subject called `w`, keeps the items whose own `w` field starts with `b`, and its `$applies` row names that field `.w`. To pick items by the value itself, use `that`.
 
 `that` picks items by the value itself, where `whose` picks them by a field: `from: every ws that starts with "b"` keeps the values of `ws` that start with `b`. It works wherever `whose` does, on a `from` line, after `every`, `some`, `count of` and `sum of` in a check, and in an item of a `for` line, and the two mix in one chain, like `ws that starts with "b" and whose w ends with "y"`. What follows `that` is a phrase about the item, and a field called `that` is written `.that`, like `every items whose .that is "x"`.
 
@@ -1535,9 +1582,9 @@ The report of a policy, an input and params is:
   "description": "",
   "engine": {
     "name": "ergo-rego",
-    "version": "0.5.1-dev"
+    "version": "0.6.0-dev"
   },
-  "ergo": "v0.5",
+  "ergo": "v0.6-dev",
   "meta": {},
   "requirements": { ... },
   "results": [ ... ],
@@ -1737,7 +1784,7 @@ and the check's `$refs` entry is `{"name": "$params.regions", "value": ["eu-west
 Take this policy:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   deployment:
     description: Something we ship
@@ -1805,7 +1852,7 @@ Each entry has:
 A subject that is written wrong still has its entry, so nothing disappears from the report. A subject whose `from` starts at another subject lists that subject even when the line is written wrong, like `every parent.items`, and a subject that narrows another has that subject's id then. A `from` that doesn't parse, or isn't a string, lists no other subject. An unknown name, like `$foo` in `parent.items whose zz is $foo`, only makes the line written wrong with `unknown name $foo`, so that line still lists `parent`. If the line has a syntax error too, like `parent.items whose zz is $foo foo bar`, it says `doesn't parse` and lists no other subject. With this policy and the same input, where `deployment` writes its `from` and `identified_by` as lists:
 
 ```yaml
-ergo_spec: v0.5
+ergo_spec: v0.6-dev
 subjects:
   deployment:
     from: [deployments]

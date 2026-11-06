@@ -139,6 +139,40 @@ pub struct Read<'a> {
 
 pub const OUTER: &str = "$outer";
 
+const ROOT_OWN: &str = ".";
+
+pub fn root(own: bool) -> Start {
+    Start::Part(Box::new(PartStart {
+        name: if own {
+            ROOT_OWN.to_string()
+        } else {
+            String::new()
+        },
+        base: Start::Alias(OUTER.to_string()),
+        steps: Vec::new(),
+        id: None,
+    }))
+}
+
+pub fn is_root(start: &Start) -> bool {
+    matches!(start, Start::Part(part)
+        if (part.name.is_empty() || part.name == ROOT_OWN)
+            && part.steps.is_empty()
+            && part.base == Start::Alias(OUTER.to_string()))
+}
+
+pub fn names_the_subject(start: &Start) -> bool {
+    matches!(start, Start::Part(part)
+        if !part.name.is_empty()
+            && part.name != ROOT_OWN
+            && part.steps.is_empty()
+            && part.base == Start::Alias(OUTER.to_string()))
+}
+
+pub fn is_root_own(start: &Start) -> bool {
+    is_root(start) && matches!(start, Start::Part(part) if part.name == ROOT_OWN)
+}
+
 pub enum Resolved {
     Key(String),
     Index(u64),

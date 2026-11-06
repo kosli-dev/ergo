@@ -20,6 +20,7 @@ pub struct Walk {
     pub whose: Vec<Check>,
     pub if_any: bool,
     pub check: Box<Check>,
+    pub for_aliases: Vec<String>,
 }
 
 impl Walk {
@@ -85,6 +86,7 @@ fn rank_of(start: &Start, segs: &[Seg]) -> Vec<Rank> {
     let mut rank = match start {
         Start::Subject | Start::Own => Vec::new(),
         Start::Alias(alias) => vec![Rank::Text(format!("${alias}"))],
+        Start::Part(_) if path::is_root(start) => vec![Rank::Text("${\"alias\":\"\"".to_string())],
         Start::Part(part) => vec![Rank::Text(format!("${{\"alias\":\"{}\"", part.name))],
         Start::Params => vec![Rank::Text("$$params".to_string())],
         Start::Input => vec![Rank::Text("$$input".to_string())],
@@ -638,12 +640,33 @@ fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
         .chain(std::iter::once(&*walk.check))
         .collect();
     outside_inputs_of(&checks, ctx)
+        .into_iter()
+        .filter(|input| {
+            !walk.for_aliases.iter().any(|alias| {
+                input
+                    .name
+                    .strip_prefix(alias.as_str())
+                    .is_some_and(|rest| rest.starts_with(" named by "))
+                    && checks.iter().any(|check| {
+                        check.paths().into_iter().any(|path| {
+                            matches!(&path.start, Start::Alias(name) if name == alias)
+                                && has_root_field(path)
+                                && name::name(path) == input.name
+                        })
+                    })
+            })
+        })
+        .collect()
 }
 
 pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     let mut inputs = Vec::new();
     for check in checks {
-        for path in check.paths().into_iter().filter(|p| reads_outside(p)) {
+        for path in check.paths().into_iter().filter(|p| {
+            reads_outside(p)
+                || (matches!(p.start, Start::Params | Start::Subject | Start::Own)
+                    && has_root_field(p))
+        }) {
             inputs.extend(path_inputs(path, ctx, &[], true));
         }
     }
@@ -662,18 +685,60 @@ pub(super) fn cut_at(path: &Path, hidden: &[&str], fields_read_items: bool) -> O
     })
 }
 
+pub(super) fn has_root_field(path: &Path) -> bool {
+    path.steps.iter().any(|step| {
+        matches!(step, Step::Field(field)
+            if path::is_root(&field.start) || path::names_the_subject(&field.start))
+    })
+}
+
+fn field_input(field: &Path, ctx: &Ctx) -> Option<Input> {
+    let mut input = read_path(field, ctx).inputs.into_iter().next()?;
+    if path::names_the_subject(&field.start) {
+        input.name = name::name(&Path {
+            start: path::root(false),
+            steps: field.steps.clone(),
+        });
+    }
+    Some(input)
+}
+
 pub(super) fn path_inputs(
     path: &Path,
     ctx: &Ctx,
     hidden: &[&str],
     fields_read_items: bool,
 ) -> Vec<Input> {
+    let mut at = ctx.clone();
+    if !at.aliases.contains_key(OUTER) {
+        at.aliases.insert(OUTER.to_string(), ctx.subject.clone());
+    }
+    if fields_read_items
+        && (path::is_root(&path.start) || has_root_field(path))
+        && !hides(path, hidden)
+    {
+        let mut inputs = if matches!(path.start, Start::Subject | Start::Own) {
+            Vec::new()
+        } else {
+            path_inputs(path, &at, hidden, false)
+        };
+        inputs.extend(path.steps.iter().filter_map(|step| match step {
+            Step::Field(field) => field_input(field, &at),
+            _ => None,
+        }));
+        return inputs;
+    }
     if hides(path, hidden) {
         return path
             .steps
             .iter()
             .filter_map(|step| match step {
-                Step::Field(field) => Some(read_path(field, ctx).inputs),
+                Step::Field(field)
+                    if path::is_root(&field.start) || path::names_the_subject(&field.start) =>
+                {
+                    field_input(field, &at).map(|input| vec![input])
+                }
+                Step::Field(field) => Some(read_path(field, &at).inputs),
                 _ => None,
             })
             .flatten()
@@ -785,6 +850,158 @@ fn merged_copies(walked: &Walked, judged: Vec<Judged>) -> Vec<Judged> {
     out
 }
 
+pub(super) fn reads_focus(check: &Check) -> bool {
+    check
+        .paths()
+        .iter()
+        .any(|path| matches!(path.start, Start::Subject | Start::Own))
+}
+
+pub(super) fn focus_ctx<'a>(item: &WalkItem<'a>, ctx: &Ctx<'a>) -> Ctx<'a> {
+    let mut focus = ctx.clone();
+    focus.label = None;
+    focus.subject = match item.end {
+        Some(end) if !item.rest.is_empty() => Located {
+            value: end,
+            location: item.end_location.clone(),
+        },
+        _ => item.item.clone(),
+    };
+    focus
+}
+
+pub(super) fn focus_lost(item: &WalkItem, check: &Check) -> bool {
+    !item.rest.is_empty() && item.end.is_none() && reads_focus(check)
+}
+
+pub(super) fn focus_check(item: &WalkItem) -> Check {
+    Check::Present(super::present::Present {
+        path: item.rest_path(),
+        missing: false,
+    })
+}
+
+pub(super) fn focus_verdict(
+    check: &Check,
+    item: &WalkItem,
+    at: &Ctx,
+    focus: &Ctx,
+) -> (Verdict, bool) {
+    if focus_lost(item, check) {
+        (lost_verdict(item, at), true)
+    } else {
+        (run_check(check, focus), false)
+    }
+}
+
+pub(super) fn lost_verdict(item: &WalkItem, at: &Ctx) -> Verdict {
+    Verdict {
+        cause: path::read(&item.rest_path(), at)
+            .outcome
+            .cause()
+            .unwrap_or(Cause::Unusable),
+        inputs: Vec::new(),
+    }
+}
+
+fn from_a_root(path: &Path) -> bool {
+    matches!(
+        path.start,
+        Start::Alias(_) | Start::Part(_) | Start::Params | Start::Input
+    ) && !path.steps.iter().any(|step| {
+        matches!(step, Step::Field(field) if matches!(field.start, Start::Subject | Start::Own))
+    })
+}
+
+fn right_needs(check: &Check, value: &Value) -> Option<&'static str> {
+    use super::compare::Cmp;
+    match check {
+        Check::Compare(compare) => match compare.cmp {
+            Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => (!value.is_number()).then_some("a number"),
+            Cmp::StartsWith
+            | Cmp::EndsWith
+            | Cmp::NotStartsWith
+            | Cmp::NotEndsWith
+            | Cmp::AlphabeticallyBefore
+            | Cmp::AlphabeticallyAfter
+            | Cmp::AlphabeticallyOnOrBefore
+            | Cmp::AlphabeticallyOnOrAfter => (!value.is_string()).then_some("text"),
+            Cmp::Eq | Cmp::Ne => None,
+        },
+        Check::CompareTime(_) => super::time::read_time(value).is_none().then_some("a time"),
+        Check::In(_) | Check::Contains(_) | Check::Matches(_) => {
+            (!value.is_array()).then_some("a list")
+        }
+        _ => None,
+    }
+}
+
+pub(super) fn listed_refs(check: &Check) -> Vec<&Path> {
+    use super::lists::Wanted;
+    match check {
+        Check::In(check) => check.values.ref_paths(),
+        Check::Matches(check) => check.patterns.ref_paths(),
+        Check::Contains(check) => match &check.wanted {
+            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => right.ref_paths(),
+        },
+        _ => Vec::new(),
+    }
+}
+
+fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
+    check
+        .paths()
+        .into_iter()
+        .chain(listed_refs(check))
+        .filter(|path| from_a_root(path))
+        .find_map(|path| {
+            if let Some(listed) = super::lists::walked(path, ctx) {
+                return (listed.cause == Some(cause)).then_some(listed.text);
+            }
+            let read = path::read(path, ctx);
+            let state = read.outcome.cause();
+            if matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
+                && state == Some(cause)
+            {
+                return Some(message::root_text(path, ctx, cause));
+            }
+            let value = read.value.filter(|_| read.outcome == Outcome::Found)?;
+            if cause != Cause::Unusable {
+                return None;
+            }
+            right_needs(check, value).map(|kind| message::isnt(&name::name(path), value, kind))
+        })
+}
+
+fn clash_named(said: String, item: &WalkItem, check: &Check, walked: &Path) -> String {
+    if item.rest.is_empty() {
+        return said;
+    }
+    let rest = name::name(&item.rest_path());
+    let clashes = check
+        .paths()
+        .into_iter()
+        .any(|path| from_a_root(path) && name::name(path) == rest);
+    let cut = format!(": {rest} ");
+    match said.find(&cut) {
+        Some(at) if clashes => format!(
+            "{}: {} {}",
+            &said[..at],
+            name::name(walked),
+            &said[at + cut.len()..]
+        ),
+        _ => said,
+    }
+}
+
+pub(super) fn focus_segs<'s>(item: &'s WalkItem, check: &Check) -> &'s [Seg] {
+    if item.end.is_some() && reads_focus(check) {
+        &item.end_segs
+    } else {
+        &item.item_segs
+    }
+}
+
 fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
     let mut at = ctx.clone();
     walked
@@ -793,20 +1010,46 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
         .map(|item| {
             at.subject = item.item.clone();
             at.label = None;
-            let verdicts: Vec<(&Check, Verdict)> = walk
+            let focus = focus_ctx(item, ctx);
+            let lost_check = focus_check(item);
+            let verdicts: Vec<(&Check, Verdict, bool)> = walk
                 .whose
                 .iter()
-                .map(|check| (check, run_check(check, &at)))
+                .map(|check| {
+                    if focus_lost(item, check) {
+                        (check, lost_verdict(item, &at), true)
+                    } else {
+                        (check, run_check(check, &focus), false)
+                    }
+                })
                 .collect();
             let undecided = verdicts
                 .iter()
-                .find(|(_, v)| !matches!(v.cause, Cause::Satisfied | Cause::Value));
-            let kept = !verdicts.iter().any(|(_, v)| v.cause == Cause::Value);
+                .find(|(_, v, _)| !matches!(v.cause, Cause::Satisfied | Cause::Value));
+            let kept = !verdicts.iter().any(|(_, v, _)| v.cause == Cause::Value);
             let leaf_check = walk.check.with_left(item.rest_path());
             let leaf = run_check(&leaf_check, &at);
             let passed = undecided.is_none() && kept && leaf.passed();
-            let failure = if let Some((check, verdict)) = undecided {
-                let named = named_side(check, &at);
+            let failure = if let Some((_, verdict, true)) = undecided {
+                Some(Failure {
+                    msg: message::prefixed(
+                        &walked.item_name(&item.item_segs),
+                        &message::message(&lost_check, &at, verdict),
+                    ),
+                    order: item.end_segs.clone(),
+                    said: walked.item_name_dotted(&item.end_segs),
+                    rank: rank_of(&walk.path.start, &item.end_segs),
+                    path: walked.name_of(&item.end_segs, item.unaliased),
+                    item: walked.name_of(&item.item_segs, item.unaliased),
+                    cause: verdict.cause,
+                    value: Value::Null,
+                    location: Some(item.end_location.clone()),
+                    copies: Vec::new(),
+                })
+            } else if let Some((check, verdict, _)) = undecided {
+                let at = &focus;
+                let item_segs = focus_segs(item, check);
+                let named = named_side(check, at);
                 let (steps, outside): (Vec<Step>, bool) = match &named {
                     Some((path, _)) => (
                         path.steps.clone(),
@@ -814,7 +1057,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     ),
                     None => (Vec::new(), false),
                 };
-                let mut order = item.item_segs.clone();
+                let mut order = item_segs.to_vec();
                 let rank = match &named {
                     Some((path, _)) if outside => rank_of_path(path),
                     _ => {
@@ -830,17 +1073,18 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                         .unwrap_or_default()
                 } else {
                     order.extend(steps.iter().map(seg_of));
-                    let mut named_steps: Vec<Step> =
-                        item.item_segs.iter().map(Seg::to_step).collect();
+                    let mut named_steps: Vec<Step> = item_segs.iter().map(Seg::to_step).collect();
                     named_steps.extend(steps);
                     walked.name_of_steps(named_steps, item.unaliased)
                 };
                 let read = named.map(|(_, read)| read);
                 let off = message::off_item(check, ctx, verdict.cause);
-                let said = if off.is_empty() {
+                let said = if let Some(fault) = message::root_fault(check, ctx, verdict.cause) {
+                    fault
+                } else if off.is_empty() {
                     message::prefixed(
-                        &walked.item_name(&item.item_segs),
-                        &message::message(check, &at, verdict),
+                        &walked.item_name(item_segs),
+                        &message::message(check, at, verdict),
                     )
                 } else {
                     off.join(", and ")
@@ -849,7 +1093,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                     msg: said,
                     order,
                     path: name,
-                    said: walked.item_name_dotted(&item.item_segs),
+                    said: walked.item_name_dotted(item_segs),
                     rank,
                     item: walked.name_of(&item.item_segs, item.unaliased),
                     cause: verdict.cause,
@@ -862,13 +1106,20 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 })
             } else if kept && !passed {
                 let off = message::off_item(&leaf_check, ctx, leaf.cause);
-                let said = if off.is_empty() {
-                    message::prefixed(
-                        &walked.item_name(&item.item_segs),
-                        &message::message(&leaf_check, &at, &leaf),
-                    )
-                } else {
+                let said = if let Some(alone) = root_alone(&leaf_check, &at, leaf.cause) {
+                    alone
+                } else if !off.is_empty() {
                     off.join(", and ")
+                } else {
+                    clash_named(
+                        message::prefixed(
+                            &walked.item_name(&item.item_segs),
+                            &message::message(&leaf_check, &at, &leaf),
+                        ),
+                        item,
+                        &leaf_check,
+                        &walk.path,
+                    )
                 };
                 Some(Failure {
                     msg: said,
@@ -1045,8 +1296,45 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
         row.failed_items = Vec::new();
         row.parts = walk_faults(walk, &outer(ctx));
         row.message = Some(message::joined(row.parts.clone()));
+        return row;
+    }
+    let outer_ctx = outer(ctx);
+    let whose: Vec<&Check> = walk.whose.iter().collect();
+    let flaw = message::root_flaw(&whose, &outer_ctx).or_else(|| {
+        matches!(row.verdict.cause, Cause::Satisfied | Cause::Value)
+            .then(|| message::root_flaw(&[&*walk.check], &outer_ctx))
+            .flatten()
+    });
+    if let Some((cause, text)) = flaw {
+        let (cause, failed_items, message) = read_up_front(
+            row.verdict.cause,
+            std::mem::take(&mut row.failed_items),
+            cause,
+            &text,
+        );
+        if let Some(message) = message {
+            row.parts = vec![message.clone()];
+            row.message = Some(message);
+        }
+        row.verdict.cause = cause;
+        row.failed_items = failed_items;
     }
     row
+}
+
+pub(super) fn read_up_front(
+    row: Cause,
+    failed_items: Vec<Value>,
+    flaw: Cause,
+    text: &str,
+) -> (Cause, Vec<Value>, Option<String>) {
+    if row == flaw {
+        (row, failed_items, Some(text.to_string()))
+    } else if matches!(row, Cause::Satisfied | Cause::Value) {
+        (flaw, Vec::new(), Some(text.to_string()))
+    } else {
+        (row, failed_items, None)
+    }
 }
 
 fn walk_faults(walk: &Walk, outer_ctx: &Ctx) -> Vec<String> {
@@ -1118,6 +1406,7 @@ mod tests {
             whose,
             if_any,
             check: Box::new(check),
+            for_aliases: Vec::new(),
         }
     }
 
@@ -1407,41 +1696,36 @@ mod tests {
     }
 
     #[test]
-    fn whose_leaves_out_an_item_that_fails_it_and_every_with_none_left_fails_as_value() {
+    fn whose_reads_the_value_the_path_ends_at_and_leaves_out_an_item_that_fails_it() {
         let whose = Check::Equals(Equals {
             path: at(Start::Subject, &["k"]),
             value: json!("a"),
         });
-        let walk = every(&["xs", "ok"], vec![whose], equals(json!(true)), false);
-        let subject = json!({"xs": [{"k": "a", "ok": true}, {"k": "b", "ok": false}]});
+        let walk = every(&["xs", "ok"], vec![whose], present(false), false);
+        let subject = json!({"xs": [{"ok": {"k": "a"}}, {"k": "a", "ok": {"k": "b"}}]});
         let out = row(&walk, subject);
         assert!(out.verdict.passed());
-        assert_eq!(out.verdict.inputs[0].value, json!([true, false]));
-        let none = row(&walk, json!({"xs": [{"k": "b", "ok": false}]}));
+        assert_eq!(out.verdict.inputs[0].value, json!([{"k": "a"}, {"k": "b"}]));
+        let none = row(&walk, json!({"xs": [{"k": "a", "ok": {"k": "b"}}]}));
         assert_eq!(none.verdict.cause, Cause::Value);
         assert!(none.failed_items.is_empty());
     }
 
     #[test]
-    fn an_item_whose_cannot_decide_fails_the_check_with_its_cause_and_is_listed_by_the_whose_field()
-    {
+    fn an_item_whose_cannot_decide_fails_the_check_with_its_cause_and_is_listed_by_the_whose_field_under_the_focus()
+     {
         let whose = Check::Equals(Equals {
             path: at(Start::Subject, &["k"]),
             value: json!("a"),
         });
-        let walk = every(
-            &["xs", "ok"],
-            vec![whose.clone()],
-            equals(json!(true)),
-            false,
-        );
-        let subject = json!({"xs": [{"k": "a", "ok": true}, {"ok": true}]});
+        let walk = every(&["xs", "ok"], vec![whose.clone()], present(false), false);
+        let subject = json!({"xs": [{"ok": {"k": "a"}}, {"k": "a", "ok": {}}]});
         let out = row(&walk, subject.clone());
         assert_eq!(out.verdict.cause, Cause::Absent);
         assert_eq!(
             out.failed_items,
             [
-                json!({"path": "xs[1].k", "item": "item 2 of xs", "cause": "absent", "value": null, "locations": ["/s/xs/1"]})
+                json!({"path": "xs[1].ok.k", "item": "item 2 of xs", "cause": "absent", "value": null, "locations": ["/s/xs/1/ok"]})
             ]
         );
         let mut some = walk.clone();
@@ -1455,10 +1739,10 @@ mod tests {
             path: at(Start::Subject, &["note"]),
             missing: false,
         });
-        let walk = every(&["xs", "ok"], vec![whose], equals(json!(true)), false);
+        let walk = every(&["xs", "ok"], vec![whose], present(false), false);
         let out = row(
             &walk,
-            json!({"xs": [{"note": 1, "ok": true}, {"ok": false}]}),
+            json!({"xs": [{"ok": {"note": 1}}, {"note": 1, "ok": {}}]}),
         );
         assert!(out.verdict.passed());
     }
@@ -1558,6 +1842,7 @@ mod tests {
             whose: vec![],
             if_any: false,
             check: Box::new(equals(json!(2))),
+            for_aliases: Vec::new(),
         };
         let out = run(&walk, &context);
         assert_eq!(
@@ -1588,6 +1873,7 @@ mod tests {
             whose: vec![],
             if_any: false,
             check: Box::new(equals(json!("bad"))),
+            for_aliases: Vec::new(),
         };
         let out = run(&walk, &context);
         assert_eq!(out.verdict.inputs[0].name, "prs[].rs[].s");

@@ -17,7 +17,8 @@ pub use print::{
     print_from_condition, print_left_term, print_path, print_path_as_written, print_term,
 };
 pub use rules::{
-    check_problems, check_self_problems, for_problems, from_problems, from_self_problems,
+    SUBJECT_MARK, check_problems, check_self_problems, for_problems, from_problems,
+    from_self_problems,
 };
 pub use tree::*;
 

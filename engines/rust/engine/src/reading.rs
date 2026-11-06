@@ -1329,7 +1329,7 @@ mod tests {
 
     fn reading(subjects: Value) -> (Policy, Reading) {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": subjects,
             "requirements": {}
         }));
@@ -1359,7 +1359,7 @@ mod tests {
     #[test]
     fn a_whose_dot_on_a_field_named_like_the_subject_stays_in_the_from_text() {
         let policy = json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {"kid": {"from": "every kids whose .kid is 1"}},
             "requirements": {"r": {"subject": "kid", "checks": {"c": ".x is 1"}}}
         });
@@ -1557,7 +1557,7 @@ mod tests {
     #[test]
     fn a_subject_in_a_loop_lists_the_whole_loop_but_only_reads_itself() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {"x": {"from": "y whose id exists"}, "y": {"from": "x whose id exists"}},
             "requirements": {}
         }));
@@ -1897,7 +1897,7 @@ mod tests {
     #[test]
     fn the_problems_of_a_parent_belong_to_the_requirement_of_its_child() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {"art": {"from": "arts whose"}, "b": {"from": "art.bs"}},
             "requirements": {"r": {"subject": "b", "checks": {"c": "x"}}}
         }));
@@ -1917,7 +1917,7 @@ mod tests {
 
     fn requirement_problems(subjects: Value) -> Problems {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": subjects,
             "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}}
         }));

@@ -2,7 +2,16 @@
 
 Each release names the version of the spec it follows. The spec's own changes are in [spec/CHANGELOG.md](../../spec/CHANGELOG.md), and those of `ergo.rego` in [CHANGELOG.md](../../CHANGELOG.md).
 
-## 0.3.1 (not released yet)
+## 0.4.0 (not released yet)
+
+### Changed
+
+- Names resolve where spec 0.6 says, as in `ergo.rego` 0.6.0: a bare name on the right of the phrase after `every` or `some` reads the subject's field, `whose` and `that` read the value the path ends at, `pr.author` reads the subject's field inside a relative clause, and the right side of a `some` or `every` condition in a `from` line reads the candidate. Reports change for policies that write these, see [spec/CHANGELOG.md](../../spec/CHANGELOG.md). This version follows spec 0.6, so a policy says `ergo_spec: v0.6-dev`.
+- As spec 0.6 also says: `pr named by k` and `pr[0]` are allowed inside a relative clause; a `whose` that compares a field with itself says `write pr.x`; `distinct` no longer makes a bare name on the right written wrong; a `sum of` whose `whose`, or the right side of its `that`, reads a name of the value it adds is written wrong; a `named by` on the right of `every` or `some` reads the subject's key whatever the path starts at, `$params` and `$input` included; `named by pr.k` takes the key from the subject inside a relative clause, after any path; a root name in a `whose` or on the right of `every` or `some` is read once, up front, so a problem with it fails the row even on an empty list; a `whose` that compares a field with itself gives no advice when the subject's name needs double quotes; and messages name a value past the list after its item and a colon, list every item a `count of` or `sum of` couldn't read, say a root name no item can use once, and a root name's problem inside a relative clause once with no item, and an item of its own list once, like `item 2 of $params.envs is null, which isn't an object`, name a `named by` key that can't be read, and write the item's path in full when a name on the right is spelled the same.
+
+### Fixed
+
+- A `count of` or `sum of` whose path runs into an item that isn't an object says so, like `item 1 of xs: m is "s", which isn't an object`, as `ergo.rego` does, where it said `m.v is null, which isn't a number`.
 
 ## 0.3.0
 

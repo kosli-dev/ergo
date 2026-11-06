@@ -1,7 +1,7 @@
 use super::compare::{self, Cmp, Compare};
 use super::time::{self, NANOS_PER_SECOND, SECONDS_PER_DAY, Time};
 use super::walk::{self, Options};
-use super::{Check, Input, Part, SidePath, Verdict, read_path, run as run_check, verdict};
+use super::{Check, Input, Part, SidePath, Verdict, read_path, verdict};
 use crate::cause::Cause;
 use crate::lower::{Scope, UNSUPPORTED_SUFFIX};
 use crate::name;
@@ -559,16 +559,19 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         };
     }
     let mut causes: Vec<Cause> = walked.failures.iter().map(|f| f.cause).collect();
+    let whose_checks: Vec<&Check> = counted.whose.iter().collect();
+    causes.extend(super::message::root_flaw(&whose_checks, &outer).map(|(cause, _)| cause));
     causes.extend(counted.whose.iter().filter_map(|c| unusable_ref(c, &outer)));
     let mut numbers: Vec<Value> = Vec::new();
     let mut at = outer.clone();
     for item in &walked.items {
         at.subject = item.item.clone();
         at.label = None;
+        let focus = walk::focus_ctx(item, &outer);
         let verdicts: Vec<Cause> = counted
             .whose
             .iter()
-            .map(|check| run_check(check, &at).cause)
+            .map(|check| walk::focus_verdict(check, item, &at, &focus).0.cause)
             .collect();
         let undecided = verdicts
             .iter()
@@ -1150,6 +1153,10 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
         if walk::path_needs_an_object_subject(&counted.path, ctx) {
             return None;
         }
+        let whose: Vec<&Check> = counted.whose.iter().collect();
+        let root = super::message::root_flaw(&whose, &outer)
+            .filter(|(flaw, _)| *flaw == cause)
+            .map(|(_, text)| text);
         let walked = walk::walk(
             &counted.path,
             &outer,
@@ -1170,12 +1177,40 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                     let blocked = super::message::blocked_of(&counted.path, &outer);
                     if !blocked.is_empty() {
                         out.push(super::message::joined(blocked));
+                    } else {
+                        let read = path::read(&counted.path, &outer);
+                        if let (path::Outcome::Found, Some(value)) = (read.outcome, read.value)
+                            && !value.is_array()
+                            && !value.is_object()
+                        {
+                            out.push(super::message::isnt(
+                                &walked.name,
+                                value,
+                                "a list or an object",
+                            ));
+                        }
                     }
                 }
                 _ => {}
             }
-            return out.pop();
+            out.extend(root);
+            return if out.is_empty() {
+                None
+            } else {
+                Some(super::message::joined(out))
+            };
         }
+        if let Some(text) = root {
+            let mut said: Vec<String> = walked
+                .failures
+                .iter()
+                .filter(|f| f.cause == cause)
+                .map(|f| f.msg.clone())
+                .collect();
+            said.push(text);
+            return Some(super::message::joined(said));
+        }
+        let mut always = std::collections::BTreeSet::new();
         let mut found: Vec<(Cause, String)> = walked
             .failures
             .iter()
@@ -1199,30 +1234,43 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
         for item in &walked.items {
             at.subject = item.item.clone();
             at.label = None;
+            let focus = walk::focus_ctx(item, &outer);
             let name = walked.item_name(&item.item_segs);
             let mut undecided = false;
             for check in &counted.whose {
-                let verdict = run_check(check, &at);
+                let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
                 if !matches!(verdict.cause, Cause::Satisfied | Cause::Value) {
                     undecided = true;
-                    let off = super::message::off_item(check, &outer, verdict.cause);
-                    found.push((
-                        verdict.cause,
-                        if off.is_empty() {
+                    let said = if lost {
+                        super::message::prefixed(
+                            &name,
+                            &super::message::message(&walk::focus_check(item), &at, &verdict),
+                        )
+                    } else {
+                        let off = super::message::off_item(check, &outer, verdict.cause);
+                        if let Some(fault) =
+                            super::message::root_fault(check, &outer, verdict.cause)
+                        {
+                            fault
+                        } else if off.is_empty() {
                             super::message::prefixed(
-                                &name,
-                                &super::message::message(check, &at, &verdict),
+                                &walked.item_name(walk::focus_segs(item, check)),
+                                &super::message::message(check, &focus, &verdict),
                             )
                         } else {
                             off.join(", and ")
-                        },
-                    ));
+                        }
+                    };
+                    if !item.rest.is_empty() && walk::reads_focus(check) {
+                        always.insert(found.len());
+                    }
+                    found.push((verdict.cause, said));
                 }
             }
             let kept = counted
                 .whose
                 .iter()
-                .all(|check| run_check(check, &at).cause != Cause::Value);
+                .all(|check| walk::focus_verdict(check, item, &at, &focus).0.cause != Cause::Value);
             if undecided || !kept {
                 continue;
             }
@@ -1235,6 +1283,17 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                 continue;
             }
             match item.end {
+                None if item.miss == Cause::Unusable => found.push((
+                    item.miss,
+                    super::message::prefixed(
+                        &name,
+                        &super::message::message(
+                            &walk::focus_check(item),
+                            &at,
+                            &walk::lost_verdict(item, &at),
+                        ),
+                    ),
+                )),
                 None => found.push((
                     item.miss,
                     super::message::prefixed(
@@ -1261,8 +1320,9 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
         }
         let said: Vec<String> = found
             .into_iter()
-            .filter(|(c, _)| *c == cause)
-            .map(|(_, text)| text)
+            .enumerate()
+            .filter(|(at, (c, _))| *c == cause || always.contains(at))
+            .map(|(_, (_, text))| text)
             .collect();
         if !said.is_empty() {
             out.push(super::message::joined(said));
@@ -2010,12 +2070,33 @@ mod tests {
             Cause::Satisfied
         );
         assert_eq!(
-            cause(
-                "sum of xs.n whose k is 1 is 0",
-                json!({"xs": [{"k": 2, "n": 5}]})
-            ),
+            cause("sum of xs.n that is 1 is 0", json!({"xs": [{"n": 5}]})),
             Cause::Satisfied
         );
+    }
+
+    #[test]
+    fn a_count_or_sum_through_a_value_that_isnt_an_object_names_that_value() {
+        for sentence in ["count of xs.m.v is 3", "sum of xs.m.v is 3"] {
+            let policy = json!({
+                "ergo_spec": "v0.6-dev",
+                "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+                "requirements": {"r": {"subject": "thing", "checks": {"c": sentence}}}
+            });
+            let input = json!({"things": [{"id": 1, "xs": [{"m": "s"}]}]});
+            let report = crate::report(&input, &policy, &json!({}));
+            let found = report["results"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|row| row["check"] == "c")
+                .unwrap();
+            assert_eq!(found["cause"], "unusable", "{sentence}");
+            assert_eq!(
+                found["message"], "item 1 of xs: m is \"s\", which isn't an object",
+                "{sentence}"
+            );
+        }
     }
 
     #[test]
@@ -2065,8 +2146,8 @@ mod tests {
         );
         assert_eq!(
             cause(
-                "sum of xs.n whose k is 1 is 5",
-                json!({"xs": [{"k": 1, "n": 5}, {"k": 2, "n": "x"}]})
+                "sum of xs.n that is a number is 5",
+                json!({"xs": [{"n": 5}, {"n": "x"}]})
             ),
             Cause::Satisfied
         );
@@ -2116,14 +2197,14 @@ mod tests {
     }
 
     #[test]
-    fn a_whose_that_compares_with_a_missing_param_is_not_a_ref_so_an_empty_list_still_counts_zero()
-    {
+    fn a_param_a_whose_compares_with_is_read_up_front_so_an_empty_list_fails_without_it() {
         let sentence = "count of xs whose k is $params.limit is 0";
         let run =
             |subject: Value, params: Value| run_on(sentence, subject, json!({}), params).cause;
-        assert_eq!(run(json!({"xs": []}), json!({})), Cause::Satisfied);
+        assert_eq!(run(json!({"xs": []}), json!({})), Cause::Absent);
+        assert_eq!(run(json!({"xs": []}), json!({"limit": null})), Cause::Null);
         assert_eq!(
-            run(json!({"xs": []}), json!({"limit": null})),
+            run(json!({"xs": []}), json!({"limit": 1})),
             Cause::Satisfied
         );
     }
@@ -2239,19 +2320,22 @@ mod tests {
     }
 
     #[test]
-    fn a_count_in_the_whose_of_an_every_decides_which_items_are_checked() {
-        let sentence = "every xs.t whose count of ys is at least 1 is \"x\"";
-        let subject = json!({"xs": [{"t": "x", "ys": [1]}, {"t": "z", "ys": []}]});
+    fn a_count_in_the_whose_of_an_every_reads_the_focus_and_decides_which_items_are_checked() {
+        let sentence = "every xs.t whose count of ys is at least 1 exists";
+        let subject = json!({"xs": [{"t": {"ys": [1]}}, {"t": {"ys": []}, "ys": [1]}]});
         assert_eq!(cause(sentence, subject), Cause::Satisfied);
         assert_eq!(
-            cause(sentence, json!({"xs": [{"t": "z", "ys": [1]}]})),
+            cause(sentence, json!({"xs": [{"t": {"ys": []}, "ys": [1]}]})),
             Cause::Value
         );
         assert_eq!(
-            cause(sentence, json!({"xs": [{"t": "x", "ys": null}]})),
+            cause(sentence, json!({"xs": [{"t": {"ys": null}, "ys": [1]}]})),
             Cause::Null
         );
-        assert_eq!(cause(sentence, json!({"xs": [{"t": "x"}]})), Cause::Absent);
+        assert_eq!(
+            cause(sentence, json!({"xs": [{"t": {}, "ys": [1]}]})),
+            Cause::Absent
+        );
     }
 
     #[test]
@@ -2283,12 +2367,15 @@ mod tests {
     }
 
     #[test]
-    fn a_whose_can_compare_an_items_field_with_a_count_of_its_own_list() {
-        let sentence = "every xs.n whose n is count of ys is at least 1";
-        let subject = json!({"xs": [{"n": 2, "ys": [1, 1]}, {"n": 1, "ys": [1, 1]}]});
+    fn a_whose_can_compare_a_field_of_the_focus_with_a_count_of_its_own_list() {
+        let sentence = "every xs.o whose n is count of ys exists";
+        let subject = json!({"xs": [{"o": {"n": 2, "ys": [1, 1]}}, {"o": {"n": 1, "ys": [1, 1]}}]});
         assert_eq!(cause(sentence, subject), Cause::Satisfied);
         assert_eq!(
-            cause(sentence, json!({"xs": [{"n": 1, "ys": [1, 1]}]})),
+            cause(
+                sentence,
+                json!({"xs": [{"o": {"n": 1, "ys": [1, 1]}, "n": 2}]})
+            ),
             Cause::Value
         );
     }
@@ -2382,7 +2469,7 @@ mod tests {
 
     fn row_names(checks: Value) -> Vec<String> {
         let policy = json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {"t": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "t", "checks": {"c": checks}}}
         });
@@ -2445,7 +2532,7 @@ mod tests {
     #[test]
     fn a_whose_names_the_right_side_when_only_the_right_side_was_not_read() {
         let failed = failed_items_of(
-            "every items.s whose lo is at least hi is \"ok\"",
+            "every items whose lo is at least hi exists",
             json!([{"lo": 1, "s": "ok"}, {"hi": 1, "s": "ok"}, {"s": "ok"}, {"lo": 1, "hi": null, "s": "ok"}]),
             json!({}),
         );
@@ -2463,7 +2550,7 @@ mod tests {
     #[test]
     fn a_whose_names_the_left_side_when_both_were_read() {
         let failed = failed_items_of(
-            "every items.s whose lo is at least hi is \"ok\"",
+            "every items whose lo is at least hi exists",
             json!([{"lo": "x", "hi": 1, "s": "ok"}]),
             json!({}),
         );
@@ -2476,7 +2563,7 @@ mod tests {
     #[test]
     fn a_whose_with_a_count_names_the_count_list_when_it_is_the_side_not_read() {
         let on_left = failed_items_of(
-            "every items.s whose count of kids is at least min is \"ok\"",
+            "every items whose count of kids is at least min exists",
             json!([{"kids": [1], "s": "ok"}, {"min": 1, "s": "ok"}, {"s": "ok"}, {"kids": 5, "min": 1, "s": "ok"}]),
             json!({}),
         );
@@ -2490,7 +2577,7 @@ mod tests {
             ]
         );
         let on_right = failed_items_of(
-            "every items.s whose min is at most count of kids is \"ok\"",
+            "every items whose min is at most count of kids exists",
             json!([{"kids": [1], "s": "ok"}, {"min": 1, "s": "ok"}, {"s": "ok"}, {"kids": 5, "min": 1, "s": "ok"}]),
             json!({}),
         );
@@ -2508,7 +2595,7 @@ mod tests {
     #[test]
     fn a_whose_with_a_plus_side_names_its_first_path_that_was_not_read() {
         let failed = failed_items_of(
-            "every items.s whose lo is at least hi plus 1 is \"ok\"",
+            "every items whose lo is at least hi plus 1 exists",
             json!([{"lo": 1, "s": "ok"}, {"lo": 1, "hi": null, "s": "ok"}]),
             json!({}),
         );
@@ -2520,7 +2607,7 @@ mod tests {
             ]
         );
         let counted = failed_items_of(
-            "every items.s whose min is at most count of kids plus 1 is \"ok\"",
+            "every items whose min is at most count of kids plus 1 exists",
             json!([{"min": 1, "s": "ok"}, {"min": 1, "kids": 5, "s": "ok"}]),
             json!({}),
         );
@@ -2532,7 +2619,7 @@ mod tests {
             ]
         );
         let first_of_two = failed_items_of(
-            "every items.s whose lo is at least x plus y is \"ok\"",
+            "every items whose lo is at least x plus y exists",
             json!([{"lo": 1, "y": 1, "s": "ok"}, {"lo": 1, "s": "ok"}]),
             json!({}),
         );
@@ -2548,7 +2635,7 @@ mod tests {
     #[test]
     fn a_whose_with_an_elapsed_side_names_its_first_path_that_was_not_read() {
         let failed = failed_items_of(
-            "every items.s whose days elapsed from start to stop is at least lo is \"ok\"",
+            "every items whose days elapsed from start to stop is at least lo exists",
             json!([{"start": "2026-01-01T00:00:00Z", "lo": 1, "s": "ok"}, {"lo": 1, "s": "ok"}]),
             json!({}),
         );
@@ -2564,7 +2651,7 @@ mod tests {
     #[test]
     fn a_whose_names_a_param_or_input_by_its_own_path_and_not_under_the_item() {
         let on_right = failed_items_of(
-            "every items.s whose lo is at least $params.min is \"ok\"",
+            "every items whose lo is at least $params.min exists",
             json!([{"lo": 1, "s": "ok"}]),
             json!({}),
         );
@@ -2573,7 +2660,7 @@ mod tests {
             [("$params.min", &json!(null), &json!("$params:"))]
         );
         let on_left = failed_items_of(
-            "every items.s whose $params.min is at most lo is \"ok\"",
+            "every items whose $params.min is at most lo exists",
             json!([{"lo": 1, "s": "ok"}]),
             json!({}),
         );
@@ -2582,7 +2669,7 @@ mod tests {
             [("$params.min", &json!(null), &json!("$params:"))]
         );
         let input = failed_items_of(
-            "every items.s whose lo is at least $input.min is \"ok\"",
+            "every items whose lo is at least $input.min exists",
             json!([{"lo": 1, "s": "ok"}]),
             json!({}),
         );
@@ -2625,7 +2712,7 @@ mod tests {
         let input = json!({"things": [{"id": "t", "meta": {}, "items": [{"lo": 1, "s": "ok"}]}]});
         let failed = failed_items_with(
             &scope,
-            "every items.s whose lo is at least w is \"ok\"",
+            "every items whose lo is at least w exists",
             input,
             &[],
         );
@@ -2645,7 +2732,7 @@ mod tests {
         };
         let failed = failed_items_with(
             &scope,
-            "every items.s whose lo is at least art.q is \"ok\"",
+            "every items whose lo is at least art.q exists",
             input.clone(),
             &[("art", parent)],
         );
@@ -2695,14 +2782,12 @@ mod tests {
     fn a_count_on_the_right_of_a_whose_reads_the_part_and_not_the_items_field_of_the_same_name() {
         let input = rows_with_own_x();
         for (sentence, cause) in [
-            ("every xs.v whose n is count of x.z is 1", Cause::Satisfied),
+            ("every xs whose n is count of x.z exists", Cause::Satisfied),
             (
-                "every xs.v whose n is at most sum of x.z is 1",
+                "every xs whose n is at most sum of x.z exists",
                 Cause::Satisfied,
             ),
-            ("some xs.v whose n is count of x.z is 5", Cause::Value),
             ("count of xs whose n is count of x.z is 2", Cause::Satisfied),
-            ("sum of xs.v whose n is count of x.z is 2", Cause::Satisfied),
         ] {
             assert_eq!(
                 verdict_in(&part_x(), sentence, &input, &[]).cause,
@@ -2718,7 +2803,6 @@ mod tests {
         let input = rows_with_own_x();
         for (sentence, cause) in [
             ("count of xs whose count of x.z is 3 is 3", Cause::Satisfied),
-            ("every xs.v whose n is count of .x.z is 1", Cause::Value),
             (
                 "count of xs whose n is count of .x.z is 1",
                 Cause::Satisfied,
@@ -2734,11 +2818,15 @@ mod tests {
 
     #[test]
     fn a_part_on_the_right_of_a_whose_that_is_missing_or_null_or_not_a_list_fails_closed() {
-        for (part, cause) in [
-            (None, Cause::Absent),
-            (Some(json!(null)), Cause::Null),
-            (Some(json!({"z": "abc"})), Cause::Unusable),
-            (Some(json!({"z": {"k": 1}})), Cause::Unusable),
+        for (part, in_every, in_count) in [
+            (None, Cause::Absent, Cause::Absent),
+            (Some(json!(null)), Cause::Null, Cause::Null),
+            (Some(json!({"z": "abc"})), Cause::Unusable, Cause::Unusable),
+            (
+                Some(json!({"z": {"k": 1}})),
+                Cause::Unusable,
+                Cause::Unusable,
+            ),
         ] {
             let mut input = rows_with_own_x();
             let thing = input["things"][0].as_object_mut().unwrap();
@@ -2746,9 +2834,9 @@ mod tests {
                 Some(value) => thing.insert("p".into(), value),
                 None => thing.remove("p"),
             };
-            for sentence in [
-                "every xs.v whose n is count of x.z is 1",
-                "count of xs whose n is count of x.z is 2",
+            for (sentence, cause) in [
+                ("every xs whose n is count of x.z exists", in_every),
+                ("count of xs whose n is count of x.z is 2", in_count),
             ] {
                 assert_eq!(
                     verdict_in(&part_x(), sentence, &input, &[]).cause,
@@ -2776,12 +2864,13 @@ mod tests {
         };
         let scope = Scope::new().with_for_alias("g");
         for (sentence, cause) in [
-            ("every rows.v whose n is count of g is 1", Cause::Satisfied),
-            ("some rows.v whose n is count of g is 9", Cause::Value),
+            ("every rows whose n is count of g exists", Cause::Satisfied),
             ("count of rows whose n is count of g is 1", Cause::Satisfied),
-            ("sum of rows.v whose n is count of g is 1", Cause::Satisfied),
             ("count of rows whose count of g is 5 is 2", Cause::Satisfied),
-            ("every rows.v whose n is count of .g is 1", Cause::Value),
+            (
+                "count of rows whose n is count of .g is 1",
+                Cause::Satisfied,
+            ),
         ] {
             assert_eq!(
                 verdict_in(&scope, sentence, &input, &[("g", group.clone())]).cause,
@@ -2825,7 +2914,7 @@ mod tests {
             found["has"] = has;
         }
         let policy = json!({
-            "ergo_spec": "v0.5",
+            "ergo_spec": "v0.6-dev",
             "subjects": {subject: found},
             "requirements": {"r": {"subject": subject, "checks": {"c": check}}}
         });
