@@ -1893,6 +1893,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "releases whose some files.owner is steward",
         "releases whose some files.owner equals steward",
     ),
+    ("prs whose x equals x", "prs whose x equals x"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

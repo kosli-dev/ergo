@@ -83,8 +83,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of items.v whose n is b.n is 2",
         "sum of items.v whose n equals b.n is 2",
-        &[],
-        &[],
+        &[
+            "whose n: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose n: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "count of items whose w is pa.w is 5",
@@ -107,8 +111,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of items.v whose n is count of fam.z is 1",
         "sum of items.v whose n equals count of fam.z is 1",
-        &[],
-        &[],
+        &[
+            "whose n: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose n: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "count of items whose n is count of .fam.z is 2",
@@ -131,14 +139,22 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of items.n whose w is pa.w is 3",
         "sum of items.n whose w equals pa.w is 3",
-        &[],
-        &[],
+        &[
+            "whose w: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose w: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "sum of pa.items.n whose w is 2 is 5",
         "sum of pa.items.n whose w is 2 is 5",
-        &[],
-        &[],
+        &[
+            "whose w: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose w: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "count of pa.items whose w is pa.w is 1",
@@ -159,14 +175,22 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of items.x whose k is \"a\" is 1",
         "sum of items.x whose k is \"a\" is 1",
-        &[],
-        &[],
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "sum of items.x.y whose k is \"a\" is 1",
         "sum of items.x.y whose k is \"a\" is 1",
-        &[],
-        &[],
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     ("approvals exists", "approvals exists", &[], &[]),
     (" x   is  1 ", "x is 1", &[], &[]),
@@ -1039,17 +1063,17 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "count of items whose x equals .x is 1",
         "count of items whose x equals x is 1",
         &[
-            "x is compared with itself, because in a whose it's read from the item, and a count or a sum can't read the subject's field there yet",
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
         ],
         &[
-            "x is compared with itself, because in a whose it's read from the item, and a count or a sum can't read the subject's field there yet",
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
         ],
     ),
     (
         "count of items whose x equals x is 1",
         "count of items whose x equals x is 1",
         &[
-            "x is compared with itself, because in a whose it's read from the item, and a count or a sum can't read the subject's field there yet",
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
         ],
         &[],
     ),
@@ -1123,8 +1147,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of xs.v whose n is count of x.z is 2",
         "sum of xs.v whose n equals count of x.z is 2",
-        &[],
-        &[],
+        &[
+            "whose n: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose n: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "count of rows whose n is count of g is 2",
@@ -1135,8 +1163,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of rows.v whose n is count of g is 2",
         "sum of rows.v whose n equals count of g is 2",
-        &[],
-        &[],
+        &[
+            "whose n: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose n: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "count of items whose count of b.ks is 3 is 3",
@@ -2435,10 +2467,10 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "every xs whose k is at least k is one of 1, 'a'",
         "every xs whose k is at least k is one of 1, \"a\"",
         &[
-            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, write \u{1}.k",
         ],
         &[
-            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, write \u{1}.k",
         ],
     ),
     (
@@ -3259,26 +3291,42 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of items.usd whose kind is \"a\" is 0",
         "sum of items.usd whose kind is \"a\" is 0",
-        &[],
-        &[],
+        &[
+            "whose kind: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose kind: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "sum of items.usd whose kind is \"a\" is 10",
         "sum of items.usd whose kind is \"a\" is 10",
-        &[],
-        &[],
+        &[
+            "whose kind: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose kind: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "sum of prs.n whose count of reviews is at least 2 is 5",
         "sum of prs.n whose count of reviews is at least 2 is 5",
-        &[],
-        &[],
+        &[
+            "whose reviews: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose reviews: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "sum of x named by k whose k1.q.\"\" contains none of null equals null and \"$s\" named by k named by $input.q equals 0.10 and x.\"é\" equals true",
         "sum of x named by k whose k1.q.\"\" contains none of null is null and \"$s\" named by k named by $input.q is 0.1 and x.\"é\" is true",
-        &[],
-        &[],
+        &[
+            "whose k1.q.\"\": sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose k1.q.\"\": sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "sum of y named by k plus $params.p is 'b\\c' and ._x-1 does not equal 'b\\c'",
@@ -4139,8 +4187,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of \"q r\"._k named by $params.k whose count of y does not equal y plus count of x plus first of .\"a.b\" within 2 is \"a\\u00e9\"",
         "sum of \"q r\"._k named by $params.k whose count of y does not equal y plus count of x plus first of .\"a.b\" within 2 is \"aé\"",
-        &[],
-        &[],
+        &[
+            "whose y: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose y: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "count of l whose x is \"a\" followed by t is 1",
@@ -4705,8 +4757,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of commits.n whose kind is \"code\" is 5",
         "sum of commits.n whose kind is \"code\" is 5",
-        &[],
-        &[],
+        &[
+            "whose kind: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose kind: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     ("y.k is 9", "y.k is 9", &[], &[]),
     ("every applies.k is 9", "every applies.k is 9", &[], &[]),
@@ -4920,8 +4976,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of deps.n whose name is in $input.sbom.components.name is 2",
         "sum of deps.n whose name is in $input.sbom.components.name is 2",
-        &[],
-        &[],
+        &[
+            "whose name: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose name: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     (
         "x is in .lock.pkgs.name",
@@ -5865,8 +5925,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "sum of xs whose \"item\" is 1 is 1",
         "sum of xs whose .item is 1 is 1",
-        &[],
-        &[],
+        &[
+            "whose .item: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose .item: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
     ),
     ("x.id is \"b\"", "x.id is \"b\"", &[], &[]),
     ("\"a<b\".x is 1", "\"a<b\".x is 1", &[], &[]),
@@ -6489,6 +6553,162 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("sum of commits.n is 5", "sum of commits.n is 5", &[], &[]),
+    (
+        "count of approvers whose username is pr named by k is 1",
+        "count of approvers whose username equals pr named by k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose x equals x is 2",
+        "count of xs whose x equals x is 2",
+        &[
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
+        ],
+        &[],
+    ),
+    (
+        "count of xs.meta whose k is 1 is 1",
+        "count of xs.meta whose k is 1 is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs.meta whose n is at least t is 1",
+        "count of xs.meta whose n is at least t is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every distinct items.b is at least lo",
+        "every distinct items.b is at least lo",
+        &[],
+        &[],
+    ),
+    (
+        "every xs equals m named by k",
+        "every xs equals m named by k",
+        &[],
+        &[],
+    ),
+    (
+        "every xs equals m named by k2",
+        "every xs equals m named by k2",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose m.b equals m.b exists",
+        "every xs whose m.b equals m.b exists",
+        &[
+            "m.b is compared with itself, because in a whose it's read from the item: to read the subject's m.b, write \u{1}.m.b",
+        ],
+        &[
+            "m.b is compared with itself, because in a whose it's read from the item: to read the subject's m.b, write \u{1}.m.b",
+        ],
+    ),
+    (
+        "every xs.b whose $params.z is 1 exists",
+        "every xs.b whose $params.z is 1 exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.meta whose k is 1 exists",
+        "every xs.meta whose k is 1 exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.meta whose k is 3 does not exist",
+        "every xs.meta whose k is 3 does not exist",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.n does not equal $params.q",
+        "every xs.n does not equal $params.q",
+        &[],
+        &[],
+    ),
+    ("every xs.n is after m", "every xs.n is after m", &[], &[]),
+    (
+        "every xs.n is at least m",
+        "every xs.n is at least m",
+        &[],
+        &[],
+    ),
+    ("every xs.n is in m", "every xs.n is in m", &[], &[]),
+    (
+        "every xs.n starts with t",
+        "every xs.n starts with t",
+        &[],
+        &[],
+    ),
+    ("m exists", "m exists", &[], &[]),
+    (
+        "sum of xs whose k is 1 is 3",
+        "sum of xs whose k is 1 is 3",
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+    ),
+    (
+        "sum of xs.v that is at least 2 is 3",
+        "sum of xs.v that is at least 2 is 3",
+        &[],
+        &[],
+    ),
+    (
+        "sum of xs.v whose $params.k is 1 is 3",
+        "sum of xs.v whose $params.k is 1 is 3",
+        &[],
+        &[],
+    ),
+    (
+        "sum of xs.v whose $params.k is lo is 3",
+        "sum of xs.v whose $params.k equals lo is 3",
+        &[
+            "whose lo: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose lo: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+    ),
+    (
+        "sum of xs.v whose k is 1 is 3",
+        "sum of xs.v whose k is 1 is 3",
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+    ),
+    (
+        "username is pr named by k",
+        "username equals pr named by k",
+        &[],
+        &[],
+    ),
+    ("w.q is 1", "w.q is 1", &[], &[]),
+    ("x equals m named by k", "x equals m named by k", &[], &[]),
+    ("z.q is 1", "z.q is 1", &[], &[]),
+    (
+        "every xs.n is in $params.q",
+        "every xs.n is in $params.q",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.n starts with q",
+        "every xs.n starts with q",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -8734,10 +8954,10 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "every ts whose k equals k as t",
         "every ts whose k equals k as t",
         &[
-            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, write \u{1}.k",
         ],
         &[
-            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert",
+            "k is compared with itself, because in a whose it's read from the item: to read the subject's k, write \u{1}.k",
         ],
     ),
     (
@@ -9071,7 +9291,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "every items as pr, every other whose x equals x as j",
         "every items as pr, every other whose x equals x as j",
         &[
-            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, compare under assert",
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
         ],
         &[],
     ),
@@ -9104,17 +9324,17 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "every items whose pr equals .pr as i",
         "every items whose pr equals pr as i",
         &[
-            "pr is compared with itself, because in a whose it's read from the item: to read the subject's pr, compare under assert",
+            "pr is compared with itself, because in a whose it's read from the item: to read the subject's pr, write \u{1}.pr",
         ],
         &[
-            "pr is compared with itself, because in a whose it's read from the item: to read the subject's pr, compare under assert",
+            "pr is compared with itself, because in a whose it's read from the item: to read the subject's pr, write \u{1}.pr",
         ],
     ),
     (
         "every items whose pr equals pr as i",
         "every items whose pr equals pr as i",
         &[
-            "pr is compared with itself, because in a whose it's read from the item: to read the subject's pr, compare under assert",
+            "pr is compared with itself, because in a whose it's read from the item: to read the subject's pr, write \u{1}.pr",
         ],
         &[],
     ),
@@ -9122,17 +9342,17 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "every items whose x equals .x as i",
         "every items whose x equals x as i",
         &[
-            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, compare under assert",
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
         ],
         &[
-            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, compare under assert",
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
         ],
     ),
     (
         "every items whose x equals x as i",
         "every items whose x equals x as i",
         &[
-            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, compare under assert",
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
         ],
         &[],
     ),
@@ -9508,7 +9728,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "last of items whose x equals x as i",
         "last of items whose x equals x as i",
         &[
-            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, compare under assert",
+            "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write \u{1}.x",
         ],
         &[],
     ),
@@ -9597,10 +9817,10 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "some conditions whose type equals type as condition",
         "some conditions whose type equals type as condition",
         &[
-            "type is compared with itself, because in a whose it's read from the item: to read the subject's type, compare under assert",
+            "type is compared with itself, because in a whose it's read from the item: to read the subject's type, write \u{1}.type",
         ],
         &[
-            "type is compared with itself, because in a whose it's read from the item: to read the subject's type, compare under assert",
+            "type is compared with itself, because in a whose it's read from the item: to read the subject's type, write \u{1}.type",
         ],
     ),
     ("some items as i", "some items as i", &[], &[]),
@@ -10121,6 +10341,46 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         "every prs as pr, every pr.approvers whose username does not equal pr.author as ap",
         &[],
         &[],
+    ),
+    (
+        "every ws whose q is 1 as w",
+        "every ws whose q is 1 as w",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as x, every x.ys.z whose q is 1 as z",
+        "every xs as x, every x.ys.z whose q is 1 as z",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.meta whose k is 1 as m",
+        "every xs.meta whose k is 1 as m",
+        &[],
+        &[],
+    ),
+    (
+        "every ys.z whose q is 1 as z",
+        "every ys.z whose q is 1 as z",
+        &[],
+        &[],
+    ),
+    (
+        "last of xs.meta sorted by t as x",
+        "last of xs.meta sorted by t as x",
+        &[],
+        &[],
+    ),
+    (
+        "some conditions whose type equals type as c",
+        "some conditions whose type equals type as c",
+        &[
+            "type is compared with itself, because in a whose it's read from the item: to read the subject's type, write \u{1}.type",
+        ],
+        &[
+            "type is compared with itself, because in a whose it's read from the item: to read the subject's type, write \u{1}.type",
+        ],
     ),
 ];
 

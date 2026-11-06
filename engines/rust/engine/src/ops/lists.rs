@@ -61,6 +61,14 @@ pub struct Matches {
 }
 
 impl Right {
+    pub(super) fn ref_paths(&self) -> Vec<&Path> {
+        match self {
+            Right::Ref(path) => vec![path],
+            Right::Join(pieces) => pieces.iter().flat_map(Right::ref_paths).collect(),
+            Right::Written(_) | Right::Field(_) => Vec::new(),
+        }
+    }
+
     fn shown_paths(&self) -> Vec<&Path> {
         match self {
             Right::Written(_) | Right::Ref(_) => Vec::new(),

@@ -1177,6 +1177,7 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             }
             return out.pop();
         }
+        let mut always = std::collections::BTreeSet::new();
         let mut found: Vec<(Cause, String)> = walked
             .failures
             .iter()
@@ -1202,7 +1203,6 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             at.label = None;
             let focus = walk::focus_ctx(item, &outer);
             let name = walked.item_name(&item.item_segs);
-            let focus_name = walked.item_name(walk::focus_segs(item));
             let mut undecided = false;
             for check in &counted.whose {
                 let (verdict, lost) = walk::focus_verdict(check, item, &at, &focus);
@@ -1217,13 +1217,16 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                         let off = super::message::off_item(check, &outer, verdict.cause);
                         if off.is_empty() {
                             super::message::prefixed(
-                                &focus_name,
+                                &walked.item_name(walk::focus_segs(item, check)),
                                 &super::message::message(check, &focus, &verdict),
                             )
                         } else {
                             off.join(", and ")
                         }
                     };
+                    if !item.rest.is_empty() && walk::reads_focus(check) {
+                        always.insert(found.len());
+                    }
                     found.push((verdict.cause, said));
                 }
             }
@@ -1280,8 +1283,9 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
         }
         let said: Vec<String> = found
             .into_iter()
-            .filter(|(c, _)| *c == cause)
-            .map(|(_, text)| text)
+            .enumerate()
+            .filter(|(at, (c, _))| *c == cause || always.contains(at))
+            .map(|(_, (_, text))| text)
             .collect();
         if !said.is_empty() {
             out.push(super::message::joined(said));

@@ -307,6 +307,7 @@ pub fn lower_for(
 struct Live<'a> {
     at: Located<'a>,
     name: String,
+    bare: Option<String>,
     focus: String,
     said: String,
     order: Vec<Seg>,
@@ -333,6 +334,7 @@ fn merged_live(live: Vec<Live<'_>>) -> Vec<Live<'_>> {
 
 struct Dead {
     msg: Option<String>,
+    bare: Option<String>,
     shared: bool,
     order: Vec<Seg>,
     name: String,
@@ -354,6 +356,7 @@ impl Dead {
 
     fn of_failure(failure: &Failure) -> Dead {
         Dead {
+            bare: None,
             msg: None,
             shared: false,
             order: failure.order.clone(),
@@ -368,6 +371,7 @@ impl Dead {
 
     fn copy(&self) -> Dead {
         Dead {
+            bare: self.bare.clone(),
             msg: self.msg.clone(),
             shared: self.shared,
             order: self.order.clone(),
@@ -553,12 +557,13 @@ impl For {
                         )
                     } else {
                         super::message::prefixed(
-                            &walked.item_name_dotted(walk::focus_segs(w)),
+                            &walked.item_name_dotted(walk::focus_segs(w, check)),
                             &super::message::message(check, &focus, verdict),
                         )
                     }
                 });
             let dead_item = |cause: Cause| Dead {
+                bare: None,
                 msg: if undecided.is_some() && depth == 0 && !matches!(item.how, How::Pick { .. }) {
                     why.clone()
                 } else {
@@ -567,7 +572,12 @@ impl For {
                 shared: false,
                 order: w.item_segs.clone(),
                 name: name.clone(),
-                said: walked.item_name_dotted(&w.item_segs),
+                said: if !w.rest.is_empty() && w.item.value.is_object() && cause != Cause::Unusable
+                {
+                    walked.item_name_dotted(&w.end_segs)
+                } else {
+                    walked.item_name_dotted(&w.item_segs)
+                },
                 path: name.clone(),
                 cause,
                 value: w.shown(),
@@ -588,6 +598,8 @@ impl For {
                         location: w.end_location.clone(),
                     },
                     said: walked.item_name_dotted(&w.item_segs),
+                    bare: (!w.rest.is_empty() && w.item.value.is_object())
+                        .then(|| walked.item_name_dotted(&w.end_segs)),
                     focus: if w.rest.is_empty() {
                         name.clone()
                     } else {
@@ -635,6 +647,7 @@ impl For {
             let nothing = through_first.then(|| {
                 let shown = crate::name::name(&item.path);
                 Dead {
+                    bare: None,
                     msg: None,
                     shared: false,
                     order: Vec::new(),
@@ -807,6 +820,7 @@ impl For {
                 for i in tied {
                     let (found, _, value, location) = &keys[i];
                     cands.dead.push(Dead {
+                        bare: None,
                         msg: None,
                         shared: false,
                         order: found.order.clone(),
@@ -886,6 +900,7 @@ fn sort_failure(
         )
     };
     Dead {
+        bare: None,
         msg: Some(said),
         shared: false,
         order: found.order.clone(),
@@ -1031,6 +1046,7 @@ impl For {
                     }
                 };
                 vec![Dead {
+                    bare: None,
                     msg: (!keyed.is_empty()).then(|| keyed.join(", and ")),
                     shared: !reads_path(&item.path, &self.items[0].alias),
                     order: Vec::new(),
@@ -1057,6 +1073,7 @@ impl For {
             let mut bound = ctx.clone();
             bound.aliases.insert(item.alias.clone(), live.at.clone());
             let entry = Dead {
+                bare: live.bare.clone(),
                 msg: None,
                 shared: false,
                 order: live.order.clone(),
@@ -1769,7 +1786,12 @@ impl For {
         let outcome = child.failed.as_ref()?;
         let name = self.strip(child.entry.shown());
         Some(if bare_item(outcome, &child.entry) {
-            super::message::isnt(&name, &child.entry.value, "an object")
+            let bare = child
+                .entry
+                .bare
+                .as_deref()
+                .map_or_else(|| name.clone(), |bare| self.strip(bare));
+            super::message::isnt(&bare, &child.entry.value, "an object")
         } else if outcome.said.is_empty() {
             if outcome.assertions.is_empty() && outcome.inner.is_empty() {
                 if self.items.len() > 1
@@ -1889,7 +1911,10 @@ impl For {
 }
 
 fn bare_item(outcome: &Outcome, entry: &Dead) -> bool {
-    outcome.cause == Cause::NotAnObject && !entry.value.is_object()
+    let only_shared = outcome.assertions.is_empty()
+        && !outcome.inner.is_empty()
+        && outcome.inner.iter().all(|dead| dead.shared);
+    outcome.cause == Cause::NotAnObject && !entry.value.is_object() && !only_shared
 }
 
 const MARK: char = '\u{1}';
@@ -2850,6 +2875,36 @@ mod tests {
         assert_eq!(
             found["message"],
             "item 1 of rs: m: t is \"zz\", which isn't a number, a time or a date"
+        );
+    }
+
+    #[test]
+    fn a_first_item_that_isnt_an_object_is_not_named_when_only_a_second_items_whose_failed_under_it()
+     {
+        let found = row(
+            "every xs as x, every ys whose q is 1 as y",
+            json!("y.q is 1"),
+            json!({"xs": [{"n": 1}, 5], "ys": [{"q": 1}, "s"]}),
+        );
+        assert_eq!(found["cause"], "not_an_object");
+        assert_eq!(
+            found["message"],
+            "item 2 of ys is \"s\", which isn't an object"
+        );
+    }
+
+    #[test]
+    fn a_value_past_the_list_that_isnt_an_object_is_named_after_its_item_and_the_rest_of_the_path()
+    {
+        let found = row(
+            "every ys.z as z",
+            json!("z.q is 1"),
+            json!({"ys": [{"z": {"q": 1}}, {"z": "s"}, {}]}),
+        );
+        assert_eq!(found["cause"], "not_an_object");
+        assert_eq!(
+            found["message"],
+            "item 2 of ys: z is \"s\", which isn't an object; item 3 of ys: z is missing"
         );
     }
 

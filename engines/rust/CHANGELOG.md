@@ -7,6 +7,7 @@ Each release names the version of the spec it follows. The spec's own changes ar
 ### Changed
 
 - Names resolve where spec 0.6 says, as in `ergo.rego` 0.6.0: a bare name on the right of the phrase after `every` or `some` reads the subject's field, `whose` and `that` read the value the path ends at, `pr.author` reads the subject's field inside a relative clause, and the right side of a `some` or `every` condition in a `from` line reads the candidate. Reports change for policies that write these, see [spec/CHANGELOG.md](../../spec/CHANGELOG.md). This version follows spec 0.6, so a policy says `ergo_spec: v0.6-dev`.
+- As spec 0.6 also says: `pr named by k` and `pr[0]` are allowed inside a relative clause; a `whose` that compares a field with itself says `write pr.x`; `distinct` no longer makes a bare name on the right written wrong; a `sum of` whose `whose` reads a name of the value it adds is written wrong; and messages name a value past the list after its item and a colon, list every item a `count of` or `sum of` couldn't read, say a root name no item can use once, name a `named by` key that can't be read, and write the item's path in full when a name on the right is spelled the same.
 
 ### Fixed
 

@@ -4,16 +4,16 @@ mod support;
 use ergo_policy_sentences::*;
 use support::*;
 
+fn is_self(problem: &str) -> bool {
+    problem.contains("compared with itself") || problem.contains(": sum of adds up numbers")
+}
+
 fn without_self(all: Vec<String>) -> Vec<String> {
-    all.into_iter()
-        .filter(|m| !m.contains("compared with itself"))
-        .collect()
+    all.into_iter().filter(|m| !is_self(m)).collect()
 }
 
 fn only_self(all: Vec<String>) -> Vec<String> {
-    all.into_iter()
-        .filter(|m| m.contains("compared with itself"))
-        .collect()
+    all.into_iter().filter(|m| is_self(m)).collect()
 }
 
 #[test]

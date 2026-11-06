@@ -113,8 +113,6 @@ fn lowered_plan(
     Some(Plan { items, all_of })
 }
 
-const COMPARED_WITH_ITSELF: &str = " is compared with itself";
-
 fn read_one(
     check: &crate::policy::Check,
     scope: &Scope,
@@ -169,12 +167,10 @@ fn read_one(
             let mut names: Vec<String> = aliases_owned.clone();
             let mut for_tree = None;
             let mut for_ok = true;
-            let mut for_unread = false;
             if let Some(text) = for_line {
                 match s::parse_for(text) {
                     Ok(tree) => {
                         for problem in s::for_problems(&tree, &aliases) {
-                            for_unread |= !problem.contains(COMPARED_WITH_ITSELF);
                             problems.insert(format!("for: {problem}"));
                             for_ok = false;
                         }
@@ -194,7 +190,6 @@ fn read_one(
                     }
                     Err(errors) => {
                         for_ok = false;
-                        for_unread = true;
                         for message in messages(errors) {
                             problems.insert(format!("for: {message}"));
                         }
@@ -212,9 +207,6 @@ fn read_one(
                         &aliases,
                         &mut problems,
                     );
-                    if for_unread {
-                        problems.retain(|problem| !problem.contains(lower::DISTINCT_ITEM));
-                    }
                     if !parsed.ok || !for_ok || !problems.is_empty() {
                         return wrong(problems);
                     }
@@ -255,9 +247,6 @@ fn read_one(
                             None
                         }
                     };
-                    if for_unread {
-                        problems.retain(|problem| !problem.contains(lower::DISTINCT_ITEM));
-                    }
                     if !parsed.ok || !for_ok || !problems.is_empty() {
                         return wrong(problems);
                     }
@@ -340,14 +329,18 @@ pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<Str
         .and_then(|name| reading.infos.get(name))
         .map(|info| info.scope.clone())
         .unwrap_or_default();
+    let written = subject.map_or_else(|| "the subject".to_string(), crate::name::parent_key_text);
     requirement
         .checks
         .iter()
         .map(|(check_name, check)| {
-            (
-                check_name.clone(),
-                read_one(check, &scope, reading, subject),
-            )
+            let mut read = read_one(check, &scope, reading, subject);
+            read.problems = read
+                .problems
+                .into_iter()
+                .map(|problem| problem.replace(s::SUBJECT_MARK, &written))
+                .collect();
+            (check_name.clone(), read)
         })
         .collect()
 }
@@ -619,7 +612,7 @@ mod tests {
     #[test]
     fn values_of_mixed_types_are_listed_beside_a_field_compared_with_itself_in_a_whose() {
         let sentence = "every xs whose k is at least k is one of 1, 'a'";
-        let itself = "k is compared with itself, because in a whose it's read from the item: to read the subject's k, compare under assert";
+        let itself = "k is compared with itself, because in a whose it's read from the item: to read the subject's k, write t.k";
         let read = one(json!({"c": sentence}));
         assert_eq!(problems(&read), [itself, "values of mixed types"]);
         let read = one(json!({"c": {"assert": ["x exists", sentence]}}));

@@ -848,18 +848,106 @@ pub(super) fn lost_verdict(item: &WalkItem, at: &Ctx) -> Verdict {
     }
 }
 
-fn root_unusable(check: &Check, ctx: &Ctx) -> bool {
-    check.paths().iter().any(|path| {
-        path::is_root(&path.start)
-            && !matches!(
-                path::read(path, ctx).outcome,
-                Outcome::Found | Outcome::Null | Outcome::Absent
-            )
+fn from_a_root(path: &Path) -> bool {
+    matches!(
+        path.start,
+        Start::Alias(_) | Start::Part(_) | Start::Params | Start::Input
+    ) && !path.steps.iter().any(|step| {
+        matches!(step, Step::Field(field) if matches!(field.start, Start::Subject | Start::Own))
     })
 }
 
-pub(super) fn focus_segs<'s>(item: &'s WalkItem) -> &'s [Seg] {
-    if item.end.is_some() {
+fn right_needs(check: &Check, value: &Value) -> Option<&'static str> {
+    use super::compare::Cmp;
+    match check {
+        Check::Compare(compare) => match compare.cmp {
+            Cmp::Gt | Cmp::Gte | Cmp::Lt | Cmp::Lte => (!value.is_number()).then_some("a number"),
+            Cmp::StartsWith
+            | Cmp::EndsWith
+            | Cmp::NotStartsWith
+            | Cmp::NotEndsWith
+            | Cmp::AlphabeticallyBefore
+            | Cmp::AlphabeticallyAfter
+            | Cmp::AlphabeticallyOnOrBefore
+            | Cmp::AlphabeticallyOnOrAfter => (!value.is_string()).then_some("text"),
+            Cmp::Eq | Cmp::Ne => None,
+        },
+        Check::CompareTime(_) => super::time::read_time(value).is_none().then_some("a time"),
+        Check::In(_) | Check::Contains(_) | Check::Matches(_) => {
+            (!value.is_array()).then_some("a list")
+        }
+        _ => None,
+    }
+}
+
+fn listed_refs(check: &Check) -> Vec<&Path> {
+    use super::lists::Wanted;
+    match check {
+        Check::In(check) => check.values.ref_paths(),
+        Check::Matches(check) => check.patterns.ref_paths(),
+        Check::Contains(check) => match &check.wanted {
+            Wanted::One(right) | Wanted::All(right) | Wanted::Some(right) => right.ref_paths(),
+        },
+        _ => Vec::new(),
+    }
+}
+
+fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
+    check
+        .paths()
+        .into_iter()
+        .chain(listed_refs(check))
+        .filter(|path| from_a_root(path))
+        .find_map(|path| {
+            let read = path::read(path, ctx);
+            let state = read.outcome.cause();
+            if matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
+                && state == Some(cause)
+            {
+                let present = Check::Present(super::present::Present {
+                    path: path.clone(),
+                    missing: false,
+                });
+                return Some(message::message(
+                    &present,
+                    ctx,
+                    &Verdict {
+                        cause,
+                        inputs: Vec::new(),
+                    },
+                ));
+            }
+            let value = read.value.filter(|_| read.outcome == Outcome::Found)?;
+            if cause != Cause::Unusable {
+                return None;
+            }
+            right_needs(check, value).map(|kind| message::isnt(&name::name(path), value, kind))
+        })
+}
+
+fn clash_named(said: String, item: &WalkItem, check: &Check, walked: &Path) -> String {
+    if item.rest.is_empty() {
+        return said;
+    }
+    let rest = name::name(&item.rest_path());
+    let clashes = check
+        .paths()
+        .into_iter()
+        .any(|path| from_a_root(path) && name::name(path) == rest);
+    let cut = format!(": {rest} ");
+    match said.find(&cut) {
+        Some(at) if clashes => format!(
+            "{}: {} {}",
+            &said[..at],
+            name::name(walked),
+            &said[at + cut.len()..]
+        ),
+        _ => said,
+    }
+}
+
+pub(super) fn focus_segs<'s>(item: &'s WalkItem, check: &Check) -> &'s [Seg] {
+    if item.end.is_some() && reads_focus(check) {
         &item.end_segs
     } else {
         &item.item_segs
@@ -912,7 +1000,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 })
             } else if let Some((check, verdict, _)) = undecided {
                 let at = &focus;
-                let item_segs = focus_segs(item);
+                let item_segs = focus_segs(item, check);
                 let named = named_side(check, at);
                 let (steps, outside): (Vec<Step>, bool) = match &named {
                     Some((path, _)) => (
@@ -968,14 +1056,19 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 })
             } else if kept && !passed {
                 let off = message::off_item(&leaf_check, ctx, leaf.cause);
-                let said = if !off.is_empty() {
+                let said = if let Some(alone) = root_alone(&leaf_check, &at, leaf.cause) {
+                    alone
+                } else if !off.is_empty() {
                     off.join(", and ")
-                } else if leaf.cause == Cause::Unusable && root_unusable(&leaf_check, &at) {
-                    message::message(&leaf_check, &at, &leaf)
                 } else {
-                    message::prefixed(
-                        &walked.item_name(&item.item_segs),
-                        &message::message(&leaf_check, &at, &leaf),
+                    clash_named(
+                        message::prefixed(
+                            &walked.item_name(&item.item_segs),
+                            &message::message(&leaf_check, &at, &leaf),
+                        ),
+                        item,
+                        &leaf_check,
+                        &walk.path,
                     )
                 };
                 Some(Failure {

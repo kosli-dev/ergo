@@ -702,8 +702,7 @@ fn has_elapsed(terms: &[s::Term]) -> bool {
 pub fn in_from_line(found: Vec<String>) -> Vec<String> {
     let mut out = Vec::new();
     for problem in found {
-        let argument = problem.ends_with(" can't take a count of, a sum of or a plus")
-            || problem.starts_with(DISTINCT_ITEM);
+        let argument = problem.ends_with(" can't take a count of, a sum of or a plus");
         if problem == ELAPSED_AFTER_QUANTIFIER {
             out.push(problem.clone());
         }
@@ -1017,9 +1016,6 @@ pub fn lower_quantified(
             None => None,
         },
     };
-    if distinct {
-        problems.extend(distinct_item_problem(phrase, &item));
-    }
     if !problems.is_empty() {
         return Err(problems);
     }
@@ -1037,47 +1033,6 @@ pub fn lower_quantified(
         }))),
         _ => Err(vec![format!("every or some{UNSUPPORTED_SUFFIX}")]),
     }
-}
-
-pub const DISTINCT_ITEM: &str =
-    "distinct is about the value its path points at, but the phrase also reads ";
-
-fn phrase_paths(phrase: &s::Phrase) -> Vec<&s::Path> {
-    let mut paths: Vec<&s::Path> = phrase_terms(phrase)
-        .iter()
-        .filter_map(|term| match term {
-            s::Term::Path(path) => Some(path),
-            _ => None,
-        })
-        .collect();
-    if let s::Phrase::OneOf { list, .. }
-    | s::Phrase::Matches { list, .. }
-    | s::Phrase::ContainsAll(list)
-    | s::Phrase::ContainsNone(list)
-    | s::Phrase::ContainsSome(list)
-    | s::Phrase::NotContainsAll(list) = phrase
-        && let s::List::Path(path) = list
-    {
-        paths.push(path);
-    }
-    paths
-}
-
-fn distinct_item_problem(phrase: &s::Phrase, item: &Scope) -> Option<String> {
-    let mut names: Vec<String> = phrase_paths(phrase)
-        .into_iter()
-        .filter_map(|path| item.path(path).ok())
-        .filter(|path| matches!(path.start, Start::Subject | Start::Own) && !path.steps.is_empty())
-        .map(|path| crate::name::name(&path))
-        .collect();
-    names.sort();
-    names.dedup();
-    (!names.is_empty()).then(|| {
-        format!(
-            "{DISTINCT_ITEM}{} outside that value: leave distinct out, or put the items on a for line",
-            names.join(", ")
-        )
-    })
 }
 
 fn unsupported(condition: &s::Condition, names: &[&str]) -> Vec<String> {
