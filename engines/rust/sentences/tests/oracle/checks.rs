@@ -3385,6 +3385,10 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("v exists", "v exists", &[], &[]),
+    ("d exists", "d exists", &[], &[]),
+    ("name is \"ann\"", "name is \"ann\"", &[], &[]),
+    ("u exists", "u exists", &[], &[]),
+    ("up is true", "up is true", &[], &[]),
     (
         "values named by key is 5",
         "values named by key is 5",

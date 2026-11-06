@@ -1998,6 +1998,22 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "every build named by $params.k",
     ),
     ("every builds.tags", "every builds.tags"),
+    (
+        "$input.build named by each of $params.kinds",
+        "$input.build named by each of $params.kinds",
+    ),
+    (
+        "b.runs named by each of $params.k",
+        "b.runs named by each of $params.k",
+    ),
+    ("d.m", "d.m"),
+    ("ds", "ds"),
+    ("every builds.version.x", "every builds.version.x"),
+    ("every d.ms", "every d.ms"),
+    ("every ds", "every ds"),
+    ("every xs.n", "every xs.n"),
+    ("xs[0]", "item 1 of xs"),
+    ("ys[0]", "item 1 of ys"),
     ("every builds.version", "every builds.version"),
     ("every builds[0].tests", "every builds[0].tests"),
     (

@@ -318,7 +318,7 @@ fn each_of_entries<'a>(
     if object.outcome == Outcome::NotAnObject || alias_is_not_an_object {
         return Read::Failed(Cause::NotAnObject);
     }
-    let met = keyed_met(env, path, anc);
+    let met = keyed_met(env, path, source, anc);
     let unread = match (object.outcome, object.value) {
         _ if met.is_some() => Some(Cause::Unusable),
         (Outcome::Found, Some(Value::Object(_))) => None,
@@ -483,24 +483,61 @@ fn type_word(value: &Value) -> &'static str {
     }
 }
 
+struct Note {
+    msg: String,
+    items: Vec<(Vec<walk::Seg>, Value, Location)>,
+}
+
+impl Note {
+    fn brokens(self, root: &str, child: bool) -> Vec<Broken> {
+        let mut out: Vec<Broken> = self
+            .items
+            .into_iter()
+            .map(|(segs, value, at)| Broken {
+                msg: String::new(),
+                rank: 1,
+                listed: true,
+                path: start_name(&segs, root, child),
+                order: segs,
+                cause: Cause::Unusable,
+                value,
+                location: Some(at.render()),
+            })
+            .collect();
+        out.push(note_broken(self.msg));
+        out
+    }
+}
+
 fn types_note<'v>(
-    values: impl Iterator<Item = (Vec<walk::Seg>, &'v Value)>,
+    values: impl Iterator<Item = (Vec<walk::Seg>, &'v Value, Location)>,
     root: &str,
     child: bool,
-) -> Option<String> {
+    plain: bool,
+) -> Option<Note> {
     let mut seen: Vec<&'static str> = Vec::new();
     let mut said: Vec<String> = Vec::new();
-    for (segs, value) in values {
+    let mut items = Vec::new();
+    for (segs, value, at) in values {
         if value.is_null() {
             continue;
         }
         let word = type_word(value);
         if !seen.contains(&word) {
             seen.push(word);
-            said.push(format!("{} is {word}", from_item_name(&segs, root, child)));
+            let name = if plain {
+                start_name(&segs, root, child)
+            } else {
+                from_item_name(&segs, root, child)
+            };
+            said.push(format!("{name} is {word}"));
+            items.push((segs, value.clone(), at));
         }
     }
-    (said.len() > 1).then(|| said.join(", "))
+    (said.len() > 1).then(|| Note {
+        msg: said.join(", "),
+        items,
+    })
 }
 
 fn root_name(child: bool, anc: &[Anc]) -> String {
@@ -546,6 +583,29 @@ fn found_list(path: &Path, j: usize, ctx: &Ctx) -> bool {
     read.outcome == Outcome::Found && matches!(read.value, Some(Value::Array(_)))
 }
 
+fn named_steps(steps: &[Step]) -> usize {
+    steps
+        .iter()
+        .filter(|step| !matches!(step, Step::Index(_)))
+        .count()
+}
+
+fn keyed_message(env: &Env, source: &Source, anc: &[Anc]) -> Option<String> {
+    match source {
+        Source::Root {
+            path,
+            each_of: Some(_),
+            ..
+        }
+        | Source::Child {
+            path,
+            each_of: Some(_),
+            ..
+        } => keyed_met(env, path, source, anc),
+        _ => None,
+    }
+}
+
 fn plain_met(env: &Env, source: &Source, anc: &[Anc]) -> Option<(usize, String)> {
     let (path, names, every_text, child) = match source {
         Source::Root {
@@ -570,12 +630,7 @@ fn plain_met(env: &Env, source: &Source, anc: &[Anc]) -> Option<(usize, String)>
         return None;
     }
     let path = &flat_path(path);
-    let named_steps = path
-        .steps
-        .iter()
-        .filter(|step| !matches!(step, Step::Index(_)))
-        .count();
-    let named_start = child || names > named_steps;
+    let named_start = child || names > named_steps(&path.steps);
     let ctx = context(env, input_root(env), anc);
     let n = path.steps.len();
     let at = (0..=n).find(|&j| {
@@ -591,13 +646,22 @@ fn plain_met(env: &Env, source: &Source, anc: &[Anc]) -> Option<(usize, String)>
     ))
 }
 
-fn keyed_met(env: &Env, path: &Path, anc: &[Anc]) -> Option<String> {
+fn keyed_met(env: &Env, path: &Path, source: &Source, anc: &[Anc]) -> Option<String> {
+    let names = match source {
+        Source::Root { names, .. } | Source::Child { names, .. } => *names,
+    };
     let path = &flat_path(path);
     let child = matches!(path.start, Start::Alias(_));
+    let named_start = child || names > named_steps(&path.steps);
     let ctx = context(env, input_root(env), anc);
     let n = path.steps.len();
-    let at = (1..=n).find(|&j| {
-        (j == n || !matches!(path.steps[j], Step::Index(_))) && found_list(path, j, &ctx)
+    let at = (0..=n).find(|&j| {
+        let point = if j == 0 {
+            named_start && !matches!(path.steps.first(), Some(Step::Index(_)))
+        } else {
+            j == n || !matches!(path.steps[j], Step::Index(_))
+        };
+        point && found_list(path, j, &ctx)
     })?;
     let segs = resolved_segs(&path.steps[..at], &ctx)?;
     let name = start_name(&segs, &root_name(child, anc), child);
@@ -606,22 +670,28 @@ fn keyed_met(env: &Env, path: &Path, anc: &[Anc]) -> Option<String> {
     ))
 }
 
-fn plain_types(read: &path::Read, path: &Path, ctx: &Ctx, anc: &[Anc]) -> Option<String> {
-    let Some(Value::Array(items)) = read.value else {
-        return None;
+fn plain_types(read: &path::Read, path: &Path, ctx: &Ctx, anc: &[Anc]) -> Vec<Broken> {
+    let (Some(Value::Array(items)), Some(location)) = (read.value, read.location.as_ref()) else {
+        return Vec::new();
     };
     let path = &flat_path(path);
     let child = matches!(path.start, Start::Alias(_));
-    let segs = resolved_segs(&path.steps, ctx)?;
+    let Some(segs) = resolved_segs(&path.steps, ctx) else {
+        return Vec::new();
+    };
+    let root = root_name(child, anc);
     types_note(
         items.iter().enumerate().map(|(at, item)| {
             let mut here = segs.clone();
             here.push(walk::Seg::Index(at as u64));
-            (here, item)
+            (here, item, location.index(at as u64))
         }),
-        &root_name(child, anc),
+        &root,
         child,
+        true,
     )
+    .map(|note| note.brokens(&root, child))
+    .unwrap_or_default()
 }
 
 #[derive(Clone)]
@@ -632,12 +702,20 @@ enum Fv<'a> {
 }
 
 #[derive(Clone)]
+struct Why {
+    segs: Vec<walk::Seg>,
+    value: Value,
+    kind: &'static str,
+}
+
+#[derive(Clone)]
 struct Fe<'a> {
     segs: Vec<walk::Seg>,
     item: usize,
     v: Fv<'a>,
     listed: bool,
     at: Location,
+    why: Option<Why>,
 }
 
 fn fv_gone(v: &Fv) -> bool {
@@ -680,16 +758,35 @@ fn fl_read<'a>(e: &Fe<'a>, seg: &walk::Seg) -> Fe<'a> {
         (Fv::Absent | Fv::Val(Value::Null), _) => (Fv::Absent, e.at.clone()),
         _ => (Fv::Unusable, e.at.clone()),
     };
+    let why = match (&e.v, seg) {
+        (Fv::Unusable, _) => e.why.clone(),
+        (Fv::Val(value), walk::Seg::Key(_)) if !value.is_object() && !value.is_null() => {
+            Some(Why {
+                segs: e.segs.clone(),
+                value: (*value).clone(),
+                kind: "an object",
+            })
+        }
+        (Fv::Val(value), walk::Seg::Index(_)) if !value.is_array() && !value.is_null() => {
+            Some(Why {
+                segs: e.segs.clone(),
+                value: (*value).clone(),
+                kind: "a list",
+            })
+        }
+        _ => None,
+    };
     Fe {
         segs,
         item: e.item,
         v,
         listed: false,
         at,
+        why,
     }
 }
 
-fn mixed_note(list: &Fe, other: &Fe, root: &str, child: bool) -> String {
+fn mixed_note(list: &Fe, other: &Fe, root: &str, child: bool) -> Note {
     let field = steps_name(&list.segs[list.item..]);
     let first = from_item_name(&list.segs[..list.item], root, child);
     let second = from_item_name(&other.segs[..other.item], root, child);
@@ -705,10 +802,16 @@ fn mixed_note(list: &Fe, other: &Fe, root: &str, child: bool) -> String {
         }
         _ => second,
     };
-    format!(
-        "{field} is a list in {first} but {} in {shown_second}",
-        value::literal_text(&fv_shown(&other.v))
-    )
+    Note {
+        msg: format!(
+            "{field} is a list in {first} but {} in {shown_second}",
+            ops::message::print(&fv_shown(&other.v))
+        ),
+        items: vec![
+            (list.segs.clone(), fv_shown(&list.v), list.at.clone()),
+            (other.segs.clone(), fv_shown(&other.v), other.at.clone()),
+        ],
+    }
 }
 
 fn fl_broken(e: &Fe, cause: Cause, root: &str, child: bool) -> Broken {
@@ -718,8 +821,16 @@ fn fl_broken(e: &Fe, cause: Cause, root: &str, child: bool) -> Broken {
     } else {
         "a list or an object"
     };
+    let msg = match &e.why {
+        Some(why) => ops::message::isnt(
+            &from_item_name(&why.segs, root, child),
+            &why.value,
+            why.kind,
+        ),
+        None => ops::message::stated(&from_item_name(&e.segs, root, child), cause, &shown, kind),
+    };
     Broken {
-        msg: ops::message::stated(&from_item_name(&e.segs, root, child), cause, &shown, kind),
+        msg,
         rank: 0,
         listed: true,
         order: e.segs.clone(),
@@ -756,9 +867,10 @@ fn fl_walk<'a>(
         v: Fv::Val(base.value),
         listed: false,
         at: base.location.clone(),
+        why: None,
     }];
     let mut broken: Vec<Broken> = Vec::new();
-    let mut notes: Vec<String> = Vec::new();
+    let mut notes: Vec<Note> = Vec::new();
     let mut any = false;
     for i in 0..=n {
         let seg = segs.get(i);
@@ -786,6 +898,7 @@ fn fl_walk<'a>(
                         v: Fv::Val(item),
                         listed: true,
                         at: e.at.index(j as u64),
+                        why: None,
                     });
                 }
             } else if lists && fv_gone(&e.v) {
@@ -800,11 +913,22 @@ fn fl_walk<'a>(
         };
         let mut next = Vec::new();
         for x in expanded {
-            let not_an_object = matches!(seg, walk::Seg::Key(_))
+            let item_read = matches!(seg, walk::Seg::Key(_))
                 && x.listed
                 && matches!(x.v, Fv::Val(v) if !v.is_object() && !v.is_null());
-            if not_an_object {
-                broken.push(fl_broken(&x, Cause::NotAnObject, root, child));
+            if item_read {
+                let cause = if fv_list(&x.v) {
+                    Cause::NotAnObject
+                } else {
+                    Cause::Unusable
+                };
+                let mut said = x.clone();
+                said.why = Some(Why {
+                    segs: x.segs.clone(),
+                    value: fv_shown(&x.v),
+                    kind: "an object",
+                });
+                broken.push(fl_broken(&said, cause, root, child));
             } else {
                 next.push(fl_read(&x, seg));
             }
@@ -823,16 +947,28 @@ fn fl_walk<'a>(
     }
     if let Some(note) = types_note(
         kept.iter().filter_map(|e| match e.v {
-            Fv::Val(value) => Some((e.segs.clone(), value)),
+            Fv::Val(value) => Some((e.segs.clone(), value, e.at.clone())),
             _ => None,
         }),
         root,
         child,
+        false,
     ) {
         notes.push(note);
     }
+    for note in notes {
+        broken.extend(note.brokens(root, child));
+    }
     broken.sort_by(|a, b| a.order.cmp(&b.order));
-    broken.extend(notes.into_iter().map(note_broken));
+    broken.dedup_by(|a, b| {
+        a.listed
+            && b.listed
+            && a.msg.is_empty()
+            && a.order == b.order
+            && a.cause == b.cause
+            && a.value == b.value
+            && a.location == b.location
+    });
     let entries = kept
         .into_iter()
         .filter_map(|e| match e.v {
@@ -1104,19 +1240,7 @@ fn read_entries<'a>(
             match read.outcome {
                 Outcome::Found => match plain_entries(&read, scalar_ok) {
                     Ok(entries) => {
-                        let broken = plain_types(&read, path, &ctx, anc)
-                            .map(|msg| Broken {
-                                msg,
-                                rank: 1,
-                                listed: false,
-                                order: Vec::new(),
-                                path: String::new(),
-                                cause: Cause::Unusable,
-                                value: Value::Null,
-                                location: None,
-                            })
-                            .into_iter()
-                            .collect();
+                        let broken = plain_types(&read, path, &ctx, anc);
                         Read::Entries { entries, broken }
                     }
                     Err(cause) => Read::Failed(cause),
@@ -1266,7 +1390,12 @@ fn target_message(
             Value::Null => return Some(format!("{root} is null")),
             Value::Object(_) | Value::Array(_) => {}
             _ => {
-                return Some(ops::message::isnt(&root, doc, "a list or an object"));
+                let kind = if cause == Cause::NotAnObject {
+                    "an object"
+                } else {
+                    "a list or an object"
+                };
+                return Some(ops::message::isnt(&root, doc, kind));
             }
         }
     }
@@ -1366,7 +1495,7 @@ fn target_message(
             if parent.is_array() || parent.is_object() {
                 return None;
             }
-            Some(ops::message::isnt(&root, parent, "a list or an object"))
+            Some(ops::message::isnt(&root, parent, "an object"))
         }
         _ => None,
     }
@@ -1419,6 +1548,7 @@ fn from_message(
 ) -> Option<String> {
     ref_message(env, lowered, anc, cause)
         .or_else(|| plain_met(env, &lowered.source, anc).map(|(_, said)| said))
+        .or_else(|| keyed_message(env, &lowered.source, anc))
         .or_else(|| walk_message(env, empty, lowered, anc))
         .or_else(|| target_message(env, empty, &lowered.source, anc, cause))
 }
@@ -1805,6 +1935,19 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     {
         min.message = Some(said);
     }
+    if !every
+        && env.unreadable.is_empty()
+        && min.cause != Cause::Satisfied
+        && broken.iter().any(|b| b.listed && b.rank == 1)
+    {
+        min.failed_items = Some(Value::Array(
+            broken
+                .iter()
+                .filter(|b| b.listed && b.rank == 1)
+                .map(Broken::to_json)
+                .collect(),
+        ));
+    }
     if every {
         let listed = if env.unreadable.is_empty() {
             broken
@@ -2042,7 +2185,9 @@ fn descend<'a>(
             ..
         }
     );
-    if !keyed_child && let Some(cause) = Cause::worst(broken.iter().map(|b| b.cause)) {
+    if !keyed_child
+        && let Some(cause) = Cause::worst(broken.iter().filter(|b| b.rank == 0).map(|b| b.cause))
+    {
         return vec![failed_level(env, anc, cause, anc.is_empty())];
     }
     let mut out = Vec::new();
@@ -2521,8 +2666,11 @@ mod tests {
         assert_eq!(
             min["failed_items"],
             json!([
+                {"path": "arts[0].prs", "item": "arts[0].prs", "cause": "unusable", "value": [{"u": 1}], "locations": ["/arts/0/prs"]},
+                {"path": "item 1 of arts[0].prs", "item": "item 1 of arts[0].prs", "cause": "unusable", "value": {"u": 1}, "locations": ["/arts/0/prs/0"]},
                 {"path": "arts[1].prs", "item": "arts[1].prs", "cause": "absent", "value": null, "locations": ["/arts/1"]},
-                {"path": "arts[2].prs", "item": "arts[2].prs", "cause": "null", "value": null, "locations": ["/arts/2/prs"]}
+                {"path": "arts[2].prs", "item": "arts[2].prs", "cause": "null", "value": null, "locations": ["/arts/2/prs"]},
+                {"path": "arts[3].prs", "item": "arts[3].prs", "cause": "unusable", "value": "none", "locations": ["/arts/3/prs"]}
             ])
         );
         assert_eq!(

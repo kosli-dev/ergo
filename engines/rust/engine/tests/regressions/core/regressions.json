@@ -44741,7 +44741,37 @@
         {
           "cause": "unusable",
           "check": "$min_subjects",
-          "failed_items": [],
+          "failed_items": [
+            {
+              "cause": "unusable",
+              "item": "item 1 of g",
+              "locations": [
+                "/g/0"
+              ],
+              "path": "item 1 of g",
+              "value": "s"
+            },
+            {
+              "cause": "unusable",
+              "item": "item 2 of g",
+              "locations": [
+                "/g/1"
+              ],
+              "path": "item 2 of g",
+              "value": 1
+            },
+            {
+              "cause": "unusable",
+              "item": "item 4 of g",
+              "locations": [
+                "/g/3"
+              ],
+              "path": "item 4 of g",
+              "value": [
+                1
+              ]
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -44754,13 +44784,13 @@
               "value": 4
             }
           ],
+          "message": "item 1 of g is text, item 2 of g is a number, item 4 of g is a list",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
             "type": "d"
-          },
-          "message": "item 1 of g is text, item 2 of g is a number, item 4 of g is a list"
+          }
         },
         {
           "cause": "satisfied",
@@ -44791,13 +44821,13 @@
               "value": null
             }
           ],
+          "message": "d is \"s\", which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": "s",
             "type": "d"
-          },
-          "message": "d is \"s\", which isn't an object"
+          }
         },
         {
           "cause": "not_an_object",
@@ -44811,13 +44841,13 @@
               "value": null
             }
           ],
+          "message": "d is 1, which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": 1,
             "type": "d"
-          },
-          "message": "d is 1, which isn't an object"
+          }
         },
         {
           "cause": "not_an_object",
@@ -44831,13 +44861,13 @@
               "value": null
             }
           ],
+          "message": "d is null, which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
             "type": "d"
-          },
-          "message": "d is null, which isn't an object"
+          }
         },
         {
           "cause": "not_an_object",
@@ -44851,6 +44881,7 @@
               "value": null
             }
           ],
+          "message": "d is [1], which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -44858,8 +44889,7 @@
               1
             ],
             "type": "d"
-          },
-          "message": "d is [1], which isn't an object"
+          }
         }
       ],
       "subjects": {
@@ -45196,7 +45226,7 @@
           "check": "$min_subjects",
           "failed_items": [
             {
-              "cause": "not_an_object",
+              "cause": "unusable",
               "item": "item 1 of g",
               "locations": [
                 "/g/0"
@@ -45205,7 +45235,7 @@
               "value": "s"
             },
             {
-              "cause": "not_an_object",
+              "cause": "unusable",
               "item": "item 2 of g",
               "locations": [
                 "/g/1"
@@ -45241,13 +45271,13 @@
               "value": 0
             }
           ],
+          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; and 1 more",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
             "type": "d"
-          },
-          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; and 1 more"
+          }
         },
         {
           "cause": "satisfied",
@@ -45409,7 +45439,7 @@
           "check": "$min_subjects",
           "failed_items": [
             {
-              "cause": "not_an_object",
+              "cause": "unusable",
               "item": "item 1 of g",
               "locations": [
                 "/g/0"
@@ -45418,7 +45448,7 @@
               "value": "s"
             },
             {
-              "cause": "not_an_object",
+              "cause": "unusable",
               "item": "item 2 of g",
               "locations": [
                 "/g/1"
@@ -45454,13 +45484,13 @@
               "value": 0
             }
           ],
+          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; and 1 more",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
             "type": "d"
-          },
-          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; and 1 more"
+          }
         },
         {
           "cause": "satisfied",
@@ -45531,7 +45561,7 @@
         "r": {
           "causes": [
             {
-              "cause": "not_an_object",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -45592,11 +45622,11 @@
           }
         },
         {
-          "cause": "not_an_object",
+          "cause": "unusable",
           "check": "$min_subjects",
           "failed_items": [
             {
-              "cause": "not_an_object",
+              "cause": "unusable",
               "item": "item 2 of g",
               "locations": [
                 "/g/1"
@@ -45614,13 +45644,13 @@
               "value": 1
             }
           ],
+          "message": "item 2 of g is \"s\", which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
             "type": "d"
-          },
-          "message": "item 2 of g is \"s\", which isn't an object"
+          }
         },
         {
           "cause": "satisfied",
@@ -46065,7 +46095,7 @@
         "r": {
           "causes": [
             {
-              "cause": "not_an_object",
+              "cause": "unusable",
               "rows": 1
             }
           ],
@@ -46126,11 +46156,11 @@
           }
         },
         {
-          "cause": "not_an_object",
+          "cause": "unusable",
           "check": "$min_subjects",
           "failed_items": [
             {
-              "cause": "not_an_object",
+              "cause": "unusable",
               "item": "item 1 of g",
               "locations": [
                 "/g/0"
@@ -46146,13 +46176,13 @@
               "value": 0
             }
           ],
+          "message": "item 1 of g is \"s\", which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
             "type": "d"
-          },
-          "message": "item 1 of g is \"s\", which isn't an object"
+          }
         },
         {
           "cause": "satisfied",
