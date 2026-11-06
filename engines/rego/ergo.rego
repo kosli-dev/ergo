@@ -629,12 +629,10 @@ _every_from(req) if {
 	m in object.get(data.ergo_subject_sentences, "every", set())
 }
 
-_every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e)} | some e in w.items; _every_kept(e, last)], "fails": array.concat(array.concat(w.fails, _walk_stop(w)), [object.union(_every_end_fail(e), {"at": _walk_at(w, e)}) | some e in w.items; not _every_kept(e, last)])} if {
+_every_walk(doc, keys) := {"subjects": [{"subject": e.v, "at": _walk_at(w, e)} | some e in w.items; last], "fails": array.concat(array.concat(w.fails, _walk_stop(w)), [object.union(_every_end_fail(e), {"at": _walk_at(w, e)}) | some e in w.items; not last])} if {
 	w := _walk({"c": [], "v": doc, "i": null, "iv": null, "r": [], "a": _doc_at}, keys, true)
 	last := count(keys) in w.walked
 }
-
-_every_kept(_, true)
 
 _every_end_fail(e) := {"path": e.c, "item": e.c, "cause": _walk_stop_state(e.v), "value": _walk_shown(e.v)}
 
@@ -671,12 +669,16 @@ _fl_full_walk(doc, keys) := r if {
 	r := _fl_result(doc, keys, [l0, l1, l2, l3, l4, l5, l6, l7, l8, l9, l10], l10.next)
 }
 
-_fl_result(doc, keys, levels, ends) := {"subjects": [{"subject": e.v, "at": _joined(_doc_at, e.c)} | some e in kept], "fails": [object.union(f, {"at": _pointer(_doc_at, doc, f.path)}) | some f in fails], "notes": array.concat([n | some l in levels; some n in l.notes], _fl_type_note(kept))} if {
+_fl_result(doc, keys, levels, ends) := {"subjects": [{"subject": e.v, "at": _joined(_doc_at, e.c)} | some e in kept], "fails": [_fl_at(doc, f) | some f in fails], "notes": [_fl_note_at(doc, n) | some n in array.concat([n | some l in levels; some n in l.notes], _fl_type_note(kept))]} if {
 	some l in levels
 	l.lists
 	kept := [e | some e in ends; _fl_kept_end(e)]
 	fails := array.concat([f | some l in levels; some f in l.fails], [_fl_fail(e, _walk_state(e.v)) | some e in ends; not _fl_kept_end(e)])
 } else := object.union(_every_walk(doc, keys), {"notes": []})
+
+_fl_at(doc, f) := object.union(f, {"at": _pointer(_doc_at, doc, f.path)})
+
+_fl_note_at(doc, n) := object.union(n, {"items": [_fl_at(doc, f) | some f in n.items]})
 
 _fl_level(es, keys, i) := {"next": es, "fails": [], "lists": false, "notes": []} if i > count(keys)
 
@@ -685,7 +687,7 @@ _fl_level(es, keys, i) := {"next": next, "fails": array.concat(gone, bad), "list
 	lists := _fl_lists_here(es, keys, i)
 	gone := [_fl_fail(e, _walk_state(e.v)) | some e in es; _fl_dropped(e, lists)]
 	expanded := [x | some e in es; not _fl_dropped(e, lists); some x in _fl_expand(e, lists)]
-	bad := [_fl_fail(x, "not_an_object") | some x in expanded; _fl_list_item_read(x, keys, i)]
+	bad := [_fl_item_fail(x) | some x in expanded; _fl_list_item_read(x, keys, i)]
 	next := [_fl_step(x, keys, i) | some x in expanded; not _fl_list_item_read(x, keys, i)]
 }
 
@@ -711,7 +713,7 @@ _fl_gone(v) if _walk_marked(v)
 
 _fl_gone(null)
 
-_fl_expand(e, lists) := [{"c": array.concat(e.c, [j]), "i": array.concat(e.c, [j]), "v": x, "x": true} | some j, x in e.v] if {
+_fl_expand(e, lists) := [{"c": array.concat(e.c, [j]), "i": array.concat(e.c, [j]), "v": x, "x": true, "w": null} | some j, x in e.v] if {
 	lists
 	is_array(e.v)
 } else := [e]
@@ -726,9 +728,39 @@ _fl_list_item_read(x, keys, i) if {
 
 _fl_step(x, keys, i) := x if i >= count(keys)
 
-_fl_step(x, keys, i) := {"c": array.concat(x.c, [keys[i]]), "i": x.i, "v": _walk_read(x.v, keys[i]), "x": false} if i < count(keys)
+_fl_step(x, keys, i) := {"c": array.concat(x.c, [keys[i]]), "i": x.i, "v": _walk_read(x.v, keys[i]), "x": false, "w": _fl_why(x, keys[i])} if i < count(keys)
 
-_fl_fail(e, cause) := {"path": e.c, "item": e.c, "cause": cause, "value": _walk_shown(e.v)}
+_fl_why(x, k) := x.w if {
+	_walk_marked(x.v)
+	_is_key(k)
+} else := {"path": x.c, "value": x.v, "kind": _fl_wanted(k)} if {
+	not _fl_readable(x.v, k)
+	x.v != null
+} else := null
+
+_fl_wanted(k) := "an object" if is_string(k)
+
+else := "a list"
+
+_fl_readable(v, k) if {
+	is_string(k)
+	is_object(v)
+}
+
+_fl_readable(v, k) if {
+	is_number(k)
+	is_array(v)
+}
+
+_fl_fail(e, cause) := {"path": e.c, "item": e.c, "cause": cause, "value": _walk_shown(e.v), "why": e.w}
+
+_fl_item_fail(x) := {"path": x.c, "item": x.c, "cause": _fl_item_cause(x.v), "value": x.v, "why": {"path": x.c, "value": x.v, "kind": "an object"}}
+
+_fl_item_cause(v) := "not_an_object" if is_array(v)
+
+else := "unusable"
+
+_fl_note_item(path, v) := {"path": path, "item": path, "cause": "unusable", "value": v}
 
 _fl_kept_end(e) if {
 	not _walk_marked(e.v)
@@ -740,17 +772,18 @@ _fl_kept_end(e) if {
 	e.x
 }
 
-_fl_mixed_note(es, lists) := [{"list": ls[0], "other": os[0]}] if {
+_fl_mixed_note(es, lists) := [{"list": ls[0], "other": os[0], "items": [_fl_note_item(ls[0].c, ls[0].v), _fl_note_item(os[0].c, os[0].v)]}] if {
 	lists
 	ls := [e | some e in es; is_array(e.v)]
 	os := [e | some e in es; not is_array(e.v); not _fl_gone(e.v)]
 	count(os) > 0
 } else := []
 
-_fl_type_note(kept) := [{"types": [typed[k] | some k in ks]}] if {
-	typed := [[_fl_type(e.v), e.c] | some e in kept; e.v != null]
+_fl_type_note(kept) := [{"types": types, "items": [_fl_note_item(t[1], t[2]) | some t in types]}] if {
+	typed := [[_fl_type(e.v), e.c, e.v] | some e in kept; e.v != null]
 	ks := sort({min({i | some i, x in typed; x[0] == t}) | some t in {x[0] | some x in typed}})
 	count(ks) > 1
+	types := [typed[k] | some k in ks]
 } else := []
 
 _fl_type(v) := "an object" if is_object(v)
@@ -763,19 +796,24 @@ else := "a number" if is_number(v)
 
 else := "true or false"
 
-_fl_plain_types(doc, req) := [{"types": [typed[k] | some k in ks]}] if {
+_fl_plain_types(doc, req) := [{"types": types, "plain": true, "items": [_fl_at(doc, _fl_note_item(t[1], t[2])) | some t in types]}] if {
 	coll := _target(doc, req)
 	is_array(coll)
 	count({_fl_type(x) | some x in coll; x != null}) > 1
 	not _every_from(req)
 	not _keys_step(req)
 	keys := _from_keys(req)
-	typed := [[_fl_type(x), array.concat(keys, [i])] | some i, x in coll; x != null]
+	typed := [[_fl_type(x), array.concat(keys, [i]), x] | some i, x in coll; x != null]
 	ks := sort({min({i | some i, x in typed; x[0] == t}) | some t in {x[0] | some x in typed}})
 	count(ks) > 1
+	types := [typed[k] | some k in ks]
 }
 
-_fl_note_text(req, n) := concat(", ", [concat("", [_m_from_item_name(req, t[1]), " is ", t[0]]) | some t in n.types]) if "types" in object.keys(n)
+_fl_note_text(req, n) := concat(", ", [concat("", [_fl_type_name(req, n, t[1]), " is ", t[0]]) | some t in n.types]) if "types" in object.keys(n)
+
+_fl_type_name(req, n, path) := _visible_path_name(_visible(path), _m_from_root(req)) if object.get(n, "plain", false) == true
+
+else := _m_from_item_name(req, path)
 
 _fl_note_text(req, n) := concat("", [_fl_field_name(n.list), " is a list in ", a, " but ", _literal_text(n.other.v), " in ", _fl_other_item(a, b)]) if {
 	"list" in object.keys(n)
@@ -845,9 +883,21 @@ _fl_met_at(doc, req) := js[0] if {
 _fl_keyed_met_at(doc, req) := js[0] if {
 	_keys_step(req)
 	keys := _from_keys(req)
-	js := [j | some j in numbers.range(1, count(keys)); j > 0; _fl_point(keys, j, req); is_array(_fl_value_at(doc, keys, j))]
+	js := [j | some j in numbers.range(0, count(keys)); _fl_keyed_point(keys, j, req); is_array(_fl_value_at(doc, keys, j))]
 	count(js) > 0
 }
+
+_fl_keyed_point(keys, j, req) if {
+	j > 0
+	_fl_point(keys, j, req)
+}
+
+_fl_keyed_point(keys, 0, req) if {
+	_fl_named_start(req)
+	not _fl_index_first(keys)
+}
+
+_fl_index_first(keys) if _index_step(keys[0])
 
 _fl_list_name(req, 0) := _m_from_root(req)
 
@@ -857,8 +907,35 @@ _fl_plain_message(doc, req) := concat("", [_fl_list_name(req, j), " is a list: w
 	j := _fl_met_at(doc, req)
 } else := concat("", [_fl_list_name(req, j), " is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it"]) if {
 	j := _fl_keyed_met_at(doc, req)
-} else := _fl_note_text(req, n) if {
+} else := _fl_note_text(req, _fl_plain_typed(doc, req))
+
+_fl_plain_typed(doc, req) := n if {
+	not _from_unreadable(req)
+	not _fl_met_at(doc, req)
+	_target_state(doc, req) == "unusable"
 	[n] := _fl_plain_types(doc, req)
+}
+
+_fl_failed(doc, req) := array.concat(w.fails, [f | some n in w.notes; some f in n.items]) if w := _fl_broken(doc, _from_keys(req))
+
+_fl_items(req, fails) := [x |
+	some p in sort({f.path | some f in fails})
+	some x in {{"path": _fl_fail_name(req, f.path), "item": _fl_fail_name(req, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} | some f in fails; f.path == p}
+]
+
+_fl_fail_text(req, f) := _m_isnt(_m_from_item_name(req, f.why.path), f.why.value, f.why.kind) if is_object(object.get(f, "why", null))
+
+else := _m_named_fail(object.union(f, {"path": _m_from_item_name(req, f.path)}))
+
+_fl_typed_only(doc, req) if {
+	not _every_from(req)
+	_fl_plain_typed(doc, req)
+}
+
+_fl_typed_only(doc, req) if {
+	_every_from(req)
+	_walkable(doc)
+	_fl_broken(doc, _from_keys(req)).fails == []
 }
 
 _fl_fail_name(req, path) := _visible_path_name(_visible(path), _m_from_root(req)) if {
@@ -4888,17 +4965,14 @@ _min_subjects_row(doc, req, req_name, matching, at) := _m_from_row(doc, req, obj
 
 _m_from_row(doc, req, row) := object.union(row, _m_from_message(doc, req, row.passed, row.cause))
 
-_every_failed_items(doc, req) := {"failed_items": [{"path": _fl_fail_name(req, f.path), "item": _fl_fail_name(req, f.item), "cause": f.cause, "value": f.value, "locations": _fail_locations(f)} |
-	fails := _fl_broken(doc, _from_keys(req)).fails
-	some p in sort({f.path | some f in fails})
-	some f in fails
-	f.path == p
-]} if {
+_every_failed_items(doc, req) := {"failed_items": _fl_items(req, _fl_failed(doc, req))} if {
 	_every_from(req)
 	not _fl_parent_unread(doc, req)
 	_from_well_formed(req)
 	not _from_unreadable(req)
 } else := {"failed_items": []} if _every_from(req)
+
+else := {"failed_items": _fl_items(req, _fl_plain_typed(doc, req).items)} if _fl_plain_typed(doc, req)
 
 else := {}
 
@@ -5769,6 +5843,7 @@ _parent_pick(doc, req) := pick if {
 
 _parent_pick_of(doc, preq) := {"cause": c} if {
 	c := _target_cause(doc, preq)
+	not _fl_typed_only(doc, preq)
 } else := {"cause": _from_cause(preq)} if {
 	_from_well_formed(preq)
 	_from_unreadable(preq)
@@ -12892,10 +12967,15 @@ _m_from_message(doc, req, false, cause) := {"message": m} if {
 	m := _m_joined(ms)
 } else := {"message": m} if {
 	m := _fl_plain_message(doc, req)
+} else := {"message": _m_isnt(_m_from_root(req), doc, "an object")} if {
+	cause == "not_an_object"
+	_chained(req)
+	not _walkable(doc)
+	not _walk_gone(doc)
 } else := {"message": m} if {
 	_every_from(req)
 	w := _fl_broken(doc, _from_keys(req))
-	ms := array.concat([_m_named_fail(object.union(f, {"path": _m_from_item_name(req, f.path)})) | some p in sort({f.path | some f in w.fails}); some f in w.fails; f.path == p], [_fl_note_text(req, n) | some n in w.notes])
+	ms := array.concat([_fl_fail_text(req, f) | some p in sort({f.path | some f in w.fails}); some f in w.fails; f.path == p], [_fl_note_text(req, n) | some n in w.notes])
 	count(ms) > 0
 	m := _m_joined(ms)
 } else := {"message": m} if {

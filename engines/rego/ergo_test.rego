@@ -1176,7 +1176,7 @@ test_every_walks_that_start_at_a_list_input_read_the_lists_inside_its_items if {
 }
 
 test_every_walk_that_starts_at_a_list_input_fails_an_item_that_is_not_an_object_or_has_no_list if {
-	every doc, cause in {`[1]`: "not_an_object", `[{}]`: "absent", `[{"commits": null}]`: "null", `[{"commits": 1}, {"commits": [2]}]`: "unusable"} {
+	every doc, cause in {`[1]`: "unusable", `[[1]]`: "not_an_object", `[{}]`: "absent", `[{"commits": null}]`: "null", `[{"commits": 1}, {"commits": [2]}]`: "unusable"} {
 		req := {"s": object.union(min_subjects_req(1).s, {"from": "every commits"})}
 		[[r.passed, r.cause] | some r in rows_for(report(json.unmarshal(doc), req), "s", "$min_subjects")] == [[false, cause]]
 	}
@@ -6319,9 +6319,14 @@ test_a_chain_with_no_parent_or_an_unreadable_one_finds_no_subjects if {
 }
 
 test_a_child_under_a_parent_that_is_not_an_object_fails_min_subjects_as_not_an_object if {
-	every parent in ["x", 5, [1], true, null] {
+	every parent in ["x", 5, true, null] {
 		_chain_min_cause(_chain_report({"trail": {"artifacts": [parent]}}, _plain_chain, {"c": "url exists"}, {})) == [["not_an_object", {"type", "id", "in"}]]
 	}
+	_chain_min_cause(_chain_report({"trail": {"artifacts": [[[1]]]}}, _plain_chain, {"c": "url exists"}, {})) == [["not_an_object", {"type", "id", "in"}]]
+}
+
+test_a_child_read_with_every_under_a_list_parent_of_numbers_fails_min_subjects_as_unusable if {
+	_chain_min_cause(_chain_report({"trail": {"artifacts": [[1]]}}, _plain_chain, {"c": "url exists"}, {})) == [["unusable", {"type", "id", "in"}]]
 }
 
 test_a_child_under_an_object_parent_without_the_field_still_fails_min_subjects_as_absent if {
@@ -8633,12 +8638,15 @@ test_a_broken_branch_along_a_from_line_with_every_fails_min_subjects_with_the_wo
 	]}
 	rep := _from_report(doc, _every_prs, {"c": "approvals is at least 1"}, {})
 	[[r.passed, r.cause, r.failed_items] | some r in rep.results; r.check == "$min_subjects"] == [[false, "unusable", [
+		{"path": "artifacts[0].pull_requests", "item": "artifacts[0].pull_requests", "cause": "unusable", "value": [{"url": "pr/7", "approvals": 2}], "locations": ["/artifacts/0/pull_requests"]},
+		{"path": "item 1 of artifacts[0].pull_requests", "item": "item 1 of artifacts[0].pull_requests", "cause": "unusable", "value": {"url": "pr/7", "approvals": 2}, "locations": ["/artifacts/0/pull_requests/0"]},
 		{"path": "artifacts[1].pull_requests", "item": "artifacts[1].pull_requests", "cause": "absent", "value": null, "locations": ["/artifacts/1"]},
 		{"path": "artifacts[2].pull_requests", "item": "artifacts[2].pull_requests", "cause": "null", "value": null, "locations": ["/artifacts/2/pull_requests"]},
+		{"path": "artifacts[3].pull_requests", "item": "artifacts[3].pull_requests", "cause": "unusable", "value": "none", "locations": ["/artifacts/3/pull_requests"]},
 	]]]
 	[[r.subject.id, r.cause] | some r in rep.results; r.check == "c"] == [["pr/7", "satisfied"], ["none", "not_an_object"]]
 	rep.requirements.r.status == "not_met"
-	[[v.check, v.failed_items[0].path] | some v in ergo.violations(rep); v.check == "$min_subjects"] == [["$min_subjects", "artifacts[1].pull_requests"]]
+	[[v.check, v.failed_items[0].path] | some v in ergo.violations(rep); v.check == "$min_subjects"] == [["$min_subjects", "artifacts[0].pull_requests"]]
 	missing := _from_report({"artifacts": [{"pull_requests": [{"url": "pr/7"}]}, {}]}, _every_prs, {"c": "url exists"}, {})
 	[r.cause | some r in missing.results; r.check == "$min_subjects"] == ["absent"]
 	zero := ergo.report(doc, {"ergo_spec": "v0.6-dev", "subjects": _every_prs, "requirements": {"r": {"subject": "pull request", "min_subjects": 0, "checks": {"c": "url exists"}}}}, {})
@@ -8652,7 +8660,7 @@ test_a_from_line_with_every_fails_where_its_path_stops_as_every_does_in_a_check 
 	gone := _from_report({}, _every_prs, {"c": "x exists"}, {})
 	[[r.cause, r.failed_items[0].path] | some r in gone.results; r.check == "$min_subjects"] == [["absent", "artifacts"]]
 	ends := _from_report({"flows": [{"a": {"n": 1}}, {"a": "x"}]}, {"a": {"from": "every flows.a"}}, {"c": "n exists"}, {})
-	[[r.cause, [f.path | some f in r.failed_items]] | some r in ends.results; r.check == "$min_subjects"] == [["unusable", []]]
+	[[r.cause, [f.path | some f in r.failed_items]] | some r in ends.results; r.check == "$min_subjects"] == [["unusable", ["flows[0].a", "flows[1].a"]]]
 	[r.cause | some r in ends.results; r.check == "c"] == ["satisfied", "not_an_object"]
 }
 
