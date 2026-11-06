@@ -6572,15 +6572,8 @@
         "compliant": false,
         "results": [
           {
-            "requirement": "r",
-            "subject": {
-              "id": null,
-              "type": "s"
-            },
-            "check": "$min_subjects",
-            "message": "in-scope s count is 1",
-            "passed": false,
             "cause": "unusable",
+            "check": "$min_subjects",
             "inputs": [
               {
                 "locations": [
@@ -6589,18 +6582,18 @@
                 "name": "in-scope s count",
                 "value": 1
               }
-            ]
-          },
-          {
+            ],
+            "message": "$input is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
+            "passed": false,
             "requirement": "r",
             "subject": {
-              "id": "a",
+              "id": null,
               "type": "s"
-            },
-            "check": "c",
-            "message": "it is missing",
-            "passed": false,
+            }
+          },
+          {
             "cause": "value",
+            "check": "c",
             "inputs": [
               {
                 "locations": [
@@ -6609,7 +6602,14 @@
                 "name": "it",
                 "value": null
               }
-            ]
+            ],
+            "message": "it is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "a",
+              "type": "s"
+            }
           }
         ]
       },
@@ -12308,18 +12308,14 @@
             "check": "$well_formed",
             "inputs": [
               {
+                "locations": [],
                 "name": "count(checks)",
-                "value": 1,
-                "locations": [
-
-                ]
+                "value": 1
               },
               {
+                "locations": [],
                 "name": "require",
-                "value": "every",
-                "locations": [
-
-                ]
+                "value": "every"
               }
             ],
             "passed": true,
@@ -12334,32 +12330,67 @@
             "check": "$min_subjects",
             "failed_items": [
               {
+                "cause": "unusable",
+                "item": "artifacts[0].pull_requests",
+                "locations": [
+                  "/artifacts/0/pull_requests"
+                ],
+                "path": "artifacts[0].pull_requests",
+                "value": [
+                  {
+                    "approvals": 2,
+                    "url": "pr/7"
+                  }
+                ]
+              },
+              {
+                "cause": "unusable",
+                "item": "item 1 of artifacts[0].pull_requests",
+                "locations": [
+                  "/artifacts/0/pull_requests/0"
+                ],
+                "path": "item 1 of artifacts[0].pull_requests",
+                "value": {
+                  "approvals": 2,
+                  "url": "pr/7"
+                }
+              },
+              {
                 "cause": "absent",
                 "item": "artifacts[1].pull_requests",
-                "path": "artifacts[1].pull_requests",
-                "value": null,
                 "locations": [
                   "/artifacts/1"
-                ]
+                ],
+                "path": "artifacts[1].pull_requests",
+                "value": null
               },
               {
                 "cause": "null",
                 "item": "artifacts[2].pull_requests",
-                "path": "artifacts[2].pull_requests",
-                "value": null,
                 "locations": [
                   "/artifacts/2/pull_requests"
-                ]
+                ],
+                "path": "artifacts[2].pull_requests",
+                "value": null
+              },
+              {
+                "cause": "unusable",
+                "item": "artifacts[3].pull_requests",
+                "locations": [
+                  "/artifacts/3/pull_requests"
+                ],
+                "path": "artifacts[3].pull_requests",
+                "value": "none"
               }
             ],
             "inputs": [
               {
-                "name": "in-scope pull request count",
-                "value": 2,
                 "locations": [
                   "/artifacts/0/pull_requests/0",
                   "/artifacts/3/pull_requests"
-                ]
+                ],
+                "name": "in-scope pull request count",
+                "value": 2
               }
             ],
             "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; pull_requests is a list in item 1 of artifacts but \"none\" in item 4; and 1 more",
@@ -12375,11 +12406,9 @@
             "check": "$unique_ids",
             "inputs": [
               {
+                "locations": [],
                 "name": "repeated pull request ids",
-                "value": [],
-                "locations": [
-
-                ]
+                "value": []
               }
             ],
             "passed": true,
@@ -12394,11 +12423,11 @@
             "check": "c",
             "inputs": [
               {
-                "name": "approvals",
-                "value": 2,
                 "locations": [
                   "/artifacts/0/pull_requests/0/approvals"
-                ]
+                ],
+                "name": "approvals",
+                "value": 2
               }
             ],
             "passed": true,
@@ -12413,20 +12442,20 @@
             "check": "c",
             "inputs": [
               {
-                "name": "approvals",
-                "value": null,
                 "locations": [
                   "/artifacts/3/pull_requests"
-                ]
+                ],
+                "name": "approvals",
+                "value": null
               }
             ],
+            "message": "pull request is \"none\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
               "id": "none",
               "type": "pull request"
-            },
-            "message": "pull request is \"none\", which isn't an object"
+            }
           }
         ]
       },
@@ -12754,9 +12783,9 @@
         "requirements": {"r": {"subjects": {"matching": 1, "total": 2}}},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "releases is a list in item 2 of artifacts but 5 in item 1; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}, {"cause": "unusable", "item": "artifacts[1].releases", "locations": ["/artifacts/1/releases"], "path": "artifacts[1].releases", "value": [{"id": "r1", "n": 1}]}, {"cause": "unusable", "item": "item 1 of artifacts[1].releases", "locations": ["/artifacts/1/releases/0"], "path": "item 1 of artifacts[1].releases", "value": {"id": "r1", "n": 1}}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "releases is a list in item 2 of artifacts but 5 in item 1; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated k ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
-          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/artifacts/0/releases"], "name": "n", "value": null}], "passed": false, "requirement": "r", "subject": {"id": 5, "type": "k"}, "message": "k is 5, which isn't an object"},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/artifacts/0/releases"], "name": "n", "value": null}], "message": "k is 5, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": 5, "type": "k"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/artifacts/1/releases/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/1/releases/0/id"], "name": "id", "value": "r1"}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}}
         ]
@@ -12776,9 +12805,9 @@
         "requirements": {"r": {"subjects": {"matching": 1, "total": 2}}},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "releases is a list in item 2 of artifacts but 5 in item 1; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].releases", "locations": ["/artifacts/0/releases"], "path": "artifacts[0].releases", "value": 5}, {"cause": "unusable", "item": "artifacts[1].releases", "locations": ["/artifacts/1/releases"], "path": "artifacts[1].releases", "value": [{"id": "r1", "n": 1}]}, {"cause": "unusable", "item": "item 1 of artifacts[1].releases", "locations": ["/artifacts/1/releases/0"], "path": "item 1 of artifacts[1].releases", "value": {"id": "r1", "n": 1}}], "inputs": [{"locations": ["/artifacts/1/releases/0"], "name": "in-scope k count", "value": 1}], "message": "releases is a list in item 2 of artifacts but 5 in item 1; item 1 of artifacts: releases is a number, item 2 of artifacts: item 1 of releases is an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated k ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
-          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/artifacts/0/releases"], "name": "n", "value": null}], "passed": false, "requirement": "r", "subject": {"id": 5, "type": "k"}, "message": "k is 5, which isn't an object"},
+          {"cause": "not_an_object", "check": "$applies", "inputs": [{"locations": ["/artifacts/0/releases"], "name": "n", "value": null}], "message": "k is 5, which isn't an object", "passed": false, "requirement": "r", "subject": {"id": 5, "type": "k"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/artifacts/1/releases/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/1/releases/0/id"], "name": "id", "value": "r1"}], "passed": true, "requirement": "r", "subject": {"id": "r1", "type": "k"}}
         ]
@@ -17679,9 +17708,9 @@
         "rules": ["location.failed_items"],
         "input": {"artifacts": [{"pull_requests": [{"url": "pr/7", "approvals": 2}]}, {}, {"pull_requests": null}, {"pull_requests": "none"}]},
         "results": [
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "absent", "item": "artifacts[1].pull_requests", "locations": ["/artifacts/1"], "path": "artifacts[1].pull_requests", "value": null}, {"cause": "null", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2/pull_requests"], "path": "artifacts[2].pull_requests", "value": null}], "inputs": [{"locations": ["/artifacts/0/pull_requests/0", "/artifacts/3/pull_requests"], "name": "in-scope pull request count", "value": 2}], "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; pull_requests is a list in item 1 of artifacts but \"none\" in item 4; and 1 more", "passed": false, "requirement": "r", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "artifacts[0].pull_requests", "locations": ["/artifacts/0/pull_requests"], "path": "artifacts[0].pull_requests", "value": [{"approvals": 2, "url": "pr/7"}]}, {"cause": "unusable", "item": "item 1 of artifacts[0].pull_requests", "locations": ["/artifacts/0/pull_requests/0"], "path": "item 1 of artifacts[0].pull_requests", "value": {"approvals": 2, "url": "pr/7"}}, {"cause": "absent", "item": "artifacts[1].pull_requests", "locations": ["/artifacts/1"], "path": "artifacts[1].pull_requests", "value": null}, {"cause": "null", "item": "artifacts[2].pull_requests", "locations": ["/artifacts/2/pull_requests"], "path": "artifacts[2].pull_requests", "value": null}, {"cause": "unusable", "item": "artifacts[3].pull_requests", "locations": ["/artifacts/3/pull_requests"], "path": "artifacts[3].pull_requests", "value": "none"}], "inputs": [{"locations": ["/artifacts/0/pull_requests/0", "/artifacts/3/pull_requests"], "name": "in-scope pull request count", "value": 2}], "message": "item 2 of artifacts: pull_requests is missing; item 3 of artifacts: pull_requests is null; pull_requests is a list in item 1 of artifacts but \"none\" in item 4; and 1 more", "passed": false, "requirement": "r", "subject": {"id": null, "type": "pull request"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/artifacts/0/pull_requests/0/approvals"], "name": "approvals", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": "pr/7", "type": "pull request"}},
-          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/artifacts/3/pull_requests"], "name": "approvals", "value": null}], "passed": false, "requirement": "r", "subject": {"id": "none", "type": "pull request"}, "message": "pull request is \"none\", which isn't an object"}
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/artifacts/3/pull_requests"], "name": "approvals", "value": null}], "message": "pull request is \"none\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "none", "type": "pull request"}}
         ]
       }
     ]
@@ -17921,25 +17950,25 @@
         "compliant": false,
         "results": [
           {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope pull_request count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is \"x\", which isn't an object",
+            "passed": false,
             "requirement": "s",
             "subject": {
-              "type": "pull_request",
               "id": null,
               "in": {
                 "artifact": "x"
-              }
-            },
-            "check": "$min_subjects",
-            "message": "artifact is \"x\", which isn't a list or an object",
-            "passed": false,
-            "cause": "not_an_object",
-            "inputs": [
-              {
-                "name": "in-scope pull_request count",
-                "value": 0,
-                "locations": []
-              }
-            ]
+              },
+              "type": "pull_request"
+            }
           }
         ]
       },
@@ -17960,25 +17989,25 @@
         "compliant": false,
         "results": [
           {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope pull_request count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is 5, which isn't an object",
+            "passed": false,
             "requirement": "s",
             "subject": {
-              "type": "pull_request",
               "id": null,
               "in": {
                 "artifact": 5
-              }
-            },
-            "check": "$min_subjects",
-            "message": "artifact is 5, which isn't a list or an object",
-            "passed": false,
-            "cause": "not_an_object",
-            "inputs": [
-              {
-                "name": "in-scope pull_request count",
-                "value": 0,
-                "locations": []
-              }
-            ]
+              },
+              "type": "pull_request"
+            }
           }
         ]
       },
@@ -18042,25 +18071,25 @@
         "compliant": false,
         "results": [
           {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope pull_request count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is true, which isn't an object",
+            "passed": false,
             "requirement": "s",
             "subject": {
-              "type": "pull_request",
               "id": null,
               "in": {
                 "artifact": true
-              }
-            },
-            "check": "$min_subjects",
-            "message": "artifact is true, which isn't a list or an object",
-            "passed": false,
-            "cause": "not_an_object",
-            "inputs": [
-              {
-                "name": "in-scope pull_request count",
-                "value": 0,
-                "locations": []
-              }
-            ]
+              },
+              "type": "pull_request"
+            }
           }
         ]
       },
@@ -20463,48 +20492,48 @@
         "compliant": false,
         "results": [
           {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "pr is \"x\", which isn't an object",
+            "passed": false,
             "requirement": "s",
             "subject": {
-              "type": "k",
               "id": null,
               "in": {
                 "artifact": "a",
                 "pr": "x"
-              }
-            },
-            "check": "$min_subjects",
-            "message": "pr is \"x\", which isn't a list or an object",
-            "passed": false,
-            "cause": "not_an_object",
-            "inputs": [
-              {
-                "name": "in-scope k count",
-                "value": 0,
-                "locations": []
-              }
-            ]
+              },
+              "type": "k"
+            }
           },
           {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "pr is null",
+            "passed": false,
             "requirement": "s",
             "subject": {
-              "type": "k",
               "id": null,
               "in": {
                 "artifact": "a",
                 "pr": null
-              }
-            },
-            "check": "$min_subjects",
-            "message": "pr is null",
-            "passed": false,
-            "cause": "not_an_object",
-            "inputs": [
-              {
-                "name": "in-scope k count",
-                "value": 0,
-                "locations": []
-              }
-            ]
+              },
+              "type": "k"
+            }
           }
         ]
       }
@@ -20552,25 +20581,25 @@
         "compliant": false,
         "results": [
           {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is \"x\", which isn't an object",
+            "passed": false,
             "requirement": "s",
             "subject": {
-              "type": "k",
               "id": null,
               "in": {
                 "artifact": "x"
-              }
-            },
-            "check": "$min_subjects",
-            "message": "artifact is \"x\", which isn't a list or an object",
-            "passed": false,
-            "cause": "not_an_object",
-            "inputs": [
-              {
-                "name": "in-scope k count",
-                "value": 0,
-                "locations": []
-              }
-            ]
+              },
+              "type": "k"
+            }
           }
         ]
       },
@@ -20660,25 +20689,25 @@
         "compliant": false,
         "results": [
           {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is \"x\", which isn't an object",
+            "passed": false,
             "requirement": "s",
             "subject": {
-              "type": "k",
               "id": null,
               "in": {
                 "artifact": "x"
-              }
-            },
-            "check": "$min_subjects",
-            "message": "artifact is \"x\", which isn't a list or an object",
-            "passed": false,
-            "cause": "not_an_object",
-            "inputs": [
-              {
-                "name": "in-scope k count",
-                "value": 0,
-                "locations": []
-              }
-            ]
+              },
+              "type": "k"
+            }
           }
         ]
       },
@@ -20769,25 +20798,25 @@
         "compliant": false,
         "results": [
           {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is \"x\", which isn't an object",
+            "passed": false,
             "requirement": "s",
             "subject": {
-              "type": "k",
               "id": null,
               "in": {
                 "artifact": "x"
-              }
-            },
-            "check": "$min_subjects",
-            "message": "artifact is \"x\", which isn't a list or an object",
-            "passed": false,
-            "cause": "not_an_object",
-            "inputs": [
-              {
-                "name": "in-scope k count",
-                "value": 0,
-                "locations": []
-              }
-            ]
+              },
+              "type": "k"
+            }
           }
         ]
       },
@@ -20880,25 +20909,25 @@
         "compliant": false,
         "results": [
           {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope kid count",
+                "value": 0
+              }
+            ],
+            "message": "open is \"x\", which isn't an object",
+            "passed": false,
             "requirement": "s",
             "subject": {
-              "type": "kid",
               "id": null,
               "in": {
                 "open": "x"
-              }
-            },
-            "check": "$min_subjects",
-            "message": "open is \"x\", which isn't a list or an object",
-            "passed": false,
-            "cause": "not_an_object",
-            "inputs": [
-              {
-                "name": "in-scope kid count",
-                "value": 0,
-                "locations": []
-              }
-            ]
+              },
+              "type": "kid"
+            }
           }
         ]
       }
@@ -21224,10 +21253,12 @@
     },
     "cases": [
       {
-        "description": "fails min_subjects as unusable when the parents aren't all of one type, and gives no subject",
+        "description": "fails min_subjects as not_an_object under each parent, even with min_subjects 0, and gives no subject, though the parents aren't all of one type",
         "rules": [
           "subjects.chain.not_an_object",
-          "subjects.chain.count"
+          "subjects.chain.count",
+          "subjects.one_type.children",
+          "subjects.keyed.list_before"
         ],
         "input": {
           "artifacts": [
@@ -21246,7 +21277,7 @@
         "compliant": false,
         "results": [
           {
-            "cause": "unusable",
+            "cause": "not_an_object",
             "check": "$min_subjects",
             "inputs": [
               {
@@ -21255,11 +21286,100 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "artifact is \"s\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
               "id": null,
+              "in": {
+                "artifact": "s"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": null
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is 5, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": 5
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": [
+                  1
+                ]
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is true, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": true
+              },
               "type": "k"
             }
           }
@@ -21501,10 +21621,12 @@
     },
     "cases": [
       {
-        "description": "fails min_subjects as unusable when the parents aren't all of one type, and gives no subject",
+        "description": "fails min_subjects as not_an_object under each parent, even with min_subjects 0, and gives no subject, though the parents aren't all of one type",
         "rules": [
           "subjects.chain.not_an_object",
-          "subjects.chain.count"
+          "subjects.chain.count",
+          "subjects.one_type.children",
+          "subjects.keyed.list_before"
         ],
         "input": {
           "artifacts": [
@@ -21523,7 +21645,7 @@
         "compliant": false,
         "results": [
           {
-            "cause": "unusable",
+            "cause": "not_an_object",
             "check": "$min_subjects",
             "inputs": [
               {
@@ -21532,11 +21654,100 @@
                 "value": 0
               }
             ],
-            "message": "in-scope k count is 0",
+            "message": "artifact is \"s\", which isn't an object",
             "passed": false,
             "requirement": "r",
             "subject": {
               "id": null,
+              "in": {
+                "artifact": "s"
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": null
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is 5, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": 5
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": [
+                  1
+                ]
+              },
+              "type": "k"
+            }
+          },
+          {
+            "cause": "not_an_object",
+            "check": "$min_subjects",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "in-scope k count",
+                "value": 0
+              }
+            ],
+            "message": "artifact is true, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": null,
+              "in": {
+                "artifact": true
+              },
               "type": "k"
             }
           }
@@ -28026,7 +28237,7 @@
     "cases": [
       {
         "description": "fail min_subjects as unusable even with min_subjects 0, name the first value of each type, and are still listed and checked",
-        "rules": ["subjects.one_type"],
+        "rules": ["subjects.one_type", "subjects.failed_items"],
         "input": {"tags": ["a", {"x": 1}], "builds": [{"version": "1.0"}, {"version": {"v": 1}}], "nums": [1, 1.5]},
         "compliant": false,
         "results": [
@@ -28034,8 +28245,8 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "t", "subject": {"id": null, "type": "tag"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "v", "subject": {"id": null, "type": "version"}},
           {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/nums/0", "/nums/1"], "name": "in-scope number count", "value": 2}], "passed": true, "requirement": "n", "subject": {"id": null, "type": "number"}},
-          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": ["/tags/0", "/tags/1"], "name": "in-scope tag count", "value": 2}], "message": "item 1 of tags is text, item 2 of tags is an object", "passed": false, "requirement": "t", "subject": {"id": null, "type": "tag"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/builds/0/version", "/builds/1/version"], "name": "in-scope version count", "value": 2}], "message": "item 1 of builds: version is text, item 2 of builds: version is an object", "passed": false, "requirement": "v", "subject": {"id": null, "type": "version"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "item 1 of tags", "locations": ["/tags/0"], "path": "item 1 of tags", "value": "a"}, {"cause": "unusable", "item": "item 2 of tags", "locations": ["/tags/1"], "path": "item 2 of tags", "value": {"x": 1}}], "inputs": [{"locations": ["/tags/0", "/tags/1"], "name": "in-scope tag count", "value": 2}], "message": "item 1 of tags is text, item 2 of tags is an object", "passed": false, "requirement": "t", "subject": {"id": null, "type": "tag"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "builds[0].version", "locations": ["/builds/0/version"], "path": "builds[0].version", "value": "1.0"}, {"cause": "unusable", "item": "builds[1].version", "locations": ["/builds/1/version"], "path": "builds[1].version", "value": {"v": 1}}], "inputs": [{"locations": ["/builds/0/version", "/builds/1/version"], "name": "in-scope version count", "value": 2}], "message": "item 1 of builds: version is text, item 2 of builds: version is an object", "passed": false, "requirement": "v", "subject": {"id": null, "type": "version"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated number ids", "value": []}], "passed": true, "requirement": "n", "subject": {"id": null, "type": "number"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated tag ids", "value": []}], "passed": true, "requirement": "t", "subject": {"id": null, "type": "tag"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated version ids", "value": []}], "passed": true, "requirement": "v", "subject": {"id": null, "type": "version"}},
@@ -28132,8 +28343,8 @@
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "m", "subject": {"id": null, "type": "monitor"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "p", "subject": {"id": null, "type": "plain monitor"}},
-          {"cause": "not_an_object", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope monitor count", "value": 0}], "message": "deployment is \"d1\", which isn't a list or an object", "passed": false, "requirement": "m", "subject": {"id": null, "in": {"deployment": "d1"}, "type": "monitor"}},
-          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope plain monitor count", "value": 0}], "message": "deployment is \"d1\", which isn't a list or an object", "passed": false, "requirement": "p", "subject": {"id": null, "in": {"deployment": "d1"}, "type": "plain monitor"}},
+          {"cause": "not_an_object", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope monitor count", "value": 0}], "message": "deployment is \"d1\", which isn't an object", "passed": false, "requirement": "m", "subject": {"id": null, "in": {"deployment": "d1"}, "type": "monitor"}},
+          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope plain monitor count", "value": 0}], "message": "deployment is \"d1\", which isn't an object", "passed": false, "requirement": "p", "subject": {"id": null, "in": {"deployment": "d1"}, "type": "plain monitor"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated monitor ids", "value": []}], "passed": true, "requirement": "m", "subject": {"id": null, "in": {"deployment": "d1"}, "type": "monitor"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated plain monitor ids", "value": []}], "passed": true, "requirement": "p", "subject": {"id": null, "in": {"deployment": "d1"}, "type": "plain monitor"}}
         ]
@@ -28204,12 +28415,12 @@
     "cases": [
       {
         "description": "fails min_subjects as unusable, and its values are still listed and checked",
-        "rules": ["subjects.every.same"],
+        "rules": ["subjects.every.same", "subjects.failed_items"],
         "input": {"builds": [{"tags": ["a", "b"]}, {"tags": "c"}]},
         "compliant": false,
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "tag"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/builds/0/tags/0", "/builds/0/tags/1", "/builds/1/tags"], "name": "in-scope tag count", "value": 3}], "message": "tags is a list in item 1 of builds but \"c\" in item 2", "passed": false, "requirement": "s", "subject": {"id": null, "type": "tag"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "builds[0].tags", "locations": ["/builds/0/tags"], "path": "builds[0].tags", "value": ["a", "b"]}, {"cause": "unusable", "item": "builds[1].tags", "locations": ["/builds/1/tags"], "path": "builds[1].tags", "value": "c"}], "inputs": [{"locations": ["/builds/0/tags/0", "/builds/0/tags/1", "/builds/1/tags"], "name": "in-scope tag count", "value": 3}], "message": "tags is a list in item 1 of builds but \"c\" in item 2", "passed": false, "requirement": "s", "subject": {"id": null, "type": "tag"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated tag ids", "value": []}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "tag"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/builds/0/tags/0"], "name": "tag", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "tag"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/builds/0/tags/1"], "name": "tag", "value": "b"}], "passed": true, "requirement": "s", "subject": {"id": "b", "type": "tag"}},
@@ -28303,7 +28514,7 @@
         "compliant": false,
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "tag"}},
-          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0/ys/0/tags/0", "/xs/1/ys/0/tags"], "name": "in-scope tag count", "value": 2}], "message": "tags is a list in item 1 of xs: item 1 of ys but \"c\" in item 2 of xs: item 1 of ys", "passed": false, "requirement": "s", "subject": {"id": null, "type": "tag"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "xs[0].ys[0].tags", "locations": ["/xs/0/ys/0/tags"], "path": "xs[0].ys[0].tags", "value": ["a"]}, {"cause": "unusable", "item": "xs[1].ys[0].tags", "locations": ["/xs/1/ys/0/tags"], "path": "xs[1].ys[0].tags", "value": "c"}], "inputs": [{"locations": ["/xs/0/ys/0/tags/0", "/xs/1/ys/0/tags"], "name": "in-scope tag count", "value": 2}], "message": "tags is a list in item 1 of xs: item 1 of ys but \"c\" in item 2 of xs: item 1 of ys", "passed": false, "requirement": "s", "subject": {"id": null, "type": "tag"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated tag ids", "value": []}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "tag"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/ys/0/tags/0"], "name": "tag", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "tag"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/1/ys/0/tags"], "name": "tag", "value": "c"}], "passed": true, "requirement": "s", "subject": {"id": "c", "type": "tag"}}
@@ -28324,15 +28535,484 @@
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "k"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "rx", "subject": {"id": null, "type": "kx"}},
-          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope k count", "value": 0}], "message": "artifact is \"s\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "in": {"artifact": "s"}, "type": "k"}},
-          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope k count", "value": 0}], "message": "artifact is \"t\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": null, "in": {"artifact": "t"}, "type": "k"}},
-          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope kx count", "value": 0}], "message": "artifact is \"s\", which isn't a list or an object", "passed": false, "requirement": "rx", "subject": {"id": null, "in": {"artifact": "s"}, "type": "kx"}},
-          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope kx count", "value": 0}], "message": "artifact is \"t\", which isn't a list or an object", "passed": false, "requirement": "rx", "subject": {"id": null, "in": {"artifact": "t"}, "type": "kx"}},
+          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope k count", "value": 0}], "message": "artifact is \"s\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "in": {"artifact": "s"}, "type": "k"}},
+          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope k count", "value": 0}], "message": "artifact is \"t\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "in": {"artifact": "t"}, "type": "k"}},
+          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope kx count", "value": 0}], "message": "artifact is \"s\", which isn't an object", "passed": false, "requirement": "rx", "subject": {"id": null, "in": {"artifact": "s"}, "type": "kx"}},
+          {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope kx count", "value": 0}], "message": "artifact is \"t\", which isn't an object", "passed": false, "requirement": "rx", "subject": {"id": null, "in": {"artifact": "t"}, "type": "kx"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated k ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"artifact": "s"}, "type": "k"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated k ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"artifact": "t"}, "type": "k"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated kx ids", "value": []}], "passed": true, "requirement": "rx", "subject": {"id": null, "in": {"artifact": "s"}, "type": "kx"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated kx ids", "value": []}], "passed": true, "requirement": "rx", "subject": {"id": null, "in": {"artifact": "t"}, "type": "kx"}}
         ]
+      }
+    ]
+  },
+  {
+    "description": "every in a from line that meets text where it needs an object",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "v": {
+          "from": "every builds.version.x"
+        },
+        "n": {
+          "from": "every xs.n"
+        }
+      },
+      "requirements": {
+        "rv": {
+          "subject": "v",
+          "min_subjects": 0,
+          "checks": {
+            "c": "v exists"
+          }
+        },
+        "rn": {
+          "subject": "n",
+          "min_subjects": 0,
+          "checks": {
+            "c": "n exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable, names the value where the read stopped as a check does, and lists each place",
+        "rules": [
+          "subjects.every.lists",
+          "subjects.every.broken"
+        ],
+        "input": {
+          "builds": [
+            {
+              "version": "1.0"
+            },
+            {
+              "version": "1.1"
+            }
+          ],
+          "xs": [
+            "a",
+            5,
+            true,
+            {
+              "n": 1
+            }
+          ]
+        },
+        "results": [{"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/xs/0"], "path": "item 1 of xs", "value": "a"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/xs/1"], "path": "item 2 of xs", "value": 5}, {"cause": "unusable", "item": "item 3 of xs", "locations": ["/xs/2"], "path": "item 3 of xs", "value": true}], "inputs": [{"locations": ["/xs/3/n"], "name": "in-scope n count", "value": 1}], "message": "item 1 of xs is \"a\", which isn't an object; item 2 of xs is 5, which isn't an object; item 3 of xs is true, which isn't an object", "passed": false, "requirement": "rn", "subject": {"id": null, "type": "n"}}, {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "builds[0].version.x", "locations": ["/builds/0/version"], "path": "builds[0].version.x", "value": null}, {"cause": "unusable", "item": "builds[1].version.x", "locations": ["/builds/1/version"], "path": "builds[1].version.x", "value": null}], "inputs": [{"locations": [], "name": "in-scope v count", "value": 0}], "message": "item 1 of builds: version is \"1.0\", which isn't an object; item 2 of builds: version is \"1.1\", which isn't an object", "passed": false, "requirement": "rv", "subject": {"id": null, "type": "v"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/3/n"], "name": "n", "value": 1}], "passed": true, "requirement": "rn", "subject": {"id": 1, "type": "n"}}]
+      },
+      {
+        "description": "fails min_subjects as absent or null where the value is missing or null",
+        "rules": [
+          "subjects.every.broken"
+        ],
+        "input": {
+          "builds": [
+            {},
+            {
+              "version": null
+            }
+          ],
+          "xs": [
+            null,
+            {
+              "n": 1
+            }
+          ]
+        },
+        "results": [{"cause": "absent", "check": "$min_subjects", "failed_items": [{"cause": "absent", "item": "xs[0].n", "locations": ["/xs/0"], "path": "xs[0].n", "value": null}], "inputs": [{"locations": ["/xs/1/n"], "name": "in-scope n count", "value": 1}], "message": "item 1 of xs: n is missing", "passed": false, "requirement": "rn", "subject": {"id": null, "type": "n"}}, {"cause": "absent", "check": "$min_subjects", "failed_items": [{"cause": "absent", "item": "builds[0].version.x", "locations": ["/builds/0"], "path": "builds[0].version.x", "value": null}, {"cause": "absent", "item": "builds[1].version.x", "locations": ["/builds/1/version"], "path": "builds[1].version.x", "value": null}], "inputs": [{"locations": [], "name": "in-scope v count", "value": 0}], "message": "item 1 of builds: version.x is missing; item 2 of builds: version.x is missing", "passed": false, "requirement": "rv", "subject": {"id": null, "type": "v"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/1/n"], "name": "n", "value": 1}], "passed": true, "requirement": "rn", "subject": {"id": 1, "type": "n"}}]
+      }
+    ]
+  },
+  {
+    "description": "a child subject under a parent line that mixes types",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "d": {
+          "from": "ds"
+        },
+        "m": {
+          "from": "d.m"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "m",
+          "min_subjects": 0,
+          "checks": {
+            "c": "up is true"
+          }
+        },
+        "rd": {
+          "subject": "d",
+          "min_subjects": 0,
+          "checks": {
+            "c": "d exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is read under each parent, and only the parent's own min_subjects row fails for the mix",
+        "rules": [
+          "subjects.one_type.children",
+          "subjects.one_type",
+          "subjects.chain.not_an_object"
+        ],
+        "input": {
+          "ds": [
+            {
+              "m": {
+                "up": false
+              }
+            },
+            "x"
+          ]
+        },
+        "results": [{"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/ds/0/m"], "name": "in-scope m count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"d": {"m": {"up": false}}}, "type": "m"}}, {"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope m count", "value": 0}], "message": "d is \"x\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "in": {"d": "x"}, "type": "m"}}, {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "item 1 of ds", "locations": ["/ds/0"], "path": "item 1 of ds", "value": {"m": {"up": false}}}, {"cause": "unusable", "item": "item 2 of ds", "locations": ["/ds/1"], "path": "item 2 of ds", "value": "x"}], "inputs": [{"locations": ["/ds/0", "/ds/1"], "name": "in-scope d count", "value": 2}], "message": "item 1 of ds is an object, item 2 of ds is text", "passed": false, "requirement": "rd", "subject": {"id": null, "type": "d"}}, {"cause": "value", "check": "c", "inputs": [{"locations": ["/ds/0/m/up"], "name": "up", "value": false}], "message": "up is false", "passed": false, "requirement": "r", "subject": {"id": {"up": false}, "in": {"d": {"m": {"up": false}}}, "type": "m"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ds/0"], "name": "d", "value": {"m": {"up": false}}}], "passed": true, "requirement": "rd", "subject": {"id": {"m": {"up": false}}, "type": "d"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ds/1"], "name": "d", "value": "x"}], "passed": true, "requirement": "rd", "subject": {"id": "x", "type": "d"}}]
+      }
+    ]
+  },
+  {
+    "description": "a child subject read with every under a parent read with every that mixes types",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "d": {
+          "from": "every ds"
+        },
+        "m": {
+          "from": "every d.ms"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "m",
+          "min_subjects": 0,
+          "checks": {
+            "c": "up is true"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "is read under each parent, a list parent included, and a parent that is text fails as not_an_object",
+        "rules": [
+          "subjects.one_type.children",
+          "subjects.every.child"
+        ],
+        "input": {
+          "ds": [
+            {
+              "ms": [
+                {
+                  "up": false
+                }
+              ]
+            },
+            "x",
+            [
+              {
+                "ms": [
+                  {
+                    "up": true
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        "results": [{"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/ds/0/ms/0"], "name": "in-scope m count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"d": {"ms": [{"up": false}]}}, "type": "m"}}, {"cause": "not_an_object", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope m count", "value": 0}], "message": "d is \"x\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "in": {"d": "x"}, "type": "m"}}, {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/ds/2/0/ms/0"], "name": "in-scope m count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"d": [{"ms": [{"up": true}]}]}, "type": "m"}}, {"cause": "value", "check": "c", "inputs": [{"locations": ["/ds/0/ms/0/up"], "name": "up", "value": false}], "message": "up is false", "passed": false, "requirement": "r", "subject": {"id": {"up": false}, "in": {"d": {"ms": [{"up": false}]}}, "type": "m"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ds/2/0/ms/0/up"], "name": "up", "value": true}], "passed": true, "requirement": "r", "subject": {"id": {"up": true}, "in": {"d": [{"ms": [{"up": true}]}]}, "type": "m"}}]
+      }
+    ]
+  },
+  {
+    "description": "every batch.owner when the batches mix lists and objects",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "batch": {
+          "from": "batches"
+        },
+        "owner": {
+          "from": "every batch.owner"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "owner",
+          "min_subjects": 0,
+          "checks": {
+            "c": "name is \"ann\""
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "reads the owners of a batch that is a list, and fails where a batch is an object with no list",
+        "rules": [
+          "subjects.one_type.children",
+          "subjects.every.child",
+          "subjects.every.broken"
+        ],
+        "input": {
+          "batches": [
+            [
+              {
+                "owner": {
+                  "name": "ann"
+                }
+              }
+            ],
+            {
+              "owner": {
+                "name": "bob"
+              }
+            }
+          ]
+        },
+        "results": [{"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/batches/0/0/owner"], "name": "in-scope owner count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"batch": [{"owner": {"name": "ann"}}]}, "type": "owner"}}, {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "owner", "locations": ["/batches/1/owner"], "path": "owner", "value": {"name": "bob"}}], "inputs": [{"locations": [], "name": "in-scope owner count", "value": 0}], "message": "owner is {\"name\": \"bob\"}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": null, "in": {"batch": {"owner": {"name": "bob"}}}, "type": "owner"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/batches/0/0/owner/name"], "name": "name", "value": "ann"}], "passed": true, "requirement": "r", "subject": {"id": {"name": "ann"}, "in": {"batch": [{"owner": {"name": "ann"}}]}, "type": "owner"}}]
+      }
+    ]
+  },
+  {
+    "description": "a name every reads as a list in one item and as an object in another",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "t": {
+          "from": "every builds.tags"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "t",
+          "min_subjects": 0,
+          "checks": {
+            "c": "t exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "writes the object as a check writes a value, and lists both items",
+        "rules": [
+          "subjects.every.same",
+          "subjects.failed_items",
+          "message.from"
+        ],
+        "input": {
+          "builds": [
+            {
+              "tags": [
+                1,
+                2
+              ]
+            },
+            {
+              "tags": {
+                "k": [
+                  1,
+                  2
+                ]
+              }
+            }
+          ]
+        },
+        "results": [{"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "builds[0].tags", "locations": ["/builds/0/tags"], "path": "builds[0].tags", "value": [1, 2]}, {"cause": "unusable", "item": "item 1 of builds[0].tags", "locations": ["/builds/0/tags/0"], "path": "item 1 of builds[0].tags", "value": 1}, {"cause": "unusable", "item": "builds[1].tags", "locations": ["/builds/1/tags"], "path": "builds[1].tags", "value": {"k": [1, 2]}}], "inputs": [{"locations": ["/builds/0/tags/0", "/builds/0/tags/1", "/builds/1/tags"], "name": "in-scope t count", "value": 3}], "message": "tags is a list in item 1 of builds but {\"k\": [1, 2]} in item 2; item 1 of builds: item 1 of tags is a number, item 2 of builds: tags is an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/builds/0/tags/0"], "name": "t", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": 1, "type": "t"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/builds/0/tags/1"], "name": "t", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": 2, "type": "t"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/builds/1/tags"], "name": "t", "value": {"k": [1, 2]}}], "passed": true, "requirement": "r", "subject": {"id": {"k": [1, 2]}, "type": "t"}}]
+      }
+    ]
+  },
+  {
+    "description": "a from line that starts at a list input and goes on to named by each of",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "t": {
+          "from": "$input.build named by each of $params.kinds"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "t",
+          "checks": {
+            "c": "passed is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "kinds": [
+        "unit"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable and names the input as the list",
+        "rules": [
+          "subjects.keyed.list_before"
+        ],
+        "input": [
+          {
+            "build": {
+              "unit": {
+                "passed": true
+              }
+            }
+          }
+        ],
+        "results": [{"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [""], "name": "in-scope t count", "value": 1}], "message": "$input is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}, {"cause": "absent", "check": "c", "inputs": [{"locations": [""], "name": "passed", "value": null}], "message": "passed is missing", "passed": false, "requirement": "r", "subject": {"id": "unit", "type": "t"}}]
+      }
+    ]
+  },
+  {
+    "description": "a from line with a position whose items mix types",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "t": {
+          "from": "xs[0]"
+        },
+        "u": {
+          "from": "ys[0]"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "t",
+          "min_subjects": 0,
+          "checks": {
+            "c": "t exists"
+          }
+        },
+        "ru": {
+          "subject": "u",
+          "min_subjects": 0,
+          "checks": {
+            "c": "u exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the items by the path as written",
+        "rules": [
+          "subjects.one_type",
+          "subjects.failed_items"
+        ],
+        "input": {
+          "xs": [
+            [
+              "a",
+              {
+                "k": 1
+              }
+            ]
+          ],
+          "ys": [
+            [
+              1,
+              "b"
+            ]
+          ]
+        },
+        "results": [{"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "item 1 of xs[0]", "locations": ["/xs/0/0"], "path": "item 1 of xs[0]", "value": "a"}, {"cause": "unusable", "item": "item 2 of xs[0]", "locations": ["/xs/0/1"], "path": "item 2 of xs[0]", "value": {"k": 1}}], "inputs": [{"locations": ["/xs/0/0", "/xs/0/1"], "name": "in-scope t count", "value": 2}], "message": "item 1 of xs[0] is text, item 2 of xs[0] is an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}, {"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "item 1 of ys[0]", "locations": ["/ys/0/0"], "path": "item 1 of ys[0]", "value": 1}, {"cause": "unusable", "item": "item 2 of ys[0]", "locations": ["/ys/0/1"], "path": "item 2 of ys[0]", "value": "b"}], "inputs": [{"locations": ["/ys/0/0", "/ys/0/1"], "name": "in-scope u count", "value": 2}], "message": "item 1 of ys[0] is a number, item 2 of ys[0] is text", "passed": false, "requirement": "ru", "subject": {"id": null, "type": "u"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/0"], "name": "t", "value": "a"}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "t"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/1"], "name": "t", "value": {"k": 1}}], "passed": true, "requirement": "r", "subject": {"id": {"k": 1}, "type": "t"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ys/0/0"], "name": "u", "value": 1}], "passed": true, "requirement": "ru", "subject": {"id": 1, "type": "u"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/ys/0/1"], "name": "u", "value": "b"}], "passed": true, "requirement": "ru", "subject": {"id": "b", "type": "u"}}]
+      }
+    ]
+  },
+  {
+    "description": "a from line that starts at a list input read through a position, whose items mix types",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "t": {
+          "from": "$input[0]"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "t",
+          "min_subjects": 0,
+          "checks": {
+            "c": "t exists"
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "names the items from $input",
+        "rules": [
+          "subjects.one_type",
+          "subjects.failed_items"
+        ],
+        "input": [
+          [
+            "a",
+            {
+              "k": 1
+            }
+          ]
+        ],
+        "results": [{"cause": "unusable", "check": "$min_subjects", "failed_items": [{"cause": "unusable", "item": "item 1 of $input[0]", "locations": ["/0/0"], "path": "item 1 of $input[0]", "value": "a"}, {"cause": "unusable", "item": "item 2 of $input[0]", "locations": ["/0/1"], "path": "item 2 of $input[0]", "value": {"k": 1}}], "inputs": [{"locations": ["/0/0", "/0/1"], "name": "in-scope t count", "value": 2}], "message": "item 1 of $input[0] is text, item 2 of $input[0] is an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/0/0"], "name": "t", "value": "a"}], "passed": true, "requirement": "r", "subject": {"id": "a", "type": "t"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/0/1"], "name": "t", "value": {"k": 1}}], "passed": true, "requirement": "r", "subject": {"id": {"k": 1}, "type": "t"}}]
+      }
+    ]
+  },
+  {
+    "description": "a child subject with a path and named by each of, under a parent that is a list",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "b": {
+          "from": "bs"
+        },
+        "u": {
+          "from": "b.runs named by each of $params.k"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "u",
+          "checks": {
+            "c": "ok is true"
+          }
+        }
+      }
+    },
+    "params": {
+      "k": [
+        "x"
+      ]
+    },
+    "cases": [
+      {
+        "description": "fails min_subjects as not_an_object and says to make each item a subject",
+        "rules": [
+          "subjects.keyed.list_before",
+          "subjects.chain.not_an_object"
+        ],
+        "input": {
+          "bs": [
+            [
+              {
+                "runs": {
+                  "x": {
+                    "ok": true
+                  }
+                }
+              }
+            ]
+          ]
+        },
+        "results": [{"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope u count", "value": 0}], "message": "b is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it", "passed": false, "requirement": "r", "subject": {"id": null, "in": {"b": [{"runs": {"x": {"ok": true}}}]}, "type": "u"}}]
       }
     ]
   }
