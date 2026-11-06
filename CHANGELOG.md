@@ -2,6 +2,12 @@
 
 This file is about `ergo.rego` only. The Rust engine's changes are in [engines/rust/CHANGELOG.md](engines/rust/CHANGELOG.md), and the spec's in [spec/CHANGELOG.md](spec/CHANGELOG.md). Each release names the version of the spec it follows.
 
+## 0.6.0
+
+### Changed
+
+- Names resolve where spec 0.6 says, from their root or against the focus. A bare name on the right of the phrase after `every` or `some` reads the subject's field, and so do a name written with a dot and a `named by` field there. `whose` and `that` after `every`, `some`, `count of`, `sum of` and on a `for` item read the value the path ends at, so `count of approvers.username whose state is "APPROVED"` fails as `not_an_object`. The subject's name followed by a step, like `pr.author`, reads the subject's field inside a relative clause. In a `from` line, the right side of a `some` or `every` condition reads the candidate subject. Reports change for policies that write these, see [spec/CHANGELOG.md](spec/CHANGELOG.md). This version follows spec 0.6, so a policy says `ergo_spec: v0.6-dev`, and the report's `ergo` says `v0.6-dev`.
+
 ## 0.5.0
 
 ### New

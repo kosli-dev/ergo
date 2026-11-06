@@ -41,7 +41,7 @@ Here is one case, from `cases/present`. Its group's policy has a `thing` subject
 
 ```json
 {
-  "ergo_spec": "v0.5",
+  "ergo_spec": "v0.6-dev",
   "subjects": {"thing": {"from": "things", "identified_by": "id"}},
   "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
 }

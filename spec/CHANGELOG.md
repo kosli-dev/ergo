@@ -2,6 +2,16 @@
 
 Each version says whether reports changed, so that anyone who only stores reports knows when to look.
 
+## 0.6
+
+### Changed
+
+- The sentence decides where each name resolves, never the data, and one table in [Where a name resolves](syntax.md#where-a-name-resolves) says it for every word. Reports change for the policies below, and for no other.
+- A bare name on the right side of the phrase after `every` or `some` is the subject's field, not the item's ([sentence.resolve.root](syntax.md#where-a-name-resolves)). With the subject `pr`, `every approvers.username does not equal author` compares each username with the pull request's `author`, so `ann` fails as `value` where the row failed as `absent` because approvers have no `author`. The same holds for a name written with a dot, a `named by` field there, and the right side of a `some` or `every` condition in a `from` line, which reads the candidate subject. `every conditions.type equals type` is no longer compared with itself, so it isn't written wrong. Comparing two fields of one item takes a `for` line. Such a row's message names the subject's field without the item, like `author is missing`, and its `inputs` list it.
+- `whose` and `that` after `every`, `some`, `count of` and `sum of`, and on a `for` item, read the value the path ends at, not the item of the last list walked ([sentence.resolve.focus](syntax.md#where-a-name-resolves)). `count of approvers.username whose state is "APPROVED"` fails as `not_an_object`, with `item 1 of approvers: username is "ann", which isn't an object`, where it read each approver's `state`. To filter on one field and check another, put the item on a `for` line. The `sorted by` field of a `for` item is read on that value too. A value that is missing fails a condition that reads it as `absent`, like `item 2 of approvers: username is missing`.
+- The subject's name followed by a step, like `pr.author`, reads the subject's field inside a relative clause, in a check, an `any_of` option, a `for` item and a `from` line, where it used to be written wrong ([sentence.path.subject.step](syntax.md#paths)). Outside a relative clause it is still written wrong.
+- `sentence.argument.item` is gone, and so is the warning about `every $input.artifact.developers does not equal tested_by` in [sentence.every.walk](syntax.md#every-some-and-whose). [sentence.subject.own](syntax.md#subjects) is narrowed to the two places a subject's own name in its `from` line is the input field.
+
 ## 0.5
 
 ### New
