@@ -9501,7 +9501,7 @@
       },
       "subjects": {
         "d": {
-          "from": "p.items"
+          "from": "every p.items"
         },
         "p": {
           "from": "g named by $params.key"
@@ -9519,12 +9519,12 @@
           "checks": {
             "$min_subjects": {
               "description": "The in-scope d count is at least 1",
-              "expression": "count(matching(p.items)) >= 1",
+              "expression": "count(matching(every p.items)) >= 1",
               "meta": {}
             },
             "$unique_ids": {
               "description": "Every d id is unique",
-              "expression": "count(repeated(ids(p.items))) == 0",
+              "expression": "count(repeated(ids(every p.items))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -9598,7 +9598,8 @@
               }
             },
             "type": "d"
-          }
+          },
+          "failed_items": []
         },
         {
           "cause": "satisfied",
@@ -9660,7 +9661,7 @@
       "subjects": {
         "d": {
           "description": "",
-          "from": "p.items",
+          "from": "every p.items",
           "identified_by": null,
           "parts": {}
         },
@@ -44675,6 +44676,10 @@
             {
               "cause": "not_an_object",
               "rows": 4
+            },
+            {
+              "cause": "unusable",
+              "rows": 1
             }
           ],
           "checks": {
@@ -44734,9 +44739,39 @@
           }
         },
         {
-          "cause": "satisfied",
+          "cause": "unusable",
           "check": "$min_subjects",
-          "failed_items": [],
+          "failed_items": [
+            {
+              "cause": "unusable",
+              "item": "item 1 of g",
+              "locations": [
+                "/g/0"
+              ],
+              "path": "item 1 of g",
+              "value": "s"
+            },
+            {
+              "cause": "unusable",
+              "item": "item 2 of g",
+              "locations": [
+                "/g/1"
+              ],
+              "path": "item 2 of g",
+              "value": 1
+            },
+            {
+              "cause": "unusable",
+              "item": "item 4 of g",
+              "locations": [
+                "/g/3"
+              ],
+              "path": "item 4 of g",
+              "value": [
+                1
+              ]
+            }
+          ],
           "inputs": [
             {
               "locations": [
@@ -44749,7 +44784,8 @@
               "value": 4
             }
           ],
-          "passed": true,
+          "message": "item 1 of g is text, item 2 of g is a number, item 4 of g is a list",
+          "passed": false,
           "requirement": "r",
           "subject": {
             "id": null,
@@ -44785,6 +44821,7 @@
               "value": null
             }
           ],
+          "message": "d is \"s\", which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -44804,6 +44841,7 @@
               "value": null
             }
           ],
+          "message": "d is 1, which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -44823,6 +44861,7 @@
               "value": null
             }
           ],
+          "message": "d is null, which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -44842,6 +44881,7 @@
               "value": null
             }
           ],
+          "message": "d is [1], which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -45121,7 +45161,7 @@
         "r": {
           "causes": [
             {
-              "cause": "unusable",
+              "cause": "not_an_object",
               "rows": 1
             }
           ],
@@ -45182,26 +45222,26 @@
           }
         },
         {
-          "cause": "unusable",
+          "cause": "not_an_object",
           "check": "$min_subjects",
           "failed_items": [
             {
               "cause": "unusable",
-              "item": "g[0].i",
+              "item": "item 1 of g",
               "locations": [
                 "/g/0"
               ],
-              "path": "g[0].i",
-              "value": null
+              "path": "item 1 of g",
+              "value": "s"
             },
             {
               "cause": "unusable",
-              "item": "g[1].i",
+              "item": "item 2 of g",
               "locations": [
                 "/g/1"
               ],
-              "path": "g[1].i",
-              "value": null
+              "path": "item 2 of g",
+              "value": 1
             },
             {
               "cause": "absent",
@@ -45213,13 +45253,15 @@
               "value": null
             },
             {
-              "cause": "unusable",
-              "item": "g[3].i",
+              "cause": "not_an_object",
+              "item": "item 4 of g",
               "locations": [
                 "/g/3"
               ],
-              "path": "g[3].i",
-              "value": null
+              "path": "item 4 of g",
+              "value": [
+                1
+              ]
             }
           ],
           "inputs": [
@@ -45229,6 +45271,7 @@
               "value": 0
             }
           ],
+          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; and 1 more",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -45331,7 +45374,7 @@
         "r": {
           "causes": [
             {
-              "cause": "unusable",
+              "cause": "not_an_object",
               "rows": 1
             }
           ],
@@ -45392,26 +45435,26 @@
           }
         },
         {
-          "cause": "unusable",
+          "cause": "not_an_object",
           "check": "$min_subjects",
           "failed_items": [
             {
               "cause": "unusable",
-              "item": "g[0].i",
+              "item": "item 1 of g",
               "locations": [
                 "/g/0"
               ],
-              "path": "g[0].i",
-              "value": null
+              "path": "item 1 of g",
+              "value": "s"
             },
             {
               "cause": "unusable",
-              "item": "g[1].i",
+              "item": "item 2 of g",
               "locations": [
                 "/g/1"
               ],
-              "path": "g[1].i",
-              "value": null
+              "path": "item 2 of g",
+              "value": 1
             },
             {
               "cause": "absent",
@@ -45423,13 +45466,15 @@
               "value": null
             },
             {
-              "cause": "unusable",
-              "item": "g[3].i",
+              "cause": "not_an_object",
+              "item": "item 4 of g",
               "locations": [
                 "/g/3"
               ],
-              "path": "g[3].i",
-              "value": null
+              "path": "item 4 of g",
+              "value": [
+                1
+              ]
             }
           ],
           "inputs": [
@@ -45439,6 +45484,7 @@
               "value": 0
             }
           ],
+          "message": "item 1 of g is \"s\", which isn't an object; item 2 of g is 1, which isn't an object; item 3 of g: i is missing; and 1 more",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -45581,12 +45627,12 @@
           "failed_items": [
             {
               "cause": "unusable",
-              "item": "g[1].i",
+              "item": "item 2 of g",
               "locations": [
                 "/g/1"
               ],
-              "path": "g[1].i",
-              "value": null
+              "path": "item 2 of g",
+              "value": "s"
             }
           ],
           "inputs": [
@@ -45598,6 +45644,7 @@
               "value": 1
             }
           ],
+          "message": "item 2 of g is \"s\", which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -46114,12 +46161,12 @@
           "failed_items": [
             {
               "cause": "unusable",
-              "item": "g[0].i",
+              "item": "item 1 of g",
               "locations": [
                 "/g/0"
               ],
-              "path": "g[0].i",
-              "value": null
+              "path": "item 1 of g",
+              "value": "s"
             }
           ],
           "inputs": [
@@ -46129,6 +46176,7 @@
               "value": 0
             }
           ],
+          "message": "item 1 of g is \"s\", which isn't an object",
           "passed": false,
           "requirement": "r",
           "subject": {
@@ -46231,7 +46279,11 @@
         "r": {
           "causes": [
             {
-              "cause": "unusable",
+              "cause": "not_an_object",
+              "rows": 1
+            },
+            {
+              "cause": "absent",
               "rows": 1
             }
           ],
@@ -46263,8 +46315,8 @@
           "status": "not_met",
           "subject": "d",
           "subjects": {
-            "matching": 0,
-            "total": 0
+            "matching": 1,
+            "total": 1
           }
         }
       },
@@ -46292,18 +46344,9 @@
           }
         },
         {
-          "cause": "unusable",
+          "cause": "absent",
           "check": "$min_subjects",
           "failed_items": [
-            {
-              "cause": "unusable",
-              "item": "items[0].y",
-              "locations": [
-                "/items/0/y"
-              ],
-              "path": "items[0].y",
-              "value": 2
-            },
             {
               "cause": "absent",
               "item": "items[1].y",
@@ -46316,9 +46359,11 @@
           ],
           "inputs": [
             {
-              "locations": [],
+              "locations": [
+                "/items/0/y"
+              ],
               "name": "in-scope d count",
-              "value": 0
+              "value": 1
             }
           ],
           "passed": false,
@@ -46326,7 +46371,8 @@
           "subject": {
             "id": null,
             "type": "d"
-          }
+          },
+          "message": "item 2 of items: y is missing"
         },
         {
           "cause": "satisfied",
@@ -46344,6 +46390,26 @@
             "id": null,
             "type": "d"
           }
+        },
+        {
+          "cause": "not_an_object",
+          "check": "c",
+          "inputs": [
+            {
+              "locations": [
+                "/items/0/y"
+              ],
+              "name": "x",
+              "value": null
+            }
+          ],
+          "passed": false,
+          "requirement": "r",
+          "subject": {
+            "id": 2,
+            "type": "d"
+          },
+          "message": "d is 2, which isn't an object"
         }
       ],
       "subjects": {
@@ -46423,7 +46489,7 @@
         "r": {
           "causes": [
             {
-              "cause": "unusable",
+              "cause": "not_an_object",
               "rows": 1
             }
           ],
@@ -46455,8 +46521,8 @@
           "status": "not_met",
           "subject": "d",
           "subjects": {
-            "matching": 0,
-            "total": 0
+            "matching": 1,
+            "total": 1
           }
         }
       },
@@ -46484,27 +46550,19 @@
           }
         },
         {
-          "cause": "unusable",
+          "cause": "satisfied",
           "check": "$min_subjects",
-          "failed_items": [
+          "failed_items": [],
+          "inputs": [
             {
-              "cause": "unusable",
-              "item": "w[0].x",
               "locations": [
                 "/w/0/x"
               ],
-              "path": "w[0].x",
+              "name": "in-scope d count",
               "value": 1
             }
           ],
-          "inputs": [
-            {
-              "locations": [],
-              "name": "in-scope d count",
-              "value": 0
-            }
-          ],
-          "passed": false,
+          "passed": true,
           "requirement": "r",
           "subject": {
             "id": null,
@@ -46527,6 +46585,26 @@
             "id": null,
             "type": "d"
           }
+        },
+        {
+          "cause": "not_an_object",
+          "check": "c",
+          "inputs": [
+            {
+              "locations": [
+                "/w/0/x"
+              ],
+              "name": "x",
+              "value": null
+            }
+          ],
+          "passed": false,
+          "requirement": "r",
+          "subject": {
+            "id": 1,
+            "type": "d"
+          },
+          "message": "d is 1, which isn't an object"
         }
       ],
       "subjects": {

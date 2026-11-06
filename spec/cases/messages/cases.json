@@ -576,7 +576,7 @@
   },
   {
     "description": "a child subject reads a part of its parent that can't be reached",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"s": {"checks": {"c": "approvals is at least artifact.cov.min"}, "subject": "pr"}}, "subjects": {"artifact": {"from": "things", "has": {"cov": "reports.coverage"}, "identified_by": "id"}, "pr": {"from": "artifact.prs", "identified_by": "url"}}},
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"s": {"checks": {"c": "approvals is at least artifact.cov.min"}, "subject": "pr"}}, "subjects": {"artifact": {"from": "things", "has": {"cov": "reports.coverage"}, "identified_by": "id"}, "pr": {"from": "every artifact.prs", "identified_by": "url"}}},
     "cases": [
       {
         "description": "the part and the field carry the parent's name",
@@ -1592,11 +1592,12 @@
         ]
       },
       {
-        "description": "says that an item that isn't a list or an object can't be read",
+        "description": "makes an item that is a number one subject, whose check fails as not_an_object",
         "rules": ["message.cause", "message.from", "subjects.sentence"],
         "input": {"things": [{"x": 1}, 3]},
         "results": [
-          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "item 2 of things is 3, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": null, "type": "t"}}
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/1"], "name": "in-scope t count", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": null, "type": "t"}},
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/1"], "name": "x", "value": null}], "message": "t is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 3, "type": "t"}}
         ]
       }
     ]
@@ -1644,11 +1645,12 @@
         ]
       },
       {
-        "description": "says what the field is when it isn't a list or an object",
+        "description": "makes a field that is a number one subject, whose check fails as not_an_object",
         "rules": ["message.cause", "message.from", "subjects.sentence"],
         "input": {"things": [{"id": "a", "ws": 5}]},
         "results": [
-          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope w count", "value": 0}], "message": "ws is 5, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": null, "in": {"t": {"id": "a", "ws": 5}}, "type": "w"}}
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/0/ws"], "name": "in-scope w count", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": null, "in": {"t": {"id": "a", "ws": 5}}, "type": "w"}},
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/ws"], "name": "x", "value": null}], "message": "w is 5, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 5, "in": {"t": {"id": "a", "ws": 5}}, "type": "w"}}
         ]
       }
     ]
@@ -1707,7 +1709,7 @@
   },
   {
     "description": "a child of a child subject read from a field of its parent",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "t.ws"}, "g": {"from": "w.kids"}}, "requirements": {"s": {"subject": "g", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "every t.ws"}, "g": {"from": "w.kids"}}, "requirements": {"s": {"subject": "g", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "names the field of the nearest parent when it is missing",
@@ -1726,18 +1728,19 @@
         ]
       },
       {
-        "description": "says what the field is when it isn't a list or an object",
+        "description": "makes a field that is a number one subject, whose check fails as not_an_object",
         "rules": ["message.cause", "message.from", "subjects.sentence"],
         "input": {"things": [{"id": "a", "ws": [{"id": "b", "kids": 7}]}]},
         "results": [
-          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope g count", "value": 0}], "message": "kids is 7, which isn't a list or an object", "passed": false, "requirement": "s", "subject": {"id": null, "in": {"t": {"id": "a", "ws": [{"id": "b", "kids": 7}]}, "w": {"id": "b", "kids": 7}}, "type": "g"}}
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/0/ws/0/kids"], "name": "in-scope g count", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": null, "in": {"t": {"id": "a", "ws": [{"id": "b", "kids": 7}]}, "w": {"id": "b", "kids": 7}}, "type": "g"}},
+          {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/things/0/ws/0/kids"], "name": "x", "value": null}], "message": "g is 7, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": 7, "in": {"t": {"id": "a", "ws": [{"id": "b", "kids": 7}]}, "w": {"id": "b", "kids": 7}}, "type": "g"}}
         ]
       }
     ]
   },
   {
     "description": "a child subject read from a path of two keys under its parent",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "t.ws"}, "g": {"from": "w.meta.owner"}}, "requirements": {"s": {"subject": "g", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "every t.ws"}, "g": {"from": "w.meta.owner"}}, "requirements": {"s": {"subject": "g", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "names the first key that is missing",
@@ -1828,7 +1831,7 @@
   },
   {
     "description": "a child subject whose from line has a whose over items that aren't objects",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "t.ws whose lo is at least 1"}}, "requirements": {"s": {"subject": "w", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things"}, "w": {"from": "every t.ws whose lo is at least 1"}}, "requirements": {"s": {"subject": "w", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "says each item that isn't an object can't be read",

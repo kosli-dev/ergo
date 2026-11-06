@@ -9161,7 +9161,7 @@
           "identified_by": "id"
         },
         "kid": {
-          "from": "t.kids",
+          "from": "every t.kids",
           "identified_by": "id"
         }
       },
@@ -9259,7 +9259,8 @@
                 "t": "t1"
               },
               "type": "kid"
-            }
+            },
+            "failed_items": []
           },
           {
             "cause": "satisfied",
@@ -11912,7 +11913,7 @@
   },
   {
     "description": "a failed sentence that counts items whose a parent's field matches lists the parent's value",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": {"assert": "count of items whose w is artifact.w is 5", "for": "every groups as g"}}, "subject": "pr"}}, "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "artifact.prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": {"assert": "count of items whose w is artifact.w is 5", "for": "every groups as g"}}, "subject": "pr"}}, "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "every artifact.prs", "identified_by": "id"}}},
     "cases": [
       {
         "description": "lists the parent's value and its location beside the count",
@@ -12306,7 +12307,7 @@
   },
   {
     "description": "a for line on a child subject whose sentence reads the parent and its own field of the same name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": {"for": "every cs as c", "assert": "c.ts is at least b.x plus .b.x"}}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "every b.kids", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": {"for": "every cs as c", "assert": "c.ts is at least b.x plus .b.x"}}}}},
     "cases": [
       {
         "description": "lists the parent's field and the child's own field of the same name in the order they were read",
@@ -12418,7 +12419,7 @@
   },
   {
     "description": "a for line on a child subject that reads the parent's field named like the parent and its own",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "item": {"from": "art.items", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"f": {"for": "every .art.xs as x", "assert": "x is at least .art.k"}}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "item": {"from": "every art.items", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"f": {"for": "every .art.xs as x", "assert": "x is at least .art.k"}}}}},
     "cases": [
       {
         "description": "keeps the dot in the name of the child's own field",
@@ -12426,7 +12427,7 @@
         "input": {"arts": [{"id": "a1", "k": 5, "xs": [1, 2], "items": [{"id": "i1", "art": {"k": 1, "xs": [5, 6]}, "v": 5}]}]},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
-          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/arts/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"art": "a1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/arts/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"art": "a1"}, "type": "item"}, "failed_items": []},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"art": "a1"}, "type": "item"}},
           {"cause": "satisfied", "check": "f", "failed_items": [], "inputs": [{"locations": ["/arts/0/items/0/art/k"], "name": ".art.k", "value": 1}, {"locations": ["/arts/0/items/0/art/xs/0", "/arts/0/items/0/art/xs/1"], "name": ".art.xs[]", "value": [5, 6]}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "item"}}
         ]
@@ -12481,11 +12482,11 @@
       "ergo_spec": "v0.6-dev",
       "subjects": {
         "artifact": {
-          "from": "trail.artifacts",
+          "from": "every trail.artifacts",
           "identified_by": "id"
         },
         "pr": {
-          "from": "artifact.prs",
+          "from": "every artifact.prs",
           "identified_by": "id"
         }
       },
@@ -12595,7 +12596,7 @@
           "identified_by": "name"
         },
         "pr": {
-          "from": "artifact.pull_requests",
+          "from": "every artifact.pull_requests",
           "identified_by": "id"
         }
       },
@@ -12794,14 +12795,14 @@
       "ergo_spec": "v0.6-dev",
       "subjects": {
         "artifact": {
-          "from": "trail.artifacts",
+          "from": "every trail.artifacts",
           "identified_by": "id",
           "has": {
             "ap": "ps"
           }
         },
         "pr": {
-          "from": "artifact.prs",
+          "from": "every artifact.prs",
           "identified_by": "id"
         }
       },
@@ -12938,14 +12939,14 @@
       "ergo_spec": "v0.6-dev",
       "subjects": {
         "artifact": {
-          "from": "trail.artifacts",
+          "from": "every trail.artifacts",
           "identified_by": "id",
           "has": {
             "ap": "ps"
           }
         },
         "pr": {
-          "from": "artifact.prs",
+          "from": "every artifact.prs",
           "identified_by": "id"
         }
       },
@@ -15050,7 +15051,7 @@
       },
       "subjects": {
         "kid": {
-          "from": "t.kids",
+          "from": "every t.kids",
           "identified_by": "id"
         },
         "t": {

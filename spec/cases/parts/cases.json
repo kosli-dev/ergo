@@ -1366,7 +1366,7 @@
   },
   {
     "description": "a child subject that reads its own field named like its parent's part, with no part of its own",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "every round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r": {"subject": "item", "checks": {"c": ".cov is 1", "d": "count of .cov is 1"}}}},
     "cases": [
       {
         "description": "prints no dot, because a bare name in the child doesn't read the parent's part",
@@ -1376,7 +1376,7 @@
         "status": {"r": "not_met"},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
-          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}, "failed_items": []},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/rounds/0/items/0/cov"], "name": "cov", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"round": "r1"}, "type": "item"}},
@@ -1462,7 +1462,7 @@
   },
   {
     "description": "a child subject with no part of its own, reading a field named like its parent's part",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r0": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r1": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r2": {"subject": "item", "checks": {"c": ".zz is 1"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"round": {"from": "rounds", "identified_by": "id", "has": {"cov": "d.b"}}, "item": {"from": "every round.items whose .cov is 1", "identified_by": "id"}}, "requirements": {"r0": {"subject": "item", "checks": {"c": ".cov is 1"}}, "r1": {"subject": "item", "checks": {"c": "count of .cov is 1"}}, "r2": {"subject": "item", "checks": {"c": ".zz is 1"}}}},
     "cases": [
       {
         "description": "prints no dot, because a bare name in the child doesn't read the parent's part",
@@ -1473,9 +1473,9 @@
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r0", "subject": {"id": null, "type": "item"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r1", "subject": {"id": null, "type": "item"}},
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r2", "subject": {"id": null, "type": "item"}},
-          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r1", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
-          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r2", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r0", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}, "failed_items": []},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r1", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}, "failed_items": []},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/rounds/0/items/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r2", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}, "failed_items": []},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r0", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r1", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated item ids", "value": []}], "passed": true, "requirement": "r2", "subject": {"id": null, "in": {"round": "r1"}, "type": "item"}},
@@ -1785,7 +1785,7 @@
           "identified_by": "id"
         },
         "kid": {
-          "from": "fam.kids",
+          "from": "every fam.kids",
           "identified_by": "id"
         }
       },
@@ -1881,7 +1881,7 @@
           "identified_by": "id"
         },
         "kid": {
-          "from": "fam.kids",
+          "from": "every fam.kids",
           "identified_by": "id"
         }
       },
@@ -2166,7 +2166,7 @@
           }
         },
         "kid": {
-          "from": "fam.kids",
+          "from": "every fam.kids",
           "identified_by": "id"
         }
       },
@@ -2282,7 +2282,7 @@
   },
   {
     "description": "a parent's name on the right side of a count of or sum of in a whose",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": "count of items whose n is count of fam.z is 1", "e": "count of items whose n is count of .fam.z is 2", "f": "count of items whose count of fam.z is 1 is 3"}, "subject": "kid"}}, "subjects": {"fam": {"from": "fams", "identified_by": "id"}, "kid": {"from": "fam.kids", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": "count of items whose n is count of fam.z is 1", "e": "count of items whose n is count of .fam.z is 2", "f": "count of items whose count of fam.z is 1 is 3"}, "subject": "kid"}}, "subjects": {"fam": {"from": "fams", "identified_by": "id"}, "kid": {"from": "every fam.kids", "identified_by": "id"}}},
     "cases": [
       {
         "description": "counts the parent's field, not the item's field of the same name, while the left side and a name written with a dot read the item's",
@@ -2774,7 +2774,7 @@
           }
         },
         "pull request": {
-          "from": "artifact.pra.pull_requests",
+          "from": "every artifact.pra.pull_requests",
           "identified_by": "url",
           "has": {
             "rev": "reviews"
@@ -2831,8 +2831,8 @@
         },
         "expressions": {
           "r": {
-            "$min_subjects": "count(matching(artifact.pra.pull_requests)) >= 1",
-            "$unique_ids": "count(repeated(ids(artifact.pra.pull_requests))) == 0"
+            "$min_subjects": "count(matching(every artifact.pra.pull_requests)) >= 1",
+            "$unique_ids": "count(repeated(ids(every artifact.pra.pull_requests))) == 0"
           }
         },
         "report": {
@@ -2850,7 +2850,7 @@
             },
             "pull request": {
               "description": "",
-              "from": "artifact.pra.pull_requests",
+              "from": "every artifact.pra.pull_requests",
               "identified_by": "url",
               "parts": {
                 "rev": {
@@ -4031,13 +4031,13 @@
   },
   {
     "description": "a part written with a dot on the left of a whose in a child's from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "art.items whose .cov.k is 1", "identified_by": "id", "has": {"cov": "cov"}}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"art": {"from": "arts", "identified_by": "id"}, "thing": {"from": "every art.items whose .cov.k is 1", "identified_by": "id", "has": {"cov": "cov"}}}, "requirements": {"r": {"subject": "thing", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "prints the dot the policy wrote",
         "rules": ["name.dot", "parts.where"],
         "input": {"arts": [{"id": "a1", "k": 1, "xs": [5], "items": [{"id": "i1", "art": {"k": 1, "xs": [5]}, "v": 1, "cov": {"k": 1}, "leaves": [{"id": "l1", "v": 1, "art": {"k": 1}}]}]}]},
-        "report": {"subjects": {"art": {"description": "", "from": "arts", "identified_by": "id", "parts": {}}, "thing": {"description": "", "from": "art.items whose .cov.k is 1", "identified_by": "id", "parts": {"cov": {"from": "cov", "identified_by": null}}}}},
+        "report": {"subjects": {"art": {"description": "", "from": "arts", "identified_by": "id", "parts": {}}, "thing": {"description": "", "from": "every art.items whose .cov.k is 1", "identified_by": "id", "parts": {"cov": {"from": "cov", "identified_by": null}}}}},
         "results": [
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/arts/0/items/0/cov/k"], "name": ".cov.k", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/arts/0/items/0/id"], "name": "id", "value": "i1"}], "passed": true, "requirement": "r", "subject": {"id": "i1", "in": {"art": "a1"}, "type": "thing"}}
@@ -4985,7 +4985,7 @@
           }
         },
         "kid": {
-          "from": "b.kids",
+          "from": "every b.kids",
           "identified_by": "id"
         }
       },
@@ -6017,7 +6017,7 @@
           }
         },
         "kid": {
-          "from": "b.kids",
+          "from": "every b.kids",
           "identified_by": "id"
         }
       },
@@ -6618,7 +6618,7 @@
           }
         },
         "kid": {
-          "from": "b.kids",
+          "from": "every b.kids",
           "identified_by": "id",
           "has": {
             "y": "xs"

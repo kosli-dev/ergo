@@ -284,7 +284,7 @@
   },
   {
     "description": "a parent's part of nine names in the whose of a count of",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"s": {"checks": {"c": "count of xs whose n is count of b.x.z is 1"}, "subject": "kid"}}, "subjects": {"b": {"from": "bs", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9"}, "identified_by": "id"}, "kid": {"from": "b.kids", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"s": {"checks": {"c": "count of xs whose n is count of b.x.z is 1"}, "subject": "kid"}}, "subjects": {"b": {"from": "bs", "has": {"x": "k1.k2.k3.k4.k5.k6.k7.k8.k9"}, "identified_by": "id"}, "kid": {"from": "every b.kids", "identified_by": "id"}}},
     "cases": [
       {
         "description": "reads the parent's part on the right side, so the item's own field of the same name is not counted",

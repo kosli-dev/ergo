@@ -105,14 +105,14 @@
   },
   {
     "description": "a grandchild of a subject read with every distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "c.licenses", "identified_by": "id"}, "term": {"from": "lic.terms", "identified_by": "t"}}, "requirements": {"r": {"subject": "term", "checks": {"k": "ok is true"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "every c.licenses", "identified_by": "id"}, "term": {"from": "every lic.terms", "identified_by": "t"}}, "requirements": {"r": {"subject": "term", "checks": {"k": "ok is true"}}}},
     "cases": [
       {
         "description": "its rows list the location under every copy of the grandparent",
         "rules": ["subjects.distinct", "subjects.chain.levels"],
         "input": {"sbom": {"components": [{"licenses": [{"id": "MIT", "terms": [{"ok": false, "t": "x"}]}], "name": "a"}, {"licenses": [{"id": "MIT", "terms": [{"ok": false, "t": "x"}]}], "name": "a"}]}},
         "results": [
-          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/sbom/components/0/licenses/0/terms/0", "/sbom/components/1/licenses/0/terms/0"], "name": "in-scope term count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"c": "a", "lic": "MIT"}, "type": "term"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/sbom/components/0/licenses/0/terms/0", "/sbom/components/1/licenses/0/terms/0"], "name": "in-scope term count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"c": "a", "lic": "MIT"}, "type": "term"}, "failed_items": []},
           {"cause": "value", "check": "k", "inputs": [{"locations": ["/sbom/components/0/licenses/0/terms/0/ok", "/sbom/components/1/licenses/0/terms/0/ok"], "name": "ok", "value": false}], "message": "ok is false", "passed": false, "requirement": "r", "subject": {"id": "x", "in": {"c": "a", "lic": "MIT"}, "type": "term"}}
         ]
       }
@@ -161,14 +161,14 @@
   },
   {
     "description": "a child of a subject read with every distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "c.licenses", "identified_by": "id"}}, "requirements": {"r": {"subject": "lic", "checks": {"k": "ok is true", "e": "every notes is \"fine\""}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "every c.licenses", "identified_by": "id"}}, "requirements": {"r": {"subject": "lic", "checks": {"k": "ok is true", "e": "every notes is \"fine\""}}}},
     "cases": [
       {
         "description": "the child's rows list the location under every copy of the parent",
         "rules": ["subjects.distinct", "subjects.chain"],
         "input": {"sbom": {"components": [{"licenses": [{"id": "MIT", "notes": ["bad"], "ok": false}], "name": "a"}, {"licenses": [{"id": "MIT", "notes": ["bad"], "ok": false}], "name": "a"}]}},
         "results": [
-          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/sbom/components/0/licenses/0", "/sbom/components/1/licenses/0"], "name": "in-scope lic count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"c": "a"}, "type": "lic"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/sbom/components/0/licenses/0", "/sbom/components/1/licenses/0"], "name": "in-scope lic count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "in": {"c": "a"}, "type": "lic"}, "failed_items": []},
           {"cause": "value", "check": "e", "failed_items": [{"cause": "value", "item": "item 1 of notes", "locations": ["/sbom/components/0/licenses/0/notes/0", "/sbom/components/1/licenses/0/notes/0"], "path": "item 1 of notes", "value": "bad"}], "inputs": [{"locations": ["/sbom/components/0/licenses/0/notes/0", "/sbom/components/1/licenses/0/notes/0"], "name": "notes[]", "value": ["bad"]}], "message": "item 1 of notes is \"bad\"", "passed": false, "requirement": "r", "subject": {"id": "MIT", "in": {"c": "a"}, "type": "lic"}},
           {"cause": "value", "check": "k", "inputs": [{"locations": ["/sbom/components/0/licenses/0/ok", "/sbom/components/1/licenses/0/ok"], "name": "ok", "value": false}], "message": "ok is false", "passed": false, "requirement": "r", "subject": {"id": "MIT", "in": {"c": "a"}, "type": "lic"}}
         ]
@@ -586,7 +586,7 @@
   },
   {
     "description": "locations read through the subject and read from the input",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "c.licenses", "identified_by": "id"}}, "requirements": {"r": {"subject": "c", "checks": {"own": "version is \"1\"", "d0": "version is $input.sbom.components[0].version", "d2": "version is $input.sbom.components[2].version"}}, "l": {"subject": "lic", "checks": {"k": "ok is true", "dl": "ok is $input.sbom.components[0].licenses[0].ok", "par": "c.version is \"1\"", "whole": "c is an object", "n": {"for": "every notes as note", "assert": "note is \"fine\""}}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "every c.licenses", "identified_by": "id"}}, "requirements": {"r": {"subject": "c", "checks": {"own": "version is \"1\"", "d0": "version is $input.sbom.components[0].version", "d2": "version is $input.sbom.components[2].version"}}, "l": {"subject": "lic", "checks": {"k": "ok is true", "dl": "ok is $input.sbom.components[0].licenses[0].ok", "par": "c.version is \"1\"", "whole": "c is an object", "n": {"for": "every notes as note", "assert": "note is \"fine\""}}}}},
     "cases": [
       {
         "description": "a read through the subject lists every copy, and a path from the input lists only the location it names",
@@ -879,7 +879,7 @@
   },
   {
     "description": "distinct with a list read on a parent subject",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"p": {"from": "rs", "identified_by": "name", "has": {"pl": "ok"}}, "w": {"from": "p.gs whose some distinct hs.k is in p.ok"}}, "requirements": {"r": {"subject": "w", "checks": {"in": "some distinct hs.k is in p.ok", "one": "some distinct hs.k is one of p.ok", "not": "every distinct hs.k is not in p.ok", "part": "some distinct hs.k is in p.pl"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"p": {"from": "rs", "identified_by": "name", "has": {"pl": "ok"}}, "w": {"from": "every p.gs whose some distinct hs.k is in p.ok"}}, "requirements": {"r": {"subject": "w", "checks": {"in": "some distinct hs.k is in p.ok", "one": "some distinct hs.k is one of p.ok", "not": "every distinct hs.k is not in p.ok", "part": "some distinct hs.k is in p.pl"}}}},
     "cases": [
       {
         "description": "it reads, in a check and in the from line",

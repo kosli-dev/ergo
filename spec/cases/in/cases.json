@@ -620,7 +620,7 @@
   },
   {
     "description": "a path that starts at a parent or a grandparent walks",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}, "file": {"from": "dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "dep", "checks": {"a": "name is in repo.allowed.name"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "every repo.deps", "identified_by": "name"}, "file": {"from": "dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "dep", "checks": {"a": "name is in repo.allowed.name"}}}},
     "cases": [
       {
         "description": "compares with the list of what it reads from each item of the parent",
@@ -646,7 +646,7 @@
   },
   {
     "description": "a path that starts at a grandparent walks",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}, "file": {"from": "dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "file", "checks": {"a": "path is in repo.allowed.name"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "every repo.deps", "identified_by": "name"}, "file": {"from": "every dep.files", "identified_by": "path"}}, "requirements": {"s": {"subject": "file", "checks": {"a": "path is in repo.allowed.name"}}}},
     "cases": [
       {
         "description": "compares with the list of what it reads from each item of the grandparent",
@@ -774,7 +774,7 @@
   },
   {
     "description": "a leading dot on a right side only keeps its dot in a name when a part, an alias or a parent has that name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "repo", "checks": {"missing": "x is in .lock.pkgs.name", "text": "x contains all of .x", "list": "x is one of .tags"}}, "t": {"subject": "dep", "checks": {"missing": "name is in .allowed.name"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "every repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "repo", "checks": {"missing": "x is in .lock.pkgs.name", "text": "x contains all of .x", "list": "x is one of .tags"}}, "t": {"subject": "dep", "checks": {"missing": "name is in .allowed.name"}}}},
     "cases": [
       {
         "description": "names the path without the dot when nothing has its name",
@@ -870,7 +870,7 @@
   },
   {
     "description": "a leading dot on a right side that walks keeps its dot when a parent subject has the name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "dep", "checks": {"dot": "name is in .repo.pkgs.name"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"repo": {"from": "repos", "identified_by": "id"}, "dep": {"from": "every repo.deps", "identified_by": "name"}}, "requirements": {"s": {"subject": "dep", "checks": {"dot": "name is in .repo.pkgs.name"}}}},
     "cases": [
       {
         "description": "names the field of the dep with the dot when it is empty, has an item that is not an object, or has no name",
