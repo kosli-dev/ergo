@@ -4284,8 +4284,8 @@ test_a_path_compared_with_itself_is_written_wrong_because_it_could_only_pass_or_
 	_sentence_problems({"for": "every xs as entry", "assert": "entry.y equals entry.y"}) == ["entry.y is compared with itself"]
 }
 
-test_a_whose_that_compares_a_field_with_itself_says_the_bare_name_is_the_items if {
-	message := "type is compared with itself, because in a whose it's read from the item: to read the subject's type, compare under assert"
+test_a_whose_that_compares_a_field_with_itself_says_to_read_the_subjects_field_by_its_name if {
+	message := "type is compared with itself, because in a whose it's read from the item: to read the subject's type, write thing.type"
 	_sentence_problems(`some conditions.status whose type equals type is "OK"`) == [message]
 	_sentence_problems({"for": "some conditions whose type equals type as condition", "assert": `condition.status is "OK"`}) == [concat("", ["for: ", message])]
 }
@@ -4853,11 +4853,9 @@ test_a_count_or_sum_that_starts_at_a_part_name_on_the_right_of_a_whose_reads_the
 	_part_walk_problems(has, "every xs.v whose n is count of x.z is 1") == _too_long
 	_part_walk_problems(has, "some xs whose n is at most sum of x.z is not empty") == _too_long
 	_part_walk_problems(has, "count of xs whose n is count of x.z is 1") == _too_long
-	_part_walk_problems(has, "sum of xs.v whose n is count of x.z is 1") == _too_long
 	_part_walk_reads({"x": _nine}, "every xs.v whose n is count of x.z is 1")
 	_part_walk_reads({"x": _nine}, "some xs whose n is at most sum of x.z is not empty")
 	_part_walk_reads({"x": _nine}, "count of xs whose n is count of x.z is 1")
-	_part_walk_reads({"x": _nine}, "sum of xs.v whose n is count of x.z is 1")
 	_part_walk_reads(has, "every xs.v whose n is count of .x.z is 1")
 	_part_walk_reads(has, "every xs.v whose count of x.z is 1 is 1")
 	_part_walk_reads(has, "count of xs whose count of x.z is 1 is 1")
@@ -4888,16 +4886,14 @@ test_a_count_or_sum_carries_a_part_tag_only_when_its_list_is_read_from_the_part 
 	policy := _part_walk_policy({"pa": "pa"}, {
 		"on_items": "count of items whose w is pa.w is 1",
 		"on_part": "count of pa.items whose w is pa.w is 1",
-		"sum_on_items": "sum of items.n whose w is pa.w is 3",
-		"sum_on_part": "sum of pa.items.n whose w is 2 is 5",
+		"sum_on_part": "sum of pa.items.n that is 5 is 5",
 	})
 	doc := {"things": [{"id": "a", "items": [{"w": 1, "n": 2}, {"w": 2, "n": 3}], "pa": {"w": 2, "items": [{"w": 2, "n": 5}]}}]}
 	report := ergo.report(doc, policy, {})
 	_tag_of(report, "on_items", "count of items whose w equals pa.w") == null
 	_tag_of(report, "on_items", "pa.w") == {"id": null, "name": "pa"}
 	_tag_of(report, "on_part", "count of pa.items whose w equals pa.w") == {"id": null, "name": "pa"}
-	_tag_of(report, "sum_on_items", "sum of items.n whose w equals pa.w") == null
-	_tag_of(report, "sum_on_part", "sum of pa.items.n whose w is 2") == {"id": null, "name": "pa"}
+	_tag_of(report, "sum_on_part", "sum of pa.items.n that is 5") == {"id": null, "name": "pa"}
 }
 
 test_a_part_in_an_option_of_an_any_of_counts_the_parts_path if {
@@ -4950,7 +4946,6 @@ test_a_count_or_sum_on_the_right_of_a_whose_of_a_count_reads_the_parents_part_an
 
 test_a_count_or_sum_on_the_right_of_a_whose_of_a_count_counts_the_parents_part_at_ten_names if {
 	_parent_part_problems({"x": _ten}, "count of xs whose n is count of b.x.z is 1") == [_too_long]
-	_parent_part_problems({"x": _ten}, "sum of xs.v whose n is count of b.x.z is 1") == [_too_long]
 	_parent_part_problems({"x": _nine}, "count of xs whose n is count of b.x.z is 1") == []
 	_parent_part_problems({"x": _ten}, "count of xs whose count of b.x.z is 1 is 1") == []
 }
@@ -5448,13 +5443,14 @@ test_a_count_whose_named_by_cant_be_read_fails_with_its_cause if {
 
 _sum_whose_cause(check, items) := [row[1] | some row in _tally_rows(check, [{"id": "t", "items": items}], {})]
 
-test_a_sum_whose_whose_reads_a_field_of_each_value_it_adds_fails_closed if {
-	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": 1, "k": "a"}]) == ["not_an_object"]
-	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": null, "k": "a"}]) == ["not_an_object"]
-	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"k": "a"}]) == ["absent"]
-	_sum_whose_cause(`sum of items.x.y whose k is "a" is 1`, [{"x": "ab", "k": "a"}]) == ["unusable"]
-	_sum_whose_cause(`sum of items.x whose k is "a" is 1`, [{"x": {"k": "a"}}]) == ["unusable"]
-	_sum_whose_cause(`sum of items.x whose k is "a" is 0`, [{"x": {"k": "b"}}]) == ["satisfied"]
+test_a_sum_whose_whose_reads_a_name_against_the_focus_is_written_wrong if {
+	message := "sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose"
+	_sentence_problems(`sum of items.x whose k is "a" is 1`) == [concat("", ["whose k: ", message])]
+	_sentence_problems(`sum of items whose k is "a" is 1`) == [concat("", ["whose k: ", message])]
+	_sentence_problems(`sum of items.x whose $params.k is lo is 1`) == [concat("", ["whose lo: ", message])]
+	_sentence_problems(`sum of items.x whose count of ys is 1 is 1`) == [concat("", ["whose ys: ", message])]
+	not _sentence_problems(`sum of items.x whose $params.k is 1 is 1`)
+	not _sentence_problems(`sum of items.x that is at least 1 is 1`)
 }
 
 test_a_sum_whose_worst_cause_wins_between_its_undecided_values if {
@@ -7716,10 +7712,10 @@ test_a_part_on_the_right_of_a_whose_in_a_count_or_a_sum_is_the_part if {
 	_parts_row(rep, "sum").passed
 }
 
-test_a_whose_in_a_count_compared_with_itself_says_the_subject_cant_be_read_there if {
-	message := "x is compared with itself, because in a whose it's read from the item, and a count or a sum can't read the subject's field there yet"
+test_a_whose_in_a_count_compared_with_itself_says_to_read_the_subjects_field_by_its_name if {
+	message := "x is compared with itself, because in a whose it's read from the item: to read the subject's x, write thing.x"
 	_sentence_problems("count of xs whose x equals x is 2") == [message]
-	_sentence_problems("sum of xs.y whose x equals .x is 2") == [message]
+	_sentence_problems("sum of xs.y whose x equals .x is 2") == ["whose x: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose", message]
 }
 
 test_a_part_on_the_right_after_every_is_not_the_item_compared_with_itself if {
@@ -8112,15 +8108,15 @@ _swap_lines := [
 _swap_walks := [
 	"every @lst.x is 1",
 	"some @lst.x is 1",
-	"every @lst.x whose y is 2 is 1",
+	"every @lst whose y is 2 is an object",
 	"every @lst.x is at least 1",
 	"every @lst, if any, is not empty",
-	"some @lst.x whose y is 2 is 1",
+	"some @lst whose y is 2 is a list",
 	"every @lst.sub is not empty",
 	"count of @lst is 2",
 	"count of @lst whose y is 2 is 1",
 	"sum of @lst.n is 5",
-	"sum of @lst.n whose y is 2 is 2",
+	"sum of @lst.n that is 2 is 2",
 	"@cov.x plus @cov.n is 3",
 	"count of @lst plus @cov.x is 3",
 	"days elapsed from @cov.t to @cov.t2 is 1",
@@ -11550,7 +11546,7 @@ test_every_list_phrase_walks_a_list_input_on_its_right_side if {
 }
 
 test_a_count_whose_right_side_walks_a_list_input_fails_with_the_first_cause_in_order if {
-	every check in ["count of m whose v is in $input.v is 1", "sum of m.v whose v is in $input.v is 1"] {
+	every check in ["count of m whose v is in $input.v is 1", "sum of m.v that is in $input.v is 1"] {
 		policy := _list_key_policy({"from": "$input", "identified_by": "id"}, check)
 		every m in [{"v": 1}, "s", 3] {
 			[[r.subject.id, r.cause] | some r in ergo.report([{"id": "a", "v": 1, "m": m}, {"id": "b"}], policy, {}).results; r.check == "c"] == [["a", "unusable"], ["b", "absent"]]
@@ -12148,25 +12144,16 @@ test_a_dot_in_a_from_whose_reads_the_field_named_like_the_subject if {
 	[r.passed | some r in rep.results; r.check == "c"] == [true]
 }
 
-test_a_distinct_phrase_that_reads_the_item_is_written_wrong_as_a_check if _distinct_scope_in(0)
-
-test_a_distinct_phrase_that_reads_the_item_is_written_wrong_on_a_line_of_an_assert_list if _distinct_scope_in(1)
-
-test_a_distinct_phrase_that_reads_the_item_is_written_wrong_under_a_for_line if _distinct_scope_in(2)
-
-test_a_distinct_phrase_that_reads_the_item_is_written_wrong_on_a_line_under_a_for_line if _distinct_scope_in(3)
-
-test_a_distinct_phrase_that_reads_the_item_is_written_wrong_in_an_any_of_option if _distinct_scope_in(4)
-
-test_a_distinct_phrase_that_reads_the_item_is_written_wrong_in_a_from_line if {
-	problems := _from_problems(_from_report({"rs": [{"fs": [{"k": 5, "lo": 1}]}]}, {"w": {"from": "every rs whose some distinct fs.k is at least lo"}}, {"c": "w exists"}, {}))
-	some i in problems
-	some p in i.value
-	startswith(p, "whose: distinct is about the value its path points at")
+test_a_distinct_phrase_that_reads_a_bare_name_reads_it_from_the_subject_so_it_is_not_written_wrong if {
+	every place in numbers.range(0, 4) {
+		_distinct_scope_reads(place)
+	}
+	problems := _from_problems(_from_report({"rs": [{"lo": 1, "fs": [{"k": 5, "lo": 1}]}]}, {"w": {"from": "every rs whose some distinct fs.k is at least lo"}}, {"c": "w exists"}, {}))
+	count(problems) == 0
 }
 
-_distinct_scope_in(place) if {
-	every sentence in [`every distinct xs.k is at least lo`, `some distinct xs.k is in ok`, `every distinct xs.k is at least .lo`, `every distinct xs.k whose lo is 1 is at least lo`, `every distinct xs.k is lo plus 4`] {
+_distinct_scope_reads(place) if {
+	every sentence in [`every distinct xs.k is at least lo`, `some distinct xs.k is in ok`, `every distinct xs.k is at least .lo`, `every distinct xs.k whose lo is 1 is at least lo`] {
 		checks := [
 			sentence,
 			{"assert": ["xs exists", sentence]},
@@ -12174,23 +12161,23 @@ _distinct_scope_in(place) if {
 			{"for": "every ys as y", "assert": ["y exists", sentence]},
 			{"any_of": {"x": sentence, "y": "xs exists"}},
 		]
-		_distinct_scope_problem({"c": checks[place]})
+		rep := _from_report({"s": {"lo": 3, "ok": [5], "xs": [{"k": 5, "lo": 1}, {"k": 5, "lo": 9}], "ys": [1]}}, {"s": {}}, {"c": checks[place]}, {})
+		[r.passed | some r in rep.results; r.check == "$well_formed"] == [true]
 	}
-}
-
-_distinct_scope_problem(checks) if {
-	rep := _from_report({"s": {"xs": [{"k": 5, "lo": 1}, {"k": 5, "lo": 9}], "ys": [1]}}, {"s": {}}, checks, {})
-	some r in rep.results
-	r.check == "$well_formed"
-	some i in r.inputs
-	i.name == "checks.c"
-	some p in i.value
-	contains(p, "distinct is about the value its path points at, but the phrase also reads ")
 }
 
 _rooted_field_rows(doc) := [[r.check, r.cause, r.message] | some r in ergo.report({"ts": [doc]}, {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "ts", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"w": "every rows.n is at least m named by k", "p": "m named by k is 1"}}}}, {}).results; r.check in {"w", "p"}]
 
 test_a_named_by_field_on_the_right_of_every_reads_the_subjects_key_and_never_an_items if {
-	_rooted_field_rows({"id": 1, "k": null, "m": null, "rows": [{"n": 3}]}) == [["p", "null", "k is null"], ["w", "null", "m is null"]]
+	_rooted_field_rows({"id": 1, "k": null, "m": null, "rows": [{"n": 3}]}) == [["p", "null", "k is null"], ["w", "null", "k is null"]]
 	_rooted_field_rows({"id": 1, "k": "m", "m": 3, "rows": [{"n": 3, "k": "n"}, {"n": 4}]}) == [["p", "unusable", "m is 3, which isn't an object"], ["w", "unusable", "m is 3, which isn't an object"]]
+}
+
+test_a_field_compared_with_itself_in_a_requirement_without_a_subject_says_the_subject if {
+	rep := ergo.report({}, {"ergo_spec": "v0.6-dev", "subjects": {}, "requirements": {"r": {"checks": {"c": "count of xs whose x equals x is 2"}}}}, {})
+	some r in rep.results
+	r.check == "$well_formed"
+	some i in r.inputs
+	i.name == "checks.c"
+	i.value == ["x is compared with itself, because in a whose it's read from the item: to read the subject's x, write the subject.x"]
 }

@@ -1265,15 +1265,15 @@
     ]
   },
   {
-    "description": "a quoted subject name that is a word of the syntax is printed as written in a sum whose",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": "sum of xs whose \"item\" is 1 is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
+    "description": "a quoted subject name that is a word of the syntax is printed as written in a count whose",
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": "count of xs whose \"item\" is 1 is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every releases"}}},
     "cases": [
       {
         "description": "the field the whose reads is printed with its quotes and no dot",
         "rules": ["name.dot", "tally.whose"],
         "input": {"releases": [{"id": "a", "item": 2, "name": "a", "xs": [{"item": 3, "v": 1}]}]},
         "results": [
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/releases/0/xs/0"], "name": "sum of xs whose \"item\" is 1", "value": 0}, {"locations": ["/releases/0/xs/0"], "name": "xs[]", "value": [{"item": 3, "v": 1}]}], "message": "sum of xs whose \"item\" is 1 is 0", "passed": false, "requirement": "r", "subject": {"id": {"id": "a", "item": 2, "name": "a", "xs": [{"item": 3, "v": 1}]}, "type": "item"}}
+          {"requirement": "r", "subject": {"type": "item", "id": {"id": "a", "name": "a", "item": 2, "xs": [{"item": 3, "v": 1}]}}, "check": "c", "message": "count of xs whose \"item\" is 1 is 0", "passed": false, "cause": "value", "inputs": [{"name": "count of xs whose \"item\" is 1", "value": 0, "locations": ["/releases/0/xs/0"]}, {"name": "xs[]", "value": [{"item": 3, "v": 1}], "locations": ["/releases/0/xs/0"]}]}
         ]
       }
     ]

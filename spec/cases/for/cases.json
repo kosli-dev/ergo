@@ -6529,42 +6529,7 @@
           ]
         },
         "results": [
-          {
-            "cause": "absent",
-            "check": "c",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 2 of pull_requests",
-                "path": "item 2 of pull_requests",
-                "value": null,
-                "locations": [
-                  "/releases/0/pull_requests/1"
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "name": "pull_requests[].title",
-                "value": [
-                  "Fix",
-                  null
-                ],
-                "locations": [
-                  "/releases/0/pull_requests/0/title",
-                  "/releases/0/pull_requests/1"
-                ]
-              }
-            ],
-            "message": "item 2 of pull_requests is missing",
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": "r1",
-              "type": "release"
-            }
-          }
+          {"requirement": "s", "subject": {"type": "release", "id": "r1"}, "check": "c", "message": "item 2 of pull_requests: title is missing", "passed": false, "cause": "absent", "inputs": [{"name": "pull_requests[].title", "value": ["Fix", null], "locations": ["/releases/0/pull_requests/0/title", "/releases/0/pull_requests/1"]}], "failed_items": [{"cause": "absent", "failed_assertions": [], "value": null, "locations": ["/releases/0/pull_requests/1"], "path": "item 2 of pull_requests", "item": "item 2 of pull_requests"}]}
         ]
       },
       {
@@ -11758,55 +11723,7 @@
           ]
         },
         "results": [
-          {
-            "cause": "absent",
-            "check": "c",
-            "failed_items": [
-              {
-                "cause": "absent",
-                "failed_assertions": [],
-                "item": "item 2 of items",
-                "locations": [
-                  "/things/0/items/1"
-                ],
-                "path": "item 2 of items",
-                "value": null
-              }
-            ],
-            "inputs": [
-              {
-                "locations": [
-                  "/things/0/items/0/v",
-                  "/things/0/items/1"
-                ],
-                "name": "items[].v",
-                "value": [
-                  {
-                    "subs": [
-                      1
-                    ]
-                  },
-                  null
-                ]
-              },
-              {
-                "locations": [
-                  "/things/0/items/0/v/subs/0"
-                ],
-                "name": "z.subs[]",
-                "value": [
-                  1
-                ]
-              }
-            ],
-            "message": "item 2 of items is missing",
-            "passed": false,
-            "requirement": "r",
-            "subject": {
-              "id": "a",
-              "type": "thing"
-            }
-          }
+          {"requirement": "r", "subject": {"type": "thing", "id": "a"}, "check": "c", "message": "item 2 of items: v is missing", "passed": false, "cause": "absent", "inputs": [{"name": "items[].v", "value": [{"subs": [1]}, null], "locations": ["/things/0/items/0/v", "/things/0/items/1"]}, {"name": "z.subs[]", "value": [1], "locations": ["/things/0/items/0/v/subs/0"]}], "failed_items": [{"cause": "absent", "failed_assertions": [], "value": null, "locations": ["/things/0/items/1"], "path": "item 2 of items", "item": "item 2 of items"}]}
         ]
       }
     ]

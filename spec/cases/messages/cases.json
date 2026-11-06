@@ -1133,7 +1133,7 @@
         "rules": ["message.alias"],
         "input": {"things": [{"id": "t", "d": {"b": "no", "items": [{"x": 1}]}}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "item 1 of lst", "locations": ["/things/0/d/items/0/x"], "path": "lst[0].x", "value": 1}], "inputs": [{"locations": ["/things/0/d/b"], "name": "cov.x", "part": {"id": null, "name": "cov"}, "value": null}, {"locations": ["/things/0/d/items/0/x"], "name": "lst[].x", "part": {"id": null, "name": "lst"}, "value": [1]}], "message": "item 1 of lst: cov is \"no\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"requirement": "s", "subject": {"type": "thing", "id": "t"}, "check": "c", "message": "cov is \"no\", which isn't an object", "passed": false, "cause": "unusable", "inputs": [{"name": "cov.x", "value": null, "part": {"id": null, "name": "cov"}, "locations": ["/things/0/d/b"]}, {"name": "lst[].x", "value": [1], "part": {"id": null, "name": "lst"}, "locations": ["/things/0/d/items/0/x"]}], "failed_items": [{"cause": "unusable", "value": 1, "locations": ["/things/0/d/items/0/x"], "path": "lst[0].x", "item": "item 1 of lst"}]}
         ]
       }
     ]
