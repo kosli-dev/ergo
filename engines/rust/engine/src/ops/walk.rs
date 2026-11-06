@@ -662,11 +662,11 @@ fn outside_inputs(walk: &Walk, ctx: &Ctx) -> Vec<Input> {
 pub(super) fn outside_inputs_of(checks: &[&Check], ctx: &Ctx) -> Vec<Input> {
     let mut inputs = Vec::new();
     for check in checks {
-        for path in check
-            .paths()
-            .into_iter()
-            .filter(|p| reads_outside(p) || (p.start == Start::Params && has_root_field(p)))
-        {
+        for path in check.paths().into_iter().filter(|p| {
+            reads_outside(p)
+                || (matches!(p.start, Start::Params | Start::Subject | Start::Own)
+                    && has_root_field(p))
+        }) {
             inputs.extend(path_inputs(path, ctx, &[], true));
         }
     }
@@ -717,7 +717,7 @@ pub(super) fn path_inputs(
         && (path::is_root(&path.start) || has_root_field(path))
         && !hides(path, hidden)
     {
-        let mut inputs = if matches!(path.start, Start::Params | Start::Input) {
+        let mut inputs = if matches!(path.start, Start::Subject | Start::Own) {
             Vec::new()
         } else {
             path_inputs(path, &at, hidden, false)
@@ -733,6 +733,11 @@ pub(super) fn path_inputs(
             .steps
             .iter()
             .filter_map(|step| match step {
+                Step::Field(field)
+                    if path::is_root(&field.start) || path::names_the_subject(&field.start) =>
+                {
+                    field_input(field, &at).map(|input| vec![input])
+                }
                 Step::Field(field) => Some(read_path(field, &at).inputs),
                 _ => None,
             })
@@ -931,7 +936,7 @@ fn right_needs(check: &Check, value: &Value) -> Option<&'static str> {
     }
 }
 
-fn listed_refs(check: &Check) -> Vec<&Path> {
+pub(super) fn listed_refs(check: &Check) -> Vec<&Path> {
     use super::lists::Wanted;
     match check {
         Check::In(check) => check.values.ref_paths(),
@@ -958,18 +963,7 @@ fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
             if matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
                 && state == Some(cause)
             {
-                let present = Check::Present(super::present::Present {
-                    path: path.clone(),
-                    missing: false,
-                });
-                return Some(message::message(
-                    &present,
-                    ctx,
-                    &Verdict {
-                        cause,
-                        inputs: Vec::new(),
-                    },
-                ));
+                return Some(message::root_text(path, ctx, cause));
             }
             let value = read.value.filter(|_| read.outcome == Outcome::Found)?;
             if cause != Cause::Unusable {
@@ -1085,17 +1079,16 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 };
                 let read = named.map(|(_, read)| read);
                 let off = message::off_item(check, ctx, verdict.cause);
-                let said =
-                    if let Some(fault) = message::subject_key_fault(check, ctx, verdict.cause) {
-                        fault
-                    } else if off.is_empty() {
-                        message::prefixed(
-                            &walked.item_name(item_segs),
-                            &message::message(check, at, verdict),
-                        )
-                    } else {
-                        off.join(", and ")
-                    };
+                let said = if let Some(fault) = message::root_fault(check, ctx, verdict.cause) {
+                    fault
+                } else if off.is_empty() {
+                    message::prefixed(
+                        &walked.item_name(item_segs),
+                        &message::message(check, at, verdict),
+                    )
+                } else {
+                    off.join(", and ")
+                };
                 Some(Failure {
                     msg: said,
                     order,
@@ -1303,8 +1296,45 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
         row.failed_items = Vec::new();
         row.parts = walk_faults(walk, &outer(ctx));
         row.message = Some(message::joined(row.parts.clone()));
+        return row;
+    }
+    let outer_ctx = outer(ctx);
+    let whose: Vec<&Check> = walk.whose.iter().collect();
+    let flaw = message::root_flaw(&whose, &outer_ctx).or_else(|| {
+        matches!(row.verdict.cause, Cause::Satisfied | Cause::Value)
+            .then(|| message::root_flaw(&[&*walk.check], &outer_ctx))
+            .flatten()
+    });
+    if let Some((cause, text)) = flaw {
+        let (cause, failed_items, message) = read_up_front(
+            row.verdict.cause,
+            std::mem::take(&mut row.failed_items),
+            cause,
+            &text,
+        );
+        if let Some(message) = message {
+            row.parts = vec![message.clone()];
+            row.message = Some(message);
+        }
+        row.verdict.cause = cause;
+        row.failed_items = failed_items;
     }
     row
+}
+
+pub(super) fn read_up_front(
+    row: Cause,
+    failed_items: Vec<Value>,
+    flaw: Cause,
+    text: &str,
+) -> (Cause, Vec<Value>, Option<String>) {
+    if row == flaw {
+        (row, failed_items, Some(text.to_string()))
+    } else if matches!(row, Cause::Satisfied | Cause::Value) {
+        (flaw, Vec::new(), Some(text.to_string()))
+    } else {
+        (row, failed_items, None)
+    }
 }
 
 fn walk_faults(walk: &Walk, outer_ctx: &Ctx) -> Vec<String> {

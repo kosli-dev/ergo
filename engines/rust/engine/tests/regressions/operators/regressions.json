@@ -2525,6 +2525,13 @@
                   "inputs": [
                     {
                       "locations": [
+                        "$params:/r"
+                      ],
+                      "name": "$params.r named by k",
+                      "value": null
+                    },
+                    {
+                      "locations": [
                         "/things/0/items/0/v",
                         "/things/0/items/1/v"
                       ],
@@ -2562,6 +2569,13 @@
             }
           ],
           "inputs": [
+            {
+              "locations": [
+                "$params:/r"
+              ],
+              "name": "$params.r named by k",
+              "value": null
+            },
             {
               "locations": [
                 "/things/0/items/0",

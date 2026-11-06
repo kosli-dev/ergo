@@ -559,6 +559,8 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
         };
     }
     let mut causes: Vec<Cause> = walked.failures.iter().map(|f| f.cause).collect();
+    let whose_checks: Vec<&Check> = counted.whose.iter().collect();
+    causes.extend(super::message::root_flaw(&whose_checks, &outer).map(|(cause, _)| cause));
     causes.extend(counted.whose.iter().filter_map(|c| unusable_ref(c, &outer)));
     let mut numbers: Vec<Value> = Vec::new();
     let mut at = outer.clone();
@@ -1151,6 +1153,10 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
         if walk::path_needs_an_object_subject(&counted.path, ctx) {
             return None;
         }
+        let whose: Vec<&Check> = counted.whose.iter().collect();
+        let root = super::message::root_flaw(&whose, &outer)
+            .filter(|(flaw, _)| *flaw == cause)
+            .map(|(_, text)| text);
         let walked = walk::walk(
             &counted.path,
             &outer,
@@ -1171,11 +1177,38 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                     let blocked = super::message::blocked_of(&counted.path, &outer);
                     if !blocked.is_empty() {
                         out.push(super::message::joined(blocked));
+                    } else {
+                        let read = path::read(&counted.path, &outer);
+                        if let (path::Outcome::Found, Some(value)) = (read.outcome, read.value)
+                            && !value.is_array()
+                            && !value.is_object()
+                        {
+                            out.push(super::message::isnt(
+                                &walked.name,
+                                value,
+                                "a list or an object",
+                            ));
+                        }
                     }
                 }
                 _ => {}
             }
-            return out.pop();
+            out.extend(root);
+            return if out.is_empty() {
+                None
+            } else {
+                Some(super::message::joined(out))
+            };
+        }
+        if let Some(text) = root {
+            let mut said: Vec<String> = walked
+                .failures
+                .iter()
+                .filter(|f| f.cause == cause)
+                .map(|f| f.msg.clone())
+                .collect();
+            said.push(text);
+            return Some(super::message::joined(said));
         }
         let mut always = std::collections::BTreeSet::new();
         let mut found: Vec<(Cause, String)> = walked
@@ -1216,7 +1249,7 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                     } else {
                         let off = super::message::off_item(check, &outer, verdict.cause);
                         if let Some(fault) =
-                            super::message::subject_key_fault(check, &outer, verdict.cause)
+                            super::message::root_fault(check, &outer, verdict.cause)
                         {
                             fault
                         } else if off.is_empty() {
@@ -2164,14 +2197,14 @@ mod tests {
     }
 
     #[test]
-    fn a_whose_that_compares_with_a_missing_param_is_not_a_ref_so_an_empty_list_still_counts_zero()
-    {
+    fn a_param_a_whose_compares_with_is_read_up_front_so_an_empty_list_fails_without_it() {
         let sentence = "count of xs whose k is $params.limit is 0";
         let run =
             |subject: Value, params: Value| run_on(sentence, subject, json!({}), params).cause;
-        assert_eq!(run(json!({"xs": []}), json!({})), Cause::Satisfied);
+        assert_eq!(run(json!({"xs": []}), json!({})), Cause::Absent);
+        assert_eq!(run(json!({"xs": []}), json!({"limit": null})), Cause::Null);
         assert_eq!(
-            run(json!({"xs": []}), json!({"limit": null})),
+            run(json!({"xs": []}), json!({"limit": 1})),
             Cause::Satisfied
         );
     }
@@ -2785,11 +2818,15 @@ mod tests {
 
     #[test]
     fn a_part_on_the_right_of_a_whose_that_is_missing_or_null_or_not_a_list_fails_closed() {
-        for (part, cause) in [
-            (None, Cause::Absent),
-            (Some(json!(null)), Cause::Null),
-            (Some(json!({"z": "abc"})), Cause::Unusable),
-            (Some(json!({"z": {"k": 1}})), Cause::Unusable),
+        for (part, in_every, in_count) in [
+            (None, Cause::Absent, Cause::Absent),
+            (Some(json!(null)), Cause::Null, Cause::Null),
+            (Some(json!({"z": "abc"})), Cause::Unusable, Cause::Unusable),
+            (
+                Some(json!({"z": {"k": 1}})),
+                Cause::Unusable,
+                Cause::Unusable,
+            ),
         ] {
             let mut input = rows_with_own_x();
             let thing = input["things"][0].as_object_mut().unwrap();
@@ -2797,9 +2834,9 @@ mod tests {
                 Some(value) => thing.insert("p".into(), value),
                 None => thing.remove("p"),
             };
-            for sentence in [
-                "every xs whose n is count of x.z exists",
-                "count of xs whose n is count of x.z is 2",
+            for (sentence, cause) in [
+                ("every xs whose n is count of x.z exists", in_every),
+                ("count of xs whose n is count of x.z is 2", in_count),
             ] {
                 assert_eq!(
                     verdict_in(&part_x(), sentence, &input, &[]).cause,

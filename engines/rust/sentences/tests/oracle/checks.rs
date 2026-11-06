@@ -6734,6 +6734,24 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "$params.m named by $params.k is 1",
+        "$params.m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $params.m named by $params.k is 1",
+        "count of xs whose v equals $params.m named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals pl.x is 1",
+        "count of xs whose v equals pl.x is 1",
+        &[],
+        &[],
+    ),
+    (
         "count of xs whose v equals v is 1",
         "count of xs whose v equals v is 1",
         &[
@@ -6830,6 +6848,203 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "v equals pr named by pr.k",
         "v equals pr named by pr.k",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $input.m named by k is 1",
+        "count of xs whose v equals $input.m named by k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $input.m named by pr.k is 1",
+        "count of xs whose v equals $input.m named by pr.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $input.m.z is 1",
+        "count of xs whose v equals $input.m.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $params.a.b is 1",
+        "count of xs whose v equals $params.a.b is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $params.d named by pr.k.e is 1",
+        "count of xs whose v equals $params.d named by pr.k.e is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $params.m named by $params.k is 0",
+        "count of xs whose v equals $params.m named by $params.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $params.m named by k is 1",
+        "count of xs whose v equals $params.m named by k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $params.m named by pr.k is 0",
+        "count of xs whose v equals $params.m named by pr.k is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $params.m named by pr.k is 1",
+        "count of xs whose v equals $params.m named by pr.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $params.m.z is 1",
+        "count of xs whose v equals $params.m.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals art.a.b is 1",
+        "count of xs whose v equals art.a.b is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals art.m named by pr.k is 1",
+        "count of xs whose v equals art.m named by pr.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals m named by pr.k is 1",
+        "count of xs whose v equals m named by pr.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals mm named by pr.k is 1",
+        "count of xs whose v equals mm named by pr.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals pl named by pr.k is 1",
+        "count of xs whose v equals pl named by pr.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals pl.b is 1",
+        "count of xs whose v equals pl.b is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals pr named by $params.k is 1",
+        "count of xs whose v equals pr named by $params.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals pr.a.b is 1",
+        "count of xs whose v equals pr.a.b is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose v equals pr.z is 0",
+        "count of xs whose v equals pr.z is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs.n that equals $params.m named by k is 1",
+        "count of xs.n that equals $params.m named by k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v equals $input.a.b exists",
+        "every xs whose v equals $input.a.b exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v equals $input.m.z exists",
+        "every xs whose v equals $input.m.z exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v equals $params.m named by pr.k exists",
+        "every xs whose v equals $params.m named by pr.k exists",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v equals $params.m.z exists",
+        "every xs whose v equals $params.m.z exists",
+        &[],
+        &[],
+    ),
+    ("id is \"no\"", "id is \"no\"", &[], &[]),
+    (
+        "sum of xs whose $params.m named by k equals 1 is 1",
+        "sum of xs whose $params.m named by k is 1 is 1",
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+        &[
+            "whose k: sum of adds up numbers, which have no fields: to keep numbers by their value, write that instead of whose",
+        ],
+    ),
+    (
+        "sum of xs.n that equals $params.m named by k is 1",
+        "sum of xs.n that equals $params.m named by k is 1",
+        &[
+            "that k: sum of adds up numbers, which have no fields, so k can't be read from one: to read the subject's k, write \u{1}.k",
+        ],
+        &[
+            "that k: sum of adds up numbers, which have no fields, so k can't be read from one: to read the subject's k, write \u{1}.k",
+        ],
+    ),
+    (
+        "sum of xs.n that equals $params.m named by pr.k is 1",
+        "sum of xs.n that equals $params.m named by pr.k is 1",
+        &[
+            "that pr: sum of adds up numbers, which have no fields, so pr can't be read from one: to read the subject's pr, write \u{1}.pr",
+        ],
+        &[],
+    ),
+    (
+        "count of xs whose v equals $params.q is 0",
+        "count of xs whose v equals $params.q is 0",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.v, if any, equals $params.q",
+        "every xs.v, if any, equals $params.q",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose $params.q does not exist is 0",
+        "count of xs whose $params.q does not exist is 0",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose $params.q exists is 0",
+        "count of xs whose $params.q exists is 0",
         &[],
         &[],
     ),
@@ -10507,6 +10722,31 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         ],
     ),
     ("every ys as y", "every ys as y", &[], &[]),
+    ("every ms as mm", "every ms as mm", &[], &[]),
+    (
+        "every xs as x, every x.ys whose v equals pr named by pr.k as y",
+        "every xs as x, every x.ys whose v equals pr named by pr.k as y",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v equals pr.a.b as x",
+        "every xs whose v equals pr.a.b as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as x, every x.ys whose v is x.k as y",
+        "every xs as x, every x.ys whose v equals x.k as y",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v equals pr.z as x",
+        "every xs whose v equals pr.z as x",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

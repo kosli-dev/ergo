@@ -826,10 +826,25 @@ fn focus_names(condition: &Condition, aliases: &[&str]) -> Vec<String> {
         .collect();
     right.extend(terms.iter().flat_map(term_paths));
     right.extend(phrase_list_path(&condition.phrase));
-    for path in right {
+    for path in &right {
         let named = first_key(path).is_some_and(|key| aliases.contains(&key)) && !dot_of(path);
         if !rooted_start(path) && !named {
             names.push(text(path));
+        }
+    }
+    let mut every_path: Vec<&Path> = match &condition.left {
+        Left::Path(path) => vec![path],
+        Left::Derived(derived) => vec![&derived.path],
+        Left::Elapsed(elapsed) => vec![&elapsed.from, &elapsed.to],
+    };
+    every_path.extend(right);
+    for path in every_path {
+        for step in &path.steps {
+            if let Step::NamedBy(Reference::Name(key)) | Step::Brackets(Reference::Name(key)) = step
+                && !aliases.contains(&key.as_str())
+            {
+                names.push(key.clone());
+            }
         }
     }
     names

@@ -1901,6 +1901,11 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("art.kids", "art.kids"),
     ("c", "c"),
     ("every ls", "every ls"),
+    ("art.prs", "art.prs"),
+    (
+        "every prs whose some xs.v equals $params.q",
+        "every prs whose some xs.v equals $params.q",
+    ),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[
