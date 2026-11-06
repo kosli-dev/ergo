@@ -11547,10 +11547,14 @@ _walk_parts(check, subj, raw, r) := [_m_not_object(check, subj)] if {
 	raw.cause == "not_an_object"
 }
 
-_walk_parts(check, _, raw, r) := [concat("", [_path_name(check.path), " is ", _m_state_word(raw.cause)])] if {
+_walk_parts(check, _, raw, r) := [_walk_empty_text(check, raw.cause)] if {
 	r.failed == []
 	raw.cause in {"absent", "null"}
 }
+
+_walk_empty_text(check, cause) := _m_root_alone(check.check, cause) if is_object(object.get(check, "check", null))
+
+else := concat("", [_path_name(check.path), " is ", _m_state_word(cause)])
 
 _walk_parts(check, subj, raw, r) := fs if {
 	r.failed == []

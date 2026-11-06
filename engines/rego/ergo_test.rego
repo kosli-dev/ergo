@@ -12191,3 +12191,10 @@ test_a_field_compared_with_itself_in_a_requirement_without_a_subject_gives_no_ad
 	i.name == "checks.c"
 	i.value == ["x is compared with itself, because in a whose it's read from the item"]
 }
+
+test_message_of_an_empty_list_read_on_the_right_names_the_root_that_is_missing_not_the_list if {
+	rep := ergo.report({"prs": [{"id": "p", "ys": [{}], "xs": []}]}, {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "min_subjects": 0, "checks": {"c": {"for": "every ys as y", "assert": "every xs.v, if any, equals y.z"}}}}}, {})
+	some r in rep.results
+	r.check == "c"
+	r.message == "item 1 of ys: y.z is missing"
+}

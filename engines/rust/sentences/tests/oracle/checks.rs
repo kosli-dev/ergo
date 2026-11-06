@@ -7037,6 +7037,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "every xs.v, if any, equals y.z",
+        "every xs.v, if any, equals y.z",
+        &[],
+        &[],
+    ),
+    (
         "count of xs whose $params.q does not exist is 0",
         "count of xs whose $params.q does not exist is 0",
         &[],
