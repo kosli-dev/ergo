@@ -7054,6 +7054,29 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "\"all batches\" is a list",
+        "\"all batches\" is a list",
+        &[],
+        &[],
+    ),
+    ("number is at least 1", "number is at least 1", &[], &[]),
+    ("passed is true", "passed is true", &[], &[]),
+    ("tag exists", "tag exists", &[], &[]),
+    (
+        "tag matches \"^[a-z]+$\"",
+        "tag matches \"^[a-z]+$\"",
+        &[],
+        &[],
+    ),
+    (
+        "tags matches \"^[a-z]+$\"",
+        "tags matches \"^[a-z]+$\"",
+        &[],
+        &[],
+    ),
+    ("version is \"1.2.0\"", "version is \"1.2.0\"", &[], &[]),
+    ("version matches \"^1\"", "version matches \"^1\"", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

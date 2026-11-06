@@ -525,7 +525,7 @@
           "identified_by": "id"
         },
         "thing": {
-          "from": "kid.things whose count of kid.arr is 1",
+          "from": "every kid.things whose count of kid.arr is 1",
           "identified_by": "id"
         }
       }
@@ -555,12 +555,12 @@
             },
             "$min_subjects": {
               "description": "The in-scope thing count is at least 1",
-              "expression": "count(matching(kid.things)) >= 1",
+              "expression": "count(matching(every kid.things)) >= 1",
               "meta": {}
             },
             "$unique_ids": {
               "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(kid.things))) == 0",
+              "expression": "count(repeated(ids(every kid.things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -626,7 +626,9 @@
               "kid": "k1"
             },
             "type": "thing"
-          }
+          },
+          "failed_items": [],
+          "message": "in-scope thing count is 0"
         },
         {
           "cause": "satisfied",
@@ -671,7 +673,8 @@
               "kid": "k1"
             },
             "type": "thing"
-          }
+          },
+          "message": ".kid is missing"
         },
         {
           "cause": "absent",
@@ -696,7 +699,8 @@
               "kid": "k1"
             },
             "type": "thing"
-          }
+          },
+          "message": ".kid is missing"
         }
       ],
       "subjects": {
@@ -708,7 +712,7 @@
         },
         "thing": {
           "description": "",
-          "from": "kid.things whose count of kid.arr is 1",
+          "from": "every kid.things whose count of kid.arr is 1",
           "identified_by": "id",
           "parts": {}
         }
@@ -4586,7 +4590,7 @@
           "identified_by": "id"
         },
         "thing": {
-          "from": "kid.things whose n equals count of kid.arr",
+          "from": "every kid.things whose n equals count of kid.arr",
           "identified_by": "id"
         }
       }
@@ -4607,12 +4611,12 @@
             },
             "$min_subjects": {
               "description": "The in-scope thing count is at least 1",
-              "expression": "count(matching(kid.things)) >= 1",
+              "expression": "count(matching(every kid.things)) >= 1",
               "meta": {}
             },
             "$unique_ids": {
               "description": "Every thing id is unique",
-              "expression": "count(repeated(ids(kid.things))) == 0",
+              "expression": "count(repeated(ids(every kid.things))) == 0",
               "meta": {}
             },
             "$well_formed": {
@@ -4680,7 +4684,8 @@
               "kid": "k1"
             },
             "type": "thing"
-          }
+          },
+          "failed_items": []
         },
         {
           "cause": "satisfied",
@@ -4782,7 +4787,8 @@
               "kid": "k1"
             },
             "type": "thing"
-          }
+          },
+          "message": "n is 1, and count of kid.arr is 2"
         },
         {
           "cause": "satisfied",
@@ -4816,7 +4822,7 @@
         },
         "thing": {
           "description": "",
-          "from": "kid.things whose n equals count of kid.arr",
+          "from": "every kid.things whose n equals count of kid.arr",
           "identified_by": "id",
           "parts": {}
         }

@@ -46,10 +46,16 @@ pub enum Source {
         every: bool,
         distinct: bool,
         each_of: Option<path::Path>,
+        names: usize,
+        every_text: String,
     },
     Child {
         path: path::Path,
+        every: bool,
+        distinct: bool,
         each_of: Option<path::Path>,
+        names: usize,
+        every_text: String,
     },
 }
 
@@ -526,10 +532,19 @@ fn from_problems(
         if parent.trim().is_empty() {
             problems.push(format!("\"{parent}\" isn't a subject name"));
         }
-        if line.every {
-            problems.push(
-                "every can't go with a from line that starts at another subject yet".to_string(),
+        if line.every && matches!(relation, Relation::Narrows(_)) {
+            let shown = s::print_path(
+                &s::Path {
+                    position: None,
+                    start: line.path.start.clone(),
+                    steps: Vec::new(),
+                },
+                s::Side::Left,
+                &[],
             );
+            problems.push(format!(
+                "{shown} is a subject: write {shown} whose \u{2026} to narrow it, without every"
+            ));
         }
     }
     if line.every && line.named_by_each_of.is_some() {
@@ -610,12 +625,21 @@ fn source_of(
                 None => None,
                 Some(each) => Some(scope.path(each)?),
             };
-            Ok(Source::Child { path, each_of })
+            let names = 1 + named_steps(&steps);
+            Ok(Source::Child {
+                path,
+                every: line.every,
+                distinct: line.every && line.distinct,
+                each_of,
+                names,
+                every_text: every_text(line),
+            })
         }
         _ => {
             if let s::Start::Field { key, .. } | s::Start::Quoted(key) = &line.path.start {
                 steps.insert(0, Step::Key(key.clone()));
             }
+            let names = named_steps(&steps) + usize::from(line.path.start == s::Start::Input);
             let each_of = match &line.named_by_each_of {
                 None => None,
                 Some(each) => {
@@ -648,9 +672,32 @@ fn source_of(
                 every: line.every,
                 distinct: line.every && line.distinct,
                 each_of,
+                names,
+                every_text: every_text(line),
             })
         }
     }
+}
+
+fn named_steps(steps: &[Step]) -> usize {
+    steps
+        .iter()
+        .filter(|step| !matches!(step, Step::Index(_)))
+        .count()
+}
+
+fn every_text(line: &s::FromLine) -> String {
+    s::print_from(
+        &s::FromLine {
+            every: true,
+            distinct: false,
+            path: line.path.clone(),
+            named_by_each_of: None,
+            whose: Vec::new(),
+        },
+        &[],
+        &[],
+    )
 }
 
 fn source_text(source: &Source) -> String {
@@ -677,7 +724,19 @@ fn source_text(source: &Source) -> String {
             };
             format!("{words}{text}")
         }
-        Source::Child { path, .. } => name::name(path),
+        Source::Child {
+            path,
+            every,
+            distinct,
+            ..
+        } => {
+            let words = match (*every, *distinct) {
+                (true, true) => "every distinct ",
+                (true, false) => "every ",
+                _ => "",
+            };
+            format!("{words}{}", name::name(path))
+        }
     }
 }
 
@@ -1159,7 +1218,7 @@ impl Reading {
                 refs.extend(each_of.iter().filter(|each| path::is_ref(each)).cloned());
                 refs
             }
-            Some(Source::Child { path, each_of }) => {
+            Some(Source::Child { path, each_of, .. }) => {
                 let mut refs = path::step_refs(path);
                 refs.extend(each_of.iter().filter(|each| path::is_ref(each)).cloned());
                 refs
@@ -1606,12 +1665,24 @@ mod tests {
     }
 
     #[test]
-    fn every_cannot_go_with_a_from_line_that_starts_at_a_subject() {
-        let (_, r) = reading(json!({"art": {"from": "arts"}, "p": {"from": "every art.prs"}}));
-        assert_eq!(
-            texts(&r, "p", "subjects.p.from"),
-            ["every can't go with a from line that starts at another subject yet"]
-        );
+    fn every_reads_a_list_in_each_parent_but_never_stands_for_the_subject_itself() {
+        let (_, r) = reading(json!({
+            "art": {"from": "arts"},
+            "p": {"from": "every art.prs"},
+            "q": {"from": "every art"},
+            "w": {"from": "every art whose x is 1"}
+        }));
+        assert!(!r.infos["p"].problems.contains_key("subjects.p.from"));
+        assert!(matches!(
+            r.lowered("p").unwrap().source,
+            Source::Child { every: true, .. }
+        ));
+        for name in ["q", "w"] {
+            assert_eq!(
+                texts(&r, name, &format!("subjects.{name}.from")),
+                ["art is a subject: write art whose \u{2026} to narrow it, without every"]
+            );
+        }
     }
 
     #[test]
