@@ -1069,7 +1069,7 @@
   },
   {
     "description": "a from line whose that reads a field named like the item's alias reads the item's own field",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": ".x is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "rel.kids whose kid.x is 1"}, "rel": {"from": "every rels"}}},
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": ".x is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "every rel.kids whose kid.x is 1"}, "rel": {"from": "every rels"}}},
     "cases": [
       {
         "description": "a kid whose own kid field has x 1 is the subject, whatever its own x",
@@ -1131,7 +1131,7 @@
   },
   {
     "description": "a from line of a child whose whose reads a field named like the parent reads the kid's field",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": ".x is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "rel.kids whose rel.w is 1"}, "rel": {"from": "every rels"}}},
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": ".x is 1"}, "subject": "kid"}}, "subjects": {"kid": {"from": "every rel.kids whose rel.w is 1"}, "rel": {"from": "every rels"}}},
     "cases": [
       {
         "description": "a kid with a rel field whose w is 1 is a subject",
@@ -1294,7 +1294,7 @@
   },
   {
     "description": "a sort key named like a parent subject sorts by the item's field, not by the parent",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.v is 2", "for": "first of ys sorted by s as y"}}, "subject": "t"}}, "subjects": {"s": {"from": "every ps"}, "t": {"from": "s.items"}}},
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.v is 2", "for": "first of ys sorted by s as y"}}, "subject": "t"}}, "subjects": {"s": {"from": "every ps"}, "t": {"from": "every s.items"}}},
     "cases": [
       {
         "description": "the item with the lowest s comes first",
@@ -1316,7 +1316,7 @@
   },
   {
     "description": "a sort key named like a grandparent subject sorts by the item's field, not by the grandparent",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.v is 2", "for": "first of ys sorted by s as y"}}, "subject": "t"}}, "subjects": {"s": {"from": "every ps"}, "t": {"from": "u.items"}, "u": {"from": "s.mids"}}},
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"c": {"assert": "y.v is 2", "for": "first of ys sorted by s as y"}}, "subject": "t"}}, "subjects": {"s": {"from": "every ps"}, "t": {"from": "every u.items"}, "u": {"from": "every s.mids"}}},
     "cases": [
       {
         "description": "the item with the lowest s comes first",
@@ -1346,7 +1346,7 @@
         "input": {"xs": [{"first": 1, "item": 1, "k": 1}, {"first": [1, 2], "item": 2, "k": 2}, {"k": 3}, "a"]},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
-          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope item count", "value": 1}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}, "message": "item 1 of xs is an object, item 4 of xs is text"},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/xs/0/item"], "name": ".item", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"first": 1, "item": 1, "k": 1}, "type": "item"}},
           {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/xs/1/item"], "name": ".item", "value": 2}], "message": ".item is 2", "passed": false, "requirement": "r", "subject": {"id": {"first": [1, 2], "item": 2, "k": 2}, "type": "item"}},
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/xs/2"], "name": ".item", "value": null}], "message": ".item is missing", "passed": false, "requirement": "r", "subject": {"id": {"k": 3}, "type": "item"}},
@@ -1366,7 +1366,7 @@
         "input": {"xs": [{"first": 1, "item": 1, "k": 1}, {"first": [1, 2], "item": 2, "k": 2}, {"k": 3}, "a"]},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "first"}},
-          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope first count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "first"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope first count", "value": 1}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "first"}, "message": "item 1 of xs is an object, item 4 of xs is text"},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/xs/0/first"], "name": ".first", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"first": 1, "item": 1, "k": 1}, "type": "first"}},
           {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/xs/1/first"], "name": ".first", "value": [1, 2]}], "message": ".first is [1, 2], which isn't a number", "passed": false, "requirement": "r", "subject": {"id": {"first": [1, 2], "item": 2, "k": 2}, "type": "first"}},
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/xs/2"], "name": ".first", "value": null}], "message": ".first is missing", "passed": false, "requirement": "r", "subject": {"id": {"k": 3}, "type": "first"}},
@@ -1378,7 +1378,7 @@
   },
   {
     "description": "the expression of a from line whose that reads a field named like the subject is the condition as written",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"q": {"checks": {"c": ".k is 1"}, "subject": "my t"}, "r": {"checks": {"c": ".k is 1"}, "subject": "t"}, "w": {"checks": {"c": ".k is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "s.items whose \"item\" is 1"}, "my t": {"from": "s.items whose \"my t\" is 1"}, "s": {"from": "every ps"}, "t": {"from": "s.items whose t is 1 and whose .t is 1"}}},
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"q": {"checks": {"c": ".k is 1"}, "subject": "my t"}, "r": {"checks": {"c": ".k is 1"}, "subject": "t"}, "w": {"checks": {"c": ".k is 1"}, "subject": "item"}}, "subjects": {"item": {"from": "every s.items whose \"item\" is 1"}, "my t": {"from": "every s.items whose \"my t\" is 1"}, "s": {"from": "every ps"}, "t": {"from": "every s.items whose t is 1 and whose .t is 1"}}},
     "cases": [
       {
         "description": "the subject's name stays as written, bare or with its dot, a quoted name stays quoted, and a quoted word of the syntax has a dot, while the inputs and messages name the field with its dot",
@@ -1409,7 +1409,7 @@
         "input": {"xs": [{"item": [1], "k": 1}, {"item": [1, 2], "k": 2}, {"k": 3}, "a"]},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
-          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope item count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0"], "name": "in-scope item count", "value": 1}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}, "message": "item 1 of xs is an object, item 4 of xs is text"},
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/xs/0/item/0"], "name": ".item[]", "value": [1]}, {"locations": ["/xs/0/item/0"], "name": "count of .item", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"item": [1], "k": 1}, "type": "item"}},
           {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/xs/1/item/0", "/xs/1/item/1"], "name": ".item[]", "value": [1, 2]}, {"locations": ["/xs/1/item/0", "/xs/1/item/1"], "name": "count of .item", "value": 2}], "message": "count of .item is 2", "passed": false, "requirement": "r", "subject": {"id": {"item": [1, 2], "k": 2}, "type": "item"}},
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": [], "name": ".item", "value": []}, {"locations": [], "name": "count of .item", "value": null}], "message": ".item is missing", "passed": false, "requirement": "r", "subject": {"id": {"k": 3}, "type": "item"}},
@@ -1429,7 +1429,7 @@
         "input": {"xs": ["a", [1], [2]]},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
-          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0", "/xs/1", "/xs/2"], "name": "in-scope item count", "value": 3}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "item"}},
+          {"cause": "unusable", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/xs/0", "/xs/1", "/xs/2"], "name": "in-scope item count", "value": 3}], "passed": false, "requirement": "r", "subject": {"id": null, "type": "item"}, "message": "item 1 of xs is text, item 2 of xs is a list"},
           {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "item": "item", "locations": ["/xs/0"], "path": "item", "value": "a"}], "inputs": [{"locations": [], "name": "item", "value": []}], "message": "item is \"a\", which isn't a list or an object", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "item"}},
           {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/xs/1/0"], "name": "item[]", "value": [1]}], "passed": true, "requirement": "r", "subject": {"id": [1], "type": "item"}},
           {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "item": "item 1 of item", "locations": ["/xs/2/0"], "path": "item 1 of item", "value": 2}], "inputs": [{"locations": ["/xs/2/0"], "name": "item[]", "value": [2]}], "message": "item 1 of item is 2", "passed": false, "requirement": "r", "subject": {"id": [2], "type": "item"}}

@@ -63,11 +63,12 @@
         ]
       },
       {
-        "description": "fails min_subjects as unusable on a string",
+        "description": "makes a string one subject",
         "rules": ["subjects.from"],
         "input": {"t": "a"},
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "t is \"a\", which isn't a list or an object", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/t"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": "a"}, "check": "c", "message": "subject is \"a\", which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/t"]}]}
         ]
       },
       {
@@ -265,17 +266,17 @@
   },
   {
     "description": "a from line that is only named by a param",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "$input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "every $input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
     "params": {"k": "a"},
     "cases": [
       {
         "description": "names the line as written in both expressions",
         "rules": ["added.text", "subjects.from"],
         "input": {"a": [{"id": 1}]},
-        "expressions": {"r": {"$min_subjects": "count(matching($input named by $params.k)) >= 1", "$unique_ids": "count(repeated(ids($input named by $params.k))) == 0"}},
+        "expressions": {"r": {"$min_subjects": "count(matching(every $input named by $params.k)) >= 1", "$unique_ids": "count(repeated(ids(every $input named by $params.k))) == 0"}},
         "results": [
           {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
-          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/a/0"], "name": "in-scope s count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/a/0"], "name": "in-scope s count", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}, "failed_items": []},
           {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated s ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "s"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/a/0"], "name": "s", "value": {"id": 1}}], "passed": true, "requirement": "r", "subject": {"id": {"id": 1}, "type": "s"}}
         ]
@@ -352,13 +353,14 @@
         ]
       },
       {
-        "description": "names a list that breaks from $input",
+        "description": "says when a name read as a list in one item isn't one in another, and still checks what it read",
         "rules": ["subjects.every.broken"],
         "input": [{"commits": [{"x": 1}]}, {"commits": 5}],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "item 2 of $input: commits is 5, which isn't a list or an object", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "unusable", "value": 5, "locations": ["/1/commits"]}], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0/commits/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "commits is a list in item 1 of $input but 5 in item 2; item 1 of $input: item 1 of commits is an object, item 2 of $input: commits is a number", "passed": false, "cause": "unusable", "failed_items": [], "inputs": [{"name": "in-scope subject count", "value": 2, "locations": ["/0/commits/0", "/1/commits"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 5}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/1/commits"]}], "message": "subject is 5, which isn't an object"}
         ]
       }
     ]
@@ -378,13 +380,14 @@
         ]
       },
       {
-        "description": "names a list that breaks from $input",
+        "description": "says when a name read as a list in one item isn't one in another, and still checks what it read",
         "rules": ["subjects.every.broken"],
         "input": [{"commits": [{"x": 1}]}, {"commits": 5}],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "item 2 of $input: commits is 5, which isn't a list or an object", "passed": false, "cause": "unusable", "failed_items": [{"path": "$input[1].commits", "item": "$input[1].commits", "cause": "unusable", "value": 5, "locations": ["/1/commits"]}], "inputs": [{"name": "in-scope subject count", "value": 1, "locations": ["/0/commits/0"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "commits is a list in item 1 of $input but 5 in item 2; item 1 of $input: item 1 of commits is an object, item 2 of $input: commits is a number", "passed": false, "cause": "unusable", "failed_items": [], "inputs": [{"name": "in-scope subject count", "value": 2, "locations": ["/0/commits/0", "/1/commits"]}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]},
-          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "subject", "id": {"x": 1}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": 5}, "check": "c", "passed": false, "cause": "not_an_object", "inputs": [{"name": "x", "value": null, "locations": ["/1/commits"]}], "message": "subject is 5, which isn't an object"}
         ]
       }
     ]
@@ -654,11 +657,11 @@
     "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "$input.commits"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
-        "description": "ends unusable, because a key needs an object",
+        "description": "ends unusable and names the list to read with every, because a key needs an object",
         "rules": ["subjects.from", "path.unusable"],
         "input": [{"commits": [{"x": 1}]}],
         "results": [
-          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "in-scope subject count is 0", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
+          {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$min_subjects", "message": "$input is a list: write every $input.commits to read each item", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope subject count", "value": 0, "locations": []}]},
           {"requirement": "s", "subject": {"type": "subject", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated subject ids", "value": [], "locations": []}]}
         ]
       }
@@ -705,15 +708,12 @@
     "policy": {"ergo_spec": "v0.6-dev", "subjects": {"p": {"from": "$input"}, "q": {"from": "p.commits"}}, "requirements": {"s": {"subject": "q", "checks": {"c": "x exists"}}}},
     "cases": [
       {
-        "description": "reads each item, and an item that isn't an object fails not_an_object",
+        "description": "fails min_subjects as unusable when the items aren't all of one type, and reads no child",
         "rules": ["subjects.chain", "subjects.chain.not_an_object", "subjects.from"],
         "input": [{"commits": [{"x": 1}]}, 5],
         "results": [
-          {"requirement": "s", "subject": {"type": "q", "id": null, "in": {"p": {"commits": [{"x": 1}]}}}, "check": "$min_subjects", "passed": true, "cause": "satisfied", "inputs": [{"name": "in-scope q count", "value": 1, "locations": ["/0/commits/0"]}]},
-          {"requirement": "s", "subject": {"type": "q", "id": null, "in": {"p": 5}}, "check": "$min_subjects", "message": "p is 5, which isn't a list or an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "in-scope q count", "value": 0, "locations": []}]},
-          {"requirement": "s", "subject": {"type": "q", "id": null, "in": {"p": {"commits": [{"x": 1}]}}}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated q ids", "value": [], "locations": []}]},
-          {"requirement": "s", "subject": {"type": "q", "id": null, "in": {"p": 5}}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated q ids", "value": [], "locations": []}]},
-          {"requirement": "s", "subject": {"type": "q", "id": {"x": 1}, "in": {"p": {"commits": [{"x": 1}]}}}, "check": "c", "passed": true, "cause": "satisfied", "inputs": [{"name": "x", "value": 1, "locations": ["/0/commits/0/x"]}]}
+          {"requirement": "s", "subject": {"type": "q", "id": null}, "check": "$min_subjects", "passed": false, "cause": "unusable", "inputs": [{"name": "in-scope q count", "value": 0, "locations": []}], "message": "in-scope q count is 0"},
+          {"requirement": "s", "subject": {"type": "q", "id": null}, "check": "$unique_ids", "passed": true, "cause": "satisfied", "inputs": [{"name": "repeated q ids", "value": [], "locations": []}]}
         ]
       }
     ]
@@ -802,7 +802,7 @@
           "identified_by": "id"
         },
         "kid": {
-          "from": "\"x y\".items",
+          "from": "every \"x y\".items",
           "identified_by": "n"
         },
         "y y": {
@@ -851,8 +851,8 @@
         },
         "expressions": {
           "r": {
-            "$min_subjects": "count(matching(\"x y\".items)) >= 1",
-            "$unique_ids": "count(repeated(ids(\"x y\".items))) == 0"
+            "$min_subjects": "count(matching(every \"x y\".items)) >= 1",
+            "$unique_ids": "count(repeated(ids(every \"x y\".items))) == 0"
           },
           "s": {
             "$min_subjects": "count(matching(\"y y\")) >= 1",
@@ -869,7 +869,7 @@
             },
             "kid": {
               "description": "",
-              "from": "\"x y\".items",
+              "from": "every \"x y\".items",
               "identified_by": "n",
               "parts": {}
             },
@@ -927,7 +927,7 @@
       }
     ]
   },
-  {"description": "a subject name with a space is quoted through a part and with a null definition", "policy": {"ergo_spec": "v0.6-dev", "subjects": {"x y": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}, "kid": {"from": "\"x y\".pa.items", "identified_by": "n"}, "z z": null}, "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}, "s": {"subject": "z z", "checks": {"c": "n exists"}}}}, "cases": [{"description": "a child read through a part of a spaced subject, and a spaced subject defined as null, quote the name", "rules": ["name.keys", "added.text", "report.subjects"], "input": {"things": [{"id": "a", "meta": {"items": [{"n": 1}]}}], "z z": [{"n": 1}]}, "expressions": {"r": {"$min_subjects": "count(matching(\"x y\".pa.items)) >= 1", "$unique_ids": "count(repeated(ids(\"x y\".pa.items))) == 0"}, "s": {"$min_subjects": "count(matching(\"z z\")) >= 1", "$unique_ids": "count(repeated(ids(\"z z\"))) == 0"}}, "report": {"subjects": {"x y": {"description": "", "from": "things", "identified_by": "id", "parts": {"pa": {"from": "meta", "identified_by": null}}}, "z z": {"description": "", "from": "\"z z\"", "identified_by": null, "parts": {}}, "kid": {"description": "", "from": "\"x y\".pa.items", "identified_by": "n", "parts": {}}}}, "results": [{"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/meta/items/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": 1, "in": {"x y": "a"}, "type": "kid"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/z z/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": {"n": 1}, "type": "z z"}}]}]},
+  {"description": "a subject name with a space is quoted through a part and with a null definition", "policy": {"ergo_spec": "v0.6-dev", "subjects": {"x y": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}, "kid": {"from": "every \"x y\".pa.items", "identified_by": "n"}, "z z": null}, "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}, "s": {"subject": "z z", "checks": {"c": "n exists"}}}}, "cases": [{"description": "a child read through a part of a spaced subject, and a spaced subject defined as null, quote the name", "rules": ["name.keys", "added.text", "report.subjects"], "input": {"things": [{"id": "a", "meta": {"items": [{"n": 1}]}}], "z z": [{"n": 1}]}, "expressions": {"r": {"$min_subjects": "count(matching(every \"x y\".pa.items)) >= 1", "$unique_ids": "count(repeated(ids(every \"x y\".pa.items))) == 0"}, "s": {"$min_subjects": "count(matching(\"z z\")) >= 1", "$unique_ids": "count(repeated(ids(\"z z\"))) == 0"}}, "report": {"subjects": {"x y": {"description": "", "from": "things", "identified_by": "id", "parts": {"pa": {"from": "meta", "identified_by": null}}}, "z z": {"description": "", "from": "\"z z\"", "identified_by": null, "parts": {}}, "kid": {"description": "", "from": "every \"x y\".pa.items", "identified_by": "n", "parts": {}}}}, "results": [{"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/meta/items/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": 1, "in": {"x y": "a"}, "type": "kid"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/z z/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": {"n": 1}, "type": "z z"}}]}]},
   {
     "description": "require some",
     "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "require": "some", "checks": {"a": ".a exists", "b": "b exists"}}}},
