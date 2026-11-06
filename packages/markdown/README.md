@@ -227,7 +227,7 @@ The tool doesn't read the sentences. Ergo does, and a sentence written wrong sho
 
 Someone who'd rather edit YAML can change the policy and write the change back into the document. `ergo apply` rewrites only what changed and leaves the rest of the file as it was, prose included.
 
-Compile `cakes.ergo.md` from above to `policy.yaml`, then change `from: batches` to `from: today.batches` and add a check:
+Compile `cakes.ergo.md` from above to `policy.yaml`, then change `from: batches` to `from: every today.batches` and add a check:
 
 ```yaml
       sealed:
@@ -248,7 +248,7 @@ and `cakes.ergo.md` now has:
 
 ```diff
 -- From `batches`
-+- From `today.batches`
++- From `every today.batches`
 ```
 
 ```diff
