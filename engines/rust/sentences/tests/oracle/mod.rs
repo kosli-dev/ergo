@@ -87,6 +87,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
         "m named by each of $params.a.k",
         "m named by each of $params.a.k",
     ),
+    (
+        "$input.m named by each of $input.a.k",
+        "$input.m named by each of $input.a.k",
+    ),
     ("$input whose x is 1", "$input whose x is 1"),
     (
         "$input whose id is in $input.ok.id",

@@ -367,12 +367,12 @@ pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value>
         .items
         .iter()
         .flat_map(|item| {
-            let one = crate::ops::lists::one_rights(&item.check);
+            let walking = item.check.walking_refs();
             item.check
                 .refs()
                 .into_iter()
                 .map(|reference| {
-                    let walks = !one.contains(&&reference);
+                    let walks = walking.contains(&reference);
                     (reference, walks)
                 })
                 .collect::<Vec<_>>()
@@ -382,7 +382,7 @@ pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value>
 }
 
 pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<Value> {
-    let paths: Vec<(Path, bool)> = paths.iter().map(|p| (p.clone(), true)).collect();
+    let paths: Vec<(Path, bool)> = paths.iter().map(|p| (p.clone(), false)).collect();
     refs_walked(&paths, input, params)
 }
 

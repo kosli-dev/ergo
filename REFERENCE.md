@@ -200,6 +200,45 @@ and the `$applies` entry's `expression` is the conditions as written, `environme
 
 - `named by $params.name` picks one key: `from: trail.artifacts named by $params.artifact_name`. When the param is missing, `null` or not a string, there are no subjects and `$min_subjects` fails as `absent`, `null` or `unusable`, also with `every` in front of the line. A number is not a key and never reads an item of a list, so `x named by $params.k` with `{"k": 1}` fails as `unusable`.
 - `named by each of $params.kinds` makes each key in the list a subject: `from: build.test_runs named by each of $params.kinds`. Each key is a subject, even one the object doesn't have, and the key is its id, so an `identified_by` on that subject is written wrong, with `not allowed with named by each of: the key is the id`. When the object itself is missing, `null` or not an object, a list included, each key is still a subject, but `$min_subjects` fails as `absent`, `null` or `unusable`, so the requirement is never met. A child subject whose parent isn't an object makes no subject of its keys, because nothing below that parent is read: its `$min_subjects` fails as `not_an_object`. When the list is missing, isn't a list, or holds anything but strings, there are no subjects and `$min_subjects` fails as `absent`, `null` or `unusable`. The list is read from `$params` or `$input`. A path that starts anywhere else, like `t.keys`, `keys` or `.keys`, is written wrong, with `named by each of takes a list from $params or $input, so it can't start at a field or a subject`, so a parent can't list the keys of its children and nothing is read from that path. A ref before `named by each of`, like `$params.env` in `scans named by $params.env named by each of $params.kinds`, is read first: when it's missing, `null` or not a string, `$min_subjects` fails as `absent`, `null` or `unusable`, whatever the list holds. Whether each key is still a subject then is [an open question](spec/OPEN.md#where-both-engines-differ-from-a-rule).
+
+  The path to the list is read as one path and never walks a list, so the keys must be a list in one place. With this policy:
+
+  ```yaml
+  ergo_spec: v0.6-dev
+  subjects:
+    scan:
+      from: $input.scans named by each of $input.required.kind
+  requirements:
+    scanned:
+      subject: scan
+      checks:
+        passed: status is "pass"
+  ```
+
+  and this input, where `required` is a list of objects:
+
+  ```json
+  {
+    "scans": {"snyk": {"status": "pass"}, "trivy": {"status": "pass"}},
+    "required": [{"kind": "snyk"}, {"kind": "trivy"}]
+  }
+  ```
+
+  there are no subjects, and `$min_subjects` fails:
+
+  ```json
+  {
+    "cause": "unusable",
+    "check": "$min_subjects",
+    "inputs": [{"locations": [], "name": "in-scope scan count", "value": 0}],
+    "message": "$input.required is [{\"kind\": \"snyk\"}, {\"kind\": \"trivy\"}], which isn't an object",
+    "passed": false,
+    "requirement": "scanned",
+    "subject": {"id": null, "type": "scan"}
+  }
+  ```
+
+  With `"required": {"kind": ["snyk", "trivy"]}`, both scans are subjects and pass. The `$refs` of `$min_subjects` and `$unique_ids` list `$input.required.kind` with the value `null`.
 - A condition can ask about the items of a list with a one-line `some` or `every`, written as in a [check](#checks). With this policy:
 
   ```yaml
@@ -1053,7 +1092,7 @@ requirements:
 
 The path is in the check's `$refs` as `$input.sbom.components[].name`, with the location of each name, and a path from the subject is in the row's `inputs` instead. It works after every phrase above but `contains` and `does not contain`, which take one value. Ergo can't tell whether the names are complete when one can't be read, so every row fails: a component with no name fails as `absent`, with the message `item 2 of $input.sbom.components: name is missing`, one with a `null` name as `null`, something that isn't an object in the list or after the name as `unusable`, and an empty list as `value`, even after `is not in`, with the message `$input.sbom.components is []`. A path that meets no list is read as before, so a list that is `null` or missing fails as `null` or `absent`, and text fails as `unusable` with `$input.sbom.components is "x", which isn't an object`. A phrase that takes one value, like `is` or `starts with`, doesn't read its right side this way.
 
-`contains` and `does not contain` look for one value in a list, so the path after them never walks a list. A list it ends at is one value, so a list of pairs can be searched for a pair. A list it meets on the way fails the row as `unusable` and names that list, and a path from `$input` on an input that is a list fails as `not_an_object`. To check a list of values, use `contains all of`, `contains some of` or `contains none of`. With this policy and this input:
+`contains` and `does not contain` look for one value in a list, so the path after them never walks a list. A list it ends at is one value, so a list of pairs can be searched for a pair. A list it meets on the way fails the row as `unusable` and names that list. On an input that is a list, a path from `$input` whose first step is a name, like `$input.k`, fails as `not_an_object` with `$input is [...], which isn't an object`, said once without an item inside a `whose`; `$input[0].k` reads the first item, and `$input` alone is the whole input, looked for as one value. To check a list of values, use `contains all of`, `contains some of` or `contains none of`. With this policy and this input:
 
 ```yaml
 ergo_spec: v0.6-dev

@@ -281,6 +281,22 @@ impl Tally {
         }
         refs
     }
+
+    pub fn walking_refs(&self) -> Vec<Path> {
+        let mut refs = Vec::new();
+        for side in std::iter::once(&self.left).chain(self.right.as_ref()) {
+            if let Side::Derived(derived) = side {
+                for term in &derived.terms {
+                    if let Term::Counted(counted) = term {
+                        for check in &counted.whose {
+                            refs.extend(check.walking_refs());
+                        }
+                    }
+                }
+            }
+        }
+        refs
+    }
 }
 
 pub fn run(check: &Tally, ctx: &Ctx) -> Verdict {

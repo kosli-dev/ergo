@@ -310,7 +310,7 @@ fn read_right(right: &Right, ctx: &Ctx, walks: bool) -> RightRead {
             Some(walk) => walked_read(walk, Vec::new()),
             None => {
                 let read = read_path(path, ctx);
-                let outcome = if !walks && path.start == Start::Input && ctx.input.is_array() {
+                let outcome = if !walks && input_one_path(path, ctx) {
                     Outcome::NotAnObject
                 } else {
                     read.outcome
@@ -898,12 +898,18 @@ pub fn one_rights(check: &super::Check) -> Vec<&Path> {
     out
 }
 
+fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
+    path.start == Start::Input
+        && ctx.input.is_array()
+        && matches!(path.steps.first(), Some(Step::Key(_)))
+}
+
 pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
     match check {
         super::Check::Contains(Contains {
             wanted: Wanted::One(Right::Ref(path)),
             ..
-        }) if path.start == Start::Input && ctx.input.is_array() => {
+        }) if input_one_path(path, ctx) => {
             vec![super::message::isnt("$input", ctx.input, "an object")]
         }
         _ => Vec::new(),

@@ -39,6 +39,14 @@ impl Walk {
         }
         refs
     }
+
+    pub fn walking_refs(&self) -> Vec<Path> {
+        self.whose
+            .iter()
+            .chain(std::iter::once(&*self.check))
+            .flat_map(Check::walking_refs)
+            .collect()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]

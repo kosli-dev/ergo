@@ -1371,6 +1371,13 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                 if counted && let Some(found) = first_null_step(&root, ctx) {
                     return Some(found);
                 }
+                if !is_key
+                    && lists::one_rights(check).contains(&&root)
+                    && let Some(text) = lists::input_one_fault(check, ctx).into_iter().next()
+                {
+                    found.push((Cause::NotAnObject, text, false));
+                    continue;
+                }
                 let read = path::read(&root, ctx);
                 if let Some(cause) = read.outcome.cause() {
                     found.push((cause, root_text(&root, ctx, cause), is_key));

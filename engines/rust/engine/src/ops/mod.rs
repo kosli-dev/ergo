@@ -278,6 +278,24 @@ impl Check {
         }
     }
 
+    pub fn walking_refs(&self) -> Vec<Path> {
+        match self {
+            Check::Tally(check) => check.walking_refs(),
+            Check::Walk(check) => check.walking_refs(),
+            Check::For(check) => check.walking_refs(),
+            Check::AnyOf(check) => check.walking_refs(),
+            Check::In(check) => check.values.ref_paths().into_iter().cloned().collect(),
+            Check::Matches(check) => check.patterns.ref_paths().into_iter().cloned().collect(),
+            Check::Contains(check) => match &check.wanted {
+                lists::Wanted::One(_) => Vec::new(),
+                lists::Wanted::All(right) | lists::Wanted::Some(right) => {
+                    right.ref_paths().into_iter().cloned().collect()
+                }
+            },
+            _ => Vec::new(),
+        }
+    }
+
     pub fn flawed(&self, ctx: &Ctx) -> bool {
         match self {
             Check::AnyOf(check) => check.flawed(ctx),

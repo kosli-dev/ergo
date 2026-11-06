@@ -4431,6 +4431,7 @@ _one_input_ref(check, r) if {
 	_is_ref(object.get(check, "value", null))
 	check.value.ref == r
 	r[0] == "$$input"
+	is_string(r[1])
 }
 
 _wrong_step(check, r) if {
@@ -12183,6 +12184,10 @@ _m_undecided_text(subj, c, e, cause, roots) := _m_isnt(_m_item_name(e.i, roots),
 } else := concat(", and ", off) if {
 	off := _m_keyed_off(subj, c, cause)
 	off != []
+} else := concat(", and ", off) if {
+	cause == "not_an_object"
+	off := _m_input_one_refs(c)
+	off != []
 } else := _m_leaf_in(e.i, _m_cond_message(c, e.iv, cause), roots)
 
 _m_off_path(p) if {
@@ -12207,7 +12212,7 @@ _root_read_flaw(subj, c) := _worst_of(states) if {
 	lists := {y[_basic_form(y)] | walk(c, [_, y]); _basic_form(y) in {"count_of", "sum_of"}}
 	states := {st |
 		some p in _root_reads(c)
-		st := _root_list_state(subj, p, lists)
+		st := _root_state(subj, c, p, lists)
 		st in {"absent", "null", "unusable", "not_an_object"}
 	}
 	count(states) > 0
@@ -12236,6 +12241,11 @@ _presence_path(c, x) if {
 	object.get(c, "op", "") in {"present", "missing"}
 	c.path == x
 }
+
+_root_state(subj, c, p, lists) := "not_an_object" if {
+	_one_input_ref(c, p)
+	is_array(data.ergo_document)
+} else := _root_list_state(subj, p, lists)
 
 _root_list_state(subj, p, lists) := _any_read_state(subj, array.slice(shown, 0, i)) if {
 	p in lists
@@ -12306,7 +12316,12 @@ _rooted_failed(r) := [] if r.cause in {"satisfied", "value"}
 
 else := r.failed
 
-_m_root_texts(subj, c, cause) := _m_keyed_off(subj, c, cause) if count(_m_keyed_off(subj, c, cause)) > 0
+_m_root_texts(subj, c, cause) := [_m_isnt("$input", data.ergo_document, "an object")] if {
+	cause == "not_an_object"
+	some p in _root_reads(c)
+	_one_input_ref(c, p)
+	is_array(data.ergo_document)
+} else := _m_keyed_off(subj, c, cause) if count(_m_keyed_off(subj, c, cause)) > 0
 
 else := [concat("", [_input_name(_as_subject_part(p)), " is ", _m_state_word(cause)]) | some p in sort(_root_reads(c))]
 

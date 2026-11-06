@@ -29084,5 +29084,20 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a from line with named by each of a list read through a list, and its $refs",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input.m named by each of $input.a.k"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "v is 1"}}}},
+    "cases": [
+      {
+        "description": "lists the keys unread in $refs, where it listed what it read from each item",
+        "rules": ["subjects.keyed.list"],
+        "input": {"m": {"x": {"v": 1}}, "a": [{"k": "x"}]},
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$input.a is [{\"k\": \"x\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated t ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "t"}}
+        ]
+      }
+    ]
   }
 ]

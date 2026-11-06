@@ -11687,6 +11687,36 @@ test_contains_with_a_ref_from_an_input_that_is_a_list_fails_as_not_an_object if 
 	}
 }
 
+test_contains_reads_a_position_or_the_whole_input_of_an_input_that_is_a_list if {
+	doc := [{"id": "t", "k": "z", "tags": ["a"]}]
+	every check, want in {
+		"tags contains $input[0].k": ["value", "tags is [\"a\"], and $input[0].k is \"z\""],
+		"tags contains $input[0]": ["unusable", "tags is [\"a\"], which isn't a list of objects"],
+		"tags contains $input": ["unusable", "tags is [\"a\"], which isn't a list of lists"],
+	} {
+		[[r.cause, r.message] | some r in ergo.report(doc, _list_key_policy({"from": "$input", "identified_by": "id"}, check), {}).results; r.check == "c"] == [want]
+	}
+	[r.passed | some r in ergo.report(doc, _list_key_policy({"from": "$input", "identified_by": "id"}, "tags does not contain $input[0].k"), {}).results; r.check == "c"] == [true]
+}
+
+test_contains_with_a_ref_from_an_input_that_is_a_list_says_it_once_inside_a_whose if {
+	doc := [{"id": "t", "k": "a", "items": [{"tags": ["a"]}, {"tags": ["b"]}]}]
+	m := "$input is [{\"id\": \"t\", \"items\": [{\"tags\": [\"a\"]}, {\"tags\": [\"b\"]}], \"k\": \"a\"}], which isn't an object"
+	every check in ["count of items whose tags contains $input.k is 1", "count of items whose tags does not contain $input.k is 1", "every items whose tags contains $input.k exists"] {
+		[[r.cause, r.message] | some r in ergo.report(doc, _list_key_policy({"from": "$input", "identified_by": "id"}, check), {}).results; r.check == "c"] == [["not_an_object", m]]
+	}
+}
+
+test_a_contains_ref_that_meets_a_list_is_in_refs_as_written if {
+	doc := {"r": [{"n": "a"}], "things": [{"id": "s", "items": [{"tags": ["a"]}]}]}
+	every check in ["tags contains $input.r.n", "count of items whose tags contains $input.r.n is 1", "every items whose tags contains $input.r.n exists"] {
+		rep := ergo.report(doc, _list_key_policy({"from": "things", "identified_by": "id"}, check), {})
+		rep.requirements.r.checks.c["$refs"] == [{"name": "$input.r.n", "value": null, "locations": ["/r"]}]
+	}
+	keyed := ergo.report({"m": {"x": {"v": 1}}, "a": [{"k": "x"}]}, _list_key_policy({"from": "$input.m named by each of $input.a.k"}, "v is 1"), {})
+	keyed.requirements.r.checks["$min_subjects"]["$refs"] == [{"name": "$input.a.k", "value": null, "locations": ["/a"]}]
+}
+
 test_named_by_each_of_a_list_read_through_a_list_fails_and_names_the_list if {
 	m := {"x": {"v": 1}, "y": {"v": 1}}
 	every pair in [[[{"k": "x"}, {"k": "y"}], "[{\"k\": \"x\"}, {\"k\": \"y\"}]"], [[], "[]"], [[["x"]], "[[\"x\"]]"], ["zz", "\"zz\""]] {
