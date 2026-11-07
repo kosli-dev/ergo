@@ -2327,6 +2327,80 @@
     ]
   },
   {
+    "description": "a part or the subject's name in a count of after that, over items that aren't objects",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id", "has": {"cov": "coverage"}}}, "requirements": {"r": {"subject": "pr", "checks": {"p": "count of xs that is count of cov.z is 1", "n": "count of xs that is count of pr.coverage.z is 1", "e": "every xs that is count of cov.z is 2", "s": "some xs that is count of cov.z is 2"}}}},
+    "cases": [
+      {
+        "description": "counts the part's list once for every item, so 2 is the one item that equals 2",
+        "rules": ["parts.where", "sentence.resolve.clause", "sentence.resolve.root", "sentence.path.part", "sentence.path.subject", "sentence.derived.count", "tally.walk"],
+        "input": {"prs": [{"id": "P", "coverage": {"z": [1, 2]}, "xs": [2, 5]}]},
+        "results": [
+          {"cause": "satisfied", "check": "e", "failed_items": [], "inputs": [{"locations": ["/prs/0/coverage/z"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": [1, 2]}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}], "passed": true, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "satisfied", "check": "n", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs that equals count of pr.coverage.z", "value": 1}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/prs/0/coverage/z"], "name": "pr.coverage.z", "value": [1, 2]}], "passed": true, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "satisfied", "check": "p", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs that equals count of cov.z", "value": 1}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/prs/0/coverage/z"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": [1, 2]}], "passed": true, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "satisfied", "check": "s", "failed_items": [], "inputs": [{"locations": ["/prs/0/coverage/z"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": [1, 2]}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}], "passed": true, "requirement": "r", "subject": {"id": "P", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "fails as absent when the part has no such list, and names the part, not the items",
+        "rules": ["parts.where", "sentence.resolve.clause", "sentence.derived.count", "tally.walk"],
+        "input": {"prs": [{"id": "P", "coverage": {}, "xs": [2, 5]}]},
+        "results": [
+          {"cause": "absent", "check": "e", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/prs/0/coverage"], "path": "cov.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/prs/0/coverage"], "path": "cov.z", "value": null}], "inputs": [{"locations": ["/prs/0/coverage"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}], "message": "cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "absent", "check": "n", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs that equals count of pr.coverage.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/prs/0/coverage"], "name": "pr.coverage.z", "value": null}], "message": "pr.coverage.z is missing", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "absent", "check": "p", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs that equals count of cov.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/prs/0/coverage"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": null}], "message": "cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "absent", "check": "s", "failed_items": [{"cause": "absent", "item": "item 1 of xs", "locations": ["/prs/0/coverage"], "path": "cov.z", "value": null}, {"cause": "absent", "item": "item 2 of xs", "locations": ["/prs/0/coverage"], "path": "cov.z", "value": null}], "inputs": [{"locations": ["/prs/0/coverage"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}], "message": "cov.z is missing", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "fails as null when the part is null",
+        "rules": ["parts.where", "sentence.resolve.clause", "sentence.derived.count", "tally.walk"],
+        "input": {"prs": [{"id": "P", "coverage": null, "xs": [2, 5]}]},
+        "results": [
+          {"cause": "null", "check": "e", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/prs/0/coverage"], "path": "cov.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/prs/0/coverage"], "path": "cov.z", "value": null}], "inputs": [{"locations": ["/prs/0/coverage"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}], "message": "cov is null", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "null", "check": "n", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs that equals count of pr.coverage.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/prs/0/coverage"], "name": "pr.coverage.z", "value": null}], "message": "pr.coverage is null", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "null", "check": "p", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs that equals count of cov.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/prs/0/coverage"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": null}], "message": "cov is null", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "null", "check": "s", "failed_items": [{"cause": "null", "item": "item 1 of xs", "locations": ["/prs/0/coverage"], "path": "cov.z", "value": null}, {"cause": "null", "item": "item 2 of xs", "locations": ["/prs/0/coverage"], "path": "cov.z", "value": null}], "inputs": [{"locations": ["/prs/0/coverage"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}], "message": "cov is null", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "fails as unusable when the part's list is text",
+        "rules": ["parts.where", "sentence.resolve.clause", "sentence.derived.count", "tally.walk"],
+        "input": {"prs": [{"id": "P", "coverage": {"z": "12"}, "xs": [2, 5]}]},
+        "results": [
+          {"cause": "unusable", "check": "e", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/prs/0/coverage/z"], "path": "cov.z", "value": "12"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/prs/0/coverage/z"], "path": "cov.z", "value": "12"}], "inputs": [{"locations": ["/prs/0/coverage/z"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": "12"}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}], "message": "cov.z is \"12\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "unusable", "check": "n", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs that equals count of pr.coverage.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/prs/0/coverage/z"], "name": "pr.coverage.z", "value": "12"}], "message": "pr.coverage.z is \"12\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "unusable", "check": "p", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs that equals count of cov.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/prs/0/coverage/z"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": "12"}], "message": "cov.z is \"12\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}},
+          {"cause": "unusable", "check": "s", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/prs/0/coverage/z"], "path": "cov.z", "value": "12"}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/prs/0/coverage/z"], "path": "cov.z", "value": "12"}], "inputs": [{"locations": ["/prs/0/coverage/z"], "name": "cov.z", "part": {"id": null, "name": "cov"}, "value": "12"}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [2, 5]}], "message": "cov.z is \"12\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "P", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a parent's name or a for alias in a count of after that, over items that aren't objects",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"fam": {"from": "fams", "identified_by": "id"}, "kid": {"from": "every fam.kids", "identified_by": "id"}}, "requirements": {"r": {"subject": "kid", "checks": {"c": "count of xs that is count of fam.z is 1", "f": {"for": "every gs as g", "assert": "count of g.xs that is count of g.z is 1"}}}}},
+    "cases": [
+      {
+        "description": "counts the parent's list and the alias's list once for every item",
+        "rules": ["parts.where", "sentence.resolve.clause", "sentence.resolve.root", "sentence.subject.chain", "sentence.for.scope", "sentence.derived.count", "tally.walk"],
+        "input": {"fams": [{"id": "F", "z": [1, 2], "kids": [{"id": "K", "xs": [2, 5], "gs": [{"z": [1, 2], "xs": [2, 5]}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/xs/0", "/fams/0/kids/0/xs/1"], "name": "count of xs that equals count of fam.z", "value": 1}, {"locations": ["/fams/0/kids/0/xs/0", "/fams/0/kids/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/fams/0/z"], "name": "fam.z", "value": [1, 2]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "satisfied", "check": "f", "failed_items": [], "inputs": [{"locations": ["/fams/0/kids/0/gs/0"], "name": "gs[]", "value": [{"xs": [2, 5], "z": [1, 2]}]}], "passed": true, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}}
+        ]
+      },
+      {
+        "description": "fails as absent when the parent or the alias has no such list",
+        "rules": ["parts.where", "sentence.resolve.clause", "sentence.subject.chain", "sentence.for.scope", "sentence.derived.count", "tally.walk"],
+        "input": {"fams": [{"id": "F", "kids": [{"id": "K", "xs": [2, 5], "gs": [{"xs": [2, 5]}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/fams/0/kids/0/xs/0", "/fams/0/kids/0/xs/1"], "name": "count of xs that equals count of fam.z", "value": null}, {"locations": ["/fams/0/kids/0/xs/0", "/fams/0/kids/0/xs/1"], "name": "xs[]", "value": [2, 5]}, {"locations": ["/fams/0"], "name": "fam.z", "value": null}], "message": "fam.z is missing", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}},
+          {"cause": "absent", "check": "f", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of g.xs that equals count of g.z is 1", "cause": "absent", "inputs": [{"locations": ["/fams/0/kids/0/gs/0/xs/0", "/fams/0/kids/0/gs/0/xs/1"], "name": "count of g.xs that equals count of g.z", "value": null}, {"locations": ["/fams/0/kids/0/gs/0/xs/0", "/fams/0/kids/0/gs/0/xs/1"], "name": "g.xs[]", "value": [2, 5]}, {"locations": ["/fams/0/kids/0/gs/0"], "name": "g.z", "value": null}]}], "item": "item 1 of gs", "locations": ["/fams/0/kids/0/gs/0"], "path": "item 1 of gs", "value": {"xs": [2, 5]}}], "inputs": [{"locations": ["/fams/0/kids/0/gs/0"], "name": "gs[]", "value": [{"xs": [2, 5]}]}], "message": "item 1 of gs: g.z is missing", "passed": false, "requirement": "r", "subject": {"id": "K", "in": {"fam": "F"}, "type": "kid"}}
+        ]
+      }
+    ]
+  },
+  {
     "description": "an alias that is also a for alias",
     "policy": {
       "ergo_spec": "v0.6-dev",
