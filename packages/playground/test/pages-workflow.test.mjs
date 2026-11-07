@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 
 const check = (workflow) => {
@@ -27,4 +30,13 @@ test("Pages tests the staged interface against released engines before publishin
   const ignored = structuredClone(workflow);
   ignored.jobs.build.steps.find((step) => step.run === "pnpm --filter @kosli/ergo-playground test")["continue-on-error"] = true;
   assert.throws(() => check(ignored), /staged tests must run/);
+});
+
+test("Pages gives pnpm setup a manifest it can read from the workspace", { skip: Boolean(process.env.ERGO_PLAYGROUND_SAMPLE_CASES) }, () => {
+  const root = fileURLToPath(new URL("../../../", import.meta.url));
+  const workflow = parse(readFileSync(new URL("../../../.github/workflows/pages.yml", import.meta.url), "utf8"));
+  const step = workflow.jobs.build.steps.find((step) => step.uses?.startsWith("pnpm/action-setup@"));
+  const input = step.with.package_json_file.replace("${{ runner.temp }}", tmpdir());
+  const manifest = JSON.parse(readFileSync(join(root, input), "utf8"));
+  assert.match(manifest.packageManager, /^pnpm@.+$/);
 });
