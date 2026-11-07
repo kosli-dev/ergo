@@ -4950,6 +4950,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("pairs contains pair", "pairs contains pair", &[], &[]),
     (
+        "tags contains $input.m named by key",
+        "tags contains $input.m named by key",
+        &[],
+        &[],
+    ),
+    (
+        "tags does not contain $input.m named by key",
+        "tags does not contain $input.m named by key",
+        &[],
+        &[],
+    ),
+    (
         "count of items whose tags contains $input.k is 1",
         "count of items whose tags contains $input.k is 1",
         &[],

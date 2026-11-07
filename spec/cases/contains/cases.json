@@ -484,5 +484,20 @@
         ]
       }
     ]
+  },
+  {
+    "description": "contains with a named by after a path from $input, on an input that is a list",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"named": "tags contains $input.m named by key", "not_named": "tags does not contain $input.m named by key"}}}},
+    "cases": [
+      {
+        "description": "fails as not_an_object and names the input",
+        "rules": ["contains.value"],
+        "input": [{"id": "t", "key": "x", "k": "a", "m": {"x": "a"}, "tags": ["a"]}],
+        "results": [
+          {"cause": "not_an_object", "check": "named", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["/0/key"], "name": "key", "value": "x"}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "not_an_object", "check": "not_named", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["/0/key"], "name": "key", "value": "x"}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
   }
 ]

@@ -11512,10 +11512,21 @@ _m_params_unread(check) if {
 _m_message(check, subj, "not_an_object") := _m_isnt(_m_label(check), subj, "an object") if not is_object(subj)
 
 _m_input_one_refs(check) := [_m_isnt("$input", data.ergo_document, "an object") |
-	some r in _check_refs(check)
-	_one_input_ref(check, r)
+	_reads_input_one(check)
 	is_array(data.ergo_document)
 ]
+
+_reads_input_one(check) if {
+	some r in _check_refs(check)
+	_one_input_ref(check, r)
+}
+
+_reads_input_one(check) if {
+	_one_right(check)
+	is_array(check.right)
+	check.right[0] == "$$input"
+	is_string(check.right[1])
+}
 
 _m_label(check) := check.label if {
 	is_object(check)

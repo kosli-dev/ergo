@@ -11699,6 +11699,14 @@ test_contains_reads_a_position_or_the_whole_input_of_an_input_that_is_a_list if 
 	[r.passed | some r in ergo.report(doc, _list_key_policy({"from": "$input", "identified_by": "id"}, "tags does not contain $input[0].k"), {}).results; r.check == "c"] == [true]
 }
 
+test_contains_with_a_named_by_path_from_an_input_that_is_a_list_names_the_input if {
+	doc := [{"id": "t", "key": "x", "m": {"x": "a"}, "tags": ["a"]}]
+	m := "$input is [{\"id\": \"t\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object"
+	every check in ["tags contains $input.m named by key", "tags does not contain $input.m named by key"] {
+		[[r.cause, r.message] | some r in ergo.report(doc, _list_key_policy({"from": "$input", "identified_by": "id"}, check), {}).results; r.check == "c"] == [["not_an_object", m]]
+	}
+}
+
 test_contains_with_a_ref_from_an_input_that_is_a_list_says_it_once_inside_a_whose if {
 	doc := [{"id": "t", "k": "a", "items": [{"tags": ["a"]}, {"tags": ["b"]}]}]
 	m := "$input is [{\"id\": \"t\", \"items\": [{\"tags\": [\"a\"]}, {\"tags\": [\"b\"]}], \"k\": \"a\"}], which isn't an object"
