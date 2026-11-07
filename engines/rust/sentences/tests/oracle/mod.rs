@@ -2117,6 +2117,7 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("every xs.ys.tags", "every xs.ys.tags"),
     ("every $input.requests", "every $input.requests"),
     ("every $input.resources", "every $input.resources"),
+    ("every pr.cms", "every pr.cms"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

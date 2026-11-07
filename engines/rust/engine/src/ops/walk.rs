@@ -1208,6 +1208,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             locations: Vec::new(),
             part: None,
             state: crate::path::Outcome::Found,
+            null_at: None,
         }];
         inputs.extend(outside);
         inputs.sort_by(|a, b| a.name.cmp(&b.name));
@@ -1259,6 +1260,7 @@ fn read_row(walk: &Walk, ctx: &Ctx) -> Run {
             .collect(),
         part: tag,
         state: crate::path::Outcome::Found,
+        null_at: None,
     }];
     inputs.extend(outside);
     inputs.sort_by(|a, b| a.name.cmp(&b.name));

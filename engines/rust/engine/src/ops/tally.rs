@@ -392,6 +392,7 @@ fn number_entry(text: &str, result: &Result<Number, Cause>, locations: Vec<Strin
         locations,
         part: None,
         state: crate::path::Outcome::Found,
+        null_at: None,
     }
 }
 
@@ -519,6 +520,7 @@ fn counted_entries(
         locations: list.locations.clone(),
         part: list.part.clone(),
         state: crate::path::Outcome::Found,
+        null_at: None,
     }];
     entries.push(list);
     entries.extend(super::field_inputs(&counted.path, ctx));
@@ -536,6 +538,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             locations: Vec::new(),
             part: None,
             state: crate::path::Outcome::Found,
+            null_at: None,
         };
         let whose: Vec<&Check> = counted.whose.iter().collect();
         let mut outside = walk::outside_inputs_of(&whose, &outer);
@@ -566,6 +569,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             locations: Vec::new(),
             part: None,
             state: crate::path::Outcome::Found,
+            null_at: None,
         };
         let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
@@ -626,6 +630,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             .collect(),
         part: path::part_tag(&counted.path, &outer).map(|(name, id)| Part { name, id }),
         state: crate::path::Outcome::Found,
+        null_at: None,
     };
     let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
     Worked {

@@ -153,6 +153,7 @@ impl Walked {
             locations: self.locations.clone(),
             part: self.part.clone(),
             state: Outcome::Found,
+            null_at: None,
         }
     }
 }
@@ -746,6 +747,7 @@ fn right_shown(right: &Right, ctx: &Ctx, walks: bool) -> Vec<Input> {
                     locations: Vec::new(),
                     part: None,
                     state: Outcome::Found,
+                    null_at: None,
                 }],
                 _ => pieces
                     .iter()
@@ -899,6 +901,16 @@ fn rights_of(check: &super::Check) -> Vec<&Right> {
         super::Check::Matches(c) => vec![&c.patterns],
         _ => Vec::new(),
     }
+}
+
+pub fn haystacks(check: &super::Check) -> Vec<&Path> {
+    rights_of(check)
+        .into_iter()
+        .filter_map(|right| match right {
+            Right::Ref(path) | Right::Field(path) => Some(path),
+            _ => None,
+        })
+        .collect()
 }
 
 pub fn one_rights(check: &super::Check) -> Vec<&Path> {
@@ -1896,7 +1908,7 @@ mod tests {
         );
         assert_eq!(
             is_in(with_deps(json!(null)), deps_name(), false),
-            Cause::Absent
+            Cause::Null
         );
         assert_eq!(
             is_in(json!({"x": "click"}), deps_name(), false),

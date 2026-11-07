@@ -305,7 +305,7 @@ pub fn read<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
     if !walked.step_unreadable
         && matches!(
             walked.outcome,
-            Outcome::Absent | Outcome::Unusable | Outcome::NotAnObject
+            Outcome::Absent | Outcome::Null | Outcome::Unusable | Outcome::NotAnObject
         )
     {
         let failed = leading_steps(&path.start)
@@ -342,6 +342,10 @@ fn walk<'a>(path: &Path, ctx: &Ctx<'a>) -> Read<'a> {
             return ended(Outcome::NotAnObject, location);
         }
         match (resolved, value) {
+            (Resolved::Index(_), Value::Null) if path.start != Start::Params => {
+                return ended(Outcome::Null, location);
+            }
+            (_, Value::Null) if at > 0 => return ended(Outcome::Null, location),
             (_, Value::Null) => return ended(Outcome::Absent, location),
             (Resolved::Key(key), Value::Object(map)) => match map.get(&key) {
                 Some(next) => {
@@ -569,9 +573,9 @@ mod tests {
     }
 
     #[test]
-    fn a_position_on_a_null_subject_is_absent_and_on_an_empty_list_too() {
+    fn a_position_on_a_null_subject_is_null_and_on_an_empty_list_absent() {
         let p = subject_path(vec![Step::Index(0)]);
-        assert_eq!(World::new("null").run(&p).0, Outcome::Absent);
+        assert_eq!(World::new("null").run(&p).0, Outcome::Null);
         assert_eq!(World::new("[]").run(&p).0, Outcome::Absent);
     }
 
@@ -627,13 +631,13 @@ mod tests {
     }
 
     #[test]
-    fn steps_after_null_are_absent_and_point_at_the_null() {
+    fn steps_after_null_are_null_and_point_at_the_null() {
         let (o, _, l) = World::new(r#"{"a": null}"#).run(&subject_path(vec![key("a"), key("b")]));
-        assert_eq!(o, Outcome::Absent);
+        assert_eq!(o, Outcome::Null);
         assert_eq!(l, loc("/s/a"));
         let (o, _, _) =
             World::new(r#"{"a": null}"#).run(&subject_path(vec![key("a"), Step::Index(0)]));
-        assert_eq!(o, Outcome::Absent);
+        assert_eq!(o, Outcome::Null);
     }
 
     #[test]

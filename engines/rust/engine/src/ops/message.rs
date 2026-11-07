@@ -120,9 +120,11 @@ fn state_word(state: Outcome) -> &'static str {
 fn state_clause(input: &Input) -> Option<String> {
     match input.state {
         Outcome::Found => Some(is(&input.name, &input.value)),
-        Outcome::Absent | Outcome::Null => {
-            Some(format!("{} is {}", input.name, state_word(input.state)))
-        }
+        Outcome::Absent | Outcome::Null => Some(format!(
+            "{} is {}",
+            input.stopped_at(),
+            state_word(input.state)
+        )),
         _ => None,
     }
 }
@@ -250,13 +252,20 @@ pub fn resolved_name(path: &Path, ctx: &Ctx) -> String {
     })
 }
 
+pub fn stops_at_a_null(path: &Path, ctx: &Ctx) -> bool {
+    super::null_step_name(path, ctx).is_some()
+}
+
 pub fn key_states_of(path: &Path, ctx: &Ctx, want: Outcome) -> Vec<String> {
     let mut out = Vec::new();
+    if stops_at_a_null(path, ctx) {
+        return out;
+    }
     for key in key_steps(path) {
         if let Some(input) = first_input(key, ctx)
             && input.state == want
         {
-            let clause = format!("{} is {}", input.name, state_word(want));
+            let clause = format!("{} is {}", input.stopped_at(), state_word(want));
             if !out.contains(&clause) {
                 out.push(clause);
             }
@@ -276,6 +285,9 @@ fn key_faults(check: &Check, ctx: &Ctx) -> Vec<String> {
 
 pub fn key_faults_of(path: &Path, ctx: &Ctx) -> Vec<String> {
     let mut out = Vec::new();
+    if stops_at_a_null(path, ctx) {
+        return out;
+    }
     for key in key_steps(path) {
         if let Some(input) = first_input(key, ctx)
             && input.state == Outcome::Found
@@ -618,7 +630,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
                 let mut found: Vec<String> = sources(check, ctx, verdict)
                     .iter()
                     .filter(|i| i.state == want)
-                    .map(|i| format!("{} is {}", i.name, state_word(want)))
+                    .map(|i| format!("{} is {}", i.stopped_at(), state_word(want)))
                     .collect();
                 found.extend(
                     lists::walk_fault(check, ctx)
@@ -902,6 +914,7 @@ fn plain_side_inputs(side: &Side, ctx: &Ctx) -> Vec<Input> {
                     locations: Vec::new(),
                     part: None,
                     state: Outcome::Found,
+                    null_at: None,
                 }],
                 _ => pieces
                     .iter()
@@ -924,6 +937,7 @@ fn tally_inputs(side: &TallySide, ctx: &Ctx, cause: Cause) -> Vec<Input> {
                     locations: Vec::new(),
                     part: None,
                     state: Outcome::Found,
+                    null_at: None,
                 }],
                 (Cause::Value, Err(_)) | (_, _) => {
                     let _ = counted;
@@ -1177,7 +1191,7 @@ pub fn for_empty(items: &[ForItem], ctx: &Ctx, cause: Cause) -> String {
                     inputs.extend(first_input(&reference, ctx));
                 }
                 for input in inputs.iter().filter(|input| input.state == want) {
-                    clauses.push(format!("{} is {}", input.name, state_word(want)));
+                    clauses.push(format!("{} is {}", input.stopped_at(), state_word(want)));
                 }
             }
             said = once_of(clauses);
@@ -1226,6 +1240,7 @@ pub fn subject_key_fault(check: &Check, ctx: &Ctx, cause: Cause) -> Option<Strin
     check
         .paths()
         .into_iter()
+        .filter(|path| !stops_at_a_null(path, ctx))
         .flat_map(|path| path.steps.iter())
         .find_map(|step| {
             let Step::Field(field) = step else {
@@ -1298,6 +1313,7 @@ pub fn root_text(path: &Path, ctx: &Ctx, cause: Cause) -> String {
         };
         let read = path::read(&before, ctx);
         if matches!(read.outcome, Outcome::Found | Outcome::Null)
+            && !stops_at_a_null(&before, ctx)
             && let Some(text) = key_text(step, ctx)
         {
             return text;
@@ -1306,7 +1322,10 @@ pub fn root_text(path: &Path, ctx: &Ctx, cause: Cause) -> String {
     }
     match cause {
         Cause::Absent => format!("{} is missing", name::name(path)),
-        Cause::Null => format!("{} is null", name::name(path)),
+        Cause::Null => format!(
+            "{} is null",
+            super::null_step_name(path, ctx).unwrap_or_else(|| name::name(path))
+        ),
         _ => {
             let present = Check::Present(super::present::Present {
                 path: path.clone(),
@@ -1359,8 +1378,8 @@ fn first_null_step(root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
 }
 
 pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
-    let mut found: Vec<(Cause, String, bool)> = Vec::new();
-    for check in checks {
+    let mut found: Vec<(usize, Cause, String, bool)> = Vec::new();
+    for (at, check) in checks.iter().enumerate() {
         if matches!(check, Check::Present(_)) {
             continue;
         }
@@ -1401,29 +1420,54 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                     && lists::one_rights(check).contains(&&root)
                     && let Some(text) = lists::input_one_fault(check, ctx).into_iter().next()
                 {
-                    found.push((Cause::NotAnObject, text, false));
+                    found.push((at, Cause::NotAnObject, text, false));
                     continue;
                 }
                 let read = path::read(&root, ctx);
                 if let Some(cause) = read.outcome.cause() {
-                    found.push((cause, root_text(&root, ctx, cause), is_key));
+                    found.push((at, cause, root_text(&root, ctx, cause), is_key));
                 } else if is_key && let Some(value) = read.value.filter(|value| !value.is_string())
                 {
                     found.push((
+                        at,
                         Cause::Unusable,
                         isnt(&name::name(&root), value, "text"),
                         true,
+                    ));
+                } else if !is_key
+                    && lists::haystacks(check).contains(&&root)
+                    && let Some(value) = read.value.filter(|value| !value.is_array())
+                {
+                    found.push((
+                        at,
+                        Cause::Unusable,
+                        isnt(&name::name(&root), value, "a list"),
+                        false,
                     ));
                 }
             }
         }
     }
-    let worst = Cause::worst(found.iter().map(|(cause, _, _)| *cause).collect::<Vec<_>>())?;
-    found
-        .into_iter()
-        .filter(|(cause, _, _)| *cause == worst)
-        .min_by_key(|(_, _, is_key)| !is_key)
-        .map(|(cause, text, _)| (cause, text))
+    let worst = Cause::worst(
+        found
+            .iter()
+            .map(|(_, cause, _, _)| *cause)
+            .collect::<Vec<_>>(),
+    )?;
+    let worst_found: Vec<&(usize, Cause, String, bool)> = found
+        .iter()
+        .filter(|(_, cause, _, _)| *cause == worst)
+        .collect();
+    let mut texts: Vec<String> = Vec::new();
+    for (at, _, text, is_key) in &worst_found {
+        let keyed = worst_found
+            .iter()
+            .any(|(other, _, _, key)| other == at && *key);
+        if (*is_key || !keyed) && !texts.contains(text) {
+            texts.push(text.clone());
+        }
+    }
+    Some((worst, texts.join("; ")))
 }
 
 pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {

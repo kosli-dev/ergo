@@ -452,6 +452,7 @@ fn empty_list(name: String) -> Input {
         locations: Vec::new(),
         part: None,
         state: crate::path::Outcome::Found,
+        null_at: None,
     }
 }
 
@@ -533,6 +534,7 @@ impl For {
                 .collect(),
             part: path::part_tag(&item.path, &outer).map(|(name, id)| Part { name, id }),
             state: crate::path::Outcome::Found,
+            null_at: None,
         };
         let mut dead: Vec<Dead> = walked.failures.iter().map(Dead::of_failure).collect();
         let from_list = walked.failures.len();
@@ -908,6 +910,7 @@ impl For {
                 locations: vec![found.location.render()],
                 part: cands.list.part.clone(),
                 state: crate::path::Outcome::Found,
+                null_at: None,
             }
         } else {
             Input {
@@ -916,6 +919,7 @@ impl For {
                 locations: vec![found.location.render()],
                 part: cands.list.part.clone(),
                 state: crate::path::Outcome::Found,
+                null_at: None,
             }
         };
         cands.picked = true;
@@ -1436,6 +1440,7 @@ impl For {
                 .collect(),
             part: path::part_tag(path, &outer).map(|(name, id)| Part { name, id }),
             state: crate::path::Outcome::Found,
+            null_at: None,
         }
     }
 
