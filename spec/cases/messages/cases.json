@@ -2281,5 +2281,24 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a walk whose ref step can't be read, with a phrase that can't read its root either",
+    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"every": "every xs named by $params.k, if any, equals q", "some": "some xs named by $params.k equals q"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "cases": [
+      {
+        "description": "names the path and then the root, whatever the root's cause",
+        "rules": ["message.items", "walk.flaws", "path.ref_step"],
+        "input": {"prs": [{"id": "p0", "xs": []}, {"id": "p1", "q": null, "xs": []}, {"id": "p2", "q": 1, "xs": []}]},
+        "results": [
+          {"cause": "absent", "check": "every", "failed_items": [], "inputs": [{"locations": ["/prs/0"], "name": "q", "value": null}, {"locations": [], "name": "xs named by $params.k", "value": []}], "message": "xs named by $params.k is missing; q is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "absent", "check": "some", "failed_items": [], "inputs": [{"locations": ["/prs/0"], "name": "q", "value": null}, {"locations": [], "name": "xs named by $params.k", "value": []}], "message": "xs named by $params.k is missing; q is missing", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "absent", "check": "every", "failed_items": [], "inputs": [{"locations": ["/prs/1/q"], "name": "q", "value": null}, {"locations": [], "name": "xs named by $params.k", "value": []}], "message": "xs named by $params.k is missing; q is null", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pr"}},
+          {"cause": "absent", "check": "some", "failed_items": [], "inputs": [{"locations": ["/prs/1/q"], "name": "q", "value": null}, {"locations": [], "name": "xs named by $params.k", "value": []}], "message": "xs named by $params.k is missing; q is null", "passed": false, "requirement": "r", "subject": {"id": "p1", "type": "pr"}},
+          {"cause": "absent", "check": "every", "failed_items": [], "inputs": [{"locations": ["/prs/2/q"], "name": "q", "value": 1}, {"locations": [], "name": "xs named by $params.k", "value": []}], "message": "xs named by $params.k is missing", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}},
+          {"cause": "absent", "check": "some", "failed_items": [], "inputs": [{"locations": ["/prs/2/q"], "name": "q", "value": 1}, {"locations": [], "name": "xs named by $params.k", "value": []}], "message": "xs named by $params.k is missing", "passed": false, "requirement": "r", "subject": {"id": "p2", "type": "pr"}}
+        ]
+      }
+    ]
   }
 ]

@@ -12390,6 +12390,16 @@ test_a_root_read_through_null_inside_a_relative_clause_names_the_null_step_once 
 	rows.c == ["null", "$params.c is null"]
 }
 
+test_a_walk_whose_ref_step_cant_be_read_names_its_path_and_every_root_its_phrase_cant_read if {
+	whose := {"c": "every xs named by $params.k whose v is 1, if any, exists"}
+	_root_rows(whose, {"id": "p", "xs": []}, {}).c == ["absent", "xs named by $params.k is missing"]
+	_root_rows(whose, {"id": "p", "xs": []}, {"k": null}).c == ["null", "xs named by $params.k is null"]
+	phrase := {"c": "every xs named by $params.k, if any, equals q"}
+	_root_rows(phrase, {"id": "p", "xs": []}, {}).c == ["absent", "xs named by $params.k is missing; q is missing"]
+	_root_rows(phrase, {"id": "p", "xs": [], "q": null}, {"k": null}).c == ["null", "xs named by $params.k is null; q is null"]
+	_root_rows(phrase, {"id": "p", "xs": [], "q": 1}, {}).c == ["absent", "xs named by $params.k is missing"]
+}
+
 test_both_sides_of_a_comparison_are_named_when_one_is_missing_and_the_other_null if {
 	rows := _root_rows({"c": "c.z is d.z"}, {"id": "p", "c": {}, "d": null}, {})
 	rows.c == ["absent", "c.z is missing, and d is null"]
