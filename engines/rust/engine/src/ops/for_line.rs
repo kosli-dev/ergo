@@ -1523,12 +1523,28 @@ impl For {
             .iter()
             .flat_map(|item| item.whose.iter())
             .collect();
-        if let Some((cause, text)) = super::message::root_flaw(&whose, &outer_ctx(ctx)) {
+        let outer = outer_ctx(ctx);
+        if let Some((cause, text)) = super::message::root_flaw(&whose, &outer) {
+            let flawed = whose
+                .iter()
+                .copied()
+                .chain(self.sentences.iter().map(|s| &s.check))
+                .any(|check| check.flawed(&outer));
+            if flawed && let Some(said) = run.message.clone() {
+                let parts = super::message::with_roots(
+                    said.split("; ").map(str::to_string).collect(),
+                    &text,
+                );
+                run.message = Some(super::message::joined(parts));
+                return run;
+            }
+            let said = run.message.clone();
             let (cause, failed_items, message) = walk::read_up_front(
                 run.verdict.cause,
                 std::mem::take(&mut run.failed_items),
                 cause,
                 &text,
+                said.as_deref(),
             );
             run.verdict.cause = cause;
             run.failed_items = failed_items;

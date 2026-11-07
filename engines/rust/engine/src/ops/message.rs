@@ -217,7 +217,7 @@ fn side_paths(check: &Check) -> Vec<&Path> {
     }
 }
 
-fn once_of(all: Vec<String>) -> Vec<String> {
+pub fn once_of(all: Vec<String>) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for text in all {
         if !out.contains(&text) {
@@ -627,10 +627,22 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             let want = state_of(verdict.cause).unwrap_or(Outcome::Absent);
             let keys = key_states(check, ctx, want);
             if keys.is_empty() {
+                let roots: Vec<String> = check
+                    .paths()
+                    .into_iter()
+                    .chain(super::walk::listed_refs(check))
+                    .filter(|path| reads_from_a_root(path))
+                    .map(name::name)
+                    .collect();
                 let mut found: Vec<String> = sources(check, ctx, verdict)
                     .iter()
-                    .filter(|i| i.state == want)
-                    .map(|i| format!("{} is {}", i.stopped_at(), state_word(want)))
+                    .filter(|i| {
+                        i.state == want
+                            || ctx.label.is_some()
+                                && !roots.contains(&i.name)
+                                && matches!(i.state, Outcome::Absent | Outcome::Null)
+                    })
+                    .map(|i| format!("{} is {}", i.stopped_at(), state_word(i.state)))
                     .collect();
                 found.extend(
                     lists::walk_fault(check, ctx)
@@ -864,6 +876,19 @@ pub fn prefixed(item: &str, said: &str) -> String {
         Some(rest) => format!("{item} {rest}"),
         None => format!("{item}: {said}"),
     }
+}
+
+pub fn with_roots(said: Vec<String>, roots: &str) -> Vec<String> {
+    let roots: Vec<String> = roots.split("; ").map(str::to_string).collect();
+    if said.iter().all(|part| roots.contains(part)) {
+        return roots;
+    }
+    let mut out: Vec<String> = roots
+        .into_iter()
+        .filter(|root| !said.iter().any(|part| part.contains(root.as_str())))
+        .collect();
+    out.extend(said);
+    out
 }
 
 pub fn joined(parts: Vec<String>) -> String {
@@ -1403,7 +1428,9 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                 {
                     continue;
                 }
-                if lists::walked_in(check, &root, ctx).is_some() {
+                if lists::right_paths(check).contains(&&root)
+                    && lists::walked_in(check, &root, ctx).is_some()
+                {
                     continue;
                 }
                 let counted = match check {
@@ -1454,15 +1481,11 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
             .map(|(_, cause, _, _)| *cause)
             .collect::<Vec<_>>(),
     )?;
-    let worst_found: Vec<&(usize, Cause, String, bool)> = found
-        .iter()
-        .filter(|(_, cause, _, _)| *cause == worst)
-        .collect();
     let mut texts: Vec<String> = Vec::new();
-    for (at, _, text, is_key) in &worst_found {
-        let keyed = worst_found
-            .iter()
-            .any(|(other, _, _, key)| other == at && *key);
+    for (at, cause, text, is_key) in &found {
+        let keyed = found.iter().any(|(other, other_cause, _, key)| {
+            other == at && *key && (other_cause == cause || *other_cause == Cause::Unusable)
+        });
         if (*is_key || !keyed) && !texts.contains(text) {
             texts.push(text.clone());
         }

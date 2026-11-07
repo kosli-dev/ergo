@@ -2118,6 +2118,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("every $input.requests", "every $input.requests"),
     ("every $input.resources", "every $input.resources"),
     ("every pr.cms", "every pr.cms"),
+    ("every prs.c.z", "every prs.c.z"),
+    ("prs whose c.z is 1", "prs whose c.z is 1"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

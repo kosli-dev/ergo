@@ -1175,7 +1175,9 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             return None;
         }
         let whose: Vec<&Check> = counted.whose.iter().collect();
-        let root = super::message::root_flaw(&whose, &outer)
+        let any_root = super::message::root_flaw(&whose, &outer);
+        let root = any_root
+            .clone()
             .filter(|(flaw, _)| *flaw == cause)
             .map(|(_, text)| text);
         let walked = walk::walk(
@@ -1241,6 +1243,13 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             .iter()
             .map(|f| (f.cause, f.msg.clone()))
             .collect();
+        let root_texts: Vec<String> = any_root
+            .map(|(_, text)| text.split("; ").map(str::to_string).collect())
+            .unwrap_or_default();
+        for text in &root_texts {
+            always.insert(found.len());
+            found.push((cause, text.clone()));
+        }
         let mut refs: Vec<Path> = counted.whose.iter().flat_map(Check::refs).collect();
         refs.sort_by_key(name::name);
         refs.dedup();
@@ -1252,7 +1261,12 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                 _ => None,
             };
             if let Some((found_cause, word)) = said {
-                found.push((found_cause, format!("{} is {word}", name::name(reference))));
+                let named = super::null_step_name(reference, &outer)
+                    .unwrap_or_else(|| name::name(reference));
+                let text = format!("{named} is {word}");
+                if !root_texts.contains(&text) {
+                    found.push((found_cause, text));
+                }
             }
         }
         let mut at = outer.clone();
@@ -1348,12 +1362,14 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                 _ => {}
             }
         }
-        let said: Vec<String> = found
-            .into_iter()
-            .enumerate()
-            .filter(|(at, (c, _))| *c == cause || always.contains(at))
-            .map(|(_, (_, text))| text)
-            .collect();
+        let said: Vec<String> = super::message::once_of(
+            found
+                .into_iter()
+                .enumerate()
+                .filter(|(at, (c, _))| *c == cause || always.contains(at))
+                .map(|(_, (_, text))| text)
+                .collect(),
+        );
         if !said.is_empty() {
             out.push(super::message::joined(said));
         }

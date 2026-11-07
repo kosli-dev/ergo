@@ -964,7 +964,11 @@ fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
         .chain(listed_refs(check))
         .filter(|path| from_a_root(path))
         .find_map(|path| {
-            if let Some(listed) = super::lists::walked_in(check, path, ctx) {
+            let listed = super::lists::right_paths(check)
+                .contains(&path)
+                .then(|| super::lists::walked_in(check, path, ctx))
+                .flatten();
+            if let Some(listed) = listed {
                 return (listed.cause == Some(cause)).then_some(listed.text);
             }
             let read = path::read(path, ctx);
@@ -1310,7 +1314,12 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
     if flawed {
         row.verdict.cause = Cause::Unusable;
         row.failed_items = Vec::new();
-        row.parts = walk_faults(walk, &outer(ctx));
+        let outer_ctx = outer(ctx);
+        row.parts = walk_faults(walk, &outer_ctx);
+        let whose: Vec<&Check> = walk.whose.iter().collect();
+        if let Some((_, text)) = message::root_flaw(&whose, &outer_ctx) {
+            row.parts = message::with_roots(std::mem::take(&mut row.parts), &text);
+        }
         row.message = Some(message::joined(row.parts.clone()));
         return row;
     }
@@ -1322,11 +1331,23 @@ pub fn run(walk: &Walk, ctx: &Ctx) -> Run {
             .flatten()
     });
     if let Some((cause, text)) = flaw {
+        if row.verdict.cause != cause
+            && !matches!(row.verdict.cause, Cause::Satisfied | Cause::Value)
+        {
+            let in_a_for_line = ctx.aliases.keys().any(|name| name != OUTER);
+            if ctx.label.is_some() && !in_a_for_line && !row.parts.is_empty() {
+                let parts = message::with_roots(std::mem::take(&mut row.parts), &text);
+                row.message = Some(message::joined(parts.clone()));
+                row.parts = parts;
+            }
+            return row;
+        }
         let (cause, failed_items, message) = read_up_front(
             row.verdict.cause,
             std::mem::take(&mut row.failed_items),
             cause,
             &text,
+            None,
         );
         if let Some(message) = message {
             row.parts = vec![message.clone()];
@@ -1343,13 +1364,16 @@ pub(super) fn read_up_front(
     failed_items: Vec<Value>,
     flaw: Cause,
     text: &str,
+    said: Option<&str>,
 ) -> (Cause, Vec<Value>, Option<String>) {
     if row == flaw {
         (row, failed_items, Some(text.to_string()))
     } else if matches!(row, Cause::Satisfied | Cause::Value) {
         (flaw, Vec::new(), Some(text.to_string()))
     } else {
-        (row, failed_items, None)
+        let message =
+            said.map(|said| message::joined(message::with_roots(vec![said.to_string()], text)));
+        (row, failed_items, message)
     }
 }
 
