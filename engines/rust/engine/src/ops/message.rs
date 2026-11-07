@@ -606,9 +606,43 @@ fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
     }
 }
 
+pub fn null_key_parts(path: &Path, ctx: &Ctx) -> Vec<String> {
+    let Some(at) = path.steps.iter().position(|step| {
+        matches!(step, Step::Field(_) | Step::Ref(_)) && path::resolve(step, ctx).is_err()
+    }) else {
+        return Vec::new();
+    };
+    let null_at = (0..=at).find(|end| {
+        let prefix = Path {
+            start: path.start.clone(),
+            steps: path.steps[..*end].to_vec(),
+        };
+        path::read(&prefix, ctx).outcome == Outcome::Null
+    });
+    let (Some(end), Some(key)) = (null_at, key_text(&path.steps[at], ctx)) else {
+        return Vec::new();
+    };
+    let prefix = Path {
+        start: path.start.clone(),
+        steps: path.steps[..end].to_vec(),
+    };
+    vec![format!("{} is null", name::name(&prefix)), key]
+}
+
 pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
     if let Check::AnyOf(any) = check {
         return any_of_message(any, ctx);
+    }
+    if matches!(verdict.cause, Cause::Absent | Cause::Null | Cause::Unusable) {
+        let parts: Vec<String> = once_of(
+            side_paths(check)
+                .into_iter()
+                .flat_map(|path| null_key_parts(path, ctx))
+                .collect(),
+        );
+        if !parts.is_empty() {
+            return parts.join("; ");
+        }
     }
     let clauses: Vec<String> = match verdict.cause {
         Cause::Value => {
@@ -1402,6 +1436,23 @@ fn first_null_step(root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
     None
 }
 
+pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<String> {
+    if lists::haystacks(check).contains(&root) {
+        return lists::ref_faults(check, ctx).into_iter().next();
+    }
+    let right = match check {
+        Check::Compare(c) => &c.right,
+        Check::CompareTime(c) => &c.right,
+        _ => return None,
+    };
+    if !matches!(right, super::compare::Side::Path(path) if path == root) {
+        return None;
+    }
+    let read = path::read(root, ctx);
+    let value = read.value.filter(|_| read.outcome == Outcome::Found)?;
+    super::walk::right_needs(check, value).map(|kind| isnt(&name::name(root), value, kind))
+}
+
 pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
     let mut found: Vec<(usize, Cause, String, bool)> = Vec::new();
     for (at, check) in checks.iter().enumerate() {
@@ -1461,16 +1512,8 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                         isnt(&name::name(&root), value, "text"),
                         true,
                     ));
-                } else if !is_key
-                    && lists::haystacks(check).contains(&&root)
-                    && let Some(value) = read.value.filter(|value| !value.is_array())
-                {
-                    found.push((
-                        at,
-                        Cause::Unusable,
-                        isnt(&name::name(&root), value, "a list"),
-                        false,
-                    ));
+                } else if !is_key && let Some(text) = root_kind_fault(check, &root, ctx) {
+                    found.push((at, Cause::Unusable, text, false));
                 }
             }
         }

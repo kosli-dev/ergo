@@ -922,7 +922,7 @@ fn from_a_root(path: &Path) -> bool {
     })
 }
 
-fn right_needs(check: &Check, value: &Value) -> Option<&'static str> {
+pub(super) fn right_needs(check: &Check, value: &Value) -> Option<&'static str> {
     use super::compare::Cmp;
     match check {
         Check::Compare(compare) => match compare.cmp {
@@ -982,7 +982,8 @@ fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
             if cause != Cause::Unusable {
                 return None;
             }
-            right_needs(check, value).map(|kind| message::isnt(&name::name(path), value, kind))
+            message::root_kind_fault(check, path, ctx)
+                .or_else(|| right_needs(check, value).map(|kind| message::isnt(&name::name(path), value, kind)))
         })
 }
 

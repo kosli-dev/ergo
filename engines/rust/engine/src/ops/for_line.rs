@@ -1522,8 +1522,23 @@ impl For {
             .items
             .iter()
             .flat_map(|item| item.whose.iter())
+            .chain(self.sentences.iter().flat_map(|s| nested_whose(&s.check)))
             .collect();
         let outer = outer_ctx(ctx);
+        if super::message::root_flaw(&whose, &outer).is_none()
+            && let Some((cause, texts)) = self.second_roots(ctx)
+        {
+            if matches!(run.verdict.cause, Cause::Satisfied | Cause::Value) {
+                run.verdict.cause = cause;
+                run.failed_items = Vec::new();
+                run.message = Some(super::message::joined(texts));
+                return run;
+            }
+            if run.verdict.cause == cause {
+                run.message = Some(super::message::joined(texts));
+                return run;
+            }
+        }
         if let Some((cause, text)) = super::message::root_flaw(&whose, &outer) {
             let flawed = whose
                 .iter()
@@ -1553,6 +1568,24 @@ impl For {
             }
         }
         run
+    }
+
+    fn second_roots(&self, ctx: &Ctx) -> Option<(Cause, Vec<String>)> {
+        let [first, second] = self.items.as_slice() else {
+            return None;
+        };
+        let whose: Vec<&Check> = second.whose.iter().collect();
+        let mut causes = Vec::new();
+        let mut texts = Vec::new();
+        for live in self.candidates(0, ctx).live {
+            let mut bound = ctx.clone();
+            bound.aliases.insert(first.alias.clone(), live.at.clone());
+            if let Some((cause, text)) = super::message::root_flaw(&whose, &outer_ctx(&bound)) {
+                causes.push(cause);
+                texts.extend(text.split("; ").map(|t| format!("{}: {t}", live.name)));
+            }
+        }
+        Cause::worst(causes).map(|cause| (cause, texts))
     }
 
     fn run_items(&self, ctx: &Ctx) -> Run {
@@ -3544,5 +3577,26 @@ mod tests {
             found["message"],
             "item 1 of ws: item 1 of items: i is {\"a\": 1}, which isn't text"
         );
+    }
+}
+
+fn nested_whose(check: &Check) -> Vec<&Check> {
+    match check {
+        Check::Tally(tally) => super::tally::tally_sides(tally)
+            .into_iter()
+            .flat_map(|side| match side {
+                Side::Derived(derived) => derived
+                    .terms
+                    .iter()
+                    .flat_map(|term| match term {
+                        Term::Counted(counted) => counted.whose.iter().collect::<Vec<_>>(),
+                        _ => Vec::new(),
+                    })
+                    .collect::<Vec<_>>(),
+                Side::Plain(_) => Vec::new(),
+            })
+            .collect(),
+        Check::Walk(walk) => walk.whose.iter().collect(),
+        _ => Vec::new(),
     }
 }
