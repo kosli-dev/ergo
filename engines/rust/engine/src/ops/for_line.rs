@@ -1522,12 +1522,36 @@ impl For {
             .items
             .iter()
             .flat_map(|item| item.whose.iter())
-            .chain(self.sentences.iter().flat_map(|s| nested_whose(&s.check)))
+            .chain(
+                self.sentences
+                    .iter()
+                    .flat_map(|s| nested_whose(&s.check, false)),
+            )
+            .collect();
+        let counted: Vec<&Check> = self
+            .sentences
+            .iter()
+            .flat_map(|s| nested_whose(&s.check, true))
+            .collect();
+        let nested: Vec<&Check> = self
+            .sentences
+            .iter()
+            .flat_map(|s| nested_whose(&s.check, false))
             .collect();
         let outer = outer_ctx(ctx);
-        if super::message::root_flaw(&whose, &outer).is_none()
-            && let Some((cause, texts)) = self.second_roots(ctx)
-        {
+        let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested);
+        if let Some((cause, texts)) = self.second_roots(ctx) {
+            let (cause, texts) = match &outer_flaw {
+                None => (cause, texts),
+                Some((outer_cause, outer_text)) => (
+                    Cause::worst(vec![*outer_cause, cause]).unwrap_or(cause),
+                    outer_text
+                        .split("; ")
+                        .map(str::to_string)
+                        .chain(texts)
+                        .collect(),
+                ),
+            };
             if matches!(run.verdict.cause, Cause::Satisfied | Cause::Value) {
                 run.verdict.cause = cause;
                 run.failed_items = Vec::new();
@@ -1539,7 +1563,7 @@ impl For {
                 return run;
             }
         }
-        if let Some((cause, text)) = super::message::root_flaw(&whose, &outer) {
+        if let Some((cause, text)) = outer_flaw {
             let flawed = whose
                 .iter()
                 .copied()
@@ -1574,15 +1598,28 @@ impl For {
         let [first, second] = self.items.as_slice() else {
             return None;
         };
-        let whose: Vec<&Check> = second.whose.iter().collect();
+        let outer = outer_ctx(ctx);
         let mut causes = Vec::new();
         let mut texts = Vec::new();
         for live in self.candidates(0, ctx).live {
             let mut bound = ctx.clone();
             bound.aliases.insert(first.alias.clone(), live.at.clone());
-            if let Some((cause, text)) = super::message::root_flaw(&whose, &outer_ctx(&bound)) {
-                causes.push(cause);
-                texts.extend(text.split("; ").map(|t| format!("{}: {t}", live.name)));
+            let bound = outer_ctx(&bound);
+            for cond in &second.whose {
+                let Some((cause, text)) = super::message::root_flaw(&[cond], &bound) else {
+                    continue;
+                };
+                let said = super::message::root_flaw(&[cond], &outer)
+                    .map(|(_, said)| said)
+                    .unwrap_or_default();
+                let extra: Vec<&str> = text
+                    .split("; ")
+                    .filter(|part| !said.split("; ").any(|old| old == *part))
+                    .collect();
+                if !extra.is_empty() {
+                    causes.push(cause);
+                    texts.extend(extra.iter().map(|t| format!("{}: {t}", live.name)));
+                }
             }
         }
         Cause::worst(causes).map(|cause| (cause, texts))
@@ -2366,6 +2403,27 @@ fn reading_order(check: &Check, inputs: &[Input], aliases: &[&str]) -> Vec<Input
         })
     });
     through.into_iter().chain(rest).collect()
+}
+
+fn nested_whose(check: &Check, counts_only: bool) -> Vec<&Check> {
+    match check {
+        Check::Tally(tally) => super::tally::tally_sides(tally)
+            .into_iter()
+            .flat_map(|side| match side {
+                Side::Derived(derived) => derived
+                    .terms
+                    .iter()
+                    .flat_map(|term| match term {
+                        Term::Counted(counted) => counted.whose.iter().collect::<Vec<_>>(),
+                        _ => Vec::new(),
+                    })
+                    .collect::<Vec<_>>(),
+                Side::Plain(_) => Vec::new(),
+            })
+            .collect(),
+        Check::Walk(walk) if !counts_only => walk.whose.iter().collect(),
+        _ => Vec::new(),
+    }
 }
 
 #[cfg(test)]
@@ -3531,13 +3589,13 @@ mod tests {
     }
 
     #[test]
-    fn a_missing_param_in_an_inner_whose_is_named_once_under_the_for_item() {
+    fn a_missing_param_in_an_inner_whose_is_named_once_with_no_item() {
         let found = row(
             "every ws as w",
             json!("every w.items whose lo is at least $params.p exists"),
             json!({"ws": [{"items": [{"hi": 2}, {"lo": 5}]}]}),
         );
-        assert_eq!(found["message"], "item 1 of ws: $params.p is missing");
+        assert_eq!(found["message"], "$params.p is missing");
     }
 
     #[test]
@@ -3577,26 +3635,5 @@ mod tests {
             found["message"],
             "item 1 of ws: item 1 of items: i is {\"a\": 1}, which isn't text"
         );
-    }
-}
-
-fn nested_whose(check: &Check) -> Vec<&Check> {
-    match check {
-        Check::Tally(tally) => super::tally::tally_sides(tally)
-            .into_iter()
-            .flat_map(|side| match side {
-                Side::Derived(derived) => derived
-                    .terms
-                    .iter()
-                    .flat_map(|term| match term {
-                        Term::Counted(counted) => counted.whose.iter().collect::<Vec<_>>(),
-                        _ => Vec::new(),
-                    })
-                    .collect::<Vec<_>>(),
-                Side::Plain(_) => Vec::new(),
-            })
-            .collect(),
-        Check::Walk(walk) => walk.whose.iter().collect(),
-        _ => Vec::new(),
     }
 }

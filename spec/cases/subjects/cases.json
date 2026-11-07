@@ -17769,7 +17769,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "x is null; $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17816,7 +17816,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "x is null; $params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -17863,7 +17863,7 @@
         "rules": ["scope.unreadable", "path.ref_step"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "x is null; $params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {

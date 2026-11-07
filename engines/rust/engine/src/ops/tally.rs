@@ -1175,7 +1175,7 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             return None;
         }
         let whose: Vec<&Check> = counted.whose.iter().collect();
-        let any_root = super::message::root_flaw(&whose, &outer);
+        let any_root = super::message::root_flaw_counted(&whose, &outer);
         let root = any_root
             .clone()
             .filter(|(flaw, _)| *flaw == cause)

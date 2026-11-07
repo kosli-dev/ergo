@@ -976,14 +976,19 @@ fn root_alone(check: &Check, ctx: &Ctx, cause: Cause) -> Option<String> {
             if matches!(cause, Cause::Absent | Cause::Null | Cause::Unusable)
                 && state == Some(cause)
             {
+                let parts = message::null_key_parts(path, ctx);
+                if !parts.is_empty() {
+                    return Some(parts.join("; "));
+                }
                 return Some(message::root_text(path, ctx, cause));
             }
             let value = read.value.filter(|_| read.outcome == Outcome::Found)?;
             if cause != Cause::Unusable {
                 return None;
             }
-            message::root_kind_fault(check, path, ctx)
-                .or_else(|| right_needs(check, value).map(|kind| message::isnt(&name::name(path), value, kind)))
+            message::root_kind_fault(check, path, ctx).or_else(|| {
+                right_needs(check, value).map(|kind| message::isnt(&name::name(path), value, kind))
+            })
         })
 }
 

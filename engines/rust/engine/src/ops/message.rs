@@ -612,7 +612,8 @@ pub fn null_key_parts(path: &Path, ctx: &Ctx) -> Vec<String> {
     }) else {
         return Vec::new();
     };
-    let null_at = (0..=at).find(|end| {
+    let first = usize::from(path.start == Start::Subject);
+    let null_at = (first..=at).find(|end| {
         let prefix = Path {
             start: path.start.clone(),
             steps: path.steps[..*end].to_vec(),
@@ -1454,7 +1455,21 @@ pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<S
 }
 
 pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
+    root_flaw_ordered(checks, ctx, &[], &[])
+}
+
+pub fn root_flaw_counted(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
+    root_flaw_ordered(checks, ctx, checks, &[])
+}
+
+pub fn root_flaw_ordered(
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+    keys_left: &[&Check],
+) -> Option<(Cause, String)> {
     let mut found: Vec<(usize, Cause, String, bool)> = Vec::new();
+    let mut refs: Vec<String> = Vec::new();
     for (at, check) in checks.iter().enumerate() {
         if matches!(check, Check::Present(_)) {
             continue;
@@ -1474,6 +1489,9 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                 roots.push((path.clone(), false));
             }
             for (root, is_key) in roots {
+                if is_key && keys_left.iter().any(|left| std::ptr::eq(*left, *check)) {
+                    continue;
+                }
                 if let Start::Alias(name) = &root.start
                     && !ctx.aliases.contains_key(name)
                 {
@@ -1503,7 +1521,15 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                 }
                 let read = path::read(&root, ctx);
                 if let Some(cause) = read.outcome.cause() {
-                    found.push((at, cause, root_text(&root, ctx, cause), is_key));
+                    let text = root_text(&root, ctx, cause);
+                    if refs_first.iter().any(|first| std::ptr::eq(*first, *check))
+                        && !is_key
+                        && matches!(root.start, Start::Params | Start::Input)
+                        && matches!(cause, Cause::Absent | Cause::Null)
+                    {
+                        refs.push(text.clone());
+                    }
+                    found.push((at, cause, text, is_key));
                 } else if is_key && let Some(value) = read.value.filter(|value| !value.is_string())
                 {
                     found.push((
@@ -1524,13 +1550,28 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
             .map(|(_, cause, _, _)| *cause)
             .collect::<Vec<_>>(),
     )?;
-    let mut texts: Vec<String> = Vec::new();
+    let mut kept: Vec<(String, bool)> = Vec::new();
     for (at, cause, text, is_key) in &found {
         let keyed = found.iter().any(|(other, other_cause, _, key)| {
             other == at && *key && (other_cause == cause || *other_cause == Cause::Unusable)
         });
-        if (*is_key || !keyed) && !texts.contains(text) {
-            texts.push(text.clone());
+        if (*is_key || !keyed) && !kept.iter().any(|(said, _)| said == text) {
+            kept.push((text.clone(), *is_key));
+        }
+    }
+    refs.retain(|text| kept.iter().any(|(said, _)| said == text));
+    refs.sort();
+    let keys = kept
+        .iter()
+        .filter(|(text, is_key)| *is_key && !refs.is_empty() && !refs.contains(text))
+        .map(|(text, _)| text.clone());
+    let mut texts: Vec<String> = Vec::new();
+    for text in keys
+        .chain(refs.clone())
+        .chain(kept.iter().map(|(text, _)| text.clone()))
+    {
+        if !texts.contains(&text) {
+            texts.push(text);
         }
     }
     Some((worst, texts.join("; ")))

@@ -7630,6 +7630,20 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("o is pl.name", "o equals pl.name", &[], &[]),
+    ("count of xs whose s starts with pr.z is 0", "count of xs whose s starts with pr.z is 0", &[], &[]),
+    ("count of xs whose v is at least pr.z is 0", "count of xs whose v is at least pr.z is 0", &[], &[]),
+    ("count of xs whose w is in pr.l and whose v is in $params.l is 0", "count of xs whose w is in pr.l and whose v is in $params.l is 0", &[], &[]),
+    ("count of xs whose w is in pr.m and whose v is in $params.b and whose v is in $params.a is 0", "count of xs whose w is in pr.m and whose v is in $params.b and whose v is in $params.a is 0", &[], &[]),
+    ("count of xs whose w is in pr.z is 0", "count of xs whose w is in pr.z is 0", &[], &[]),
+    ("every xs.t, if any, is before z", "every xs.t, if any, is before z", &[], &[]),
+    ("every xs.v, if any, is at least z", "every xs.v, if any, is at least z", &[], &[]),
+    ("n.v is 1", "n.v is 1", &[], &[]),
+    ("pl.z named by p exists", "pl.z named by p exists", &[], &[]),
+    ("s.x named by p does not exist", "s.x named by p does not exist", &[], &[]),
+    ("s.x named by p exists", "s.x named by p exists", &[], &[]),
+    ("some xs whose v is in $params.b and whose w is in $params.a exists", "some xs whose v is in $params.b and whose w is in $params.a exists", &[], &[]),
+    ("some xs.v is at least z", "some xs.v is at least z", &[], &[]),
+    ("x[0] named by zz exists", "x[0] named by zz exists", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -11396,6 +11410,8 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every ys as m", "every ys as m", &[], &[]),
+    ("every ys as m, every xs whose v is in m.q, if any, as n", "every ys as m, every xs whose v is in m.q, if any, as n", &[], &[]),
+    ("every ys as m, every xs whose w is in m.q and whose v is in $params.l, if any, as n", "every ys as m, every xs whose w is in m.q and whose v is in $params.l, if any, as n", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
