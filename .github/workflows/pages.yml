@@ -84,7 +84,7 @@ jobs:
         with:
           node-version-file: ${{ runner.temp }}/playground/packages/.nvmrc
           cache: pnpm
-          cache-dependency-path: ${{ runner.temp }}/playground/packages/pnpm-lock.yaml
+          cache-dependency-path: packages/pnpm-lock.yaml
       - name: Build the playground interface with released engines and samples
         working-directory: ${{ runner.temp }}/playground/packages
         run: |
