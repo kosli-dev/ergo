@@ -17908,6 +17908,21 @@
     ]
   },
   {
+    "description": "a whose filter with a ref step after a field, and the input value is a list",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things whose x.y named by $input.i does not exist", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "id exists"}}}},
+    "cases": [
+      {
+        "description": "fails as unusable and shows the input path in refs",
+        "rules": ["scope.unreadable", "path.ref_step"],
+        "input": {"things": [{"id": "t1"}], "i": [1]},
+        "results": [
+          {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $input.i", "value": null}], "message": "$input.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["/i"], "name": "$input.i", "value": [1]}]}}
+      }
+    ]
+  },
+  {
     "description": "a from line with a key named like its parent",
     "policy": {"ergo_spec": "v0.6-dev", "subjects": {"b": {"from": "bs", "identified_by": "id"}, "kid": {"from": "every b.kids whose b.x equals v", "identified_by": "id"}}, "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}},
     "cases": [
