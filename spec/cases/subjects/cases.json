@@ -17762,7 +17762,8 @@
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
       },
       {
         "description": "fails with the ref's cause when the parent field is null",
@@ -17770,7 +17771,8 @@
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
       },
       {
         "description": "fails with the ref's cause when the subject is a list",
@@ -17778,7 +17780,8 @@
         "input": {"things": [[1]]},
         "results": [
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
       },
       {
         "description": "fails with the ref's cause when the subject is a string",
@@ -17786,7 +17789,8 @@
         "input": {"things": ["s"]},
         "results": [
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
       },
       {
         "description": "fails with the ref's cause when the subject is null",
@@ -17794,7 +17798,8 @@
         "input": {"things": [null]},
         "results": [
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:"], "name": "$params.i", "value": null}]}}
       }
     ]
   },
@@ -17809,7 +17814,8 @@
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
       },
       {
         "description": "fails with the ref's cause when the parent field is null",
@@ -17817,7 +17823,8 @@
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
           {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
       },
       {
         "description": "fails with the ref's cause when the subject is a list",
@@ -17825,7 +17832,8 @@
         "input": {"things": [[1]]},
         "results": [
           {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
       },
       {
         "description": "fails with the ref's cause when the subject is a string",
@@ -17833,7 +17841,8 @@
         "input": {"things": ["s"]},
         "results": [
           {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
       },
       {
         "description": "fails with the ref's cause when the subject is null",
@@ -17841,7 +17850,8 @@
         "input": {"things": [null]},
         "results": [
           {"cause": "null", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": null}]}}
       }
     ]
   },
@@ -17856,7 +17866,8 @@
         "input": {"things": [{"id": "t1"}]},
         "results": [
           {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
       },
       {
         "description": "fails with the ref's cause when the parent field is null",
@@ -17864,7 +17875,8 @@
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
           {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0/x"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
       },
       {
         "description": "fails with the ref's cause when the subject is a list",
@@ -17872,7 +17884,8 @@
         "input": {"things": [[1]]},
         "results": [
           {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": [1], "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
       },
       {
         "description": "fails with the ref's cause when the subject is a string",
@@ -17880,7 +17893,8 @@
         "input": {"things": ["s"]},
         "results": [
           {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": "s", "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
       },
       {
         "description": "fails with the ref's cause when the subject is null",
@@ -17888,7 +17902,8 @@
         "input": {"things": [null]},
         "results": [
           {"cause": "unusable", "check": "$applies", "inputs": [{"locations": ["/things/0"], "name": "x.y named by $params.i", "value": null}], "message": "$params.i is [1], which isn't text", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}
-        ]
+        ],
+        "refs": {"s": {"$applies": [{"locations": ["$params:/i"], "name": "$params.i", "value": [1]}]}}
       }
     ]
   },

@@ -414,10 +414,19 @@ pub fn check_defs(
     );
     match filters_text(reading, policy, requirement, extra) {
         Some(filters) => {
-            defs.insert(
-                "$applies".to_string(),
-                CheckDef::added(format!("The {kind} is in scope"), filters),
-            );
+            let mut applies_def = CheckDef::added(format!("The {kind} is in scope"), filters);
+            if let Some((name, _)) = policy.subject_of(requirement)
+                && let Some(lowered) = reading.lowered(name)
+            {
+                let checks: Vec<&crate::ops::Check> =
+                    lowered.filters.iter().map(|f| &f.check).collect();
+                applies_def.refs = crate::checks::refs_of_checks(
+                    &checks,
+                    input,
+                    params.as_object().map(|_| params),
+                );
+            }
+            defs.insert("$applies".to_string(), applies_def);
         }
         None => {
             defs.remove("$applies");
