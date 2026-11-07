@@ -11,7 +11,9 @@ const root = join(here, "..", "..");
 const require = createRequire(import.meta.url);
 
 const cases = join(root, "packages", "markdown", "cases");
-export const sampleCases = {
+export const sampleCases = process.env.ERGO_PLAYGROUND_SAMPLE_CASES
+  ? JSON.parse(readFileSync(process.env.ERGO_PLAYGROUND_SAMPLE_CASES, "utf8"))
+  : {
   bakery: "baking",
   "any of": "any-of-licences",
   "for line": "for-line-peer-approval",

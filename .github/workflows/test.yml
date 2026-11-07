@@ -289,6 +289,8 @@ jobs:
       - name: Test the site's scripts
         run: |
           site/latest-release_test.sh
+          site/prepare-playground_test.sh
+          .github/pages-source_test.sh
           site/prepare_test.sh
           site/check_fit_test.sh
           site/check_examples_test.sh

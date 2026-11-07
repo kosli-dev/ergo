@@ -14,7 +14,7 @@ const kindsOf = (line) => line.map((t) => (t.kind === "plain" ? t.text : `[${t.k
 const markdown = (source) => highlightMarkdown(source, compile(source).blocks).map(kindsOf);
 const yaml = (text) => highlightYaml(text).map(kindsOf);
 
-test("the grammar words are the words spec/sentences.abnf spells out", () => {
+test("the grammar words are the words spec/sentences.abnf spells out", { skip: Boolean(process.env.ERGO_PLAYGROUND_SAMPLE_CASES) }, () => {
   const abnf = readFileSync(join(here, "..", "..", "..", "spec", "sentences.abnf"), "utf8");
   const words = new Set([...abnf.matchAll(/"([a-z][a-z-]*)"/g)].map((m) => m[1]).filter((w) => w.length > 1 || w === "a"));
   assert.deepEqual([...GRAMMAR_WORDS].sort(), [...words].sort());
@@ -71,7 +71,7 @@ test("the Markdown pane marks front matter, headings, field labels, check labels
   const source = readSample("baking").source;
   assert.deepEqual(markdown(source).slice(0, 12), [
     "[marker:---]",
-    "[key:ergo_spec]:[string: v0.6-dev]",
+    `[key:ergo_spec]:[string: ${compile(source).policy.ergo_spec}]`,
     "[marker:---]",
     "",
     "[marker:#] [heading:Cake batches]",
@@ -156,8 +156,9 @@ test("lines inside a fenced code block are code", () => {
 });
 
 test("the YAML view marks keys, plain values and the sentences of a check", () => {
-  const lines = yaml(yamlText(compile(readSample("any-of-licences").source).policy));
-  assert.ok(lines.includes("[key:ergo_spec]: [string:v0.6-dev]"));
+  const policy = compile(readSample("any-of-licences").source).policy;
+  const lines = yaml(yamlText(policy));
+  assert.ok(lines.includes(`[key:ergo_spec]: [string:${policy.ergo_spec}]`));
   assert.ok(lines.includes("      [key:licence allowed]:"));
   assert.ok(lines.includes("        [key:description]: [string:The licence is allowed]"));
   assert.ok(lines.includes("          [key:declared]: [word:some] licenses.license.id [word:is] [word:in] [ref:$params.allowed_licenses]"));

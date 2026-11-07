@@ -13,15 +13,16 @@ concurrency:
 jobs:
   build:
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pages: read
-      actions: read
     env:
       HUGO_VERSION: 0.157.0
     steps:
@@ -32,8 +33,13 @@ jobs:
           sudo dpkg -i "$RUNNER_TEMP/hugo.deb"
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: main
           fetch-depth: 0
+      - name: Select the tested commit from main
+        if: github.event_name == 'workflow_run'
+        env:
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: .github/pages-source.sh "$TESTED_SHA"
       - uses: open-policy-agent/setup-opa@v2
         with:
           version: 1.22.0
@@ -46,64 +52,61 @@ jobs:
         run: site/prepare.sh
       - name: Test the released tutorial and home page examples before publishing them
         run: site/check.sh
-      - name: Find the test run that built the Wasm
-        id: tests
-        continue-on-error: true
+      - name: Stage the released playground and engines
         env:
           GH_TOKEN: ${{ github.token }}
-          RUN_ID: ${{ github.event.workflow_run.id }}
-          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
-        shell: bash
+        run: site/prepare-playground.sh "$RUNNER_TEMP/playground"
+      - name: Install the released Rust toolchain and wasm-bindgen
+        working-directory: ${{ runner.temp }}/playground/engines/rust
         run: |
-          if [ -z "$RUN_ID" ]; then
-            RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow test.yml --commit "$SHA" --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
-          fi
-          if [ -z "$RUN_ID" ]; then
-            echo "::error::No successful test run for $SHA, so there is no Wasm for the playground. Run this workflow on a commit of main whose tests passed."
-            exit 1
-          fi
-          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
-      - uses: actions/download-artifact@v8
-        continue-on-error: true
-        with:
-          name: ergo-policy-wasm-pkg
-          path: engines/rust/wasm/pkg
-          run-id: ${{ steps.tests.outputs.run_id }}
-          github-token: ${{ github.token }}
-      - uses: actions/download-artifact@v8
-        continue-on-error: true
-        with:
-          name: ergo-policy-sentences-wasm-pkg
-          path: engines/rust/sentences-wasm/pkg
-          run-id: ${{ steps.tests.outputs.run_id }}
-          github-token: ${{ github.token }}
+          rustup toolchain install
+          version=$(python3 -c 'import tomllib; print(next(p["version"] for p in tomllib.load(open("Cargo.lock", "rb"))["package"] if p["name"] == "wasm-bindgen"))')
+          cargo install wasm-bindgen-cli --version "$version" --locked -j 4
+      - name: Install Binaryen
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/binaryen.tar.gz" https://github.com/WebAssembly/binaryen/releases/download/version_133/binaryen-version_133-x86_64-linux.tar.gz
+          echo "2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489  $RUNNER_TEMP/binaryen.tar.gz" | sha256sum -c -
+          tar -xz -C "$RUNNER_TEMP" -f "$RUNNER_TEMP/binaryen.tar.gz"
+          echo "$RUNNER_TEMP/binaryen-version_133/bin" >> "$GITHUB_PATH"
+      - name: Build the released Rust engine and sentence parser for the browser
+        working-directory: ${{ runner.temp }}/playground/engines/rust
+        run: |
+          cargo build --locked --profile wasm -j 4 -p ergo-policy-wasm -p ergo-policy-sentences-wasm --target wasm32-unknown-unknown
+          wasm-bindgen --target web --out-dir wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_policy_wasm.wasm
+          wasm-bindgen --target web --out-dir sentences-wasm/pkg target/wasm32-unknown-unknown/wasm/ergo_policy_sentences_wasm.wasm
+          for file in wasm/pkg/*_bg.wasm sentences-wasm/pkg/*_bg.wasm; do
+            wasm-opt -Oz --enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext --enable-mutable-globals --enable-reference-types --enable-multivalue "$file" -o "$file"
+          done
       - uses: pnpm/action-setup@v6
-        continue-on-error: true
         with:
-          package_json_file: packages/package.json
+          package_json_file: ${{ runner.temp }}/playground/packages/package.json
       - uses: actions/setup-node@v7
-        continue-on-error: true
         with:
-          node-version-file: packages/.nvmrc
+          node-version-file: ${{ runner.temp }}/playground/packages/.nvmrc
           cache: pnpm
-          cache-dependency-path: packages/pnpm-lock.yaml
-      - name: Build the playground
-        continue-on-error: true
-        working-directory: packages
+          cache-dependency-path: ${{ runner.temp }}/playground/packages/pnpm-lock.yaml
+      - name: Build the playground interface with released engines and samples
+        working-directory: ${{ runner.temp }}/playground/packages
         run: |
           pnpm install --frozen-lockfile
-          pnpm --filter @kosli/ergo-playground build
+          node --input-type=module -e 'import { sampleCases } from "./playground/released-build.mjs"; import { writeFileSync } from "node:fs"; if (!sampleCases || !Object.keys(sampleCases).length) throw new Error("The released playground has no sample catalogue"); writeFileSync("playground/sample-cases.json", JSON.stringify(sampleCases));'
+          ERGO_PLAYGROUND_SAMPLE_CASES="$PWD/playground/sample-cases.json" pnpm --filter @kosli/ergo-playground build
+      - name: Test the playground interface with released engines and samples
+        working-directory: ${{ runner.temp }}/playground/packages
+        env:
+          ERGO_PLAYGROUND_SAMPLE_CASES: ${{ runner.temp }}/playground/packages/playground/sample-cases.json
+        run: pnpm --filter @kosli/ergo-playground test
       - id: pages
         uses: actions/configure-pages@v6
       - name: Build
         shell: bash
         run: |
           hugo --source site --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
-          if [ ! -f packages/playground/dist/playground.html ]; then
+          if [ ! -f "$RUNNER_TEMP/playground/packages/playground/dist/playground.html" ]; then
             echo "::error::The playground wasn't built, and every page links to /playground/."
             exit 1
           fi
-          site/playground.sh packages/playground/dist/playground.html site/public
+          site/playground.sh "$RUNNER_TEMP/playground/packages/playground/dist/playground.html" site/public
           test -f site/public/playground/index.html
           python3 site/check_build.py site/public
       - uses: actions/upload-pages-artifact@v5

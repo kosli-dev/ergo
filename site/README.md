@@ -20,7 +20,7 @@ Each page follows the release of what it describes, so nothing on the site is ah
 
 The docs and the OPA page always go together: the docs come from a tag that has `OPA.md` if and only if the OPA page is built, so the short README never ships without the page it links to, and the long README, which has the engines in it, never ships next to an OPA or CLI page. When the newest spec that a published `rego-vX.Y.Z` reads and the latest `rego-vX.Y.Z` both have `OPA.md`, the docs come from that spec. When only the latest `rego-vX.Y.Z` has it, because no spec release does yet, they come from that release. When neither has it, the site keeps the old layout, everything from the latest `rego-vX.Y.Z` tag, with no OPA or CLI page. The OPA page comes from the latest `rego-vX.Y.Z`, and the CLI page from the latest `rust-vX.Y.Z` when it has `CLI.md` and the OPA page is built. `prepare.sh` says which it chose and fails if the two ever disagree. `release.json` has empty `opa` and `cli` for a page that wasn't built, and a link to such a page turns into plain text. `check_build.py` fails when a docs page links to a page or a heading that isn't there.
 
-Everything else follows `main`: the home page's layout, design and words, the other pages, the CSS other than `tutorial.css`, and the bakery page's text. The playground still follows `main`, not the releases.
+Everything else follows `main`: the home page's layout, design and words, the other pages, the CSS other than `tutorial.css`, and the bakery page's text. The playground interface follows `main`, and its engines and samples follow releases.
 
 ## Run it locally
 
@@ -56,7 +56,7 @@ The script picks the newest `rego-vX.Y.Z`, `rust-vX.Y.Z` and `spec-vX.Y` release
 
 After `hugo` builds the site, `site/check_build.py <folder>` checks that the built tutorial writes the spec of the Ergo it runs, that its script has the strings of the tutorial `site/prepare.sh` chose and none that only the other one has, that its page has that tutorial's layout and title, that its CSS has that `tutorial.css`'s classes, properties, colours and lengths, and that the home page shows the examples `site/check.sh` checked. That catches a mount in `hugo.toml` that lets `main`'s file win over the release's.
 
-The deploy also builds `packages/playground` and `site/playground.sh` puts it at `/playground/` with a `noindex` meta tag, and also writes a small page at `/editor/` that sends old links on to it. The top navigation of every page links to it, and so does the home page's start section. `check_build.py` fails when the home page has no link to it, when `sitemap.xml` lists either page, or when either page has no `noindex` tag. The deploy reuses the Wasm the `test` run built, so it needs a successful `test` run for the commit.
+The deploy also builds `packages/playground` and `site/playground.sh` puts it at `/playground/` with a `noindex` meta tag, and also writes a small page at `/editor/` that sends old links on to it. The top navigation of every page links to it, and so does the home page's start section. `check_build.py` fails when the home page has no link to it, when `sitemap.xml` lists either page, or when either page has no `noindex` tag. `site/prepare-playground.sh <empty folder>` stages the playground and its Markdown compiler from the commit being deployed, takes the samples from the latest published `rego-vX.Y.Z` release, replaces `ergo.rego` with that release's asset, and stages the Rust sources from the latest published `rust-vX.Y.Z` release. Drafts and prereleases are excluded. The deploy builds both Rust Wasm packages with the released toolchain and the wasm-bindgen version in its lockfile, then reads the Rego release's sample catalogue and builds the staged playground. Before deployment it runs the playground tests inside that staged folder with the same catalogue, checking the current interface against the released Wasm, Rego and sample reports. The parser tests use the Rust release's sentence corpus. A failing test stops deployment. A new sample on `main` therefore does not require an engine release. It fails if either engine has no published release or a build fails. Local playground builds still use the working tree.
 
 CI does all of this from the working tree and from the release on every pull request, and the deploy runs the release checks before it publishes.
 
@@ -91,7 +91,7 @@ Most text is Markdown, so `` `code` ``, `*emphasis*` and `**bold**` work. Write 
 
 ## Deploy
 
-GitHub Pages serves the site at https://ergo.kosli.com. `.github/workflows/pages.yml` builds `site/` and deploys it each time the `test` workflow passes on `main`, and the release workflow starts it after each release. You can also run it by hand from the Actions tab.
+GitHub Pages serves the site at https://ergo.kosli.com. `.github/workflows/pages.yml` builds `site/` and deploys it each time the `test` workflow passes on `main`, and the release workflow starts it after each release. You can also run it by hand from the Actions tab, on `main`. Before an automatic build runs the tested commit, `.github/pages-source.sh` checks that it is part of `main`, so a run from an unmerged branch cannot supply build code.
 
 The custom domain is set in the repo's **Settings → Pages**, with a DNS `CNAME` record pointing `ergo` at `kosli-dev.github.io`.
 
