@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
+import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
@@ -39,4 +40,15 @@ test("Pages gives pnpm setup a manifest it can read from the workspace", { skip:
   const input = step.with.package_json_file.replace("${{ runner.temp }}", tmpdir());
   const manifest = JSON.parse(readFileSync(join(root, input), "utf8"));
   assert.match(manifest.packageManager, /^pnpm@.+$/);
+});
+
+test("Pages gives Node setup a lockfile it can hash inside the workspace", { skip: Boolean(process.env.ERGO_PLAYGROUND_SAMPLE_CASES) }, () => {
+  const root = resolve(fileURLToPath(new URL("../../../", import.meta.url)));
+  const workflow = parse(readFileSync(new URL("../../../.github/workflows/pages.yml", import.meta.url), "utf8"));
+  const step = workflow.jobs.build.steps.find((step) => step.uses?.startsWith("actions/setup-node@") && step.with?.cache === "pnpm");
+  const input = step.with["cache-dependency-path"].replace("${{ runner.temp }}", tmpdir());
+  const file = resolve(root, input);
+  const hash = file.startsWith(`${root}${sep}`) ? createHash("sha256").update(readFileSync(file)).digest("hex") : "";
+  assert.notEqual(hash, "", "Node setup ignores cache files outside GITHUB_WORKSPACE");
+  assert.equal(hash, createHash("sha256").update(readFileSync(new URL("../../pnpm-lock.yaml", import.meta.url))).digest("hex"));
 });
