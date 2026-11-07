@@ -7770,6 +7770,34 @@ test_a_part_is_the_items_field_on_the_left_of_a_whose_and_the_part_on_the_right 
 	{"name": ".cov", "value": null, "locations": ["/trail"]} in _parts_row(rep, "d").inputs
 }
 
+test_a_count_of_a_part_after_that_reads_the_part_when_the_items_are_not_objects if {
+	has := {"cov": "dd.b"}
+	checks := {
+		"c": "count of dd.xs that is count of cov.z is 1",
+		"e": "every dd.xs that is count of cov.z is 2",
+		"s": "some dd.xs that is count of cov.z is 2",
+		"n": "count of dd.xs that is count of round.dd.b.z is 1",
+	}
+	rep := _parts_report(has, checks, {"b": {"z": [1, 2]}, "xs": [2, 5]})
+	every c in ["c", "e", "s", "n"] {
+		_parts_row(rep, c).cause == "satisfied"
+	}
+}
+
+test_a_count_of_a_missing_part_after_that_fails_on_the_part_not_the_items if {
+	has := {"cov": "dd.b"}
+	checks := {
+		"c": "count of dd.xs that is count of cov.z is 1",
+		"e": "every dd.xs that is count of cov.z is 2",
+		"n": "count of dd.xs that is count of round.dd.b.z is 1",
+	}
+	rep := _parts_report(has, checks, {"xs": [2, 5]})
+	_parts_row(rep, "c").cause == "absent"
+	_parts_row(rep, "c").message == "cov.z is missing"
+	_parts_row(rep, "e").cause == "absent"
+	_parts_row(rep, "n").message == "round.dd.b.z is missing"
+}
+
 test_an_alias_works_on_the_subject_in_a_for_line_and_not_on_its_items if {
 	has := {"cov": "dd.b", "lst": "dd.items"}
 	checks := {

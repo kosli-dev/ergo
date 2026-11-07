@@ -2105,6 +2105,13 @@ _subject_part(path) if {
 	_part_of(path).of == null
 }
 
+default _old_subject_part(_) := false
+
+_old_subject_part(path) if {
+	_subject_part(path)
+	_part_of(path).old == true
+}
+
 default _at_ctx := {}
 
 _at_ctx := input["ergo/names"]["$at"] if is_object(input["ergo/names"]["$at"])
@@ -6557,6 +6564,7 @@ _side_inputs(subj, side) := array.concat([_derived_input(subj, side, _side_text(
 _tally(subj, side) := {"states": {"not_an_object"}, "list": _path_name(path), "values": [], "locations": []} if {
 	path := side[_basic_form(side)]
 	not _off_subject(path)
+	not _old_subject_part(path)
 	not _reads_subject(path)
 	not _list_start(path, subj)
 	not is_object(subj)
@@ -6609,6 +6617,7 @@ _cond_side(item, side) := {"v": [x | x := t.value], "found": [x | x := t.value],
 
 _cond_tally(item, side) := {"states": {"not_an_object"}} if {
 	not _off_subject(side.count_of)
+	not _old_subject_part(side.count_of)
 	not _reads_subject(side.count_of)
 	not _list_start(side.count_of, item)
 	not is_object(item)

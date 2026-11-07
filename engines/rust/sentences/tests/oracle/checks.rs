@@ -109,6 +109,42 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of xs that is count of cov.z is 1",
+        "count of xs that equals count of cov.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs that is count of pr.coverage.z is 1",
+        "count of xs that equals count of pr.coverage.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every xs that is count of cov.z is 2",
+        "every xs that equals count of cov.z is 2",
+        &[],
+        &[],
+    ),
+    (
+        "some xs that is count of cov.z is 2",
+        "some xs that equals count of cov.z is 2",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs that is count of fam.z is 1",
+        "count of xs that equals count of fam.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of g.xs that is count of g.z is 1",
+        "count of g.xs that equals count of g.z is 1",
+        &[],
+        &[],
+    ),
+    (
         "sum of items.v whose n is count of fam.z is 1",
         "sum of items.v whose n equals count of fam.z is 1",
         &[
