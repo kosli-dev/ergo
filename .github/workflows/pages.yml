@@ -91,6 +91,11 @@ jobs:
           pnpm install --frozen-lockfile
           node --input-type=module -e 'import { sampleCases } from "./playground/released-build.mjs"; import { writeFileSync } from "node:fs"; if (!sampleCases || !Object.keys(sampleCases).length) throw new Error("The released playground has no sample catalogue"); writeFileSync("playground/sample-cases.json", JSON.stringify(sampleCases));'
           ERGO_PLAYGROUND_SAMPLE_CASES="$PWD/playground/sample-cases.json" pnpm --filter @kosli/ergo-playground build
+      - name: Test the playground interface with released engines and samples
+        working-directory: ${{ runner.temp }}/playground/packages
+        env:
+          ERGO_PLAYGROUND_SAMPLE_CASES: ${{ runner.temp }}/playground/packages/playground/sample-cases.json
+        run: pnpm --filter @kosli/ergo-playground test
       - id: pages
         uses: actions/configure-pages@v6
       - name: Build

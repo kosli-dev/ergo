@@ -1,0 +1,30 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { parse } from "yaml";
+
+const check = (workflow) => {
+  const steps = workflow.jobs.build.steps;
+  const command = "pnpm --filter @kosli/ergo-playground test";
+  const index = steps.findIndex((step) => step.run === command);
+  assert.ok(index >= 0, "Pages must test the staged playground before deployment");
+  const step = steps[index];
+  assert.equal(step["working-directory"], "${{ runner.temp }}/playground/packages");
+  assert.equal(step.env?.ERGO_PLAYGROUND_SAMPLE_CASES, "${{ runner.temp }}/playground/packages/playground/sample-cases.json");
+  assert.ok(!step.if && !step["continue-on-error"], "staged tests must run and stop a failed build");
+  const build = steps.findIndex((step) => step.run?.includes("pnpm --filter @kosli/ergo-playground build"));
+  const publish = steps.findIndex((step) => step.uses?.startsWith("actions/upload-pages-artifact@"));
+  const opa = steps.findIndex((step) => step.uses?.startsWith("open-policy-agent/setup-opa@"));
+  assert.ok(opa >= 0 && opa < build && build < index && index < publish);
+};
+
+test("Pages tests the staged interface against released engines before publishing it", { skip: Boolean(process.env.ERGO_PLAYGROUND_SAMPLE_CASES) }, () => {
+  const workflow = parse(readFileSync(new URL("../../../.github/workflows/pages.yml", import.meta.url), "utf8"));
+  check(workflow);
+  const missing = structuredClone(workflow);
+  missing.jobs.build.steps = missing.jobs.build.steps.filter((step) => step.run !== "pnpm --filter @kosli/ergo-playground test");
+  assert.throws(() => check(missing), /Pages must test/);
+  const ignored = structuredClone(workflow);
+  ignored.jobs.build.steps.find((step) => step.run === "pnpm --filter @kosli/ergo-playground test")["continue-on-error"] = true;
+  assert.throws(() => check(ignored), /staged tests must run/);
+});

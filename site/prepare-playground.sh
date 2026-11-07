@@ -18,7 +18,7 @@ tar -xf "$dir/ui.tar" -C "$out"
 git archive --output "$dir/rego.tar" "$rego" packages/markdown/cases engines/rego
 tar -xf "$dir/rego.tar" -C "$out"
 git show "$rego:packages/playground/build.mjs" > "$out/packages/playground/released-build.mjs"
-git archive --output "$dir/rust.tar" "$rust" engines/rust
+git archive --output "$dir/rust.tar" "$rust" engines/rust spec/sentences-corpus.json
 tar -xf "$dir/rust.tar" -C "$out"
 gh release download "$rego" --repo "$repo" --pattern ergo.rego --dir "$dir/asset"
 grep -qxF "version := \"${rego#rego-v}\"" "$dir/asset/ergo.rego" || { echo "The ergo.rego asset doesn't match $rego" >&2; exit 1; }
