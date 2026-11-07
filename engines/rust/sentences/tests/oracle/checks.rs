@@ -7375,6 +7375,94 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "$input named by key is 1",
+        "$input named by key is 1",
+        &[],
+        &[],
+    ),
+    ("$params.w is in d.name", "$params.w is in d.name", &[], &[]),
+    ("count of pl.name is 1", "count of pl.name is 1", &[], &[]),
+    (
+        "count of rows whose v is in d.name is 1",
+        "count of rows whose v is in d.name is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows whose v is in pl.z is 1",
+        "count of rows whose v is in pl.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows.v that is in d.name is 1",
+        "count of rows.v that is in d.name is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of rows.w named by p is 1",
+        "count of rows.w named by p is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of tags whose $input.k is in tags is 1",
+        "count of tags whose $input.k is in tags is 1",
+        &[],
+        &[],
+    ),
+    ("every name is .other", "every name equals other", &[], &[]),
+    ("every name is other", "every name equals other", &[], &[]),
+    (
+        "every rows.v is in d.name",
+        "every rows.v is in d.name",
+        &[],
+        &[],
+    ),
+    (
+        "every rows.w named by p is 1",
+        "every rows.w named by p is 1",
+        &[],
+        &[],
+    ),
+    ("every xs.v is in pl.v", "every xs.v is in pl.v", &[], &[]),
+    ("every xs.v is in ys.v", "every xs.v is in ys.v", &[], &[]),
+    ("n is \"a\"", "n is \"a\"", &[], &[]),
+    (
+        "o is $params.m named by stage",
+        "o equals $params.m named by stage",
+        &[],
+        &[],
+    ),
+    ("o is boss", "o equals boss", &[], &[]),
+    ("some name is other", "some name equals other", &[], &[]),
+    (
+        "sum of rows.w named by p is 1",
+        "sum of rows.w named by p is 1",
+        &[],
+        &[],
+    ),
+    (
+        "tags contains all of $input.m named by key",
+        "tags contains all of $input.m named by key",
+        &[],
+        &[],
+    ),
+    (
+        "tags is in $input.m named by key",
+        "tags is in $input.m named by key",
+        &[],
+        &[],
+    ),
+    (
+        "tags is one of $input.m named by key",
+        "tags is in $input.m named by key",
+        &[],
+        &[],
+    ),
+    ("o is pl.name", "o equals pl.name", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -11096,6 +11184,19 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("some owner as o", "some owner as o", &[], &[]),
+    (
+        "every deps as d, every d.name as n",
+        "every deps as d, every d.name as n",
+        &[],
+        &[],
+    ),
+    (
+        "every deps as d, some d.name as n",
+        "every deps as d, some d.name as n",
+        &[],
+        &[],
+    ),
+    ("every pl.name as n", "every pl.name as n", &[], &[]),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[

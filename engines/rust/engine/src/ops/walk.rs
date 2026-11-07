@@ -631,7 +631,7 @@ fn reads_outside(path: &Path) -> bool {
     matches!(path.start, Start::Alias(_) | Start::Part(_) | Start::Input)
 }
 
-fn through_a_list(path: &Path, ctx: &Ctx) -> bool {
+pub(super) fn through_a_list(path: &Path, ctx: &Ctx) -> bool {
     (0..path.steps.len()).any(|at| {
         let before = Path {
             start: path.start.clone(),
@@ -1088,8 +1088,13 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 };
                 let read = named.map(|(_, read)| read);
                 let off = message::off_item(check, ctx, verdict.cause);
+                let walked_root = super::lists::field_walk_fault(check, ctx)
+                    .filter(|(cause, _)| *cause == verdict.cause)
+                    .map(|(_, text)| text);
                 let said = if let Some(fault) = message::root_fault(check, ctx, verdict.cause) {
                     fault
+                } else if let Some(text) = walked_root {
+                    text
                 } else if off.is_empty() {
                     message::prefixed(
                         &walked.item_name(item_segs),

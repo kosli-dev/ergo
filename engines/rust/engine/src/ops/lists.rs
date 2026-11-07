@@ -923,7 +923,10 @@ pub fn one_rights(check: &super::Check) -> Vec<&Path> {
 fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
     path.start == Start::Input
         && ctx.input.is_array()
-        && matches!(path.steps.first(), Some(Step::Key(_)))
+        && matches!(
+            path.steps.first(),
+            Some(Step::Key(_) | Step::Field(_) | Step::Ref(_))
+        )
 }
 
 pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
@@ -946,6 +949,11 @@ pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
         other => other.left_path().into_iter().collect(),
     };
     paths.extend(one_rights(check));
+    paths.extend(
+        right_paths(check)
+            .into_iter()
+            .filter(|path| walked_in(check, path, ctx).is_none()),
+    );
     if paths.iter().any(|path| input_one_path(path, ctx)) {
         vec![super::message::isnt("$input", ctx.input, "an object")]
     } else {
@@ -958,6 +966,15 @@ pub fn walked_in(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked>
         return None;
     }
     walked_from(path, ctx, right_paths(check).contains(&path))
+}
+
+pub(super) fn field_walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {
+    rights_of(check).into_iter().find_map(|right| match right {
+        Right::Field(path) => {
+            walked(path, ctx).and_then(|walk| walk.cause.map(|cause| (cause, walk.text)))
+        }
+        _ => None,
+    })
 }
 
 pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {

@@ -10,7 +10,8 @@ use crate::path::{self, OUTER, PartStart, Path, Start, Step};
 /// at the subject's name `label` instead of the subject, so the subject
 /// is walked as a list.
 pub fn read(check: &Check, label: &str) -> Check {
-    if reads_root_field(check) {
+    if reads_root_field(check) || (!matches!(check, Check::AnyOf(_)) && reads_plainly(check, false))
+    {
         return check.clone();
     }
     let at = At {
@@ -32,7 +33,9 @@ pub fn read(check: &Check, label: &str) -> Check {
             let mut any = any.clone();
             for option in &mut any.options {
                 for check in option.iter_mut() {
-                    *check = at.leaf(check);
+                    if !reads_plainly(check, false) {
+                        *check = at.leaf(check);
+                    }
                 }
             }
             Check::AnyOf(any)
@@ -196,6 +199,71 @@ impl At<'_> {
                 id: None,
             })),
             steps,
+        }
+    }
+}
+
+fn reads_plainly(check: &Check, top: bool) -> bool {
+    let read = |path: &Path| plain_path(path, top);
+    match check {
+        Check::Walk(walk) => {
+            reads_plainly(&walk.check, false) || walk.whose.iter().any(|c| reads_plainly(c, false))
+        }
+        Check::For(line) => {
+            line.items
+                .iter()
+                .any(|item| item.whose.iter().any(|c| reads_plainly(c, false)))
+                || line
+                    .sentences
+                    .iter()
+                    .any(|sentence| reads_plainly(&sentence.check, true))
+        }
+        Check::AnyOf(any) => any.options.iter().flatten().any(|c| reads_plainly(c, top)),
+        Check::Tally(tally) => std::iter::once(&tally.left)
+            .chain(tally.right.as_ref())
+            .any(|side| match side {
+                Side::Plain(plain) => plain.paths().into_iter().any(read),
+                Side::Derived(derived) => derived.terms.iter().any(|term| match term {
+                    Term::Path(path) => read(path),
+                    Term::Elapsed(elapsed) => read(&elapsed.from) || read(&elapsed.to),
+                    Term::Counted(counted) => counted.whose.iter().any(|c| reads_plainly(c, false)),
+                    Term::Number(_) => false,
+                }),
+            }),
+        Check::In(c) => read(&c.path),
+        Check::Matches(c) => read(&c.path),
+        Check::Contains(c) => {
+            read(&c.path)
+                || match &c.wanted {
+                    Wanted::One(Right::Ref(path) | Right::Field(path)) => read(path),
+                    _ => false,
+                }
+        }
+        other => other.paths().into_iter().any(read),
+    }
+}
+
+fn plain_path(path: &Path, top: bool) -> bool {
+    let first = path::leading_steps(&path.start)
+        .iter()
+        .chain(path.steps.iter())
+        .next();
+    if matches!(first, Some(Step::Index(_))) {
+        return false;
+    }
+    let steps = !path.steps.is_empty();
+    match &path.start {
+        start if path::is_root(start) => steps,
+        Start::Part(part) if part.base == Start::Alias(OUTER.to_string()) => {
+            steps || !part.steps.is_empty()
+        }
+        Start::Part(part) if part.base == Start::Subject => !part.steps.is_empty(),
+        Start::Subject | Start::Own if top => steps,
+        _ => {
+            top && path
+                .steps
+                .iter()
+                .any(|step| matches!(step, Step::Field(field) if field.start == Start::Subject))
         }
     }
 }

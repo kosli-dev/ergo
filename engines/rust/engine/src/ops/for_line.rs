@@ -346,6 +346,7 @@ fn merged_live(live: Vec<Live<'_>>) -> Vec<Live<'_>> {
 }
 
 struct Dead {
+    raw: Option<Value>,
     msg: Option<String>,
     bare: Option<String>,
     shared: bool,
@@ -379,11 +380,13 @@ impl Dead {
             cause: failure.cause,
             value: failure.value.clone(),
             location: failure.location.clone(),
+            raw: None,
         }
     }
 
     fn copy(&self) -> Dead {
         Dead {
+            raw: self.raw.clone(),
             bare: self.bare.clone(),
             msg: self.msg.clone(),
             shared: self.shared,
@@ -598,6 +601,7 @@ impl For {
                     }
                 });
             let dead_item = |cause: Cause| Dead {
+                raw: (w.end.is_none() && !w.item.value.is_object()).then(|| w.item.value.clone()),
                 bare: None,
                 msg: if undecided.is_some() && depth == 0 && !matches!(item.how, How::Pick { .. }) {
                     why.clone()
@@ -684,6 +688,7 @@ impl For {
             let nothing = through_first.then(|| {
                 let shown = crate::name::name(&item.path);
                 Dead {
+                    raw: None,
                     bare: None,
                     msg: None,
                     shared: false,
@@ -857,6 +862,7 @@ impl For {
                 for i in tied {
                     let (found, _, value, location) = &keys[i];
                     cands.dead.push(Dead {
+                        raw: None,
                         bare: None,
                         msg: None,
                         shared: false,
@@ -937,6 +943,7 @@ fn sort_failure(
         )
     };
     Dead {
+        raw: None,
         bare: None,
         msg: Some(said),
         shared: false,
@@ -1083,6 +1090,7 @@ impl For {
                     }
                 };
                 vec![Dead {
+                    raw: None,
                     bare: None,
                     msg: (!keyed.is_empty()).then(|| keyed.join(", and ")),
                     shared: !reads_path(&item.path, &self.items[0].alias),
@@ -1110,6 +1118,7 @@ impl For {
             let mut bound = ctx.clone();
             bound.aliases.insert(item.alias.clone(), live.at.clone());
             let entry = Dead {
+                raw: None,
                 bare: live.bare.clone(),
                 msg: None,
                 shared: false,
@@ -1126,6 +1135,9 @@ impl For {
                 matches!(&next.start, Start::Alias(name) if *name == item.alias)
                     && !matches!(next.steps.first(), None | Some(Step::Index(_)))
                     && !live.at.value.is_object()
+                    && !(live.at.value.is_array()
+                        && !matches!(self.items[depth + 1].how, How::Pick { .. })
+                        && matches!(next.steps.first(), Some(Step::Key(_))))
             };
             let (outcome, sfails) = if into_non_object {
                 (
@@ -1732,7 +1744,11 @@ impl For {
         if name.contains(" named by ") {
             name = self.strip(&name);
         }
-        super::message::stated(&name, dead.cause, &dead.value, kind)
+        let value = match (&dead.raw, dead.cause) {
+            (Some(raw), Cause::NotAnObject) => raw,
+            _ => &dead.value,
+        };
+        super::message::stated(&name, dead.cause, value, kind)
     }
 
     fn keyed_alias_input(&self, check: &Check, input: &Input) -> bool {
@@ -1871,7 +1887,11 @@ impl For {
                 .bare
                 .as_deref()
                 .map_or_else(|| name.clone(), |bare| self.strip(bare));
-            super::message::isnt(&bare, &child.entry.value, "an object")
+            super::message::isnt(
+                &bare,
+                child.entry.raw.as_ref().unwrap_or(&child.entry.value),
+                "an object",
+            )
         } else if outcome.said.is_empty() {
             if outcome.assertions.is_empty() && outcome.inner.is_empty() {
                 if self.items.len() > 1
