@@ -451,6 +451,7 @@
           {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "id is \"b\", and $input[].ok.id is [\"a\", \"c\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
         ],
+        "refs": {"s": {"$applies": [{"locations": ["/0/ok/id", "/1/ok/id"], "name": "$input[].ok.id", "value": ["a", "c"]}]}},
         "requirements": {"s": {"subjects": {"matching": 1, "total": 2}}}
       },
       {
@@ -462,6 +463,7 @@
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "item 2 of $input: ok.id is missing", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
           {"cause": "absent", "check": "$applies", "inputs": [{"locations": ["/1/id"], "name": "id", "value": "b"}], "message": "item 2 of $input: ok.id is missing", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
         ],
+        "refs": {"s": {"$applies": [{"locations": ["/0/ok/id", "/1/ok"], "name": "$input[].ok.id", "value": ["a", null]}]}},
         "requirements": {"s": {"subjects": {"matching": 0, "total": 2}}}
       }
     ]
