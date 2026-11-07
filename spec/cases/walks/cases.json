@@ -780,8 +780,8 @@
         "rules": ["walk.flaws", "sentence.every.if_any"],
         "input": {"things": [{"id": "t1", "xs": [{"v": 2, "kind": "a"}]}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "xs is [{\"kind\": \"a\", \"v\": 2}], which isn't an object; $params.l is \"text\", which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "xs[].v", "value": [2], "locations": ["/things/0/xs/0/v"]}], "failed_items": []},
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "n", "message": "xs named by $params.k is missing", "passed": false, "cause": "absent", "inputs": [{"name": "xs named by $params.k", "value": [], "locations": []}], "failed_items": []}
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": ["/things/0/xs/0/v"], "name": "xs[].v", "value": [2]}], "message": "$params.l is \"text\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "n", "failed_items": [], "inputs": [{"locations": [], "name": "xs named by $params.k", "value": []}], "message": "xs named by $params.k is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]

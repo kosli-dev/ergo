@@ -526,15 +526,15 @@
     "cases": [
       {
         "description": "has the location of the subject itself for its name, one for each item for every and count of the subject name, and where each failed item was read",
-        "rules": ["location.read", "location.each", "location.worked_out", "location.failed_items"],
+        "rules": ["location.read", "location.each", "location.worked_out", "location.failed_items", "walk.start"],
         "input": {"values": [1, 2], "lists": [[1, 2]], "sets": [[1, 2], [3]]},
         "requirements": {"k": {"status": "not_met"}, "l": {"status": "not_met"}, "p": {"status": "not_met"}},
         "results": [
           {"cause": "satisfied", "check": "$applies", "inputs": [{"locations": ["/sets/0"], "name": "kept", "value": [1, 2]}], "passed": true, "requirement": "k", "subject": {"id": [1, 2], "type": "kept"}},
           {"cause": "value", "check": "$applies", "inputs": [{"locations": ["/sets/1"], "name": "kept", "value": [3]}], "message": "kept is [3]", "passed": false, "requirement": "k", "subject": {"id": [3], "type": "kept"}},
           {"cause": "not_an_object", "check": "c", "inputs": [{"locations": ["/sets/0"], "name": "plain", "value": null}], "message": "kept is [1, 2], which isn't an object", "passed": false, "requirement": "k", "subject": {"id": [1, 2], "type": "kept"}},
-          {"cause": "not_an_object", "check": "all", "failed_items": [], "inputs": [], "message": "list is [1, 2], which isn't an object", "passed": false, "requirement": "l", "subject": {"id": [1, 2], "type": "list"}},
-          {"cause": "not_an_object", "check": "size", "inputs": [{"locations": [], "name": "count of plain", "value": null}, {"locations": [], "name": "plain", "value": []}], "message": "list is [1, 2], which isn't an object", "passed": false, "requirement": "l", "subject": {"id": [1, 2], "type": "list"}},
+          {"cause": "not_an_object", "check": "all", "failed_items": [{"cause": "not_an_object", "item": "item 1 of list", "locations": ["/lists/0/0"], "path": "list[0].plain", "value": null}, {"cause": "not_an_object", "item": "item 2 of list", "locations": ["/lists/0/1"], "path": "list[1].plain", "value": null}], "inputs": [{"locations": ["/lists/0/0", "/lists/0/1"], "name": "list[].plain", "value": [null, null]}], "message": "item 1 of list is 1, which isn't an object; item 2 of list is 2, which isn't an object", "passed": false, "requirement": "l", "subject": {"id": [1, 2], "type": "list"}},
+          {"cause": "not_an_object", "check": "size", "inputs": [{"locations": ["/lists/0/0", "/lists/0/1"], "name": "count of plain", "value": null}, {"locations": ["/lists/0/0", "/lists/0/1"], "name": "list[].plain", "value": [null, null]}], "message": "item 1 of list is 1, which isn't an object; item 2 of list is 2, which isn't an object", "passed": false, "requirement": "l", "subject": {"id": [1, 2], "type": "list"}},
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/values/0"], "name": "plain", "value": 1}], "passed": true, "requirement": "p", "subject": {"id": 1, "type": "plain"}},
           {"cause": "value", "check": "c", "inputs": [{"locations": ["/values/1"], "name": "plain", "value": 2}], "message": "plain is 2", "passed": false, "requirement": "p", "subject": {"id": 2, "type": "plain"}}
         ]
@@ -816,16 +816,16 @@
     "cases": [
       {
         "description": "a field or a position after the subject on the right of a whose reads the subject's field",
-        "rules": ["sentence.path.subject.step", "sentence.resolve.clause", "sentence.whose.item"],
+        "rules": ["sentence.path.subject.step", "sentence.resolve.clause", "sentence.whose.item", "walk.start"],
         "input": {"xs": [{"name": 1, "ws": [{"x": 1}, {"x": 2}]}, [{"y": 2}], {"name": 1, "ws": [{"x": 2}]}]},
         "results": [
-          {"requirement": "r", "subject": {"type": "region", "id": null}, "check": "$well_formed", "passed": true, "cause": "satisfied", "inputs": [{"name": "count(checks)", "value": 2, "locations": []}, {"name": "require", "value": "every", "locations": []}]},
-          {"requirement": "r", "subject": {"type": "region", "id": {"name": 1, "ws": [{"x": 1}, {"x": 2}]}}, "check": "a", "passed": true, "cause": "satisfied", "inputs": [{"name": "count of ws whose x equals region.name", "value": 1, "locations": ["/xs/0/ws/0", "/xs/0/ws/1"]}, {"name": "ws[]", "value": [{"x": 1}, {"x": 2}], "locations": ["/xs/0/ws/0", "/xs/0/ws/1"]}, {"name": "region.name", "value": 1, "locations": ["/xs/0/name"]}]},
-          {"requirement": "r", "subject": {"type": "region", "id": {"name": 1, "ws": [{"x": 1}, {"x": 2}]}}, "check": "b", "message": "region is {\"name\": 1, \"ws\": [{\"x\": 1}, {\"x\": 2}]}, which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "count of ws whose x equals region[0].y", "value": null, "locations": ["/xs/0/ws/0", "/xs/0/ws/1"]}, {"name": "ws[]", "value": [{"x": 1}, {"x": 2}], "locations": ["/xs/0/ws/0", "/xs/0/ws/1"]}, {"name": "region[0].y", "value": null, "locations": ["/xs/0"]}]},
-          {"requirement": "r", "subject": {"type": "region", "id": [{"y": 2}]}, "check": "a", "message": "region is [{\"y\": 2}], which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "count of ws whose x equals region.name", "value": null, "locations": []}, {"name": "ws", "value": [], "locations": []}, {"name": "region.name", "value": null, "locations": ["/xs/1"]}]},
-          {"requirement": "r", "subject": {"type": "region", "id": [{"y": 2}]}, "check": "b", "message": "region is [{\"y\": 2}], which isn't an object", "passed": false, "cause": "not_an_object", "inputs": [{"name": "count of ws whose x equals region[0].y", "value": null, "locations": []}, {"name": "ws", "value": [], "locations": []}, {"name": "region[0].y", "value": 2, "locations": ["/xs/1/0/y"]}]},
-          {"requirement": "r", "subject": {"type": "region", "id": {"name": 1, "ws": [{"x": 2}]}}, "check": "a", "message": "count of ws whose x equals region.name is 0", "passed": false, "cause": "value", "inputs": [{"name": "count of ws whose x equals region.name", "value": 0, "locations": ["/xs/2/ws/0"]}, {"name": "ws[]", "value": [{"x": 2}], "locations": ["/xs/2/ws/0"]}, {"name": "region.name", "value": 1, "locations": ["/xs/2/name"]}]},
-          {"requirement": "r", "subject": {"type": "region", "id": {"name": 1, "ws": [{"x": 2}]}}, "check": "b", "message": "region is {\"name\": 1, \"ws\": [{\"x\": 2}]}, which isn't a list", "passed": false, "cause": "unusable", "inputs": [{"name": "count of ws whose x equals region[0].y", "value": null, "locations": ["/xs/2/ws/0"]}, {"name": "ws[]", "value": [{"x": 2}], "locations": ["/xs/2/ws/0"]}, {"name": "region[0].y", "value": null, "locations": ["/xs/2"]}]}
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "region"}},
+          {"cause": "satisfied", "check": "a", "inputs": [{"locations": ["/xs/0/ws/0", "/xs/0/ws/1"], "name": "count of ws whose x equals region.name", "value": 1}, {"locations": ["/xs/0/ws/0", "/xs/0/ws/1"], "name": "ws[]", "value": [{"x": 1}, {"x": 2}]}, {"locations": ["/xs/0/name"], "name": "region.name", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": {"name": 1, "ws": [{"x": 1}, {"x": 2}]}, "type": "region"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/xs/0/ws/0", "/xs/0/ws/1"], "name": "count of ws whose x equals region[0].y", "value": null}, {"locations": ["/xs/0/ws/0", "/xs/0/ws/1"], "name": "ws[]", "value": [{"x": 1}, {"x": 2}]}, {"locations": ["/xs/0"], "name": "region[0].y", "value": null}], "message": "region is {\"name\": 1, \"ws\": [{\"x\": 1}, {\"x\": 2}]}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"name": 1, "ws": [{"x": 1}, {"x": 2}]}, "type": "region"}},
+          {"cause": "not_an_object", "check": "a", "inputs": [{"locations": [], "name": "count of ws whose x equals region.name", "value": null}, {"locations": [], "name": "ws", "value": []}, {"locations": ["/xs/1"], "name": "region.name", "value": null}], "message": "region is [{\"y\": 2}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [{"y": 2}], "type": "region"}},
+          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/xs/1/0"], "name": "count of ws whose x equals region[0].y", "value": null}, {"locations": ["/xs/1/0"], "name": "region[].ws", "value": [null]}, {"locations": ["/xs/1/0/y"], "name": "region[0].y", "value": 2}], "message": "item 1 of region: ws is missing", "passed": false, "requirement": "r", "subject": {"id": [{"y": 2}], "type": "region"}},
+          {"cause": "value", "check": "a", "inputs": [{"locations": ["/xs/2/ws/0"], "name": "count of ws whose x equals region.name", "value": 0}, {"locations": ["/xs/2/ws/0"], "name": "ws[]", "value": [{"x": 2}]}, {"locations": ["/xs/2/name"], "name": "region.name", "value": 1}], "message": "count of ws whose x equals region.name is 0", "passed": false, "requirement": "r", "subject": {"id": {"name": 1, "ws": [{"x": 2}]}, "type": "region"}},
+          {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/xs/2/ws/0"], "name": "count of ws whose x equals region[0].y", "value": null}, {"locations": ["/xs/2/ws/0"], "name": "ws[]", "value": [{"x": 2}]}, {"locations": ["/xs/2"], "name": "region[0].y", "value": null}], "message": "region is {\"name\": 1, \"ws\": [{\"x\": 2}]}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"name": 1, "ws": [{"x": 2}]}, "type": "region"}}
         ]
       }
     ]
@@ -1042,7 +1042,7 @@
       },
       {
         "description": "a subject that isn't an object still lists the part the whose reads",
-        "rules": ["name.dot", "tally.whose"],
+        "rules": ["name.dot", "tally.whose", "walk.start"],
         "input": {"xs": [[1, 2]]},
         "results": [
           {"cause": "not_an_object", "check": "c", "inputs": [{"locations": [], "name": "count of ys whose thing equals p", "value": null}, {"locations": [], "name": "ys", "value": []}, {"locations": ["/xs/0"], "name": "p", "part": {"id": null, "name": "p"}, "value": null}], "message": "thing is [1, 2], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": [1, 2], "type": "thing"}}
