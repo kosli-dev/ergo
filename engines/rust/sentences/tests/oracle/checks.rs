@@ -7393,6 +7393,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("m.b is 1", "m.b is 1", &[], &[]),
     ("m.v is 1", "m.v is 1", &[], &[]),
+    (
+        "every xs named by $params.k, if any, equals q",
+        "every xs named by $params.k, if any, equals q",
+        &[],
+        &[],
+    ),
+    (
+        "some xs named by $params.k equals q",
+        "some xs named by $params.k equals q",
+        &[],
+        &[],
+    ),
     ("c.z is d.z", "c.z equals d.z", &[], &[]),
     (
         "count of xs whose v is in $input.c.z is 0",
