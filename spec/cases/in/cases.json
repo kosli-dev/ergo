@@ -255,12 +255,12 @@
         ]
       },
       {
-        "description": "reads the path as it always did when the list is null, and fails as absent",
+        "description": "reads the path as it always did when the list is null, and fails as null",
         "rules": ["walk.right", "compare.list", "sentence.phrase.one_of", "walk.right.plain"],
         "input": {"sbom": {"components": null}, "things": [{"id": "t1", "x": "click"}]},
         "results": [
-          {"cause": "absent", "check": "in", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "click"}], "message": "$input.sbom.components.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "absent", "check": "not_in", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "click"}], "message": "$input.sbom.components.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "in", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "click"}], "message": "$input.sbom.components is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "not_in", "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": "click"}], "message": "$input.sbom.components is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {

@@ -103,7 +103,7 @@
         "rules": ["present.missing", "path.absent"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": "x.y is missing", "passed": false, "cause": "value", "inputs": [{"name": "x.y", "value": null, "locations": ["/things/0/x"]}]}
+          {"requirement": "s", "subject": {"id": "t1", "type": "thing"}, "check": "c", "message": "x is null", "passed": false, "cause": "value", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}]}
         ]
       },
       {
@@ -385,7 +385,7 @@
         "rules": ["location.read", "location.one"],
         "input": {"things": [{"id": "t1", "x": null}]},
         "results": [
-          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}], "message": "x.y is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/x"], "name": "x.y", "value": null}], "message": "x is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {

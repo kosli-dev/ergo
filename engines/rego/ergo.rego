@@ -4282,6 +4282,8 @@ _plain_read_state(subj, path, v) := "value" if {
 
 else := "null" if v == null
 
+else := "null" if _null_before_field(subj, path)
+
 else := "unusable" if _blocked(subj, path)
 
 else := "absent"
@@ -4333,7 +4335,27 @@ _position_first(path) if {
 
 _any_read_state(subj, path) := s if {
 	s := _name_step_state(path)
+} else := "null" if {
+	not _starts_at_non_object(subj, path)
+	_null_stops(subj, path)
+} else := "null" if {
+	_position_first(path)
+	not path[0] in _params_starts
+	_start_of(subj, path) == null
+	not _ref_step_flawed(path)
 } else := _path_read_state(subj, path)
+
+_null_stops(subj, path) if {
+	not _ref_step_flawed(path)
+	_field_step_key(subj, path[_null_stop_at(subj, path)])
+}
+
+_null_stop_at(subj, path) := min({i | some i, _ in path; i > _first_key_at(path); _resolved(subj, array.slice(path, 0, i)) == null})
+
+_ref_step_flawed(path) if {
+	some seg in path
+	_ref_step_flaw(seg)
+}
 
 _path_read_state(subj, path) := _field_step_state(subj, path)
 
@@ -4652,6 +4674,18 @@ _params_null(r) if {
 }
 
 _ref_state_read(r) := "null" if _ref_read(r) == null
+
+_ref_state_read(r) := "null" if {
+	_ref_read(r) == _absent
+	not _ref_walks(r)
+	_ref_null_partway(r)
+}
+
+_ref_null_partway(r) if {
+	some j, _ in r
+	j > 1
+	_ref_read(array.slice(r, 0, j)) == null
+}
 
 _ref_state_read(r) := "unusable" if {
 	_ref_read(r) == _absent
@@ -11586,10 +11620,15 @@ _m_shown(subj, side) := {"name": w.name, "state": w.state, "value": w.value, "te
 	w.failed
 }
 
-_m_shown(_, side) := {"name": _ref_label(side.ref), "state": _ref_state(side.ref), "value": _ref_shown(side.ref)} if {
+_m_shown(_, side) := {"name": _m_ref_null_name(side.ref), "state": _ref_state(side.ref), "value": _ref_shown(side.ref)} if {
 	_is_ref(side)
 	not _ref_failed_walk(side.ref)
 }
+
+_m_ref_null_name(r) := _ref_name(array.slice(r, 0, j)) if {
+	_ref_state(r) == "null"
+	j := min({i | some i, _ in r; i > 1; _ref_read(array.slice(r, 0, i)) == null})
+} else := _ref_label(r)
 
 _m_shown(_, side) := {"name": _ref_label(side.ref), "state": _ref_state(side.ref), "value": _ref_shown(side.ref), "text": _ref_walk_text(side.ref)} if {
 	_is_ref(side)
@@ -11607,7 +11646,16 @@ _m_state_clause(s) := s.text if "text" in object.keys(s)
 
 _m_state_clause(s) := concat("", [s.name, " is ", _m_state_word(s.state)]) if not "text" in object.keys(s)
 
-_m_shown(subj, side) := {"name": _input_name(side), "state": _read_state(subj, side), "value": object.get({"v": _value_at(subj, side)}, "v", null)} if is_array(side)
+_m_shown(subj, side) := {"name": _m_null_name(subj, side), "state": _read_state(subj, side), "value": object.get({"v": _value_at(subj, side)}, "v", null)} if is_array(side)
+
+_m_null_name(subj, side) := _input_name(array.slice(side, 0, j)) if {
+	_read_state(subj, side) == "null"
+	j := min({i | some i, _ in side; i > _first_key_at(side); _resolved(subj, array.slice(side, 0, i)) == null})
+} else := _input_name(array.slice(side, 0, _first_key_at(side))) if {
+	_read_state(subj, side) == "null"
+	_position_first(side)
+	_start_of(subj, side) == null
+} else := _input_name(side)
 
 _m_shown(subj, side) := {"name": side.text, "state": "value", "value": v} if {
 	_side_form(side) in {"count_of", "sum_of", "elapsed", "add", "join"}
@@ -11818,10 +11866,16 @@ _m_key_states(subj, check, cause) := _once([c |
 	some side in _m_sides(check)
 	some p in _m_side_paths(side)
 	is_array(p)
-	some step in p
+	some i, step in p
+	not _null_stop_before(subj, p, i)
 	_m_key_state(subj, step) == cause
 	c := concat("", [_m_key_name(step), " is ", _m_state_word(cause)])
 ])
+
+_null_stop_before(subj, p, i) if {
+	_null_stops(subj, p)
+	_null_stop_at(subj, p) < i
+}
 
 _m_key_state(_, step) := _ref_state(step.ref) if _is_ref(step)
 
@@ -12434,7 +12488,10 @@ _m_tally(subj, side) := array.concat(
 		[[x.cause, _m_fail(x, roots)] | some x in array.concat(w.fails, _walk_stop(w))],
 		array.concat(
 			[[s, concat("", [_ref_name(r), " is ", _m_state_word(s)])] | some r in sort({r | some c in side.whose; some r in _check_refs(c)}); not _ref_failed_walk(r); s := _ref_state(r); s in {"absent", "null"}],
-			[[s, m] | some c in side.whose; s := _root_read_flaw(subj, c); s != ""; some m in _m_root_texts(subj, c, s)],
+			array.concat(
+				[["unusable", m] | some c in side.whose; some m in _m_off_right_ref(c)],
+				[[s, m] | some c in side.whose; s := _root_read_flaw(subj, c); s != ""; some m in _m_root_texts(subj, c, s)],
+			),
 		),
 	),
 	_m_tally_items(subj, side),
@@ -12555,7 +12612,19 @@ _presence_path(c, x) if {
 _root_state(subj, c, p, lists) := "not_an_object" if {
 	_input_one_root(c, p)
 	is_array(data.ergo_document)
+} else := "unusable" if {
+	_root_off_list(subj, c, p)
 } else := _root_list_state(subj, p, lists)
+
+_root_off_list(subj, c, p) if {
+	_list_cmp(c)
+	not _one_right(c)
+	_rpath(c.right) == p
+	not _rwalking(subj, c.right)
+	shown := _as_subject_part(p)
+	_read_state(subj, shown) == "value"
+	not is_array(_value_at(subj, shown))
+}
 
 _root_list_state(subj, p, lists) := _any_read_state(subj, array.slice(shown, 0, i)) if {
 	p in lists
@@ -12600,11 +12669,18 @@ _walk_root_msgs(check, subj) := _once([m |
 	some m in _m_root_texts(subj, c, fl)
 ])
 
-_leaf_root_flaw(check, subj) := _root_read_flaw(subj, {"paths": paths}) if {
+_leaf_root_flaw(check, subj) := fl if {
 	check.op in {"every", "some"}
 	is_object(object.get(check, "check", null))
 	paths := [p | some p in _m_root_paths(check.check); not _walking_root(check.check, p)]
 	count(paths) > 0
+	fl := _root_read_flaw(subj, {"paths": paths})
+	fl != ""
+} else := "unusable" if {
+	check.op in {"every", "some"}
+	is_object(object.get(check, "check", null))
+	some p in _root_reads(check.check)
+	_root_off_list(subj, check.check, p)
 } else := ""
 
 _leaf_root_msgs(check, flaw) := [m] if {

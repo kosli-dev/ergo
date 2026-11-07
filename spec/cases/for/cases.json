@@ -21405,7 +21405,7 @@
         ]
       },
       {
-        "description": "fails as absent when the alias is null",
+        "description": "fails as null when the alias is null",
         "rules": [
           "path.field_step",
           "path.unusable",
@@ -21425,15 +21425,15 @@
         "compliant": false,
         "results": [
           {
-            "cause": "absent",
+            "cause": "null",
             "check": "c",
             "failed_items": [
               {
-                "cause": "absent",
+                "cause": "null",
                 "failed_assertions": [
                   {
                     "assertion": "w[0] named by zz is 1",
-                    "cause": "absent",
+                    "cause": "null",
                     "inputs": [
                       {
                         "locations": [
@@ -21478,7 +21478,7 @@
                 "value": "a"
               }
             ],
-            "message": "item 1 of ws: w[0] named by zz is missing",
+            "message": "item 1 of ws: w is null",
             "passed": false,
             "requirement": "r",
             "subject": {

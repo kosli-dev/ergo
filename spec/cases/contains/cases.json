@@ -368,13 +368,13 @@
         ]
       },
       {
-        "description": "fails as absent when the holder is null",
+        "description": "fails as null when the holder is null",
         "rules": ["contains.value", "path.absent"],
         "input": {"x": null, "things": [{"id": "t1", "labels": ["a"], "x": null}]},
         "results": [
-          {"cause": "absent", "check": "input_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}], "message": "$input.x.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "absent", "check": "name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
-          {"cause": "absent", "check": "no_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "input_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}], "message": "$input.x is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "no_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
