@@ -6549,40 +6549,7 @@
           ]
         },
         "results": [
-          {
-            "cause": "not_an_object",
-            "check": "c",
-            "failed_items": [
-              {
-                "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 1 of pull_requests",
-                "path": "item 1 of pull_requests",
-                "value": null,
-                "locations": [
-                  "/releases/0/pull_requests/0"
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "name": "pull_requests[].title",
-                "value": [
-                  null
-                ],
-                "locations": [
-                  "/releases/0/pull_requests/0"
-                ]
-              }
-            ],
-            "message": "item 1 of pull_requests is null, which isn't an object",
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": "r1",
-              "type": "release"
-            }
-          }
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0"], "path": "item 1 of pull_requests", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0"], "name": "pull_requests[].title", "value": [null]}], "message": "item 1 of pull_requests is \"text\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]
@@ -13481,40 +13448,7 @@
           ]
         },
         "results": [
-          {
-            "cause": "not_an_object",
-            "check": "c",
-            "failed_items": [
-              {
-                "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 1 of pull_requests",
-                "path": "item 1 of pull_requests",
-                "value": null,
-                "locations": [
-                  "/releases/0/pull_requests/0"
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "name": "pull_requests[].title",
-                "value": [
-                  null
-                ],
-                "locations": [
-                  "/releases/0/pull_requests/0"
-                ]
-              }
-            ],
-            "message": "item 1 of pull_requests is null, which isn't an object",
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": "r1",
-              "type": "release"
-            }
-          }
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0"], "path": "item 1 of pull_requests", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0"], "name": "pull_requests[].title", "value": [null]}], "message": "item 1 of pull_requests is 7, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       },
       {
@@ -13537,42 +13471,7 @@
           ]
         },
         "results": [
-          {
-            "cause": "not_an_object",
-            "check": "c",
-            "failed_items": [
-              {
-                "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 2 of pull_requests",
-                "path": "item 2 of pull_requests",
-                "value": null,
-                "locations": [
-                  "/releases/0/pull_requests/1"
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "name": "pull_requests[].title",
-                "value": [
-                  "Fix",
-                  null
-                ],
-                "locations": [
-                  "/releases/0/pull_requests/0/title",
-                  "/releases/0/pull_requests/1"
-                ]
-              }
-            ],
-            "message": "item 2 of pull_requests is null, which isn't an object",
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": "r1",
-              "type": "release"
-            }
-          }
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 2 of pull_requests", "locations": ["/releases/0/pull_requests/1"], "path": "item 2 of pull_requests", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0/title", "/releases/0/pull_requests/1"], "name": "pull_requests[].title", "value": ["Fix", null]}], "message": "item 2 of pull_requests is \"text\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]
@@ -13741,40 +13640,7 @@
           ]
         },
         "results": [
-          {
-            "cause": "not_an_object",
-            "check": "c",
-            "failed_items": [
-              {
-                "cause": "not_an_object",
-                "failed_assertions": [],
-                "item": "item 1 of pull_requests",
-                "path": "item 1 of pull_requests",
-                "value": null,
-                "locations": [
-                  "/releases/0/pull_requests/0"
-                ]
-              }
-            ],
-            "inputs": [
-              {
-                "name": "pull_requests[].title",
-                "value": [
-                  null
-                ],
-                "locations": [
-                  "/releases/0/pull_requests/0"
-                ]
-              }
-            ],
-            "message": "item 1 of pull_requests is null, which isn't an object",
-            "passed": false,
-            "requirement": "s",
-            "subject": {
-              "id": "r1",
-              "type": "release"
-            }
-          }
+          {"cause": "not_an_object", "check": "c", "failed_items": [{"cause": "not_an_object", "failed_assertions": [], "item": "item 1 of pull_requests", "locations": ["/releases/0/pull_requests/0"], "path": "item 1 of pull_requests", "value": null}], "inputs": [{"locations": ["/releases/0/pull_requests/0"], "name": "pull_requests[].title", "value": [null]}], "message": "item 1 of pull_requests is \"text\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "r1", "type": "release"}}
         ]
       }
     ]
