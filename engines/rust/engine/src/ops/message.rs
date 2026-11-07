@@ -664,21 +664,24 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
         }
         Cause::NotAnObject => {
             let subject = ctx.subject.value;
+            let tallies: Vec<String> = match check {
+                Check::Tally(t) => tally::tally_sides(t)
+                    .into_iter()
+                    .filter_map(|side| match side {
+                        TallySide::Derived(d) => Some(d),
+                        TallySide::Plain(_) => None,
+                    })
+                    .flat_map(|d| tally::counted_texts(d, ctx, Cause::NotAnObject))
+                    .collect(),
+                _ => Vec::new(),
+            };
             if subject.is_object() {
                 let mut found = aliases_blocked(check, ctx);
                 found.extend(lists::input_one_fault(check, ctx));
-                if let Check::Tally(t) = check {
-                    found.extend(
-                        tally::tally_sides(t)
-                            .into_iter()
-                            .filter_map(|side| match side {
-                                TallySide::Derived(d) => Some(d),
-                                TallySide::Plain(_) => None,
-                            })
-                            .flat_map(|d| tally::counted_texts(d, ctx, Cause::NotAnObject)),
-                    );
-                }
+                found.extend(tallies);
                 found
+            } else if subject.is_array() && !tallies.is_empty() && !list_read_plainly(check, ctx) {
+                tallies
             } else {
                 vec![isnt(ctx.subject_label(), subject, "an object")]
             }
@@ -699,6 +702,26 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
     } else {
         once.join(", and ")
     }
+}
+
+fn list_read_plainly(check: &Check, ctx: &Ctx) -> bool {
+    let Check::Tally(t) = check else {
+        return false;
+    };
+    let mut outer = ctx.clone();
+    outer
+        .aliases
+        .insert(path::OUTER.to_string(), ctx.subject.clone());
+    tally::tally_sides(t).into_iter().any(|side| match side {
+        TallySide::Plain(Side::Path(path)) => path::read(path, ctx).outcome == Outcome::NotAnObject,
+        TallySide::Plain(_) => false,
+        TallySide::Derived(d) => d.terms.iter().any(|term| match term {
+            tally::Term::Counted(counted) => counted.whose.iter().any(|w| {
+                root_flaw(&[w], &outer).is_some_and(|(cause, _)| cause == Cause::NotAnObject)
+            }),
+            _ => false,
+        }),
+    })
 }
 
 pub fn params_that_arent_an_object(check: &Check, ctx: &Ctx) -> Option<String> {
@@ -1368,6 +1391,9 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                     Check::Tally(tally) => tally.counted_paths().contains(&path),
                     _ => false,
                 };
+                if counted && !is_key && lists::starts_at_a_list(&root, ctx) {
+                    continue;
+                }
                 if counted && let Some(found) = first_null_step(&root, ctx) {
                     return Some(found);
                 }
@@ -1439,7 +1465,7 @@ pub fn off_item(check: &Check, ctx: &Ctx, cause: Cause) -> Vec<String> {
 
 fn off_item_lists(check: &Check, ctx: &Ctx) -> Vec<String> {
     let Check::Tally(tally_check) = check else {
-        return Vec::new();
+        return off_item_rights(check, ctx);
     };
     let mut paths: Vec<&Path> = Vec::new();
     for side in tally::tally_sides(tally_check) {
@@ -1464,6 +1490,32 @@ fn off_item_lists(check: &Check, ctx: &Ctx) -> Vec<String> {
         if let (Outcome::Found, Some(value)) = (read.outcome, read.value)
             && !value.is_array()
             && !value.is_null()
+        {
+            let clause = isnt(&name::name(path), value, "a list");
+            if !out.contains(&clause) {
+                out.push(clause);
+            }
+        }
+    }
+    out
+}
+
+fn off_item_rights(check: &Check, ctx: &Ctx) -> Vec<String> {
+    let ones = lists::one_rights(check);
+    let mut out: Vec<String> = Vec::new();
+    for path in lists::right_paths(check) {
+        if ones.contains(&path)
+            || !matches!(
+                path.start,
+                Start::Alias(_) | Start::Part(_) | Start::Params | Start::Input
+            )
+            || lists::walked_in(check, path, ctx).is_some()
+        {
+            continue;
+        }
+        let read = path::read(path, ctx);
+        if let (Outcome::Found, Some(value)) = (read.outcome, read.value)
+            && !value.is_array()
         {
             let clause = isnt(&name::name(path), value, "a list");
             if !out.contains(&clause) {

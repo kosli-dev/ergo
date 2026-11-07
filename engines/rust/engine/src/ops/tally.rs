@@ -1190,7 +1190,11 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                     out.push(format!("{} is null", walked.name));
                 }
                 Some(Cause::Unusable) if cause == Cause::Unusable => {
-                    let blocked = super::message::blocked_of(&counted.path, &outer);
+                    let blocked = if walk::through_a_list(&counted.path, &outer) {
+                        Vec::new()
+                    } else {
+                        super::message::blocked_of(&counted.path, &outer)
+                    };
                     if !blocked.is_empty() {
                         out.push(super::message::joined(blocked));
                     } else {
@@ -1264,10 +1268,15 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                         )
                     } else {
                         let off = super::message::off_item(check, &outer, verdict.cause);
+                        let walked_root = super::lists::field_walk_fault(check, &focus)
+                            .filter(|(cause, _)| *cause == verdict.cause)
+                            .map(|(_, text)| text);
                         if let Some(fault) =
                             super::message::root_fault(check, &outer, verdict.cause)
                         {
                             fault
+                        } else if let Some(text) = walked_root {
+                            text
                         } else if off.is_empty() {
                             super::message::prefixed(
                                 &walked.item_name(walk::focus_segs(item, check)),
@@ -2977,7 +2986,7 @@ mod tests {
             "thing",
             json!({"p": "thing"}),
             "count of ys whose thing is p is 1",
-            json!({"xs": [[1, 2]]}),
+            json!({"xs": [3]}),
         );
         assert_eq!(row["cause"], "not_an_object");
         let names: Vec<&str> = row["inputs"]

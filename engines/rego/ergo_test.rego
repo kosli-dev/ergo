@@ -11607,10 +11607,12 @@ test_a_ref_that_starts_at_params_that_are_a_list_is_not_walked if {
 	report.requirements.r.checks.c["$refs"] == [{"name": "$params.id", "value": null, "locations": ["$params:"]}]
 }
 
-test_a_ref_that_starts_at_an_alias_that_is_a_list_is_not_walked if {
+test_a_right_side_that_starts_at_an_alias_that_is_a_list_walks_it_once if {
 	policy := {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"description": "d", "subject": "t", "checks": {"c": {"description": "d", "for": "every deps as d", "assert": "id is in d.name"}}}}}
-	doc := {"things": [{"id": "a", "deps": [[{"name": "a"}]]}]}
-	[[r.passed, r.cause, r.message] | some r in ergo.report(doc, policy, {}).results; r.check == "c"] == [[false, "not_an_object", "item 1 of deps is [{\"name\": \"a\"}], which isn't an object"]]
+	walked := {"things": [{"id": "a", "deps": [[{"name": "a"}]]}]}
+	[[r.passed, r.cause] | some r in ergo.report(walked, policy, {}).results; r.check == "c"] == [[true, "satisfied"]]
+	nested := {"things": [{"id": "a", "deps": [[[{"name": "a"}]]]}]}
+	[[r.passed, r.cause] | some r in ergo.report(nested, policy, {}).results; r.check == "c"] == [[false, "unusable"]]
 }
 
 test_every_list_phrase_fails_every_row_as_absent_when_an_item_has_no_value_even_the_rows_that_would_pass if {
@@ -12214,9 +12216,11 @@ test_a_path_with_no_name_is_called_the_subject_and_never_it if {
 	ergo._walk_root_name([]) == ["the subject"]
 }
 
-test_a_for_line_that_walks_a_list_subject_fails_as_not_an_object_like_any_for_line_on_a_list_subject if {
+test_a_for_line_that_picks_from_a_list_subject_fails_as_not_an_object_and_one_that_walks_it_reads_each_item if {
 	doc := {"xs": [[1, 2], [3]]}
-	every line in ["last of s as e", "first of s as e", "every s as e", "some s as e"] {
+	walked := _subject_rows(doc, "every xs", {"for": "some s as e", "assert": "e is 1"}, {})
+	[[r[1], r[2]] | some r in walked] == [[true, "satisfied"], [false, "value"]]
+	every line in ["last of s as e", "first of s as e"] {
 		rows := _subject_rows(doc, "every xs", {"for": line, "assert": "e is 1"}, {})
 		[[r[1], r[2]] | some r in rows] == [[false, "not_an_object"], [false, "not_an_object"]]
 	}

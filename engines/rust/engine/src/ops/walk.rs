@@ -631,7 +631,7 @@ fn reads_outside(path: &Path) -> bool {
     matches!(path.start, Start::Alias(_) | Start::Part(_) | Start::Input)
 }
 
-fn through_a_list(path: &Path, ctx: &Ctx) -> bool {
+pub(super) fn through_a_list(path: &Path, ctx: &Ctx) -> bool {
     (0..path.steps.len()).any(|at| {
         let before = Path {
             start: path.start.clone(),
@@ -781,7 +781,8 @@ pub(super) fn path_needs_an_object_subject(path: &Path, ctx: &Ctx) -> bool {
         Start::Part(part) => {
             part.base == Start::Subject
                 && !(part.steps.is_empty()
-                    && matches!(path.steps.first(), None | Some(Step::Index(_))))
+                    && (ctx.subject.value.is_array()
+                        || matches!(path.steps.first(), None | Some(Step::Index(_)))))
         }
         _ => false,
     }
@@ -1087,8 +1088,13 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 };
                 let read = named.map(|(_, read)| read);
                 let off = message::off_item(check, ctx, verdict.cause);
+                let walked_root = super::lists::field_walk_fault(check, at)
+                    .filter(|(cause, _)| *cause == verdict.cause)
+                    .map(|(_, text)| text);
                 let said = if let Some(fault) = message::root_fault(check, ctx, verdict.cause) {
                     fault
+                } else if let Some(text) = walked_root {
+                    text
                 } else if off.is_empty() {
                     message::prefixed(
                         &walked.item_name(item_segs),
@@ -1352,7 +1358,9 @@ fn walk_faults(walk: &Walk, outer_ctx: &Ctx) -> Vec<String> {
         .chain(std::iter::once(&*walk.check))
         .collect();
     let mut faults = message::key_faults_of(&walk.path, outer_ctx);
-    faults.extend(message::blocked_of(&walk.path, outer_ctx));
+    if !through_a_list(&walk.path, outer_ctx) {
+        faults.extend(message::blocked_of(&walk.path, outer_ctx));
+    }
     faults.extend(message::ref_fault_list(&checks, outer_ctx));
     if faults.is_empty() {
         vec!["the check is false".to_string()]

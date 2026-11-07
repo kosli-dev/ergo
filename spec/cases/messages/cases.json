@@ -1915,5 +1915,38 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a root name after is in inside a whose that isn't a list is named once, with no item",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "pr", "checks": {"part": "count of xs whose v is in pl.z is 0", "params": "count of xs whose v is in $params.q is 0", "subject": "count of xs whose v is in pr.z is 0", "walk": "every xs.v, if any, is not in $params.q"}}}},
+    "params": {"q": "s"},
+    "cases": [
+      {
+        "description": "each name's problem is said once, whatever item is read",
+        "rules": ["message.items", "walk.flaws"],
+        "input": {"prs": [{"id": "p", "c": {"z": "s"}, "z": "s", "xs": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "unusable", "check": "params", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs whose v is in $params.q", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "$params.q is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
+          {"cause": "unusable", "check": "part", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs whose v is in pl.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/prs/0/c/z"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": "s"}], "message": "pl.z is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
+          {"cause": "unusable", "check": "subject", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs whose v is in pr.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/prs/0/z"], "name": "pr.z", "value": "s"}], "message": "pr.z is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
+          {"cause": "unusable", "check": "walk", "failed_items": [], "inputs": [{"locations": ["/prs/0/xs/0/v", "/prs/0/xs/1/v"], "name": "xs[].v", "value": [1, 2]}], "message": "$params.q is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a walk that can't use a param names the param, not the list it walks",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"walk": "every xs.v, if any, is not in $params.q"}}}},
+    "params": {"q": "s"},
+    "cases": [
+      {
+        "description": "an empty list is not said to be anything",
+        "rules": ["message.items", "walk.flaws"],
+        "input": {"prs": [{"id": "p", "xs": []}]},
+        "results": [
+          {"cause": "unusable", "check": "walk", "failed_items": [], "inputs": [{"locations": [], "name": "xs[].v", "value": []}], "message": "$params.q is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}}
+        ]
+      }
+    ]
   }
 ]

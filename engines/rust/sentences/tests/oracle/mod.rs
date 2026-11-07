@@ -2114,6 +2114,8 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("tags", "tags"),
     ("trails.r.prs", "trails.r.prs"),
     ("every xs.ys.tags", "every xs.ys.tags"),
+    ("every $input.requests", "every $input.requests"),
+    ("every $input.resources", "every $input.resources"),
 ];
 
 pub const FROM_ERRORS: &[(&str, &[&str])] = &[

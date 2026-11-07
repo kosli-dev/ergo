@@ -295,8 +295,8 @@ fn each_of_entries<'a>(
         return Read::Failed(Cause::Unusable);
     }
     let ctx = context(env, input_root(env), anc);
-    let object = path::read(path, &ctx);
-    let keys = path::read(each_of, &ctx);
+    let object = read_from(path, &ctx);
+    let keys = read_from(each_of, &ctx);
     if keys.outcome != Outcome::Found {
         return Read::Failed(keys.outcome.cause().unwrap_or(Cause::Unusable));
     }
@@ -579,7 +579,7 @@ fn found_list(path: &Path, j: usize, ctx: &Ctx) -> bool {
         start: path.start.clone(),
         steps: path.steps[..j].to_vec(),
     };
-    let read = path::read(&prefix, ctx);
+    let read = read_from(&prefix, ctx);
     read.outcome == Outcome::Found && matches!(read.value, Some(Value::Array(_)))
 }
 
@@ -1169,7 +1169,7 @@ fn unread_ref_cause(env: &Env, source: &Source, anc: &[Anc]) -> Option<Cause> {
     if first_bad_ref.is_some() {
         return first_bad_ref;
     }
-    let read = path::read(each_of?, &ctx);
+    let read = read_from(each_of?, &ctx);
     match read.outcome {
         Outcome::Found => None,
         other => Some(other.cause().unwrap_or(Cause::Unusable)),
@@ -1234,7 +1234,7 @@ fn read_entries<'a>(
                 });
             }
             let ctx = context(env, input_root(env), anc);
-            let read = path::read(path, &ctx);
+            let read = read_from(path, &ctx);
             let scalar_ok =
                 !path.steps.is_empty() || matches!(&lowered.source, Source::Child { .. });
             match read.outcome {
@@ -1304,7 +1304,7 @@ fn ref_message(env: &Env, lowered: &Lowered, anc: &[Anc], cause: Cause) -> Optio
     let states: Vec<RefState> = listed
         .iter()
         .map(|(reference, kind)| {
-            let read = path::read(reference, &ctx);
+            let read = read_from(reference, &ctx);
             let blocked = path::start_of(&reference.start, &ctx)
                 .is_ok_and(|(start, _, _)| start.is_object())
                 .then(|| ops::message::blocked_of(reference, &ctx).into_iter().next())
@@ -1448,7 +1448,7 @@ fn target_message(
                     start: path.start.clone(),
                     steps: path.steps[..k].to_vec(),
                 };
-                let read = path::read(&prefix, &ctx);
+                let read = read_from(&prefix, &ctx);
                 if read.outcome == Outcome::Found && read.value.is_some_and(Value::is_object) {
                     let shown = if k == 0 {
                         root.clone()
@@ -1465,7 +1465,7 @@ fn target_message(
         }
         _ => {}
     }
-    let read = path::read(path, &ctx);
+    let read = read_from(path, &ctx);
     let name = from_name(path, source, anc, &ctx, !read.step_unreadable);
     match cause {
         Cause::Absent | Cause::Null => {
@@ -1564,7 +1564,7 @@ fn from_message(
 fn object_target_message(env: &Env, lowered: &Lowered, anc: &[Anc]) -> Option<String> {
     let (Source::Root { path, .. } | Source::Child { path, .. }) = &lowered.source;
     let ctx = context(env, input_root(env), anc);
-    let read = path::read(path, &ctx);
+    let read = read_from(path, &ctx);
     match (read.outcome, read.value) {
         (Outcome::Found, Some(value @ Value::Object(_))) => {
             let name = from_name(path, &lowered.source, anc, &ctx, true);
@@ -1762,7 +1762,7 @@ fn id_of(lowered: &Lowered, entry: &Entry, ctx: &Ctx) -> (Value, Option<String>)
     match &lowered.id {
         None => (entry.at.value.clone(), Some(entry.at.location.render())),
         Some(steps) => {
-            let read = path::read(
+            let read = read_from(
                 &Path {
                     start: Start::Subject,
                     steps: steps.clone(),
@@ -2032,6 +2032,14 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
     }
 }
 
+fn read_from<'a>(path: &Path, ctx: &Ctx<'a>) -> path::Read<'a> {
+    let mut read = path::read(path, ctx);
+    if path.start == Start::Input && read.outcome == Outcome::NotAnObject {
+        read.outcome = Outcome::Unusable;
+    }
+    read
+}
+
 fn check_rows<'a>(
     env: &Env<'a>,
     judged: &Judged<'a>,
@@ -2066,11 +2074,18 @@ fn check_rows<'a>(
 fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc: &[Anc]) -> Row {
     let mut failed_items = None;
     let mut said: Vec<Option<String>> = Vec::new();
-    let verdicts: Vec<Verdict> = plan
+    let checks: Vec<Check> = plan
         .items
         .iter()
-        .map(|item| {
-            let ran = ops::run_full(&item.check, ctx);
+        .map(|item| match (&ctx.label, ctx.subject.value.is_array()) {
+            (Some(label), true) => ops::list_start::read(&item.check, label),
+            _ => item.check.clone(),
+        })
+        .collect();
+    let verdicts: Vec<Verdict> = checks
+        .iter()
+        .map(|check| {
+            let ran = ops::run_full(check, ctx);
             failed_items = ran.failed_items.map(Value::Array);
             let mut verdict = ran.verdict;
             let mut own = ran.message;
@@ -2096,15 +2111,14 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
     let mut row = row_of(env.requirement_name, env.requirement, name, cause, inputs);
     row.subject_id = judged.id.clone();
     if cause != Cause::Satisfied {
-        let messages: Vec<String> = plan
-            .items
+        let messages: Vec<String> = checks
             .iter()
             .zip(&verdicts)
             .zip(&said)
             .filter(|((_, v), _)| !v.passed())
-            .map(|((item, v), own)| match own {
+            .map(|((check, v), own)| match own {
                 Some(text) => text.clone(),
-                None => ops::message::message(&item.check, ctx, v),
+                None => ops::message::message(check, ctx, v),
             })
             .collect();
         let mut once: Vec<String> = Vec::new();
