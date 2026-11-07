@@ -1681,6 +1681,48 @@ A position is written in words, as for a field. With the input `{"releases": {"t
 
 `1` can't be compared with `"a"`, so the second list fails as `unusable`, and the empty one has no first item, so it fails as `absent`, as `first of v` does on a field.
 
+A subject that is a list of objects can be read field by field, without its name. `every`, `some`, `count of` and `sum of` walk the list a path starts at, and so do an item of a `for` line that has no position and the right side of `is one of`, `is not one of`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match`. With these params:
+
+```json
+{"allowed": ["ana"]}
+```
+
+this input:
+
+```json
+{"pipelines": [[{"stage": "build", "owner": "ana"}, {"stage": "test", "owner": "bo"}]]}
+```
+
+and this policy:
+
+```yaml
+ergo_spec: v0.6-dev
+subjects:
+  pipeline:
+    from: every pipelines
+requirements:
+  owned:
+    subject: pipeline
+    checks:
+      owners: every owner is in $params.allowed
+      stages: count of stage is 2
+      plain: owner is "ana"
+```
+
+the pipeline is one subject, a list of two stages, and the rows are:
+
+```json
+{"check": "owners", "subject": {"id": [{"owner": "ana", "stage": "build"}, {"owner": "bo", "stage": "test"}], "type": "pipeline"}, "passed": false, "cause": "value", "message": "item 2 of pipeline: owner is \"bo\", and $params.allowed is [\"ana\"]",
+ "failed_items": [{"cause": "value", "item": "item 2 of pipeline", "path": "pipeline[1].owner", "value": "bo", "locations": ["/pipelines/0/1/owner"]}],
+ "inputs": [{"name": "pipeline[].owner", "value": ["ana", "bo"], "locations": ["/pipelines/0/0/owner", "/pipelines/0/1/owner"]}], "requirement": "owned"}
+{"check": "plain", "subject": {"id": [{"owner": "ana", "stage": "build"}, {"owner": "bo", "stage": "test"}], "type": "pipeline"}, "passed": false, "cause": "not_an_object", "message": "pipeline is [{\"owner\": \"ana\", \"stage\": \"build\"}, {\"owner\": \"bo\", \"stage\": \"test\"}], which isn't an object",
+ "inputs": [{"name": "owner", "value": null, "locations": ["/pipelines/0"]}], "requirement": "owned"}
+{"check": "stages", "subject": {"id": [{"owner": "ana", "stage": "build"}, {"owner": "bo", "stage": "test"}], "type": "pipeline"}, "passed": true, "cause": "satisfied",
+ "inputs": [{"name": "count of stage", "value": 2, "locations": ["/pipelines/0/0/stage", "/pipelines/0/1/stage"]}, {"name": "pipeline[].stage", "value": ["build", "test"], "locations": ["/pipelines/0/0/stage", "/pipelines/0/1/stage"]}], "requirement": "owned"}
+```
+
+The walked list is named after the subject, `pipeline[].owner` and `item 2 of pipeline`. A path without one of those words, like `owner is "ana"`, fails as `not_an_object`, because the list has no `owner`. `for: every owner as o` with `o is in $params.allowed` walks the stages the same way, while a `for` item with a position, like `first of owner as o`, fails as `not_an_object`. Only the list the path starts at is walked: a list directly inside it is an item that isn't an object, so `every owner` on `[[{"owner": "ana"}]]` fails `item 1 of pipeline` as `not_an_object`. An empty list fails as `value`, and `null` as `not_an_object`. A check that reads a key of the subject with `named by`, like `every age_days is less than $params.max_days named by severity`, fails as `not_an_object` as a whole, because a list has no `severity`: to give each item its own limit, make each item a subject of its own, with a `from` line that walks to it. A part, a `for` alias and `$input` are read the same way at the start of a path. On an input that is a list, `$input.id exists` fails as `not_an_object` with `$input is [{"id": "a"}], which isn't an object`, and `$input[0].id is "a"` on `[1]` fails as `unusable` with `item 1 of $input is 1, which isn't an object`.
+
 Four rules say what the name can do:
 
 - **Nothing follows it, outside a relative clause.** A step, a position or `named by` after the name, like `pr.author`, `pr[0].y` or `pr named by k`, is allowed only inside a relative clause, and the name alone everywhere. Outside one, the subject's fields are bare words already, so `region.name` means nothing and is written wrong, and so are `region[0]`, `region."x"`, `region named by $params.k` and `first of region.name`. With the subject `lib` and the check `lib.name is 1`, the `$well_formed` row says `lib.name: nothing can follow lib, which means the subject: for a field called lib, write .lib.name`. Brackets straight after the name, like `lib[0]`, are written wrong in the same way, with `write .lib[0]`. To read one item of a subject that is a list, write the position in words, `first of lib` or `item 2 of lib`. The name can't be the key of a `named by` either: `$params.m named by lib is 1` says `named by lib: lib is the whole subject, so it can't name a key`. Inside a relative clause, after `whose` or `that`, a bare word is the item's field, so there `lib.name` reads the subject's `name`: with the subject `pr`, `count of approvers whose username does not equal pr.author is 1` counts the approvers who aren't the pull request's author. In `pr named by k` there, `k` is each approver's own field, and an approver without one fails as `absent`, with the approver named, like `item 2 of approvers: k is missing`. To take the key from the subject, write it with the subject's name after any path, like `pr named by pr.k` or `$params.m named by pr.k`: the key is the pull request's `k` whatever the approver holds, and when the pull request has no `k` the check fails as `absent` with `pr.k is missing`, once. A name read from a root inside a relative clause, like `pr.a.b`, `$params.a.b` or a part, is the same for every approver, so its problem is said once with no approver named: `pr.a is 3, which isn't an object`.
@@ -2152,7 +2194,7 @@ When the input or the params hold something JSON can't, every check on a subject
 
 When a check reads several fields, the row shows the first cause in this table's order. An ambiguous pick matters more than any value, because it means the policy can't even tell what it's looking at.
 
-- For `every`, `some` and `for` lines, a list that isn't there gives `absent`, and one that isn't a list gives `unusable`. An empty list gives `value`, since it was read fine and just has nothing in it. An item that isn't an object, `null` included, fails as `not_an_object` when the path goes on into it: with `t` holding `["a"]` or `[null]`, `every t.k is 1` and a `for` line `every t.k as x` both fail `item 1 of t` that way, and so do `count of t.k` and `sum of t.k`. Otherwise the cause is the first, in this table's order, among the items that failed. So when one approver is a bot and another has no `username`, a check that some approver isn't a bot fails as `absent`, because the second one might not be. An `any_of` works the same way across its options, and so does a path through several lists.
+- For `every`, `some` and `for` lines, a list that isn't there gives `absent`, and one that isn't a list gives `unusable`. An empty list gives `value`, since it was read fine and just has nothing in it. A subject that is a list is walked like any list ([The subject itself](#the-subject-itself)). An item that isn't an object, `null` included, fails as `not_an_object` when the path goes on into it: with `t` holding `["a"]` or `[null]`, `every t.k is 1` and a `for` line `every t.k as x` both fail `item 1 of t` that way, and so do `count of t.k` and `sum of t.k`. Otherwise the cause is the first, in this table's order, among the items that failed. So when one approver is a bot and another has no `username`, a check that some approver isn't a bot fails as `absent`, because the second one might not be. An `any_of` works the same way across its options, and so does a path through several lists.
 - `$well_formed` and `$min_subjects` don't read the subject, so their cause is `satisfied` or `value`, except that `$min_subjects` fails as `absent`, `null` or `unusable` when a `$params` or `$input` path after `named by` in `from` can't be read, or when `from` doesn't lead to a list or an object. `$applies` reports the state of the fields read by the conditions that failed. Its `inputs` list each field its conditions read once, sorted by name, so two conditions on `status` show `status` once. For example, a subject whose condition field is missing says `absent`, and that fails the requirement. A condition that's written wrong makes the requirement written wrong, so it gets no `$applies` rows at all.
 
 ## Violations
