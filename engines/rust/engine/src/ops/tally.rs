@@ -1268,7 +1268,7 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                         )
                     } else {
                         let off = super::message::off_item(check, &outer, verdict.cause);
-                        let walked_root = super::lists::field_walk_fault(check, &outer)
+                        let walked_root = super::lists::field_walk_fault(check, &focus)
                             .filter(|(cause, _)| *cause == verdict.cause)
                             .map(|(_, text)| text);
                         if let Some(fault) =

@@ -1088,7 +1088,7 @@ fn judge(walk: &Walk, walked: &Walked, ctx: &Ctx) -> Vec<Judged> {
                 };
                 let read = named.map(|(_, read)| read);
                 let off = message::off_item(check, ctx, verdict.cause);
-                let walked_root = super::lists::field_walk_fault(check, ctx)
+                let walked_root = super::lists::field_walk_fault(check, at)
                     .filter(|(cause, _)| *cause == verdict.cause)
                     .map(|(_, text)| text);
                 let said = if let Some(fault) = message::root_fault(check, ctx, verdict.cause) {

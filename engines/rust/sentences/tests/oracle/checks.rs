@@ -7390,6 +7390,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     (
+        "count of rows whose v is in os.name is 1",
+        "count of rows whose v is in os.name is 1",
+        &[],
+        &[],
+    ),
+    (
         "count of rows whose v is in pl.z is 1",
         "count of rows whose v is in pl.z is 1",
         &[],

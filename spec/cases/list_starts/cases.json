@@ -287,5 +287,27 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a name in a whose is read from the row, so a bad list of the same name on the subject isn't blamed",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of rows whose v is in os.name is 1"}}}},
+    "cases": [
+      {
+        "description": "a row with no field of that name fails as absent, naming the row's field and not the subject's",
+        "rules": ["sentence.resolve.focus", "walk.right", "tally.whose"],
+        "input": {"things": [{"id": "x", "os": [{"name": "b"}, {}], "rows": [{"v": "a"}]}]},
+        "results": [
+          {"cause": "absent", "check": "count", "inputs": [{"locations": ["/things/0/rows/0"], "name": "count of rows whose v is in os.name", "value": null}, {"locations": ["/things/0/rows/0"], "name": "rows[]", "value": [{"v": "a"}]}], "message": "item 1 of rows: os.name is missing", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "t"}}
+        ]
+      },
+      {
+        "description": "a row whose field is null fails as absent, naming the row's field and not the subject's",
+        "rules": ["sentence.resolve.focus", "walk.right", "tally.whose"],
+        "input": {"things": [{"id": "x", "os": [{"name": "b"}, {}], "rows": [{"v": "a", "os": null}]}]},
+        "results": [
+          {"cause": "absent", "check": "count", "inputs": [{"locations": ["/things/0/rows/0"], "name": "count of rows whose v is in os.name", "value": null}, {"locations": ["/things/0/rows/0"], "name": "rows[]", "value": [{"os": null, "v": "a"}]}], "message": "item 1 of rows: os.name is missing", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "t"}}
+        ]
+      }
+    ]
   }
 ]
