@@ -206,7 +206,7 @@
         "input": {"things": [[{"c": null}]]},
         "results": [
           {"cause": "absent", "check": "count", "inputs": [{"locations": ["/things/0/0/c"], "name": "count of pl.name", "value": null}, {"locations": ["/things/0/0/c"], "name": "t[].c.name", "value": [null]}], "message": "item 1 of t: c.name is missing", "passed": false, "requirement": "r", "subject": {"id": [{"c": null}], "type": "t"}},
-          {"cause": "absent", "check": "every", "failed_items": [{"cause": "absent", "item": "item 1 of t", "locations": ["/things/0/0/c"], "path": "t[0].c.name", "value": null}], "inputs": [{"locations": ["/things/0/0/c"], "name": "t[].c.name", "value": [null]}], "message": "item 1 of t: c.name is missing", "passed": false, "requirement": "r", "subject": {"id": [{"c": null}], "type": "t"}},
+          {"cause": "null", "check": "every", "failed_items": [{"cause": "null", "item": "item 1 of t", "locations": ["/things/0/0/c"], "path": "t[0].c.name", "value": null}], "inputs": [{"locations": ["/things/0/0/c"], "name": "t[].c.name", "value": [null]}], "message": "item 1 of t: c is null", "passed": false, "requirement": "r", "subject": {"id": [{"c": null}], "type": "t"}},
           {"cause": "absent", "check": "right", "inputs": [{"locations": ["$params:/w"], "name": "$params.w", "value": "a"}, {"locations": ["/things/0/0/c"], "name": "t[].c.name", "value": [null]}], "message": "item 1 of t: c.name is missing", "passed": false, "requirement": "r", "subject": {"id": [{"c": null}], "type": "t"}}
         ]
       },

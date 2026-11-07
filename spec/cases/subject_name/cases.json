@@ -380,7 +380,7 @@
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/0"], "name": "item 1 of region", "value": 1}], "passed": true, "requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}},
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "allowed", "subject": {"id": [], "type": "region"}},
           {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "item 1 of region", "value": null}], "message": "region is \"s\", which isn't a list", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}},
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 1 of region", "value": null}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
         ],
         "expressions": {"allowed": {"c": "first of region is 1"}}
       }
@@ -398,7 +398,7 @@
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/xs/0/1"], "name": "item 2 of region", "value": "x"}], "passed": true, "requirement": "allowed", "subject": {"id": [1, "x"], "type": "region"}},
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "allowed", "subject": {"id": [1], "type": "region"}},
           {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "item 2 of region", "value": null}], "message": "region is \"s\", which isn't a list", "passed": false, "requirement": "allowed", "subject": {"id": "s", "type": "region"}},
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 2 of region", "value": null}], "message": "region is null", "passed": false, "requirement": "allowed", "subject": {"id": null, "type": "region"}}
         ],
         "expressions": {"allowed": {"c": "item 2 of region is \"x\""}}
       }
@@ -762,8 +762,8 @@
           {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/1"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "r", "subject": {"id": [], "type": "region"}},
           {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/xs/2"], "name": "item 1 of region", "value": null}], "message": "region is \"a\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}},
           {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/2"], "name": "item 2 of region", "value": null}], "message": "region is \"a\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "a", "type": "region"}},
-          {"cause": "absent", "check": "b", "inputs": [{"locations": ["/xs/3"], "name": "item 1 of region", "value": null}], "message": "item 1 of region is missing", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
-          {"cause": "absent", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 2 of region", "value": null}], "message": "item 2 of region is missing", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
+          {"cause": "null", "check": "b", "inputs": [{"locations": ["/xs/3"], "name": "item 1 of region", "value": null}], "message": "region is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
+          {"cause": "null", "check": "c", "inputs": [{"locations": ["/xs/3"], "name": "item 2 of region", "value": null}], "message": "region is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}}
         ]
       }
     ]

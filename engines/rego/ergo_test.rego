@@ -7535,10 +7535,12 @@ test_a_missing_part_fails_as_absent_like_its_full_path if {
 	_parts_row(rep2, "f").cause == "value"
 }
 
-test_a_null_part_fails_as_null_when_the_alias_stands_alone_and_absent_when_a_step_follows if {
+test_a_null_part_fails_as_null_and_is_named_when_a_step_follows if {
 	rep := _parts_report({"cov": "dd.b"}, {"c": "cov.x is 1", "a": "cov is null", "f": "dd.b.x is 1"}, {"b": null})
-	_parts_row(rep, "c").cause == "absent"
-	_parts_row(rep, "f").cause == "absent"
+	_parts_row(rep, "c").cause == "null"
+	_parts_row(rep, "c").message == "cov is null"
+	_parts_row(rep, "f").cause == "null"
+	_parts_row(rep, "f").message == "dd.b is null"
 	_parts_row(rep, "a").passed
 }
 
@@ -10501,7 +10503,7 @@ test_a_position_on_the_subjects_name_names_the_item_the_way_a_field_does if {
 	rows == [[["a", "b"], true, "satisfied", [{"name": "item 1 of s", "value": "a", "locations": ["/xs/0/0"]}]]]
 	_subject_rows({"xs": [[]]}, "every xs", "first of s is 'a'", {})[0][2] == "absent"
 	_subject_rows({"xs": ["s"]}, "every xs", "first of s is 'a'", {})[0][2] == "unusable"
-	_subject_rows({"xs": [null]}, "every xs", "first of s is 'a'", {})[0][2] == "absent"
+	_subject_rows({"xs": [null]}, "every xs", "first of s is 'a'", {})[0][2] == "null"
 	_subject_report({"xs": [["a"]]}, "every xs", {"c": "item 2 of s is 'a'"}, {}).requirements.r.checks.c.expression == "item 2 of s is \"a\""
 	_subject_problems("every xs", {"c": "first of s.k is 1"}) == ["first of s.k: nothing can follow s, which means the subject: for a field called s, write .s.k"]
 }
@@ -10622,7 +10624,6 @@ test_a_walk_reads_a_parent_through_a_for_alias_on_its_right_side if {
 test_a_walk_through_a_for_alias_fails_like_a_count_when_the_key_is_missing_or_the_parent_is_not_an_object if {
 	every assertion in _named_read_walks {
 		_named_read_cause({"k2": 1}, ["k1"], assertion) == "absent"
-		_named_read_cause(null, ["k1"], assertion) == "absent"
 		_named_read_cause("abc", ["k1"], assertion) == "unusable"
 		_named_read_cause(5, ["k1"], assertion) == "unusable"
 	}
@@ -10634,6 +10635,7 @@ test_a_walk_through_a_for_alias_fails_like_a_count_when_the_alias_is_null_or_a_n
 		_named_read_cause({"k1": 1}, [3], assertion) == "unusable"
 		_named_read_cause({"k1": "a"}, ["k1"], assertion) == "unusable"
 		_named_read_cause({"k1": null}, ["k1"], assertion) == "null"
+		_named_read_cause(null, ["k1"], assertion) == "null"
 	}
 }
 
@@ -11778,8 +11780,13 @@ test_a_ref_that_reads_into_text_says_which_value_cant_hold_the_next_step if {
 	}
 }
 
-test_a_ref_that_reads_into_null_or_something_missing_fails_as_it_did_before_the_walk if {
-	every doc in [{"sbom": {"components": null}}, {"sbom": {}}, {"sbom": {"components": {"a": 1}}}] {
+test_a_ref_that_reads_into_null_fails_as_null_and_names_the_null if {
+	rows := _walk_right_rows("x is in $input.sbom.components.name", {"sbom": {"components": null}, "things": [{"id": "t1", "x": "a"}]}, {})
+	rows == [[false, "null", "$input.sbom.components is null"]]
+}
+
+test_a_ref_that_reads_into_something_missing_fails_as_it_did_before_the_walk if {
+	every doc in [{"sbom": {}}, {"sbom": {"components": {"a": 1}}}] {
 		every row in _walk_right_rows("x is in $input.sbom.components.name", object.union(doc, {"things": [{"id": "t1", "x": "a"}]}), {}) {
 			row[1] == "absent"
 			row[2] == "$input.sbom.components.name is missing"
@@ -11952,8 +11959,8 @@ test_a_leading_dot_on_a_right_side_that_walks_fails_as_absent_when_an_item_of_th
 	_dot_rows({"pkgs": [{"name": "a"}, {}]}) == [{"cause": "absent", "message": "item 2 of .lock.pkgs: name is missing", "names": ["x", ".lock.pkgs[].name"]}]
 }
 
-test_a_leading_dot_on_a_right_side_that_walks_fails_when_the_field_has_no_list if {
-	_dot_rows(null) == [{"cause": "absent", "message": ".lock.pkgs.name is missing", "names": ["x", ".lock.pkgs.name"]}]
+test_a_leading_dot_on_a_right_side_that_walks_fails_as_null_when_the_field_is_null if {
+	_dot_rows(null) == [{"cause": "null", "message": ".lock is null", "names": ["x", ".lock.pkgs.name"]}]
 }
 
 test_a_leading_dot_on_a_right_side_that_walks_fails_as_null_when_an_item_of_the_field_has_a_null_name if {
@@ -12328,4 +12335,72 @@ test_message_of_an_empty_list_read_on_the_right_names_the_root_that_is_missing_n
 	some r in rep.results
 	r.check == "c"
 	r.message == "item 1 of ys: y.z is missing"
+}
+
+test_a_root_that_isnt_a_list_after_is_in_fails_before_any_item_is_read if {
+	policy := {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "pr", "checks": {
+		"subject": "count of xs whose v is in pr.z is 0",
+		"part": "every xs.v, if any, is not in pl.z",
+		"params": "count of xs whose v is in $params.q is 0",
+		"for": {"for": "every xs whose v is in pr.z as m", "assert": "m.v is 1"},
+	}}}}
+	rep := ergo.report({"prs": [{"id": "p", "c": {"z": 5}, "z": "s", "xs": []}]}, policy, {"q": "s"})
+	msgs := {r.check: [r.cause, r.message] | some r in rep.results; not startswith(r.check, "$")}
+	msgs == {
+		"subject": ["unusable", "pr.z is \"s\", which isn't a list"],
+		"part": ["unusable", "pl.z is 5, which isn't a list"],
+		"params": ["unusable", "$params.q is \"s\", which isn't a list"],
+		"for": ["unusable", "pr.z is \"s\", which isn't a list"],
+	}
+}
+
+test_a_root_that_is_a_list_after_is_in_still_passes_on_an_empty_list if {
+	policy := {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"c": "count of xs whose v is in pr.z is 0"}}}}
+	rep := ergo.report({"prs": [{"id": "p", "z": [], "xs": []}]}, policy, {})
+	some r in rep.results
+	r.check == "c"
+	r.cause == "satisfied"
+}
+
+test_two_roots_that_fail_in_one_relative_clause_are_both_named if {
+	policy := {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"c": "count of xs whose aa equals $params.q and whose b equals pr.z is 1"}}}}
+	rep := ergo.report({"prs": [{"id": "p", "xs": []}]}, policy, {})
+	some r in rep.results
+	r.check == "c"
+	r.message == "$params.q is missing; pr.z is missing"
+}
+
+_root_rows(checks, item, params) := {r.check: [r.cause, r.message] |
+	some r in ergo.report({"prs": [item]}, {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": checks}}}, params).results
+	not startswith(r.check, "$")
+}
+
+test_two_list_roots_of_the_wrong_type_are_both_named_on_a_list_with_items if {
+	rows := _root_rows({"c": "count of xs whose v is in $params.l and whose w is in pr.l is 0"}, {"id": "p", "l": 3, "xs": [{"v": 1, "w": 1}, {}]}, {"l": "s"})
+	rows.c == ["unusable", "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list"]
+}
+
+test_every_root_that_failed_is_named_whatever_its_cause if {
+	rows := _root_rows({"c": "every xs whose w is in pr.l and whose v is in $params.l, if any, exists"}, {"id": "p", "l": "s", "xs": []}, {"l": null})
+	rows.c == ["unusable", "pr.l is \"s\", which isn't a list; $params.l is null"]
+}
+
+test_a_root_read_through_null_inside_a_relative_clause_names_the_null_step_once if {
+	rows := _root_rows({"c": "count of xs whose v is in $params.c.z is 0"}, {"id": "p", "xs": []}, {"c": null})
+	rows.c == ["null", "$params.c is null"]
+}
+
+test_a_walk_whose_ref_step_cant_be_read_names_its_path_and_every_root_its_phrase_cant_read if {
+	whose := {"c": "every xs named by $params.k whose v is 1, if any, exists"}
+	_root_rows(whose, {"id": "p", "xs": []}, {}).c == ["absent", "xs named by $params.k is missing"]
+	_root_rows(whose, {"id": "p", "xs": []}, {"k": null}).c == ["null", "xs named by $params.k is null"]
+	phrase := {"c": "every xs named by $params.k, if any, equals q"}
+	_root_rows(phrase, {"id": "p", "xs": []}, {}).c == ["absent", "xs named by $params.k is missing; q is missing"]
+	_root_rows(phrase, {"id": "p", "xs": [], "q": null}, {"k": null}).c == ["null", "xs named by $params.k is null; q is null"]
+	_root_rows(phrase, {"id": "p", "xs": [], "q": 1}, {}).c == ["absent", "xs named by $params.k is missing"]
+}
+
+test_both_sides_of_a_comparison_are_named_when_one_is_missing_and_the_other_null if {
+	rows := _root_rows({"c": "c.z is d.z"}, {"id": "p", "c": {}, "d": null}, {})
+	rows.c == ["absent", "c.z is missing, and d is null"]
 }

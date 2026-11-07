@@ -102,7 +102,7 @@ fn first_of_the_subject_name_reads_an_item_of_a_list_subject() {
                 "unusable",
                 "thing is {\"name\": \"a\", \"x\": 1}, which isn't a list"
             ),
-            ("absent", "item 1 of thing is missing"),
+            ("null", "thing is null"),
             ("unusable", "thing is 5, which isn't a list"),
             ("unusable", "thing is {\"x\": 2}, which isn't a list"),
         ]

@@ -24,6 +24,9 @@ pub fn run(check: &Present, ctx: &Ctx) -> Verdict {
         .any(|step| matches!(step, Step::Field(_)) && path::resolve(step, ctx).is_err());
     let cause = match read.outcome {
         outcome if read.step_unreadable => outcome.cause().unwrap_or(Cause::Unusable),
+        Outcome::Null if key_unreadable && super::message::stops_at_a_null(&check.path, ctx) => {
+            Cause::Null
+        }
         Outcome::Absent | Outcome::Null if key_unreadable => Cause::Absent,
         Outcome::Found => verdict(!check.missing),
         Outcome::Absent | Outcome::Null if no_params => Cause::Absent,

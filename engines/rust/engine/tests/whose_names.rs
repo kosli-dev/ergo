@@ -30,10 +30,13 @@ fn a_name_on_the_right_of_a_whose_is_read_from_the_row_not_the_subject() {
         "every rows whose v is in os.name is not empty",
         "some rows whose v is in os.name is not empty",
     ] {
-        for row in [json!({"v": "a"}), json!({"v": "a", "os": null})] {
+        for (row, said) in [
+            (json!({"v": "a"}), "item 1 of rows: os.name is missing"),
+            (json!({"v": "a", "os": null}), "item 1 of rows: os is null"),
+        ] {
             assert_eq!(
                 messages(check, subject_with_a_bad_list(row.clone())),
-                ["item 1 of rows: os.name is missing"],
+                [said],
                 "{check} on {row}"
             );
         }

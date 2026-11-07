@@ -2037,6 +2037,9 @@ fn read_from<'a>(path: &Path, ctx: &Ctx<'a>) -> path::Read<'a> {
     if path.start == Start::Input && read.outcome == Outcome::NotAnObject {
         read.outcome = Outcome::Unusable;
     }
+    if read.outcome == Outcome::Null && read.value.is_none() && !read.step_unreadable {
+        read.outcome = Outcome::Absent;
+    }
     read
 }
 

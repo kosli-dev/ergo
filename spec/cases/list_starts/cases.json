@@ -301,11 +301,11 @@
         ]
       },
       {
-        "description": "a row whose field is null fails as absent, naming the row's field and not the subject's",
+        "description": "a row whose field is null fails as null, naming the row's field and not the subject's",
         "rules": ["sentence.resolve.focus", "walk.right", "tally.whose"],
         "input": {"things": [{"id": "x", "os": [{"name": "b"}, {}], "rows": [{"v": "a", "os": null}]}]},
         "results": [
-          {"cause": "absent", "check": "count", "inputs": [{"locations": ["/things/0/rows/0"], "name": "count of rows whose v is in os.name", "value": null}, {"locations": ["/things/0/rows/0"], "name": "rows[]", "value": [{"os": null, "v": "a"}]}], "message": "item 1 of rows: os.name is missing", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "t"}}
+          {"cause": "null", "check": "count", "inputs": [{"locations": ["/things/0/rows/0"], "name": "count of rows whose v is in os.name", "value": null}, {"locations": ["/things/0/rows/0"], "name": "rows[]", "value": [{"os": null, "v": "a"}]}], "message": "item 1 of rows: os is null", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "t"}}
         ]
       }
     ]

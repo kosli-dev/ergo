@@ -383,8 +383,8 @@
         ]
       },
       {
-        "description": "fails as absent when the part is null, because a step follows it",
-        "rules": ["parts.swap", "path.absent"],
+        "description": "fails as null and names the part when the part is null and a step follows it",
+        "rules": ["parts.swap", "path.null"],
         "input": {
           "trail": {
             "name": "t1",
@@ -402,7 +402,7 @@
         },
         "results": [
           {
-            "cause": "absent",
+            "cause": "null",
             "check": "complete",
             "inputs": [
               {
@@ -417,7 +417,7 @@
                 ]
               }
             ],
-            "message": "findings.truncated is missing",
+            "message": "findings is null",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -426,7 +426,7 @@
             }
           },
           {
-            "cause": "absent",
+            "cause": "null",
             "check": "every_hunk_acknowledged",
             "inputs": [
               {
@@ -452,7 +452,7 @@
                 ]
               }
             ],
-            "message": "coverage.attestation_data.hunks_acknowledged is missing, and coverage.attestation_data.hunks_total is missing",
+            "message": "coverage.attestation_data is null",
             "passed": false,
             "requirement": "review_round",
             "subject": {
@@ -883,7 +883,7 @@
             }
           },
           {
-            "cause": "absent",
+            "cause": "null",
             "check": "alias",
             "inputs": [
               {
@@ -909,7 +909,7 @@
                 ]
               }
             ],
-            "message": "cov.x is missing, and cov.n is missing",
+            "message": "cov is null",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -918,7 +918,7 @@
             }
           },
           {
-            "cause": "absent",
+            "cause": "null",
             "check": "full",
             "inputs": [
               {
@@ -936,7 +936,7 @@
                 ]
               }
             ],
-            "message": "d.b.x is missing, and d.b.n is missing",
+            "message": "d.b is null",
             "passed": false,
             "requirement": "r",
             "subject": {

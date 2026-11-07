@@ -4447,7 +4447,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "extra is missing",
+            "message": "base is null, and extra is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -5910,7 +5910,7 @@
               "id": "r1"
             },
             "check": "c",
-            "message": "findings is missing",
+            "message": "limit is null, and findings is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [
@@ -11686,7 +11686,7 @@
               "type": "vuln"
             },
             "check": "c",
-            "message": "ended is missing",
+            "message": "started is null, and ended is missing",
             "passed": false,
             "cause": "absent",
             "inputs": [

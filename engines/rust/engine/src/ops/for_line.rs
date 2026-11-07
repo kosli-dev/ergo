@@ -452,6 +452,7 @@ fn empty_list(name: String) -> Input {
         locations: Vec::new(),
         part: None,
         state: crate::path::Outcome::Found,
+        null_at: None,
     }
 }
 
@@ -533,6 +534,7 @@ impl For {
                 .collect(),
             part: path::part_tag(&item.path, &outer).map(|(name, id)| Part { name, id }),
             state: crate::path::Outcome::Found,
+            null_at: None,
         };
         let mut dead: Vec<Dead> = walked.failures.iter().map(Dead::of_failure).collect();
         let from_list = walked.failures.len();
@@ -908,6 +910,7 @@ impl For {
                 locations: vec![found.location.render()],
                 part: cands.list.part.clone(),
                 state: crate::path::Outcome::Found,
+                null_at: None,
             }
         } else {
             Input {
@@ -916,6 +919,7 @@ impl For {
                 locations: vec![found.location.render()],
                 part: cands.list.part.clone(),
                 state: crate::path::Outcome::Found,
+                null_at: None,
             }
         };
         cands.picked = true;
@@ -1436,6 +1440,7 @@ impl For {
                 .collect(),
             part: path::part_tag(path, &outer).map(|(name, id)| Part { name, id }),
             state: crate::path::Outcome::Found,
+            null_at: None,
         }
     }
 
@@ -1518,12 +1523,28 @@ impl For {
             .iter()
             .flat_map(|item| item.whose.iter())
             .collect();
-        if let Some((cause, text)) = super::message::root_flaw(&whose, &outer_ctx(ctx)) {
+        let outer = outer_ctx(ctx);
+        if let Some((cause, text)) = super::message::root_flaw(&whose, &outer) {
+            let flawed = whose
+                .iter()
+                .copied()
+                .chain(self.sentences.iter().map(|s| &s.check))
+                .any(|check| check.flawed(&outer));
+            if flawed && let Some(said) = run.message.clone() {
+                let parts = super::message::with_roots(
+                    said.split("; ").map(str::to_string).collect(),
+                    &text,
+                );
+                run.message = Some(super::message::joined(parts));
+                return run;
+            }
+            let said = run.message.clone();
             let (cause, failed_items, message) = walk::read_up_front(
                 run.verdict.cause,
                 std::mem::take(&mut run.failed_items),
                 cause,
                 &text,
+                said.as_deref(),
             );
             run.verdict.cause = cause;
             run.failed_items = failed_items;

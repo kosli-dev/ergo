@@ -392,6 +392,7 @@ fn number_entry(text: &str, result: &Result<Number, Cause>, locations: Vec<Strin
         locations,
         part: None,
         state: crate::path::Outcome::Found,
+        null_at: None,
     }
 }
 
@@ -519,6 +520,7 @@ fn counted_entries(
         locations: list.locations.clone(),
         part: list.part.clone(),
         state: crate::path::Outcome::Found,
+        null_at: None,
     }];
     entries.push(list);
     entries.extend(super::field_inputs(&counted.path, ctx));
@@ -536,6 +538,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             locations: Vec::new(),
             part: None,
             state: crate::path::Outcome::Found,
+            null_at: None,
         };
         let whose: Vec<&Check> = counted.whose.iter().collect();
         let mut outside = walk::outside_inputs_of(&whose, &outer);
@@ -566,6 +569,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             locations: Vec::new(),
             part: None,
             state: crate::path::Outcome::Found,
+            null_at: None,
         };
         let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
         return Worked {
@@ -626,6 +630,7 @@ fn work_counted(counted: &Counted, ctx: &Ctx) -> Worked<Number> {
             .collect(),
         part: path::part_tag(&counted.path, &outer).map(|(name, id)| Part { name, id }),
         state: crate::path::Outcome::Found,
+        null_at: None,
     };
     let (entries, located) = counted_entries(counted, &result, list, outside, ctx);
     Worked {
@@ -1170,7 +1175,9 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             return None;
         }
         let whose: Vec<&Check> = counted.whose.iter().collect();
-        let root = super::message::root_flaw(&whose, &outer)
+        let any_root = super::message::root_flaw(&whose, &outer);
+        let root = any_root
+            .clone()
             .filter(|(flaw, _)| *flaw == cause)
             .map(|(_, text)| text);
         let walked = walk::walk(
@@ -1236,6 +1243,13 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
             .iter()
             .map(|f| (f.cause, f.msg.clone()))
             .collect();
+        let root_texts: Vec<String> = any_root
+            .map(|(_, text)| text.split("; ").map(str::to_string).collect())
+            .unwrap_or_default();
+        for text in &root_texts {
+            always.insert(found.len());
+            found.push((cause, text.clone()));
+        }
         let mut refs: Vec<Path> = counted.whose.iter().flat_map(Check::refs).collect();
         refs.sort_by_key(name::name);
         refs.dedup();
@@ -1247,7 +1261,12 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                 _ => None,
             };
             if let Some((found_cause, word)) = said {
-                found.push((found_cause, format!("{} is {word}", name::name(reference))));
+                let named = super::null_step_name(reference, &outer)
+                    .unwrap_or_else(|| name::name(reference));
+                let text = format!("{named} is {word}");
+                if !root_texts.contains(&text) {
+                    found.push((found_cause, text));
+                }
             }
         }
         let mut at = outer.clone();
@@ -1343,12 +1362,14 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
                 _ => {}
             }
         }
-        let said: Vec<String> = found
-            .into_iter()
-            .enumerate()
-            .filter(|(at, (c, _))| *c == cause || always.contains(at))
-            .map(|(_, (_, text))| text)
-            .collect();
+        let said: Vec<String> = super::message::once_of(
+            found
+                .into_iter()
+                .enumerate()
+                .filter(|(at, (c, _))| *c == cause || always.contains(at))
+                .map(|(_, (_, text))| text)
+                .collect(),
+        );
         if !said.is_empty() {
             out.push(super::message::joined(said));
         }

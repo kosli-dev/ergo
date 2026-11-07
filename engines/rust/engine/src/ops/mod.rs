@@ -30,9 +30,17 @@ pub struct Input {
     pub locations: Vec<String>,
     pub part: Option<Part>,
     pub state: Outcome,
+    pub null_at: Option<String>,
 }
 
 impl Input {
+    pub fn stopped_at(&self) -> &str {
+        match (self.state, &self.null_at) {
+            (Outcome::Null, Some(name)) => name,
+            _ => &self.name,
+        }
+    }
+
     pub fn to_json(&self) -> Value {
         let mut entry = Map::new();
         entry.insert("name".to_string(), json!(self.name));
@@ -76,6 +84,7 @@ pub fn read_path(path: &Path, ctx: &Ctx) -> ReadPath {
         locations: read.location.iter().map(|l| l.render()).collect(),
         part: path::part_tag(path, ctx).map(|(name, id)| Part { name, id }),
         state: read.outcome,
+        null_at: null_step_name(path, ctx),
     }];
     inputs.extend(field_inputs(path, ctx));
     ReadPath {
@@ -84,6 +93,21 @@ pub fn read_path(path: &Path, ctx: &Ctx) -> ReadPath {
         value,
         inputs,
     }
+}
+
+pub fn null_step_name(path: &Path, ctx: &Ctx) -> Option<String> {
+    let read = path::read(path, ctx);
+    if read.outcome != path::Outcome::Null || read.step_unreadable {
+        return None;
+    }
+    (0..path.steps.len()).find_map(|at| {
+        let prefix = Path {
+            start: path.start.clone(),
+            steps: path.steps[..at].to_vec(),
+        };
+        let read = path::read(&prefix, ctx);
+        (read.outcome == path::Outcome::Null).then(|| name::name(&prefix))
+    })
 }
 
 pub fn field_inputs(path: &Path, ctx: &Ctx) -> Vec<Input> {
@@ -101,6 +125,7 @@ pub fn field_inputs(path: &Path, ctx: &Ctx) -> Vec<Input> {
                     locations: found.location.iter().map(|l| l.render()).collect(),
                     part: None,
                     state: found.outcome,
+                    null_at: None,
                 })
             }
             _ => None,
