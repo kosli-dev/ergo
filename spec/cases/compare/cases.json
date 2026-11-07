@@ -48,7 +48,7 @@
         "rules": ["compare.fail"],
         "input": {"things": [{"b": null, "id": "t1"}]},
         "results": [
-          {"requirement": "s", "subject": {"type": "thing", "id": "t1"}, "check": "c", "message": ".a is missing", "passed": false, "cause": "absent", "inputs": [{"name": ".a", "value": null, "locations": ["/things/0"]}, {"name": "b", "value": null, "locations": ["/things/0/b"]}]}
+          {"requirement": "s", "subject": {"id": "t1", "type": "thing"}, "check": "c", "message": ".a is missing, and b is null", "passed": false, "cause": "absent", "inputs": [{"locations": ["/things/0"], "name": ".a", "value": null}, {"locations": ["/things/0/b"], "name": "b", "value": null}]}
         ]
       }
     ]

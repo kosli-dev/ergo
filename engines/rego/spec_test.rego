@@ -182,10 +182,21 @@ test_the_that_cases_pass if {
 	_compiled_differences("that") == set()
 }
 
-test_the_messages_cases_pass if {
-	_topic_failures("messages") == _known_in("messages")
-	_compiled_differences("messages") == set()
-}
+test_the_messages_cases_pass_part_1_of_4 if _part_passes("messages", 0, 4)
+
+test_the_messages_cases_pass_compiled_part_1_of_4 if _differences_compiled("messages", _part("messages", 0, 4)) == set()
+
+test_the_messages_cases_pass_part_2_of_4 if _part_passes("messages", 1, 4)
+
+test_the_messages_cases_pass_compiled_part_2_of_4 if _differences_compiled("messages", _part("messages", 1, 4)) == set()
+
+test_the_messages_cases_pass_part_3_of_4 if _part_passes("messages", 2, 4)
+
+test_the_messages_cases_pass_compiled_part_3_of_4 if _differences_compiled("messages", _part("messages", 2, 4)) == set()
+
+test_the_messages_cases_pass_part_4_of_4 if _part_passes("messages", 3, 4)
+
+test_the_messages_cases_pass_compiled_part_4_of_4 if _differences_compiled("messages", _part("messages", 3, 4)) == set()
 
 test_the_missing_cases_pass if {
 	_topic_failures("missing") == _known_in("missing")

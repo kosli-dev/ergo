@@ -12369,3 +12369,28 @@ test_two_roots_that_fail_in_one_relative_clause_are_both_named if {
 	r.check == "c"
 	r.message == "$params.q is missing; pr.z is missing"
 }
+
+_root_rows(checks, item, params) := {r.check: [r.cause, r.message] |
+	some r in ergo.report({"prs": [item]}, {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": checks}}}, params).results
+	not startswith(r.check, "$")
+}
+
+test_two_list_roots_of_the_wrong_type_are_both_named_on_a_list_with_items if {
+	rows := _root_rows({"c": "count of xs whose v is in $params.l and whose w is in pr.l is 0"}, {"id": "p", "l": 3, "xs": [{"v": 1, "w": 1}, {}]}, {"l": "s"})
+	rows.c == ["unusable", "$params.l is \"s\", which isn't a list; pr.l is 3, which isn't a list"]
+}
+
+test_every_root_that_failed_is_named_whatever_its_cause if {
+	rows := _root_rows({"c": "every xs whose w is in pr.l and whose v is in $params.l, if any, exists"}, {"id": "p", "l": "s", "xs": []}, {"l": null})
+	rows.c == ["unusable", "pr.l is \"s\", which isn't a list; $params.l is null"]
+}
+
+test_a_root_read_through_null_inside_a_relative_clause_names_the_null_step_once if {
+	rows := _root_rows({"c": "count of xs whose v is in $params.c.z is 0"}, {"id": "p", "xs": []}, {"c": null})
+	rows.c == ["null", "$params.c is null"]
+}
+
+test_both_sides_of_a_comparison_are_named_when_one_is_missing_and_the_other_null if {
+	rows := _root_rows({"c": "c.z is d.z"}, {"id": "p", "c": {}, "d": null}, {})
+	rows.c == ["absent", "c.z is missing, and d is null"]
+}
