@@ -2977,7 +2977,7 @@ mod tests {
             "thing",
             json!({"p": "thing"}),
             "count of ys whose thing is p is 1",
-            json!({"xs": [[1, 2]]}),
+            json!({"xs": [3]}),
         );
         assert_eq!(row["cause"], "not_an_object");
         let names: Vec<&str> = row["inputs"]

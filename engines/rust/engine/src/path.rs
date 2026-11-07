@@ -221,6 +221,9 @@ pub fn resolve(step: &Step, ctx: &Ctx) -> Result<Resolved, Outcome> {
         }
         Step::Ref(reference) => {
             let read = read(reference, ctx);
+            if reference.start == Start::Input && read.outcome == Outcome::NotAnObject {
+                return Err(Outcome::Unusable);
+            }
             if read.outcome != Outcome::Found {
                 return Err(read.outcome);
             }
@@ -245,7 +248,7 @@ fn found_or_absent<'a>(at: &Located<'a>) -> Result<(&'a Value, Location, bool), 
 pub fn start_of<'a>(start: &Start, ctx: &Ctx<'a>) -> Result<(&'a Value, Location, bool), Read<'a>> {
     match start {
         Start::Subject | Start::Own => found_or_absent(&ctx.subject),
-        Start::Input => Ok((ctx.input, Location::input_root(), false)),
+        Start::Input => Ok((ctx.input, Location::input_root(), true)),
         Start::Params => match ctx.params {
             Some(params) => Ok((params, Location::params_root(), false)),
             None => Err(ended(Outcome::Absent, Location::params_root())),
@@ -685,11 +688,14 @@ mod tests {
     }
 
     #[test]
-    fn an_input_that_is_not_an_object_does_not_give_not_an_object() {
+    fn a_key_on_an_input_that_is_not_an_object_gives_not_an_object_and_a_position_reads_it() {
         let w = World::new("{}").with_input("[1]");
         let (o, _, l) = w.run(&at(Start::Input, vec![key("a")]));
-        assert_eq!(o, Outcome::Unusable);
+        assert_eq!(o, Outcome::NotAnObject);
         assert_eq!(l, loc(""));
+        let (o, _, l) = w.run(&at(Start::Input, vec![Step::Index(0), key("a")]));
+        assert_eq!(o, Outcome::Unusable);
+        assert_eq!(l, loc("/0"));
     }
 
     #[test]

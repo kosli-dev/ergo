@@ -1525,6 +1525,7 @@ impl For {
     fn run_items(&self, ctx: &Ctx) -> Run {
         let first = &self.items[0];
         let whole_subject = !ctx.subject.value.is_object()
+            && (!ctx.subject.value.is_array() || matches!(first.how, How::Pick { .. }))
             && first.path.steps.is_empty()
             && match &first.path.start {
                 Start::Subject => true,
@@ -2509,9 +2510,9 @@ mod tests {
     }
 
     #[test]
-    fn a_for_line_over_the_subject_by_its_name_fails_as_not_an_object_on_a_subject_that_is_not_an_object()
+    fn a_for_line_over_the_subject_by_its_name_fails_as_not_an_object_on_a_subject_that_is_not_an_object_or_a_list()
      {
-        for subject in [json!(["a"]), json!("text"), json!([]), json!([{"k": 1}])] {
+        for subject in [json!("text"), json!(3), json!(null)] {
             let policy = json!({
                 "ergo_spec": "v0.6-dev",
                 "subjects": {"thing": {"from": "every xs"}},

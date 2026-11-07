@@ -228,15 +228,37 @@ fn item_fault(walked: &walk::Walked, item: &walk::WalkItem) -> Option<(Cause, Ve
     }
 }
 
+pub(super) fn starts_at_a_list(path: &Path, ctx: &Ctx) -> bool {
+    !matches!(path.start, Start::Subject | Start::Own | Start::Params)
+        && !path::is_root(&path.start)
+        && path::start_of(&path.start, ctx).is_ok_and(|(value, _, _)| value.is_array())
+        && matches!(
+            path::leading_steps(&path.start)
+                .iter()
+                .chain(path.steps.iter())
+                .next(),
+            Some(Step::Key(_))
+        )
+}
+
 pub fn walked(path: &Path, ctx: &Ctx) -> Option<Walked> {
+    walked_from(path, ctx, true)
+}
+
+fn walked_from(path: &Path, ctx: &Ctx, from_start: bool) -> Option<Walked> {
     let simple = path
         .steps
         .iter()
         .all(|step| matches!(step, Step::Key(_) | Step::Index(_)));
     let params_that_arent_an_object = path.start == crate::path::Start::Params
         && ctx.params.is_some_and(|params| !params.is_object());
-    if !simple || params_that_arent_an_object || path::read(path, ctx).outcome != Outcome::Unusable
-    {
+    let list_start = || starts_at_a_list(path, ctx);
+    let walks = match path::read(path, ctx).outcome {
+        Outcome::Unusable => true,
+        Outcome::NotAnObject => from_start && list_start(),
+        _ => false,
+    };
+    if !simple || params_that_arent_an_object || !walks {
         return None;
     }
     let walked = walk::walk(path, ctx, Options::default());
@@ -905,14 +927,29 @@ fn input_one_path(path: &Path, ctx: &Ctx) -> bool {
 }
 
 pub fn input_one_fault(check: &super::Check, ctx: &Ctx) -> Vec<String> {
-    match check {
-        super::Check::Contains(Contains {
-            wanted: Wanted::One(Right::Ref(path)),
-            ..
-        }) if input_one_path(path, ctx) => {
-            vec![super::message::isnt("$input", ctx.input, "an object")]
-        }
-        _ => Vec::new(),
+    let mut paths: Vec<&Path> = match check {
+        super::Check::Compare(c) => [&c.left, &c.right]
+            .into_iter()
+            .filter_map(|side| match side {
+                super::compare::Side::Path(path) => Some(path),
+                _ => None,
+            })
+            .collect(),
+        super::Check::Tally(t) => [Some(&t.left), t.right.as_ref()]
+            .into_iter()
+            .flatten()
+            .filter_map(|side| match side {
+                super::tally::Side::Plain(super::compare::Side::Path(path)) => Some(path),
+                _ => None,
+            })
+            .collect(),
+        other => other.left_path().into_iter().collect(),
+    };
+    paths.extend(one_rights(check));
+    if paths.iter().any(|path| input_one_path(path, ctx)) {
+        vec![super::message::isnt("$input", ctx.input, "an object")]
+    } else {
+        Vec::new()
     }
 }
 
@@ -920,7 +957,7 @@ pub fn walked_in(check: &super::Check, path: &Path, ctx: &Ctx) -> Option<Walked>
     if one_rights(check).contains(&path) {
         return None;
     }
-    walked(path, ctx)
+    walked_from(path, ctx, right_paths(check).contains(&path))
 }
 
 pub fn walk_fault(check: &super::Check, ctx: &Ctx) -> Option<(Cause, String)> {

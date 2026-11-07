@@ -781,7 +781,8 @@ pub(super) fn path_needs_an_object_subject(path: &Path, ctx: &Ctx) -> bool {
         Start::Part(part) => {
             part.base == Start::Subject
                 && !(part.steps.is_empty()
-                    && matches!(path.steps.first(), None | Some(Step::Index(_))))
+                    && (ctx.subject.value.is_array()
+                        || matches!(path.steps.first(), None | Some(Step::Index(_)))))
         }
         _ => false,
     }
@@ -1352,7 +1353,9 @@ fn walk_faults(walk: &Walk, outer_ctx: &Ctx) -> Vec<String> {
         .chain(std::iter::once(&*walk.check))
         .collect();
     let mut faults = message::key_faults_of(&walk.path, outer_ctx);
-    faults.extend(message::blocked_of(&walk.path, outer_ctx));
+    if !through_a_list(&walk.path, outer_ctx) {
+        faults.extend(message::blocked_of(&walk.path, outer_ctx));
+    }
     faults.extend(message::ref_fault_list(&checks, outer_ctx));
     if faults.is_empty() {
         vec!["the check is false".to_string()]
