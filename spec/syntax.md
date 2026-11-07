@@ -454,7 +454,7 @@ The field has that JSON type, or, after `is not`, has another one. Either articl
 <path> does not contain <value or field>
 ```
 
-The field is a list that holds the value, or doesn't. Missing: `absent`. `null`: `null`. Not a list: `unusable`. Wrong type: `unusable`, when the list's items and the value have more than one type, leaving `null` aside, so `labels contains 1` on `["1"]` can't rule a subject out. `does not contain` passes on an empty list.
+The field is a list that holds the value, or doesn't. The value is one value and a path to it never walks a list, so a list it reads is looked for as one item: `pairs contains pair` passes when `pair` is `["a", "b"]` and `pairs` holds `["a", "b"]` ([contains.value](semantics.md#includes-and-excludes)). To look for each value of a list, write `contains all of`, `contains some of` or `contains none of`. Missing: `absent`. `null`: `null`. Not a list: `unusable`. Wrong type: `unusable`, when the list's items and the value have more than one type, leaving `null` aside, so `labels contains 1` on `["1"]` can't rule a subject out. `does not contain` passes on an empty list.
 
 **[sentence.phrase.contains_all]**
 ```

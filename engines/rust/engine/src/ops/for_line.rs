@@ -66,6 +66,19 @@ impl For {
         }
         refs
     }
+
+    pub fn walking_refs(&self) -> Vec<Path> {
+        let mut refs = Vec::new();
+        for item in &self.items {
+            for check in &item.whose {
+                refs.extend(check.walking_refs());
+            }
+        }
+        for sentence in &self.sentences {
+            refs.extend(sentence.check.walking_refs());
+        }
+        refs
+    }
 }
 
 pub struct Run {

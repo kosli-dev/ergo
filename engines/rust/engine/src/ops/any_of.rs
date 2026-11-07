@@ -14,6 +14,10 @@ impl AnyOf {
         self.checks().flat_map(Check::refs).collect()
     }
 
+    pub fn walking_refs(&self) -> Vec<Path> {
+        self.checks().flat_map(Check::walking_refs).collect()
+    }
+
     pub fn paths(&self) -> Vec<&Path> {
         self.checks().flat_map(Check::paths).collect()
     }

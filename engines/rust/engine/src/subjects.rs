@@ -1288,6 +1288,8 @@ fn ref_fits(value: &Value, kind: &str) -> bool {
     }
 }
 
+type RefState<'a> = (String, Outcome, Option<Value>, &'a str, Option<String>);
+
 fn ref_message(env: &Env, lowered: &Lowered, anc: &[Anc], cause: Cause) -> Option<String> {
     let (Source::Root { path, each_of, .. } | Source::Child { path, each_of, .. }) =
         &lowered.source;
@@ -1299,43 +1301,49 @@ fn ref_message(env: &Env, lowered: &Lowered, anc: &[Anc], cause: Cause) -> Optio
     if let Some(keys) = each_of {
         listed.push((keys.clone(), "a list of text"));
     }
-    let states: Vec<(String, Outcome, Option<Value>, &str)> = listed
+    let states: Vec<RefState> = listed
         .iter()
         .map(|(reference, kind)| {
             let read = path::read(reference, &ctx);
+            let blocked = path::start_of(&reference.start, &ctx)
+                .is_ok_and(|(start, _, _)| start.is_object())
+                .then(|| ops::message::blocked_of(reference, &ctx).into_iter().next())
+                .flatten();
             (
                 crate::name::name(reference),
                 read.outcome,
                 read.value.cloned(),
                 *kind,
+                blocked,
             )
         })
         .collect();
-    let says =
-        |name: &str, outcome: Outcome, value: &Option<Value>, kind: &str, want: Option<Cause>| {
-            match (outcome, value) {
-                (Outcome::Absent, _) if want.is_none_or(|c| c == Cause::Absent) => {
-                    Some(format!("{name} is missing"))
-                }
-                (Outcome::Null, _) if want.is_none_or(|c| c == Cause::Null) => {
-                    Some(format!("{name} is null"))
-                }
-                (Outcome::Found, Some(value))
-                    if want.is_none_or(|c| c == Cause::Unusable) && !ref_fits(value, kind) =>
-                {
-                    Some(ops::message::isnt(name, value, kind))
-                }
-                _ => None,
-            }
-        };
+    let says = |(name, outcome, value, kind, blocked): &RefState, want: Option<Cause>| match (
+        *outcome, value,
+    ) {
+        (Outcome::Unusable, _) if want.is_none_or(|c| c == Cause::Unusable) => blocked.clone(),
+        (Outcome::Absent, _) if want.is_none_or(|c| c == Cause::Absent) => {
+            Some(format!("{name} is missing"))
+        }
+        (Outcome::Null, _) if want.is_none_or(|c| c == Cause::Null) => {
+            Some(format!("{name} is null"))
+        }
+        (Outcome::Found, Some(value))
+            if want.is_none_or(|c| c == Cause::Unusable) && !ref_fits(value, kind) =>
+        {
+            Some(ops::message::isnt(name, value, kind))
+        }
+        _ => None,
+    };
     let unread_params = ctx.params.filter(|p| !p.is_object() && !p.is_null());
     if let Some(params) = unread_params
         && listed.iter().any(|(r, _)| r.start == Start::Params)
     {
         let mut said: Vec<String> = Vec::new();
-        for ((reference, _), (name, outcome, value, kind)) in listed.iter().zip(&states) {
+        for ((reference, _), state) in listed.iter().zip(&states) {
+            let (name, outcome, value, kind, _) = state;
             let text = if reference.start != Start::Params {
-                says(name, *outcome, value, kind, None)
+                says(state, None)
             } else if let (Outcome::Found, Some(found)) = (outcome, value)
                 && !ref_fits(found, kind)
             {
@@ -1356,12 +1364,12 @@ fn ref_message(env: &Env, lowered: &Lowered, anc: &[Anc], cause: Cause) -> Optio
     }
     let mut said: Vec<String> = states
         .iter()
-        .filter_map(|(name, outcome, value, kind)| says(name, *outcome, value, kind, Some(cause)))
+        .filter_map(|state| says(state, Some(cause)))
         .collect();
     if said.is_empty() {
         said = states
             .iter()
-            .filter_map(|(name, outcome, value, kind)| says(name, *outcome, value, kind, None))
+            .filter_map(|state| says(state, None))
             .collect();
     }
     (!said.is_empty()).then(|| ops::message::joined(said))

@@ -363,15 +363,30 @@ pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<Str
 }
 
 pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value> {
-    let paths: Vec<Path> = plan
+    let paths: Vec<(Path, bool)> = plan
         .items
         .iter()
-        .flat_map(|item| item.check.refs())
+        .flat_map(|item| {
+            let walking = item.check.walking_refs();
+            item.check
+                .refs()
+                .into_iter()
+                .map(|reference| {
+                    let walks = walking.contains(&reference);
+                    (reference, walks)
+                })
+                .collect::<Vec<_>>()
+        })
         .collect();
-    refs_read(&paths, input, params)
+    refs_walked(&paths, input, params)
 }
 
 pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<Value> {
+    let paths: Vec<(Path, bool)> = paths.iter().map(|p| (p.clone(), false)).collect();
+    refs_walked(&paths, input, params)
+}
+
+fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) -> Vec<Value> {
     let ctx = Ctx {
         label: None,
         subject: Located {
@@ -383,8 +398,8 @@ pub fn refs_read(paths: &[Path], input: &Value, params: Option<&Value>) -> Vec<V
         aliases: BTreeMap::new(),
     };
     let mut entries: Vec<Value> = Vec::new();
-    for reference in paths {
-        if let Some(walk) = crate::ops::lists::walked(reference, &ctx) {
+    for (reference, walks) in paths {
+        if let Some(walk) = crate::ops::lists::walked(reference, &ctx).filter(|_| *walks) {
             entries.push(serde_json::json!({
                 "name": walk.name,
                 "value": walk.value,

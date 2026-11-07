@@ -337,7 +337,7 @@ fn blocked(check: &Check, ctx: &Ctx, late: bool) -> Vec<String> {
                 (rights.contains(path) && matches!(path.start, Start::Input | Start::Params))
                     == late
             })
-            .filter(|path| !rights.contains(path) || lists::walked(path, ctx).is_none())
+            .filter(|path| !rights.contains(path) || lists::walked_in(check, path, ctx).is_none())
             .flat_map(|path| blocked_of(path, ctx))
             .collect(),
     )
@@ -666,6 +666,7 @@ pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
             let subject = ctx.subject.value;
             if subject.is_object() {
                 let mut found = aliases_blocked(check, ctx);
+                found.extend(lists::input_one_fault(check, ctx));
                 if let Check::Tally(t) = check {
                     found.extend(
                         tally::tally_sides(t)
@@ -1360,7 +1361,7 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                 {
                     continue;
                 }
-                if lists::walked(&root, ctx).is_some() {
+                if lists::walked_in(check, &root, ctx).is_some() {
                     continue;
                 }
                 let counted = match check {
@@ -1369,6 +1370,13 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                 };
                 if counted && let Some(found) = first_null_step(&root, ctx) {
                     return Some(found);
+                }
+                if !is_key
+                    && lists::one_rights(check).contains(&&root)
+                    && let Some(text) = lists::input_one_fault(check, ctx).into_iter().next()
+                {
+                    found.push((Cause::NotAnObject, text, false));
+                    continue;
                 }
                 let read = path::read(&root, ctx);
                 if let Some(cause) = read.outcome.cause() {

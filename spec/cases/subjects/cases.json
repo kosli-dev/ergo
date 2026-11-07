@@ -29015,5 +29015,89 @@
         "results": [{"cause": "not_an_object", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope u count", "value": 0}], "message": "b is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it", "passed": false, "requirement": "r", "subject": {"id": null, "in": {"b": [{"runs": {"x": {"ok": true}}}]}, "type": "u"}}]
       }
     ]
+  },
+  {
+    "description": "a from line with named by each of a list read through a list",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input.things[0].m named by each of $input.a.k"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "v is 1"}}}},
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable and names the list, where the keys of its items used to be read",
+        "rules": ["subjects.keyed.list"],
+        "input": {"things": [{"m": {"x": {"v": 1}, "y": {"v": 1}}}], "a": [{"k": "x"}, {"k": "y"}]},
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$input.a is [{\"k\": \"x\"}, {\"k\": \"y\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}
+        ]
+      },
+      {
+        "description": "names an empty list the same way",
+        "rules": ["subjects.keyed.list"],
+        "input": {"things": [{"m": {"x": {"v": 1}}}], "a": []},
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$input.a is [], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}
+        ]
+      },
+      {
+        "description": "names text where the read stopped",
+        "rules": ["subjects.keyed.list"],
+        "input": {"things": [{"m": {"x": {"v": 1}}}], "a": "zz"},
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$input.a is \"zz\", which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}
+        ]
+      },
+      {
+        "description": "reads the keys of an object",
+        "rules": ["subjects.keyed.list"],
+        "input": {"things": [{"m": {"x": {"v": 1}, "y": {"v": 2}}}], "a": {"k": ["x", "y"]}},
+        "results": [
+          {"cause": "satisfied", "check": "$min_subjects", "inputs": [{"locations": ["/things/0/m/x", "/things/0/m/y"], "name": "in-scope t count", "value": 2}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "t"}},
+          {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/m/x/v"], "name": "v", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": "x", "type": "t"}},
+          {"cause": "value", "check": "c", "inputs": [{"locations": ["/things/0/m/y/v"], "name": "v", "value": 2}], "message": "v is 2", "passed": false, "requirement": "r", "subject": {"id": "y", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a list read through a param that is a list",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "m named by each of $params.a.k"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "v is 1"}}}},
+    "params": {"a": [{"k": "x"}]},
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable and names the param",
+        "rules": ["subjects.keyed.list"],
+        "input": {"m": {"x": {"v": 1}}},
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$params.a is [{\"k\": \"x\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a list from an input that is a list",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input named by each of $input.ks"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "v is 1"}}}},
+    "cases": [
+      {
+        "description": "fails min_subjects as unusable and says the input is a list",
+        "rules": ["subjects.keyed.list", "subjects.keyed.list_before"],
+        "input": [{"m": {"x": {"v": 1}}, "ks": ["x"]}],
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$input is a list, but named by each of reads the keys of one object: make each item a subject and read the keys in it", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a from line with named by each of a list read through a list, and its $refs",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input.m named by each of $input.a.k"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "v is 1"}}}},
+    "cases": [
+      {
+        "description": "lists the keys unread in $refs, where it listed what it read from each item",
+        "rules": ["subjects.keyed.list"],
+        "input": {"m": {"x": {"v": 1}}, "a": [{"k": "x"}]},
+        "results": [
+          {"cause": "unusable", "check": "$min_subjects", "inputs": [{"locations": [], "name": "in-scope t count", "value": 0}], "message": "$input.a is [{\"k\": \"x\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": null, "type": "t"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated t ids", "value": []}], "passed": true, "requirement": "r", "subject": {"id": null, "type": "t"}}
+        ]
+      }
+    ]
   }
 ]

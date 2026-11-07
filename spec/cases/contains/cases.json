@@ -256,5 +256,248 @@
         ]
       }
     ]
+  },
+  {
+    "description": "contains with a path on the right that ends at a list",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"pair": "pairs contains pair", "no_pair": "pairs does not contain pair", "pair_input": "pairs contains $input.pair"}}}},
+    "cases": [
+      {
+        "description": "finds the list as one value in a list of lists",
+        "rules": ["contains.value", "sentence.phrase.contains"],
+        "input": {"pair": ["a", "b"], "things": [{"id": "t1", "pairs": [["a", "b"], ["c", "d"]], "pair": ["a", "b"]}]},
+        "results": [
+          {"cause": "value", "check": "no_pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"], ["c", "d"]]}, {"locations": ["/things/0/pair"], "name": "pair", "value": ["a", "b"]}], "message": "pairs is [[\"a\", \"b\"], [\"c\", \"d\"]], and pair is [\"a\", \"b\"]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"], ["c", "d"]]}, {"locations": ["/things/0/pair"], "name": "pair", "value": ["a", "b"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "pair_input", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"], ["c", "d"]]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as value when the list of lists doesn't hold it",
+        "rules": ["contains.value", "contains.fail"],
+        "input": {"pair": ["e", "f"], "things": [{"id": "t1", "pairs": [["c", "d"]], "pair": ["e", "f"]}]},
+        "results": [
+          {"cause": "satisfied", "check": "no_pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["c", "d"]]}, {"locations": ["/things/0/pair"], "name": "pair", "value": ["e", "f"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["c", "d"]]}, {"locations": ["/things/0/pair"], "name": "pair", "value": ["e", "f"]}], "message": "pairs is [[\"c\", \"d\"]], and pair is [\"e\", \"f\"]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "pair_input", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["c", "d"]]}], "message": "pairs is [[\"c\", \"d\"]], and $input.pair is [\"e\", \"f\"]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as absent when the value is missing",
+        "rules": ["contains.value", "contains.fail"],
+        "input": {"things": [{"id": "t1", "pairs": [["a", "b"]]}]},
+        "results": [
+          {"cause": "absent", "check": "no_pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}, {"locations": ["/things/0"], "name": "pair", "value": null}], "message": "pair is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}, {"locations": ["/things/0"], "name": "pair", "value": null}], "message": "pair is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "pair_input", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}], "message": "$input.pair is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as null when the value is null",
+        "rules": ["contains.value", "contains.fail"],
+        "input": {"pair": null, "things": [{"id": "t1", "pairs": [["a", "b"]], "pair": null}]},
+        "results": [
+          {"cause": "null", "check": "no_pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}, {"locations": ["/things/0/pair"], "name": "pair", "value": null}], "message": "pair is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}, {"locations": ["/things/0/pair"], "name": "pair", "value": null}], "message": "pair is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "null", "check": "pair_input", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}], "message": "$input.pair is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as unusable when the value has another type than the items",
+        "rules": ["contains.value", "contains.fail"],
+        "input": {"pair": "a", "things": [{"id": "t1", "pairs": [["a", "b"]], "pair": "a"}]},
+        "results": [
+          {"cause": "unusable", "check": "no_pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}, {"locations": ["/things/0/pair"], "name": "pair", "value": "a"}], "message": "pairs is [[\"a\", \"b\"]], which isn't a list of text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}, {"locations": ["/things/0/pair"], "name": "pair", "value": "a"}], "message": "pairs is [[\"a\", \"b\"]], which isn't a list of text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "pair_input", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}], "message": "pairs is [[\"a\", \"b\"]], which isn't a list of text", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains with a path on the right that meets a list on the way",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"name": "labels contains x.name", "no_name": "labels does not contain x.name", "input_name": "labels contains $input.x.name"}}}},
+    "cases": [
+      {
+        "description": "fails as unusable and names the list, where a walk read each item's name and passed",
+        "rules": ["contains.value", "walk.right", "path.unusable"],
+        "input": {"x": [{"name": "a"}], "things": [{"id": "t1", "labels": [["a"]], "x": [{"name": "a"}]}]},
+        "results": [
+          {"cause": "unusable", "check": "input_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": [["a"]]}], "message": "$input.x is [{\"name\": \"a\"}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": [["a"]]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is [{\"name\": \"a\"}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "no_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": [["a"]]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is [{\"name\": \"a\"}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as unusable on a list of lists",
+        "rules": ["contains.value", "path.unusable"],
+        "input": {"x": [["a"]], "things": [{"id": "t1", "labels": ["a"], "x": [["a"]]}]},
+        "results": [
+          {"cause": "unusable", "check": "input_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}], "message": "$input.x is [[\"a\"]], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is [[\"a\"]], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "no_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is [[\"a\"]], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as unusable on an empty list, where a walk failed as value",
+        "rules": ["contains.value", "path.unusable"],
+        "input": {"x": [], "things": [{"id": "t1", "labels": ["a"], "x": []}]},
+        "results": [
+          {"cause": "unusable", "check": "input_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}], "message": "$input.x is [], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is [], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "no_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is [], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "passes when the path meets no list",
+        "rules": ["contains.value", "contains.pass"],
+        "input": {"x": {"name": "a"}, "things": [{"id": "t1", "labels": ["a"], "x": {"name": "a"}}]},
+        "results": [
+          {"cause": "satisfied", "check": "input_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x/name"], "name": "x.name", "value": "a"}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "value", "check": "no_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x/name"], "name": "x.name", "value": "a"}], "message": "labels is [\"a\"], and x.name is \"a\"", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as absent when the holder is missing",
+        "rules": ["contains.value", "path.absent"],
+        "input": {"things": [{"id": "t1", "labels": ["a"]}]},
+        "results": [
+          {"cause": "absent", "check": "input_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}], "message": "$input.x.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0"], "name": "x.name", "value": null}], "message": "x.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "no_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0"], "name": "x.name", "value": null}], "message": "x.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as absent when the holder is null",
+        "rules": ["contains.value", "path.absent"],
+        "input": {"x": null, "things": [{"id": "t1", "labels": ["a"], "x": null}]},
+        "results": [
+          {"cause": "absent", "check": "input_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}], "message": "$input.x.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "absent", "check": "no_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x.name is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      },
+      {
+        "description": "fails as unusable when the holder is text",
+        "rules": ["contains.value", "path.unusable"],
+        "input": {"x": "zz", "things": [{"id": "t1", "labels": ["a"], "x": "zz"}]},
+        "results": [
+          {"cause": "unusable", "check": "input_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}], "message": "$input.x is \"zz\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is \"zz\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "no_name", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": ["a"]}, {"locations": ["/things/0/x"], "name": "x.name", "value": null}], "message": "x is \"zz\", which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains with a path from $params",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"pair": "pairs contains $params.pair", "has": "labels contains $params.x.name", "lacks": "labels does not contain $params.x.name"}}}},
+    "params": {"pair": ["a", "b"], "x": [{"name": "a"}]},
+    "cases": [
+      {
+        "description": "finds a list the param ends at as one value, and fails as unusable and names the param when it meets a list on the way",
+        "rules": ["contains.value", "path.unusable"],
+        "input": {"things": [{"id": "t1", "pairs": [["a", "b"]], "labels": [["a"]]}]},
+        "results": [
+          {"cause": "unusable", "check": "has", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": [["a"]]}], "message": "$params.x is [{\"name\": \"a\"}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "unusable", "check": "lacks", "inputs": [{"locations": ["/things/0/labels"], "name": "labels", "value": [["a"]]}], "message": "$params.x is [{\"name\": \"a\"}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}},
+          {"cause": "satisfied", "check": "pair", "inputs": [{"locations": ["/things/0/pairs"], "name": "pairs", "value": [["a", "b"]]}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains with a path from $input on an input that is a list",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"has": "tags contains $input.k", "lacks": "tags does not contain $input.k", "all": "tags contains all of $input.k"}}}},
+    "cases": [
+      {
+        "description": "fails as not_an_object and names the input, where contains used to read each item, and contains all of still does",
+        "rules": ["contains.value", "walk.right"],
+        "input": [{"id": "a", "k": "x", "tags": ["x"]}, {"id": "b", "k": "y", "tags": ["z"]}],
+        "results": [
+          {"cause": "value", "check": "all", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "message": "tags is [\"x\"], and $input[].k is [\"x\", \"y\"]", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "not_an_object", "check": "has", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "message": "$input is [{\"id\": \"a\", \"k\": \"x\", \"tags\": [\"x\"]}, {\"id\": \"b\", \"k\": \"y\", \"tags\": [\"z\"]}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "not_an_object", "check": "lacks", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["x"]}], "message": "$input is [{\"id\": \"a\", \"k\": \"x\", \"tags\": [\"x\"]}, {\"id\": \"b\", \"k\": \"y\", \"tags\": [\"z\"]}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}},
+          {"cause": "value", "check": "all", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "message": "tags is [\"z\"], and $input[].k is [\"x\", \"y\"]", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "not_an_object", "check": "has", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "message": "$input is [{\"id\": \"a\", \"k\": \"x\", \"tags\": [\"x\"]}, {\"id\": \"b\", \"k\": \"y\", \"tags\": [\"z\"]}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}},
+          {"cause": "not_an_object", "check": "lacks", "inputs": [{"locations": ["/1/tags"], "name": "tags", "value": ["z"]}], "message": "$input is [{\"id\": \"a\", \"k\": \"x\", \"tags\": [\"x\"]}, {\"id\": \"b\", \"k\": \"y\", \"tags\": [\"z\"]}], which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "b", "type": "thing"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains with a path from $input on an input that is a list, that starts with a position or has no step",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"at": "tags contains $input[0].k", "not_at": "tags does not contain $input[0].k", "whole": "tags contains $input", "not_whole": "tags does not contain $input"}}}},
+    "cases": [
+      {
+        "description": "reads the item at the position and compares, and reads the input itself as one value",
+        "rules": ["contains.value", "contains.fail"],
+        "input": [{"id": "t", "k": "z", "tags": ["a"]}],
+        "results": [
+          {"cause": "value", "check": "at", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}], "message": "tags is [\"a\"], and $input[0].k is \"z\"", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "satisfied", "check": "not_at", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}], "passed": true, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "unusable", "check": "not_whole", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}], "message": "tags is [\"a\"], which isn't a list of lists", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "unusable", "check": "whole", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}], "message": "tags is [\"a\"], which isn't a list of lists", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      },
+      {
+        "description": "reads the input itself as one value, so does not contain passes when no item equals it",
+        "rules": ["contains.value", "contains.pass"],
+        "input": [{"id": "x", "k": "a", "tags": [[{"id": "x", "k": "a"}]]}],
+        "results": [
+          {"cause": "unusable", "check": "at", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": [[{"id": "x", "k": "a"}]]}], "message": "tags is [[{\"id\": \"x\", \"k\": \"a\"}]], which isn't a list of text", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "t"}},
+          {"cause": "unusable", "check": "not_at", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": [[{"id": "x", "k": "a"}]]}], "message": "tags is [[{\"id\": \"x\", \"k\": \"a\"}]], which isn't a list of text", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "t"}},
+          {"cause": "satisfied", "check": "not_whole", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": [[{"id": "x", "k": "a"}]]}], "passed": true, "requirement": "r", "subject": {"id": "x", "type": "t"}},
+          {"cause": "value", "check": "whole", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": [[{"id": "x", "k": "a"}]]}], "message": "tags is [[{\"id\": \"x\", \"k\": \"a\"}]], and $input is [{\"id\": \"x\", \"k\": \"a\", \"tags\": [[{\"id\": \"x\", \"k\": \"a\"}]]}]", "passed": false, "requirement": "r", "subject": {"id": "x", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains with a path from $input on an input that is a list, inside a whose",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of items whose tags contains $input.k is 1", "not_count": "count of items whose tags does not contain $input.k is 1", "every": "every items whose tags contains $input.k exists"}}}},
+    "cases": [
+      {
+        "description": "fails as not_an_object and says it once, with no item",
+        "rules": ["contains.value", "message.items"],
+        "input": [{"id": "t", "k": "a", "items": [{"tags": ["a"]}, {"tags": ["b"]}]}],
+        "results": [
+          {"cause": "not_an_object", "check": "count", "inputs": [{"locations": ["/0/items/0", "/0/items/1"], "name": "count of items whose tags contains $input.k", "value": null}, {"locations": ["/0/items/0", "/0/items/1"], "name": "items[]", "value": [{"tags": ["a"]}, {"tags": ["b"]}]}], "message": "$input is [{\"id\": \"t\", \"items\": [{\"tags\": [\"a\"]}, {\"tags\": [\"b\"]}], \"k\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "not_an_object", "check": "every", "failed_items": [{"cause": "not_an_object", "item": "item 1 of items", "locations": ["/0/items/0/tags"], "path": "items[0].tags", "value": ["a"]}, {"cause": "not_an_object", "item": "item 2 of items", "locations": ["/0/items/1/tags"], "path": "items[1].tags", "value": ["b"]}], "inputs": [{"locations": ["/0/items/0", "/0/items/1"], "name": "items[]", "value": [{"tags": ["a"]}, {"tags": ["b"]}]}], "message": "$input is [{\"id\": \"t\", \"items\": [{\"tags\": [\"a\"]}, {\"tags\": [\"b\"]}], \"k\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "not_an_object", "check": "not_count", "inputs": [{"locations": ["/0/items/0", "/0/items/1"], "name": "count of items whose tags does not contain $input.k", "value": null}, {"locations": ["/0/items/0", "/0/items/1"], "name": "items[]", "value": [{"tags": ["a"]}, {"tags": ["b"]}]}], "message": "$input is [{\"id\": \"t\", \"items\": [{\"tags\": [\"a\"]}, {\"tags\": [\"b\"]}], \"k\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains with a path from $input that meets a list, inside a whose",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of items whose tags contains $input.r.n is 1", "some": "some items whose tags contains $input.r.n exists", "every": "every items whose tags contains $input.r.n exists"}}}},
+    "cases": [
+      {
+        "description": "fails as unusable and lists the path unread in $refs, where it listed what it read from each item",
+        "rules": ["contains.value", "walk.right.inputs"],
+        "input": {"r": [{"n": "a"}], "things": [{"id": "s", "items": [{"tags": ["a"]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "count", "inputs": [{"locations": ["/things/0/items/0"], "name": "count of items whose tags contains $input.r.n", "value": null}, {"locations": ["/things/0/items/0"], "name": "items[]", "value": [{"tags": ["a"]}]}], "message": "$input.r is [{\"n\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "s", "type": "t"}},
+          {"cause": "unusable", "check": "every", "failed_items": [{"cause": "unusable", "item": "item 1 of items", "locations": ["/things/0/items/0/tags"], "path": "items[0].tags", "value": ["a"]}], "inputs": [{"locations": ["/things/0/items/0"], "name": "items[]", "value": [{"tags": ["a"]}]}], "message": "$input.r is [{\"n\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "s", "type": "t"}},
+          {"cause": "unusable", "check": "some", "failed_items": [{"cause": "unusable", "item": "item 1 of items", "locations": ["/things/0/items/0/tags"], "path": "items[0].tags", "value": ["a"]}], "inputs": [{"locations": ["/things/0/items/0"], "name": "items[]", "value": [{"tags": ["a"]}]}], "message": "$input.r is [{\"n\": \"a\"}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "s", "type": "t"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "contains with a named by after a path from $input, on an input that is a list",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"named": "tags contains $input.m named by key", "not_named": "tags does not contain $input.m named by key"}}}},
+    "cases": [
+      {
+        "description": "fails as not_an_object and names the input",
+        "rules": ["contains.value"],
+        "input": [{"id": "t", "key": "x", "k": "a", "m": {"x": "a"}, "tags": ["a"]}],
+        "results": [
+          {"cause": "not_an_object", "check": "named", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["/0/key"], "name": "key", "value": "x"}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}},
+          {"cause": "not_an_object", "check": "not_named", "inputs": [{"locations": ["/0/tags"], "name": "tags", "value": ["a"]}, {"locations": ["/0/key"], "name": "key", "value": "x"}], "message": "$input is [{\"id\": \"t\", \"k\": \"a\", \"key\": \"x\", \"m\": {\"x\": \"a\"}, \"tags\": [\"a\"]}], which isn't an object", "passed": false, "requirement": "r", "subject": {"id": "t", "type": "t"}}
+        ]
+      }
+    ]
   }
 ]
