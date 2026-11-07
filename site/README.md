@@ -91,7 +91,7 @@ Most text is Markdown, so `` `code` ``, `*emphasis*` and `**bold**` work. Write 
 
 ## Deploy
 
-GitHub Pages serves the site at https://ergo.kosli.com. `.github/workflows/pages.yml` builds `site/` and deploys it each time the `test` workflow passes on `main`, and the release workflow starts it after each release. You can also run it by hand from the Actions tab.
+GitHub Pages serves the site at https://ergo.kosli.com. `.github/workflows/pages.yml` builds `site/` and deploys it each time the `test` workflow passes on `main`, and the release workflow starts it after each release. You can also run it by hand from the Actions tab, on `main`. Before an automatic build runs the tested commit, `.github/pages-source.sh` checks that it is part of `main`, so a run from an unmerged branch cannot supply build code.
 
 The custom domain is set in the repo's **Settings → Pages**, with a DNS `CNAME` record pointing `ergo` at `kosli-dev.github.io`.
 
