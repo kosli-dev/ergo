@@ -2324,15 +2324,24 @@ fn reading_order(check: &Check, inputs: &[Input], aliases: &[&str]) -> Vec<Input
     if !matches!(check, Check::Walk(_)) {
         return ordered;
     }
-    let (through, rest): (Vec<Input>, Vec<Input>) = ordered.into_iter().partition(|input| {
-        aliases.iter().any(|alias| {
-            input
-                .name
-                .strip_prefix(alias)
-                .is_some_and(|rest| rest.starts_with(['.', '[']))
-        })
-    });
+    let (through, rest): (Vec<Input>, Vec<Input>) = ordered
+        .into_iter()
+        .partition(|input| starts_at_alias(&input.name, aliases));
     through.into_iter().chain(rest).collect()
+}
+
+fn starts_at_alias(name: &str, aliases: &[&str]) -> bool {
+    let name = name
+        .strip_prefix("item ")
+        .and_then(|rest| {
+            let digits = rest.chars().take_while(char::is_ascii_digit).count();
+            rest[digits..].strip_prefix(" of ").filter(|_| digits > 0)
+        })
+        .unwrap_or(name);
+    aliases.iter().any(|alias| {
+        name.strip_prefix(alias)
+            .is_some_and(|rest| rest.is_empty() || rest.starts_with(['.', '[', ' ']))
+    })
 }
 
 #[cfg(test)]
@@ -3544,5 +3553,21 @@ mod tests {
             found["message"],
             "item 1 of ws: item 1 of items: i is {\"a\": 1}, which isn't text"
         );
+    }
+
+    #[test]
+    fn a_failed_assertion_lists_the_alias_before_the_path_through_it() {
+        let found = row(
+            "every ts as ok",
+            json!("every ok.fs.k is in ok"),
+            json!({"ts": [{"fs": [{"k": 1}]}]}),
+        );
+        let names: Vec<&Value> = found["failed_items"][0]["failed_assertions"][0]["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|input| &input["name"])
+            .collect();
+        assert_eq!(names, [&json!("ok"), &json!("ok.fs[].k")]);
     }
 }

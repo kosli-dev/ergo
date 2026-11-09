@@ -120,7 +120,11 @@ fn read_one(
     subject: Option<&str>,
 ) -> CheckRead {
     let written = written_expression(check);
-    if check.problems.contains("invalid for") {
+    if check
+        .problems
+        .iter()
+        .any(|problem| problem == "invalid for" || problem.starts_with("unknown field"))
+    {
         return CheckRead {
             expression: written,
             problems: BTreeSet::new(),
@@ -980,5 +984,26 @@ mod tests {
             one(json!({"c": "n is count of k1.k2"})).expression,
             "n equals count of k1.k2"
         );
+    }
+
+    #[test]
+    fn an_any_of_with_a_field_no_check_has_keeps_the_words_it_was_written_with() {
+        let read = one(json!({"c": {"any_of": {"x": "x is one of $params.z"}, "zz": 1}}));
+        assert_eq!(read.expression, "one of: x(x is one of $params.z)");
+        assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn an_assert_with_a_field_no_check_has_keeps_the_words_it_was_written_with() {
+        let read = one(json!({"c": {"assert": "x is one of $params.z", "zz": 1}}));
+        assert_eq!(read.expression, "x is one of $params.z");
+        assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn a_description_that_is_not_text_still_prints_the_sentence_in_one_spelling() {
+        let read = one(json!({"c": {"assert": "x is one of $params.z", "description": 5}}));
+        assert_eq!(read.expression, "x is in $params.z");
+        assert!(read.plan.is_some());
     }
 }
