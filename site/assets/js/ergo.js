@@ -159,19 +159,30 @@
     button.className = 'copy__button mono';
     button.textContent = 'Copy';
     button.setAttribute('aria-label', 'Copy to clipboard');
+    var status = document.createElement('span');
+    status.className = 'copy__status';
+    status.setAttribute('aria-live', 'polite');
     var timer = 0;
+    var show = function (label, copied) {
+      button.textContent = label;
+      button.classList.toggle('is-copied', copied);
+      status.textContent = label;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        button.textContent = 'Copy';
+        button.classList.remove('is-copied');
+        status.textContent = '';
+      }, 2000);
+    };
     button.addEventListener('click', function () {
-      var code = pre.querySelector('code') || pre;
-      navigator.clipboard.writeText(code.textContent.replace(/\n$/, '')).then(function () {
-        button.textContent = 'Copied';
-        button.classList.add('is-copied');
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-          button.textContent = 'Copy';
-          button.classList.remove('is-copied');
-        }, 2000);
-      });
+      var clone = (pre.querySelector('code') || pre).cloneNode(true);
+      clone.querySelectorAll('.code-label').forEach(function (label) { label.remove(); });
+      navigator.clipboard.writeText(clone.textContent.replace(/\n$/, '')).then(
+        function () { show('Copied', true); },
+        function () { show('Copy failed', false); }
+      );
     });
+    wrap.appendChild(status);
     wrap.appendChild(button);
   });
 })();
