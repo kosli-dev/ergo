@@ -390,6 +390,12 @@ p code, li code, dd code, td code {
 .prose li::marker { color: var(--faint); }
 .prose pre { margin: 20px 0; padding: 18px 20px; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--ink-2) !important; font-size: 13.5px; line-height: 1.65; tab-size: 2; }
 .prose pre code { font-size: inherit; padding: 0; background: none; }
+.copy { position: relative; margin: 20px 0; }
+.copy > pre { margin: 0; }
+.copy__button { position: absolute; top: 8px; right: 8px; padding: 4px 10px; font-size: 12px; line-height: 1.4; color: var(--muted); background: var(--ink-3); border: 1px solid var(--line-2); border-radius: 8px; cursor: pointer; }
+.copy__button:hover, .copy__button:focus-visible { color: var(--paper); border-color: var(--paper); }
+.copy__button:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+.copy__button.is-copied { color: var(--ink); background: var(--lime); border-color: var(--lime); }
 .prose code { font-size: .86em; padding: .12em .38em; border-radius: 6px; background: rgba(247, 247, 239, .08); }
 .prose table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 15px; }
 .prose th, .prose td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }

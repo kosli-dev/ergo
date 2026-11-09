@@ -145,3 +145,33 @@
   });
   window.matchMedia('(min-width: 641px)').addEventListener('change', function (e) { if (e.matches) set(false); });
 })();
+
+(function () {
+  var blocks = document.querySelectorAll('.prose pre');
+  if (!blocks.length || !navigator.clipboard) return;
+  blocks.forEach(function (pre) {
+    var wrap = document.createElement('div');
+    wrap.className = 'copy';
+    pre.parentNode.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy__button mono';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-label', 'Copy to clipboard');
+    var timer = 0;
+    button.addEventListener('click', function () {
+      var code = pre.querySelector('code') || pre;
+      navigator.clipboard.writeText(code.textContent.replace(/\n$/, '')).then(function () {
+        button.textContent = 'Copied';
+        button.classList.add('is-copied');
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          button.textContent = 'Copy';
+          button.classList.remove('is-copied');
+        }, 2000);
+      });
+    });
+    wrap.appendChild(button);
+  });
+})();
