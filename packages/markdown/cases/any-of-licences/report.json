@@ -127,6 +127,16 @@
       "inputs": [
         {
           "locations": [
+            "$params:/allowed_licenses"
+          ],
+          "name": "$params.allowed_licenses",
+          "value": [
+            "BSD-3-Clause",
+            "Apache-2.0"
+          ]
+        },
+        {
+          "locations": [
             "$params:/known_package_licenses"
           ],
           "name": "$params.known_package_licenses named by name",
@@ -175,6 +185,16 @@
       "inputs": [
         {
           "locations": [
+            "$params:/allowed_licenses"
+          ],
+          "name": "$params.allowed_licenses",
+          "value": [
+            "BSD-3-Clause",
+            "Apache-2.0"
+          ]
+        },
+        {
+          "locations": [
             "$params:/known_package_licenses/prometheus-client"
           ],
           "name": "$params.known_package_licenses named by name",
@@ -211,6 +231,16 @@
       "cause": "absent",
       "check": "licence allowed",
       "inputs": [
+        {
+          "locations": [
+            "$params:/allowed_licenses"
+          ],
+          "name": "$params.allowed_licenses",
+          "value": [
+            "BSD-3-Clause",
+            "Apache-2.0"
+          ]
+        },
         {
           "locations": [
             "$params:/known_package_licenses"
