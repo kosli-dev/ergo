@@ -1202,11 +1202,14 @@ _names_subject_of(req) if _has_root_field(req)
 _names_subject_of(req) if _has_for_check(req)
 
 _has_for_check(req) if {
-	some c in _checks_of(req)
+	is_object(req)
+	is_object(req.checks)
+	some c in req.checks
+	is_object(c)
 	_for_check(c)
 }
 
-_for_check(c) if object.get(c, "op", "") == "for"
+_for_check(c) if c.op == "for"
 
 _for_check(c) if "for" in object.keys(c)
 
@@ -10554,21 +10557,15 @@ _for_names := object.get(input, "ergo/names", {})
 
 _bound(names, name, v, at) := object.union(names, {name: v, "$at": object.union(object.get(names, "$at", {}), {"names": object.union(object.get(object.get(names, "$at", {}), "names", {}), {name: at})})})
 
-_for_row(check, subj) := r if {
-	r := _for_row_raw(check, subj)
-	r.cause == "satisfied"
-}
+_for_row(check, subj) := _for_row_of(check, subj, _for_row_raw(check, subj))
 
-_for_row(check, subj) := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [], "message": _m_fallback(check)}) if {
-	r := _for_row_raw(check, subj)
+_for_row_of(check, subj, r) := r if {
+	r.cause == "satisfied"
+} else := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [], "message": _m_fallback(check)}) if {
 	r.cause != "satisfied"
 	_m_params_unread(check)
-}
-
-_for_row(check, subj) := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [_m_strip(f) | some f in r.failed], "message": _for_row_text(check, subj, r)}) if {
-	r := _for_row_raw(check, subj)
+} else := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [_m_strip(f) | some f in r.failed], "message": _for_row_text(check, subj, r)}) if {
 	r.cause != "satisfied"
-	not _m_params_unread(check)
 }
 
 _for_row_raw(check, subj) := object.union(r, {"cause": _worst_of({"unusable", r.cause}), "natural": r.cause}) if {
@@ -10675,12 +10672,13 @@ _for_second_roots(check, subj) := [{"fl": fl, "ms": ms, "raw": [_m_aliased(m) | 
 	item := check.items[0]
 	w := _for_walk(item, subj, _for_names)
 	outer := _walk_root_msgs(check, subj)
+	conds := array.concat(object.get(check.items[1], "whose", []), _for_sentence_conds(check))
 	some e in w.items
 	wh := _for_whose(item, e, _for_names)
 	wh.undecided == []
 	wh.kept
 	names := _bound(_for_names, item.as, e.v, _walk_at(w, e))
-	some c in array.concat(object.get(check.items[1], "whose", []), _for_sentence_conds(check))
+	some c in conds
 	fl := _root_read_flaw(subj, c) with input as {"ergo/names": names}
 	not fl in {"", "not_an_object"}
 	ms := [_m_under(_m_for_item_name(check, e.i), _m_aliased(m)) | some m in _m_cond_root_texts(subj, c) with input as {"ergo/names": names}; not m in outer]
@@ -11857,11 +11855,31 @@ _message(check, subj, cause) := concat("; ", ps) if {
 } else := _m_message(_m_with_sides(_m_walked(check, subj)), subj, cause)
 
 _m_null_key_parts(subj, check) := _once([x |
-	some side in _m_sides(check)
+	some side in _m_key_sides(check)
 	some p in _m_side_paths(side)
 	is_array(p)
+	_key_step_later(p)
 	some x in _m_null_key_pair(subj, p)
 ])
+
+_m_key_sides(check) := check["$sides"] if _m_has_sides(check)
+
+_m_key_sides(check) := [check.left, check.right] if {
+	not _m_has_sides(check)
+	_two_sided(check)
+}
+
+_m_key_sides(check) := [check.path] if {
+	not _m_has_sides(check)
+	not _two_sided(check)
+	is_array(check.path)
+}
+
+_key_step_later(p) if {
+	some k, step in p
+	k > 0
+	is_object(step)
+}
 
 _m_null_key_pair(subj, p) := [concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i])] if {
 	i := min({k | some k, step in p; _m_key_text(subj, step)})
@@ -13130,9 +13148,20 @@ _leaf_root_flaw(check, subj) := fl if {
 	check.op in {"every", "some"}
 	is_object(object.get(check, "check", null))
 	check.check.op in {"compare", "compare_time", "in", "not_in", "includes", "excludes", "matches_any", "not_matches_any"}
+	_leaf_may_root(check.check)
 	some p in _root_reads(check.check)
 	_root_kind(subj, check.check, p)
 } else := ""
+
+_leaf_may_root(c) if not _leaf_without_roots(c)
+
+_leaf_without_roots(c) if {
+	not _list_cmp(c)
+	every f in ["right", "values", "patterns"] {
+		not type_name(object.get(c, f, null)) in {"array", "object"}
+	}
+	object.get(c, "ergo/for", false) != true
+}
 
 _leaf_root_msgs(check, flaw) := [m] if {
 	m := _m_root_alone(check.check, flaw)

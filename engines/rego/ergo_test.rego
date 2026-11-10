@@ -11450,6 +11450,17 @@ test_message_a_check_whose_path_is_not_a_path_has_only_its_refs_as_sides if {
 	ergo._m_found_sides({"op": "for", "path": "x"}) == []
 }
 
+test_an_every_leaf_compared_with_a_plain_value_reads_no_root if {
+	check := {"op": "every", "path": ["xs"], "check": {"op": "compare", "left": ["v"], "cmp": "eq", "right": 1}}
+	ergo._leaf_without_roots(check.check)
+	ergo._leaf_root_flaw(check, {"xs": [{"v": 1}]}) == ""
+}
+
+test_a_null_before_an_unreadable_key_is_read_from_the_sides_a_check_already_carries if {
+	check := {"$sides": [["s", {"named_by_field": "p"}]], "op": "present", "path": ["other"]}
+	ergo._m_null_key_parts({"s": null, "p": null}, check) == ["s is null", "p is null"]
+}
+
 test_message_of_an_unusable_check_with_nothing_to_blame_repeats_its_expression if {
 	check := {"$sides": [], "op": "present", "path": ["x"], "expression": "x exists"}
 	ergo._m_message(check, {"x": 1}, "unusable") == "x exists is false"
