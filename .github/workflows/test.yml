@@ -28,6 +28,10 @@ jobs:
           .github/changelog-version.sh rust
       - name: Check the spec version moved when the spec changed
         run: .github/spec-version.sh
+      - name: Check tests write the spec placeholder, not the version
+        run: |
+          .github/spec-placeholder.sh
+          .github/spec-placeholder_test.sh
       - run: opa check --strict engines/rego spec:spec examples:examples
       - name: Check Ergo compiles where input is checked against a closed schema
         run: opa check --strict --schema .github/closed-input-schema.json engines/rego/ergo.rego

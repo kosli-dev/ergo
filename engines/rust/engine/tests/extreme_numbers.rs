@@ -1,3 +1,4 @@
+use ergo_policy_engine::SPEC;
 use serde_json::{Value, json};
 use std::panic::catch_unwind;
 
@@ -67,7 +68,7 @@ const SENTENCES: [&str; 33] = [
 
 fn policy(sentence: &str) -> Value {
     json!({
-        "ergo_spec": "v0.6-dev",
+        "ergo_spec": SPEC,
         "subjects": {"thing": {"from": "things", "identified_by": "id"}},
         "requirements": {"r": {"subject": "thing", "checks": {
             "plain": sentence,
@@ -138,7 +139,7 @@ fn no_numeric_operator_panics_or_gives_a_cause_the_spec_lacks_on_extreme_numbers
 
 fn cause_of(sentence: &str, things: &str) -> String {
     let policy = json!({
-        "ergo_spec": "v0.6-dev",
+        "ergo_spec": SPEC,
         "subjects": {"thing": {"from": "things", "identified_by": "id"}},
         "requirements": {"r": {"subject": "thing", "checks": {"c": sentence}}}
     });
@@ -204,7 +205,7 @@ fn unique_ids_row(ids: &[String]) -> Value {
         .map(|id| format!(r#"{{"id": {id}, "fa": 1}}"#))
         .collect();
     let policy = json!({
-        "ergo_spec": "v0.6-dev",
+        "ergo_spec": SPEC,
         "subjects": {"thing": {"from": "things", "identified_by": "id"}},
         "requirements": {"r": {"subject": "thing", "checks": {"c": "fa is 1"}}}
     });
@@ -343,7 +344,7 @@ fn within_does_not_overflow_on_exponents_at_both_ends_of_what_it_reads() {
 
 fn one_item_policy() -> Value {
     json!({
-        "ergo_spec": "v0.6-dev",
+        "ergo_spec": SPEC,
         "subjects": {"item": {"from": "items"}},
         "requirements": {"r": {"subject": "item", "checks": {"c": "size is at least 5"}}}
     })

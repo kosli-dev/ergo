@@ -1,7 +1,7 @@
 [
   {
     "description": "subjects from a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "each item is a subject, in list order",
@@ -94,7 +94,7 @@
   },
   {
     "description": "subjects from a list with min_subjects 0",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is not applicable on an empty list",
@@ -131,7 +131,7 @@
   },
   {
     "description": "the whole input as the subject",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "$input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "checks the input itself, with itself as its id",
@@ -184,7 +184,7 @@
   },
   {
     "description": "the whole input as a list, from every",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "every $input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "every $input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "makes each item a subject, in list order, with itself as its id",
@@ -247,7 +247,7 @@
   },
   {
     "description": "a from line that is only named by a param, with every",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "every $input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "every $input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
     "params": {"k": "a"},
     "cases": [
       {
@@ -266,7 +266,7 @@
   },
   {
     "description": "a from line that is only named by a param",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "every $input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "every $input named by $params.k"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
     "params": {"k": "a"},
     "cases": [
       {
@@ -285,7 +285,7 @@
   },
   {
     "description": "a from line that is named by a param twice",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "every $input named by $params.k named by $params.j"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "every $input named by $params.k named by $params.j"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
     "params": {"k": "a", "j": "b"},
     "cases": [
       {
@@ -304,7 +304,7 @@
   },
   {
     "description": "a from line that is named by a key of a param",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "every $input named by $params.k.x"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "every $input named by $params.k.x"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
     "params": {"k": {"x": "a"}},
     "cases": [
       {
@@ -322,7 +322,7 @@
   },
   {
     "description": "a from line that is named by a param and then picks a position",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "$input named by $params.k[0]"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "$input named by $params.k[0]"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "s exists"}}}},
     "params": {"k": ["a"]},
     "cases": [
       {
@@ -340,7 +340,7 @@
   },
   {
     "description": "a walk that starts at an input that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "every $input.commits"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "every $input.commits"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "makes each item of a list in each item a subject",
@@ -367,7 +367,7 @@
   },
   {
     "description": "a walk that starts at an input that is a list, without $input",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "every commits"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "every commits"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "makes each item of a list in each item a subject",
@@ -394,7 +394,7 @@
   },
   {
     "description": "a position on the whole input when it is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "$input[0]"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "$input[0]"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "reads the item at the position, as a position on a list in a field does",
@@ -429,7 +429,7 @@
   },
   {
     "description": "an index past the end of the whole input when it is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "$input[5]"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "$input[5]"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "ends absent",
@@ -444,7 +444,7 @@
   },
   {
     "description": "a policy with no requirements section",
-    "policy": {"ergo_spec": "v0.6-dev"},
+    "policy": {"ergo_spec": "{{spec}}"},
     "cases": [
       {
         "description": "reports Ergo's own requirement, with requirements missing",
@@ -461,7 +461,7 @@
   },
   {
     "description": "a policy with an empty requirements section",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {}},
     "cases": [
       {
         "description": "reports Ergo's own requirement, with requirements empty",
@@ -478,7 +478,7 @@
   },
   {
     "description": "a policy whose requirements is null",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": null},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": null},
     "cases": [
       {
         "description": "reports Ergo's own requirement, with requirements missing",
@@ -495,7 +495,7 @@
   },
   {
     "description": "a policy whose requirements is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": []},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": []},
     "cases": [
       {
         "description": "reports Ergo's own requirement, with requirements not an object",
@@ -512,7 +512,7 @@
   },
   {
     "description": "a policy whose requirements is text",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": "x"},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": "x"},
     "cases": [
       {
         "description": "reports Ergo's own requirement, with requirements not an object",
@@ -529,7 +529,7 @@
   },
   {
     "description": "a policy whose requirements is a list with an item",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs"}}, "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs"}}, "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]},
     "cases": [
       {
         "description": "reads it as no requirements, with requirements not an object",
@@ -570,10 +570,10 @@
         "rules": ["policy.no_requirements", "policy.version"],
         "input": {},
         "status": {"$policy": "not_met"},
-        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.6-dev"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "message": "policy ergo_spec: unsupported version v9.9, expected v0.6-dev; requirements: missing", "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
+        "violations": [{"cause": "value", "check": "$well_formed", "description": "The policy is written correctly", "expression": "count(problems) == 0", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["unsupported version v9.9, expected {{spec}}"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "message": "policy ergo_spec: unsupported version v9.9, expected {{spec}}; requirements: missing", "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}],
         "requirements": {"$policy": {"status": "not_met", "subjects": {"matching": 0, "total": 0}, "causes": [{"cause": "value", "rows": 1}]}},
         "results": [
-          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.6-dev"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "message": "policy ergo_spec: unsupported version v9.9, expected v0.6-dev; requirements: missing", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
+          {"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "policy ergo_spec", "value": ["unsupported version v9.9, expected {{spec}}"]}, {"locations": [], "name": "requirements", "value": ["missing"]}], "message": "policy ergo_spec: unsupported version v9.9, expected {{spec}}; requirements: missing", "passed": false, "requirement": "$policy", "subject": {"id": "$policy", "type": "$policy"}}
         ]
       }
     ]
@@ -597,7 +597,7 @@
   },
   {
     "description": "a policy with an empty requirements section and a wrong description and meta",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {}, "description": 5, "meta": 3},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {}, "description": 5, "meta": 3},
     "cases": [
       {
         "description": "lists every policy problem next to requirements, sorted by name",
@@ -614,7 +614,7 @@
   },
   {
     "description": "a requirement called $policy",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs"}}, "requirements": {"$policy": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs"}}, "requirements": {"$policy": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, so its $well_formed row fails with a name that starts with a dollar sign",
@@ -629,7 +629,7 @@
   },
   {
     "description": "first of the whole input when it is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "first of $input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "first of $input"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "reads the first item",
@@ -654,7 +654,7 @@
   },
   {
     "description": "a field of the whole input when it is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "$input.commits"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "$input.commits"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "ends unusable and names the list to read with every, because a key needs an object",
@@ -669,7 +669,7 @@
   },
   {
     "description": "the whole input as a list, with a condition",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "$input whose x is 1"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "$input whose x is 1"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "keeps the items that pass the condition",
@@ -687,7 +687,7 @@
   },
   {
     "description": "a subject that narrows the whole input when it is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"p": {"from": "$input"}, "q": {"from": "p whose x is 1"}}, "requirements": {"s": {"subject": "q", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"p": {"from": "$input"}, "q": {"from": "p whose x is 1"}}, "requirements": {"s": {"subject": "q", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "keeps the items that pass its condition",
@@ -705,7 +705,7 @@
   },
   {
     "description": "a child subject of the whole input when it is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"p": {"from": "$input"}, "q": {"from": "p.commits"}}, "requirements": {"s": {"subject": "q", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"p": {"from": "$input"}, "q": {"from": "p.commits"}}, "requirements": {"s": {"subject": "q", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "reads the child under each item, though the items aren't all of one type",
@@ -722,7 +722,7 @@
   },
   {
     "description": "min_subjects 2",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 2, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 2, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "fails as value with one subject, though it passes",
@@ -738,7 +738,7 @@
   },
   {
     "description": "ids",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "lists each repeated id once, sorted by its JSON text",
@@ -778,7 +778,7 @@
   },
   {
     "description": "ids of subjects out of scope",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "still count",
@@ -797,7 +797,7 @@
   {
     "description": "a subject name with a space is quoted where a from starts with it",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "x y": {
           "from": "things",
@@ -929,10 +929,10 @@
       }
     ]
   },
-  {"description": "a subject name with a space is quoted through a part and with a null definition", "policy": {"ergo_spec": "v0.6-dev", "subjects": {"x y": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}, "kid": {"from": "every \"x y\".pa.items", "identified_by": "n"}, "z z": null}, "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}, "s": {"subject": "z z", "checks": {"c": "n exists"}}}}, "cases": [{"description": "a child read through a part of a spaced subject, and a spaced subject defined as null, quote the name", "rules": ["name.keys", "added.text", "report.subjects"], "input": {"things": [{"id": "a", "meta": {"items": [{"n": 1}]}}], "z z": [{"n": 1}]}, "expressions": {"r": {"$min_subjects": "count(matching(every \"x y\".pa.items)) >= 1", "$unique_ids": "count(repeated(ids(every \"x y\".pa.items))) == 0"}, "s": {"$min_subjects": "count(matching(\"z z\")) >= 1", "$unique_ids": "count(repeated(ids(\"z z\"))) == 0"}}, "report": {"subjects": {"x y": {"description": "", "from": "things", "identified_by": "id", "parts": {"pa": {"from": "meta", "identified_by": null}}}, "z z": {"description": "", "from": "\"z z\"", "identified_by": null, "parts": {}}, "kid": {"description": "", "from": "every \"x y\".pa.items", "identified_by": "n", "parts": {}}}}, "results": [{"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/meta/items/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": 1, "in": {"x y": "a"}, "type": "kid"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/z z/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": {"n": 1}, "type": "z z"}}]}]},
+  {"description": "a subject name with a space is quoted through a part and with a null definition", "policy": {"ergo_spec": "{{spec}}", "subjects": {"x y": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}, "kid": {"from": "every \"x y\".pa.items", "identified_by": "n"}, "z z": null}, "requirements": {"r": {"subject": "kid", "checks": {"c": "n exists"}}, "s": {"subject": "z z", "checks": {"c": "n exists"}}}}, "cases": [{"description": "a child read through a part of a spaced subject, and a spaced subject defined as null, quote the name", "rules": ["name.keys", "added.text", "report.subjects"], "input": {"things": [{"id": "a", "meta": {"items": [{"n": 1}]}}], "z z": [{"n": 1}]}, "expressions": {"r": {"$min_subjects": "count(matching(every \"x y\".pa.items)) >= 1", "$unique_ids": "count(repeated(ids(every \"x y\".pa.items))) == 0"}, "s": {"$min_subjects": "count(matching(\"z z\")) >= 1", "$unique_ids": "count(repeated(ids(\"z z\"))) == 0"}}, "report": {"subjects": {"x y": {"description": "", "from": "things", "identified_by": "id", "parts": {"pa": {"from": "meta", "identified_by": null}}}, "z z": {"description": "", "from": "\"z z\"", "identified_by": null, "parts": {}}, "kid": {"description": "", "from": "every \"x y\".pa.items", "identified_by": "n", "parts": {}}}}, "results": [{"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/things/0/meta/items/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "r", "subject": {"id": 1, "in": {"x y": "a"}, "type": "kid"}}, {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["/z z/0/n"], "name": "n", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": {"n": 1}, "type": "z z"}}]}]},
   {
     "description": "require some",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "require": "some", "checks": {"a": ".a exists", "b": "b exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "require": "some", "checks": {"a": ".a exists", "b": "b exists"}}}},
     "cases": [
       {
         "description": "is met when one subject passes every check, and the others aren't violations",
@@ -969,7 +969,7 @@
   },
   {
     "description": "a filter",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "leaves out a subject that fails it on value, and fails one it can't read",
@@ -1008,7 +1008,7 @@
   },
   {
     "description": "a filter with min_subjects 0",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t whose e is \"p\"", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is not applicable when every subject is out of scope",
@@ -1036,7 +1036,7 @@
   {
     "description": "two filters",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "subject": {
           "from": "t whose e is \"p\" and whose k is 1",
@@ -1065,7 +1065,7 @@
   },
   {
     "description": "a requirement with no checks",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "checks": {}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "checks": {}}}},
     "cases": [
       {
         "description": "is never met",
@@ -1088,7 +1088,7 @@
   },
   {
     "description": "a requirement with an unknown require",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "require": "most", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "require": "most", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is never met, and gets no row but $well_formed",
@@ -1111,7 +1111,7 @@
   },
   {
     "description": "a requirement with a field Ergo doesn't know",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}, "requires": "x"}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}, "requires": "x"}}},
     "cases": [
       {
         "description": "is never met",
@@ -1135,7 +1135,7 @@
   {
     "description": "a requirement with a description, meta and a subject type",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "deployment": {
           "from": "t whose e exists",
@@ -1209,7 +1209,7 @@
   },
   {
     "description": "a requirement with min_subjects 0, described",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "describes min_subjects as reading the list",
@@ -1237,7 +1237,7 @@
   },
   {
     "description": "a requirement with no description or meta",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "gets an empty description and meta",
@@ -1252,7 +1252,7 @@
   },
   {
     "description": "a policy with no requirements",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {}, "requirements": {}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {}, "requirements": {}},
     "cases": [
       {
         "description": "is never compliant, and its report has Ergo's own requirement",
@@ -1271,7 +1271,7 @@
   {
     "description": "two requirements",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "subject": {"from": "t whose id exists", "identified_by": "id"}
       },
@@ -1314,7 +1314,7 @@
   },
   {
     "description": "violations with refs and failed items",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "every cs.v is in $params.ok"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "checks": {"c": "every cs.v is in $params.ok"}}}},
     "params": {"ok": ["a", "b"]},
     "cases": [
       {
@@ -1332,7 +1332,7 @@
   },
   {
     "description": "a requirement that still has the fields of a subject",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "from": "t", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t"}}, "requirements": {"s": {"subject": "subject", "from": "t", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is never met, and says from is an unknown field",
@@ -1347,7 +1347,7 @@
   },
   {
     "description": "a subject that says id instead of identified_by",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "id": ["id"]}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is never met, and says id is an unknown field",
@@ -1363,7 +1363,7 @@
   {
     "description": "causes of a requirement",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {"thing": {"from": "things", "identified_by": "id"}},
       "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists", "d": "x is 1"}}}
     },
@@ -1385,7 +1385,7 @@
   {
     "description": "a policy with a description and meta",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "description": "Every item has an x",
       "meta": {
         "control": "DEV-0401"
@@ -1458,7 +1458,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "results": [
           {
@@ -1487,7 +1487,7 @@
   {
     "description": "a policy whose description and meta are written wrong",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "description": 5,
       "meta": "DEV-0401",
       "subjects": {
@@ -1660,7 +1660,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -1778,7 +1778,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -1896,7 +1896,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -2014,7 +2014,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -2039,14 +2039,14 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unsupported version v9.9, expected v0.6-dev"
+                  "unsupported version v9.9, expected {{spec}}"
                 ],
                 "locations": [
 
                 ]
               }
             ],
-            "message": "policy ergo_spec: unsupported version v9.9, expected v0.6-dev",
+            "message": "policy ergo_spec: unsupported version v9.9, expected {{spec}}",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2075,14 +2075,14 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unsupported version v9.9, expected v0.6-dev"
+                  "unsupported version v9.9, expected {{spec}}"
                 ],
                 "locations": [
 
                 ]
               }
             ],
-            "message": "policy ergo_spec: unsupported version v9.9, expected v0.6-dev",
+            "message": "policy ergo_spec: unsupported version v9.9, expected {{spec}}",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2121,7 +2121,7 @@
     },
     "cases": [
       {
-        "description": "fails the $well_formed row of every requirement, because main follows v0.6-dev",
+        "description": "fails the $well_formed row of every requirement, because main follows {{spec}}",
         "rules": ["policy.version"],
         "input": {
           "t": [
@@ -2132,7 +2132,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -2153,12 +2153,12 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unsupported version v0.1, expected v0.6-dev"
+                  "unsupported version v0.1, expected {{spec}}"
                 ],
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: unsupported version v0.1, expected v0.6-dev",
+            "message": "policy ergo_spec: unsupported version v0.1, expected {{spec}}",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2183,12 +2183,12 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unsupported version v0.1, expected v0.6-dev"
+                  "unsupported version v0.1, expected {{spec}}"
                 ],
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: unsupported version v0.1, expected v0.6-dev",
+            "message": "policy ergo_spec: unsupported version v0.1, expected {{spec}}",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2238,7 +2238,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -2259,12 +2259,12 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unsupported version v0.3-dev, expected v0.6-dev"
+                  "unsupported version v0.3-dev, expected {{spec}}"
                 ],
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: unsupported version v0.3-dev, expected v0.6-dev",
+            "message": "policy ergo_spec: unsupported version v0.3-dev, expected {{spec}}",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -2289,12 +2289,12 @@
               {
                 "name": "policy ergo_spec",
                 "value": [
-                  "unsupported version v0.3-dev, expected v0.6-dev"
+                  "unsupported version v0.3-dev, expected {{spec}}"
                 ],
                 "locations": []
               }
             ],
-            "message": "policy ergo_spec: unsupported version v0.3-dev, expected v0.6-dev",
+            "message": "policy ergo_spec: unsupported version v0.3-dev, expected {{spec}}",
             "passed": false,
             "requirement": "t",
             "subject": {
@@ -2344,7 +2344,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -2450,7 +2450,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -2521,7 +2521,7 @@
   {
     "description": "a policy for the version the implementation follows",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "subject": {
           "from": "t",
@@ -2556,7 +2556,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": true,
         "results": [
@@ -2756,7 +2756,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -2876,7 +2876,7 @@
           ]
         },
         "report": {
-          "ergo": "v0.6-dev"
+          "ergo": "{{spec}}"
         },
         "compliant": false,
         "results": [
@@ -2994,7 +2994,7 @@
   },
   {
     "description": "a check written with op",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"op": "present", "path": ["x"]}}}}},
     "cases": [
       {
         "description": "is written wrong: it has no assert, each of its fields is unknown, and the requirement gets no row but $well_formed",
@@ -3011,7 +3011,7 @@
   {
     "description": "a policy with two requirements written wrong and one written correctly",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {"thing": {"from": "things", "identified_by": "id"}},
       "requirements": {
         "bad": {"subject": "thing", "require": "most", "checks": {"c": "x exists"}},
@@ -3042,7 +3042,7 @@
   },
   {
     "description": "a requirement whose check doesn't parse, on a subject with a condition",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things whose x exists", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things whose x exists", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is \"a"}}}},
     "cases": [
       {
         "description": "gets only its $well_formed row, but still lists every check with its expression, the ones Ergo adds included",
@@ -3059,7 +3059,7 @@
   {
     "description": "a check named like one of Ergo's own rows",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "b": {
           "from": "things"
@@ -3174,7 +3174,7 @@
   {
     "description": "a check named like one of Ergo's own rows that is also written wrong another way",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "b": {
           "from": "things"
@@ -3254,7 +3254,7 @@
   },
   {
     "description": "a subject whose name starts with a dollar sign",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"$s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "$s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"$s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "$s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, with the problem under subjects.<name>",
@@ -3269,7 +3269,7 @@
   },
   {
     "description": "a subject whose name starts with a dollar sign and that has no from",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"$x": {"identified_by": "id"}}, "requirements": {"r": {"subject": "$x", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"$x": {"identified_by": "id"}}, "requirements": {"r": {"subject": "$x", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "lists the subject's from quoted, as name.keys says, next to the problem",
@@ -3285,7 +3285,7 @@
   },
   {
     "description": "a subject whose name starts with a dollar sign and that is null",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"$x": null}, "requirements": {"r": {"subject": "$x", "checks": {"c": "id exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"$x": null}, "requirements": {"r": {"subject": "$x", "checks": {"c": "id exists"}}}},
     "cases": [
       {
         "description": "lists the subject's from quoted, as name.keys says, next to the problem",
@@ -3301,7 +3301,7 @@
   },
   {
     "description": "a requirement whose name starts with a dollar sign",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"$r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"$r": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, with the problem under requirement name",
@@ -3316,7 +3316,7 @@
   },
   {
     "description": "a check whose name starts with a dollar sign",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"$c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"$c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, with the problem under checks.<name>, and has no entry of its own",
@@ -3331,7 +3331,7 @@
   },
   {
     "description": "an any_of option whose name starts with a dollar sign",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"any_of": {"$o": "x exists", "p": "x is 1"}}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"any_of": {"$o": "x exists", "p": "x is 1"}}}}}},
     "cases": [
       {
         "description": "is written wrong, and names the option",
@@ -3346,7 +3346,7 @@
   },
   {
     "description": "a part whose name starts with a dollar sign, written as an object",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"$p": {"from": "ys"}}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"$p": {"from": "ys"}}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, with the problem under the part's alias",
@@ -3361,7 +3361,7 @@
   },
   {
     "description": "a for alias that starts with a dollar sign",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"for": "every ys as $y", "assert": "y is 1"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"for": "every ys as $y", "assert": "y is 1"}}}}},
     "cases": [
       {
         "description": "is written wrong, because the line doesn't parse",
@@ -3376,7 +3376,7 @@
   },
   {
     "description": "names with a dollar sign after the first character",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s$": {"from": "xs", "identified_by": "id", "has": {"p$": "ys"}}}, "requirements": {"r$": {"subject": "s$", "checks": {"c$": "x exists", "d$": {"any_of": {"o$": "x exists"}}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s$": {"from": "xs", "identified_by": "id", "has": {"p$": "ys"}}}, "requirements": {"r$": {"subject": "s$", "checks": {"c$": "x exists", "d$": {"any_of": {"o$": "x exists"}}}}}},
     "cases": [
       {
         "description": "are written correctly",
@@ -3391,7 +3391,7 @@
   },
   {
     "description": "checks whose names start or end with a space or an invisible character",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {" x": "x exists", "x ": "x exists", "\tx": "x exists", "x\t": "x exists", "\u00a0x": "x exists", "x\u00a0": "x exists", "\u200bx": "x exists", "x\u200b": "x exists", "\ufeffx": "x exists", "x\ufeff": "x exists", "\u2060x": "x exists", "x\u200d": "x exists", " $x": "x exists", "$x ": "x exists", "ok": "x exists", "x y": "x exists", "\uff04x": "x exists", "a$b": "x exists", "x\ud83d\ude00": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {" x": "x exists", "x ": "x exists", "\tx": "x exists", "x\t": "x exists", "\u00a0x": "x exists", "x\u00a0": "x exists", "\u200bx": "x exists", "x\u200b": "x exists", "\ufeffx": "x exists", "x\ufeff": "x exists", "\u2060x": "x exists", "x\u200d": "x exists", " $x": "x exists", "$x ": "x exists", "ok": "x exists", "x y": "x exists", "\uff04x": "x exists", "a$b": "x exists", "x\ud83d\ude00": "x exists"}}}},
     "cases": [
       {
         "description": "lists the problem of each wrong name under checks.<name>, and none for the others",
@@ -3406,7 +3406,7 @@
   },
   {
     "description": "requirements whose names start or end with a space or an invisible character",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {" x": {"subject": "s", "checks": {"c": "x exists"}}, "x ": {"subject": "s", "checks": {"c": "x exists"}}, "\tx": {"subject": "s", "checks": {"c": "x exists"}}, "x\t": {"subject": "s", "checks": {"c": "x exists"}}, "\u00a0x": {"subject": "s", "checks": {"c": "x exists"}}, "x\u00a0": {"subject": "s", "checks": {"c": "x exists"}}, "\u200bx": {"subject": "s", "checks": {"c": "x exists"}}, "x\u200b": {"subject": "s", "checks": {"c": "x exists"}}, "\ufeffx": {"subject": "s", "checks": {"c": "x exists"}}, "x\ufeff": {"subject": "s", "checks": {"c": "x exists"}}, "\u2060x": {"subject": "s", "checks": {"c": "x exists"}}, "x\u200d": {"subject": "s", "checks": {"c": "x exists"}}, " $x": {"subject": "s", "checks": {"c": "x exists"}}, "$x ": {"subject": "s", "checks": {"c": "x exists"}}, "ok": {"subject": "s", "checks": {"c": "x exists"}}, "x y": {"subject": "s", "checks": {"c": "x exists"}}, "\uff04x": {"subject": "s", "checks": {"c": "x exists"}}, "a$b": {"subject": "s", "checks": {"c": "x exists"}}, "x\ud83d\ude00": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {" x": {"subject": "s", "checks": {"c": "x exists"}}, "x ": {"subject": "s", "checks": {"c": "x exists"}}, "\tx": {"subject": "s", "checks": {"c": "x exists"}}, "x\t": {"subject": "s", "checks": {"c": "x exists"}}, "\u00a0x": {"subject": "s", "checks": {"c": "x exists"}}, "x\u00a0": {"subject": "s", "checks": {"c": "x exists"}}, "\u200bx": {"subject": "s", "checks": {"c": "x exists"}}, "x\u200b": {"subject": "s", "checks": {"c": "x exists"}}, "\ufeffx": {"subject": "s", "checks": {"c": "x exists"}}, "x\ufeff": {"subject": "s", "checks": {"c": "x exists"}}, "\u2060x": {"subject": "s", "checks": {"c": "x exists"}}, "x\u200d": {"subject": "s", "checks": {"c": "x exists"}}, " $x": {"subject": "s", "checks": {"c": "x exists"}}, "$x ": {"subject": "s", "checks": {"c": "x exists"}}, "ok": {"subject": "s", "checks": {"c": "x exists"}}, "x y": {"subject": "s", "checks": {"c": "x exists"}}, "\uff04x": {"subject": "s", "checks": {"c": "x exists"}}, "a$b": {"subject": "s", "checks": {"c": "x exists"}}, "x\ud83d\ude00": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "lists the problems under requirement name, and none for the others",
@@ -3443,7 +3443,7 @@
   },
   {
     "description": "subjects whose names start or end with a space or an invisible character",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {" x": {"from": "xs", "identified_by": "id"}, "x ": {"from": "xs", "identified_by": "id"}, "\tx": {"from": "xs", "identified_by": "id"}, "x\t": {"from": "xs", "identified_by": "id"}, "\u00a0x": {"from": "xs", "identified_by": "id"}, "x\u00a0": {"from": "xs", "identified_by": "id"}, "\u200bx": {"from": "xs", "identified_by": "id"}, "x\u200b": {"from": "xs", "identified_by": "id"}, "\ufeffx": {"from": "xs", "identified_by": "id"}, "x\ufeff": {"from": "xs", "identified_by": "id"}, "\u2060x": {"from": "xs", "identified_by": "id"}, "x\u200d": {"from": "xs", "identified_by": "id"}, " $x": {"from": "xs", "identified_by": "id"}, "$x ": {"from": "xs", "identified_by": "id"}, "ok": {"from": "xs", "identified_by": "id"}, "x y": {"from": "xs", "identified_by": "id"}, "\uff04x": {"from": "xs", "identified_by": "id"}, "a$b": {"from": "xs", "identified_by": "id"}, "x\ud83d\ude00": {"from": "xs", "identified_by": "id"}}, "requirements": {"q0": {"subject": " x", "checks": {"c": "x exists"}}, "q1": {"subject": "x ", "checks": {"c": "x exists"}}, "q2": {"subject": "\tx", "checks": {"c": "x exists"}}, "q3": {"subject": "x\t", "checks": {"c": "x exists"}}, "q4": {"subject": "\u00a0x", "checks": {"c": "x exists"}}, "q5": {"subject": "x\u00a0", "checks": {"c": "x exists"}}, "q6": {"subject": "\u200bx", "checks": {"c": "x exists"}}, "q7": {"subject": "x\u200b", "checks": {"c": "x exists"}}, "q8": {"subject": "\ufeffx", "checks": {"c": "x exists"}}, "q9": {"subject": "x\ufeff", "checks": {"c": "x exists"}}, "q10": {"subject": "\u2060x", "checks": {"c": "x exists"}}, "q11": {"subject": "x\u200d", "checks": {"c": "x exists"}}, "q12": {"subject": " $x", "checks": {"c": "x exists"}}, "q13": {"subject": "$x ", "checks": {"c": "x exists"}}, "q14": {"subject": "ok", "checks": {"c": "x exists"}}, "q15": {"subject": "x y", "checks": {"c": "x exists"}}, "q16": {"subject": "\uff04x", "checks": {"c": "x exists"}}, "q17": {"subject": "a$b", "checks": {"c": "x exists"}}, "q18": {"subject": "x\ud83d\ude00", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {" x": {"from": "xs", "identified_by": "id"}, "x ": {"from": "xs", "identified_by": "id"}, "\tx": {"from": "xs", "identified_by": "id"}, "x\t": {"from": "xs", "identified_by": "id"}, "\u00a0x": {"from": "xs", "identified_by": "id"}, "x\u00a0": {"from": "xs", "identified_by": "id"}, "\u200bx": {"from": "xs", "identified_by": "id"}, "x\u200b": {"from": "xs", "identified_by": "id"}, "\ufeffx": {"from": "xs", "identified_by": "id"}, "x\ufeff": {"from": "xs", "identified_by": "id"}, "\u2060x": {"from": "xs", "identified_by": "id"}, "x\u200d": {"from": "xs", "identified_by": "id"}, " $x": {"from": "xs", "identified_by": "id"}, "$x ": {"from": "xs", "identified_by": "id"}, "ok": {"from": "xs", "identified_by": "id"}, "x y": {"from": "xs", "identified_by": "id"}, "\uff04x": {"from": "xs", "identified_by": "id"}, "a$b": {"from": "xs", "identified_by": "id"}, "x\ud83d\ude00": {"from": "xs", "identified_by": "id"}}, "requirements": {"q0": {"subject": " x", "checks": {"c": "x exists"}}, "q1": {"subject": "x ", "checks": {"c": "x exists"}}, "q2": {"subject": "\tx", "checks": {"c": "x exists"}}, "q3": {"subject": "x\t", "checks": {"c": "x exists"}}, "q4": {"subject": "\u00a0x", "checks": {"c": "x exists"}}, "q5": {"subject": "x\u00a0", "checks": {"c": "x exists"}}, "q6": {"subject": "\u200bx", "checks": {"c": "x exists"}}, "q7": {"subject": "x\u200b", "checks": {"c": "x exists"}}, "q8": {"subject": "\ufeffx", "checks": {"c": "x exists"}}, "q9": {"subject": "x\ufeff", "checks": {"c": "x exists"}}, "q10": {"subject": "\u2060x", "checks": {"c": "x exists"}}, "q11": {"subject": "x\u200d", "checks": {"c": "x exists"}}, "q12": {"subject": " $x", "checks": {"c": "x exists"}}, "q13": {"subject": "$x ", "checks": {"c": "x exists"}}, "q14": {"subject": "ok", "checks": {"c": "x exists"}}, "q15": {"subject": "x y", "checks": {"c": "x exists"}}, "q16": {"subject": "\uff04x", "checks": {"c": "x exists"}}, "q17": {"subject": "a$b", "checks": {"c": "x exists"}}, "q18": {"subject": "x\ud83d\ude00", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "lists the problems under subjects.<name>, and none for the others",
@@ -3480,7 +3480,7 @@
   },
   {
     "description": "any_of options whose names start or end with a space or an invisible character",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"any_of": {" x": "x exists", "x ": "x exists", "\tx": "x exists", "x\t": "x exists", "\u00a0x": "x exists", "x\u00a0": "x exists", "\u200bx": "x exists", "x\u200b": "x exists", "\ufeffx": "x exists", "x\ufeff": "x exists", "\u2060x": "x exists", "x\u200d": "x exists", " $x": "x exists", "$x ": "x exists", "ok": "x exists", "x y": "x exists", "\uff04x": "x exists", "a$b": "x exists", "x\ud83d\ude00": "x exists"}}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"any_of": {" x": "x exists", "x ": "x exists", "\tx": "x exists", "x\t": "x exists", "\u00a0x": "x exists", "x\u00a0": "x exists", "\u200bx": "x exists", "x\u200b": "x exists", "\ufeffx": "x exists", "x\ufeff": "x exists", "\u2060x": "x exists", "x\u200d": "x exists", " $x": "x exists", "$x ": "x exists", "ok": "x exists", "x y": "x exists", "\uff04x": "x exists", "a$b": "x exists", "x\ud83d\ude00": "x exists"}}}}}},
     "cases": [
       {
         "description": "lists a problem for each wrong option, named with the option",
@@ -3495,7 +3495,7 @@
   },
   {
     "description": "parts whose names start or end with a space or an invisible character",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {" x": "ys", "x ": "ys", "\u00a0x": "ys", "x\u00a0": "ys", "\u200bx": "ys", "x\u200b": "ys", "\ufeffx": "ys", "x\ufeff": "ys", "\u2060x": "ys", "x\u200d": "ys", " $x": "ys", "$x ": "ys", "ok": "ys", "x y": "ys", "\uff04x": "ys", "a$b": "ys", "x\ud83d\ude00": "ys"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {" x": "ys", "x ": "ys", "\u00a0x": "ys", "x\u00a0": "ys", "\u200bx": "ys", "x\u200b": "ys", "\ufeffx": "ys", "x\ufeff": "ys", "\u2060x": "ys", "x\u200d": "ys", " $x": "ys", "$x ": "ys", "ok": "ys", "x y": "ys", "\uff04x": "ys", "a$b": "ys", "x\ud83d\ude00": "ys"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "lists the problem of each wrong part under its alias, in place of invalid alias",
@@ -3510,7 +3510,7 @@
   },
   {
     "description": "a for alias that starts with a space",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"for": "every ys as \" y\"", "assert": "\" y\" is 1"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"for": "every ys as \" y\"", "assert": "\" y\" is 1"}}}}},
     "cases": [
       {
         "description": "is written wrong, because the line doesn't parse",
@@ -3525,7 +3525,7 @@
   },
   {
     "description": "a requirement written wrong in several fields, one of them require",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "zz": 1, "x y": 2, "checks": {}, "min_subjects": -1, "require": "most"}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "zz": 1, "x y": 2, "checks": {}, "min_subjects": -1, "require": "most"}}},
     "cases": [
       {
         "description": "lists require second, with what is wrong with it, and the other fields sorted by name as the report writes it",
@@ -3540,7 +3540,7 @@
   },
   {
     "description": "a requirement whose name is empty",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, with the problem under requirement name",
@@ -3555,7 +3555,7 @@
   },
   {
     "description": "a check whose name is empty",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, with the problem under checks.<name>",
@@ -3570,7 +3570,7 @@
   },
   {
     "description": "an any_of option whose name is empty",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"any_of": {"": "x exists", "p": "x is 1"}}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": {"any_of": {"": "x exists", "p": "x is 1"}}}}}},
     "cases": [
       {
         "description": "is written wrong, and names the option",
@@ -3585,7 +3585,7 @@
   },
   {
     "description": "a part whose name is empty, written as text",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"": "ys"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"": "ys"}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, with the problem under the part's alias",
@@ -3600,7 +3600,7 @@
   },
   {
     "description": "a part whose name is empty, written as an object",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"": {"from": "ys"}}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"from": "xs", "identified_by": "id", "has": {"": {"from": "ys"}}}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong, with the problem under the part's alias",
@@ -3615,7 +3615,7 @@
   },
   {
     "description": "a subject whose name is empty that a requirement names",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is refused under subject, as an empty subject always is",
@@ -3630,7 +3630,7 @@
   },
   {
     "description": "a subject whose name is empty that no requirement names",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"": {"from": "xs", "identified_by": "id"}, "s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"": {"from": "xs", "identified_by": "id"}, "s": {"from": "xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is never read, so it adds no problem",
@@ -3648,7 +3648,7 @@
   },
   {
     "description": "checks written wrong",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": 5, "b": {"description": "no sentence"}, "c": {"for": "every xs as x"}, "d": {"for": " every  xs ", "assert": [" x  is ", 3]}, "e": {"assert": []}, "f": {"for": 3, "assert": "x is 1"}, "g": " x   is  ", "h": {"any_of": 3}, "i": {"any_of": {}}, "j": {"any_of": {"b": " x   is  1 ", "a": [], "c": 3}}, "k": {"assert": " x  is  1", "description": 3}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": 5, "b": {"description": "no sentence"}, "c": {"for": "every xs as x"}, "d": {"for": " every  xs ", "assert": [" x  is ", 3]}, "e": {"assert": []}, "f": {"for": 3, "assert": "x is 1"}, "g": " x   is  ", "h": {"any_of": 3}, "i": {"any_of": {}}, "j": {"any_of": {"b": " x   is  1 ", "a": [], "c": 3}}, "k": {"assert": " x  is  1", "description": 3}}}}},
     "cases": [
       {
         "description": "print what was written, with angle brackets where it can't be printed, and from the parse when only the description is wrong",
@@ -3660,14 +3660,14 @@
       }
     ]
   },
-  {"description": "checks with values of mixed types", "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1.0, 'a'", "f": {"for": "every xs as x", "assert": "x.n is one of 'a', 1.0"}, "g": {"assert": ["x exists", "x is one of 1.0, 'a'"]}, "h": {"assert": ["x is one of 1, 'a'", "x is"]}, "q": {"any_of": {"o": "x is one of 1.0, 'a'"}}, "r": {"any_of": {"o": ["x exists", "x is one of 1.0, 'a'"], "p": "x exists"}}}}}}, "cases": [{"description": "a sentence with values of mixed types is printed as written and named by its check, with the line's number when the check has more than one line", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.any_of.written_wrong"], "input": {"things": [{"id": "t1", "x": 1}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.c: values of mixed types; checks.f: values of mixed types; checks.g: line 2: values of mixed types; checks.h: line 1: values of mixed types; checks.h: line 2: doesn't parse; checks.q: option o: values of mixed types; checks.r: option o: line 2: values of mixed types", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 6, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["values of mixed types"], "locations": []}, {"name": "checks.f", "value": ["values of mixed types"], "locations": []}, {"name": "checks.g", "value": ["line 2: values of mixed types"], "locations": []}, {"name": "checks.h", "value": ["line 1: values of mixed types", "line 2: doesn't parse"], "locations": []}, {"name": "checks.q", "value": ["option o: values of mixed types"], "locations": []}, {"name": "checks.r", "value": ["option o: line 2: values of mixed types"], "locations": []}]}], "status": {"s": "not_met"}, "expressions": {"s": {"c": "x is one of 1.0, 'a'", "f": "for every xs as x: x.n is one of 'a', 1.0", "g": "x exists and x is one of 1.0, 'a'", "h": "x is one of 1, 'a' and x is", "q": "one of: o(x is one of 1.0, 'a')", "r": "one of: o(x exists and x is one of 1.0, 'a') | p(x exists)"}}}]},
-  {"description": "a for line with values of mixed types in its whose", "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"i": {"for": "every xs whose v is one of 1, 'a' as x", "assert": "x exists"}}}}}, "cases": [{"description": "is printed as written and named by its check, with for: in front of the problem", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.for.line"], "input": {"things": [{"id": "t1", "xs": [{"v": 1}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.i: for: values of mixed types", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.i", "value": ["for: values of mixed types"], "locations": []}]}], "status": {"s": "not_met"}, "expressions": {"s": {"i": "for every xs whose v is one of 1, 'a' as x: x exists"}}}]},
-  {"description": "a check with values of mixed types and a field compared with itself", "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is one of 1, 'a' and y is at least y", "b": {"assert": ["x exists", "x is one of 1, 'a' and y is at least y"]}, "o": {"any_of": {"p": "x is one of 1, 'a' and y is at least y"}}, "f": {"for": "every xs as i", "assert": "i is one of 1, 'a' and y is at least y"}}}}}, "cases": [{"description": "lists both problems, on one line, in a list, in an any_of option and under a for line", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.written_wrong.self", "sentence.any_of.written_wrong"], "input": {"things": [{"id": "t1", "x": 1, "y": 1, "xs": [1]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.a: values of mixed types; checks.a: y is compared with itself; checks.b: line 2: values of mixed types; checks.b: line 2: y is compared with itself; checks.f: values of mixed types; checks.f: y is compared with itself; checks.o: option p: values of mixed types; checks.o: option p: y is compared with itself", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["values of mixed types", "y is compared with itself"]}, {"locations": [], "name": "checks.b", "value": ["line 2: values of mixed types", "line 2: y is compared with itself"]}, {"locations": [], "name": "checks.f", "value": ["values of mixed types", "y is compared with itself"]}, {"locations": [], "name": "checks.o", "value": ["option p: values of mixed types", "option p: y is compared with itself"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"a": "x is one of 1, 'a' and y is at least y", "b": "x exists and x is one of 1, 'a' and y is at least y", "f": "for every xs as i: i is one of 1, 'a' and y is at least y", "o": "one of: p(x is one of 1, 'a' and y is at least y)"}}}]},
-  {"description": "a check with values of mixed types and a field compared with itself in a whose", "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs whose k is at least k is one of 1, 'a'", "l": {"assert": ["x exists", "every xs whose k is at least k is one of 1, 'a'"]}}}}}, "cases": [{"description": "lists both problems, on one line and in a list", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.written_wrong.self"], "input": {"things": [{"id": "t1", "x": 1, "xs": [{"k": 1}]}]}, "results": [{"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["k is compared with itself, because in a whose it's read from the item: to read the subject's k, write thing.k", "values of mixed types"]}, {"locations": [], "name": "checks.l", "value": ["line 2: k is compared with itself, because in a whose it's read from the item: to read the subject's k, write thing.k", "line 2: values of mixed types"]}], "message": "checks.c: k is compared with itself, because in a whose it's read from the item: to read the subject's k, write thing.k; checks.c: values of mixed types; checks.l: line 2: k is compared with itself, because in a whose it's read from the item: to read the subject's k, write thing.k; checks.l: line 2: values of mixed types", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}], "status": {"s": "not_met"}, "expressions": {"s": {"c": "every xs whose k is at least k is one of 1, 'a'", "l": "x exists and every xs whose k is at least k is one of 1, 'a'"}}}]},
-  {"description": "a for line with a form its whose can't take", "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"i": {"for": "every xs whose name starts with count of ys as x", "assert": "x exists"}}}}}, "cases": [{"description": "is listed with for: in front of the problem, like every problem of the for line", "rules": ["sentence.for.line", "written_wrong.row", "sentence.print.written_wrong"], "input": {"things": [{"id": "t1", "xs": [{"name": "a"}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.i: for: \"starts with\" can't take a count of, a sum of or a plus", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.i", "value": ["for: \"starts with\" can't take a count of, a sum of or a plus"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"i": "for every xs whose name starts with count of ys as x: x exists"}}}]},
+  {"description": "checks with values of mixed types", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x is one of 1.0, 'a'", "f": {"for": "every xs as x", "assert": "x.n is one of 'a', 1.0"}, "g": {"assert": ["x exists", "x is one of 1.0, 'a'"]}, "h": {"assert": ["x is one of 1, 'a'", "x is"]}, "q": {"any_of": {"o": "x is one of 1.0, 'a'"}}, "r": {"any_of": {"o": ["x exists", "x is one of 1.0, 'a'"], "p": "x exists"}}}}}}, "cases": [{"description": "a sentence with values of mixed types is printed as written and named by its check, with the line's number when the check has more than one line", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.any_of.written_wrong"], "input": {"things": [{"id": "t1", "x": 1}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.c: values of mixed types; checks.f: values of mixed types; checks.g: line 2: values of mixed types; checks.h: line 1: values of mixed types; checks.h: line 2: doesn't parse; checks.q: option o: values of mixed types; checks.r: option o: line 2: values of mixed types", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 6, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.c", "value": ["values of mixed types"], "locations": []}, {"name": "checks.f", "value": ["values of mixed types"], "locations": []}, {"name": "checks.g", "value": ["line 2: values of mixed types"], "locations": []}, {"name": "checks.h", "value": ["line 1: values of mixed types", "line 2: doesn't parse"], "locations": []}, {"name": "checks.q", "value": ["option o: values of mixed types"], "locations": []}, {"name": "checks.r", "value": ["option o: line 2: values of mixed types"], "locations": []}]}], "status": {"s": "not_met"}, "expressions": {"s": {"c": "x is one of 1.0, 'a'", "f": "for every xs as x: x.n is one of 'a', 1.0", "g": "x exists and x is one of 1.0, 'a'", "h": "x is one of 1, 'a' and x is", "q": "one of: o(x is one of 1.0, 'a')", "r": "one of: o(x exists and x is one of 1.0, 'a') | p(x exists)"}}}]},
+  {"description": "a for line with values of mixed types in its whose", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"i": {"for": "every xs whose v is one of 1, 'a' as x", "assert": "x exists"}}}}}, "cases": [{"description": "is printed as written and named by its check, with for: in front of the problem", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.for.line"], "input": {"things": [{"id": "t1", "xs": [{"v": 1}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.i: for: values of mixed types", "passed": false, "cause": "value", "inputs": [{"name": "count(checks)", "value": 1, "locations": []}, {"name": "require", "value": "every", "locations": []}, {"name": "checks.i", "value": ["for: values of mixed types"], "locations": []}]}], "status": {"s": "not_met"}, "expressions": {"s": {"i": "for every xs whose v is one of 1, 'a' as x: x exists"}}}]},
+  {"description": "a check with values of mixed types and a field compared with itself", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"a": "x is one of 1, 'a' and y is at least y", "b": {"assert": ["x exists", "x is one of 1, 'a' and y is at least y"]}, "o": {"any_of": {"p": "x is one of 1, 'a' and y is at least y"}}, "f": {"for": "every xs as i", "assert": "i is one of 1, 'a' and y is at least y"}}}}}, "cases": [{"description": "lists both problems, on one line, in a list, in an any_of option and under a for line", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.written_wrong.self", "sentence.any_of.written_wrong"], "input": {"things": [{"id": "t1", "x": 1, "y": 1, "xs": [1]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.a: values of mixed types; checks.a: y is compared with itself; checks.b: line 2: values of mixed types; checks.b: line 2: y is compared with itself; checks.f: values of mixed types; checks.f: y is compared with itself; checks.o: option p: values of mixed types; checks.o: option p: y is compared with itself", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 4}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.a", "value": ["values of mixed types", "y is compared with itself"]}, {"locations": [], "name": "checks.b", "value": ["line 2: values of mixed types", "line 2: y is compared with itself"]}, {"locations": [], "name": "checks.f", "value": ["values of mixed types", "y is compared with itself"]}, {"locations": [], "name": "checks.o", "value": ["option p: values of mixed types", "option p: y is compared with itself"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"a": "x is one of 1, 'a' and y is at least y", "b": "x exists and x is one of 1, 'a' and y is at least y", "f": "for every xs as i: i is one of 1, 'a' and y is at least y", "o": "one of: p(x is one of 1, 'a' and y is at least y)"}}}]},
+  {"description": "a check with values of mixed types and a field compared with itself in a whose", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "every xs whose k is at least k is one of 1, 'a'", "l": {"assert": ["x exists", "every xs whose k is at least k is one of 1, 'a'"]}}}}}, "cases": [{"description": "lists both problems, on one line and in a list", "rules": ["sentence.print.written_wrong", "written_wrong.row", "in.values", "sentence.written_wrong.self"], "input": {"things": [{"id": "t1", "x": 1, "xs": [{"k": 1}]}]}, "results": [{"cause": "value", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 2}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.c", "value": ["k is compared with itself, because in a whose it's read from the item: to read the subject's k, write thing.k", "values of mixed types"]}, {"locations": [], "name": "checks.l", "value": ["line 2: k is compared with itself, because in a whose it's read from the item: to read the subject's k, write thing.k", "line 2: values of mixed types"]}], "message": "checks.c: k is compared with itself, because in a whose it's read from the item: to read the subject's k, write thing.k; checks.c: values of mixed types; checks.l: line 2: k is compared with itself, because in a whose it's read from the item: to read the subject's k, write thing.k; checks.l: line 2: values of mixed types", "passed": false, "requirement": "s", "subject": {"id": null, "type": "thing"}}], "status": {"s": "not_met"}, "expressions": {"s": {"c": "every xs whose k is at least k is one of 1, 'a'", "l": "x exists and every xs whose k is at least k is one of 1, 'a'"}}}]},
+  {"description": "a for line with a form its whose can't take", "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"i": {"for": "every xs whose name starts with count of ys as x", "assert": "x exists"}}}}}, "cases": [{"description": "is listed with for: in front of the problem, like every problem of the for line", "rules": ["sentence.for.line", "written_wrong.row", "sentence.print.written_wrong"], "input": {"things": [{"id": "t1", "xs": [{"name": "a"}]}]}, "results": [{"requirement": "s", "subject": {"type": "thing", "id": null}, "check": "$well_formed", "message": "checks.i: for: \"starts with\" can't take a count of, a sum of or a plus", "passed": false, "cause": "value", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "every"}, {"locations": [], "name": "checks.i", "value": ["for: \"starts with\" can't take a count of, a sum of or a plus"]}]}], "status": {"s": "not_met"}, "expressions": {"s": {"i": "for every xs whose name starts with count of ys as x: x exists"}}}]},
   {
     "description": "min_subjects 1000000",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1000000, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1000000, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is read as 1,000,000, so $min_subjects fails as value with one subject",
@@ -3683,7 +3683,7 @@
   },
   {
     "description": "min_subjects 1e6",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1e6, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1e6, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is read as 1,000,000, so $min_subjects fails as value with one subject",
@@ -3699,7 +3699,7 @@
   },
   {
     "description": "min_subjects 1.0e6",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1.0e6, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1.0e6, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is read as 1,000,000, so $min_subjects fails as value with one subject",
@@ -3715,7 +3715,7 @@
   },
   {
     "description": "min_subjects 1000000.0",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1000000.0, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1000000.0, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is read as 1,000,000, so $min_subjects fails as value with one subject",
@@ -3731,7 +3731,7 @@
   },
   {
     "description": "min_subjects 0 with no subjects",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 0, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "passes",
@@ -3745,7 +3745,7 @@
   },
   {
     "description": "min_subjects 1000001",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1000001, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1000001, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong with not a whole number from 0 to 1000000",
@@ -3760,7 +3760,7 @@
   },
   {
     "description": "min_subjects 1e308",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1e308, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1e308, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong with not a whole number from 0 to 1000000",
@@ -3775,7 +3775,7 @@
   },
   {
     "description": "min_subjects 9007199254740993",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 9007199254740993, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 9007199254740993, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong with not a whole number from 0 to 1000000",
@@ -3790,7 +3790,7 @@
   },
   {
     "description": "min_subjects -1",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": -1, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": -1, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong with not a whole number from 0 to 1000000",
@@ -3805,7 +3805,7 @@
   },
   {
     "description": "min_subjects 1.5",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1.5, "checks": {"c": "x exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"subject": {"from": "t", "identified_by": "id"}}, "requirements": {"s": {"subject": "subject", "min_subjects": 1.5, "checks": {"c": "x exists"}}}},
     "cases": [
       {
         "description": "is written wrong with not a whole number from 0 to 1000000",
@@ -3820,7 +3820,7 @@
   },
   {
     "description": "require some on a child subject needs a passing child under each parent",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
     "cases": [
       {
         "description": "isn't met when one parent has an approved pull request and another has none, and only the second parent's pull requests are violations",
@@ -3948,7 +3948,7 @@
   },
   {
     "description": "require some on a child subject with a parent that has no child",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
     "cases": [
       {
         "description": "fails the parent's own $min_subjects row with the default min_subjects",
@@ -3971,7 +3971,7 @@
   },
   {
     "description": "require some on a child subject with min_subjects 0",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}, "min_subjects": 0}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}, "min_subjects": 0}}},
     "cases": [
       {
         "description": "is met when the parent without a child is skipped",
@@ -4057,7 +4057,7 @@
   },
   {
     "description": "require some on a child subject with min_subjects 3",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}, "min_subjects": 3}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}, "min_subjects": 3}}},
     "cases": [
       {
         "description": "keeps a parent's own $min_subjects violation, and leaves out its failing pull request, when another of its pull requests passes",
@@ -4079,7 +4079,7 @@
   },
   {
     "description": "require some on a child subject whose field is missing, null or the wrong type",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
     "cases": [
       {
         "description": "fails a child whose field is missing, null or not text, so its parent needs another child",
@@ -4107,7 +4107,7 @@
   },
   {
     "description": "require some on a child of a child is decided under each direct parent",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"release": {"from": "releases", "identified_by": "name"}, "artifact": {"from": "every release.artifacts", "identified_by": "sha"}, "signature": {"from": "every artifact.signatures", "identified_by": "by"}}, "requirements": {"signed": {"subject": "signature", "require": "some", "checks": {"valid": "valid is true"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"release": {"from": "releases", "identified_by": "name"}, "artifact": {"from": "every release.artifacts", "identified_by": "sha"}, "signature": {"from": "every artifact.signatures", "identified_by": "by"}}, "requirements": {"signed": {"subject": "signature", "require": "some", "checks": {"valid": "valid is true"}}}},
     "cases": [
       {
         "description": "isn't met when an artifact has no valid signature, although another artifact of its release has one",
@@ -4135,7 +4135,7 @@
   },
   {
     "description": "require some on children read from a level above is decided under that level",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"release": {"from": "releases", "identified_by": "name"}, "signature": {"from": "every release.artifacts.signatures", "identified_by": "by"}}, "requirements": {"signed": {"subject": "signature", "require": "some", "checks": {"valid": "valid is true"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"release": {"from": "releases", "identified_by": "name"}, "signature": {"from": "every release.artifacts.signatures", "identified_by": "by"}}, "requirements": {"signed": {"subject": "signature", "require": "some", "checks": {"valid": "valid is true"}}}},
     "cases": [
       {
         "description": "is met when each release has a valid signature somewhere, whichever artifact it is on",
@@ -4159,7 +4159,7 @@
   },
   {
     "description": "require some on children read from the input counts across all of them",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pull request": {"from": "every commits.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pull request": {"from": "every commits.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
     "cases": [
       {
         "description": "is met when one pull request anywhere passes",

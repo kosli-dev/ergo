@@ -1,8 +1,10 @@
-import json, subprocess, sys
+import glob, json, os, re, subprocess, sys
 import jsonschema
 
-query = '[{"where": concat(" / ", [t, g.description, c.description]), "policy": g.policy, "report": data.ergo.report(c.input, g.policy, object.get(g, "params", {}))} | some t, gs in data.spec.cases; some g in gs; some c in g.cases]'
-opa = subprocess.run(["opa", "eval", "-d", "engines/rego", "-d", "spec:spec", "--format", "json", query], stdout=subprocess.PIPE, text=True)
+query = '[{"where": concat(" / ", [t, g.description, c.description]), "policy": g.policy, "report": data.ergo.report(c.input, g.policy, object.get(g, "params", {}))} | some t, gs in input; some g in gs; some c in g.cases]'
+spec = re.search(r'^_spec := "(v[^"]+)"$', open("engines/rego/ergo.rego").read(), re.M).group(1)
+topics = {os.path.basename(os.path.dirname(f)): json.loads(open(f).read().replace("{{spec}}", spec)) for f in sorted(glob.glob("spec/cases/*/cases.json"))}
+opa = subprocess.run(["opa", "eval", "-d", "engines/rego", "-I", "--format", "json", query], input=json.dumps(topics), stdout=subprocess.PIPE, text=True)
 if opa.returncode != 0:
     sys.exit(f"opa eval failed:\n{opa.stdout}")
 cases = json.loads(opa.stdout)["result"][0]["expressions"][0]["value"]

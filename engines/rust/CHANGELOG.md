@@ -4,6 +4,10 @@ Each release names the version of the spec it follows. The spec's own changes ar
 
 ## 0.4.0 (not released yet)
 
+### New
+
+- `ergo_policy_engine::SPEC` is public. It is the version of the spec the engine implements, the text a policy's `ergo_spec` and a report's `ergo` use, so a program that builds policies for the engine can write the version from it.
+
 ### Changed
 
 - A `from` line with more than one name needs `every` to read a list, and `every` works on a child subject, as in `ergo.rego` 0.6.0 and spec 0.6. A line that ends at text, a number or true or false gives that value as a subject, the subjects of a line must be of one type, `every` reads one list per name, a name it reads as a list must be one in every item, `every deployment` is written wrong, and a list before `named by each of` says to use a child subject. A failure for mixed types, or for a name that is a list in some items only, lists the items it names in `failed_items`, and a child subject of such a line is still read under each parent. Reports change as [spec/CHANGELOG.md](../../spec/CHANGELOG.md) says.

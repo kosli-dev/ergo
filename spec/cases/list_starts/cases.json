@@ -1,7 +1,7 @@
 [
   {
     "description": "every, some, count of and sum of walk a subject that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every xs"}}, "requirements": {"r": {"subject": "t", "checks": {"every": "every name is \"a\"", "some": "some name is \"b\"", "count": "count of name is 2", "sum": "sum of n is 3", "plain": "name is \"a\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every xs"}}, "requirements": {"r": {"subject": "t", "checks": {"every": "every name is \"a\"", "some": "some name is \"b\"", "count": "count of name is 2", "sum": "sum of n is 3", "plain": "name is \"a\""}}}},
     "cases": [
       {
         "description": "each item is read, and the names start at the subject's name",
@@ -79,7 +79,7 @@
   },
   {
     "description": "a list inside a list in the middle of a path is not walked again either",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "every rows.n is 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "every rows.n is 1"}}}},
     "cases": [
       {
         "description": "the inner list is an item that isn't an object",
@@ -93,7 +93,7 @@
   },
   {
     "description": "the right side of a phrase that takes a list walks a subject that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every xs"}}, "requirements": {"r": {"subject": "t", "checks": {"in": "$params.w is in name", "one_of": "$params.w is one of name", "not_one_of": "$params.z is not one of name", "all": "$params.ws contains all of name", "none": "$params.zs contains none of name", "some": "$params.ws contains some of name", "not_all": "$params.zs does not contain all of name", "matches": "$params.w matches pattern", "not_matches": "$params.z does not match pattern", "contains": "$params.ws contains name"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every xs"}}, "requirements": {"r": {"subject": "t", "checks": {"in": "$params.w is in name", "one_of": "$params.w is one of name", "not_one_of": "$params.z is not one of name", "all": "$params.ws contains all of name", "none": "$params.zs contains none of name", "some": "$params.ws contains some of name", "not_all": "$params.zs does not contain all of name", "matches": "$params.w matches pattern", "not_matches": "$params.z does not match pattern", "contains": "$params.ws contains name"}}}},
     "params": {"w": "a", "z": "z", "ws": ["a", "b"], "zs": ["z"]},
     "cases": [
       {
@@ -185,7 +185,7 @@
   },
   {
     "description": "a check that reads a key from a subject that is a list with named by fails as a whole",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every xs"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "every age_days is less than $params.max_days named by severity"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every xs"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "every age_days is less than $params.max_days named by severity"}}}},
     "params": {"max_days": {"high": 3}},
     "cases": [
       {
@@ -200,7 +200,7 @@
   },
   {
     "description": "a part at the start of a path walks a subject that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every xs", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"every": "every pl.name is \"a\"", "count": "count of pl.name is 2", "right": "$params.w is in pl.name", "plain": "pl.name is \"a\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every xs", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"every": "every pl.name is \"a\"", "count": "count of pl.name is 2", "right": "$params.w is in pl.name", "plain": "pl.name is \"a\""}}}},
     "params": {"w": "a"},
     "cases": [
       {
@@ -218,7 +218,7 @@
   },
   {
     "description": "a path from $input on an input that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"exists": "$input.id exists", "is": "$input.id is \"a\"", "right": "id is $input.id", "every": "every $input.id is \"a\"", "in": "id is in $input.id"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"exists": "$input.id exists", "is": "$input.id is \"a\"", "right": "id is $input.id", "every": "every $input.id is \"a\"", "in": "id is in $input.id"}}}},
     "cases": [
       {
         "description": "a key on the input fails as not_an_object and names the input, and the walking words walk it",
@@ -236,7 +236,7 @@
   },
   {
     "description": "a position on an input that is a list, then a key",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "$input[0].id is \"a\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "$input[0].id is \"a\""}}}},
     "cases": [
       {
         "description": "a key on an item that isn't an object fails as unusable and names the item",
@@ -250,7 +250,7 @@
   },
   {
     "description": "a name read from the subject that is a list walks it on the right of a list phrase after every and inside a whose",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every xs", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"right": "every rows.v is in name", "whose_part": "count of rows whose v is in pl.z is 2", "whose_param": "count of rows whose v is in $params.q is 2", "whose_count": "count of rows whose n is count of pl.z is 2"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every xs", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"right": "every rows.v is in name", "whose_part": "count of rows whose v is in pl.z is 2", "whose_param": "count of rows whose v is in $params.q is 2", "whose_count": "count of rows whose n is count of pl.z is 2"}}}},
     "params": {"q": ["a"]},
     "cases": [
       {
@@ -268,7 +268,7 @@
   },
   {
     "description": "a subject that is a list, read on the right of the phrase after every, isn't said to be anything but a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every xs"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "every rows.n is in names"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every xs"}}, "requirements": {"r": {"subject": "t", "checks": {"c": "every rows.n is in names"}}}},
     "cases": [
       {
         "description": "values of two types fail each item as unusable",
@@ -290,7 +290,7 @@
   },
   {
     "description": "a name in a whose is read from the row, so a bad list of the same name on the subject isn't blamed",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of rows whose v is in os.name is 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of rows whose v is in os.name is 1"}}}},
     "cases": [
       {
         "description": "a row with no field of that name fails as absent, naming the row's field and not the subject's",

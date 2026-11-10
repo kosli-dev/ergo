@@ -945,7 +945,7 @@ mod tests {
 
     fn policy(requirements: Value) -> Value {
         json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": requirements,
         })
@@ -1393,7 +1393,7 @@ mod tests {
     #[test]
     fn a_policy_with_no_requirements_is_never_compliant() {
         let report = report_of(
-            json!({"ergo_spec": "v0.6-dev", "subjects": {}, "requirements": {}}),
+            json!({"ergo_spec": SPEC, "subjects": {}, "requirements": {}}),
             Value::Null,
         );
         assert_eq!(report["compliant"], json!(false));
@@ -1415,7 +1415,7 @@ mod tests {
         assert_eq!(
             row["inputs"],
             json!([
-                {"name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.6-dev"], "locations": []},
+                {"name": "policy ergo_spec", "value": [format!("unsupported version v9.9, expected {SPEC}")], "locations": []},
                 {"name": "requirements", "value": ["missing"], "locations": []},
             ])
         );
@@ -1442,7 +1442,7 @@ mod tests {
             json!([{"name": "policy", "value": ["not an object"], "locations": []}])
         );
         let report = report_of(
-            json!({"ergo_spec": "v0.6-dev", "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]}),
+            json!({"ergo_spec": SPEC, "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]}),
             Value::Null,
         );
         assert_eq!(report["requirements"].as_object().unwrap().len(), 1);
@@ -1459,7 +1459,7 @@ mod tests {
     fn a_name_that_starts_with_a_dollar_sign_is_written_wrong_wherever_it_stands() {
         let wrong = json!(["a name can't start with $"]);
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"$s": {"from": "xs"}, "t": {"from": "xs", "has": {"$p": "ys"}}},
             "requirements": {
                 "$r": {"subject": "t", "checks": {"c": "x exists"}},
@@ -1515,7 +1515,7 @@ mod tests {
         let wrong = "a name can't start or end with a space or an invisible character";
         for name in [" x", "x ", "\u{a0}x", "x\u{200b}", "\u{feff}x", "\tx"] {
             let policy = json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {name: {"from": "xs"}, "u": {"from": "xs"}},
                 "requirements": {
                     name: {"subject": "u", "checks": {"c": "x exists"}},
@@ -1544,7 +1544,7 @@ mod tests {
                 && i["name"].as_str().is_some_and(|n| n.starts_with("checks."))));
             let parts = report_of(
                 json!({
-                    "ergo_spec": "v0.6-dev",
+                    "ergo_spec": SPEC,
                     "subjects": {"t": {"from": "xs", "has": {name: "ys"}}},
                     "requirements": {"h": {"subject": "t", "checks": {"c": "x exists"}}}
                 }),
@@ -1575,7 +1575,7 @@ mod tests {
     #[test]
     fn the_report_names_the_spec_version_and_the_engine() {
         let report = report_of(policy(json!({"s": good()})), Value::Null);
-        assert_eq!(report["ergo"], json!("v0.6-dev"));
+        assert_eq!(report["ergo"], json!(SPEC));
         assert_eq!(
             report["engine"],
             json!({"name": "ergo-rust", "version": env!("CARGO_PKG_VERSION")})
@@ -2203,15 +2203,24 @@ mod tests {
     }
 
     #[test]
-    fn engine_and_spec_are_the_ones_this_engine_follows() {
-        assert_eq!(SPEC, "v0.6-dev");
+    fn the_spec_is_written_as_v_digits_dot_digits_with_an_optional_dev() {
+        let version = SPEC.strip_prefix('v').unwrap();
+        let version = version.strip_suffix("-dev").unwrap_or(version);
+        let (major, minor) = version.split_once('.').unwrap();
+        for part in [major, minor] {
+            assert!(!part.is_empty() && part.chars().all(|c| c.is_ascii_digit()));
+        }
+    }
+
+    #[test]
+    fn the_engine_is_named_ergo_rust() {
         assert_eq!(engine()["name"], json!("ergo-rust"));
     }
 
     #[test]
     fn a_ref_through_a_list_of_params_points_at_where_the_read_stopped() {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"s": {"subject": "thing", "checks": {
                 "c": "x is in $params[0].v",

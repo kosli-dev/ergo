@@ -1380,6 +1380,7 @@ pub fn counted_text(counted: &Counted, ctx: &Ctx, cause: Cause) -> Option<String
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::SPEC;
     use crate::path::{Located, Location, Start, Step};
     use serde_json::json;
     use std::collections::BTreeMap;
@@ -2125,7 +2126,7 @@ mod tests {
     fn a_count_or_sum_through_a_value_that_isnt_an_object_names_that_value() {
         for sentence in ["count of xs.m.v is 3", "sum of xs.m.v is 3"] {
             let policy = json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {"thing": {"from": "things", "identified_by": "id"}},
                 "requirements": {"r": {"subject": "thing", "checks": {"c": sentence}}}
             });
@@ -2515,7 +2516,7 @@ mod tests {
 
     fn row_names(checks: Value) -> Vec<String> {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"t": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "t", "checks": {"c": checks}}}
         });
@@ -2960,7 +2961,7 @@ mod tests {
             found["has"] = has;
         }
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {subject: found},
             "requirements": {"r": {"subject": subject, "checks": {"c": check}}}
         });

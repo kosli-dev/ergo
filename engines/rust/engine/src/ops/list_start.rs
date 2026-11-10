@@ -345,11 +345,12 @@ fn every_path<'a>(check: &'a Check, out: &mut Vec<&'a Path>) {
 
 #[cfg(test)]
 mod tests {
+    use crate::SPEC;
     use serde_json::{Value, json};
 
     fn row(check: Value, subject: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"t": {"from": "every xs"}},
             "requirements": {"r": {"subject": "t", "checks": {"c": check}}}
         });

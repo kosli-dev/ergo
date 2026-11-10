@@ -1,7 +1,7 @@
 [
   {
     "description": "every distinct on a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}}, "requirements": {"r": {"subject": "c", "checks": {"v": "version exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}}, "requirements": {"r": {"subject": "c", "checks": {"v": "version exists"}}}},
     "cases": [
       {
         "description": "exact copies make one subject, and its rows list the location of every copy",
@@ -91,7 +91,7 @@
   },
   {
     "description": "every distinct and a path from the input",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}}, "requirements": {"r": {"subject": "c", "checks": {"w": "version is not $input.banned"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}}, "requirements": {"r": {"subject": "c", "checks": {"w": "version is not $input.banned"}}}},
     "cases": [
       {
         "description": "a location that isn't under the first copy is listed once",
@@ -105,7 +105,7 @@
   },
   {
     "description": "a grandchild of a subject read with every distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "every c.licenses", "identified_by": "id"}, "term": {"from": "every lic.terms", "identified_by": "t"}}, "requirements": {"r": {"subject": "term", "checks": {"k": "ok is true"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "every c.licenses", "identified_by": "id"}, "term": {"from": "every lic.terms", "identified_by": "t"}}, "requirements": {"r": {"subject": "term", "checks": {"k": "ok is true"}}}},
     "cases": [
       {
         "description": "its rows list the location under every copy of the grandparent",
@@ -120,7 +120,7 @@
   },
   {
     "description": "every distinct on a from line that walks two lists",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sboms.components", "identified_by": "name"}}, "requirements": {"r": {"subject": "c", "checks": {"v": "version exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every distinct sboms.components", "identified_by": "name"}}, "requirements": {"r": {"subject": "c", "checks": {"v": "version exists"}}}},
     "cases": [
       {
         "description": "copies in different lists make one subject",
@@ -137,7 +137,7 @@
   },
   {
     "description": "every distinct with conditions",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components whose type is \"library\"", "identified_by": "name"}}, "requirements": {"r": {"subject": "c", "checks": {"v": "version exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every distinct sbom.components whose type is \"library\"", "identified_by": "name"}}, "requirements": {"r": {"subject": "c", "checks": {"v": "version exists"}}}},
     "cases": [
       {
         "description": "copies get one $applies row, which lists the location of every copy",
@@ -161,7 +161,7 @@
   },
   {
     "description": "a child of a subject read with every distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "every c.licenses", "identified_by": "id"}}, "requirements": {"r": {"subject": "lic", "checks": {"k": "ok is true", "e": "every notes is \"fine\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "every c.licenses", "identified_by": "id"}}, "requirements": {"r": {"subject": "lic", "checks": {"k": "ok is true", "e": "every notes is \"fine\""}}}},
     "cases": [
       {
         "description": "the child's rows list the location under every copy of the parent",
@@ -177,7 +177,7 @@
   },
   {
     "description": "a subject that narrows one read with every distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lib": {"from": "c whose type is \"library\""}}, "requirements": {"r": {"subject": "lib", "checks": {"v": "version exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lib": {"from": "c whose type is \"library\""}}, "requirements": {"r": {"subject": "lib", "checks": {"v": "version exists"}}}},
     "cases": [
       {
         "description": "it takes the subjects without copies, and its expressions say every distinct",
@@ -195,7 +195,7 @@
   },
   {
     "description": "count of distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": "count of distinct commits.author is at least 2"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": "count of distinct commits.author is at least 2"}}}},
     "cases": [
       {
         "description": "copies count once, and the list in inputs holds every value",
@@ -281,7 +281,7 @@
   },
   {
     "description": "count of distinct with a whose",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": "count of distinct commits whose verified is true is 2"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": "count of distinct commits whose verified is true is 2"}}}},
     "cases": [
       {
         "description": "only the items the whose keeps are counted, each value once",
@@ -303,7 +303,7 @@
   },
   {
     "description": "sum of distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": "sum of distinct stages.usd is 3.5"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": "sum of distinct stages.usd is 3.5"}}}},
     "cases": [
       {
         "description": "each amount is added once",
@@ -333,7 +333,7 @@
   },
   {
     "description": "every and some distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"e": "every distinct commits.author is \"ann\"", "s": "some distinct commits.author is \"cid\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"e": "every distinct commits.author is \"ann\"", "s": "some distinct commits.author is \"cid\""}}}},
     "cases": [
       {
         "description": "copies that fail are one entry of failed_items with the location of every copy",
@@ -375,7 +375,7 @@
   },
   {
     "description": "every distinct with a whose",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"e": "every distinct commits whose verified is true exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"e": "every distinct commits whose verified is true exists"}}}},
     "cases": [
       {
         "description": "an item the whose can't decide isn't dropped as a copy and fails the check",
@@ -389,7 +389,7 @@
   },
   {
     "description": "for every distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"f": {"for": "every distinct commits.author as who", "assert": "who is \"ann\""}, "g": {"for": "every distinct commits as commit, some commit.reviews as review", "assert": "review is \"ok\""}, "h": {"for": "every distinct commits as commit, first of reviewers whose by is commit.author as r", "assert": "r.ok is true"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"f": {"for": "every distinct commits.author as who", "assert": "who is \"ann\""}, "g": {"for": "every distinct commits as commit, some commit.reviews as review", "assert": "review is \"ok\""}, "h": {"for": "every distinct commits as commit, first of reviewers whose by is commit.author as r", "assert": "r.ok is true"}}}}},
     "cases": [
       {
         "description": "the alias stands for each value once, and a failed entry lists every copy",
@@ -405,7 +405,7 @@
   },
   {
     "description": "distinct written wrong, part 1 of 3",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}, "d": {"from": "distinct sbom.components"}}, "requirements": {"r": {"subject": "s", "checks": {"a": "every xs whose distinct y is 1", "b": {"for": "every xs as x, distinct first of ys as y", "assert": "y is 1"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}, "d": {"from": "distinct sbom.components"}}, "requirements": {"r": {"subject": "s", "checks": {"a": "every xs whose distinct y is 1", "b": {"for": "every xs as x, distinct first of ys as y", "assert": "y is 1"}}}}},
     "cases": [
       {
         "description": "distinct out of place is written wrong",
@@ -419,7 +419,7 @@
   },
   {
     "description": "distinct written wrong, part 2 of 3",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}, "d": {"from": "distinct sbom.components"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "distinct xs is 1", "d": "distinct is 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}, "d": {"from": "distinct sbom.components"}}, "requirements": {"r": {"subject": "s", "checks": {"c": "distinct xs is 1", "d": "distinct is 1"}}}},
     "cases": [
       {
         "description": "distinct out of place is written wrong",
@@ -433,7 +433,7 @@
   },
   {
     "description": "distinct written wrong, part 3 of 3",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}, "d": {"from": "distinct sbom.components"}}, "requirements": {"r": {"subject": "s", "checks": {"e": "every distinct xs is", "f": "count of distinct xs is"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}, "d": {"from": "distinct sbom.components"}}, "requirements": {"r": {"subject": "s", "checks": {"e": "every distinct xs is", "f": "count of distinct xs is"}}}},
     "cases": [
       {
         "description": "distinct out of place is written wrong",
@@ -447,7 +447,7 @@
   },
   {
     "description": "distinct on a from line without every",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "distinct sbom.components"}}, "requirements": {"r": {"subject": "d", "checks": {"v": "version exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "distinct sbom.components"}}, "requirements": {"r": {"subject": "d", "checks": {"v": "version exists"}}}},
     "cases": [
       {
         "description": "it is written wrong",
@@ -461,7 +461,7 @@
   },
   {
     "description": "a field called distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": ".distinct is 1", "e": "every xs.distinct is 2", "n": "count of distinct xs.distinct is 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"c": ".distinct is 1", "e": "every xs.distinct is 2", "n": "count of distinct xs.distinct is 1"}}}},
     "cases": [
       {
         "description": "it is written with a dot first and needs none later",
@@ -477,7 +477,7 @@
   },
   {
     "description": "a subject called distinct",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"distinct": {"from": "every distinct items"}}, "requirements": {"r": {"subject": "distinct", "checks": {"c": "\"distinct\" is an object", "k": "k is 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"distinct": {"from": "every distinct items"}}, "requirements": {"r": {"subject": "distinct", "checks": {"c": "\"distinct\" is an object", "k": "k is 1"}}}},
     "cases": [
       {
         "description": "it is written in quotes",
@@ -492,7 +492,7 @@
   },
   {
     "description": "distinct with a phrase that also reads a bare name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}, "f": {"from": "every rels whose some distinct files.kind is at least lo"}}, "requirements": {"r": {"subject": "s", "checks": {"bare": "every distinct xs.k is at least lo", "dot": "every distinct xs.k is at least .lo", "in": "some distinct xs.k is in allowed", "two": "every distinct xs.ys.k is lo", "lines": {"assert": ["xs exists", "every distinct xs.k is lo"]}}}, "rf": {"subject": "f", "checks": {"c": "name exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}, "f": {"from": "every rels whose some distinct files.kind is at least lo"}}, "requirements": {"r": {"subject": "s", "checks": {"bare": "every distinct xs.k is at least lo", "dot": "every distinct xs.k is at least .lo", "in": "some distinct xs.k is in allowed", "two": "every distinct xs.ys.k is lo", "lines": {"assert": ["xs exists", "every distinct xs.k is lo"]}}}, "rf": {"subject": "f", "checks": {"c": "name exists"}}}},
     "cases": [
       {
         "description": "it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher",
@@ -554,7 +554,7 @@
   },
   {
     "description": "distinct with a phrase that reads only outside the item",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"has": {"lim": "limits.lo"}}}, "requirements": {"r": {"subject": "s", "checks": {"input": "every distinct xs.k is at least $input.lo", "part": "every distinct xs.k is at least lim", "whose": "every distinct xs.k that is at least 1 is 5", "for": {"for": "every distinct xs as x", "assert": "x.k is at least x.lo"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"has": {"lim": "limits.lo"}}}, "requirements": {"r": {"subject": "s", "checks": {"input": "every distinct xs.k is at least $input.lo", "part": "every distinct xs.k is at least lim", "whose": "every distinct xs.k that is at least 1 is 5", "for": {"for": "every distinct xs as x", "assert": "x.k is at least x.lo"}}}}},
     "cases": [
       {
         "description": "it reads and the copies count once",
@@ -571,7 +571,7 @@
   },
   {
     "description": "a value that holds a key called locations",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "c", "checks": {"v": "v is 1", "e": "every vs is 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every distinct xs", "identified_by": "id"}}, "requirements": {"r": {"subject": "c", "checks": {"v": "v is 1", "e": "every vs is 1"}}}},
     "cases": [
       {
         "description": "only the locations of the row are listed for every copy, never the value",
@@ -586,7 +586,7 @@
   },
   {
     "description": "locations read through the subject and read from the input",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "every c.licenses", "identified_by": "id"}}, "requirements": {"r": {"subject": "c", "checks": {"own": "version is \"1\"", "d0": "version is $input.sbom.components[0].version", "d2": "version is $input.sbom.components[2].version"}}, "l": {"subject": "lic", "checks": {"k": "ok is true", "dl": "ok is $input.sbom.components[0].licenses[0].ok", "par": "c.version is \"1\"", "whole": "c is an object", "n": {"for": "every notes as note", "assert": "note is \"fine\""}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"c": {"from": "every distinct sbom.components", "identified_by": "name"}, "lic": {"from": "every c.licenses", "identified_by": "id"}}, "requirements": {"r": {"subject": "c", "checks": {"own": "version is \"1\"", "d0": "version is $input.sbom.components[0].version", "d2": "version is $input.sbom.components[2].version"}}, "l": {"subject": "lic", "checks": {"k": "ok is true", "dl": "ok is $input.sbom.components[0].licenses[0].ok", "par": "c.version is \"1\"", "whole": "c is an object", "n": {"for": "every notes as note", "assert": "note is \"fine\""}}}}},
     "cases": [
       {
         "description": "a read through the subject lists every copy, and a path from the input lists only the location it names",
@@ -610,7 +610,7 @@
   },
   {
     "description": "distinct with a phrase that reads a bare name, in every place a sentence can stand, part 1 of 5",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"anyof": {"any_of": {"x": "every distinct ts.fs.k is at least lo", "y": "lo exists"}}, "for": {"for": "every ts as t", "assert": "every distinct t.fs.k is at least lo"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"anyof": {"any_of": {"x": "every distinct ts.fs.k is at least lo", "y": "lo exists"}}, "for": {"for": "every ts as t", "assert": "every distinct t.fs.k is at least lo"}}}}},
     "cases": [
       {
         "description": "it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher",
@@ -656,7 +656,7 @@
   },
   {
     "description": "distinct with a phrase that reads a bare name, in every place a sentence can stand, part 2 of 5",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"fordot": {"for": "every ts as t", "assert": "every distinct t.fs.k is at least .lo"}, "forin": {"for": "every ts as t", "assert": "some distinct t.fs.k is in ok"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"fordot": {"for": "every ts as t", "assert": "every distinct t.fs.k is at least .lo"}, "forin": {"for": "every ts as t", "assert": "some distinct t.fs.k is in ok"}}}}},
     "cases": [
       {
         "description": "it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher",
@@ -702,7 +702,7 @@
   },
   {
     "description": "distinct with a phrase that reads a bare name, in every place a sentence can stand, part 3 of 5",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"forinput": {"for": "every ts as t", "assert": "every distinct $input.s.ts[0].fs.k is at least lo"}, "forlines": {"for": "every ts as t", "assert": ["t exists", "every distinct t.fs.k is at least lo"]}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"forinput": {"for": "every ts as t", "assert": "every distinct $input.s.ts[0].fs.k is at least lo"}, "forlines": {"for": "every ts as t", "assert": ["t exists", "every distinct t.fs.k is at least lo"]}}}}},
     "cases": [
       {
         "description": "it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher",
@@ -748,7 +748,7 @@
   },
   {
     "description": "distinct with a phrase that reads a bare name, in every place a sentence can stand, part 4 of 5",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"fortwo": {"for": "every ts as t, every t.fs as f", "assert": "every distinct f.ok is at least lo"}, "forwhose": {"for": "every ts as t", "assert": "every distinct t.fs.k whose lo is 1 is at least lo"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"fortwo": {"for": "every ts as t, every t.fs as f", "assert": "every distinct f.ok is at least lo"}, "forwhose": {"for": "every ts as t", "assert": "every distinct t.fs.k whose lo is 1 is at least lo"}}}}},
     "cases": [
       {
         "description": "it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher",
@@ -794,7 +794,7 @@
   },
   {
     "description": "distinct with a phrase that reads a bare name, in every place a sentence can stand, part 5 of 5",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"plus": "every distinct ts.fs.k is lo plus 4", "pluszero": "every distinct ts.fs.k is at least lo plus 0"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"plus": "every distinct ts.fs.k is lo plus 4", "pluszero": "every distinct ts.fs.k is at least lo plus 0"}}}},
     "cases": [
       {
         "description": "it reads the subject's lo, so it reads whatever the dropped copy's lo is: higher",
@@ -832,7 +832,7 @@
   },
   {
     "description": "distinct under a for line with a phrase that reads the alias",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"alias": {"for": "every ts as t", "assert": "every distinct t.fs.k is at least t.lo"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"alias": {"for": "every ts as t", "assert": "every distinct t.fs.k is at least t.lo"}}}}},
     "cases": [
       {
         "description": "it reads, because the alias is outside the item",
@@ -846,7 +846,7 @@
   },
   {
     "description": "distinct with a list read through an alias or a part",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"has": {"lim": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"aliasin": {"for": "every ts as t", "assert": "some distinct t.fs.k is in t.ok"}, "aliasone": {"for": "every ts as t", "assert": "some distinct t.fs.k is one of t.ok"}, "aliasnot": {"for": "every ts as t", "assert": "every distinct t.fs.k is not in t.ok"}, "aliasmatch": {"for": "every ts as t", "assert": "every distinct t.fs.k matches t.pats"}, "partin": "some distinct ts.fs.k is in lim", "partmatch": "every distinct ts.fs.k matches lim"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"has": {"lim": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"aliasin": {"for": "every ts as t", "assert": "some distinct t.fs.k is in t.ok"}, "aliasone": {"for": "every ts as t", "assert": "some distinct t.fs.k is one of t.ok"}, "aliasnot": {"for": "every ts as t", "assert": "every distinct t.fs.k is not in t.ok"}, "aliasmatch": {"for": "every ts as t", "assert": "every distinct t.fs.k matches t.pats"}, "partin": "some distinct ts.fs.k is in lim", "partmatch": "every distinct ts.fs.k matches lim"}}}},
     "cases": [
       {
         "description": "the list is outside the item, so it reads even when copies differ in their own ok",
@@ -865,7 +865,7 @@
   },
   {
     "description": "distinct with a bare list name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"has": {"lim": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"itemin": "some distinct ts.fs.k is in ok", "itemdot": "some distinct ts.fs.k is in .lim", "first": "every distinct ts.fs.k is at least first of lol", "last": "every distinct ts.fs.k is at least last of lol", "badfor": {"for": "every ys as y whose y is 1", "assert": ["y exists", "every distinct ts.fs.k is at least lo"]}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"has": {"lim": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"itemin": "some distinct ts.fs.k is in ok", "itemdot": "some distinct ts.fs.k is in .lim", "first": "every distinct ts.fs.k is at least first of lol", "last": "every distinct ts.fs.k is at least last of lol", "badfor": {"for": "every ys as y whose y is 1", "assert": ["y exists", "every distinct ts.fs.k is at least lo"]}}}}},
     "cases": [
       {
         "description": "it reads, and a for line that doesn't read gives only its own problem",
@@ -879,7 +879,7 @@
   },
   {
     "description": "distinct with a list read on a parent subject",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"p": {"from": "rs", "identified_by": "name", "has": {"pl": "ok"}}, "w": {"from": "every p.gs whose some distinct hs.k is in p.ok"}}, "requirements": {"r": {"subject": "w", "checks": {"in": "some distinct hs.k is in p.ok", "one": "some distinct hs.k is one of p.ok", "not": "every distinct hs.k is not in p.ok", "part": "some distinct hs.k is in p.pl"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"p": {"from": "rs", "identified_by": "name", "has": {"pl": "ok"}}, "w": {"from": "every p.gs whose some distinct hs.k is in p.ok"}}, "requirements": {"r": {"subject": "w", "checks": {"in": "some distinct hs.k is in p.ok", "one": "some distinct hs.k is one of p.ok", "not": "every distinct hs.k is not in p.ok", "part": "some distinct hs.k is in p.pl"}}}},
     "cases": [
       {
         "description": "it reads, in a check and in the from line",
@@ -897,7 +897,7 @@
   },
   {
     "description": "distinct under a for line that is written wrong for another reason, part 1 of 4",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"has": {"pp": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"badalias": {"for": "every ts as every", "assert": "every distinct xs.k is in ok"}, "lastwhose": {"for": "every ts whose k is last of zs as t", "assert": "every distinct xs.k is in ok"}, "parse": {"for": "every ts", "assert": "every distinct xs.k is in ok"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"has": {"pp": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"badalias": {"for": "every ts as every", "assert": "every distinct xs.k is in ok"}, "lastwhose": {"for": "every ts whose k is last of zs as t", "assert": "every distinct xs.k is in ok"}, "parse": {"for": "every ts", "assert": "every distinct xs.k is in ok"}}}}},
     "cases": [
       {
         "description": "each check lists only its own problems, and none is about distinct",
@@ -911,7 +911,7 @@
   },
   {
     "description": "distinct under a for line that is written wrong for another reason, part 2 of 4",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"has": {"pp": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"part": {"for": "every ts as pp", "assert": "every distinct xs.k is in ok"}, "selfwhose": {"for": "every ts whose k equals k as t", "assert": "every distinct xs.k is in ok"}, "sorted": {"for": "every ts sorted by k as t", "assert": "every distinct xs.k is in ok"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"has": {"pp": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"part": {"for": "every ts as pp", "assert": "every distinct xs.k is in ok"}, "selfwhose": {"for": "every ts whose k equals k as t", "assert": "every distinct xs.k is in ok"}, "sorted": {"for": "every ts sorted by k as t", "assert": "every distinct xs.k is in ok"}}}}},
     "cases": [
       {
         "description": "each check lists only its own problems, and none is about distinct",
@@ -925,7 +925,7 @@
   },
   {
     "description": "distinct under a for line that is written wrong for another reason, part 3 of 4",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"has": {"pp": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"subject": {"for": "every ts as s", "assert": "every distinct xs.k is in ok"}, "ten": {"for": "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t", "assert": "every distinct xs.k is in ok"}, "three": {"for": "every ts as a1, every ts as a2, every ts as a3", "assert": "every distinct xs.k is in ok"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"has": {"pp": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"subject": {"for": "every ts as s", "assert": "every distinct xs.k is in ok"}, "ten": {"for": "every a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 as t", "assert": "every distinct xs.k is in ok"}, "three": {"for": "every ts as a1, every ts as a2, every ts as a3", "assert": "every distinct xs.k is in ok"}}}}},
     "cases": [
       {
         "description": "each check lists only its own problems, and none is about distinct",
@@ -939,7 +939,7 @@
   },
   {
     "description": "distinct under a for line that is written wrong for another reason, part 4 of 4",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {"has": {"pp": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"twice": {"for": "every ts as t, every ts as t", "assert": "every distinct xs.k is in ok"}, "twicelines": {"for": "every ts as t, every t.fs as t", "assert": ["t exists", "every distinct xs.k is in ok"]}, "unknown": {"for": "every ts named by zz as t", "assert": "every distinct xs.k is in ok"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {"has": {"pp": "ok"}}}, "requirements": {"r": {"subject": "s", "checks": {"twice": {"for": "every ts as t, every ts as t", "assert": "every distinct xs.k is in ok"}, "twicelines": {"for": "every ts as t, every t.fs as t", "assert": ["t exists", "every distinct xs.k is in ok"]}, "unknown": {"for": "every ts named by zz as t", "assert": "every distinct xs.k is in ok"}}}}},
     "cases": [
       {
         "description": "each check lists only its own problems, and none is about distinct",
@@ -953,7 +953,7 @@
   },
   {
     "description": "distinct with a list that is the subject",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"lo": {"from": "los"}}, "requirements": {"r": {"subject": "lo", "checks": {"c": "some distinct xs.k is in lo"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"lo": {"from": "los"}}, "requirements": {"r": {"subject": "lo", "checks": {"c": "some distinct xs.k is in lo"}}}},
     "cases": [
       {
         "description": "the subject's name reads the subject, outside the item, so it reads",
@@ -967,7 +967,7 @@
   },
   {
     "description": "distinct under a for line with a misplaced distinct or a word of the grammar in it",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"misplaced": {"for": "every ts as t, distinct first of ts as u", "assert": "every distinct xs.k is in ok"}, "word": {"for": "every ts whose distinct is 1 as t", "assert": "every distinct xs.k is in ok"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"s": {}}, "requirements": {"r": {"subject": "s", "checks": {"misplaced": {"for": "every ts as t, distinct first of ts as u", "assert": "every distinct xs.k is in ok"}, "word": {"for": "every ts whose distinct is 1 as t", "assert": "every distinct xs.k is in ok"}}}}},
     "cases": [
       {
         "description": "the for line doesn't read, so the lines under it get only its problem",

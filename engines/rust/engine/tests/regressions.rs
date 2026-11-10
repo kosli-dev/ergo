@@ -3,6 +3,8 @@ use std::path::{Path, PathBuf};
 
 use serde_json::{Value, json};
 
+mod common;
+
 fn regression_files() -> Vec<PathBuf> {
     let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/regressions");
     let mut files: Vec<PathBuf> = fs::read_dir(&dir)
@@ -36,7 +38,7 @@ fn every_regression_gives_the_report_it_pins() {
     let mut count = 0;
     for file in files {
         let text = fs::read_to_string(&file).unwrap();
-        let entries: Value = serde_json::from_str(&text)
+        let entries: Value = serde_json::from_str(&common::fill_spec(&text))
             .unwrap_or_else(|e| panic!("can't parse {}: {e}", file.display()));
         let name = file
             .parent()

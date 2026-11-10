@@ -1,7 +1,7 @@
 [
   {
     "description": "an alias that is a list is read item by item on the right of a list phrase, after every, in a whose and in a that",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"every": {"for": "every deps as d", "assert": "every rows.v is in d.name"}, "whose": {"for": "every deps as d", "assert": "count of rows whose v is in d.name is 1"}, "that": {"for": "every deps as d", "assert": "count of rows.v that is in d.name is 1"}, "plain": {"for": "every deps as d", "assert": "$params.w is in d.name"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"every": {"for": "every deps as d", "assert": "every rows.v is in d.name"}, "whose": {"for": "every deps as d", "assert": "count of rows whose v is in d.name is 1"}, "that": {"for": "every deps as d", "assert": "count of rows.v that is in d.name is 1"}, "plain": {"for": "every deps as d", "assert": "$params.w is in d.name"}}}}},
     "params": {"w": "a"},
     "cases": [
       {
@@ -63,7 +63,7 @@
   },
   {
     "description": "a list in the middle of a name on the right of a list phrase after every is read item by item",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id", "has": {"pl": "ys"}}}, "requirements": {"r": {"subject": "t", "checks": {"field": "every xs.v is in ys.v", "part": "every xs.v is in pl.v"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "things", "identified_by": "id", "has": {"pl": "ys"}}}, "requirements": {"r": {"subject": "t", "checks": {"field": "every xs.v is in ys.v", "part": "every xs.v is in pl.v"}}}},
     "cases": [
       {
         "description": "each item is read",
@@ -96,7 +96,7 @@
   },
   {
     "description": "a second for item that starts at an alias holding a list reads each item of it",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"every": {"for": "every deps as d, every d.name as n", "assert": "n is \"a\""}, "some": {"for": "every deps as d, some d.name as n", "assert": "n is \"a\""}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"every": {"for": "every deps as d, every d.name as n", "assert": "n is \"a\""}, "some": {"for": "every deps as d, some d.name as n", "assert": "n is \"a\""}}}}},
     "cases": [
       {
         "description": "every fails on the item that isn't a, and some passes",
@@ -120,7 +120,7 @@
   },
   {
     "description": "a path from $input with named by on an input that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"plain": "$input named by key is 1", "in": "tags is in $input.m named by key", "one_of": "tags is one of $input.m named by key", "all": "tags contains all of $input.m named by key", "whose": "count of tags whose $input.k is in tags is 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"plain": "$input named by key is 1", "in": "tags is in $input.m named by key", "one_of": "tags is one of $input.m named by key", "all": "tags contains all of $input.m named by key", "whose": "count of tags whose $input.k is in tags is 1"}}}},
     "cases": [
       {
         "description": "fails as not_an_object and names the input once",
@@ -138,7 +138,7 @@
   },
   {
     "description": "a check that reads a field of a subject that is a list outside what it reads item by item fails as a whole",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every things"}}, "requirements": {"r": {"subject": "t", "checks": {"every": "every name is other", "dot": "every name is .other", "some": "some name is other", "for": {"for": "every owner as o", "assert": "o is boss"}, "named": {"for": "every owner as o", "assert": "o is $params.m named by stage"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every things"}}, "requirements": {"r": {"subject": "t", "checks": {"every": "every name is other", "dot": "every name is .other", "some": "some name is other", "for": {"for": "every owner as o", "assert": "o is boss"}, "named": {"for": "every owner as o", "assert": "o is $params.m named by stage"}}}}},
     "params": {"m": {"build": "ana"}},
     "cases": [
       {
@@ -157,7 +157,7 @@
   },
   {
     "description": "a part read inside a whose on a subject that is a list, missing, null or not an object",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every things", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"c": "count of rows whose v is in pl.z is 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every things", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"c": "count of rows whose v is in pl.z is 1"}}}},
     "cases": [
       {
         "description": "a missing field fails as absent and names the item of the subject once",
@@ -187,7 +187,7 @@
   },
   {
     "description": "a part at the start of a path on a subject that is a list, missing, null or not an object",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every things", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"every": "every pl.name is \"a\"", "count": "count of pl.name is 1", "right": "$params.w is in pl.name"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every things", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"every": "every pl.name is \"a\"", "count": "count of pl.name is 1", "right": "$params.w is in pl.name"}}}},
     "params": {"w": "a"},
     "cases": [
       {
@@ -224,7 +224,7 @@
   },
   {
     "description": "a for item on a subject that is a list names an item that isn't an object by its value",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every things"}}, "requirements": {"r": {"subject": "t", "checks": {"c": {"for": "every owner as o", "assert": "o is \"ana\""}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every things"}}, "requirements": {"r": {"subject": "t", "checks": {"c": {"for": "every owner as o", "assert": "o is \"ana\""}}}}},
     "cases": [
       {
         "description": "a number, a list and null are named as they are",
@@ -240,7 +240,7 @@
   },
   {
     "description": "a count or sum that can't read a named by key names the key, not the list it reads",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of rows.w named by p is 1", "sum": "sum of rows.w named by p is 1", "every": "every rows.w named by p is 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of rows.w named by p is 1", "sum": "sum of rows.w named by p is 1", "every": "every rows.w named by p is 1"}}}},
     "cases": [
       {
         "description": "only the key is named",
@@ -256,7 +256,7 @@
   },
   {
     "description": "an any_of option that reads a field of a subject that is a list outside what it reads item by item fails on its own",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every things"}}, "requirements": {"r": {"subject": "t", "checks": {"c": {"any_of": {"plain": "every name is other", "read": "every name is \"a\""}}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every things"}}, "requirements": {"r": {"subject": "t", "checks": {"c": {"any_of": {"plain": "every name is other", "read": "every name is \"a\""}}}}}},
     "cases": [
       {
         "description": "the option that reads each item decides",
@@ -271,7 +271,7 @@
   },
   {
     "description": "a for item that starts at a part on a subject that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every things", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"c": {"for": "every pl.name as n", "assert": "n is \"a\""}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every things", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"c": {"for": "every pl.name as n", "assert": "n is \"a\""}}}}},
     "cases": [
       {
         "description": "reads the part in each item",
@@ -285,7 +285,7 @@
   },
   {
     "description": "a for item that starts at a part, with a sentence that reads the part plainly, on a subject that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "every things", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"c": {"for": "every owner as o", "assert": "o is pl.name"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "every things", "has": {"pl": "c"}}}, "requirements": {"r": {"subject": "t", "checks": {"c": {"for": "every owner as o", "assert": "o is pl.name"}}}}},
     "cases": [
       {
         "description": "fails as a whole, naming the subject once",

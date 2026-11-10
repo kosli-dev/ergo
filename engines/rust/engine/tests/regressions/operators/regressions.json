@@ -21,7 +21,7 @@
       "q": "ab"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -48,7 +48,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -178,7 +178,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -197,7 +197,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -327,7 +327,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -354,7 +354,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -510,7 +510,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -533,7 +533,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -734,7 +734,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -758,7 +758,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -940,7 +940,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -964,7 +964,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -1074,7 +1074,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -1098,7 +1098,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -1266,7 +1266,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -1290,7 +1290,7 @@
     "report": {
       "compliant": true,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -1464,7 +1464,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -1488,7 +1488,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -1656,7 +1656,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -1680,7 +1680,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -1848,7 +1848,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -1872,7 +1872,7 @@
     "report": {
       "compliant": true,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -2055,7 +2055,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -2079,7 +2079,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -2390,7 +2390,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -2414,7 +2414,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -2688,7 +2688,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -2712,7 +2712,7 @@
     "report": {
       "compliant": true,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -2912,7 +2912,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -2936,7 +2936,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -3270,7 +3270,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -3294,7 +3294,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -3635,7 +3635,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -3659,7 +3659,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -3971,7 +3971,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -3995,7 +3995,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -4236,7 +4236,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -4261,7 +4261,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -4575,7 +4575,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -4598,7 +4598,7 @@
     "report": {
       "compliant": true,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -4901,7 +4901,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -4925,7 +4925,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -5086,7 +5086,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -5105,7 +5105,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -5463,7 +5463,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -5482,7 +5482,7 @@
     "report": {
       "compliant": true,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -5837,7 +5837,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -5856,7 +5856,7 @@
     "report": {
       "compliant": true,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -6256,7 +6256,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -6275,7 +6275,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -6586,7 +6586,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -6605,7 +6605,7 @@
     "report": {
       "compliant": true,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -6908,7 +6908,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -6927,7 +6927,7 @@
     "report": {
       "compliant": true,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -7253,7 +7253,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -7272,7 +7272,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -7402,7 +7402,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -7421,7 +7421,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -7551,7 +7551,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -7570,7 +7570,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -7700,7 +7700,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -7719,7 +7719,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -7849,7 +7849,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -7873,7 +7873,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -7996,7 +7996,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -8020,7 +8020,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -8276,7 +8276,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -8300,7 +8300,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -8534,7 +8534,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -8553,7 +8553,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -8654,7 +8654,7 @@
       ]
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -8673,7 +8673,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -8837,7 +8837,7 @@
       ]
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -8856,7 +8856,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -9049,7 +9049,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -9074,7 +9074,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -9204,7 +9204,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -9228,7 +9228,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -9347,7 +9347,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -9371,7 +9371,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -9584,7 +9584,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -9608,7 +9608,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -9820,7 +9820,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -9844,7 +9844,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -10088,7 +10088,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -10112,7 +10112,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -10390,7 +10390,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -10409,7 +10409,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -10510,7 +10510,7 @@
       ]
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -10529,7 +10529,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -10687,7 +10687,7 @@
       ]
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -10706,7 +10706,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -10893,7 +10893,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -10919,7 +10919,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -11049,7 +11049,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -11076,7 +11076,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -11207,7 +11207,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -11226,7 +11226,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -11357,7 +11357,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -11376,7 +11376,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -11475,7 +11475,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -11499,7 +11499,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -11649,7 +11649,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -11673,7 +11673,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -11824,7 +11824,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -11848,7 +11848,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -11999,7 +11999,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -12023,7 +12023,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -12178,7 +12178,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -12202,7 +12202,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -12375,7 +12375,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -12399,7 +12399,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -12585,7 +12585,7 @@
       "p": 2
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -12609,7 +12609,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -12797,7 +12797,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -12816,7 +12816,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -12946,7 +12946,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -12965,7 +12965,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -13095,7 +13095,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -13114,7 +13114,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {
@@ -13244,7 +13244,7 @@
       "s": "a"
     },
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "requirements": {
         "r1": {
           "checks": {
@@ -13263,7 +13263,7 @@
     "report": {
       "compliant": false,
       "description": "",
-      "ergo": "v0.6-dev",
+      "ergo": "{{spec}}",
       "meta": {},
       "requirements": {
         "r1": {

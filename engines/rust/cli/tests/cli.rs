@@ -1,9 +1,10 @@
+use ergo_policy_engine::SPEC;
 use serde_json::{Value, json};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
-const POLICY_YAML: &str = r#"ergo_spec: v0.6-dev
+const POLICY_YAML: &str = r#"ergo_spec: {{spec}}
 subjects:
   deployment:
     from: deployments whose environment is "prod"
@@ -35,7 +36,7 @@ fn dir(name: &str) -> PathBuf {
 
 fn write(dir: &Path, file: &str, text: &str) -> String {
     let path = dir.join(file);
-    fs::write(&path, text).unwrap();
+    fs::write(&path, text.replace("{{spec}}", SPEC)).unwrap();
     path.to_string_lossy().into_owned()
 }
 
@@ -153,7 +154,7 @@ fn written_wrong_policy(name: &str) -> String {
     write(
         &dir(name),
         "wrong.yaml",
-        &POLICY_YAML.replace("ergo_spec: v0.6-dev", "ergo_spec: v0.1"),
+        &POLICY_YAML.replace("{{spec}}", "v0.1"),
     )
 }
 
@@ -277,7 +278,7 @@ fn fail_exits_three_when_the_policy_has_no_requirements_because_no_check_ran() {
     for (file, text) in [
         ("empty.json", "{}"),
         ("future.json", r#"{"ergo_spec": "v9.9"}"#),
-        ("none.json", r#"{"ergo_spec": "v0.6-dev"}"#),
+        ("none.json", r#"{"ergo_spec": "{{spec}}"}"#),
         ("null.yaml", "null\n"),
         ("list.yaml", "- 1\n"),
     ] {
@@ -387,7 +388,7 @@ fn pretty_output_escapes_like_opa() {
     let policy = write(
         &dir,
         "policy.json",
-        r#"{"ergo_spec":"v0.6-dev","meta":{"k":"a<b>&c\u2028é"}}"#,
+        r#"{"ergo_spec":"{{spec}}","meta":{"k":"a<b>&c\u2028é"}}"#,
     );
     let input = write(&dir, "input.json", "{}");
     let text = out(&ergo(&["report", "--policy", &policy, "--input", &input]));
@@ -403,7 +404,7 @@ fn params_are_read_from_the_params_file() {
     let policy = write(
         &dir,
         "policy.yaml",
-        "ergo_spec: v0.6-dev\nsubjects:\n  item:\n    from: items\n    identified_by: id\nrequirements:\n  r:\n    subject: item\n    checks:\n      small: n is at most $params.limit\n",
+        "ergo_spec: {{spec}}\nsubjects:\n  item:\n    from: items\n    identified_by: id\nrequirements:\n  r:\n    subject: item\n    checks:\n      small: n is at most $params.limit\n",
     );
     let input = write(&dir, "input.json", r#"{"items":[{"id":"a","n":5}]}"#);
     let low = write(&dir, "low.yaml", "limit: 3\n");
@@ -573,7 +574,7 @@ fn deep_nesting_and_an_alias_bomb_fail_without_crashing() {
     }
 }
 
-const YAML_WORDS_POLICY: &str = r#"ergo_spec: v0.6-dev
+const YAML_WORDS_POLICY: &str = r#"ergo_spec: {{spec}}
 subjects:
   deployment:
     from: deployments

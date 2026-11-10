@@ -2,7 +2,7 @@
   {
     "description": "any_of",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -72,7 +72,7 @@
   {
     "description": "any_of with a present check in an option",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -100,7 +100,7 @@
   {
     "description": "any_of with a name that starts like another",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -160,7 +160,7 @@
   {
     "description": "any_of with a ref to a missing param",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -239,7 +239,7 @@
   {
     "description": "any_of with a ref to a param of the wrong type",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -297,7 +297,7 @@
   },
   {
     "description": "a check with several assertions that read the same field",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x exists", "x is 1"]}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x exists", "x is 1"]}}}}},
     "cases": [
       {
         "description": "lists the field once, with its location",
@@ -312,7 +312,7 @@
   {
     "description": "an any_of next to a for line",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -403,7 +403,7 @@
   {
     "description": "an any_of with a field of its own that no check has",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -495,7 +495,7 @@
   {
     "description": "an assert with a field of its own that no check has",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -584,7 +584,7 @@
   {
     "description": "an any_of next to a for line, with written values",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -670,7 +670,7 @@
   {
     "description": "a for line with an unknown field",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -759,7 +759,7 @@
   {
     "description": "an assert that doesn't parse, with a field of its own that no check has",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -844,7 +844,7 @@
   {
     "description": "an assert that compares a path with itself, with a field of its own that no check has",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -929,7 +929,7 @@
   {
     "description": "an assert that uses a word of the grammar as a path, with a field of its own that no check has",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -1014,7 +1014,7 @@
   {
     "description": "an any_of with an option that doesn't parse, with a field of its own that no check has",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -1102,7 +1102,7 @@
   {
     "description": "an assert that doesn't parse, with two fields that no check has",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
