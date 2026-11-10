@@ -6,7 +6,7 @@ use crate::policy::{
 use crate::reading::{INVALID_FROM, Reading, Source};
 use crate::value::{Decimal, json_text};
 use serde_json::{Map, Value, json};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Row {
@@ -547,11 +547,13 @@ pub fn status(
     }
     let checks_hold = match requirement.require.as_str() {
         Some("some") => {
-            evaluation.subject_rows.is_empty()
-                || evaluation
-                    .subject_rows
-                    .iter()
-                    .any(|rows| rows.iter().all(Row::passed))
+            let keys: BTreeSet<String> = evaluation
+                .subject_rows
+                .iter()
+                .filter(|rows| !rows.is_empty())
+                .map(|rows| parent_key(&rows[0]))
+                .collect();
+            keys.is_subset(&passing_parents(requirement, evaluation))
         }
         _ => evaluation
             .subject_rows
@@ -567,10 +569,36 @@ pub fn status(
     }
 }
 
-fn causes(status: &str, well_formed: &Row, evaluation: &Evaluation) -> Value {
+fn parent_key(row: &Row) -> String {
+    match &row.subject_in {
+        Some(parents) if !parents.is_empty() => Value::Object(parents.clone()).to_string(),
+        _ => String::new(),
+    }
+}
+
+fn passing_parents(requirement: &Requirement, evaluation: &Evaluation) -> BTreeSet<String> {
+    if requirement.require.as_str() != Some("some") {
+        return BTreeSet::new();
+    }
+    evaluation
+        .subject_rows
+        .iter()
+        .filter(|rows| !rows.is_empty() && rows.iter().all(Row::passed))
+        .map(|rows| parent_key(&rows[0]))
+        .collect()
+}
+
+fn causes(
+    status: &str,
+    requirement: &Requirement,
+    well_formed: &Row,
+    evaluation: &Evaluation,
+) -> Value {
     if status != "not_met" {
         return json!([]);
     }
+    let mut shadowing = passing_parents(requirement, evaluation);
+    shadowing.remove("");
     let rows = std::iter::once(well_formed)
         .chain(&evaluation.min_subjects)
         .chain(&evaluation.unique_ids)
@@ -579,6 +607,9 @@ fn causes(status: &str, well_formed: &Row, evaluation: &Evaluation) -> Value {
     let mut counts: BTreeMap<Cause, u64> = BTreeMap::new();
     for row in rows {
         if row.passed() || (row.check == "$applies" && row.cause == Cause::Value) {
+            continue;
+        }
+        if !row.check.starts_with('$') && shadowing.contains(&parent_key(row)) {
             continue;
         }
         *counts.entry(row.cause).or_default() += 1;
@@ -687,7 +718,7 @@ pub fn assemble_with(
                 "require": requirement.require,
                 "subject": reported_subject,
                 "status": status,
-                "causes": causes(status, &well_formed, &evaluation),
+                "causes": causes(status, requirement, &well_formed, &evaluation),
                 "subjects": {"total": evaluation.total, "matching": evaluation.matching},
                 "checks": defs
                     .iter()
@@ -795,15 +826,60 @@ fn is_holding(report: &Value, requirement: &Value) -> bool {
     matches!(status, Some("met") | Some("not_applicable"))
 }
 
+fn child_check_key(report: &Value, row: &Value) -> Option<(String, String, String)> {
+    let check = row.get("check").and_then(Value::as_str)?;
+    if check.starts_with('$') {
+        return None;
+    }
+    let requirement = row.get("requirement").and_then(Value::as_str)?;
+    let require = report
+        .get("requirements")?
+        .get(requirement)?
+        .get("require")?
+        .as_str()?;
+    if require != "some" {
+        return None;
+    }
+    let subject = row.get("subject")?;
+    let parents = subject.get("in")?.as_object().filter(|m| !m.is_empty())?;
+    Some((
+        requirement.to_string(),
+        Value::Object(parents.clone()).to_string(),
+        subject.to_string(),
+    ))
+}
+
+fn shadowing_parents(report: &Value, results: &[Value]) -> BTreeSet<(String, String)> {
+    let mut subjects: BTreeMap<(String, String, String), bool> = BTreeMap::new();
+    for row in results {
+        if let Some(key) = child_check_key(report, row) {
+            let passed = row.get("passed") != Some(&Value::Bool(false));
+            let entry = subjects.entry(key).or_insert(true);
+            *entry = *entry && passed;
+        }
+    }
+    subjects
+        .into_iter()
+        .filter(|(_, passed)| *passed)
+        .map(|((requirement, parents, _), _)| (requirement, parents))
+        .collect()
+}
+
 pub fn violations(report: &Value) -> Value {
     let empty = Vec::new();
     let results = report
         .get("results")
         .and_then(Value::as_array)
         .unwrap_or(&empty);
+    let shadowing = shadowing_parents(report, results);
     let mut out = Vec::new();
     for row in results {
         if row.get("passed") != Some(&Value::Bool(false)) {
+            continue;
+        }
+        if let Some((requirement, parents, _)) = child_check_key(report, row)
+            && shadowing.contains(&(requirement, parents))
+        {
             continue;
         }
         let check = row.get("check").cloned().unwrap_or(Value::Null);
@@ -1843,14 +1919,48 @@ mod tests {
             ],
         };
         assert_eq!(
-            causes("not_met", &well_formed, &evaluation),
+            causes("not_met", &requirement, &well_formed, &evaluation),
             json!([{"cause": "absent", "rows": 2}, {"cause": "value", "rows": 2}])
         );
-        assert_eq!(causes("met", &well_formed, &evaluation), json!([]));
         assert_eq!(
-            causes("not_applicable", &well_formed, &evaluation),
+            causes("met", &requirement, &well_formed, &evaluation),
             json!([])
         );
+        assert_eq!(
+            causes("not_applicable", &requirement, &well_formed, &evaluation),
+            json!([])
+        );
+    }
+
+    fn child_row(check: &str, parent: &str, cause: Cause) -> Row {
+        let mut r = row("s", check, cause);
+        r.subject_in = Some(Map::from_iter([("p".to_string(), json!(parent))]));
+        r
+    }
+
+    #[test]
+    fn some_on_child_subjects_is_decided_under_each_parent() {
+        let (read, requirement) = requirement_of(
+            json!({"subject": "thing", "require": "some", "checks": {"c": "x exists"}}),
+        );
+        let well_formed = well_formed_row(&read, "s", &requirement, None);
+        let mut evaluation = Evaluation {
+            total: 3,
+            matching: 3,
+            subject_rows: vec![
+                vec![child_row("c", "p1", Cause::Satisfied)],
+                vec![child_row("c", "p1", Cause::Absent)],
+                vec![child_row("c", "p2", Cause::Absent)],
+            ],
+            ..Evaluation::default()
+        };
+        assert_eq!(status(&requirement, &well_formed, &evaluation), "not_met");
+        assert_eq!(
+            causes("not_met", &requirement, &well_formed, &evaluation),
+            json!([{"cause": "absent", "rows": 1}])
+        );
+        evaluation.subject_rows[2] = vec![child_row("c", "p2", Cause::Satisfied)];
+        assert_eq!(status(&requirement, &well_formed, &evaluation), "met");
     }
 
     fn full_report() -> Value {

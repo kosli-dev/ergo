@@ -718,7 +718,7 @@ A few details:
 
 - `meta` can hold anything JSON can, like `{"control": "SDLC-CTRL-0007", "frameworks": ["SOC 2", "ISO 27001"], "version": 3, "reviewed": true}`. Its numbers follow the same rule as numbers anywhere else in a policy: one a 64-bit float can't hold, like `1e400`, makes the requirement [written wrong](#checks-ergo-adds). So does a key that isn't a string, or a set, which a policy written in Rego can hold but JSON can't. In the report, a number is written in its plain form, so `1.50`, `1e2` and `-0` come out as `1.5`, `100` and `0`, and the same `meta` gives the same report however it was written.
 - `min_subjects` defaults to 1 so that a typo in `from` fails the requirement instead of quietly passing it. Set it to `0` when you mean "if there are any, they must pass; if there are none, that's fine". It means the same under `every` and `some`. When none are left, the requirement is [not applicable](#the-report). That only holds for a list that's there: a `from` that leads nowhere still fails, as above. A `from` that ends with `named by each of` is the exception, because each key is a subject even when `from` leads nowhere.
-- Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count.
+- Under `some`, one subject has to pass all the checks by itself. Two subjects that each pass half of them don't count. For a child subject, that holds under each parent: every parent with subjects in scope needs one that passes, and the failing subjects under a parent that has a passing one aren't violations.
 - A requirement with no checks, a `require` other than `every` or `some`, a check that's [written wrong](#checks-ergo-adds), or a [subject that's written wrong](#subjects), is never met. The `$well_formed` row says so, and says [what's wrong](#checks-ergo-adds), like `{"name": "require", "value": ["neither every nor some"], "locations": []}`. That row is the requirement's only row: Ergo doesn't read its subjects, so it has no `$min_subjects`, `$unique_ids`, `$applies` or check rows, and its `subjects` counts are 0. Its entry in `requirements` still lists every check, the ones Ergo adds included, so the report shows what the policy wrote. Other requirements in the policy still get theirs.
 - So is a name that starts with `$`, whether it names a subject, a requirement, a check, an `any_of` option or a part, because the report would mix it up with Ergo's own rows, like `$well_formed`. A `$` later in a name, like `a$b`, is fine, and so is `$input` or `$params` at the start of a path, which aren't names. The `$well_formed` row says `{"name": "checks.$foo", "value": ["a name can't start with $"], "locations": []}` for a check, `subjects.$foo` for a subject, `subjects.deployment.has.$foo` for a part and `requirement name` for a requirement, and for an option it says `option $foo: a name can't start with $` under the check. A check with such a name has no entry in `requirements`. A `for` alias can't start with `$` either: the line doesn't parse. A name can't start or end with a space or an invisible character either, like `" $well_formed"`, `"approved "` or a zero width space (U+200B) before a name: the problem is `a name can't start or end with a space or an invisible character`, listed in the same places, and a name with both problems lists both. A space inside a name, like `x y`, is fine. The characters are the ones Unicode calls White_Space or Cf, as [names.edge](spec/semantics.md) says. An empty name, `""`, is written wrong too, with `a name can't be empty` in the same places, as [names.empty](spec/semantics.md) says. A requirement whose `subject` is `""` gets `empty or not a string` under `subject`.
 - So is a requirement without a `subject`, or whose `subject` isn't in `subjects`, like a typo for `deploymnt`. The `$well_formed` row says `{"name": "subject", "value": ["missing"], "locations": []}` or `{"name": "subject", "value": ["not in subjects"], "locations": []}`. If `subjects` itself isn't an object, every requirement that names a subject fails with `{"name": "subjects", "value": ["not an object"], "locations": []}`.
@@ -821,12 +821,41 @@ requirements:
 
 The requirement is `met`. Pull request 7 is approved, and `a2` is never looked at, because `from` reads one commit's pull requests. Same input, same words, opposite answers.
 
+Read the pull requests as a child subject of the commit instead, and `require: some` is decided for each commit. With this policy and `{"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}, {"number": 8}]}, {"sha": "a2", "pull_requests": [{"number": 9}]}]}`:
+
+```yaml
+ergo_spec: v0.6-dev
+subjects:
+  commit:
+    from: commits
+    identified_by: sha
+  pull request:
+    from: every commit.pull_requests
+    identified_by: number
+requirements:
+  reviewed:
+    subject: pull request
+    require: some
+    checks:
+      approved:
+        description: The pull request was approved
+        assert: approved_by is a non-empty string
+```
+
+| subject | in           | check      | passed  | cause       |
+| ------- | ------------ | ---------- | ------- | ----------- |
+| `7`     | `commit: a1` | `approved` | `true`  | `satisfied` |
+| `8`     | `commit: a1` | `approved` | `false` | `absent`    |
+| `9`     | `commit: a2` | `approved` | `false` | `absent`    |
+
+The requirement is `not_met`, and its `causes` is `[{"cause": "absent", "rows": 1}]`. Commit `a1` has an approved pull request, so pull request 8 isn't a violation, but `a2` has none, so pull request 9 is the only violation, with `in` `{"commit": "a2"}`. A commit with no pull request fails its own `$min_subjects` row, or is skipped with `min_subjects: 0`. With a chain of more than two subjects, each direct parent needs a passing subject. To ask for one anywhere instead, read the pull requests from the input, like `every commits.pull_requests`: their rows have no `in`, and `some` counts across all of them.
+
 So before writing a check, decide:
 
 - **What would the policy's owner list?** The report has one row per subject, so the subject is what it lists. A rule about commits should list commits, even when the evidence is organised by pull request.
 - **What id would they cite?** The id that `identified_by` picks is how a row is found again, and how two reports are compared.
 - **How many lists sit between the subject and the values compared?** `every` and `some` walk them all, but a check that compares fields at two levels needs a `for` line, which takes two lists at most. A check that needs more usually means the subject is one list too high, or the evidence was recorded at the wrong grain. Moving the subject down flattens the check, but then the report lists the smaller thing, as above.
-- **Does `require` still say what the sentence says?** "Every commit has some approved pull request" is `every` over commits with `some` inside a check. With the pull request as the subject it becomes `some` over pull requests, which is only the same rule when there is one commit.
+- **Does `require` still say what the sentence says?** "Every commit has some approved pull request" is `every` over commits with `some` inside a check. With the pull request as a subject read from the input it becomes `some` over all pull requests, which is only the same rule when there is one commit. As a child subject of the commit it is the same rule.
 
 A policy can hold several requirements with different subjects over the same input, like a lockfile and each of its entries. Each requirement picks its own grain.
 

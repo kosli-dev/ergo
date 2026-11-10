@@ -3817,5 +3817,354 @@
         ]
       }
     ]
+  },
+  {
+    "description": "require some on a child subject needs a passing child under each parent",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
+    "cases": [
+      {
+        "description": "isn't met when one parent has an approved pull request and another has none, and only the second parent's pull requests are violations",
+        "rules": ["require.some.parent", "require", "violations", "report.causes"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}, {"number": 8}]}, {"sha": "a2", "pull_requests": [{"number": 9}]}]},
+        "requirements": {"reviewed": {"status": "not_met", "causes": [{"cause": "absent", "rows": 1}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0", "/commits/0/pull_requests/1"], "name": "in-scope pull request count", "value": 2}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/1"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 8, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 9, "in": {"commit": "a2"}, "type": "pull request"}}
+        ],
+        "violations": [
+          {"cause": "absent", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "requirement": "reviewed", "subject": {"id": 9, "in": {"commit": "a2"}, "type": "pull request"}}
+        ]
+      },
+      {
+        "description": "is met when each parent has an approved pull request, and the others aren't violations",
+        "rules": ["require.some.parent", "require", "violations"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}, {"number": 8}]}, {"sha": "a2", "pull_requests": [{"number": 9}, {"number": 10, "approved_by": "ann"}]}]},
+        "requirements": {"reviewed": {"status": "met", "causes": []}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0", "/commits/0/pull_requests/1"], "name": "in-scope pull request count", "value": 2}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/1/pull_requests/0", "/commits/1/pull_requests/1"], "name": "in-scope pull request count", "value": 2}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/1"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 8, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 9, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/1/approved_by"], "name": "approved_by", "value": "ann"}], "passed": true, "requirement": "reviewed", "subject": {"id": 10, "in": {"commit": "a2"}, "type": "pull request"}}
+        ],
+        "violations": []
+      },
+      {
+        "description": "gives the same status whichever order the children come in",
+        "rules": ["require.some.parent", "order"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 8}, {"number": 7, "approved_by": "bob"}]}, {"sha": "a2", "pull_requests": [{"number": 10, "approved_by": "ann"}, {"number": 9}]}]},
+        "requirements": {"reviewed": {"status": "met", "causes": []}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0", "/commits/0/pull_requests/1"], "name": "in-scope pull request count", "value": 2}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/1/pull_requests/0", "/commits/1/pull_requests/1"], "name": "in-scope pull request count", "value": 2}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 8, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/1/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/0/approved_by"], "name": "approved_by", "value": "ann"}], "passed": true, "requirement": "reviewed", "subject": {"id": 10, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/1"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 9, "in": {"commit": "a2"}, "type": "pull request"}}
+        ],
+        "violations": []
+      },
+      {
+        "description": "counts every failing child of a parent with no passing one, with each cause",
+        "rules": ["require.some.parent", "violations", "report.causes"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}]}, {"sha": "a2", "pull_requests": [{"number": 9}, {"number": 10, "approved_by": ""}, {"number": 11, "approved_by": 5}, {"number": 12, "approved_by": null}]}]},
+        "requirements": {"reviewed": {"status": "not_met", "causes": [{"cause": "absent", "rows": 1}, {"cause": "null", "rows": 1}, {"cause": "value", "rows": 2}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/1/pull_requests/0", "/commits/1/pull_requests/1", "/commits/1/pull_requests/2", "/commits/1/pull_requests/3"], "name": "in-scope pull request count", "value": 4}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 9, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "value", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/1/approved_by"], "name": "approved_by", "value": ""}], "message": "approved_by is \"\"", "passed": false, "requirement": "reviewed", "subject": {"id": 10, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "value", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/2/approved_by"], "name": "approved_by", "value": 5}], "message": "approved_by is 5", "passed": false, "requirement": "reviewed", "subject": {"id": 11, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "null", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/3/approved_by"], "name": "approved_by", "value": null}], "message": "approved_by is null", "passed": false, "requirement": "reviewed", "subject": {"id": 12, "in": {"commit": "a2"}, "type": "pull request"}}
+        ],
+        "violations": [
+          {"cause": "absent", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "requirement": "reviewed", "subject": {"id": 9, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "value", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/1/pull_requests/1/approved_by"], "name": "approved_by", "value": ""}], "message": "approved_by is \"\"", "requirement": "reviewed", "subject": {"id": 10, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "value", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/1/pull_requests/2/approved_by"], "name": "approved_by", "value": 5}], "message": "approved_by is 5", "requirement": "reviewed", "subject": {"id": 11, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "null", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/1/pull_requests/3/approved_by"], "name": "approved_by", "value": null}], "message": "approved_by is null", "requirement": "reviewed", "subject": {"id": 12, "in": {"commit": "a2"}, "type": "pull request"}}
+        ]
+      },
+      {
+        "description": "isn't met when no parent has an approved pull request",
+        "rules": ["require.some.parent", "violations"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7}]}, {"sha": "a2", "pull_requests": [{"number": 9}]}]},
+        "requirements": {"reviewed": {"status": "not_met", "causes": [{"cause": "absent", "rows": 2}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 9, "in": {"commit": "a2"}, "type": "pull request"}}
+        ],
+        "violations": [
+          {"cause": "absent", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "requirement": "reviewed", "subject": {"id": 9, "in": {"commit": "a2"}, "type": "pull request"}}
+        ]
+      },
+      {
+        "description": "is met with one parent whose child passes",
+        "rules": ["require.some.parent", "violations"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}]}]},
+        "requirements": {"reviewed": {"status": "met", "causes": []}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}}
+        ],
+        "violations": []
+      }
+    ]
+  },
+  {
+    "description": "require some on a child subject with a parent that has no child",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
+    "cases": [
+      {
+        "description": "fails the parent's own $min_subjects row with the default min_subjects",
+        "rules": ["require.some.parent", "min_subjects", "subjects.chain.count"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}]}, {"sha": "a2", "pull_requests": []}]},
+        "requirements": {"reviewed": {"status": "not_met", "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "value", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "message": "in-scope pull request count is 0", "passed": false, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}}
+        ],
+        "violations": [
+          {"cause": "value", "check": "$min_subjects", "description": "The in-scope pull request count is at least 1", "expression": "count(matching(every commit.pull_requests)) >= 1", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "message": "in-scope pull request count is 0", "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "require some on a child subject with min_subjects 0",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}, "min_subjects": 0}}},
+    "cases": [
+      {
+        "description": "is met when the parent without a child is skipped",
+        "rules": ["require.some.parent", "min_subjects", "subjects.chain.count"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}]}, {"sha": "a2", "pull_requests": []}]},
+        "requirements": {"reviewed": {"status": "met", "causes": []}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}}
+        ],
+        "violations": []
+      },
+      {
+        "description": "isn't met when another parent has children and none passes",
+        "rules": ["require.some.parent", "subjects.chain.count"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7}]}, {"sha": "a2", "pull_requests": []}]},
+        "requirements": {"reviewed": {"status": "not_met", "causes": [{"cause": "absent", "rows": 1}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}}
+        ],
+        "violations": [
+          {"cause": "absent", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}}
+        ]
+      },
+      {
+        "description": "is not applicable when no parent has a child",
+        "rules": ["require.some.parent", "status"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": []}, {"sha": "a2", "pull_requests": []}]},
+        "requirements": {"reviewed": {"status": "not_applicable", "causes": []}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}}
+        ],
+        "violations": []
+      },
+      {
+        "description": "fails the parent whose list is missing on its $min_subjects row",
+        "rules": ["require.some.parent", "subjects.chain.count"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}]}, {"sha": "a2"}]},
+        "requirements": {"reviewed": {"status": "not_met", "causes": [{"cause": "absent", "rows": 1}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "absent", "check": "$min_subjects", "failed_items": [{"cause": "absent", "item": "pull_requests", "locations": ["/commits/1"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "message": "pull_requests is missing", "passed": false, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}}
+        ],
+        "violations": [
+          {"cause": "absent", "check": "$min_subjects", "description": "The pull request list can be read", "expression": "every commit.pull_requests can be read", "failed_items": [{"cause": "absent", "item": "pull_requests", "locations": ["/commits/1"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "message": "pull_requests is missing", "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}}
+        ]
+      },
+      {
+        "description": "fails the parent whose list is null on its $min_subjects row",
+        "rules": ["require.some.parent", "subjects.chain.count"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}]}, {"sha": "a2", "pull_requests": null}]},
+        "requirements": {"reviewed": {"status": "not_met", "causes": [{"cause": "null", "rows": 1}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "null", "check": "$min_subjects", "failed_items": [{"cause": "null", "item": "pull_requests", "locations": ["/commits/1/pull_requests"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "message": "pull_requests is null", "passed": false, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}}
+        ],
+        "violations": [
+          {"cause": "null", "check": "$min_subjects", "description": "The pull request list can be read", "expression": "every commit.pull_requests can be read", "failed_items": [{"cause": "null", "item": "pull_requests", "locations": ["/commits/1/pull_requests"], "path": "pull_requests", "value": null}], "inputs": [{"locations": [], "name": "in-scope pull request count", "value": 0}], "message": "pull_requests is null", "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "require some on a child subject with min_subjects 3",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}, "min_subjects": 3}}},
+    "cases": [
+      {
+        "description": "keeps a parent's own $min_subjects violation, and leaves out its failing pull request, when another of its pull requests passes",
+        "rules": ["require.some.parent", "min_subjects", "subjects.chain.count"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}, {"number": 8}]}]},
+        "requirements": {"reviewed": {"status": "not_met", "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "value", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0", "/commits/0/pull_requests/1"], "name": "in-scope pull request count", "value": 2}], "message": "in-scope pull request count is 2", "passed": false, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/1"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 8, "in": {"commit": "a1"}, "type": "pull request"}}
+        ],
+        "violations": [
+          {"cause": "value", "check": "$min_subjects", "description": "The in-scope pull request count is at least 3", "expression": "count(matching(every commit.pull_requests)) >= 3", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0", "/commits/0/pull_requests/1"], "name": "in-scope pull request count", "value": 2}], "message": "in-scope pull request count is 2", "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "require some on a child subject whose field is missing, null or the wrong type",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
+    "cases": [
+      {
+        "description": "fails a child whose field is missing, null or not text, so its parent needs another child",
+        "rules": ["require.some.parent", "non_empty_string.fail"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 1}, {"number": 2, "approved_by": null}, {"number": 3, "approved_by": 5}]}, {"sha": "a2", "pull_requests": [{"number": 4, "approved_by": "ann"}]}]},
+        "requirements": {"reviewed": {"status": "not_met", "causes": [{"cause": "absent", "rows": 1}, {"cause": "null", "rows": 1}, {"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0", "/commits/0/pull_requests/1", "/commits/0/pull_requests/2"], "name": "in-scope pull request count", "value": 3}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "in-scope pull request count", "value": 1}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "in": {"commit": "a2"}, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 1, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "null", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/1/approved_by"], "name": "approved_by", "value": null}], "message": "approved_by is null", "passed": false, "requirement": "reviewed", "subject": {"id": 2, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "value", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/2/approved_by"], "name": "approved_by", "value": 5}], "message": "approved_by is 5", "passed": false, "requirement": "reviewed", "subject": {"id": 3, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/0/approved_by"], "name": "approved_by", "value": "ann"}], "passed": true, "requirement": "reviewed", "subject": {"id": 4, "in": {"commit": "a2"}, "type": "pull request"}}
+        ],
+        "violations": [
+          {"cause": "absent", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/0/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "requirement": "reviewed", "subject": {"id": 1, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "null", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/0/pull_requests/1/approved_by"], "name": "approved_by", "value": null}], "message": "approved_by is null", "requirement": "reviewed", "subject": {"id": 2, "in": {"commit": "a1"}, "type": "pull request"}},
+          {"cause": "value", "check": "approved", "description": "", "expression": "approved_by is a non-empty string", "inputs": [{"locations": ["/commits/0/pull_requests/2/approved_by"], "name": "approved_by", "value": 5}], "message": "approved_by is 5", "requirement": "reviewed", "subject": {"id": 3, "in": {"commit": "a1"}, "type": "pull request"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "require some on a child of a child is decided under each direct parent",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"release": {"from": "releases", "identified_by": "name"}, "artifact": {"from": "every release.artifacts", "identified_by": "sha"}, "signature": {"from": "every artifact.signatures", "identified_by": "by"}}, "requirements": {"signed": {"subject": "signature", "require": "some", "checks": {"valid": "valid is true"}}}},
+    "cases": [
+      {
+        "description": "isn't met when an artifact has no valid signature, although another artifact of its release has one",
+        "rules": ["require.some.parent", "subjects.chain.levels"],
+        "input": {"releases": [{"name": "r1", "artifacts": [{"sha": "x1", "signatures": [{"by": "ann", "valid": true}]}, {"sha": "x2", "signatures": [{"by": "bob", "valid": false}]}]}, {"name": "r2", "artifacts": [{"sha": "x3", "signatures": [{"by": "cy", "valid": true}, {"by": "di", "valid": false}]}]}]},
+        "requirements": {"signed": {"status": "not_met", "causes": [{"cause": "value", "rows": 1}]}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "signed", "subject": {"id": null, "type": "signature"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/releases/0/artifacts/0/signatures/0"], "name": "in-scope signature count", "value": 1}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"artifact": "x1", "release": "r1"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/releases/0/artifacts/1/signatures/0"], "name": "in-scope signature count", "value": 1}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"artifact": "x2", "release": "r1"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/releases/1/artifacts/0/signatures/0", "/releases/1/artifacts/0/signatures/1"], "name": "in-scope signature count", "value": 2}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"artifact": "x3", "release": "r2"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated signature ids", "value": []}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"artifact": "x1", "release": "r1"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated signature ids", "value": []}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"artifact": "x2", "release": "r1"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated signature ids", "value": []}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"artifact": "x3", "release": "r2"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "valid", "inputs": [{"locations": ["/releases/0/artifacts/0/signatures/0/valid"], "name": "valid", "value": true}], "passed": true, "requirement": "signed", "subject": {"id": "ann", "in": {"artifact": "x1", "release": "r1"}, "type": "signature"}},
+          {"cause": "value", "check": "valid", "inputs": [{"locations": ["/releases/0/artifacts/1/signatures/0/valid"], "name": "valid", "value": false}], "message": "valid is false", "passed": false, "requirement": "signed", "subject": {"id": "bob", "in": {"artifact": "x2", "release": "r1"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "valid", "inputs": [{"locations": ["/releases/1/artifacts/0/signatures/0/valid"], "name": "valid", "value": true}], "passed": true, "requirement": "signed", "subject": {"id": "cy", "in": {"artifact": "x3", "release": "r2"}, "type": "signature"}},
+          {"cause": "value", "check": "valid", "inputs": [{"locations": ["/releases/1/artifacts/0/signatures/1/valid"], "name": "valid", "value": false}], "message": "valid is false", "passed": false, "requirement": "signed", "subject": {"id": "di", "in": {"artifact": "x3", "release": "r2"}, "type": "signature"}}
+        ],
+        "violations": [
+          {"cause": "value", "check": "valid", "description": "", "expression": "valid is true", "inputs": [{"locations": ["/releases/0/artifacts/1/signatures/0/valid"], "name": "valid", "value": false}], "message": "valid is false", "requirement": "signed", "subject": {"id": "bob", "in": {"artifact": "x2", "release": "r1"}, "type": "signature"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "require some on children read from a level above is decided under that level",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"release": {"from": "releases", "identified_by": "name"}, "signature": {"from": "every release.artifacts.signatures", "identified_by": "by"}}, "requirements": {"signed": {"subject": "signature", "require": "some", "checks": {"valid": "valid is true"}}}},
+    "cases": [
+      {
+        "description": "is met when each release has a valid signature somewhere, whichever artifact it is on",
+        "rules": ["require.some.parent", "subjects.chain.levels", "subjects.every.child"],
+        "input": {"releases": [{"name": "r1", "artifacts": [{"sha": "x1", "signatures": [{"by": "ann", "valid": true}]}, {"sha": "x2", "signatures": [{"by": "bob", "valid": false}]}]}, {"name": "r2", "artifacts": [{"sha": "x3", "signatures": [{"by": "cy", "valid": true}, {"by": "di", "valid": false}]}]}]},
+        "requirements": {"signed": {"status": "met", "causes": []}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "signed", "subject": {"id": null, "type": "signature"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/releases/0/artifacts/0/signatures/0", "/releases/0/artifacts/1/signatures/0"], "name": "in-scope signature count", "value": 2}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"release": "r1"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/releases/1/artifacts/0/signatures/0", "/releases/1/artifacts/0/signatures/1"], "name": "in-scope signature count", "value": 2}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"release": "r2"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated signature ids", "value": []}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"release": "r1"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated signature ids", "value": []}], "passed": true, "requirement": "signed", "subject": {"id": null, "in": {"release": "r2"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "valid", "inputs": [{"locations": ["/releases/0/artifacts/0/signatures/0/valid"], "name": "valid", "value": true}], "passed": true, "requirement": "signed", "subject": {"id": "ann", "in": {"release": "r1"}, "type": "signature"}},
+          {"cause": "value", "check": "valid", "inputs": [{"locations": ["/releases/0/artifacts/1/signatures/0/valid"], "name": "valid", "value": false}], "message": "valid is false", "passed": false, "requirement": "signed", "subject": {"id": "bob", "in": {"release": "r1"}, "type": "signature"}},
+          {"cause": "satisfied", "check": "valid", "inputs": [{"locations": ["/releases/1/artifacts/0/signatures/0/valid"], "name": "valid", "value": true}], "passed": true, "requirement": "signed", "subject": {"id": "cy", "in": {"release": "r2"}, "type": "signature"}},
+          {"cause": "value", "check": "valid", "inputs": [{"locations": ["/releases/1/artifacts/0/signatures/1/valid"], "name": "valid", "value": false}], "message": "valid is false", "passed": false, "requirement": "signed", "subject": {"id": "di", "in": {"release": "r2"}, "type": "signature"}}
+        ],
+        "violations": []
+      }
+    ]
+  },
+  {
+    "description": "require some on children read from the input counts across all of them",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pull request": {"from": "every commits.pull_requests", "identified_by": "number"}}, "requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}}},
+    "cases": [
+      {
+        "description": "is met when one pull request anywhere passes",
+        "rules": ["require.some.parent", "require", "subjects.every"],
+        "input": {"commits": [{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}, {"number": 8}]}, {"sha": "a2", "pull_requests": [{"number": 9}]}]},
+        "requirements": {"reviewed": {"status": "met", "causes": []}},
+        "results": [
+          {"cause": "satisfied", "check": "$well_formed", "inputs": [{"locations": [], "name": "count(checks)", "value": 1}, {"locations": [], "name": "require", "value": "some"}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$min_subjects", "failed_items": [], "inputs": [{"locations": ["/commits/0/pull_requests/0", "/commits/0/pull_requests/1", "/commits/1/pull_requests/0"], "name": "in-scope pull request count", "value": 3}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "$unique_ids", "inputs": [{"locations": [], "name": "repeated pull request ids", "value": []}], "passed": true, "requirement": "reviewed", "subject": {"id": null, "type": "pull request"}},
+          {"cause": "satisfied", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/0/approved_by"], "name": "approved_by", "value": "bob"}], "passed": true, "requirement": "reviewed", "subject": {"id": 7, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/0/pull_requests/1"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 8, "type": "pull request"}},
+          {"cause": "absent", "check": "approved", "inputs": [{"locations": ["/commits/1/pull_requests/0"], "name": "approved_by", "value": null}], "message": "approved_by is missing", "passed": false, "requirement": "reviewed", "subject": {"id": 9, "type": "pull request"}}
+        ],
+        "violations": []
+      }
+    ]
   }
 ]
