@@ -131,9 +131,9 @@
         "subject": {
           "type": "object",
           "properties": {
-            "type": {"description": "The name of the requirement's subject, or `$policy` for the row of Ergo's own `$policy` requirement."},
+            "type": {"description": "The name of the requirement's subject, the name of the ancestor whose ids a `$unique_ancestor_ids` row checks, or `$policy` for the row of Ergo's own `$policy` requirement."},
             "id": {"description": "The subject's id, null for the rows of the checks Ergo adds to a requirement, or `$policy` for the row of Ergo's own `$policy` requirement."},
-            "in": {"type": "object", "description": "Only for a child subject: the name and id of each subject it was read from, its parent and, three subjects deep, its grandparent.", "maxProperties": 2}
+            "in": {"type": "object", "description": "Only for a child subject, or for an ancestor that a `$unique_ancestor_ids` row checks and that is a child subject itself: the name and id of each subject it was read from, its parent and, three subjects deep, its grandparent.", "maxProperties": 2}
           },
           "required": ["type", "id"],
           "additionalProperties": false

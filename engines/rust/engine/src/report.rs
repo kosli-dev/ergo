@@ -67,6 +67,7 @@ pub struct Evaluation {
     pub matching: u64,
     pub min_subjects: Vec<Row>,
     pub unique_ids: Vec<Row>,
+    pub unique_ancestor_ids: Vec<Row>,
     pub applies: Vec<Row>,
     pub subject_rows: Vec<Vec<Row>>,
 }
@@ -136,6 +137,24 @@ pub fn min_subjects_row(
     row
 }
 
+pub fn unique_ancestor_ids_row(
+    requirement_name: &str,
+    requirement: &Requirement,
+    ancestor: &str,
+    repeated: Vec<Value>,
+    locations: &[String],
+) -> Row {
+    let label = format!("repeated {ancestor} ids");
+    let mut row = unique_ids_row(requirement_name, requirement, repeated, locations);
+    row.check = "$unique_ancestor_ids".to_string();
+    row.subject_type = json!(ancestor);
+    row.inputs[0]["name"] = json!(label);
+    if let Some(message) = row.message.as_mut() {
+        *message = crate::ops::message::is(&label, &row.inputs[0]["value"]);
+    }
+    row
+}
+
 pub fn unique_ids_row(
     requirement_name: &str,
     requirement: &Requirement,
@@ -193,6 +212,7 @@ pub fn no_subjects(
             Vec::new(),
             &[],
         )],
+        unique_ancestor_ids: Vec::new(),
         applies: Vec::new(),
         subject_rows: Vec::new(),
     }
@@ -327,6 +347,56 @@ impl CheckDef {
     }
 }
 
+fn ancestor_def(
+    reading: &Reading,
+    policy: &Policy,
+    requirement: &Requirement,
+    extra: &Problems,
+    input: &Value,
+    params: &Value,
+) -> Option<CheckDef> {
+    let (name, _) = policy.subject_of(requirement)?;
+    let mut levels: Vec<String> = Vec::new();
+    let mut at = name.to_string();
+    while levels.len() < 2 && from_readable(reading, &at, extra) {
+        let Some(crate::reading::Relation::Child(parent)) = reading
+            .infos
+            .get(at.as_str())
+            .map(|info| info.relation.clone())
+        else {
+            break;
+        };
+        levels.insert(0, parent.clone());
+        at = parent;
+    }
+    if levels.is_empty() {
+        return None;
+    }
+    let mut descriptions = Vec::new();
+    let mut expressions = Vec::new();
+    let mut refs: Vec<Value> = Vec::new();
+    for (at, level) in levels.iter().enumerate() {
+        let every = if at == 0 { "Every" } else { "every" };
+        descriptions.push(format!("{every} {level} id is unique"));
+        let from = if from_readable(reading, level, extra) {
+            refs.extend(crate::checks::refs_read(
+                &reading.source_refs(level),
+                input,
+                params.as_object().map(|_| params),
+            ));
+            reading.infos[level].from_text.clone().unwrap_or_default()
+        } else {
+            INVALID_FROM.to_string()
+        };
+        expressions.push(format!("count(repeated(ids({from}))) == 0"));
+    }
+    refs.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
+    refs.dedup();
+    let mut def = CheckDef::added(descriptions.join(" and "), expressions.join(" and "));
+    def.refs = refs;
+    Some(def)
+}
+
 pub fn check_defs(
     reading: &Reading,
     policy: &Policy,
@@ -403,6 +473,9 @@ pub fn check_defs(
     );
     unique_def.refs = from_refs;
     defs.insert("$unique_ids".to_string(), unique_def);
+    if let Some(def) = ancestor_def(reading, policy, requirement, extra, input, params) {
+        defs.insert("$unique_ancestor_ids".to_string(), def);
+    }
     defs.insert(
         "$well_formed".to_string(),
         CheckDef::added(
@@ -541,6 +614,7 @@ pub fn status(
         .min_subjects
         .iter()
         .chain(&evaluation.unique_ids)
+        .chain(&evaluation.unique_ancestor_ids)
         .any(|row| !row.passed());
     if scope_unreadable || counts_failed {
         return "not_met";
@@ -604,6 +678,7 @@ fn causes(
     let rows = std::iter::once(well_formed)
         .chain(&evaluation.min_subjects)
         .chain(&evaluation.unique_ids)
+        .chain(&evaluation.unique_ancestor_ids)
         .chain(&evaluation.applies)
         .chain(evaluation.subject_rows.iter().flatten());
     let mut counts: BTreeMap<Cause, u64> = BTreeMap::new();
@@ -687,6 +762,7 @@ pub fn assemble_with(
     let mut well_formed_rows = Vec::new();
     let mut min_rows = Vec::new();
     let mut unique_rows = Vec::new();
+    let mut ancestor_rows = Vec::new();
     let mut applies_rows = Vec::new();
     let mut check_rows = Vec::new();
     let mut subjects = Map::new();
@@ -741,6 +817,7 @@ pub fn assemble_with(
         well_formed_rows.push(well_formed);
         min_rows.extend(evaluation.min_subjects);
         unique_rows.extend(evaluation.unique_ids);
+        ancestor_rows.extend(evaluation.unique_ancestor_ids);
         applies_rows.extend(evaluation.applies);
         check_rows.extend(evaluation.subject_rows.into_iter().flatten());
     }
@@ -752,6 +829,7 @@ pub fn assemble_with(
         .iter()
         .chain(&min_rows)
         .chain(&unique_rows)
+        .chain(&ancestor_rows)
         .chain(&applies_rows)
         .chain(&check_rows)
         .map(Row::to_json)
@@ -1806,6 +1884,7 @@ mod tests {
             matching,
             min_subjects: vec![row("s", "$min_subjects", Cause::Satisfied)],
             unique_ids: vec![row("s", "$unique_ids", Cause::Satisfied)],
+            unique_ancestor_ids: Vec::new(),
             applies: Vec::new(),
             subject_rows: groups
                 .into_iter()
@@ -1868,6 +1947,7 @@ mod tests {
             matching: 1,
             min_subjects: vec![row("s", "$min_subjects", min)],
             unique_ids: vec![row("s", "$unique_ids", unique)],
+            unique_ancestor_ids: Vec::new(),
             applies: applies.iter().map(|c| row("s", "$applies", *c)).collect(),
             subject_rows: vec![vec![row("s", "c", Cause::Satisfied)]],
         };
@@ -1911,6 +1991,7 @@ mod tests {
             matching: 2,
             min_subjects: vec![row("s", "$min_subjects", Cause::Satisfied)],
             unique_ids: vec![row("s", "$unique_ids", Cause::Satisfied)],
+            unique_ancestor_ids: Vec::new(),
             applies: vec![
                 row("s", "$applies", Cause::Value),
                 row("s", "$applies", Cause::Absent),

@@ -9191,6 +9191,22 @@
               "expression": "count(matching(p.items)) >= 1",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/key"
+                  ],
+                  "name": "$params.key",
+                  "value": [
+                    "a"
+                  ]
+                }
+              ],
+              "description": "Every p id is unique",
+              "expression": "count(repeated(ids(g named by $params.key))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every d id is unique",
               "expression": "count(repeated(ids(p.items))) == 0",
@@ -9273,6 +9289,23 @@
           "subject": {
             "id": null,
             "type": "d"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated p ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "p"
           }
         }
       ],
@@ -9358,6 +9391,20 @@
               "expression": "count(matching(p.items)) >= 1",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.key",
+                  "value": null
+                }
+              ],
+              "description": "Every p id is unique",
+              "expression": "count(repeated(ids(g named by $params.key))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every d id is unique",
               "expression": "count(repeated(ids(p.items))) == 0",
@@ -9441,6 +9488,23 @@
             "id": null,
             "type": "d"
           }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated p ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "p"
+          }
         }
       ],
       "subjects": {
@@ -9520,6 +9584,20 @@
             "$min_subjects": {
               "description": "The in-scope d count is at least 1",
               "expression": "count(matching(every p.items)) >= 1",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/key"
+                  ],
+                  "name": "$params.key",
+                  "value": "a"
+                }
+              ],
+              "description": "Every p id is unique",
+              "expression": "count(repeated(ids(g named by $params.key))) == 0",
               "meta": {}
             },
             "$unique_ids": {
@@ -9625,6 +9703,23 @@
               }
             },
             "type": "d"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated p ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "p"
           }
         },
         {
@@ -13492,6 +13587,11 @@
               "expression": "B.b can be read",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "description": "Every B id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every C id is unique",
               "expression": "count(repeated(ids(B.b))) == 0",
@@ -13641,6 +13741,11 @@
             "$min_subjects": {
               "description": "The C list can be read",
               "expression": "B.b can be read",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every B id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
@@ -13794,6 +13899,11 @@
               "expression": "B.b can be read",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "description": "Every B id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every C id is unique",
               "expression": "count(repeated(ids(B.b))) == 0",
@@ -13943,6 +14053,11 @@
             "$min_subjects": {
               "description": "The C list can be read",
               "expression": "B.b can be read",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every B id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
@@ -14096,6 +14211,11 @@
               "expression": "B.b can be read",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "description": "Every B id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every C id is unique",
               "expression": "count(repeated(ids(B.b))) == 0",
@@ -14245,6 +14365,11 @@
             "$min_subjects": {
               "description": "The C list can be read",
               "expression": "B.b can be read",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every B id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
@@ -16041,6 +16166,23 @@
               "expression": "scan.findings can be read",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/k"
+                  ],
+                  "name": "$params.k",
+                  "value": [
+                    "a",
+                    "a"
+                  ]
+                }
+              ],
+              "description": "Every scan id is unique",
+              "expression": "count(repeated(ids(scans))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every finding id is unique",
               "expression": "count(repeated(ids(scan.findings))) == 0",
@@ -16123,6 +16265,23 @@
           "subject": {
             "id": null,
             "type": "finding"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated scan ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
           }
         }
       ],
@@ -16196,6 +16355,23 @@
               "expression": "count(matching(scan.findings)) >= 1",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/k"
+                  ],
+                  "name": "$params.k",
+                  "value": [
+                    "a",
+                    "a"
+                  ]
+                }
+              ],
+              "description": "Every scan id is unique",
+              "expression": "count(repeated(ids(scans))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every finding id is unique",
               "expression": "count(repeated(ids(scan.findings))) == 0",
@@ -16278,6 +16454,23 @@
           "subject": {
             "id": null,
             "type": "finding"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated scan ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
           }
         }
       ],
@@ -27177,6 +27370,27 @@
               "expression": "scan.findings can be read",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/k"
+                  ],
+                  "name": "$params.k",
+                  "value": "a"
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.nope",
+                  "value": null
+                }
+              ],
+              "description": "Every scan id is unique",
+              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every finding id is unique",
               "expression": "count(repeated(ids(scan.findings))) == 0",
@@ -27259,6 +27473,23 @@
           "subject": {
             "id": null,
             "type": "finding"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated scan ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
           }
         }
       ],
@@ -27329,6 +27560,27 @@
               "expression": "count(matching(scan.findings)) >= 1",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "$refs": [
+                {
+                  "locations": [
+                    "$params:/k"
+                  ],
+                  "name": "$params.k",
+                  "value": "a"
+                },
+                {
+                  "locations": [
+                    "$params:"
+                  ],
+                  "name": "$params.nope",
+                  "value": null
+                }
+              ],
+              "description": "Every scan id is unique",
+              "expression": "count(repeated(ids(scans named by $params.nope))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every finding id is unique",
               "expression": "count(repeated(ids(scan.findings))) == 0",
@@ -27411,6 +27663,23 @@
           "subject": {
             "id": null,
             "type": "finding"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated scan ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "scan"
           }
         }
       ],
@@ -39932,6 +40201,11 @@
               "expression": "count(matching(g.items)) >= 1",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "description": "Every g id is unique",
+              "expression": "count(repeated(ids(g))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every d id is unique",
               "expression": "count(repeated(ids(g.items))) == 0",
@@ -40021,6 +40295,23 @@
           "subject": {
             "id": null,
             "type": "d"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated g ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r",
+          "subject": {
+            "id": null,
+            "type": "g"
           }
         }
       ],
@@ -48951,6 +49242,11 @@
               "expression": "\"pull request\".c can be read",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "description": "Every pull request id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every d id is unique",
               "expression": "count(repeated(ids(\"pull request\".c))) == 0",
@@ -49104,6 +49400,11 @@
             "$min_subjects": {
               "description": "The in-scope d count is at least 1",
               "expression": "count(matching(\"pull request\".c)) >= 1",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every pull request id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
@@ -49263,6 +49564,11 @@
               "expression": "count(matching(\"pull request\".c)) >= 1",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "description": "Every pull request id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every d id is unique",
               "expression": "count(repeated(ids(\"pull request\".c))) == 0",
@@ -49413,6 +49719,11 @@
             "$min_subjects": {
               "description": "The in-scope d count is at least 1",
               "expression": "count(matching(\"pull request\".c)) >= 1",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every pull request id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {
@@ -49572,6 +49883,11 @@
             "$min_subjects": {
               "description": "The in-scope d count is at least 1",
               "expression": "count(matching(\"pull request\".c)) >= 1",
+              "meta": {}
+            },
+            "$unique_ancestor_ids": {
+              "description": "Every pull request id is unique",
+              "expression": "count(repeated(ids(<invalid from>))) == 0",
               "meta": {}
             },
             "$unique_ids": {

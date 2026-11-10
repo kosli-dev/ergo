@@ -558,6 +558,11 @@
               "expression": "count(matching(every kid.things)) >= 1",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "description": "Every kid id is unique",
+              "expression": "count(repeated(ids(kids))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every thing id is unique",
               "expression": "count(repeated(ids(every kid.things))) == 0",
@@ -648,6 +653,23 @@
               "kid": "k1"
             },
             "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated kid ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "kid"
           }
         },
         {
@@ -4614,6 +4636,11 @@
               "expression": "count(matching(every kid.things)) >= 1",
               "meta": {}
             },
+            "$unique_ancestor_ids": {
+              "description": "Every kid id is unique",
+              "expression": "count(repeated(ids(kids))) == 0",
+              "meta": {}
+            },
             "$unique_ids": {
               "description": "Every thing id is unique",
               "expression": "count(repeated(ids(every kid.things))) == 0",
@@ -4705,6 +4732,23 @@
               "kid": "k1"
             },
             "type": "thing"
+          }
+        },
+        {
+          "cause": "satisfied",
+          "check": "$unique_ancestor_ids",
+          "inputs": [
+            {
+              "locations": [],
+              "name": "repeated kid ids",
+              "value": []
+            }
+          ],
+          "passed": true,
+          "requirement": "r1",
+          "subject": {
+            "id": null,
+            "type": "kid"
           }
         },
         {

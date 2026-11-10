@@ -978,5 +978,23 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a grandchild of a subject read with every distinct checks the ids of each level",
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"signed": {"checks": {"signed": "signed is true"}, "subject": "commit"}}, "subjects": {"artifact": {"from": "every distinct builds.artifacts", "identified_by": "sha"}, "commit": {"from": "every \"pull request\".commits", "identified_by": "sha"}, "pull request": {"from": "every artifact.pull_requests", "identified_by": "number"}}},
+    "cases": [
+      {
+        "description": "lists the place of a repeated pull request id in every copy of its artifact",
+        "rules": ["unique_ids.ancestors", "subjects.distinct"],
+        "input": {"builds": [{"artifacts": [{"pull_requests": [{"commits": [{"sha": "c1", "signed": true}], "number": 7}, {"commits": [{"sha": "c2", "signed": true}], "number": 7}], "sha": "x1"}]}, {"artifacts": [{"pull_requests": [{"commits": [{"sha": "c1", "signed": true}], "number": 7}, {"commits": [{"sha": "c2", "signed": true}], "number": 7}], "sha": "x1"}]}]},
+        "requirements": {"signed": {"causes": [{"cause": "value", "rows": 1}], "status": "not_met"}},
+        "results": [
+          {"cause": "satisfied", "check": "$unique_ancestor_ids", "inputs": [{"locations": [], "name": "repeated artifact ids", "value": []}], "passed": true, "requirement": "signed", "subject": {"id": null, "type": "artifact"}},
+          {"cause": "value", "check": "$unique_ancestor_ids", "inputs": [{"locations": ["/builds/0/artifacts/0/pull_requests/0/number", "/builds/1/artifacts/0/pull_requests/0/number", "/builds/0/artifacts/0/pull_requests/1/number", "/builds/1/artifacts/0/pull_requests/1/number"], "name": "repeated pull request ids", "value": [7]}], "message": "repeated pull request ids is [7]", "passed": false, "requirement": "signed", "subject": {"id": null, "in": {"artifact": "x1"}, "type": "pull request"}},
+          {"cause": "satisfied", "check": "signed", "inputs": [{"locations": ["/builds/0/artifacts/0/pull_requests/0/commits/0/signed", "/builds/1/artifacts/0/pull_requests/0/commits/0/signed"], "name": "signed", "value": true}], "passed": true, "requirement": "signed", "subject": {"id": "c1", "in": {"artifact": "x1", "pull request": 7}, "type": "commit"}},
+          {"cause": "satisfied", "check": "signed", "inputs": [{"locations": ["/builds/0/artifacts/0/pull_requests/1/commits/0/signed", "/builds/1/artifacts/0/pull_requests/1/commits/0/signed"], "name": "signed", "value": true}], "passed": true, "requirement": "signed", "subject": {"id": "c2", "in": {"artifact": "x1", "pull request": 7}, "type": "commit"}}
+        ]
+      }
+    ]
   }
 ]

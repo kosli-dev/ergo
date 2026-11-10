@@ -6,7 +6,8 @@ use crate::path::{self, Ctx, Located, Location, Outcome, Path, Start, Step};
 use crate::policy::{Policy, Requirement, SubjectName};
 use crate::reading::{Filter, Lowered, Reading, Relation, Source};
 use crate::report::{
-    Evaluation, Row, min_subjects_row, no_subjects, row_of, unique_ids_row, unreadable_params,
+    Evaluation, Row, min_subjects_row, no_subjects, row_of, unique_ancestor_ids_row,
+    unique_ids_row, unreadable_params,
 };
 use crate::value::{self, json_text};
 use serde_json::{Map, Value, json};
@@ -166,6 +167,10 @@ fn merged_evaluations(runs: Vec<Vec<Evaluation>>) -> Vec<Evaluation> {
                 matching: evaluation.matching,
                 min_subjects: merge(&|e| &e.min_subjects, evaluation.min_subjects),
                 unique_ids: merge(&|e| &e.unique_ids, evaluation.unique_ids),
+                unique_ancestor_ids: merge(
+                    &|e| &e.unique_ancestor_ids,
+                    evaluation.unique_ancestor_ids,
+                ),
                 applies: merge(&|e| &e.applies, evaluation.applies),
                 subject_rows: evaluation
                     .subject_rows
@@ -2027,6 +2032,7 @@ fn evaluate_level(env: &Env, lowered: &Lowered, anc: &[Anc], empty: &Value) -> E
         matching: in_scope.len() as u64,
         min_subjects: vec![with_in(min, anc)],
         unique_ids: vec![with_in(unique, anc)],
+        unique_ancestor_ids: Vec::new(),
         applies,
         subject_rows,
     }
@@ -2176,8 +2182,29 @@ fn failed_level(env: &Env, anc: &[Anc], cause: Cause, with_unique: bool) -> Eval
         } else {
             Vec::new()
         },
+        unique_ancestor_ids: Vec::new(),
         applies: Vec::new(),
         subject_rows: Vec::new(),
+    }
+}
+
+fn ancestor_level(
+    env: &Env,
+    ancestor: &str,
+    repeated: Vec<Value>,
+    locations: &[String],
+    anc: &[Anc],
+) -> Evaluation {
+    let row = unique_ancestor_ids_row(
+        env.requirement_name,
+        env.requirement,
+        ancestor,
+        repeated,
+        locations,
+    );
+    Evaluation {
+        unique_ancestor_ids: vec![with_in(row, anc)],
+        ..Evaluation::default()
     }
 }
 
@@ -2193,15 +2220,21 @@ fn descend<'a>(
             None => Vec::new(),
         };
     };
+    let unread = |cause: Cause, anc: &[Anc]| {
+        vec![
+            ancestor_level(env, parent, Vec::new(), &[], anc),
+            failed_level(env, anc, cause, anc.is_empty()),
+        ]
+    };
     if !env.unreadable.is_empty() {
-        return vec![failed_level(env, anc, Cause::Unusable, anc.is_empty())];
+        return unread(Cause::Unusable, anc);
     }
     let Some(lowered) = env.reading.lowered(parent) else {
-        return vec![failed_level(env, anc, Cause::Unusable, anc.is_empty())];
+        return unread(Cause::Unusable, anc);
     };
     let (entries, broken) = match read_entries(env, empty, lowered, anc) {
         Read::Entries { entries, broken } => (entries, broken),
-        Read::Failed(cause) => return vec![failed_level(env, anc, cause, anc.is_empty())],
+        Read::Failed(cause) => return unread(cause, anc),
     };
     let keyed_child = matches!(
         &lowered.source,
@@ -2213,10 +2246,12 @@ fn descend<'a>(
     if !keyed_child
         && let Some(cause) = Cause::worst(broken.iter().filter(|b| b.rank == 0).map(|b| b.cause))
     {
-        return vec![failed_level(env, anc, cause, anc.is_empty())];
+        return unread(cause, anc);
     }
-    let mut out = Vec::new();
-    for judged in judge(env, lowered, entries, anc) {
+    let judged_all = judge(env, lowered, entries, anc);
+    let (repeated, id_locations) = repeated_ids(&judged_all);
+    let mut out = vec![ancestor_level(env, parent, repeated, &id_locations, anc)];
+    for judged in judged_all {
         let mut here = Anc {
             name: parent.clone(),
             id: judged.id.clone(),
@@ -2251,6 +2286,9 @@ fn merge(evaluations: Vec<Evaluation>) -> Evaluation {
         merged.matching += evaluation.matching;
         merged.min_subjects.extend(evaluation.min_subjects);
         merged.unique_ids.extend(evaluation.unique_ids);
+        merged
+            .unique_ancestor_ids
+            .extend(evaluation.unique_ancestor_ids);
         merged.applies.extend(evaluation.applies);
         merged.subject_rows.extend(evaluation.subject_rows);
     }
@@ -2302,8 +2340,13 @@ pub fn find_subjects(
     let chain = chain_of(reading, subject);
     let mut anc = Vec::new();
     let evaluations = descend(&env, &chain, &mut anc, empty);
-    if evaluations.is_empty() {
-        return none_found(&env);
+    if evaluations.iter().all(|e| e.min_subjects.is_empty()) {
+        let mut found = none_found(&env);
+        found.unique_ancestor_ids = evaluations
+            .into_iter()
+            .flat_map(|e| e.unique_ancestor_ids)
+            .collect();
+        return found;
     }
     merge(evaluations)
 }
@@ -2327,6 +2370,7 @@ fn none_found(env: &Env) -> Evaluation {
         matching: 0,
         min_subjects: vec![min],
         unique_ids: vec![unique],
+        unique_ancestor_ids: Vec::new(),
         applies: Vec::new(),
         subject_rows: Vec::new(),
     }
@@ -2923,6 +2967,43 @@ mod tests {
         assert_eq!(
             r["requirements"]["s"]["subjects"],
             json!({"total": 3, "matching": 3})
+        );
+    }
+
+    #[test]
+    fn a_repeated_parent_id_fails_one_ancestor_row_counting_the_parents_left_out() {
+        let r = run(
+            chain(),
+            json!({"arts": [
+                {"id": "a1", "live": 1, "prs": [{"id": 1}]},
+                {"id": "a1", "prs": [{"id": 2}]}
+            ]}),
+        );
+        let ancestors = rows(&r, "$unique_ancestor_ids");
+        assert_eq!(ancestors.len(), 1);
+        assert_eq!(ancestors[0]["subject"], json!({"type": "art", "id": null}));
+        assert_eq!(
+            input_of(&ancestors[0], 0),
+            json!({"name": "repeated art ids", "value": ["a1"], "locations": ["/arts/0/id", "/arts/1/id"]})
+        );
+        assert_eq!(r["requirements"]["s"]["status"], json!("not_met"));
+        assert_eq!(
+            r["requirements"]["s"]["checks"]["$unique_ancestor_ids"]["expression"],
+            json!("count(repeated(ids(arts))) == 0")
+        );
+    }
+
+    #[test]
+    fn a_subject_with_no_parent_has_no_ancestor_row_and_no_ancestor_check() {
+        let r = run(
+            json!({"thing": {"from": "ds", "identified_by": "id"}}),
+            json!({"ds": [{"id": 1}]}),
+        );
+        assert!(rows(&r, "$unique_ancestor_ids").is_empty());
+        assert!(
+            r["requirements"]["s"]["checks"]
+                .get("$unique_ancestor_ids")
+                .is_none()
         );
     }
 

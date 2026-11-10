@@ -62,7 +62,7 @@ This is the case:
 }
 ```
 
-`results` doesn't list every row, so a case only says what it's about. It's compared with the report's rows for the policy's own checks and `$applies`. The rows of `$well_formed`, `$min_subjects` and `$unique_ids` are only compared when `results` has a row for that check. Order matters, and key order in an object doesn't.
+`results` doesn't list every row, so a case only says what it's about. It's compared with the report's rows for the policy's own checks and `$applies`. The rows of `$well_formed`, `$min_subjects`, `$unique_ids` and `$unique_ancestor_ids` are only compared when `results` has a row for that check. Order matters, and key order in an object doesn't.
 
 ## Checking the rules
 
