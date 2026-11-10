@@ -8,7 +8,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     ("every commit.pull_requests", "every commit.pull_requests"),
     ("every commits.pull_requests", "every commits.pull_requests"),
     ("every release.artifacts", "every release.artifacts"),
-    ("every release.artifacts.signatures", "every release.artifacts.signatures"),
+    (
+        "every release.artifacts.signatures",
+        "every release.artifacts.signatures",
+    ),
     ("every ws that is not empty", "every ws that is not empty"),
     ("c whose type is \"library\"", "c whose type is \"library\""),
     ("c.licenses", "c.licenses"),
