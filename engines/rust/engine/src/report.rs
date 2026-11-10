@@ -352,9 +352,7 @@ pub fn check_defs(
                     refs: expressions
                         .get(name)
                         .and_then(|read| read.plan.as_ref())
-                        .map(|plan| {
-                            crate::checks::refs_of(plan, input, params.as_object().map(|_| params))
-                        })
+                        .map(|plan| crate::checks::refs_of(plan, input, Some(params)))
                         .unwrap_or_default(),
                 },
             )
@@ -2071,5 +2069,31 @@ mod tests {
     fn engine_and_spec_are_the_ones_this_engine_follows() {
         assert_eq!(SPEC, "v0.6-dev");
         assert_eq!(engine()["name"], json!("ergo-rust"));
+    }
+
+    #[test]
+    fn a_ref_through_a_list_of_params_points_at_where_the_read_stopped() {
+        let policy = json!({
+            "ergo_spec": "v0.6-dev",
+            "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+            "requirements": {"s": {"subject": "thing", "checks": {
+                "c": "x is in $params[0].v",
+                "d": "x is in $params[0]"
+            }}}
+        });
+        let report = crate::report(
+            &json!({"things": [{"id": "t", "x": 1}]}),
+            &policy,
+            &json!([[1]]),
+        );
+        let checks = &report["requirements"]["s"]["checks"];
+        assert_eq!(
+            checks["c"]["$refs"],
+            json!([{"name": "$params[0].v", "value": null, "locations": ["$params:/0"]}])
+        );
+        assert_eq!(
+            checks["d"]["$refs"],
+            json!([{"name": "item 1 of $params", "value": [1], "locations": ["$params:/0"]}])
+        );
     }
 }

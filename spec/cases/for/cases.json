@@ -23783,5 +23783,153 @@
         ]
       }
     ]
+  },
+  {
+    "description": "a for line that reads an alias and a path through it",
+    "policy": {
+      "ergo_spec": "v0.6-dev",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ts as ok",
+              "assert": "every ok.fs.k is in ok"
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "lists the alias paths first and then the other names, in a failed assertion",
+        "rules": [
+          "for.inputs",
+          "for.failed_items"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "s": 1,
+              "ts": [
+                {
+                  "fs": [
+                    {
+                      "k": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "satisfied",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              }
+            ],
+            "passed": true,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "every ok.fs.k is in ok",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/things/0/ts/0"
+                        ],
+                        "name": "ok",
+                        "value": {
+                          "fs": [
+                            {
+                              "k": 1
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "locations": [
+                          "/things/0/ts/0/fs/0/k"
+                        ],
+                        "name": "ok.fs[].k",
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of ts",
+                "locations": [
+                  "/things/0/ts/0"
+                ],
+                "path": "item 1 of ts",
+                "value": {
+                  "fs": [
+                    {
+                      "k": 1
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/things/0/ts/0"
+                ],
+                "name": "ts[]",
+                "value": [
+                  {
+                    "fs": [
+                      {
+                        "k": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of ts: ok is {\"fs\": [{\"k\": 1}]}, which isn't a list",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": "t",
+              "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
