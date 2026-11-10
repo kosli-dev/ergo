@@ -5461,14 +5461,19 @@ _required("every", groups) if {
 }
 
 _required("some", groups) if {
-	keys := {_group_parent(group) | some group in groups; count(group) > 0}
-	passing := {_group_parent(group) | some group in groups; count(group) > 0; _all_passed(group)}
-	count(keys - passing) == 0
+	pairs := _parent_passes(groups)
+	count({parent | some [parent, _] in pairs} - {parent | some [parent, true] in pairs}) == 0
 }
 
 _group_parent(group) := object.get(group[0].subject, "in", {})
 
-_shadowing_parents(req, e) := {_group_parent(group) | some group in e.subject_rows; count(group) > 0; _all_passed(group)} - {{}} if _require_of(req) == "some"
+_parent_passes(groups) := {[_group_parent(group), _group_passed(group)] | some group in groups; count(group) > 0}
+
+_group_passed(group) if _all_passed(group)
+
+else := false
+
+_shadowing_parents(req, e) := {parent | some [parent, true] in _parent_passes(e.subject_rows)} - {{}} if _require_of(req) == "some"
 
 else := set()
 
@@ -5494,16 +5499,25 @@ _causes(status, _, _) := [] if status in {"met", "not_applicable"}
 
 _causes("not_met", e, req) := _counted_causes(e, _shadowing_parents(req, e))
 
-_counted_causes(e, shadowing) := [{"cause": cause, "rows": n} |
+_counted_causes(e, shadowing) := _cause_counts([row.cause | some row in _failing_rows(e, shadowing)])
+
+_cause_counts(causes) := [{"cause": cause, "rows": n} |
 	some cause in array.concat(_cause_precedence, ["value"])
-	n := count([row |
-		some row in _requirement_rows(e)
-		row.passed == false
-		not _out_of_scope_row(row)
-		row.cause == cause
-		not _shadowed(row, shadowing)
-	])
+	n := count([found | some found in causes; found == cause])
 	n > 0
+]
+
+_failing_rows(e, shadowing) := [row |
+	some row in _requirement_rows(e)
+	row.passed == false
+	not _out_of_scope_row(row)
+] if count(shadowing) == 0
+
+else := [row |
+	some row in _requirement_rows(e)
+	row.passed == false
+	not _out_of_scope_row(row)
+	not _shadowed(row, shadowing)
 ]
 
 _shadowed(row, shadowing) if {
@@ -6229,20 +6243,22 @@ else := {}
 
 violations(report) := _violations(report, _shadowing_report_parents(report))
 
-_shadowing_report_parents(report) := set() if count(_some_requirements(report)) == 0
+_shadowing_report_parents(report) := _shadowing_in(report, _some_requirements(report))
 
-else := {[requirement, subject.in] | some [requirement, subject] in (_child_check_subjects(report) - _failed_child_check_subjects(report))}
+_shadowing_in(report, some_requirements) := set() if count(some_requirements) == 0
+
+else := {[requirement, subject.in] | some [requirement, subject] in (_child_check_subjects(report, some_requirements) - _failed_child_check_subjects(report, some_requirements))}
 
 _some_requirements(report) := {name | some name, req in report.requirements; req.require == "some"}
 
-_child_check_subjects(report) := {[row.requirement, row.subject] |
+_child_check_subjects(report, some_requirements) := {[row.requirement, row.subject] |
 	some row in report.results
-	_child_check_row(_some_requirements(report), row)
+	_child_check_row(some_requirements, row)
 }
 
-_failed_child_check_subjects(report) := {[row.requirement, row.subject] |
+_failed_child_check_subjects(report, some_requirements) := {[row.requirement, row.subject] |
 	some row in report.results
-	_child_check_row(_some_requirements(report), row)
+	_child_check_row(some_requirements, row)
 	row.passed == false
 }
 
@@ -6264,10 +6280,13 @@ _violations(report, shadowing) := [object.union(
 	},
 	object.union(object.union(_failed_items_of(row), _failed_assertions_of(row)), _message_of(row)),
 ) |
-	some row in report.results
+	some row in _unshadowed_results(report, shadowing)
 	_is_violation(report.requirements, row)
-	not _shadowed_in_report(row, shadowing)
 ]
+
+_unshadowed_results(report, shadowing) := report.results if count(shadowing) == 0
+
+else := [row | some row in report.results; not _shadowed_in_report(row, shadowing)]
 
 _shadowed_in_report(row, shadowing) if {
 	count(shadowing) > 0
