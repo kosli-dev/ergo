@@ -1,9 +1,7 @@
 use serde_json::json;
 
 pub fn fill_spec(text: &str) -> String {
-    let report = ergo_policy_engine::report(&json!({}), &json!({}), &json!({}));
-    let spec = report["ergo"].as_str().expect("a report names its spec");
-    text.replace("{{spec}}", spec)
+    text.replace("{{spec}}", ergo_policy_engine::SPEC)
 }
 
 #[test]

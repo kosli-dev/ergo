@@ -5,9 +5,10 @@ dir=$(mktemp -d)
 trap 'rm -rf "$dir"' EXIT
 cd "$dir"
 git init --quiet
-mkdir -p engines/rego engines/rust/engine/src spec/cases/demo engines/rust/engine/tests/regressions/demo
+mkdir -p engines/rego engines/rust/engine/src engines/rust/engine/tests spec/cases/demo engines/rust/engine/tests/regressions/demo
 echo '_spec := "v0.6-dev"' > engines/rego/ergo.rego
 echo 'pub const SPEC: &str = "v0.6-dev";' > engines/rust/engine/src/policy.rs
+echo 'fn t() { let _ = SPEC; }' > engines/rust/engine/tests/demo.rs
 echo 'package ergo_test' > engines/rego/ergo_test.rego
 echo 'package spec_test' > engines/rego/spec_test.rego
 echo '[{"policy": {"ergo_spec": "{{spec}}"}, "other": "v0.5", "rc": "v0.6-dev-rc", "close": "v0.6-dev2", "longer": "xv0.6-dev", "wide": "v0.60-dev", "suffix": "v0.6-devx", "minor": "v0.6-dev.1", "bare": "0.6-dev"}]' > spec/cases/demo/cases.json
@@ -76,6 +77,21 @@ done
 echo '_spec := "v0.6-dev"' > engines/rego/ergo.rego
 echo 'pub const SPEC: &str = "v0.6-dev";' > engines/rust/engine/src/policy.rs
 echo '[{"text": "{{spec}}"}]' > spec/cases/demo/cases.json
+
+echo "spec-placeholder.sh fails and names a Rust file that writes the current version"
+echo 'fn t() { let _ = "ergo_spec: v0.6-dev"; }' > engines/rust/engine/tests/demo.rs
+git add .
+fails "engines/rust/engine/tests/demo.rs" "Write {{spec}} instead"
+echo 'fn t() { let _ = "v0.5"; }' > engines/rust/engine/tests/demo.rs
+git add .
+sh "$script"
+echo 'fn t() { let _ = SPEC; }' > engines/rust/engine/tests/demo.rs
+git add .
+
+echo "spec-placeholder.sh fails when no Rust file is tracked besides policy.rs"
+git rm --quiet --cached engines/rust/engine/tests/demo.rs
+fails "no Rust files are tracked"
+git add .
 
 echo "spec-placeholder.sh fails when Rust SPEC differs from _spec and names both"
 echo 'pub const SPEC: &str = "v0.5";' > engines/rust/engine/src/policy.rs

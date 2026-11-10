@@ -2334,12 +2334,13 @@ fn none_found(env: &Env) -> Evaluation {
 
 #[cfg(test)]
 mod tests {
+    use crate::SPEC;
     use crate::report;
     use serde_json::{Value, json};
 
     fn policy(subjects: Value, min: Value) -> Value {
         json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": subjects,
             "requirements": {"s": {"subject": "thing", "min_subjects": min, "checks": {"c": "x exists"}}}
         })
@@ -2807,7 +2808,7 @@ mod tests {
     fn a_position_under_a_keyed_parent_the_object_lacks_fails_absent_and_not_unusable() {
         for from in ["p[0]", "first of p", "p[0].x"] {
             let policy = json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {"p": {"from": "m named by each of $params.ks"}, "k": {"from": from}},
                 "requirements": {"r": {"subject": "k", "checks": {"c": "x exists"}}}
             });
@@ -2836,7 +2837,7 @@ mod tests {
         ];
         for (check, passed, cause) in cases {
             let p = json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {"s": {"from": "things named by each of $params.k"}},
                 "requirements": {"r": {"subject": "s", "checks": {"c": check}}}
             });
@@ -2856,7 +2857,7 @@ mod tests {
     #[test]
     fn a_missing_key_fails_its_check_when_the_input_is_not_an_object() {
         let p = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"s": {"from": "$input named by each of $params.k"}},
             "requirements": {"r": {"subject": "s", "checks": {"c": "it exists"}}}
         });
@@ -3084,7 +3085,7 @@ mod tests {
         report(
             &input,
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": subjects,
                 "requirements": {"s": {"subject": "kid", "checks": {"c": "id exists"}}}
             }),
@@ -3204,7 +3205,7 @@ mod tests {
     #[test]
     fn a_requirement_that_names_no_subject_gets_no_subjects() {
         let policy = json!({
-            "ergo_spec": "v0.6-dev", "subjects": {"thing": {}},
+            "ergo_spec": SPEC, "subjects": {"thing": {}},
             "requirements": {"s": {"checks": {"c": "x exists"}}}
         });
         let r = report(&json!({}), &policy, &json!({}));
@@ -3267,7 +3268,7 @@ mod tests {
 
     fn with_checks(subjects: Value, checks: Value, input: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.6-dev", "subjects": subjects,
+            "ergo_spec": SPEC, "subjects": subjects,
             "requirements": {"s": {"subject": "thing", "checks": checks}}
         });
         report(&input, &policy, &json!({}))
@@ -3547,7 +3548,7 @@ mod tests {
         let r = report(
             &input,
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": subjects,
                 "requirements": {"s": {"subject": "thing", "checks": {"c": "x exists"}}}
             }),
@@ -3631,7 +3632,7 @@ mod tests {
         let r = report(
             &json!({"ts": []}),
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {
                     "t": {"from": "ts"},
                     "w": {"from": "every t.ws named by zz"},
@@ -3675,7 +3676,7 @@ mod tests {
         let r = report(
             &json!({"ts": []}),
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {
                     "t": {"from": "ts"},
                     "w": {"from": "every t.ws"},
@@ -3693,7 +3694,7 @@ mod tests {
         let r = report(
             &json!({"ts": [{"cov": 5, "ws": [{"lo": true}]}]}),
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {
                     "t": {"from": "ts"},
                     "thing": {"from": "every t.ws whose lo is at least t.cov.x"}
@@ -3713,7 +3714,7 @@ mod tests {
         let r = report(
             &json!({"things": [{"id": "a", "name": 1}]}),
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {"thing": {"from": "things", "has": {"cv": "name"}}},
                 "requirements": {"s": {"subject": "thing", "checks": {
                     "c": {"any_of": {"a": "name is 2", "b": "cv is 2"}}
@@ -3751,7 +3752,7 @@ mod tests {
         let r = report(
             &json!({"ts": []}),
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {
                     "t": {"from": "ts"},
                     "w": {"from": parent},
@@ -3841,7 +3842,7 @@ mod tests {
         let r = report(
             &json!({"ts": []}),
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {
                     "t": {"from": "ts"},
                     "w": {"from": "every t.ws whose x is x"},
@@ -3859,7 +3860,7 @@ mod tests {
         let r = report(
             &input,
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {"thing": {"from": "things", "identified_by": "id"}},
                 "requirements": {"s": {"subject": "thing", "checks": {"c": check}}}
             }),
@@ -3963,7 +3964,7 @@ mod tests {
         let r = report(
             &json!({"things": {"k": {"id": "t"}}}),
             &json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {"s": {"from": line}},
                 "requirements": {"r": {"subject": "s", "checks": {"c": "id exists"}}}
             }),

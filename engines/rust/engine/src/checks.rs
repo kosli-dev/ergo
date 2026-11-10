@@ -448,12 +448,13 @@ fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::SPEC;
     use crate::policy::Policy;
     use serde_json::{Value, json};
 
     fn read(subjects: Value, checks: Value) -> BTreeMap<String, CheckRead> {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": subjects,
             "requirements": {"r": {"subject": "t", "checks": checks}}
         }));
@@ -478,7 +479,7 @@ mod tests {
     #[test]
     fn a_part_that_clashes_with_its_parent_still_prints_the_dot_of_a_field_called_like_it() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items", "has": {"cov": "y"}}
@@ -493,7 +494,7 @@ mod tests {
     #[test]
     fn a_field_named_like_a_part_of_the_parent_only_prints_no_dot() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items"}
@@ -683,7 +684,7 @@ mod tests {
     #[test]
     fn the_advice_to_write_the_subjects_name_is_left_out_when_the_name_needs_quotes() {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"my t": {"from": "things"}},
             "requirements": {"r": {"subject": "my t", "checks": {
                 "c": "count of xs whose k equals k is 1",

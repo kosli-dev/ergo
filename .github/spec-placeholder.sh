@@ -20,16 +20,19 @@ for path in $paths; do
   [ -r "$path" ] || { echo "$path is missing or not readable, so the check can't look at it"; exit 1; }
 done
 
+rust_files=$(git ls-files 'engines/rust/*.rs' | grep -vxF "$policy" || true)
+[ -n "$rust_files" ] || { echo "no Rust files are tracked under engines/rust, so the check can't look at them"; exit 1; }
+
 pattern="(^|[^A-Za-z0-9.-])$(printf '%s' "$version" | sed 's/\./\\./g')(\$|[^A-Za-z0-9.-]|\\.(\$|[^0-9]))"
 
 status=0
-found=$(grep -rnE "$pattern" $paths | cut -c1-120) || status=$?
+found=$(grep -rnE "$pattern" $paths $rust_files | cut -c1-120) || status=$?
 if [ "$status" -gt 1 ]; then
   echo "grep failed with status $status"
   exit 1
 fi
 if [ -n "$found" ]; then
   echo "$found"
-  echo "These tests write the spec version $version. Write {{spec}} instead (ergo._spec in ergo_test.rego), so moving the spec version edits no test."
+  echo "These tests write the spec version $version. Write {{spec}} instead (ergo._spec in ergo_test.rego), so moving the spec version edits no test. In Rust, use SPEC from ergo_policy_engine."
   exit 1
 fi
