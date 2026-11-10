@@ -2094,8 +2094,10 @@ fn check_row(env: &Env, name: &str, plan: &Plan, ctx: &Ctx, judged: &Judged, anc
             let mut own = ran.message;
             if !env.unreadable.is_empty() {
                 verdict.cause = Cause::Unusable;
-                failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
-                own = None;
+                if ops::message::params_that_arent_an_object(check, ctx).is_some() {
+                    failed_items = failed_items.take().map(|_| Value::Array(Vec::new()));
+                    own = None;
+                }
             }
             said.push(own);
             verdict

@@ -12492,3 +12492,57 @@ test_both_sides_of_a_comparison_are_named_when_one_is_missing_and_the_other_null
 	rows := _root_rows({"c": "c.z is d.z"}, {"id": "p", "c": {}, "d": null}, {})
 	rows.c == ["absent", "c.z is missing, and d is null"]
 }
+
+_params_not_object_policy := {
+	"ergo_spec": "v0.6-dev",
+	"subjects": {"pr": {"from": "prs", "identified_by": "id"}},
+	"requirements": {"r": {"subject": "pr", "checks": {
+		"least_z": {"for": "every xs as m", "assert": "m.v is at least z"},
+		"least_q": {"for": "every xs as m", "assert": "m.v is at least $params.q"},
+		"in_q": {"for": "every xs as m", "assert": "m.v is in $params.q"},
+		"plain": {"for": "every xs as m", "assert": "z is 1"},
+	}}},
+}
+
+_params_not_object_doc := {"prs": [{"id": "p0", "z": "s", "xs": [{"v": 1}, {"v": 2}]}]}
+
+_params_not_object_rows(doc, params) := {r.check: [r.cause, r.message, count(r.failed_items)] |
+	some r in ergo.report(doc, _params_not_object_policy, params).results
+	not startswith(r.check, "$")
+}
+
+test_a_for_check_that_reads_params_says_only_that_params_is_not_an_object if {
+	rows := _params_not_object_rows(_params_not_object_doc, 3)
+	rows.least_q == ["unusable", "$params is 3, which isn't an object", 0]
+	rows.in_q == ["unusable", "$params is 3, which isn't an object", 0]
+	rows_s := _params_not_object_rows(_params_not_object_doc, "s")
+	rows_s.least_q == ["unusable", "$params is \"s\", which isn't an object", 0]
+	rows_s.in_q == ["unusable", "$params is \"s\", which isn't an object", 0]
+	rows_l := _params_not_object_rows(_params_not_object_doc, [])
+	rows_l.least_q == ["unusable", "$params is [], which isn't an object", 0]
+	rows_l.in_q == ["unusable", "$params is [], which isn't an object", 0]
+}
+
+test_a_for_check_that_does_not_read_params_keeps_its_message_and_lists_every_item_when_params_is_not_an_object if {
+	every params in [3, "s", []] {
+		rows := _params_not_object_rows(_params_not_object_doc, params)
+		rows.least_z == ["unusable", "z is \"s\", which isn't a number", 2]
+		rows.plain == ["unusable", "z is \"s\", which isn't a number", 2]
+	}
+}
+
+test_a_for_check_that_does_not_read_params_but_passes_is_unusable_with_its_expression_when_params_is_not_an_object if {
+	doc := {"prs": [{"id": "p0", "z": 1, "xs": [{"v": 1}]}]}
+	every params in [3, "s", []] {
+		_params_not_object_rows(doc, params).plain == ["unusable", "for every xs as m: z is 1 is false", 0]
+	}
+}
+
+test_a_for_check_with_params_missing_or_null_reads_it_as_missing_and_lists_every_item if {
+	every params in [null, {}] {
+		rows := _params_not_object_rows(_params_not_object_doc, params)
+		rows.least_z == ["unusable", "z is \"s\", which isn't a number", 2]
+		rows.least_q == ["absent", "$params.q is missing", 2]
+		rows.in_q == ["absent", "$params.q is missing", 2]
+	}
+}

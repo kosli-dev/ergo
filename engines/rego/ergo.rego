@@ -10461,12 +10461,23 @@ _for_row(check, subj) := r if {
 	r.cause == "satisfied"
 }
 
-_for_row(check, subj) := object.union(object.remove(r, ["root_msgs", "other_roots"]), {"failed": [_m_strip(f) | some f in r.failed], "message": _for_row_message(check, subj, r)}) if {
+_for_row(check, subj) := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [], "message": _m_fallback(check)}) if {
 	r := _for_row_raw(check, subj)
 	r.cause != "satisfied"
+	_m_params_unread(check)
 }
 
-_for_row_raw(check, subj) := object.union(r, {"cause": _worst_of({"unusable", r.cause}), "failed": _for_unreadable_failed(r)}) if {
+_for_row(check, subj) := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [_m_strip(f) | some f in r.failed], "message": _for_row_text(check, subj, r)}) if {
+	r := _for_row_raw(check, subj)
+	r.cause != "satisfied"
+	not _m_params_unread(check)
+}
+
+_for_row_raw(check, subj) := object.union(r, {"cause": _worst_of({"unusable", r.cause}), "natural": r.cause}) if {
+	_params_shape_only_unreadable(check)
+	not _param_broken(check, set())
+	r := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
+} else := object.union(r, {"cause": _worst_of({"unusable", r.cause}), "failed": _for_unreadable_failed(check, r)}) if {
 	_walk_flawed(check)
 	_for_sentence_flaw(check, subj) != ""
 	r := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
@@ -10480,13 +10491,23 @@ _for_row_raw(check, subj) := object.union(r, {"cause": _worst_of({"unusable", r.
 	not is_object(subj)
 } else := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
 
-_for_unreadable_failed(r) := [] if {
+_for_row_text(check, _, r) := _m_fallback(check) if object.get(r, "natural", null) == "satisfied"
+
+_for_row_text(check, subj, r) := _for_row_message(check, subj, r) if object.get(r, "natural", null) != "satisfied"
+
+_for_unreadable_failed(check, r) := [] if {
 	_unreadable_input
 	r.cause == "unusable"
 	not "other_roots" in object.keys(r)
+	not _params_shape_only_unreadable(check)
 }
 
 else := r.failed
+
+_params_shape_only_unreadable(check) if {
+	[{"name": "$params", "value": ["not an object"], "locations": []}] == data.ergo_unreadable
+	not _m_reads_params(check)
+}
 
 _flawed_root_msgs(check, subj, said) := _with_roots(split(said, "; "), roots) if {
 	roots := _walk_root_msgs(check, subj)
