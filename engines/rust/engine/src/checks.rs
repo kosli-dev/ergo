@@ -119,12 +119,29 @@ fn read_one(
     reading: &Reading,
     subject: Option<&str>,
 ) -> CheckRead {
-    let written = written_expression(check);
+    let read = read_form(check, scope, reading, subject);
     if check
         .problems
         .iter()
-        .any(|problem| problem == "invalid for" || problem.starts_with("unknown field"))
+        .any(|problem| problem.starts_with("unknown field"))
     {
+        return CheckRead {
+            expression: written_expression(check),
+            problems: read.problems,
+            plan: None,
+        };
+    }
+    read
+}
+
+fn read_form(
+    check: &crate::policy::Check,
+    scope: &Scope,
+    reading: &Reading,
+    subject: Option<&str>,
+) -> CheckRead {
+    let written = written_expression(check);
+    if check.problems.contains("invalid for") {
         return CheckRead {
             expression: written,
             problems: BTreeSet::new(),
@@ -1005,5 +1022,45 @@ mod tests {
         let read = one(json!({"c": {"assert": "x is one of $params.z", "description": 5}}));
         assert_eq!(read.expression, "x is in $params.z");
         assert!(read.plan.is_some());
+    }
+
+    fn has_problem(read: &CheckRead, text: &str) -> bool {
+        read.problems.iter().any(|problem| problem.contains(text))
+    }
+
+    #[test]
+    fn an_assert_that_does_not_parse_next_to_a_field_no_check_has_keeps_its_problems() {
+        let read = one(json!({"c": {"assert": "nonsense words", "zz": 1}}));
+        assert_eq!(read.expression, "nonsense words");
+        assert!(has_problem(&read, "doesn't parse"));
+        assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn an_assert_that_compares_a_path_with_itself_next_to_a_field_no_check_has_keeps_its_problems()
+    {
+        let read = one(json!({"c": {"assert": "x is x", "zz": 1}}));
+        assert!(has_problem(&read, "x is compared with itself"));
+    }
+
+    #[test]
+    fn an_assert_with_a_word_of_the_grammar_next_to_a_field_no_check_has_keeps_its_problems() {
+        let read = one(json!({"c": {"assert": "every", "zz": 1}}));
+        assert!(has_problem(
+            &read,
+            "every is a word of the grammar: write .every"
+        ));
+    }
+
+    #[test]
+    fn an_any_of_with_a_bad_option_next_to_a_field_no_check_has_keeps_its_problems() {
+        let read = one(json!({"c": {"any_of": {"a": "nonsense words"}, "zz": 1}}));
+        assert!(has_problem(&read, "option a: doesn't parse"));
+    }
+
+    #[test]
+    fn a_for_next_to_an_any_of_keeps_the_problems_of_the_options() {
+        let read = one(json!({"c": {"for": "every ts as t", "any_of": {"a": "nonsense words"}}}));
+        assert!(has_problem(&read, "option a: doesn't parse"));
     }
 }

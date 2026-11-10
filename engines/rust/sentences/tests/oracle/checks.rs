@@ -7659,6 +7659,8 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         &["a that goes after every, some, count of or sum of"],
     ),
     ("a is 9", &["a is a word of the grammar: write .a"]),
+    ("every", &["every is a word of the grammar: write .every"]),
+    ("nonsense words", &["doesn't parse"]),
     ("a is at least 2", &["a is a word of the grammar: write .a"]),
     ("every items whose cov is 2 has n is 1", &["doesn't parse"]),
     (
