@@ -27,7 +27,12 @@ swept_files() {
 }
 
 version_pattern() {
-  printf '(?<![\\w.])(v?)%s(?!\\w|\\.\\d|-\\w)' "$(printf '%s' "${1#v}" | sed 's/\./\\./g')"
+  local escaped
+  escaped=$(printf '%s' "${1#v}" | sed 's/\./\\./g')
+  case $1 in
+    *-dev) printf '(?<![\\w.])(v?)%s(?!\\w|\\.\\d|-\\w)' "$escaped" ;;
+    *) printf '(?:(?<![\\w.])(v)|(?<=/spec/))%s(?!\\w|\\.\\d|-\\w)' "$escaped" ;;
+  esac
 }
 
 files_with() {
@@ -58,15 +63,19 @@ if [ "${1:-}" = set ]; then
 fi
 
 check_leftovers() {
-  local current=${rego%-dev} previous leftovers
-  [ "${current#*.}" -gt 0 ] || return 0
-  previous="v${current%%.*}.$((10#${current#*.} - 1))-dev"
-  leftovers=$(files_with "$previous")
-  [ -z "$leftovers" ] || {
-    echo "These files still write $previous, the previous dev version:"
-    echo "$leftovers" | sed 's/^/  /'
-    fail "The spec is at v$rego, so $previous should be gone. Run .github/spec-version.sh set v$rego, or edit them by hand."
-  }
+  local current=${rego%-dev} stale previous leftovers
+  stale=()
+  [ "${current#*.}" -gt 0 ] && stale+=("v${current%%.*}.$((10#${current#*.} - 1))-dev")
+  [ "$rego" = "$current" ] && stale+=("v$current-dev")
+  for previous in ${stale[@]+"${stale[@]}"}; do
+    leftovers=$(files_with "$previous")
+    [ -z "$leftovers" ] || {
+      echo "These files still write $previous, a dev version that is over:"
+      echo "$leftovers" | sed 's/^/  /'
+      fail "The spec is at v$rego, so $previous should be gone. Run .github/spec-version.sh set v$rego, or edit them by hand."
+    }
+  done
+  return 0
 }
 
 defining=(

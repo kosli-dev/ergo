@@ -109,6 +109,30 @@ git add .
 bash "$script" set v0.7 > /dev/null
 grep -qxF 'a v0.7 b v0.60 c v0.6.1 d v0.6-dev e xv0.6' REFERENCE.md
 
+echo "set leaves bare numbers alone when the old version is not a dev one"
+reset_files
+echo '_spec := "v0.7"' > engines/rego/ergo.rego
+printf 'const RATIO: &str = "0.7";\n' > engines/rust/engine/src/policy.rs
+printf '{\n  "$id": "https://ergo.kosli.com/spec/0.7/policy.schema.json",\n  "usd": 0.7\n}\n' > spec/policy/schema.json
+printf 'ratio is at least 0.7 and v0.7 and next() < 0.7\n' > REFERENCE.md
+git add .
+bash "$script" set v0.8-dev > /dev/null
+grep -qxF 'const RATIO: &str = "0.7";' engines/rust/engine/src/policy.rs
+grep -qF '"usd": 0.7' spec/policy/schema.json
+grep -qxF 'ratio is at least 0.7 and v0.8-dev and next() < 0.7' REFERENCE.md
+grep -qF 'spec/0.8-dev/policy.schema.json' spec/policy/schema.json
+
+echo "the check names a file that still writes the dev version of a released spec"
+reset_files
+echo '_spec := "v0.6"' > engines/rego/ergo.rego
+sed -i.bak 's/0\.6-dev/0.6/' spec/policy/schema.json spec/report/schema.json
+rm -f spec/policy/schema.json.bak spec/report/schema.json.bak
+echo 'ergo_spec: v0.6' > OPA.md
+git add .
+fails
+says "REFERENCE.md"
+says "v0.6-dev"
+
 echo "the check fails and names a file that still writes the previous dev version"
 reset_files
 echo '## 0.7' > spec/CHANGELOG.md
