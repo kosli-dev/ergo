@@ -7762,6 +7762,18 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("x is at least m.v", "x is at least m.v", &[], &[]),
+    ("m is $params.l", "m equals $params.l", &[], &[]),
+    ("m.k named by m.k is 1", "m.k named by m.k is 1", &[], &[]),
+    (
+        "m.v is at least $params.n",
+        "m.v is at least $params.n",
+        &[],
+        &[],
+    ),
+    ("m.v is at least 1", "m.v is at least 1", &[], &[]),
+    ("m.v is in pl.z", "m.v is in pl.z", &[], &[]),
+    ("m.v matches pl.z", "m.v matches pl.z", &[], &[]),
+    ("m.v named by m.v is 1", "m.v named by m.v is 1", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

@@ -2875,16 +2875,20 @@ fn sentence_root_flaw(forms: &[Check], ctx: &Ctx) -> Option<(Cause, Vec<String>)
         roots.dedup();
         let mut found: Vec<(Cause, String)> = Vec::new();
         for root in roots {
+            let read = path::read(root, ctx);
+            let part = matches!(&root.start, Start::Part(part) if !part.steps.is_empty());
             if super::lists::right_paths(check).contains(&root)
+                && !part
                 && super::lists::walked_in(check, root, ctx).is_some()
             {
                 continue;
             }
-            if let Some(text) = super::message::root_kind_fault(check, root, ctx) {
+            if !(part && read.outcome.cause().is_some())
+                && let Some(text) = super::message::root_kind_fault(check, root, ctx)
+            {
                 found.push((Cause::Unusable, text));
                 continue;
             }
-            let read = path::read(root, ctx);
             if keys.contains(&root)
                 && let Some(value) = read.value
                 && read.outcome.cause().is_none()
@@ -4242,5 +4246,228 @@ mod tests {
             .map(|input| &input["name"])
             .collect();
         assert_eq!(names, [&json!("ok"), &json!("ok.fs[].k")]);
+    }
+
+    fn pr_row(
+        has: Value,
+        for_line: &str,
+        assertions: Value,
+        fields: Value,
+        params: Value,
+    ) -> (String, Value) {
+        let mut subject = json!({"from": "prs", "identified_by": "id"});
+        if !has.is_null() {
+            subject["has"] = has;
+        }
+        let policy = json!({
+            "ergo_spec": SPEC,
+            "subjects": {"pr": subject},
+            "requirements": {"r": {"subject": "pr", "checks": {"c": {"for": for_line, "assert": assertions}}}}
+        });
+        let mut pr = fields;
+        pr["id"] = json!("p0");
+        let report = crate::report(&json!({"prs": [pr]}), &policy, &params);
+        let found = report["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["check"] == "c")
+            .unwrap();
+        (
+            found["cause"].as_str().unwrap().to_string(),
+            found["message"].clone(),
+        )
+    }
+
+    #[test]
+    fn a_part_that_is_not_an_object_on_the_right_of_a_list_phrase_fails_as_unusable_and_names_the_part()
+     {
+        for assertion in [
+            "m.v is in pl.z",
+            "m.v matches pl.z",
+            "pl.z contains m.v",
+            "m.v is at least pl.z",
+        ] {
+            let (cause, message) = pr_row(
+                json!({"pl": "c"}),
+                "every xs as m",
+                json!(assertion),
+                json!({"c": [], "xs": [{"v": 1}]}),
+                json!({}),
+            );
+            assert_eq!(cause, "unusable", "{assertion}");
+            assert_eq!(message, "pl is [], which isn't an object", "{assertion}");
+        }
+    }
+
+    #[test]
+    fn a_part_that_is_a_list_of_objects_is_not_walked_on_the_right_of_a_list_phrase() {
+        let fields = json!({"c": [{"z": 1}], "xs": [{"v": 1}]});
+        for assertion in ["m.v is in pl.z", "pl.z contains m.v"] {
+            let (cause, message) = pr_row(
+                json!({"pl": "c"}),
+                "every xs as m",
+                json!(assertion),
+                fields.clone(),
+                json!({}),
+            );
+            assert_eq!(cause, "unusable", "{assertion}");
+            assert_eq!(
+                message, "pl is [{\"z\": 1}], which isn't an object",
+                "{assertion}"
+            );
+        }
+        let (cause, message) = pr_row(
+            json!({"pl": "c"}),
+            "every xs as m",
+            json!("m.v matches pl.z"),
+            fields,
+            json!({}),
+        );
+        assert_eq!(cause, "unusable");
+        assert_eq!(
+            message,
+            "pl is [{\"z\": 1}], which isn't an object; item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"
+        );
+    }
+
+    #[test]
+    fn a_part_that_is_text_or_null_on_the_right_of_a_list_phrase_says_so() {
+        for (part, cause, message) in [
+            (json!("s"), "unusable", "pl is \"s\", which isn't an object"),
+            (json!(null), "null", "pl is null"),
+        ] {
+            let found = pr_row(
+                json!({"pl": "c"}),
+                "every xs as m",
+                json!("m.v is in pl.z"),
+                json!({"c": part, "xs": [{"v": 1}]}),
+                json!({}),
+            );
+            assert_eq!(found, (cause.to_string(), json!(message)));
+        }
+    }
+
+    #[test]
+    fn a_part_that_is_an_object_with_a_list_still_works_on_the_right_of_a_list_phrase() {
+        let (cause, _) = pr_row(
+            json!({"pl": "c"}),
+            "every xs as m",
+            json!("m.v is in pl.z"),
+            json!({"c": {"z": [1]}, "xs": [{"v": 1}]}),
+            json!({}),
+        );
+        assert_eq!(cause, "satisfied");
+    }
+
+    #[test]
+    fn a_walk_through_a_field_of_the_subject_or_the_item_is_still_read_on_the_right_of_a_list_phrase()
+     {
+        let fields = json!({"ws": [{"z": 1}], "xs": [{"v": 1, "ws": [{"z": 1}]}]});
+        for assertion in ["m.v is in ws.z", "m.v is in m.ws.z", "m.v is in .ws.z"] {
+            let (cause, _) = pr_row(
+                json!(null),
+                "every xs as m",
+                json!(assertion),
+                fields.clone(),
+                json!({}),
+            );
+            assert_eq!(cause, "satisfied", "{assertion}");
+        }
+    }
+
+    #[test]
+    fn params_that_are_not_an_object_make_a_for_line_unusable_even_when_its_items_are_not_objects()
+    {
+        for params in [json!([]), json!(3), json!("s"), json!(true)] {
+            for (for_line, assertion) in [
+                ("every xs as m", "m.v is at least 1"),
+                ("every xs as m", "m.v is at least $params.n"),
+                ("some xs as m", "m.v is 1"),
+                (
+                    "every xs whose k is 1 and whose v is in $params.l as m",
+                    "m.v is 1",
+                ),
+            ] {
+                for xs in [json!(["s", {"v": "x"}]), json!([null])] {
+                    let (cause, _) = pr_row(
+                        json!(null),
+                        for_line,
+                        json!(assertion),
+                        json!({"xs": xs}),
+                        params.clone(),
+                    );
+                    assert_eq!(cause, "unusable", "{params} {for_line} {assertion} {xs}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn params_that_are_not_an_object_leave_the_items_messages_of_a_for_line_that_does_not_read_them()
+     {
+        let (cause, message) = pr_row(
+            json!(null),
+            "every xs as m",
+            json!("m.v is at least 1"),
+            json!({"xs": ["s", {"v": "x"}]}),
+            json!(3),
+        );
+        assert_eq!(cause, "unusable");
+        assert_eq!(
+            message,
+            "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number"
+        );
+        let (_, message) = pr_row(
+            json!(null),
+            "every xs as m",
+            json!("m.v is at least $params.n"),
+            json!({"xs": [null, "s"]}),
+            json!(3),
+        );
+        assert_eq!(message, "$params is 3, which isn't an object");
+    }
+
+    #[test]
+    fn missing_or_empty_params_leave_items_that_are_not_objects_as_not_an_object() {
+        for params in [json!(null), json!({})] {
+            let (cause, _) = pr_row(
+                json!(null),
+                "every xs as m",
+                json!("m.v is at least 1"),
+                json!({"xs": ["s", {"v": "x"}]}),
+                params,
+            );
+            assert_eq!(cause, "not_an_object");
+        }
+    }
+
+    #[test]
+    fn a_null_item_under_a_named_by_key_says_it_is_null_once_beside_the_item_that_is_not_text() {
+        for for_line in ["every xs as m", "every xs, if any, as m"] {
+            let (cause, message) = pr_row(
+                json!(null),
+                for_line,
+                json!("m.k named by m.k is 1"),
+                json!({"xs": [null, {"k": "a"}]}),
+                json!({}),
+            );
+            assert_eq!(cause, "unusable");
+            assert_eq!(
+                message,
+                "item 1 of xs: m is null; item 2 of xs: m is {\"k\": \"a\"}, which isn't text"
+            );
+        }
+        let (_, message) = pr_row(
+            json!(null),
+            "every xs as m",
+            json!(["m is $params.l", "m.v named by m.v is 1"]),
+            json!({"xs": [null, {"k": "a"}]}),
+            json!({}),
+        );
+        assert_eq!(
+            message,
+            "$params.l is missing; item 1 of xs: m is null; item 2 of xs: m is {\"k\": \"a\"}, which isn't text"
+        );
     }
 }
