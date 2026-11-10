@@ -7721,6 +7721,9 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("m.v is in $params.q", "m.v is in $params.q", &[], &[]),
     ("n.v is at least m.w", "n.v is at least m.w", &[], &[]),
     ("n.v is in m.l", "n.v is in m.l", &[], &[]),
+    ("m.v is 2", "m.v is 2", &[], &[]),
+    ("z exists", "z exists", &[], &[]),
+    ("$params.q exists", "$params.q exists", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -11476,6 +11479,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs whose v is in pr.z as m",
         "every xs whose v is in pr.z as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is in pr.z, if any, as m",
+        "every xs whose v is in pr.z, if any, as m",
         &[],
         &[],
     ),
