@@ -5194,10 +5194,53 @@ test_a_second_item_a_whose_cant_decide_fails_the_first_item_with_its_cause if {
 	_for_rows(check, [{"id": 1, "xs": [1], "ys": [{"s": 1}, {"t": 1}]}], {})[0] == [1, "absent", [{"path": "item 2 of ys", "item": "item 2 of ys", "cause": "absent", "value": {"t": 1}, "failed_assertions": [], "locations": ["/things/0/ys/1"]}], [{"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}, {"name": "ys[]", "value": [{"s": 1}, {"t": 1}], "locations": ["/things/0/ys/0", "/things/0/ys/1"]}]]
 }
 
+_for_root_rows(checks, z, params) := {r.check: [r.cause, r.message] |
+	thing := object.union({"id": 1, "xs": [{"k": "a", "v": 1}, {"k": "b", "v": "x"}]}, z)
+	policy := {"ergo_spec": ergo._spec, "subjects": {"pr": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "pr", "checks": checks}}}
+	some r in ergo.report({"things": [thing]}, policy, params).results
+	not startswith(r.check, "$")
+}
+
+_for_root_checks := {
+	"ab": {"for": "every xs whose v is 1 and whose k is in pr.z as m", "assert": "m.v is 1"},
+	"ba": {"for": "every xs whose k is in pr.z and whose v is 1 as m", "assert": "m.v is 1"},
+	"as1": {"for": "every xs as m", "assert": ["m.v is 1", "m.k is in z"]},
+	"as2": {"for": "every xs as m", "assert": ["m.k is in z", "m.v is 1"]},
+	"second": {"for": "every xs as m, every z as y", "assert": "y is at least m.v"},
+}
+
+test_a_root_that_cant_be_read_comes_first_and_keeps_each_items_own_problem_in_any_order if {
+	missing := _for_root_rows(_for_root_checks, {}, {})
+	missing.ab == ["unusable", `pr.z is missing; item 2 of xs: v is "x", which isn't a number`]
+	missing.as1 == ["unusable", `z is missing; item 2 of xs: m.v is "x", which isn't a number`]
+	missing.second == ["unusable", `z is missing; item 2 of xs: m.v is "x", which isn't a number`]
+	nulled := _for_root_rows(_for_root_checks, {"z": null}, {})
+	nulled.ab == ["unusable", `pr.z is null; item 2 of xs: v is "x", which isn't a number`]
+	nulled.as1 == ["unusable", `z is null; item 2 of xs: m.v is "x", which isn't a number`]
+	nulled.second == ["unusable", `z is null; item 2 of xs: m.v is "x", which isn't a number`]
+	wrong := _for_root_rows(_for_root_checks, {"z": "s"}, {})
+	wrong.ab == ["unusable", `pr.z is "s", which isn't a list; item 2 of xs: v is "x", which isn't a number`]
+	wrong.as1 == ["unusable", `z is "s", which isn't a list; item 2 of xs: m.v is "x", which isn't a number`]
+	wrong.second == ["unusable", `z is "s", which isn't a list or an object; item 2 of xs: m.v is "x", which isn't a number`]
+	every rows in [missing, nulled, wrong] {
+		rows.ab == rows.ba
+		rows.as1 == rows.as2
+	}
+}
+
+test_null_params_read_by_a_key_from_the_item_say_what_params_that_are_missing_say if {
+	checks := {"whole": {"for": "every xs as m", "assert": "$params named by m.k is 1"}, "field": {"for": "every xs as m", "assert": "$params.q named by m.k is 1"}}
+	every params in [null, {}] {
+		said := `item 1 of xs: m is {"k": "a", "v": 1}, which isn't text; item 2 of xs: m is {"k": "b", "v": "x"}, which isn't text`
+		_for_root_rows(checks, {}, params) == {"whole": ["unusable", said], "field": ["unusable", said]}
+	}
+}
+
 test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs if {
 	rows := _for_rows({"for": "every xs as x", "assert": "x is one of $params.l"}, [{"id": 1, "xs": [1]}, "s"], {"l": "text"})
 	rows == [[1, "unusable", [{"cause": "unusable", "failed_assertions": [{"assertion": "x is in $params.l", "cause": "unusable"}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], [{"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}]], ["s", "unusable", [], [{"name": "xs", "value": [], "locations": []}]]]
-	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["unusable"]
+	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [{"x": 1}]}], {"l": "text"})] == ["unusable"]
+	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["not_an_object"]
 }
 
 test_a_name_whose_path_ends_missing_or_unreadable_fails_its_item_before_its_lines if {

@@ -592,31 +592,50 @@ impl For {
                         text
                     })
                 });
-            let why = item
-                .whose
-                .iter()
-                .zip(&verdicts)
-                .find(|(_, verdict)| !matches!(verdict.cause, Cause::Satisfied | Cause::Value))
+            let own = |check: &Check, verdict: &Verdict| {
+                let roots = super::message::root_flaw(&[check], &outer)
+                    .map(|(_, text)| text)
+                    .unwrap_or_default();
+                super::message::message(check, &focus, verdict)
+                    .split("; ")
+                    .flat_map(|part| part.split(", and "))
+                    .any(|part| !roots.split("; ").any(|root| root == part))
+            };
+            let undecided_whose = || {
+                item.whose.iter().zip(&verdicts).filter(|(_, verdict)| {
+                    !matches!(verdict.cause, Cause::Satisfied | Cause::Value)
+                })
+            };
+            let why = undecided_whose()
+                .find(|(check, verdict)| !lost && own(check, verdict))
                 .map(|(check, verdict)| {
-                    if !lost
-                        && let Some(fault) =
-                            super::message::root_fault(check, &outer, verdict.cause)
-                    {
-                        return fault;
-                    }
-                    if lost {
-                        let lost_check = walk::focus_check(w);
-                        let verdict = walk::lost_verdict(w, &at);
-                        super::message::prefixed(
-                            &walked.item_name_dotted(&w.item_segs),
-                            &super::message::message(&lost_check, &at, &verdict),
-                        )
-                    } else {
-                        super::message::prefixed(
-                            &walked.item_name_dotted(walk::focus_segs(w, check)),
-                            &super::message::message(check, &focus, verdict),
-                        )
-                    }
+                    super::message::prefixed(
+                        &walked.item_name_dotted(walk::focus_segs(w, check)),
+                        &super::message::message(check, &focus, verdict),
+                    )
+                })
+                .or_else(|| {
+                    undecided_whose().next().map(|(check, verdict)| {
+                        if !lost
+                            && let Some(fault) =
+                                super::message::root_fault(check, &outer, verdict.cause)
+                        {
+                            return fault;
+                        }
+                        if lost {
+                            let lost_check = walk::focus_check(w);
+                            let verdict = walk::lost_verdict(w, &at);
+                            super::message::prefixed(
+                                &walked.item_name_dotted(&w.item_segs),
+                                &super::message::message(&lost_check, &at, &verdict),
+                            )
+                        } else {
+                            super::message::prefixed(
+                                &walked.item_name_dotted(walk::focus_segs(w, check)),
+                                &super::message::message(check, &focus, verdict),
+                            )
+                        }
+                    })
                 });
             let dead_item = |cause: Cause| Dead {
                 raw: (w.end.is_none() && !w.item.value.is_object()).then(|| w.item.value.clone()),
@@ -1551,7 +1570,7 @@ impl For {
     }
 
     pub fn run(&self, ctx: &Ctx) -> Run {
-        let (mut run, free) = self.run_items(ctx, Vec::new());
+        let (mut run, free, _) = self.run_items(ctx, Vec::new());
         let said = run.message.clone();
         let (roots, ahead) = match self.rooted(&mut run, ctx) {
             Named::Plain => (Vec::new(), false),
@@ -1571,17 +1590,34 @@ impl For {
         if once.is_empty() {
             return run;
         }
-        let items = if failed {
+        let second: Vec<String> = self
+            .second_roots(ctx)
+            .map(|(_, texts, _)| texts)
+            .unwrap_or_default();
+        let (items, hoisted) = if failed {
             let mut skip = once.clone();
             if let Some((_, _, raw)) = self.second_roots(ctx) {
                 skip.extend(raw);
             }
-            self.run_items(ctx, skip).0.message
+            let (items, _, hoisted) = self.run_items(ctx, skip);
+            (items.message, hoisted)
         } else if ahead {
-            said
+            (said, Vec::new())
         } else {
-            None
+            (None, Vec::new())
         };
+        let mut ordered: Vec<String> = Vec::new();
+        for text in once
+            .iter()
+            .filter(|text| !second.contains(text))
+            .chain(hoisted.iter())
+            .chain(once.iter().filter(|text| second.contains(text)))
+        {
+            if !ordered.contains(text) {
+                ordered.push(text.clone());
+            }
+        }
+        let once = ordered;
         let mut parts = once.clone();
         if let Some(items) = items {
             parts.extend(
@@ -1624,7 +1660,7 @@ impl For {
             .flat_map(|s| root_forms(&s.check))
             .collect();
         let sentence_flaw = sentence_root_flaw(&forms, &outer);
-        let read_first = self.sentences_read_a_flawed_root(&outer);
+        let read_first = self.reads_a_flawed_root(&outer);
         if read_first || outer_flaw.is_none() || list_failures(run.verdict.cause, &run.failed_items)
         {
             let flawed = read_first
@@ -1759,7 +1795,7 @@ impl For {
         mode
     }
 
-    fn sentences_read_a_flawed_root(&self, outer: &Ctx) -> bool {
+    fn reads_a_flawed_root(&self, outer: &Ctx) -> bool {
         let forms: Vec<Check> = self
             .sentences
             .iter()
@@ -1770,8 +1806,14 @@ impl For {
             .iter()
             .flat_map(|s| nested_whose(&s.check, false))
             .collect();
+        let whose: Vec<&Check> = self
+            .items
+            .iter()
+            .flat_map(|item| item.whose.iter())
+            .collect();
         sentence_root_flaw(&forms, outer).is_some()
             || super::message::root_flaw(&nested, outer).is_some()
+            || super::message::root_flaw(&whose, outer).is_some()
     }
 
     fn second_roots(&self, ctx: &Ctx) -> Option<(Cause, Vec<String>, Vec<String>)> {
@@ -1834,7 +1876,7 @@ impl For {
         Cause::worst(causes).map(|cause| (cause, texts, raw))
     }
 
-    fn run_items(&self, ctx: &Ctx, skip: Vec<String>) -> (Run, Vec<String>) {
+    fn run_items(&self, ctx: &Ctx, skip: Vec<String>) -> (Run, Vec<String>, Vec<String>) {
         let first = &self.items[0];
         let whole_subject = !ctx.subject.value.is_object()
             && (!ctx.subject.value.is_array() || matches!(first.how, How::Pick { .. }))
@@ -1854,6 +1896,7 @@ impl For {
                     failed_items: Vec::new(),
                     message: None,
                 },
+                Vec::new(),
                 Vec::new(),
             );
         }
@@ -1905,7 +1948,7 @@ impl For {
             .flat_map(|item| item.whose.iter())
             .chain(self.sentences.iter().map(|s| &s.check))
             .any(|check| check.flawed(&outer))
-            && !self.sentences_read_a_flawed_root(&outer);
+            && !self.reads_a_flawed_root(&outer);
         let second = if flawed || !level.children.is_empty() {
             None
         } else {
@@ -1916,13 +1959,18 @@ impl For {
         } else {
             second.as_ref().map_or(level.cause, |(cause, _)| *cause)
         };
-        let (failed, said) = if let Some((_, listed)) = second {
-            (listed, Vec::new())
+        let (failed, said, hoisted) = if let Some((_, listed)) = second {
+            (listed, Vec::new(), Vec::new())
         } else if cause == Cause::Satisfied || flawed {
-            (Vec::new(), Vec::new())
+            (Vec::new(), Vec::new(), Vec::new())
         } else {
             self.failed_items(level)
         };
+        let hoisted: Vec<String> = hoisted
+            .iter()
+            .map(|text| unskipped(text, &collect.skip))
+            .filter(|text| !text.is_empty())
+            .collect();
         let said: Vec<Said> = said
             .into_iter()
             .map(|(order, text, extra)| (order, unskipped(&text, &collect.skip), extra))
@@ -1953,6 +2001,7 @@ impl For {
                 message,
             },
             free,
+            hoisted,
         )
     }
 
@@ -2227,7 +2276,7 @@ impl For {
         })
     }
 
-    fn failed_items(&self, level: Level) -> (Vec<Value>, Vec<Said>) {
+    fn failed_items(&self, level: Level) -> (Vec<Value>, Vec<Said>, Vec<String>) {
         let mut said: Vec<Said> = level
             .dead
             .iter()
@@ -2310,12 +2359,13 @@ impl For {
             .iter()
             .filter(|d| d.cause == Cause::Ambiguous)
             .collect();
+        let mut first_said: Vec<Said> = Vec::new();
         if let Some(first) = hoisted_ties.first() {
-            said.push((first.order.clone(), self.tie_text(&hoisted_ties, 1), false));
+            first_said.push((first.order.clone(), self.tie_text(&hoisted_ties, 1), false));
         }
         for entry in hoisted {
             if entry.cause != Cause::Ambiguous {
-                said.push((
+                first_said.push((
                     entry.order.clone(),
                     self.dead_text(&entry).replace(FREE, ""),
                     false,
@@ -2325,7 +2375,14 @@ impl For {
         }
         failed.sort_by(|a, b| a.0.cmp(&b.0));
         said.sort_by(|a, b| a.0.cmp(&b.0));
-        (failed.into_iter().map(|(_, v)| v).collect(), said)
+        first_said.sort_by(|a, b| a.0.cmp(&b.0));
+        let hoisted: Vec<String> = first_said.iter().map(|s| s.1.clone()).collect();
+        first_said.extend(said);
+        (
+            failed.into_iter().map(|(_, v)| v).collect(),
+            first_said,
+            hoisted,
+        )
     }
 
     fn shared_second(&self) -> bool {
@@ -3745,14 +3802,15 @@ mod tests {
     }
 
     #[test]
-    fn a_whose_ref_that_is_not_a_list_fails_the_check_as_unusable_with_no_failed_items() {
+    fn a_whose_ref_that_is_not_a_list_fails_the_check_as_unusable_and_lists_the_items_it_cant_decide()
+     {
         let found = row(
             "every xs whose kind is in $params.kinds as x",
             json!("x.ok is true"),
             json!({"xs": [{"kind": "code", "ok": false}]}),
         );
         assert_eq!(found["cause"], "unusable");
-        assert_eq!(found["failed_items"], json!([]));
+        assert_eq!(items(&found), ["item 1 of xs"]);
         assert_eq!(names(&found), ["xs[]"]);
         let usable = row(
             "every xs whose kind is in $params.list as x",

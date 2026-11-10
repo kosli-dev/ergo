@@ -5587,7 +5587,7 @@
     },
     "cases": [
       {
-        "description": "fails as unusable, whatever the items hold, with no failed items",
+        "description": "fails as unusable, whatever the items hold, and lists the items it couldn't decide",
         "rules": [
           "for.flaws",
           "for.pass"
@@ -5630,7 +5630,21 @@
                 ]
               }
             ],
-            "failed_items": []
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of commits",
+                "locations": [
+                  "/releases/0/commits/0"
+                ],
+                "path": "item 1 of commits",
+                "value": {
+                  "kind": "code",
+                  "signed": false
+                }
+              }
+            ]
           }
         ]
       }
@@ -8949,7 +8963,7 @@
                 ]
               }
             ],
-            "message": "item 2 of approvers: item 1 of commits: item 1 of files: approver.t is 0, and file.t is 1; item 2 of commits: files is missing",
+            "message": "item 2 of commits: files is missing; item 2 of approvers: item 1 of commits: item 1 of files: approver.t is 0, and file.t is 1",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -12185,7 +12199,7 @@
                 ]
               }
             ],
-            "message": "item 2 of xs: item 1 of ys: item 1 of zs: x.t is 0, and y.t is 1; item 2 of ys: zs is missing",
+            "message": "item 2 of ys: zs is missing; item 2 of xs: item 1 of ys: item 1 of zs: x.t is 0, and y.t is 1",
             "passed": false,
             "requirement": "r",
             "subject": {
@@ -16942,7 +16956,7 @@
                 "value": []
               }
             ],
-            "message": "item 1 of xs: k is missing; ys is missing",
+            "message": "ys is missing; item 1 of xs: k is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -24645,5 +24659,890 @@
         ]
       }
     ]
+  },
+  {
+    "cases": [
+      {
+        "description": "names the root once, then the item's own problem",
+        "input": {
+          "prs": [
+            {
+              "c": {
+                "z": "s"
+              },
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": "x"
+                }
+              ],
+              "z": "s"
+            }
+          ],
+          "top": {
+            "q": "s"
+          }
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "i",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "$input.top.q is \"s\", which isn't a number; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "p",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "pl.z is \"s\", which isn't a number; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "q",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "$params.q is \"s\", which isn't a number; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "z",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "pr.z is \"s\", which isn't a number; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ],
+        "rules": [
+          "for.roots"
+        ]
+      }
+    ],
+    "description": "a root in a for line's relative clause doesn't hide an item's own problem",
+    "params": {
+      "q": "s"
+    },
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "i": {
+              "assert": "m.v is 1",
+              "for": "every xs whose v is at least $input.top.q as m"
+            },
+            "p": {
+              "assert": "m.v is 1",
+              "for": "every xs whose v is at least pl.z as m"
+            },
+            "q": {
+              "assert": "m.v is 1",
+              "for": "every xs whose v is at least $params.q as m"
+            },
+            "z": {
+              "assert": "m.v is 1",
+              "for": "every xs whose v is at least pr.z as m"
+            }
+          },
+          "subject": "pr"
+        }
+      },
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "has": {
+            "pl": "c"
+          },
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "gives the same report in either order, the root first, then the item's own problem",
+        "input": {
+          "prs": [
+            {
+              "c": {
+                "z": "s"
+              },
+              "id": "p0",
+              "xs": [
+                {
+                  "k": "a",
+                  "v": 1
+                },
+                {
+                  "k": "b",
+                  "v": "x"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "pab",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "b",
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "b",
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "pl.z is \"s\", which isn't a list; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "pba",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "b",
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "b",
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "pl.z is \"s\", which isn't a list; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "qab",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "b",
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "b",
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "$params.q is \"s\", which isn't a list; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "qba",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "b",
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "b",
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "$params.q is \"s\", which isn't a list; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ],
+        "rules": [
+          "for.roots"
+        ]
+      }
+    ],
+    "description": "a root in one of two relative clauses, in either order",
+    "params": {
+      "q": "s"
+    },
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "pab": {
+              "assert": "m.v is 1",
+              "for": "every xs whose v is 1 and whose k is in pl.z as m"
+            },
+            "pba": {
+              "assert": "m.v is 1",
+              "for": "every xs whose k is in pl.z and whose v is 1 as m"
+            },
+            "qab": {
+              "assert": "m.v is 1",
+              "for": "every xs whose v is 1 and whose k is in $params.q as m"
+            },
+            "qba": {
+              "assert": "m.v is 1",
+              "for": "every xs whose k is in $params.q and whose v is 1 as m"
+            }
+          },
+          "subject": "pr"
+        }
+      },
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "has": {
+            "pl": "c"
+          },
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "names the root first, then the item's own problem",
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": "x"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "$params.q",
+                "locations": [
+                  "$params:"
+                ],
+                "path": "$params.q",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "$params.q",
+                "value": []
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "$params.q is missing; item 2 of xs: m.v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ],
+        "rules": [
+          "for.roots"
+        ]
+      }
+    ],
+    "description": "a second for line over a root list that can't be read",
+    "params": {},
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "c": {
+              "assert": "x is at least m.v",
+              "for": "every xs as m, every $params.q as x"
+            }
+          },
+          "subject": "pr"
+        }
+      },
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      }
+    }
+  },
+  {
+    "cases": [
+      {
+        "description": "read as missing params, as they are everywhere else",
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "k": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "field",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "$params.q named by m.k is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.q named by m.k",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.q",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: m is {\"k\": \"a\"}, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "plain",
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params named by k",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0"
+                ],
+                "name": "k",
+                "value": null
+              }
+            ],
+            "message": "k is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "whole",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "$params named by m.k is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params named by m.k",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: m is {\"k\": \"a\"}, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ],
+        "rules": [
+          "path.start",
+          "for.roots"
+        ]
+      }
+    ],
+    "description": "params that are null, read by a key from the item",
+    "params": null,
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "requirements": {
+        "r": {
+          "checks": {
+            "field": {
+              "assert": "$params.q named by m.k is 1",
+              "for": "every xs as m"
+            },
+            "plain": {
+              "assert": "$params named by k is 1"
+            },
+            "whole": {
+              "assert": "$params named by m.k is 1",
+              "for": "every xs as m"
+            }
+          },
+          "subject": "pr"
+        }
+      },
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      }
+    }
   }
 ]
