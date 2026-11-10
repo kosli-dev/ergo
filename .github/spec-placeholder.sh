@@ -20,7 +20,7 @@ for path in $paths; do
   [ -r "$path" ] || { echo "$path is missing or not readable, so the check can't look at it"; exit 1; }
 done
 
-pattern="(^|[^A-Za-z0-9.-])$(printf '%s' "$version" | sed 's/\./\\./g')(\$|[^A-Za-z0-9.-]|_|\\.(\$|[^0-9]))"
+pattern="(^|[^A-Za-z0-9.-])$(printf '%s' "$version" | sed 's/\./\\./g')(\$|[^A-Za-z0-9.-]|\\.(\$|[^0-9]))"
 
 status=0
 found=$(grep -rnE "$pattern" $paths | cut -c1-120) || status=$?

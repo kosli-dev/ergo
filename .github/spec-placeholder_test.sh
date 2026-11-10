@@ -54,6 +54,14 @@ for text in 'v0.6-dev-rc' 'v0.60-dev' 'v0.6-devx' 'v0.6-dev.1' 'xv0.6-dev' '0.6-
   sh "$script"
 done
 
+echo "spec-placeholder.sh does not treat a dot in the version as any character"
+for text in 'v0x6-dev' 'v006-dev' 'v0-6-dev'; do
+  printf '[{"text": "%s"}]\n' "$text" > spec/cases/demo/cases.json
+  sh "$script"
+done
+printf '[{"text": "%s"}]\n' 'v0.6-dev' > spec/cases/demo/cases.json
+fails "spec/cases/demo/cases.json"
+
 echo "spec-placeholder.sh does the same when _spec has no -dev"
 echo '_spec := "v0.6"' > engines/rego/ergo.rego
 echo 'pub const SPEC: &str = "v0.6";' > engines/rust/engine/src/policy.rs
@@ -86,5 +94,15 @@ for path in spec/cases engines/rust/engine/tests/regressions engines/rego/ergo_t
   fails "$path is missing"
   /bin/mv -f "$path.away" "$path"
 done
+
+echo "spec-placeholder.sh fails when a file it scans cannot be read"
+if [ "$(id -u)" -eq 0 ]; then
+  echo "skipped: root can read any file"
+else
+  echo '[{"text": "ok"}]' > spec/cases/demo/cases.json
+  chmod 000 spec/cases/demo/cases.json
+  fails "grep failed with status"
+  chmod 644 spec/cases/demo/cases.json
+fi
 
 sh "$script"
