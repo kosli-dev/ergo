@@ -13014,3 +13014,17 @@ test_a_part_that_is_an_object_with_a_list_still_works_in_a_count_of_whose_under_
 	rows.xs == ["satisfied", null]
 	rows.at_least == ["satisfied", null]
 }
+
+test_a_model_check_with_an_inputs_list_echoes_each_path_in_its_row_inputs if {
+	check := {"op": "present", "path": ["x"], "inputs": [["y"], ["x"]]}
+	[i.name | some i in ergo._check_inputs({"x": 1, "y": 2}, check)] == ["y", "x"]
+}
+
+test_a_model_check_with_an_inputs_list_does_not_echo_an_entry_that_is_not_a_path if {
+	check := {"op": "present", "path": ["x"], "inputs": [{"z": 1}, ["x"]]}
+	[i.name | some i in ergo._check_inputs({"x": 1}, check)] == ["x"]
+}
+
+test_the_paths_of_an_inputs_list_are_the_paths_a_model_check_reads_for_its_names if {
+	ergo._own_paths({"op": "present", "path": ["x"], "inputs": [["y"], ["$zz", "c"], {"z": 1}]}, "inputs") == [["y"], ["$zz", "c"]]
+}
