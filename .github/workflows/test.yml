@@ -27,7 +27,9 @@ jobs:
           .github/changelog-version.sh rego
           .github/changelog-version.sh rust
       - name: Check the spec version moved when the spec changed
-        run: .github/spec-version.sh
+        run: |
+          .github/spec-version.sh
+          .github/spec-version_test.sh
       - name: Check tests write the spec placeholder, not the version
         run: |
           .github/spec-placeholder.sh

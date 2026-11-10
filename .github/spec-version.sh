@@ -8,6 +8,76 @@ fail() {
   exit 1
 }
 
+swept_paths=(
+  engines/rego/ergo.rego
+  engines/rust/engine
+  REFERENCE.md
+  OPA.md
+  spec
+  packages
+  site/assets/js/tutorial
+  .github/wasm-js.cjs
+  examples
+)
+
+swept_files() {
+  git ls-files -- "${swept_paths[@]}" |
+    grep -v -E '(^|/)CHANGELOG\.md$|^spec/sentences-corpus' |
+    grep -v -E '_test\.sh$|\.(svg|png|ico|wasm)$' || true
+}
+
+version_pattern() {
+  local escaped
+  escaped=$(printf '%s' "${1#v}" | sed 's/\./\\./g')
+  case $1 in
+    *-dev) printf '(?<![\\w.])(v?)%s(?!\\w|\\.\\d|-\\w)' "$escaped" ;;
+    *) printf '(?:(?<![\\w.])(v)|(?<=/spec/))%s(?!\\w|\\.\\d|-\\w)' "$escaped" ;;
+  esac
+}
+
+files_with() {
+  local pattern f
+  pattern=$(version_pattern "$1")
+  for f in $(swept_files); do
+    if PATTERN=$pattern perl -ne 'BEGIN { $p = qr/$ENV{PATTERN}/ } $found = 1 if /$p/; END { exit($found ? 0 : 1) }' "$f"; then
+      echo "$f"
+    fi
+  done
+}
+
+if [ "${1:-}" = set ]; then
+  new=${2:-}
+  [[ $new =~ ^v[0-9]+\.[0-9]+(-dev)?$ ]] || fail "Usage: .github/spec-version.sh set vX.Y or vX.Y-dev"
+  old=$(sed -n 's/^_spec := "\(v[0-9][0-9.]*\(-dev\)\{0,1\}\)"$/\1/p' engines/rego/ergo.rego)
+  [ -n "$old" ] || fail 'ergo.rego must say _spec := "vX.Y" or _spec := "vX.Y-dev"'
+  [ "$new" != "$old" ] || fail "The spec already says $old"
+  pattern=$(version_pattern "$old")
+  for f in $(files_with "$old"); do
+    PATTERN=$pattern NEW=${new#v} perl -i -pe 'BEGIN { $p = qr/$ENV{PATTERN}/ } s/$p/$1$ENV{NEW}/g' "$f"
+    echo "$f"
+  done
+  echo "Not changed, by hand: README.md, CLI.md, the engine versions"
+  heading=${new#v}
+  echo "spec/CHANGELOG.md needs a \"## ${heading%-dev}\" heading"
+  exit 0
+fi
+
+check_leftovers() {
+  local current=${rego%-dev} stale previous leftovers
+  stale=()
+  [ "${current#*.}" -gt 0 ] && stale+=("v${current%%.*}.$((10#${current#*.} - 1))-dev")
+  [ "$rego" = "$current" ] && stale+=("v$current-dev")
+  for previous in ${stale[@]+"${stale[@]}"}; do
+    leftovers=$(files_with "$previous")
+    [ -z "$leftovers" ] || {
+      echo "These files still write $previous, a dev version that is over:"
+      echo "$leftovers" | sed 's/^/  /'
+      fail "The spec is at v$rego, so $previous should be gone. Run .github/spec-version.sh set v$rego, or edit them by hand."
+    }
+  done
+  return 0
+}
+
 defining=(
   spec/syntax.md
   spec/semantics.md
@@ -42,13 +112,15 @@ fi
 
 if $dev || { [ -n "$latest" ] && [ "$version" != "$latest" ]; }; then
   grep -qxF "## $version" spec/CHANGELOG.md || fail "spec/CHANGELOG.md has no \"## $version\" heading for v$rego"
+  check_leftovers
   exit 0
 fi
 
-[ -n "$latest" ] || exit 0
+[ -n "$latest" ] || { check_leftovers; exit 0; }
 
 if ! git diff --quiet "spec-v$latest" -- "${defining[@]}"; then
   echo "Changed since spec-v$latest:"
   git diff --name-only "spec-v$latest" -- "${defining[@]}" | sed 's/^/  /'
   fail "spec/ changed since spec-v$latest, so move the spec to v${latest%%.*}.$((10#${latest#*.} + 1))-dev"
 fi
+check_leftovers
