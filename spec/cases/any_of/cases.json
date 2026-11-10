@@ -2,7 +2,7 @@
   {
     "description": "any_of",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -72,7 +72,7 @@
   {
     "description": "any_of with a present check in an option",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -100,7 +100,7 @@
   {
     "description": "any_of with a name that starts like another",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -160,7 +160,7 @@
   {
     "description": "any_of with a ref to a missing param",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -239,7 +239,7 @@
   {
     "description": "any_of with a ref to a param of the wrong type",
     "policy": {
-      "ergo_spec": "v0.6-dev",
+      "ergo_spec": "{{spec}}",
       "subjects": {
         "thing": {
           "from": "things",
@@ -297,7 +297,7 @@
   },
   {
     "description": "a check with several assertions that read the same field",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x exists", "x is 1"]}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": {"assert": ["x exists", "x is 1"]}}}}},
     "cases": [
       {
         "description": "lists the field once, with its location",
@@ -306,6 +306,883 @@
         "results": [
           {"cause": "satisfied", "check": "c", "failed_assertions": [], "inputs": [{"locations": ["/things/0/x"], "name": "x", "value": 1}], "passed": true, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
+      }
+    ]
+  },
+  {
+    "description": "an any_of next to a for line",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ts as t",
+              "any_of": {
+                "x": "t is one of $params.z"
+              }
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "z": [
+        1
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the words as written, is one of before a path, and has no $refs",
+        "rules": [
+          "sentence.any_of.written_wrong",
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "unknown field for"
+                ]
+              }
+            ],
+            "message": "checks.c: unknown field for",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "one of: x(t is one of $params.z)"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an any_of with a field of its own that no check has",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "any_of": {
+                "x": "x is one of $params.z"
+              },
+              "zz": 1
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "z": [
+        1
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the words as written, is one of before a path, and has no $refs",
+        "rules": [
+          "sentence.any_of.written_wrong",
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "x": 1,
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "unknown field zz"
+                ]
+              }
+            ],
+            "message": "checks.c: unknown field zz",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "one of: x(x is one of $params.z)"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an assert with a field of its own that no check has",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "assert": "x is one of $params.z",
+              "zz": 1
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "z": [
+        1
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the words as written, is one of before a path, and has no $refs",
+        "rules": [
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "x": 1,
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "unknown field zz"
+                ]
+              }
+            ],
+            "message": "checks.c: unknown field zz",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "x is one of $params.z"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an any_of next to a for line, with written values",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ts as t",
+              "any_of": {
+                "x": "t is one of 1, 2"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "keeps the words as written, is one of before values",
+        "rules": [
+          "sentence.any_of.written_wrong",
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "unknown field for"
+                ]
+              }
+            ],
+            "message": "checks.c: unknown field for",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "one of: x(t is one of 1, 2)"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "a for line with an unknown field",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "for": "every ts as t",
+              "assert": "t is one of $params.z",
+              "zz": 1
+            }
+          }
+        }
+      }
+    },
+    "params": {
+      "z": [
+        1
+      ]
+    },
+    "cases": [
+      {
+        "description": "keeps the words as written, is one of before a path, and has no $refs",
+        "rules": [
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "unknown field zz"
+                ]
+              }
+            ],
+            "message": "checks.c: unknown field zz",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "for every ts as t: t is one of $params.z"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an assert that doesn't parse, with a field of its own that no check has",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "assert": "nonsense words",
+              "zz": 1
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as written wrong and still lists what is wrong with the sentence",
+        "rules": [
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "x": 1,
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "doesn't parse",
+                  "unknown field zz"
+                ]
+              }
+            ],
+            "message": "checks.c: doesn't parse; checks.c: unknown field zz",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "nonsense words"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an assert that compares a path with itself, with a field of its own that no check has",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "assert": "x is x",
+              "zz": 1
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as written wrong and still lists the comparison with itself",
+        "rules": [
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "x": 1,
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "unknown field zz",
+                  "x is compared with itself"
+                ]
+              }
+            ],
+            "message": "checks.c: unknown field zz; checks.c: x is compared with itself",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "x is x"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an assert that uses a word of the grammar as a path, with a field of its own that no check has",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "assert": "every",
+              "zz": 1
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as written wrong and still lists the word of the grammar",
+        "rules": [
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "x": 1,
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "every is a word of the grammar: write .every",
+                  "unknown field zz"
+                ]
+              }
+            ],
+            "message": "checks.c: every is a word of the grammar: write .every; checks.c: unknown field zz",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "every"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an any_of with an option that doesn't parse, with a field of its own that no check has",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "any_of": {
+                "a": "nonsense words"
+              },
+              "zz": 1
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as written wrong and still lists what is wrong with the option",
+        "rules": [
+          "sentence.any_of.written_wrong",
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "x": 1,
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "option a: doesn't parse",
+                  "unknown field zz"
+                ]
+              }
+            ],
+            "message": "checks.c: option a: doesn't parse; checks.c: unknown field zz",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "one of: a(nonsense words)"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
+      }
+    ]
+  },
+  {
+    "description": "an assert that doesn't parse, with two fields that no check has",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "thing": {
+          "from": "things",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "s": {
+          "subject": "thing",
+          "checks": {
+            "c": {
+              "assert": "nonsense words",
+              "zz": 1,
+              "yy": 1
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "description": "fails as written wrong and lists what is wrong with the sentence and each field",
+        "rules": [
+          "sentence.print.written_wrong"
+        ],
+        "input": {
+          "things": [
+            {
+              "id": "t",
+              "x": 1,
+              "ts": [
+                1
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "$well_formed",
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count(checks)",
+                "value": 1
+              },
+              {
+                "locations": [],
+                "name": "require",
+                "value": "every"
+              },
+              {
+                "locations": [],
+                "name": "checks.c",
+                "value": [
+                  "doesn't parse",
+                  "unknown field yy",
+                  "unknown field zz"
+                ]
+              }
+            ],
+            "message": "checks.c: doesn't parse; checks.c: unknown field yy; checks.c: unknown field zz",
+            "passed": false,
+            "requirement": "s",
+            "subject": {
+              "id": null,
+              "type": "thing"
+            }
+          }
+        ],
+        "expressions": {
+          "s": {
+            "c": "nonsense words"
+          }
+        },
+        "refs": {
+          "s": {
+            "c": []
+          }
+        }
       }
     ]
   }

@@ -5047,6 +5047,21 @@ _unique_ids_def(req) := {"$unique_ids": _with_refs(
 	{"from": _listed_from(req), "id": _id_of(req)},
 )}
 
+_unique_ancestor_ids_def(req) := {"$unique_ancestor_ids": _with_refs(
+	{
+		"description": concat(" and ", [_unique_ancestor_description(i, a) | some i, a in levels]),
+		"expression": concat(" and ", [concat("", ["count(repeated(ids(", _from_text({"subject": a, "checks": {}}), "))) == 0"]) | some a in levels]),
+	},
+	[{"from": _listed_from({"subject": a, "checks": {}}), "id": _id_of({"subject": a, "checks": {}})} | some a in levels],
+)} if {
+	levels := array.reverse(_ancestors_of(req))
+	count(levels) > 0
+} else := {}
+
+_unique_ancestor_description(0, a) := concat("", ["Every ", _text(a), " id is unique"])
+
+_unique_ancestor_description(i, a) := concat("", ["every ", _text(a), " id is unique"]) if i > 0
+
 _repeated_ids_name(req) := concat(" ", ["repeated", _text(_subject_type_of(req)), "ids"])
 
 _well_formed_def := {"$well_formed": {
@@ -5173,7 +5188,7 @@ _requirement_checks_written_or_added(req) := object.union(
 			not _dollar_name(name)
 			def := _check_def(check, _s_written_here(req, "checks", name))
 		},
-		object.union(_min_subjects_def(req), _unique_ids_def(req)),
+		object.union(object.union(_min_subjects_def(req), _unique_ids_def(req)), _unique_ancestor_ids_def(req)),
 	),
 	object.union(_applies_def(req), _well_formed_def),
 )
@@ -5461,6 +5476,7 @@ default _holds(_, _) := false
 _holds(req, e) if {
 	e.well_formed.passed
 	_all_passed(e.unique_ids)
+	_all_passed(e.unique_ancestor_ids)
 	_all_passed(e.min_subjects)
 	e.scope_readable
 	e.rows_complete
@@ -5474,11 +5490,21 @@ _required("every", groups) if {
 }
 
 _required("some", groups) if {
-	some group in groups
-	_all_passed(group)
+	pairs := _parent_passes(groups)
+	count({parent | some [parent, _] in pairs} - {parent | some [parent, true] in pairs}) == 0
 }
 
-_required("some", groups) if count(groups) == 0
+_group_parent(group) := object.get(group[0].subject, "in", {})
+
+_parent_passes(groups) := {[_group_parent(group), _group_passed(group)] | some group in groups; count(group) > 0}
+
+_group_passed(group) if _all_passed(group)
+
+else := false
+
+_shadowing_parents(req, e) := {parent | some [parent, true] in _parent_passes(e.subject_rows)} - {{}} if _require_of(req) == "some"
+
+else := set()
 
 _all_passed(rows) if {
 	every row in rows {
@@ -5498,21 +5524,39 @@ _status(req, e) := "not_applicable" if {
 
 _status(req, e) := "not_met" if not _holds(req, e)
 
-_causes(status, _) := [] if status in {"met", "not_applicable"}
+_causes(status, _, _) := [] if status in {"met", "not_applicable"}
 
-_causes("not_met", e) := [{"cause": cause, "rows": n} |
+_causes("not_met", e, req) := _counted_causes(e, _shadowing_parents(req, e))
+
+_counted_causes(e, shadowing) := _cause_counts([row.cause | some row in _failing_rows(e, shadowing)])
+
+_cause_counts(causes) := [{"cause": cause, "rows": n} |
 	some cause in array.concat(_cause_precedence, ["value"])
-	n := count([row |
-		some row in _requirement_rows(e)
-		row.passed == false
-		not _out_of_scope_row(row)
-		row.cause == cause
-	])
+	n := count([found | some found in causes; found == cause])
 	n > 0
 ]
 
+_failing_rows(e, shadowing) := [row |
+	some row in _requirement_rows(e)
+	row.passed == false
+	not _out_of_scope_row(row)
+] if count(shadowing) == 0
+
+else := [row |
+	some row in _requirement_rows(e)
+	row.passed == false
+	not _out_of_scope_row(row)
+	not _shadowed(row, shadowing)
+]
+
+_shadowed(row, shadowing) if {
+	count(shadowing) > 0
+	not startswith(row.check, "$")
+	object.get(row.subject, "in", {}) in shadowing
+}
+
 _requirement_rows(e) := array.concat(
-	array.concat(array.concat([e.well_formed], array.concat(e.min_subjects, e.unique_ids)), e.applies),
+	array.concat(array.concat([e.well_formed], array.concat(e.min_subjects, array.concat(e.unique_ids, e.unique_ancestor_ids))), e.applies),
 	[row | some group in e.subject_rows; some row in group],
 )
 
@@ -5532,7 +5576,10 @@ _results(policy, evaluations) := [_m_row_one_line(row) | some row in rows] if {
 			[_m_problems_row(evaluations[name].well_formed) | some name in _names(policy)],
 			array.concat(
 				[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].min_subjects],
-				[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].unique_ids],
+				array.concat(
+					[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].unique_ids],
+					[_m_count_row(row) | some name in _names(policy); some row in evaluations[name].unique_ancestor_ids],
+				),
 			),
 		),
 		array.concat(
@@ -5963,7 +6010,7 @@ _report_of(doc, policy, compiled) := {
 		"require": _require_of(req),
 		"subject": _reported_subject_name(req),
 		"status": status,
-		"causes": _causes(status, evaluations[name]),
+		"causes": _causes(status, evaluations[name], req),
 		"subjects": {"total": evaluations[name].total, "matching": evaluations[name].matching},
 		"checks": _ahead_check_defs(req, object.get(compiled, name, {})),
 	} |
@@ -5985,6 +6032,7 @@ _written_wrong(row) := {
 	"well_formed": row,
 	"min_subjects": [],
 	"unique_ids": [],
+	"unique_ancestor_ids": [],
 	"applies": [],
 	"subject_rows": [],
 	"total": 0,
@@ -5993,14 +6041,15 @@ _written_wrong(row) := {
 	"rows_complete": true,
 }
 
-_evaluated(doc, req, name, parts) := e if {
+_evaluated(doc, req, name, parts) := object.union(e, {"unique_ancestor_ids": []}) if {
 	not _chained(req)
 	e := _evaluation(doc, req, name, parts)
 }
 
-_evaluated(doc, req, name, parts) := _chain_evaluation(req, name, _parent_pick(doc, req), parts) if {
+_evaluated(doc, req, name, parts) := object.union(_chain_evaluation(req, name, pick, parts), {"unique_ancestor_ids": [_ancestor_ids_row(pick, data.ergo_subject_sentences.chains[req.subject], name)]}) if {
 	_chained(req)
 	not _grand_chained(req)
+	pick := _parent_pick(doc, req)
 }
 
 _evaluated(doc, req, name, parts) := _grand_evaluation(req, name, _parent_pick_of(doc, {"subject": grand, "checks": {}}), parent, grand, _fixed(req), parts) if {
@@ -6014,21 +6063,33 @@ _grand_chained(req) if {
 	data.ergo_subject_sentences.chains[req.subject] in object.keys(data.ergo_subject_sentences.chains)
 }
 
-_grand_evaluation(req, name, gpick, _, _, _, parts) := _no_parent_evaluation(req, name, gpick.cause, parts) if "cause" in object.keys(gpick)
+_grand_evaluation(req, name, gpick, _, grand, _, parts) := object.union(_no_parent_evaluation(req, name, gpick.cause, parts), {"unique_ancestor_ids": [_ancestor_ids_row(gpick, grand, name)]}) if "cause" in object.keys(gpick)
 
-_grand_evaluation(req, name, gpick, parent, grand, fixed, parts) := _grand_branches(req, name, [e | some g in gpick.parents; some e in _grand_branch(req, name, parent, grand, g, fixed)], parts) if "parents" in object.keys(gpick)
+_grand_evaluation(req, name, gpick, parent, grand, fixed, parts) := object.union(_grand_branches(req, name, [e | some b in branches; some e in b.es], parts), {"unique_ancestor_ids": array.concat([_ancestor_ids_row(gpick, grand, name)], [r | some b in branches; some r in b.rows])}) if {
+	"parents" in object.keys(gpick)
+	branches := [_grand_branch(req, name, parent, grand, g, fixed) | some g in gpick.parents]
+}
 
 _grand_branches(req, name, es, parts) := _parents_evaluation(req, name, es, parts) if count(es) > 0
 
 else := _no_parent_evaluation(req, name, "none", parts)
 
-_grand_branch(req, name, _, grand, g, fixed) := [_parent_evaluation(req, name, grand, g, fixed)] if "cause" in object.keys(g)
+_grand_branch(req, name, _, grand, g, fixed) := {"es": [_parent_evaluation(req, name, grand, g, fixed)], "rows": []} if "cause" in object.keys(g)
 
-_grand_branch(req, name, parent, grand, g, fixed) := _grand_children(req, name, parent, grand, g, pick, fixed) if {
+_grand_branch(req, name, parent, grand, g, fixed) := {"es": _grand_children(req, name, parent, grand, g, pick, fixed), "rows": [_copied_ancestor_row(row, g)]} if {
 	"subject" in object.keys(g)
 	gat := _copy_base(g, "~g")
 	pick := _parent_pick_of(g.subject, {"subject": parent, "checks": {}}) with data.ergo_in as {grand: g.id} with data.ergo_parent as {grand: g.subject} with input as {"ergo/names": {"$at": {"doc": gat, "names": {grand: gat}}}}
+	row := _ancestor_ids_row(pick, parent, name) with data.ergo_in as {grand: g.id} with data.ergo_parent as {grand: g.subject} with input as {"ergo/names": {"$at": {"doc": gat, "names": {grand: gat}}}}
 }
+
+_copied_ancestor_row(row, g) := row if object.get(g, "ats", null) == null
+
+else := _copied_row(row, {"from": "~g", "to": g.ats})
+
+_ancestor_ids_row(pick, ancestor, name) := object.union(_unique_ids_row(pick.raw, pick.refs, {"subject": ancestor, "checks": {}}, name), {"check": "$unique_ancestor_ids"}) if "raw" in object.keys(pick)
+
+else := object.union(_unique_ids_row([], {}, {"subject": ancestor, "checks": {}}, name), {"check": "$unique_ancestor_ids"})
 
 _grand_children(req, name, _, grand, g, pick, fixed) := [_parent_evaluation(req, name, grand, {"id": g.id, "cause": pick.cause}, fixed)] if "cause" in object.keys(pick)
 
@@ -6172,7 +6233,7 @@ _parent_pick_of(doc, preq) := {"cause": c} if {
 	r := _parent_pick_from(raw, refs, applies, preq)
 }
 
-_parent_pick_from(raw, refs, applies, preq) := {"parent": preq.subject, "parents": [p |
+_parent_pick_from(raw, refs, applies, preq) := {"parent": preq.subject, "raw": raw, "refs": refs, "parents": [p |
 	some i, entry in raw
 	some p in _parent_of(entry, refs[i], applies, i, preq)
 ]}
@@ -6226,7 +6287,34 @@ _every_no_items(req) := {"failed_items": []} if _every_from(req)
 
 else := {}
 
-violations(report) := [object.union(
+violations(report) := _violations(report, _shadowing_report_parents(report))
+
+_shadowing_report_parents(report) := _shadowing_in(report, _some_requirements(report))
+
+_shadowing_in(report, some_requirements) := set() if count(some_requirements) == 0
+
+else := {[requirement, subject.in] | some [requirement, subject] in (_child_check_subjects(report, some_requirements) - _failed_child_check_subjects(report, some_requirements))}
+
+_some_requirements(report) := {name | some name, req in report.requirements; req.require == "some"}
+
+_child_check_subjects(report, some_requirements) := {[row.requirement, row.subject] |
+	some row in report.results
+	_child_check_row(some_requirements, row)
+}
+
+_failed_child_check_subjects(report, some_requirements) := {[row.requirement, row.subject] |
+	some row in report.results
+	_child_check_row(some_requirements, row)
+	row.passed == false
+}
+
+_child_check_row(some_requirements, row) if {
+	row.requirement in some_requirements
+	not startswith(row.check, "$")
+	object.get(row.subject, "in", {}) != {}
+}
+
+_violations(report, shadowing) := [object.union(
 	{
 		"requirement": row.requirement,
 		"subject": row.subject,
@@ -6238,9 +6326,19 @@ violations(report) := [object.union(
 	},
 	object.union(object.union(_failed_items_of(row), _failed_assertions_of(row)), _message_of(row)),
 ) |
-	some row in report.results
+	some row in _unshadowed_results(report, shadowing)
 	_is_violation(report.requirements, row)
 ]
+
+_unshadowed_results(report, shadowing) := report.results if count(shadowing) == 0
+
+else := [row | some row in report.results; not _shadowed_in_report(row, shadowing)]
+
+_shadowed_in_report(row, shadowing) if {
+	count(shadowing) > 0
+	not startswith(row.check, "$")
+	[row.requirement, object.get(row.subject, "in", {})] in shadowing
+}
 
 _message_of(row) := {"message": row.message} if "message" in object.keys(row)
 

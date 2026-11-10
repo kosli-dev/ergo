@@ -4,6 +4,8 @@ use std::path::{Path, PathBuf};
 
 use serde_json::{Map, Value, json};
 
+mod common;
+
 struct Case {
     id: String,
     group: Value,
@@ -27,7 +29,7 @@ fn load_cases(dir: &Path) -> Vec<Case> {
         let file = topic.join("cases.json");
         let text = fs::read_to_string(&file)
             .unwrap_or_else(|e| panic!("can't read {}: {e}", file.display()));
-        let groups: Value = serde_json::from_str(&text)
+        let groups: Value = serde_json::from_str(&common::fill_spec(&text))
             .unwrap_or_else(|e| panic!("can't parse {}: {e}", file.display()));
         for group in groups
             .as_array()

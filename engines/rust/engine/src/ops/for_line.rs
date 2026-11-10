@@ -2648,14 +2648,9 @@ fn reading_order(check: &Check, inputs: &[Input], aliases: &[&str]) -> Vec<Input
     if !matches!(check, Check::Walk(_)) {
         return ordered;
     }
-    let (through, rest): (Vec<Input>, Vec<Input>) = ordered.into_iter().partition(|input| {
-        aliases.iter().any(|alias| {
-            input
-                .name
-                .strip_prefix(alias)
-                .is_some_and(|rest| rest.starts_with(['.', '[']))
-        })
-    });
+    let (through, rest): (Vec<Input>, Vec<Input>) = ordered
+        .into_iter()
+        .partition(|input| starts_at_alias(&input.name, aliases));
     through.into_iter().chain(rest).collect()
 }
 
@@ -2901,13 +2896,28 @@ fn nested_whose(check: &Check, counts_only: bool) -> Vec<&Check> {
     }
 }
 
+fn starts_at_alias(name: &str, aliases: &[&str]) -> bool {
+    let name = name
+        .strip_prefix("item ")
+        .and_then(|rest| {
+            let digits = rest.chars().take_while(char::is_ascii_digit).count();
+            rest[digits..].strip_prefix(" of ").filter(|_| digits > 0)
+        })
+        .unwrap_or(name);
+    aliases.iter().any(|alias| {
+        name.strip_prefix(alias)
+            .is_some_and(|rest| rest.is_empty() || rest.starts_with(['.', '[', ' ']))
+    })
+}
+
 #[cfg(test)]
 mod tests {
+    use crate::SPEC;
     use serde_json::{Value, json};
 
     fn row(for_line: &str, assertions: Value, subject: Value) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": assertions}}}}
         });
@@ -2937,7 +2947,7 @@ mod tests {
 
     fn problems(for_line: &str) -> Value {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": for_line, "assert": "x exists"}}}}
         });
@@ -3100,7 +3110,7 @@ mod tests {
     #[test]
     fn a_subject_that_is_not_an_object_fails_as_not_an_object_with_nothing_listed() {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as x", "assert": "x is 1"}}}}
         });
@@ -3121,7 +3131,7 @@ mod tests {
      {
         for subject in [json!("text"), json!(3), json!(null)] {
             let policy = json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {"thing": {"from": "every xs"}},
                 "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every thing as k", "assert": "k is 1"}}}}
             });
@@ -3141,7 +3151,7 @@ mod tests {
     #[test]
     fn a_failed_assertion_keeps_the_dot_of_a_field_named_like_the_subject() {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"thing": {"from": "every xs"}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every ys as k", "assert": ".thing is 1"}}}}
         });
@@ -3270,7 +3280,7 @@ mod tests {
     #[test]
     fn a_failed_count_whose_whose_reads_a_part_lists_the_parts_value_with_its_location() {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"thing": {"from": "things", "identified_by": "id", "has": {"pa": "meta"}}},
             "requirements": {"r": {"subject": "thing", "checks": {"c": {
                 "for": "every groups as g",
@@ -4158,5 +4168,21 @@ mod tests {
             found["message"],
             "item 1 of ws: item 1 of items: i is {\"a\": 1}, which isn't text"
         );
+    }
+
+    #[test]
+    fn a_failed_assertion_lists_the_alias_before_the_path_through_it() {
+        let found = row(
+            "every ts as ok",
+            json!("every ok.fs.k is in ok"),
+            json!({"ts": [{"fs": [{"k": 1}]}]}),
+        );
+        let names: Vec<&Value> = found["failed_items"][0]["failed_assertions"][0]["inputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|input| &input["name"])
+            .collect();
+        assert_eq!(names, [&json!("ok"), &json!("ok.fs[].k")]);
     }
 }

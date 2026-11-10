@@ -1,4 +1,11 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "approved_by is a non-empty string",
+        "approved_by is a non-empty string",
+        &[],
+        &[],
+    ),
+    ("valid is true", "valid is true", &[], &[]),
     ("i.qty is 1", "i.qty is 1", &[], &[]),
     ("w is not empty", "w is not empty", &[], &[]),
     (".y.k is 9", "y.k is 9", &[], &[]),
@@ -3761,6 +3768,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     ("x is one of $params.k", "x is in $params.k", &[], &[]),
     ("x is one of $params.l", "x is in $params.l", &[], &[]),
+    ("x is one of $params.z", "x is in $params.z", &[], &[]),
     ("x is one of 1, \"a\"", "x is one of 1, \"a\"", &[], &[]),
     (
         "x is one of 1, 'a' and y is at least y",
@@ -4020,6 +4028,8 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("l is \"x\"", "l is \"x\"", &[], &[]),
     ("sum of xs.n is 1", "sum of xs.n is 1", &[], &[]),
     ("t is \"Fix\"", "t is \"Fix\"", &[], &[]),
+    ("t is one of $params.z", "t is in $params.z", &[], &[]),
+    ("t is one of 1, 2", "t is one of 1, 2", &[], &[]),
     ("i exists", "i exists", &[], &[]),
     ("o exists", "o exists", &[], &[]),
     ("p is 1", "p is 1", &[], &[]),
@@ -5709,6 +5719,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("sum of $params.v is 1", "sum of $params.v is 1", &[], &[]),
     ("w is in $params.v", "w is in $params.v", &[], &[]),
     ("x is in $params[0].v", "x is in $params[0].v", &[], &[]),
+    ("x is in $params[0]", "x is in item 1 of $params", &[], &[]),
     (
         "x named by $params.v is 1",
         "x named by $params.v is 1",
@@ -5922,6 +5933,7 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every ok.fs.k is in ok", "every ok.fs.k is in ok", &[], &[]),
     ("every plain is 1", "every plain is 1", &[], &[]),
     ("every region is 1", "every region is 1", &[], &[]),
     (
@@ -7748,6 +7760,8 @@ pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
         &["a that goes after every, some, count of or sum of"],
     ),
     ("a is 9", &["a is a word of the grammar: write .a"]),
+    ("every", &["every is a word of the grammar: write .every"]),
+    ("nonsense words", &["doesn't parse"]),
     ("a is at least 2", &["a is a word of the grammar: write .a"]),
     ("every items whose cov is 2 has n is 1", &["doesn't parse"]),
     (
@@ -9957,6 +9971,7 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    ("every ts as ok", "every ts as ok", &[], &[]),
     ("every ts as pp", "every ts as pp", &[], &[]),
     ("every ts as s", "every ts as s", &[], &[]),
     (

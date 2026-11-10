@@ -1,7 +1,7 @@
 [
   {
     "description": "word in the whose of a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"word": {"from": "every ws that is a string and that starts with 'b'"}}, "requirements": {"r": {"subject": "word", "checks": {"c": "word is a string"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"word": {"from": "every ws that is a string and that starts with 'b'"}}, "requirements": {"r": {"subject": "word", "checks": {"c": "word is a string"}}}},
     "cases": [
       {
         "description": "each item is read as the subject, and the $applies row names it word",
@@ -20,7 +20,7 @@
   },
   {
     "description": "some \"tag list\" in a from line's whose",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"tag list": {"from": "every releases.tags that contains \"latest\""}}, "requirements": {"r": {"subject": "tag list", "min_subjects": 0, "checks": {"c": "every \"tag list\" is a string"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"tag list": {"from": "every releases.tags that contains \"latest\""}}, "requirements": {"r": {"subject": "tag list", "min_subjects": 0, "checks": {"c": "every \"tag list\" is a string"}}}},
     "cases": [
       {
         "description": "keeps the tag lists that have latest, and fails the requirement for a value that isn't a list",
@@ -40,7 +40,7 @@
   },
   {
     "description": "that on a from line picks items by the value itself, and the $applies row names the item by the subject",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "each string is read as the subject, and the row names it w",
@@ -56,7 +56,7 @@
   },
   {
     "description": "that twice on a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every ws that starts with \"b\" and that ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every ws that starts with \"b\" and that ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "every condition has to pass, and the $applies row joins them with and",
@@ -75,7 +75,7 @@
   },
   {
     "description": "that and whose in one from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every ws that starts with \"b\" and that ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every ws that starts with \"b\" and that ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "the two words mix, and each condition keeps its own reading",
@@ -92,7 +92,7 @@
   },
   {
     "description": "that without every on a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "ws that starts with \"b\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "ws that starts with \"b\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "a list of strings is read like the subject name is with every",
@@ -109,7 +109,7 @@
   },
   {
     "description": "that in a check",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"e": "every ws that starts with \"b\" ends with \"y\"", "n": "count of ws that starts with \"b\" and that ends with \"y\" is 1", "s": "some ws that starts with \"b\" is alphabetically after \"bb\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"e": "every ws that starts with \"b\" ends with \"y\"", "n": "count of ws that starts with \"b\" and that ends with \"y\" is 1", "s": "some ws that starts with \"b\" is alphabetically after \"bb\""}}}},
     "cases": [
       {
         "description": "every, count of and some keep the items that pass, and a list that that walks is listed with []",
@@ -128,7 +128,7 @@
   },
   {
     "description": "that on a for line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that starts with \"b\" as w", "assert": "w ends with \"y\""}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that starts with \"b\" as w", "assert": "w ends with \"y\""}}}}},
     "cases": [
       {
         "description": "the for line keeps the strings that pass",
@@ -142,7 +142,7 @@
   },
   {
     "description": "a field called that",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every items whose .that is \"x\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every items whose .that is \"x\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "is written with a dot and reads the field",
@@ -158,7 +158,7 @@
   },
   {
     "description": "a field called that in a check",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": ".that is \"x\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": ".that is \"x\""}}}},
     "cases": [
       {
         "description": "the dot reads the field",
@@ -173,7 +173,7 @@
   },
   {
     "description": "whose a is 1 and b is 2 on a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every things whose a is 1 and b is 2"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every things whose a is 1 and b is 2"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "is written wrong, and the requirement gets no row but $well_formed",
@@ -187,7 +187,7 @@
   },
   {
     "description": "and with a bare phrase after a that on a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every ws that starts with \"b\" and ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every ws that starts with \"b\" and ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "is written wrong, and the requirement gets no row but $well_formed",
@@ -201,7 +201,7 @@
   },
   {
     "description": "that with no phrase on a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every ws that"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every ws that"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "is written wrong, and the requirement gets no row but $well_formed",
@@ -215,7 +215,7 @@
   },
   {
     "description": "that after that without and on a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every ws that starts with \"b\" that ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every ws that starts with \"b\" that ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "is written wrong, and the requirement gets no row but $well_formed",
@@ -229,7 +229,7 @@
   },
   {
     "description": "whose after that without and on a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every ws that starts with \"b\" whose name ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every ws that starts with \"b\" whose name ends with \"y\""}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "is written wrong, and the requirement gets no row but $well_formed",
@@ -243,7 +243,7 @@
   },
   {
     "description": "whose a is 1 and b is 2 in a check",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every items whose a is 1 and b is 2 is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every items whose a is 1 and b is 2 is not empty"}}}},
     "cases": [
       {
         "description": "is written wrong, and the requirement gets no row but $well_formed",
@@ -257,7 +257,7 @@
   },
   {
     "description": "that with no phrase in a check",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every ws that is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every ws that is not empty"}}}},
     "cases": [
       {
         "description": "is written wrong, and the requirement gets no row but $well_formed",
@@ -271,7 +271,7 @@
   },
   {
     "description": "that with no path in a check",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every that is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every that is not empty"}}}},
     "cases": [
       {
         "description": "is written wrong, and the requirement gets no row but $well_formed",
@@ -285,7 +285,7 @@
   },
   {
     "description": "that on a for line over a value that isn't text",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that starts with \"b\" as w", "assert": "w is not empty"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that starts with \"b\" as w", "assert": "w is not empty"}}}}},
     "cases": [
       {
         "description": "names the item before what it is, with no name for the item",
@@ -299,7 +299,7 @@
   },
   {
     "description": "that with a value to compare on a for line over a value that isn't text",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that is one of \"bay\", \"bee\" as w", "assert": "w is not empty"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that is one of \"bay\", \"bee\" as w", "assert": "w is not empty"}}}}},
     "cases": [
       {
         "description": "names the item before what it is, with no name for the item",
@@ -313,7 +313,7 @@
   },
   {
     "description": "that on a from line over a list that is missing or null",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every ws that is not empty"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every ws that is not empty"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "w is not empty"}}}},
     "cases": [
       {
         "description": "a missing list leaves no subject",
@@ -335,7 +335,7 @@
   },
   {
     "description": "that in a check over a list that is missing or null",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every ws that starts with \"b\" ends with \"y\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every ws that starts with \"b\" ends with \"y\""}}}},
     "cases": [
       {
         "description": "a missing list is absent",
@@ -357,7 +357,7 @@
   },
   {
     "description": "that on a for line over a list that is missing or null",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that is not empty as w", "assert": "w is not empty"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"f": {"for": "every ws that is not empty as w", "assert": "w is not empty"}}}}},
     "cases": [
       {
         "description": "a missing list is absent",
@@ -379,7 +379,7 @@
   },
   {
     "description": "a for line with that and whose gives the same cause in either order",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "t"}}, "requirements": {"r": {"subject": "t", "checks": {"f": {"for": "every items that is not empty and whose kind is \"a\" as i", "assert": "i.qty is 1"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "t"}}, "requirements": {"r": {"subject": "t", "checks": {"f": {"for": "every items that is not empty and whose kind is \"a\" as i", "assert": "i.qty is 1"}}}}},
     "cases": [
       {
         "description": "an item that isn't an object is not_an_object, with that first",
@@ -393,7 +393,7 @@
   },
   {
     "description": "a for line with that and whose gives the same cause in either order, with whose first",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "t"}}, "requirements": {"r": {"subject": "t", "checks": {"f": {"for": "every items whose kind is \"a\" and that is not empty as i", "assert": "i.qty is 1"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "t"}}, "requirements": {"r": {"subject": "t", "checks": {"f": {"for": "every items whose kind is \"a\" and that is not empty as i", "assert": "i.qty is 1"}}}}},
     "cases": [
       {
         "description": "an item that isn't an object is not_an_object, with whose first",
@@ -407,7 +407,7 @@
   },
   {
     "description": "a condition after and without whose or that says where to put one",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every ws that is \"a\" and is \"b\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "every ws that is \"a\" and is \"b\""}}}},
     "cases": [
       {
         "description": "the requirement gets no row but $well_formed",
@@ -421,7 +421,7 @@
   },
   {
     "description": "a that after a count of says that, not whose",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ws that is \"a\" is \"a\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"d": {"from": "deployments", "identified_by": "id"}}, "requirements": {"r": {"subject": "d", "checks": {"c": "ws that is \"a\" is \"a\""}}}},
     "cases": [
       {
         "description": "the requirement gets no row but $well_formed",
@@ -435,7 +435,7 @@
   },
   {
     "description": "that on a from line, with a subject called \"my w\": the row and the message use the plain name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"my w": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "my w", "checks": {"c": "\"my w\" is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"my w": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "my w", "checks": {"c": "\"my w\" is not empty"}}}},
     "cases": [
       {
         "description": "each string is read as the subject, and the row names it my w",
@@ -451,7 +451,7 @@
   },
   {
     "description": "that after whose on a from line, with a subject called \"my w\": the inputs sort by name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"my w": {"from": "items whose kind is \"a\" and that is not empty"}}, "requirements": {"r": {"subject": "my w", "checks": {"c": "\"my w\" is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"my w": {"from": "items whose kind is \"a\" and that is not empty"}}, "requirements": {"r": {"subject": "my w", "checks": {"c": "\"my w\" is not empty"}}}},
     "cases": [
       {
         "description": "the item that isn't text, the one that isn't an object, and the subject named my w in the row",
@@ -466,7 +466,7 @@
   },
   {
     "description": "that on a from line, with a subject called \"item\": the row and the message use the plain name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"item": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "item", "checks": {"c": "\"item\" is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"item": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "item", "checks": {"c": "\"item\" is not empty"}}}},
     "cases": [
       {
         "description": "each string is read as the subject, and the row names it item",
@@ -482,7 +482,7 @@
   },
   {
     "description": "that after whose on a from line, with a subject called \"item\": the inputs sort by name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"item": {"from": "items whose kind is \"a\" and that is not empty"}}, "requirements": {"r": {"subject": "item", "checks": {"c": "\"item\" is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"item": {"from": "items whose kind is \"a\" and that is not empty"}}, "requirements": {"r": {"subject": "item", "checks": {"c": "\"item\" is not empty"}}}},
     "cases": [
       {
         "description": "the item that isn't text, the one that isn't an object, and the subject named item in the row",
@@ -497,7 +497,7 @@
   },
   {
     "description": "that on a from line, with a subject called \"that\": the row and the message use the plain name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"that": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "that", "checks": {"c": "\"that\" is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"that": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "that", "checks": {"c": "\"that\" is not empty"}}}},
     "cases": [
       {
         "description": "each string is read as the subject, and the row names it that",
@@ -513,7 +513,7 @@
   },
   {
     "description": "that after whose on a from line, with a subject called \"that\": the inputs sort by name",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"that": {"from": "items whose kind is \"a\" and that is not empty"}}, "requirements": {"r": {"subject": "that", "checks": {"c": "\"that\" is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"that": {"from": "items whose kind is \"a\" and that is not empty"}}, "requirements": {"r": {"subject": "that", "checks": {"c": "\"that\" is not empty"}}}},
     "cases": [
       {
         "description": "the item that isn't text, the one that isn't an object, and the subject named that in the row",
@@ -528,7 +528,7 @@
   },
   {
     "description": "a from line with that and a subject called it",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"it": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "it", "checks": {"c": "it is not empty"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"it": {"from": "every ws that starts with \"b\""}}, "requirements": {"r": {"subject": "it", "checks": {"c": "it is not empty"}}}},
     "cases": [
       {
         "description": "the row names the subject it like any other name",
@@ -544,7 +544,7 @@
   },
   {
     "description": "whose with a field called it on a from line",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"w": {"from": "every ws whose it is 1"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "a exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"w": {"from": "every ws whose it is 1"}}, "requirements": {"r": {"subject": "w", "checks": {"c": "a exists"}}}},
     "cases": [
       {
         "description": "it is an ordinary field name on the left of a whose",

@@ -1,7 +1,7 @@
 [
   {
     "description": "includes a value",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains \"a\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains \"a\""}}}},
     "cases": [
       {
         "description": "passes when the list contains it",
@@ -64,7 +64,7 @@
   },
   {
     "description": "includes a number",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains 1"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains 1"}}}},
     "cases": [
       {
         "description": "passes on 1.0, because numbers compare by value",
@@ -95,7 +95,7 @@
   },
   {
     "description": "includes values",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of \"b\", \"a\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains all of \"b\", \"a\""}}}},
     "cases": [
       {
         "description": "passes when the list contains every one",
@@ -118,7 +118,7 @@
   },
   {
     "description": "excludes a value",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain \"a\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain \"a\""}}}},
     "cases": [
       {
         "description": "passes when the list doesn't contain it",
@@ -173,7 +173,7 @@
   },
   {
     "description": "excludes values",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of \"nuts\", \"garlic\""}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of \"nuts\", \"garlic\""}}}},
     "cases": [
       {
         "description": "passes when the list contains none of them",
@@ -196,7 +196,7 @@
   },
   {
     "description": "excludes a value read through a ref",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain $params.banned"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x does not contain $params.banned"}}}},
     "params": {},
     "cases": [
       {
@@ -212,7 +212,7 @@
   },
   {
     "description": "excludes values read through a ref to an empty list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
     "params": {"banned": []},
     "cases": [
       {
@@ -228,7 +228,7 @@
   },
   {
     "description": "excludes values read through a ref that isn't a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
     "params": {"banned": "a"},
     "cases": [
       {
@@ -243,7 +243,7 @@
   },
   {
     "description": "excludes values read through a ref that holds values of mixed types",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"c": "x contains none of $params.banned"}}}},
     "params": {"banned": ["a", 1]},
     "cases": [
       {
@@ -259,7 +259,7 @@
   },
   {
     "description": "contains with a path on the right that ends at a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"pair": "pairs contains pair", "no_pair": "pairs does not contain pair", "pair_input": "pairs contains $input.pair"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"pair": "pairs contains pair", "no_pair": "pairs does not contain pair", "pair_input": "pairs contains $input.pair"}}}},
     "cases": [
       {
         "description": "finds the list as one value in a list of lists",
@@ -315,7 +315,7 @@
   },
   {
     "description": "contains with a path on the right that meets a list on the way",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"name": "labels contains x.name", "no_name": "labels does not contain x.name", "input_name": "labels contains $input.x.name"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"name": "labels contains x.name", "no_name": "labels does not contain x.name", "input_name": "labels contains $input.x.name"}}}},
     "cases": [
       {
         "description": "fails as unusable and names the list, where a walk read each item's name and passed",
@@ -391,7 +391,7 @@
   },
   {
     "description": "contains with a path from $params",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"pair": "pairs contains $params.pair", "has": "labels contains $params.x.name", "lacks": "labels does not contain $params.x.name"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"pair": "pairs contains $params.pair", "has": "labels contains $params.x.name", "lacks": "labels does not contain $params.x.name"}}}},
     "params": {"pair": ["a", "b"], "x": [{"name": "a"}]},
     "cases": [
       {
@@ -408,7 +408,7 @@
   },
   {
     "description": "contains with a path from $input on an input that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"has": "tags contains $input.k", "lacks": "tags does not contain $input.k", "all": "tags contains all of $input.k"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"thing": {"from": "$input", "identified_by": "id"}}, "requirements": {"s": {"subject": "thing", "checks": {"has": "tags contains $input.k", "lacks": "tags does not contain $input.k", "all": "tags contains all of $input.k"}}}},
     "cases": [
       {
         "description": "fails as not_an_object and names the input, where contains used to read each item, and contains all of still does",
@@ -427,7 +427,7 @@
   },
   {
     "description": "contains with a path from $input on an input that is a list, that starts with a position or has no step",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"at": "tags contains $input[0].k", "not_at": "tags does not contain $input[0].k", "whole": "tags contains $input", "not_whole": "tags does not contain $input"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"at": "tags contains $input[0].k", "not_at": "tags does not contain $input[0].k", "whole": "tags contains $input", "not_whole": "tags does not contain $input"}}}},
     "cases": [
       {
         "description": "reads the item at the position and compares, and reads the input itself as one value",
@@ -455,7 +455,7 @@
   },
   {
     "description": "contains with a path from $input on an input that is a list, inside a whose",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of items whose tags contains $input.k is 1", "not_count": "count of items whose tags does not contain $input.k is 1", "every": "every items whose tags contains $input.k exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of items whose tags contains $input.k is 1", "not_count": "count of items whose tags does not contain $input.k is 1", "every": "every items whose tags contains $input.k exists"}}}},
     "cases": [
       {
         "description": "fails as not_an_object and says it once, with no item",
@@ -471,7 +471,7 @@
   },
   {
     "description": "contains with a path from $input that meets a list, inside a whose",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of items whose tags contains $input.r.n is 1", "some": "some items whose tags contains $input.r.n exists", "every": "every items whose tags contains $input.r.n exists"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"count": "count of items whose tags contains $input.r.n is 1", "some": "some items whose tags contains $input.r.n exists", "every": "every items whose tags contains $input.r.n exists"}}}},
     "cases": [
       {
         "description": "fails as unusable and lists the path unread in $refs, where it listed what it read from each item",
@@ -487,7 +487,7 @@
   },
   {
     "description": "contains with a named by after a path from $input, on an input that is a list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"named": "tags contains $input.m named by key", "not_named": "tags does not contain $input.m named by key"}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"t": {"from": "$input", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"named": "tags contains $input.m named by key", "not_named": "tags does not contain $input.m named by key"}}}},
     "cases": [
       {
         "description": "fails as not_an_object and names the input",

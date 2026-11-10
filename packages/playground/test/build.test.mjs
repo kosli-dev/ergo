@@ -152,7 +152,7 @@ test("the Wasm inside the page takes input and params that aren't objects, as Er
   }
 });
 
-test("the bakery sample is the baking case", () => {
+test("the bakery sample is the baking case", { skip: Boolean(process.env.ERGO_PLAYGROUND_SAMPLE_CASES) }, () => {
   assert.equal(sampleCases.bakery, "baking");
 });
 

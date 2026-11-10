@@ -1,10 +1,11 @@
+use ergo_policy_engine::SPEC;
 use serde_json::{Value, json};
 
 fn report(subject: &str, from: &str, check: &str, input: Value) -> Value {
     ergo_policy_engine::report(
         &input,
         &json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {subject: {"from": from}},
             "requirements": {"r": {"subject": subject, "checks": {"c": check}}}
         }),

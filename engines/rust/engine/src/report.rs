@@ -6,7 +6,7 @@ use crate::policy::{
 use crate::reading::{INVALID_FROM, Reading, Source};
 use crate::value::{Decimal, json_text};
 use serde_json::{Map, Value, json};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Row {
@@ -67,6 +67,7 @@ pub struct Evaluation {
     pub matching: u64,
     pub min_subjects: Vec<Row>,
     pub unique_ids: Vec<Row>,
+    pub unique_ancestor_ids: Vec<Row>,
     pub applies: Vec<Row>,
     pub subject_rows: Vec<Vec<Row>>,
 }
@@ -136,6 +137,24 @@ pub fn min_subjects_row(
     row
 }
 
+pub fn unique_ancestor_ids_row(
+    requirement_name: &str,
+    requirement: &Requirement,
+    ancestor: &str,
+    repeated: Vec<Value>,
+    locations: &[String],
+) -> Row {
+    let label = format!("repeated {ancestor} ids");
+    let mut row = unique_ids_row(requirement_name, requirement, repeated, locations);
+    row.check = "$unique_ancestor_ids".to_string();
+    row.subject_type = json!(ancestor);
+    row.inputs[0]["name"] = json!(label);
+    if let Some(message) = row.message.as_mut() {
+        *message = crate::ops::message::is(&label, &row.inputs[0]["value"]);
+    }
+    row
+}
+
 pub fn unique_ids_row(
     requirement_name: &str,
     requirement: &Requirement,
@@ -193,6 +212,7 @@ pub fn no_subjects(
             Vec::new(),
             &[],
         )],
+        unique_ancestor_ids: Vec::new(),
         applies: Vec::new(),
         subject_rows: Vec::new(),
     }
@@ -327,6 +347,56 @@ impl CheckDef {
     }
 }
 
+fn ancestor_def(
+    reading: &Reading,
+    policy: &Policy,
+    requirement: &Requirement,
+    extra: &Problems,
+    input: &Value,
+    params: &Value,
+) -> Option<CheckDef> {
+    let (name, _) = policy.subject_of(requirement)?;
+    let mut levels: Vec<String> = Vec::new();
+    let mut at = name.to_string();
+    while levels.len() < 2 && from_readable(reading, &at, extra) {
+        let Some(crate::reading::Relation::Child(parent)) = reading
+            .infos
+            .get(at.as_str())
+            .map(|info| info.relation.clone())
+        else {
+            break;
+        };
+        levels.insert(0, parent.clone());
+        at = parent;
+    }
+    if levels.is_empty() {
+        return None;
+    }
+    let mut descriptions = Vec::new();
+    let mut expressions = Vec::new();
+    let mut refs: Vec<Value> = Vec::new();
+    for (at, level) in levels.iter().enumerate() {
+        let every = if at == 0 { "Every" } else { "every" };
+        descriptions.push(format!("{every} {level} id is unique"));
+        let from = if from_readable(reading, level, extra) {
+            refs.extend(crate::checks::refs_read(
+                &reading.source_refs(level),
+                input,
+                params.as_object().map(|_| params),
+            ));
+            reading.infos[level].from_text.clone().unwrap_or_default()
+        } else {
+            INVALID_FROM.to_string()
+        };
+        expressions.push(format!("count(repeated(ids({from}))) == 0"));
+    }
+    refs.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
+    refs.dedup();
+    let mut def = CheckDef::added(descriptions.join(" and "), expressions.join(" and "));
+    def.refs = refs;
+    Some(def)
+}
+
 pub fn check_defs(
     reading: &Reading,
     policy: &Policy,
@@ -352,9 +422,7 @@ pub fn check_defs(
                     refs: expressions
                         .get(name)
                         .and_then(|read| read.plan.as_ref())
-                        .map(|plan| {
-                            crate::checks::refs_of(plan, input, params.as_object().map(|_| params))
-                        })
+                        .map(|plan| crate::checks::refs_of(plan, input, Some(params)))
                         .unwrap_or_default(),
                 },
             )
@@ -405,6 +473,9 @@ pub fn check_defs(
     );
     unique_def.refs = from_refs;
     defs.insert("$unique_ids".to_string(), unique_def);
+    if let Some(def) = ancestor_def(reading, policy, requirement, extra, input, params) {
+        defs.insert("$unique_ancestor_ids".to_string(), def);
+    }
     defs.insert(
         "$well_formed".to_string(),
         CheckDef::added(
@@ -414,10 +485,19 @@ pub fn check_defs(
     );
     match filters_text(reading, policy, requirement, extra) {
         Some(filters) => {
-            defs.insert(
-                "$applies".to_string(),
-                CheckDef::added(format!("The {kind} is in scope"), filters),
-            );
+            let mut applies_def = CheckDef::added(format!("The {kind} is in scope"), filters);
+            if let Some((name, _)) = policy.subject_of(requirement)
+                && let Some(lowered) = reading.lowered(name)
+            {
+                let checks: Vec<&crate::ops::Check> =
+                    lowered.filters.iter().map(|f| &f.check).collect();
+                applies_def.refs = crate::checks::refs_of_checks(
+                    &checks,
+                    input,
+                    params.as_object().map(|_| params),
+                );
+            }
+            defs.insert("$applies".to_string(), applies_def);
         }
         None => {
             defs.remove("$applies");
@@ -534,17 +614,20 @@ pub fn status(
         .min_subjects
         .iter()
         .chain(&evaluation.unique_ids)
+        .chain(&evaluation.unique_ancestor_ids)
         .any(|row| !row.passed());
     if scope_unreadable || counts_failed {
         return "not_met";
     }
     let checks_hold = match requirement.require.as_str() {
         Some("some") => {
-            evaluation.subject_rows.is_empty()
-                || evaluation
-                    .subject_rows
-                    .iter()
-                    .any(|rows| rows.iter().all(Row::passed))
+            let keys: BTreeSet<String> = evaluation
+                .subject_rows
+                .iter()
+                .filter(|rows| !rows.is_empty())
+                .map(|rows| parent_key(&rows[0]))
+                .collect();
+            keys.is_subset(&passing_parents(requirement, evaluation))
         }
         _ => evaluation
             .subject_rows
@@ -560,18 +643,50 @@ pub fn status(
     }
 }
 
-fn causes(status: &str, well_formed: &Row, evaluation: &Evaluation) -> Value {
+fn parent_key(row: &Row) -> String {
+    match &row.subject_in {
+        Some(parents) if !parents.is_empty() => {
+            crate::value::plain(&Value::Object(parents.clone())).to_string()
+        }
+        _ => String::new(),
+    }
+}
+
+fn passing_parents(requirement: &Requirement, evaluation: &Evaluation) -> BTreeSet<String> {
+    if requirement.require.as_str() != Some("some") {
+        return BTreeSet::new();
+    }
+    evaluation
+        .subject_rows
+        .iter()
+        .filter(|rows| !rows.is_empty() && rows.iter().all(Row::passed))
+        .map(|rows| parent_key(&rows[0]))
+        .collect()
+}
+
+fn causes(
+    status: &str,
+    requirement: &Requirement,
+    well_formed: &Row,
+    evaluation: &Evaluation,
+) -> Value {
     if status != "not_met" {
         return json!([]);
     }
+    let mut shadowing = passing_parents(requirement, evaluation);
+    shadowing.remove("");
     let rows = std::iter::once(well_formed)
         .chain(&evaluation.min_subjects)
         .chain(&evaluation.unique_ids)
+        .chain(&evaluation.unique_ancestor_ids)
         .chain(&evaluation.applies)
         .chain(evaluation.subject_rows.iter().flatten());
     let mut counts: BTreeMap<Cause, u64> = BTreeMap::new();
     for row in rows {
         if row.passed() || (row.check == "$applies" && row.cause == Cause::Value) {
+            continue;
+        }
+        if !row.check.starts_with('$') && shadowing.contains(&parent_key(row)) {
             continue;
         }
         *counts.entry(row.cause).or_default() += 1;
@@ -647,6 +762,7 @@ pub fn assemble_with(
     let mut well_formed_rows = Vec::new();
     let mut min_rows = Vec::new();
     let mut unique_rows = Vec::new();
+    let mut ancestor_rows = Vec::new();
     let mut applies_rows = Vec::new();
     let mut check_rows = Vec::new();
     let mut subjects = Map::new();
@@ -680,7 +796,7 @@ pub fn assemble_with(
                 "require": requirement.require,
                 "subject": reported_subject,
                 "status": status,
-                "causes": causes(status, &well_formed, &evaluation),
+                "causes": causes(status, requirement, &well_formed, &evaluation),
                 "subjects": {"total": evaluation.total, "matching": evaluation.matching},
                 "checks": defs
                     .iter()
@@ -701,6 +817,7 @@ pub fn assemble_with(
         well_formed_rows.push(well_formed);
         min_rows.extend(evaluation.min_subjects);
         unique_rows.extend(evaluation.unique_ids);
+        ancestor_rows.extend(evaluation.unique_ancestor_ids);
         applies_rows.extend(evaluation.applies);
         check_rows.extend(evaluation.subject_rows.into_iter().flatten());
     }
@@ -712,6 +829,7 @@ pub fn assemble_with(
         .iter()
         .chain(&min_rows)
         .chain(&unique_rows)
+        .chain(&ancestor_rows)
         .chain(&applies_rows)
         .chain(&check_rows)
         .map(Row::to_json)
@@ -788,15 +906,60 @@ fn is_holding(report: &Value, requirement: &Value) -> bool {
     matches!(status, Some("met") | Some("not_applicable"))
 }
 
+fn child_check_key(report: &Value, row: &Value) -> Option<(String, String, String)> {
+    let check = row.get("check").and_then(Value::as_str)?;
+    if check.starts_with('$') {
+        return None;
+    }
+    let requirement = row.get("requirement").and_then(Value::as_str)?;
+    let require = report
+        .get("requirements")?
+        .get(requirement)?
+        .get("require")?
+        .as_str()?;
+    if require != "some" {
+        return None;
+    }
+    let subject = row.get("subject")?;
+    let parents = subject.get("in")?.as_object().filter(|m| !m.is_empty())?;
+    Some((
+        requirement.to_string(),
+        Value::Object(parents.clone()).to_string(),
+        subject.to_string(),
+    ))
+}
+
+fn shadowing_parents(report: &Value, results: &[Value]) -> BTreeSet<(String, String)> {
+    let mut subjects: BTreeMap<(String, String, String), bool> = BTreeMap::new();
+    for row in results {
+        if let Some(key) = child_check_key(report, row) {
+            let passed = row.get("passed") != Some(&Value::Bool(false));
+            let entry = subjects.entry(key).or_insert(true);
+            *entry = *entry && passed;
+        }
+    }
+    subjects
+        .into_iter()
+        .filter(|(_, passed)| *passed)
+        .map(|((requirement, parents, _), _)| (requirement, parents))
+        .collect()
+}
+
 pub fn violations(report: &Value) -> Value {
     let empty = Vec::new();
     let results = report
         .get("results")
         .and_then(Value::as_array)
         .unwrap_or(&empty);
+    let shadowing = shadowing_parents(report, results);
     let mut out = Vec::new();
     for row in results {
         if row.get("passed") != Some(&Value::Bool(false)) {
+            continue;
+        }
+        if let Some((requirement, parents, _)) = child_check_key(report, row)
+            && shadowing.contains(&(requirement, parents))
+        {
             continue;
         }
         let check = row.get("check").cloned().unwrap_or(Value::Null);
@@ -860,7 +1023,7 @@ mod tests {
 
     fn policy(requirements: Value) -> Value {
         json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"thing": {"from": "things", "identified_by": "id"}},
             "requirements": requirements,
         })
@@ -1308,7 +1471,7 @@ mod tests {
     #[test]
     fn a_policy_with_no_requirements_is_never_compliant() {
         let report = report_of(
-            json!({"ergo_spec": "v0.6-dev", "subjects": {}, "requirements": {}}),
+            json!({"ergo_spec": SPEC, "subjects": {}, "requirements": {}}),
             Value::Null,
         );
         assert_eq!(report["compliant"], json!(false));
@@ -1330,7 +1493,7 @@ mod tests {
         assert_eq!(
             row["inputs"],
             json!([
-                {"name": "policy ergo_spec", "value": ["unsupported version v9.9, expected v0.6-dev"], "locations": []},
+                {"name": "policy ergo_spec", "value": [format!("unsupported version v9.9, expected {SPEC}")], "locations": []},
                 {"name": "requirements", "value": ["missing"], "locations": []},
             ])
         );
@@ -1357,7 +1520,7 @@ mod tests {
             json!([{"name": "policy", "value": ["not an object"], "locations": []}])
         );
         let report = report_of(
-            json!({"ergo_spec": "v0.6-dev", "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]}),
+            json!({"ergo_spec": SPEC, "requirements": [{"subject": "s", "checks": {"c": "x exists"}}]}),
             Value::Null,
         );
         assert_eq!(report["requirements"].as_object().unwrap().len(), 1);
@@ -1374,7 +1537,7 @@ mod tests {
     fn a_name_that_starts_with_a_dollar_sign_is_written_wrong_wherever_it_stands() {
         let wrong = json!(["a name can't start with $"]);
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"$s": {"from": "xs"}, "t": {"from": "xs", "has": {"$p": "ys"}}},
             "requirements": {
                 "$r": {"subject": "t", "checks": {"c": "x exists"}},
@@ -1430,7 +1593,7 @@ mod tests {
         let wrong = "a name can't start or end with a space or an invisible character";
         for name in [" x", "x ", "\u{a0}x", "x\u{200b}", "\u{feff}x", "\tx"] {
             let policy = json!({
-                "ergo_spec": "v0.6-dev",
+                "ergo_spec": SPEC,
                 "subjects": {name: {"from": "xs"}, "u": {"from": "xs"}},
                 "requirements": {
                     name: {"subject": "u", "checks": {"c": "x exists"}},
@@ -1459,7 +1622,7 @@ mod tests {
                 && i["name"].as_str().is_some_and(|n| n.starts_with("checks."))));
             let parts = report_of(
                 json!({
-                    "ergo_spec": "v0.6-dev",
+                    "ergo_spec": SPEC,
                     "subjects": {"t": {"from": "xs", "has": {name: "ys"}}},
                     "requirements": {"h": {"subject": "t", "checks": {"c": "x exists"}}}
                 }),
@@ -1490,7 +1653,7 @@ mod tests {
     #[test]
     fn the_report_names_the_spec_version_and_the_engine() {
         let report = report_of(policy(json!({"s": good()})), Value::Null);
-        assert_eq!(report["ergo"], json!("v0.6-dev"));
+        assert_eq!(report["ergo"], json!(SPEC));
         assert_eq!(
             report["engine"],
             json!({"name": "ergo-rust", "version": env!("CARGO_PKG_VERSION")})
@@ -1721,6 +1884,7 @@ mod tests {
             matching,
             min_subjects: vec![row("s", "$min_subjects", Cause::Satisfied)],
             unique_ids: vec![row("s", "$unique_ids", Cause::Satisfied)],
+            unique_ancestor_ids: Vec::new(),
             applies: Vec::new(),
             subject_rows: groups
                 .into_iter()
@@ -1783,6 +1947,7 @@ mod tests {
             matching: 1,
             min_subjects: vec![row("s", "$min_subjects", min)],
             unique_ids: vec![row("s", "$unique_ids", unique)],
+            unique_ancestor_ids: Vec::new(),
             applies: applies.iter().map(|c| row("s", "$applies", *c)).collect(),
             subject_rows: vec![vec![row("s", "c", Cause::Satisfied)]],
         };
@@ -1826,6 +1991,7 @@ mod tests {
             matching: 2,
             min_subjects: vec![row("s", "$min_subjects", Cause::Satisfied)],
             unique_ids: vec![row("s", "$unique_ids", Cause::Satisfied)],
+            unique_ancestor_ids: Vec::new(),
             applies: vec![
                 row("s", "$applies", Cause::Value),
                 row("s", "$applies", Cause::Absent),
@@ -1836,14 +2002,73 @@ mod tests {
             ],
         };
         assert_eq!(
-            causes("not_met", &well_formed, &evaluation),
+            causes("not_met", &requirement, &well_formed, &evaluation),
             json!([{"cause": "absent", "rows": 2}, {"cause": "value", "rows": 2}])
         );
-        assert_eq!(causes("met", &well_formed, &evaluation), json!([]));
         assert_eq!(
-            causes("not_applicable", &well_formed, &evaluation),
+            causes("met", &requirement, &well_formed, &evaluation),
             json!([])
         );
+        assert_eq!(
+            causes("not_applicable", &requirement, &well_formed, &evaluation),
+            json!([])
+        );
+    }
+
+    fn child_row(check: &str, parent: &str, cause: Cause) -> Row {
+        let mut r = row("s", check, cause);
+        r.subject_in = Some(Map::from_iter([("p".to_string(), json!(parent))]));
+        r
+    }
+
+    #[test]
+    fn some_on_child_subjects_is_decided_under_each_parent() {
+        let (read, requirement) = requirement_of(
+            json!({"subject": "thing", "require": "some", "checks": {"c": "x exists"}}),
+        );
+        let well_formed = well_formed_row(&read, "s", &requirement, None);
+        let mut evaluation = Evaluation {
+            total: 3,
+            matching: 3,
+            subject_rows: vec![
+                vec![child_row("c", "p1", Cause::Satisfied)],
+                vec![child_row("c", "p1", Cause::Absent)],
+                vec![child_row("c", "p2", Cause::Absent)],
+            ],
+            ..Evaluation::default()
+        };
+        assert_eq!(status(&requirement, &well_formed, &evaluation), "not_met");
+        assert_eq!(
+            causes("not_met", &requirement, &well_formed, &evaluation),
+            json!([{"cause": "absent", "rows": 1}])
+        );
+        evaluation.subject_rows[2] = vec![child_row("c", "p2", Cause::Satisfied)];
+        assert_eq!(status(&requirement, &well_formed, &evaluation), "met");
+    }
+
+    #[test]
+    fn some_on_child_subjects_groups_parent_ids_1_and_1_0_together() {
+        let (read, requirement) = requirement_of(
+            json!({"subject": "thing", "require": "some", "checks": {"c": "x exists"}}),
+        );
+        let well_formed = well_formed_row(&read, "s", &requirement, None);
+        let mut one = child_row("c", "p", Cause::Satisfied);
+        one.subject_in = Some(Map::from_iter([(
+            "p".to_string(),
+            serde_json::from_str("1").unwrap(),
+        )]));
+        let mut one_point_zero = child_row("c", "p", Cause::Absent);
+        one_point_zero.subject_in = Some(Map::from_iter([(
+            "p".to_string(),
+            serde_json::from_str("1.0").unwrap(),
+        )]));
+        let evaluation = Evaluation {
+            total: 2,
+            matching: 2,
+            subject_rows: vec![vec![one], vec![one_point_zero]],
+            ..Evaluation::default()
+        };
+        assert_eq!(status(&requirement, &well_formed, &evaluation), "met");
     }
 
     fn full_report() -> Value {
@@ -2059,8 +2284,43 @@ mod tests {
     }
 
     #[test]
-    fn engine_and_spec_are_the_ones_this_engine_follows() {
-        assert_eq!(SPEC, "v0.6-dev");
+    fn the_spec_is_written_as_v_digits_dot_digits_with_an_optional_dev() {
+        let version = SPEC.strip_prefix('v').unwrap();
+        let version = version.strip_suffix("-dev").unwrap_or(version);
+        let (major, minor) = version.split_once('.').unwrap();
+        for part in [major, minor] {
+            assert!(!part.is_empty() && part.chars().all(|c| c.is_ascii_digit()));
+        }
+    }
+
+    #[test]
+    fn the_engine_is_named_ergo_rust() {
         assert_eq!(engine()["name"], json!("ergo-rust"));
+    }
+
+    #[test]
+    fn a_ref_through_a_list_of_params_points_at_where_the_read_stopped() {
+        let policy = json!({
+            "ergo_spec": SPEC,
+            "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+            "requirements": {"s": {"subject": "thing", "checks": {
+                "c": "x is in $params[0].v",
+                "d": "x is in $params[0]"
+            }}}
+        });
+        let report = crate::report(
+            &json!({"things": [{"id": "t", "x": 1}]}),
+            &policy,
+            &json!([[1]]),
+        );
+        let checks = &report["requirements"]["s"]["checks"];
+        assert_eq!(
+            checks["c"]["$refs"],
+            json!([{"name": "$params[0].v", "value": null, "locations": ["$params:/0"]}])
+        );
+        assert_eq!(
+            checks["d"]["$refs"],
+            json!([{"name": "item 1 of $params", "value": [1], "locations": ["$params:/0"]}])
+        );
     }
 }

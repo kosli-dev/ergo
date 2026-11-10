@@ -3,6 +3,31 @@
 pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
+    ("commits", "commits"),
+    (
+        "commits whose merged is true",
+        "commits whose merged is true",
+    ),
+    (
+        "artifacts whose prod is true",
+        "artifacts whose prod is true",
+    ),
+    (
+        "every \"pull request\".commits",
+        "every \"pull request\".commits",
+    ),
+    (
+        "every distinct builds.artifacts",
+        "every distinct builds.artifacts",
+    ),
+    ("every artifact.signatures", "every artifact.signatures"),
+    ("every commit.pull_requests", "every commit.pull_requests"),
+    ("every commits.pull_requests", "every commits.pull_requests"),
+    ("every release.artifacts", "every release.artifacts"),
+    (
+        "every release.artifacts.signatures",
+        "every release.artifacts.signatures",
+    ),
     ("every ws that is not empty", "every ws that is not empty"),
     ("c whose type is \"library\"", "c whose type is \"library\""),
     ("c.licenses", "c.licenses"),
@@ -211,6 +236,10 @@ pub const FROM_OK: &[(&str, &str)] = &[
     (
         "things whose x.y named by $params.i does not exist",
         "things whose x.y named by $params.i does not exist",
+    ),
+    (
+        "things whose x.y named by $input.i does not exist",
+        "things whose x.y named by $input.i does not exist",
     ),
     ("\u{3000}k\n", "k"),
     ("\tm\n", "m"),
@@ -3137,6 +3166,8 @@ pub const FROM_PARTIAL: &[(&str, &[&str])] = &[
 ];
 
 pub const PATH_OK: &[(&str, &str)] = &[
+    ("by", "by"),
+    ("number", "number"),
     ("thing", "thing"),
     ("owner.name", "owner.name"),
     ("y", "y"),

@@ -1,11 +1,12 @@
+use ergo_policy_engine::SPEC;
 use serde_json::Value;
 
 fn read(text: &str) -> Value {
-    serde_json::from_str(text).unwrap()
+    serde_json::from_str(&text.replace("{{spec}}", SPEC)).unwrap()
 }
 
 const POLICY: &str = r#"{
-    "ergo_spec": "v0.6-dev",
+    "ergo_spec": "{{spec}}",
     "description": "keys in one order",
     "meta": {"owner": "ops", "area": "release"},
     "subjects": {
@@ -47,7 +48,7 @@ const POLICY_REORDERED: &str = r#"{
     },
     "meta": {"area": "release", "owner": "ops"},
     "description": "keys in one order",
-    "ergo_spec": "v0.6-dev"
+    "ergo_spec": "{{spec}}"
 }"#;
 
 const INPUT: &str = r#"{

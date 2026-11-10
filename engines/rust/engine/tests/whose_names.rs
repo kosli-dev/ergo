@@ -1,10 +1,11 @@
+use ergo_policy_engine::SPEC;
 use serde_json::{Value, json};
 
 fn messages(check: &str, input: Value) -> Vec<String> {
     let report = ergo_policy_engine::report(
         &input,
         &json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"t": {"from": "things", "identified_by": "id"}},
             "requirements": {"r": {"subject": "t", "checks": {"c": check}}}
         }),

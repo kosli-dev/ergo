@@ -119,6 +119,27 @@ fn read_one(
     reading: &Reading,
     subject: Option<&str>,
 ) -> CheckRead {
+    let read = read_form(check, scope, reading, subject);
+    if check
+        .problems
+        .iter()
+        .any(|problem| problem.starts_with("unknown field"))
+    {
+        return CheckRead {
+            expression: written_expression(check),
+            problems: read.problems,
+            plan: None,
+        };
+    }
+    read
+}
+
+fn read_form(
+    check: &crate::policy::Check,
+    scope: &Scope,
+    reading: &Reading,
+    subject: Option<&str>,
+) -> CheckRead {
     let written = written_expression(check);
     if check.problems.contains("invalid for") {
         return CheckRead {
@@ -363,12 +384,16 @@ pub fn read_checks(reading: &Reading, requirement: &Requirement) -> BTreeMap<Str
 }
 
 pub fn refs_of(plan: &Plan, input: &Value, params: Option<&Value>) -> Vec<Value> {
-    let paths: Vec<(Path, bool)> = plan
-        .items
+    let checks: Vec<&Check> = plan.items.iter().map(|item| &item.check).collect();
+    refs_of_checks(&checks, input, params)
+}
+
+pub fn refs_of_checks(checks: &[&Check], input: &Value, params: Option<&Value>) -> Vec<Value> {
+    let paths: Vec<(Path, bool)> = checks
         .iter()
-        .flat_map(|item| {
-            let walking = item.check.walking_refs();
-            item.check
+        .flat_map(|check| {
+            let walking = check.walking_refs();
+            check
                 .refs()
                 .into_iter()
                 .map(|reference| {
@@ -423,12 +448,13 @@ fn refs_walked(paths: &[(Path, bool)], input: &Value, params: Option<&Value>) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::SPEC;
     use crate::policy::Policy;
     use serde_json::{Value, json};
 
     fn read(subjects: Value, checks: Value) -> BTreeMap<String, CheckRead> {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": subjects,
             "requirements": {"r": {"subject": "t", "checks": checks}}
         }));
@@ -453,7 +479,7 @@ mod tests {
     #[test]
     fn a_part_that_clashes_with_its_parent_still_prints_the_dot_of_a_field_called_like_it() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items", "has": {"cov": "y"}}
@@ -468,7 +494,7 @@ mod tests {
     #[test]
     fn a_field_named_like_a_part_of_the_parent_only_prints_no_dot() {
         let policy = Policy::read(&json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {
                 "round": {"from": "rounds", "has": {"cov": "d.b"}},
                 "item": {"from": "round.items"}
@@ -658,7 +684,7 @@ mod tests {
     #[test]
     fn the_advice_to_write_the_subjects_name_is_left_out_when_the_name_needs_quotes() {
         let policy = json!({
-            "ergo_spec": "v0.6-dev",
+            "ergo_spec": SPEC,
             "subjects": {"my t": {"from": "things"}},
             "requirements": {"r": {"subject": "my t", "checks": {
                 "c": "count of xs whose k equals k is 1",
@@ -976,5 +1002,66 @@ mod tests {
             one(json!({"c": "n is count of k1.k2"})).expression,
             "n equals count of k1.k2"
         );
+    }
+
+    #[test]
+    fn an_any_of_with_a_field_no_check_has_keeps_the_words_it_was_written_with() {
+        let read = one(json!({"c": {"any_of": {"x": "x is one of $params.z"}, "zz": 1}}));
+        assert_eq!(read.expression, "one of: x(x is one of $params.z)");
+        assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn an_assert_with_a_field_no_check_has_keeps_the_words_it_was_written_with() {
+        let read = one(json!({"c": {"assert": "x is one of $params.z", "zz": 1}}));
+        assert_eq!(read.expression, "x is one of $params.z");
+        assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn a_description_that_is_not_text_still_prints_the_sentence_in_one_spelling() {
+        let read = one(json!({"c": {"assert": "x is one of $params.z", "description": 5}}));
+        assert_eq!(read.expression, "x is in $params.z");
+        assert!(read.plan.is_some());
+    }
+
+    fn has_problem(read: &CheckRead, text: &str) -> bool {
+        read.problems.iter().any(|problem| problem.contains(text))
+    }
+
+    #[test]
+    fn an_assert_that_does_not_parse_next_to_a_field_no_check_has_keeps_its_problems() {
+        let read = one(json!({"c": {"assert": "nonsense words", "zz": 1}}));
+        assert_eq!(read.expression, "nonsense words");
+        assert!(has_problem(&read, "doesn't parse"));
+        assert!(read.plan.is_none());
+    }
+
+    #[test]
+    fn an_assert_that_compares_a_path_with_itself_next_to_a_field_no_check_has_keeps_its_problems()
+    {
+        let read = one(json!({"c": {"assert": "x is x", "zz": 1}}));
+        assert!(has_problem(&read, "x is compared with itself"));
+    }
+
+    #[test]
+    fn an_assert_with_a_word_of_the_grammar_next_to_a_field_no_check_has_keeps_its_problems() {
+        let read = one(json!({"c": {"assert": "every", "zz": 1}}));
+        assert!(has_problem(
+            &read,
+            "every is a word of the grammar: write .every"
+        ));
+    }
+
+    #[test]
+    fn an_any_of_with_a_bad_option_next_to_a_field_no_check_has_keeps_its_problems() {
+        let read = one(json!({"c": {"any_of": {"a": "nonsense words"}, "zz": 1}}));
+        assert!(has_problem(&read, "option a: doesn't parse"));
+    }
+
+    #[test]
+    fn a_for_next_to_an_any_of_keeps_the_problems_of_the_options() {
+        let read = one(json!({"c": {"for": "every ts as t", "any_of": {"a": "nonsense words"}}}));
+        assert!(has_problem(&read, "option a: doesn't parse"));
     }
 }
