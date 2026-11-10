@@ -1441,6 +1441,19 @@ pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<S
     if lists::haystacks(check).contains(&root) {
         return lists::ref_faults(check, ctx).into_iter().next();
     }
+    if let Check::Tally(tally) = check
+        && let Some(super::tally::Side::Plain(super::compare::Side::Path(right))) = &tally.right
+        && right == root
+        && let super::tally::Test::Compare { cmp, within } = &tally.test
+    {
+        let compare = Check::Compare(super::compare::Compare {
+            left: super::compare::Side::Value(serde_json::Value::Null),
+            right: super::compare::Side::Path(right.clone()),
+            cmp: *cmp,
+            within: within.clone(),
+        });
+        return root_kind_fault(&compare, root, ctx);
+    }
     let right = match check {
         Check::Compare(c) => &c.right,
         Check::CompareTime(c) => &c.right,
@@ -1495,6 +1508,12 @@ pub fn root_flaw_ordered(
                 if let Start::Alias(name) = &root.start
                     && !ctx.aliases.contains_key(name)
                 {
+                    continue;
+                }
+                if root.steps.iter().any(|step| {
+                    matches!(step, Step::Ref(key) | Step::Field(key)
+                        if matches!(&key.start, Start::Alias(name) if !ctx.aliases.contains_key(name)))
+                }) {
                     continue;
                 }
                 if lists::right_paths(check).contains(&&root)

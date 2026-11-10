@@ -6774,6 +6774,29 @@ test_a_whose_that_reads_a_parent_through_a_for_name_lists_the_part_before_the_na
 	]]]
 }
 
+_for_sentence_root_rows(checks, subject) := {r.check: [r.cause, r.message] |
+	some r in ergo.report({"things": [object.union(subject, {"id": 1})]}, {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": checks}}}, {}).results
+	not startswith(r.check, "$")
+}
+
+test_a_sentence_root_that_cant_be_read_fails_once_before_any_item_on_an_empty_list if {
+	checks := {"c": {"for": "every xs, if any, as m", "assert": "m.v is at least z"}}
+	_for_sentence_root_rows(checks, {"xs": []}) == {"c": ["absent", "z is missing"]}
+	_for_sentence_root_rows(checks, {"xs": [], "z": null}) == {"c": ["null", "z is null"]}
+	_for_sentence_root_rows(checks, {"xs": [], "z": "s"}) == {"c": ["unusable", "z is \"s\", which isn't a number"]}
+	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {"v": 2}], "z": "s"}) == {"c": ["unusable", "z is \"s\", which isn't a number"]}
+}
+
+test_a_sentence_root_that_cant_be_read_comes_before_an_empty_list_without_if_any if {
+	checks := {"c": {"for": "every xs as m", "assert": "m.v is at least $params.missing"}}
+	_for_sentence_root_rows(checks, {"xs": []}) == {"c": ["absent", "$params.missing is missing; xs is []"]}
+}
+
+test_a_sentence_root_named_by_the_lines_alias_is_read_for_each_item if {
+	checks := {"c": {"for": "every ks as k", "assert": "m named by k is 1"}}
+	_for_sentence_root_rows(checks, {"ks": ["a", "b"], "m": {"a": 1}}) == {"c": ["absent", "item 2 of ks: m named by k is missing"]}
+}
+
 _old_policy := {
 	"ergo_spec": "v0.6-dev",
 	"subjects": {"deployment": {
@@ -12311,7 +12334,8 @@ _distinct_scope_reads(place) if {
 _rooted_field_rows(doc) := [[r.check, r.cause, r.message] | some r in ergo.report({"ts": [doc]}, {"ergo_spec": "v0.6-dev", "subjects": {"t": {"from": "ts", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"w": "every rows.n is at least m named by k", "p": "m named by k is 1"}}}}, {}).results; r.check in {"w", "p"}]
 
 test_a_named_by_field_on_the_right_of_every_reads_the_subjects_key_and_never_an_items if {
-	_rooted_field_rows({"id": 1, "k": null, "m": null, "rows": [{"n": 3}]}) == [["p", "null", "k is null"], ["w", "null", "k is null"]]
+	_rooted_field_rows({"id": 1, "k": null, "m": null, "rows": [{"n": 3}]}) == [["p", "null", "m is null; k is null"], ["w", "null", "m is null; k is null"]]
+	_rooted_field_rows({"id": 1, "k": null, "m": {}, "rows": [{"n": 3}]}) == [["p", "null", "k is null"], ["w", "null", "k is null"]]
 	_rooted_field_rows({"id": 1, "k": "m", "m": 3, "rows": [{"n": 3, "k": "n"}, {"n": 4}]}) == [["p", "unusable", "m is 3, which isn't an object"], ["w", "unusable", "m is 3, which isn't an object"]]
 }
 

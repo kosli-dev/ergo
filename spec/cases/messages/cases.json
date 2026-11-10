@@ -1546,19 +1546,19 @@
     "params": {"l": "no"},
     "cases": [
       {
-        "description": "the list the line reads is printed as found",
+        "description": "names the param once, with no item",
         "rules": ["message.empty"],
         "input": {"things": [{"id": "t1", "xs": [{"k": 1}]}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"k": 1}]}], "message": "xs is [{\"k\": 1}]", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"k": 1}]}], "message": "$params.l is \"no\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
-        "description": "with no list to print, the check is printed as the report writes it",
+        "description": "names the param, then the list that is missing",
         "rules": ["message.empty"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [], "inputs": [{"locations": [], "name": "xs", "value": []}], "message": "for every xs as x: x.k is in $params.l is false", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "xs", "locations": ["/things/0"], "path": "xs", "value": null}], "inputs": [{"locations": [], "name": "xs", "value": []}], "message": "$params.l is \"no\", which isn't a list; xs is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]

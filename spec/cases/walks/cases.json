@@ -3010,7 +3010,7 @@
                 ]
               }
             ],
-            "message": "item 1 of keys: key is missing",
+            "message": "key is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -3212,7 +3212,7 @@
                 ]
               }
             ],
-            "message": "item 1 of keys: key is missing",
+            "message": "key is missing",
             "passed": false,
             "requirement": "s",
             "subject": {

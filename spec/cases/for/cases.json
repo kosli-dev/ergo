@@ -3007,7 +3007,7 @@
                 ]
               }
             ],
-            "message": "item 1 of commits: owner is missing",
+            "message": "owner is missing",
             "passed": false,
             "requirement": "s",
             "subject": {
@@ -13062,7 +13062,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "message": "item 1 of rs: $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13070,7 +13070,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{"x": null}]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "message": "item 1 of rs: r.x is null; $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13078,7 +13078,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [[1]]}]},
         "results": [
-          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "message": "item 1 of rs: $params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "absent", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "message": "$params.i is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -13093,7 +13093,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{}]}]},
         "results": [
-          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "message": "item 1 of rs: $params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{}]}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13101,7 +13101,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [{"x": null}]}]},
         "results": [
-          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "message": "item 1 of rs: r.x is null; $params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0/x"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": {"x": null}}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [{"x": null}]}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -13109,7 +13109,7 @@
         "rules": ["for.flaws", "path.ref_step"],
         "input": {"things": [{"id": "t1", "rs": [[1]]}]},
         "results": [
-          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "message": "item 1 of rs: $params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "null", "check": "c", "failed_items": [{"cause": "null", "failed_assertions": [{"assertion": "r.x.y named by $params.i does not exist", "cause": "null", "inputs": [{"locations": ["/things/0/rs/0"], "name": "r.x.y named by $params.i", "value": null}]}], "item": "item 1 of rs", "locations": ["/things/0/rs/0"], "path": "item 1 of rs", "value": [1]}], "inputs": [{"locations": ["/things/0/rs/0"], "name": "rs[]", "value": [[1]]}], "message": "$params.i is null", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -23780,6 +23780,111 @@
         "results": [
           {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/decisions/0", "/decisions/1"], "name": "$input.decisions[]", "value": [{"correlation_id": "c1", "decision": "allow"}, {"correlation_id": "c2", "decision": "deny"}]}, {"locations": ["/requests/0/correlation_id"], "name": "correlation_id", "value": "c1"}], "passed": true, "requirement": "r", "subject": {"id": "ok", "type": "request"}},
           {"cause": "value", "check": "c", "failed_items": [{"cause": "value", "failed_assertions": [{"assertion": "d.correlation_id equals correlation_id", "cause": "value", "inputs": [{"locations": ["/decisions/0/correlation_id"], "name": "d.correlation_id", "value": "c1"}, {"locations": ["/requests/1/correlation_id"], "name": "correlation_id", "value": "c2"}]}], "item": "item 1 of $input.decisions", "locations": ["/decisions/0"], "path": "item 1 of $input.decisions", "value": {"correlation_id": "c1", "decision": "allow"}}, {"cause": "value", "failed_assertions": [{"assertion": "d.decision is \"allow\"", "cause": "value", "inputs": [{"locations": ["/decisions/1/decision"], "name": "d.decision", "value": "deny"}]}], "item": "item 2 of $input.decisions", "locations": ["/decisions/1"], "path": "item 2 of $input.decisions", "value": {"correlation_id": "c2", "decision": "deny"}}], "inputs": [{"locations": ["/decisions/0", "/decisions/1"], "name": "$input.decisions[]", "value": [{"correlation_id": "c1", "decision": "allow"}, {"correlation_id": "c2", "decision": "deny"}]}, {"locations": ["/requests/1/correlation_id"], "name": "correlation_id", "value": "c2"}], "message": "item 1 of $input.decisions: d.correlation_id is \"c1\", and correlation_id is \"c2\"; item 2 of $input.decisions: decision is \"deny\"", "passed": false, "requirement": "r", "subject": {"id": "denied", "type": "request"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line's sentence that reads a root of the wrong type, which doesn't depend on the item",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"least_z": {"for": "every xs as m", "assert": "m.v is at least z"}, "least_q": {"for": "every xs as m", "assert": "m.v is at least $params.q"}, "in_q": {"for": "every xs as m", "assert": "m.v is in $params.q"}}}}},
+    "params": {"q": "s"},
+    "cases": [
+      {
+        "description": "reads the root once, before any item, and names it once with no item in front",
+        "rules": ["for.flaws", "walk.flaws"],
+        "input": {"prs": [{"id": "p0", "z": "s", "xs": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "unusable", "check": "in_q", "failed_items": [], "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "$params.q is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "least_q", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least $params.q", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0/v"], "name": "m.v", "value": 1}, {"locations": ["$params:/q"], "name": "$params.q", "value": "s"}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least $params.q", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/1/v"], "name": "m.v", "value": 2}, {"locations": ["$params:/q"], "name": "$params.q", "value": "s"}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"v": 2}}], "inputs": [{"locations": ["$params:/q"], "name": "$params.q", "value": "s"}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "$params.q is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "least_z", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least z", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0/v"], "name": "m.v", "value": 1}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [{"assertion": "m.v is at least z", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/1/v"], "name": "m.v", "value": 2}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}]}], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"v": 2}}], "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "names the root first, then the empty list, and fails with the worse cause",
+        "rules": ["for.flaws", "walk.flaws"],
+        "input": {"prs": [{"id": "p0", "z": "s", "xs": []}]},
+        "results": [
+          {"cause": "unusable", "check": "in_q", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is \"s\", which isn't a list; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "least_q", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": ["$params:/q"], "name": "$params.q", "value": "s"}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is \"s\", which isn't a number; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "least_z", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line with if any whose sentence reads a root of the wrong type, which doesn't depend on the item",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"least_z": {"for": "every xs, if any, as m", "assert": "m.v is at least z"}, "least_q": {"for": "every xs, if any, as m", "assert": "m.v is at least $params.q"}, "in_q": {"for": "every xs, if any, as m", "assert": "m.v is in $params.q"}}}}},
+    "params": {"q": "s"},
+    "cases": [
+      {
+        "description": "fails on an empty list too",
+        "rules": ["for.flaws", "walk.flaws"],
+        "input": {"prs": [{"id": "p0", "z": "s", "xs": []}]},
+        "results": [
+          {"cause": "unusable", "check": "in_q", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "least_q", "failed_items": [], "inputs": [{"locations": ["$params:/q"], "name": "$params.q", "value": "s"}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "least_z", "failed_items": [], "inputs": [{"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/z"], "name": "z", "value": "s"}], "message": "z is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line's sentence whose root reads the first item's alias, on the second item",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"least_w": {"for": "every xs as m, every m.ys, if any, as n", "assert": "n.v is at least m.w"}, "in_l": {"for": "every xs as m, every m.ys, if any, as n", "assert": "n.v is in m.l"}}}}},
+    "cases": [
+      {
+        "description": "reads the root once for each first item, before any second item, and names it under the first item",
+        "rules": ["for.flaws"],
+        "input": {"prs": [{"id": "p0", "xs": [{"w": "s", "l": "s", "ys": [{"v": 1}, {"v": 2}]}, {"w": 1, "l": [1], "ys": [{"v": 1}]}]}]},
+        "results": [
+          {"cause": "unusable", "check": "in_l", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "n.v is in m.l", "cause": "unusable", "items": [{"cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0/ys/0/v"], "name": "n.v", "value": 1}, {"locations": ["/prs/0/xs/0/l"], "name": "m.l", "value": "s"}], "item": "item 1 of m.ys"}, {"cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0/ys/1/v"], "name": "n.v", "value": 2}, {"locations": ["/prs/0/xs/0/l"], "name": "m.l", "value": "s"}], "item": "item 2 of m.ys"}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"l": "s", "w": "s", "ys": [{"v": 1}, {"v": 2}]}}], "inputs": [{"locations": ["/prs/0/xs/0/ys/0", "/prs/0/xs/0/ys/1", "/prs/0/xs/1/ys/0"], "name": "m.ys[]", "value": [{"v": 1}, {"v": 2}, {"v": 1}]}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"l": "s", "w": "s", "ys": [{"v": 1}, {"v": 2}]}, {"l": [1], "w": 1, "ys": [{"v": 1}]}]}], "message": "item 1 of xs: m.l is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "least_w", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "n.v is at least m.w", "cause": "unusable", "items": [{"cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0/ys/0/v"], "name": "n.v", "value": 1}, {"locations": ["/prs/0/xs/0/w"], "name": "m.w", "value": "s"}], "item": "item 1 of m.ys"}, {"cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0/ys/1/v"], "name": "n.v", "value": 2}, {"locations": ["/prs/0/xs/0/w"], "name": "m.w", "value": "s"}], "item": "item 2 of m.ys"}]}], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"l": "s", "w": "s", "ys": [{"v": 1}, {"v": 2}]}}], "inputs": [{"locations": ["/prs/0/xs/0/ys/0", "/prs/0/xs/0/ys/1", "/prs/0/xs/1/ys/0"], "name": "m.ys[]", "value": [{"v": 1}, {"v": 2}, {"v": 1}]}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"l": "s", "w": "s", "ys": [{"v": 1}, {"v": 2}]}, {"l": [1], "w": 1, "ys": [{"v": 1}]}]}], "message": "item 1 of xs: m.w is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      },
+      {
+        "description": "fails when the second list is empty too",
+        "rules": ["for.flaws"],
+        "input": {"prs": [{"id": "p0", "xs": [{"w": "s", "l": "s", "ys": []}, {"w": 1, "l": [1], "ys": []}]}]},
+        "results": [
+          {"cause": "unusable", "check": "in_l", "failed_items": [], "inputs": [{"locations": [], "name": "m.ys[]", "value": []}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"l": "s", "w": "s", "ys": []}, {"l": [1], "w": 1, "ys": []}]}], "message": "item 1 of xs: m.l is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "least_w", "failed_items": [], "inputs": [{"locations": [], "name": "m.ys[]", "value": []}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"l": "s", "w": "s", "ys": []}, {"l": [1], "w": 1, "ys": []}]}], "message": "item 1 of xs: m.w is \"s\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line's count whose whose reads a list named by a key of the subject",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"plain": "count of xs whose v is in pr.t named by pr.p is 0", "for": {"for": "every ws as w", "assert": "count of xs whose v is in pr.t named by pr.p is 0"}}}}},
+    "cases": [
+      {
+        "description": "names the list once when it isn't a list, with no item in front",
+        "rules": ["for.flaws", "tally.walk"],
+        "input": {"prs": [{"id": "p0", "p": "a", "t": {"a": "s"}, "ws": [1, 2], "xs": [{"v": 1}, {"v": 2}]}]},
+        "results": [
+          {"cause": "unusable", "check": "for", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "count of xs whose v is in pr.t named by pr.p is 0", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs whose v is in pr.t named by pr.p", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/prs/0/p"], "name": "p", "value": "a"}, {"locations": ["/prs/0/t/a"], "name": "pr.t named by pr.p", "value": "s"}]}], "item": "item 1 of ws", "locations": ["/prs/0/ws/0"], "path": "item 1 of ws", "value": 1}, {"cause": "unusable", "failed_assertions": [{"assertion": "count of xs whose v is in pr.t named by pr.p is 0", "cause": "unusable", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs whose v is in pr.t named by pr.p", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/prs/0/p"], "name": "p", "value": "a"}, {"locations": ["/prs/0/t/a"], "name": "pr.t named by pr.p", "value": "s"}]}], "item": "item 2 of ws", "locations": ["/prs/0/ws/1"], "path": "item 2 of ws", "value": 2}], "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs whose v is in pr.t named by pr.p", "value": null}, {"locations": ["/prs/0/p"], "name": "p", "value": "a"}, {"locations": ["/prs/0/t/a"], "name": "pr.t named by pr.p", "value": "s"}, {"locations": ["/prs/0/ws/0", "/prs/0/ws/1"], "name": "ws[]", "value": [1, 2]}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "pr.t named by pr.p is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "unusable", "check": "plain", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs whose v is in pr.t named by pr.p", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/prs/0/p"], "name": "p", "value": "a"}, {"locations": ["/prs/0/t/a"], "name": "pr.t named by pr.p", "value": "s"}], "message": "pr.t named by pr.p is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line's count whose whose reads a parent's field named by the line's alias",
+    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "every artifact.prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"c": {"for": "every ks as k", "assert": "count of rows whose n is artifact.nums named by k is at least 1"}}}}},
+    "cases": [
+      {
+        "description": "reads the field for each item, so it passes when each item names a field that is there",
+        "rules": ["for.flaws", "tally.whose"],
+        "input": {"artifacts": [{"id": "a", "nums": {"a": 1, "b": 2}, "prs": [{"id": 1, "ks": ["a", "b"], "rows": [{"n": 1}, {"n": 2}]}]}]},
+        "results": [
+          {"cause": "satisfied", "check": "c", "failed_items": [], "inputs": [{"locations": ["/artifacts/0/nums"], "name": "artifact.nums", "value": {"a": 1, "b": 2}}, {"locations": ["/artifacts/0/prs/0/ks/0", "/artifacts/0/prs/0/ks/1"], "name": "ks[]", "value": ["a", "b"]}, {"locations": ["/artifacts/0/prs/0/rows/0", "/artifacts/0/prs/0/rows/1"], "name": "rows[]", "value": [{"n": 1}, {"n": 2}]}], "passed": true, "requirement": "r", "subject": {"id": 1, "in": {"artifact": "a"}, "type": "pr"}}
+        ]
+      },
+      {
+        "description": "names the item when the field it names is missing",
+        "rules": ["for.flaws", "tally.whose"],
+        "input": {"artifacts": [{"id": "a", "nums": {"a": 1}, "prs": [{"id": 1, "ks": ["a", "b"], "rows": [{"n": 1}, {"n": 2}]}]}]},
+        "results": [
+          {"cause": "absent", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [{"assertion": "count of rows whose n equals artifact.nums named by k is at least 1", "cause": "absent", "inputs": [{"locations": ["/artifacts/0/prs/0/rows/0", "/artifacts/0/prs/0/rows/1"], "name": "count of rows whose n equals artifact.nums named by k", "value": null}, {"locations": ["/artifacts/0/prs/0/rows/0", "/artifacts/0/prs/0/rows/1"], "name": "rows[]", "value": [{"n": 1}, {"n": 2}]}, {"locations": ["/artifacts/0/nums"], "name": "artifact.nums named by k", "value": null}]}], "item": "item 2 of ks", "locations": ["/artifacts/0/prs/0/ks/1"], "path": "item 2 of ks", "value": "b"}], "inputs": [{"locations": ["/artifacts/0/nums"], "name": "artifact.nums", "value": {"a": 1}}, {"locations": ["/artifacts/0/prs/0/ks/0", "/artifacts/0/prs/0/ks/1"], "name": "ks[]", "value": ["a", "b"]}, {"locations": ["/artifacts/0/prs/0/rows/0", "/artifacts/0/prs/0/rows/1"], "name": "rows[]", "value": [{"n": 1}, {"n": 2}]}], "message": "item 2 of ks: artifact.nums named by k is missing", "passed": false, "requirement": "r", "subject": {"id": 1, "in": {"artifact": "a"}, "type": "pr"}}
         ]
       }
     ]
