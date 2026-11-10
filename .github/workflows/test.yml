@@ -53,6 +53,8 @@ jobs:
           .github/release-notes_test.sh
           .github/release_test.sh
           .github/changelog-version_test.sh
+      - name: Check the compiled-policy tests run in batches
+        run: .github/compiled-tests_test.sh
       - name: Lint for likely bugs
         run: regal lint --format github --disable-all --enable-category bugs --disable redundant-existence-check engines/rego examples engines/rust/sentences/tests/oracle
       - name: Check there are no comments
