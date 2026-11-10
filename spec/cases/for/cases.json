@@ -23786,7 +23786,7 @@
   },
   {
     "description": "a for line's sentence that reads a root of the wrong type, which doesn't depend on the item",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"least_z": {"for": "every xs as m", "assert": "m.v is at least z"}, "least_q": {"for": "every xs as m", "assert": "m.v is at least $params.q"}, "in_q": {"for": "every xs as m", "assert": "m.v is in $params.q"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"least_z": {"for": "every xs as m", "assert": "m.v is at least z"}, "least_q": {"for": "every xs as m", "assert": "m.v is at least $params.q"}, "in_q": {"for": "every xs as m", "assert": "m.v is in $params.q"}}}}},
     "params": {"q": "s"},
     "cases": [
       {
@@ -23813,7 +23813,7 @@
   },
   {
     "description": "a for line with if any whose sentence reads a root of the wrong type, which doesn't depend on the item",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"least_z": {"for": "every xs, if any, as m", "assert": "m.v is at least z"}, "least_q": {"for": "every xs, if any, as m", "assert": "m.v is at least $params.q"}, "in_q": {"for": "every xs, if any, as m", "assert": "m.v is in $params.q"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"least_z": {"for": "every xs, if any, as m", "assert": "m.v is at least z"}, "least_q": {"for": "every xs, if any, as m", "assert": "m.v is at least $params.q"}, "in_q": {"for": "every xs, if any, as m", "assert": "m.v is in $params.q"}}}}},
     "params": {"q": "s"},
     "cases": [
       {
@@ -23830,7 +23830,7 @@
   },
   {
     "description": "a for line's sentence whose root reads the first item's alias, on the second item",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"least_w": {"for": "every xs as m, every m.ys, if any, as n", "assert": "n.v is at least m.w"}, "in_l": {"for": "every xs as m, every m.ys, if any, as n", "assert": "n.v is in m.l"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"least_w": {"for": "every xs as m, every m.ys, if any, as n", "assert": "n.v is at least m.w"}, "in_l": {"for": "every xs as m, every m.ys, if any, as n", "assert": "n.v is in m.l"}}}}},
     "cases": [
       {
         "description": "reads the root once for each first item, before any second item, and names it under the first item",
@@ -23854,7 +23854,7 @@
   },
   {
     "description": "a for line's count whose whose reads a list named by a key of the subject",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"plain": "count of xs whose v is in pr.t named by pr.p is 0", "for": {"for": "every ws as w", "assert": "count of xs whose v is in pr.t named by pr.p is 0"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"plain": "count of xs whose v is in pr.t named by pr.p is 0", "for": {"for": "every ws as w", "assert": "count of xs whose v is in pr.t named by pr.p is 0"}}}}},
     "cases": [
       {
         "description": "names the list once when it isn't a list, with no item in front",
@@ -23869,7 +23869,7 @@
   },
   {
     "description": "a for line's count whose whose reads a parent's field named by the line's alias",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "every artifact.prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"c": {"for": "every ks as k", "assert": "count of rows whose n is artifact.nums named by k is at least 1"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"artifact": {"from": "artifacts", "identified_by": "id"}, "pr": {"from": "every artifact.prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"c": {"for": "every ks as k", "assert": "count of rows whose n is artifact.nums named by k is at least 1"}}}}},
     "cases": [
       {
         "description": "reads the field for each item, so it passes when each item names a field that is there",
@@ -23891,7 +23891,7 @@
   },
   {
     "description": "a for line whose sentences read a root that can't be read and the item's own fields",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"line": {"for": "every xs as m", "assert": ["m.v is 2", "m.v is at least z"]}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"line": {"for": "every xs as m", "assert": ["m.v is 2", "m.v is at least z"]}}}}},
     "cases": [
       {
         "description": "names the root first, once, then each item's own problems without the root, and fails with the worse cause",
@@ -23905,7 +23905,7 @@
   },
   {
     "description": "a for line whose sentences fail without reading the item",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"z_one": {"for": "every xs as m", "assert": "z is 1"}, "z_exists": {"for": "every xs as m", "assert": "z exists"}, "q_exists": {"for": "every xs as m", "assert": "$params.q exists"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"z_one": {"for": "every xs as m", "assert": "z is 1"}, "z_exists": {"for": "every xs as m", "assert": "z exists"}, "q_exists": {"for": "every xs as m", "assert": "$params.q exists"}}}}},
     "cases": [
       {
         "description": "names the problem once, with no item in front, whatever its cause, and lists every item in failed_items",
@@ -23931,7 +23931,7 @@
   },
   {
     "description": "a for line when $params is not an object",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"in_q": {"assert": "m.v is in $params.q", "for": "every xs as m"}, "least_q": {"assert": "m.v is at least $params.q", "for": "every xs as m"}, "least_z": {"assert": "m.v is at least z", "for": "every xs as m"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"in_q": {"assert": "m.v is in $params.q", "for": "every xs as m"}, "least_q": {"assert": "m.v is at least $params.q", "for": "every xs as m"}, "least_z": {"assert": "m.v is at least z", "for": "every xs as m"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "params": 3,
     "cases": [
       {
@@ -24088,6 +24088,558 @@
             "subject": {
               "id": "t",
               "type": "thing"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose sentence reads $params alone, when the params are null",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "is_3": {
+              "for": "every xs as m",
+              "assert": "$params is 3"
+            },
+            "least": {
+              "for": "every xs as m",
+              "assert": "m.v is at least $params"
+            }
+          }
+        }
+      }
+    },
+    "params": null,
+    "cases": [
+      {
+        "description": "a bare $params on an empty list when the params are null",
+        "rules": [
+          "for.roots",
+          "for.flaws",
+          "message.items"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "is_3",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "$params is missing; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "least",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "$params is missing; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a bare $params when the params are null and the list is missing",
+        "rules": [
+          "for.roots",
+          "for.flaws",
+          "message.items"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "is_3",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0"
+                ],
+                "path": "xs",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs",
+                "value": []
+              }
+            ],
+            "message": "$params is missing; xs is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "least",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0"
+                ],
+                "path": "xs",
+                "value": null
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params",
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs",
+                "value": []
+              }
+            ],
+            "message": "$params is missing; xs is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a bare $params that is null, with items",
+        "rules": [
+          "for.roots",
+          "for.flaws",
+          "message.items"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1
+                },
+                {
+                  "v": 2
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "is_3",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "$params is 3",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "$params is 3",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "v": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 2
+                  }
+                ]
+              }
+            ],
+            "message": "$params is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "absent",
+            "check": "least",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is at least $params",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "m.v",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              },
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is at least $params",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "m.v",
+                        "value": 2
+                      },
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "v": 2
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  },
+                  {
+                    "v": 2
+                  }
+                ]
+              }
+            ],
+            "message": "$params is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a for line whose sentence reads $params alone, when the params are an object",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "is_3": {
+              "for": "every xs as m",
+              "assert": "$params is 3"
+            },
+            "least": {
+              "for": "every xs as m",
+              "assert": "m.v is at least $params"
+            }
+          }
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "a bare $params that is an object, on an empty list",
+        "rules": [
+          "for.roots",
+          "for.flaws",
+          "message.items"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "is_3",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params",
+                "value": {}
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "least",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params",
+                "value": {}
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "$params is {}, which isn't a number; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
             }
           }
         ]

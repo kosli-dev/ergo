@@ -2303,7 +2303,7 @@
   },
   {
     "description": "a root of the wrong type for a phrase that reads a number, text or a time",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"count_least": "count of xs whose v is at least pr.z is 0", "count_starts": "count of xs whose s starts with pr.z is 0", "every_before": "every xs.t, if any, is before z", "every_least": "every xs.v, if any, is at least z", "some_least": "some xs.v is at least z"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"count_least": "count of xs whose v is at least pr.z is 0", "count_starts": "count of xs whose s starts with pr.z is 0", "every_before": "every xs.t, if any, is before z", "every_least": "every xs.v, if any, is at least z", "some_least": "some xs.v is at least z"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "cases": [
       {
         "description": "fails as unusable before any item, with no item in front, on an empty list",
@@ -2355,7 +2355,7 @@
   },
   {
     "description": "a key read from a field after a null",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"exists": "s.x named by p exists", "gone": "s.x named by p does not exist", "named": "s.x named by p is 1", "part": "pl.z named by p exists"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "has": {"pl": "c"}, "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"exists": "s.x named by p exists", "gone": "s.x named by p does not exist", "named": "s.x named by p is 1", "part": "pl.z named by p exists"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "has": {"pl": "c"}, "identified_by": "id"}}},
     "cases": [
       {
         "description": "names the null step, then the key that can't be read",
@@ -2406,7 +2406,7 @@
   },
   {
     "description": "a position and a key after a null",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"gone": "x[0] named by zz does not exist", "here": "x[0] named by zz exists"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"gone": "x[0] named by zz does not exist", "here": "x[0] named by zz exists"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "cases": [
       {
         "description": "names the null step, then a key that is missing, null or not text, and none when it is text",
@@ -2427,7 +2427,7 @@
   },
   {
     "description": "a root of a for line, said once",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"counted": {"assert": "count of xs whose w is in pr.z is 0", "for": "every ys as m"}, "line": {"assert": "m.v is 1", "for": "every xs whose v is in pr.z as m"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"counted": {"assert": "count of xs whose w is in pr.z is 0", "for": "every ys as m"}, "line": {"assert": "m.v is 1", "for": "every xs whose v is in pr.z as m"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "cases": [
       {
         "description": "names the root once, with no item, whatever the list holds",
@@ -2444,7 +2444,7 @@
   },
   {
     "description": "a root that reads the alias of the first item of a for line, in the second item",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"line": {"assert": "n.v is 1", "for": "every ys as m, every xs whose v is in m.q, if any, as n"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"line": {"assert": "n.v is 1", "for": "every ys as m, every xs whose v is in m.q, if any, as n"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "cases": [
       {
         "description": "fails before any item of the second list, naming each first item, on an empty list too",
@@ -2471,7 +2471,7 @@
   },
   {
     "description": "a root of a for line and a root that reads the alias in one message",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"line": {"assert": "n.v is 1", "for": "every ys as m, every xs whose w is in m.q and whose v is in $params.l, if any, as n"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"line": {"assert": "n.v is 1", "for": "every ys as m, every xs whose w is in m.q and whose v is in $params.l, if any, as n"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "cases": [
       {
         "description": "names the root first, then the alias root of each first item",
@@ -2486,7 +2486,7 @@
   },
   {
     "description": "the order of the roots a count of names",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"every": "every xs whose w is in pr.l and whose v is in $params.l, if any, exists", "refs": "count of xs whose w is in pr.m and whose v is in $params.b and whose v is in $params.a is 0", "some": "some xs whose v is in $params.b and whose w is in $params.a exists", "tally": "count of xs whose w is in pr.l and whose v is in $params.l is 0"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"every": "every xs whose w is in pr.l and whose v is in $params.l, if any, exists", "refs": "count of xs whose w is in pr.m and whose v is in $params.b and whose v is in $params.a is 0", "some": "some xs whose v is in $params.b and whose w is in $params.a exists", "tally": "count of xs whose w is in pr.l and whose v is in $params.l is 0"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "cases": [
       {
         "description": "puts the missing or null $params and $input roots first, sorted, and the others in the order the sentence reads them",
@@ -2507,7 +2507,7 @@
   },
   {
     "description": "the order of the roots a count of names when $params holds null",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"every": "every xs whose w is in pr.l and whose v is in $params.l, if any, exists", "refs": "count of xs whose w is in pr.m and whose v is in $params.b and whose v is in $params.a is 0", "tally": "count of xs whose w is in pr.l and whose v is in $params.l is 0"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"every": "every xs whose w is in pr.l and whose v is in $params.l, if any, exists", "refs": "count of xs whose w is in pr.m and whose v is in $params.b and whose v is in $params.a is 0", "tally": "count of xs whose w is in pr.l and whose v is in $params.l is 0"}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "params": {"a": null, "b": null, "l": null},
     "cases": [
       {
@@ -2527,7 +2527,7 @@
   },
   {
     "description": "a count of in a for line, and the order of its roots",
-    "policy": {"ergo_spec": "v0.6-dev", "requirements": {"r": {"checks": {"line": {"assert": "count of xs whose w is in pr.l and whose v is in $params.l is 0", "for": "every ys as m"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
+    "policy": {"ergo_spec": "{{spec}}", "requirements": {"r": {"checks": {"line": {"assert": "count of xs whose w is in pr.l and whose v is in $params.l is 0", "for": "every ys as m"}}, "subject": "pr"}}, "subjects": {"pr": {"from": "prs", "identified_by": "id"}}},
     "cases": [
       {
         "description": "names the $params root first and each root once",
@@ -2542,7 +2542,7 @@
   },
   {
     "description": "a root of a for line with if any, on an empty list",
-    "policy": {"ergo_spec": "v0.6-dev", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"line": {"for": "every xs whose v is in pr.z, if any, as m", "assert": "m.v is 1"}}}}},
+    "policy": {"ergo_spec": "{{spec}}", "subjects": {"pr": {"from": "prs", "identified_by": "id"}}, "requirements": {"r": {"subject": "pr", "checks": {"line": {"for": "every xs whose v is in pr.z, if any, as m", "assert": "m.v is 1"}}}}},
     "cases": [
       {
         "description": "names only the root, because if any lets the list be empty",

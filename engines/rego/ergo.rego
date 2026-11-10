@@ -12854,7 +12854,6 @@ _m_off_path(p) if {
 
 _m_off_path(p) if {
 	is_array(p)
-	count(p) > 1
 	_builtin(p)
 	not _item_keyed(p)
 }
@@ -12876,7 +12875,7 @@ _m_cond_root_texts(subj, c) := _once([m |
 	some p in sort(_root_reads(c))
 	_root_state(subj, c, p, set()) == st
 	m := _m_for_root_text(subj, c, p, st)
-]) if object.get(c, "ergo/for", false)
+]) if object.get(c, "ergo/for", false) == true
 
 else := _m_root_texts_all(subj, c)
 
@@ -12920,7 +12919,7 @@ _walking_root(c, p) if {
 }
 
 _walking_root(c, p) if {
-	object.get(c, "ergo/for", false)
+	object.get(c, "ergo/for", false) == true
 	_list_cmp(c)
 	not _one_right(c)
 	_rpath(c.right) == p
@@ -12957,10 +12956,10 @@ _root_state(subj, c, p, lists) := "not_an_object" if {
 } else := "unusable" if {
 	_root_kind(subj, c, p)
 } else := _any_read_state(subj, _as_subject_part(p)) if {
-	object.get(c, "ergo/for", false)
+	object.get(c, "ergo/for", false) == true
 	not _builtin(p)
 } else := _any_read_state(subj, p) if {
-	object.get(c, "ergo/for", false)
+	object.get(c, "ergo/for", false) == true
 	_has_field_step(p)
 } else := _root_list_state(subj, p, lists)
 
@@ -12987,7 +12986,7 @@ _root_kind(subj, c, p) := _m_right_kind(cmp, v) if {
 	_right_root(c, p)
 	k := _m_right_needs(c, _root_value(subj, p))
 } else := "text" if {
-	object.get(c, "ergo/for", false)
+	object.get(c, "ergo/for", false) == true
 	_builtin(p)
 	_keys_by(c, p)
 	_ref_state(p) == "value"

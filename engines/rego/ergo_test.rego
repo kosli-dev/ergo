@@ -6800,7 +6800,7 @@ test_a_whose_that_reads_a_parent_through_a_for_name_lists_the_part_before_the_na
 }
 
 _for_sentence_root_rows(checks, subject) := {r.check: [r.cause, r.message] |
-	some r in ergo.report({"things": [object.union(subject, {"id": 1})]}, {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": checks}}}, {}).results
+	some r in ergo.report({"things": [object.union(subject, {"id": 1})]}, {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": checks}}}, {}).results
 	not startswith(r.check, "$")
 }
 
@@ -6826,14 +6826,14 @@ test_a_roots_problem_comes_first_once_and_each_item_keeps_its_own_problems if {
 }
 
 test_a_roots_problem_said_once_still_lists_every_failed_item if {
-	rep := ergo.report({"things": [{"id": 1, "xs": [{"v": 1}, {"v": 3}]}]}, {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as m", "assert": ["m.v is 2", "m.v is at least z"]}}}}}, {})
+	rep := ergo.report({"things": [{"id": 1, "xs": [{"v": 1}, {"v": 3}]}]}, {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as m", "assert": ["m.v is 2", "m.v is at least z"]}}}}}, {})
 	some r in rep.results
 	r.check == "c"
 	[[f.item, f.cause, [a.cause | some a in f.failed_assertions]] | some f in r.failed_items] == [["item 1 of xs", "absent", ["value", "absent"]], ["item 2 of xs", "absent", ["value", "absent"]]]
 }
 
 test_a_null_on_the_items_own_path_is_named_after_a_roots_problem if {
-	policy := {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}}
+	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}}
 	input_doc := {"things": [{"id": 1, "rs": [{"x": null}, {"x": {}}]}]}
 	msgs := {[p, r.cause, r.message] | some p in [{}, {"i": null}, {"i": [1]}]; some r in ergo.report(input_doc, policy, p).results; r.check == "c"}
 	msgs == {
@@ -6859,14 +6859,14 @@ test_a_sentence_that_doesnt_read_the_item_is_said_once_whatever_its_cause if {
 }
 
 test_a_params_sentence_that_doesnt_read_the_item_is_said_once if {
-	policy := {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"q": {"for": "every xs as m", "assert": "$params.q exists"}}}}}
+	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"q": {"for": "every xs as m", "assert": "$params.q exists"}}}}}
 	input_doc := {"things": [{"id": 1, "xs": [{"v": 1}, {"v": 2}]}]}
 	msgs := {[p, r.cause, r.message, count(r.failed_items)] | some p in [{}, {"q": null}]; some r in ergo.report(input_doc, policy, p).results; r.check == "q"}
 	msgs == {[{}, "value", "$params.q is missing", 2], [{"q": null}, "value", "$params.q is null", 2]}
 }
 
 test_failed_items_lists_every_item_when_the_list_a_sentence_looks_in_isnt_a_list if {
-	policy := {"ergo_spec": "v0.6-dev", "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as m", "assert": "m.v is in $params.q"}}}}}
+	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as m", "assert": "m.v is in $params.q"}}}}}
 	input_doc := {"things": [{"id": 1, "xs": [{"v": 1}, {}]}]}
 	rows := {[q, r.cause, r.message, [[f.item, f.cause, [[a.assertion, a.cause] | some a in f.failed_assertions]] | some f in r.failed_items]] |
 		some q in ["s", 3, {"a": 1}]
@@ -12524,8 +12524,97 @@ test_both_sides_of_a_comparison_are_named_when_one_is_missing_and_the_other_null
 	rows.c == ["absent", "c.z is missing, and d is null"]
 }
 
+test_a_for_line_reads_a_bare_params_once_before_any_item_whatever_the_list_holds if {
+	least := {"c": {"for": "every xs as m", "assert": "m.v is at least $params"}}
+	_root_rows(least, {"id": "p", "xs": []}, null).c == ["absent", "$params is missing; xs is []"]
+	_root_rows(least, {"id": "p"}, null).c == ["absent", "$params is missing; xs is missing"]
+	_root_rows(least, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, null).c == ["absent", "$params is missing"]
+	_root_rows(least, {"id": "p", "xs": []}, {}).c == ["unusable", "$params is {}, which isn't a number; xs is []"]
+	_root_rows(least, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, {}).c == ["unusable", "$params is {}, which isn't a number"]
+	_root_rows(least, {"id": "p", "xs": []}, "s").c == ["unusable", "$params is \"s\", which isn't an object"]
+}
+
+test_a_for_line_compares_a_bare_params_before_any_item_and_names_the_empty_list_after_it if {
+	is_3 := {"c": {"for": "every xs as m", "assert": "$params is 3"}}
+	_root_rows(is_3, {"id": "p", "xs": []}, null).c == ["absent", "$params is missing; xs is []"]
+	_root_rows(is_3, {"id": "p", "xs": [{"v": 1}]}, null).c == ["absent", "$params is missing"]
+	_root_rows(is_3, {"id": "p", "xs": []}, {}).c == ["value", "xs is []"]
+	_root_rows(is_3, {"id": "p", "xs": []}, 3).c == ["unusable", "$params is 3, which isn't an object"]
+}
+
+test_a_for_line_reads_a_bare_input_before_any_item_and_names_the_empty_list_after_it if {
+	least := {"c": {"for": "every xs as m", "assert": "m.v is at least $input"}}
+	_root_rows(least, {"id": "p", "xs": []}, {}).c == ["unusable", "$input is {\"prs\": [{\"id\": \"p\", \"xs\": []}]}, which isn't a number; xs is []"]
+	_root_rows(least, {"id": "p", "xs": [{"v": 1}]}, {}).c == ["unusable", "$input is {\"prs\": [{\"id\": \"p\", \"xs\": [{\"v\": 1}]}]}, which isn't a number"]
+}
+
+test_a_bare_params_in_a_whose_is_read_once_with_no_item_in_front if {
+	whose := {"c": {"for": "every xs whose v is in $params as m", "assert": "m.v is 1"}}
+	_root_rows(whose, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, null).c == ["absent", "$params is missing"]
+	_root_rows(whose, {"id": "p", "xs": []}, 3).c == ["unusable", "$params is 3, which isn't an object"]
+	count_whose := {"c": "count of xs whose v is in $params is 0"}
+	_root_rows(count_whose, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, 3).c == ["unusable", "$params is 3, which isn't a list"]
+	_root_rows(count_whose, {"id": "p", "xs": []}, null).c == ["absent", "$params is missing"]
+}
+
+test_a_check_with_a_for_key_and_no_op_is_a_for_check if {
+	ergo._for_check({"for": "every xs as m", "assert": "m.v is 1"})
+	ergo._for_check({"op": "for"})
+	not ergo._for_check({"op": "all_of"})
+}
+
+test_a_path_with_a_ref_step_that_cant_be_read_is_flawed if {
+	path := ["x", {"ref": ["$$params", "k"]}]
+	ergo._ref_step_flawed(path) with data.ergo_params as {}
+	ergo._ref_step_flawed(path) with data.ergo_params as {"k": 3}
+	not ergo._ref_step_flawed(path) with data.ergo_params as {"k": "a"}
+}
+
+test_a_for_row_with_no_failed_item_says_what_the_empty_list_found if {
+	ergo._for_item_text({"items": [{"path": ["xs"]}]}, {"xs": []}, {"cause": "value", "failed": []}, []) == "xs is []"
+}
+
+test_a_null_on_the_path_stops_the_read_at_the_step_after_the_first_key if {
+	ergo._null_stop_at({"c": null}, ["c", "z"]) == 1
+}
+
+test_a_right_side_that_is_a_ref_is_the_root_it_reads if {
+	ergo._right_root({"right": {"ref": ["$$params", "q"]}}, ["$$params", "q"])
+	ergo._right_root({"right": ["$$params", "q"]}, ["$$params", "q"])
+}
+
+test_a_root_message_said_inside_another_is_not_said_again if {
+	ergo._with_roots(["x is 1"], ["y is missing"]) == ["y is missing", "x is 1"]
+	ergo._with_roots(["y is missing", "x is 1"], ["y is missing"]) == ["y is missing", "x is 1"]
+	ergo._with_roots(["item 1 of xs: y is missing"], ["y is missing"]) == ["item 1 of xs: y is missing"]
+}
+
+test_a_for_row_that_only_names_roots_has_no_item_text if {
+	ergo._for_item_text({}, {}, {"root_msgs": ["a"], "failed": []}, ["a"]) == ""
+}
+
+test_a_second_for_roots_problem_is_added_to_the_row_in_every_state_the_row_can_be_in if {
+	xs := [{"fl": "absent", "ms": ["m"]}]
+	ergo._for_second_rooted({"cause": "value", "failed": [{}]}, xs) == {"cause": "absent", "failed": [{}], "other_roots": ["m"]}
+	ergo._for_second_rooted({"cause": "value", "failed": [{"failed_assertions": [1]}]}, xs) == {"cause": "absent", "failed": [], "root_msgs": ["m"]}
+	ergo._for_second_rooted({"cause": "unusable", "failed": [{"failed_assertions": [1]}]}, xs) == {"cause": "unusable", "failed": [{"failed_assertions": [1]}], "other_roots": ["m"]}
+}
+
+test_a_for_list_that_failed_names_what_it_found_whatever_narrowed_it if {
+	ergo._m_for_empty({"items": [{"path": ["xs"]}]}, {"xs": []}, "value") == ["xs is []"]
+	ergo._m_for_empty({"items": [{"path": ["xs"], "whose": [{"op": "present", "path": ["v"]}]}]}, {"xs": []}, "value") == ["xs is []"]
+	ergo._m_for_empty({"items": [{"path": ["xs"]}]}, {"xs": [1]}, "value") == ["xs is [1]"]
+	ergo._m_for_empty({"items": [{"path": ["xs"]}], "assert": "m.v is 1"}, {"xs": "s"}, "value") == ["the check is false"]
+}
+
+test_a_ref_that_is_not_a_list_names_the_kind_of_list_the_phrase_needs if {
+	ergo._m_leaf_needs({"op": "includes", "values": {"ref": ["$$params", "q"]}}, "s") == "a list"
+	ergo._m_leaf_needs({"op": "includes", "values": {"ref": ["$$params", "q"]}}, []) == "a list with at least one value"
+	ergo._m_leaf_needs({"op": "matches", "patterns": {"ref": ["$$params", "q"]}}, "s") == "a list"
+}
+
 _params_not_object_policy := {
-	"ergo_spec": "v0.6-dev",
+	"ergo_spec": ergo._spec,
 	"subjects": {"pr": {"from": "prs", "identified_by": "id"}},
 	"requirements": {"r": {"subject": "pr", "checks": {
 		"least_z": {"for": "every xs as m", "assert": "m.v is at least z"},

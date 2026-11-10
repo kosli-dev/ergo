@@ -7736,6 +7736,13 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("m.v is 2", "m.v is 2", &[], &[]),
     ("z exists", "z exists", &[], &[]),
     ("$params.q exists", "$params.q exists", &[], &[]),
+    ("$params is 3", "$params is 3", &[], &[]),
+    (
+        "m.v is at least $params",
+        "m.v is at least $params",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
