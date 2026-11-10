@@ -7743,6 +7743,25 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
         &[],
     ),
+    (
+        "$params named by k is 1",
+        "$params named by k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "$params named by m.k is 1",
+        "$params named by m.k is 1",
+        &[],
+        &[],
+    ),
+    (
+        "$params.q named by m.k is 1",
+        "$params.q named by m.k is 1",
+        &[],
+        &[],
+    ),
+    ("x is at least m.v", "x is at least m.v", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -11537,6 +11556,60 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("every xs, if any, as m", "every xs, if any, as m", &[], &[]),
+    (
+        "every xs as m, every $params.q as x",
+        "every xs as m, every $params.q as x",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose k is in $params.q and whose v is 1 as m",
+        "every xs whose k is in $params.q and whose v is 1 as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose k is in pl.z and whose v is 1 as m",
+        "every xs whose k is in pl.z and whose v is 1 as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is 1 and whose k is in $params.q as m",
+        "every xs whose v is 1 and whose k is in $params.q as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is 1 and whose k is in pl.z as m",
+        "every xs whose v is 1 and whose k is in pl.z as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is at least $input.top.q as m",
+        "every xs whose v is at least $input.top.q as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is at least $params.q as m",
+        "every xs whose v is at least $params.q as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is at least pl.z as m",
+        "every xs whose v is at least pl.z as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs whose v is at least pr.z as m",
+        "every xs whose v is at least pr.z as m",
+        &[],
+        &[],
+    ),
 ];
 
 pub const FOR_ERRORS: &[(&str, &[&str])] = &[
