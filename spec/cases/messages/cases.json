@@ -1550,7 +1550,7 @@
         "rules": ["message.empty"],
         "input": {"things": [{"id": "t1", "xs": [{"k": 1}]}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "x.k is in $params.l", "cause": "unusable", "inputs": [{"locations": ["/things/0/xs/0/k"], "name": "x.k", "value": 1}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": {"k": 1}}], "inputs": [{"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"k": 1}]}], "message": "$params.l is \"no\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "unusable", "failed_assertions": [{"assertion": "x.k is in $params.l", "cause": "unusable", "inputs": [{"locations": ["/things/0/xs/0/k"], "name": "x.k", "value": 1}, {"locations": ["$params:/l"], "name": "$params.l", "value": "no"}]}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": {"k": 1}}], "inputs": [{"locations": ["$params:/l"], "name": "$params.l", "value": "no"}, {"locations": ["/things/0/xs/0"], "name": "xs[]", "value": [{"k": 1}]}], "message": "$params.l is \"no\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       },
       {
@@ -1558,7 +1558,7 @@
         "rules": ["message.empty"],
         "input": {"things": [{"id": "t1"}]},
         "results": [
-          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "xs", "locations": ["/things/0"], "path": "xs", "value": null}], "inputs": [{"locations": [], "name": "xs", "value": []}], "message": "$params.l is \"no\", which isn't a list; xs is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "failed_items": [{"cause": "absent", "failed_assertions": [], "item": "xs", "locations": ["/things/0"], "path": "xs", "value": null}], "inputs": [{"locations": ["$params:/l"], "name": "$params.l", "value": "no"}, {"locations": [], "name": "xs", "value": []}], "message": "$params.l is \"no\", which isn't a list; xs is missing", "passed": false, "requirement": "s", "subject": {"id": "t1", "type": "thing"}}
         ]
       }
     ]
@@ -1960,7 +1960,7 @@
         "input": {"prs": [{"c": {"z": "s"}, "id": "p", "xs": [], "z": "s"}], "z": 5},
         "results": [
           {"cause": "unusable", "check": "for", "failed_items": [{"cause": "value", "failed_assertions": [], "item": "xs", "locations": ["/prs/0/xs"], "path": "xs", "value": []}], "inputs": [{"locations": [], "name": "xs[]", "value": []}], "message": "pr.z is \"s\", which isn't a list; xs is []", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
-          {"cause": "unusable", "check": "input", "inputs": [{"locations": [], "name": "count of xs whose v is not in $input.z", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$input.z is 5, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
+          {"cause": "unusable", "check": "input", "inputs": [{"locations": [], "name": "count of xs whose v is not in $input.z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": ["/z"], "name": "$input.z", "value": 5}], "message": "$input.z is 5, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
           {"cause": "unusable", "check": "params", "inputs": [{"locations": [], "name": "count of xs whose v is in $params.q", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.q is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
           {"cause": "unusable", "check": "part", "inputs": [{"locations": [], "name": "count of xs whose v is in pl.z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": ["/prs/0/c/z"], "name": "pl.z", "part": {"id": null, "name": "pl"}, "value": "s"}], "message": "pl.z is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
           {"cause": "unusable", "check": "some", "failed_items": [], "inputs": [{"locations": ["/prs/0/z"], "name": "pr.z", "value": "s"}, {"locations": [], "name": "xs[]", "value": []}], "message": "pr.z is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
@@ -2102,7 +2102,7 @@
         "input": {"prs": [{"id": "p", "xs": [{"v": 1}, {"v": 2}], "z": "s"}], "z": 5},
         "results": [
           {"cause": "unusable", "check": "for", "failed_items": [{"cause": "unusable", "failed_assertions": [], "item": "item 1 of xs", "locations": ["/prs/0/xs/0"], "path": "item 1 of xs", "value": {"v": 1}}, {"cause": "unusable", "failed_assertions": [], "item": "item 2 of xs", "locations": ["/prs/0/xs/1"], "path": "item 2 of xs", "value": {"v": 2}}], "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "pr.z is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
-          {"cause": "unusable", "check": "input", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs whose v is not in $input.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "$input.z is 5, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
+          {"cause": "unusable", "check": "input", "inputs": [{"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "count of xs whose v is not in $input.z", "value": null}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}, {"locations": ["/z"], "name": "$input.z", "value": 5}], "message": "$input.z is 5, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}},
           {"cause": "unusable", "check": "some", "failed_items": [{"cause": "unusable", "item": "item 1 of xs", "locations": ["/prs/0/xs/0/v"], "path": "xs[0].v", "value": 1}, {"cause": "unusable", "item": "item 2 of xs", "locations": ["/prs/0/xs/1/v"], "path": "xs[1].v", "value": 2}], "inputs": [{"locations": ["/prs/0/z"], "name": "pr.z", "value": "s"}, {"locations": ["/prs/0/xs/0", "/prs/0/xs/1"], "name": "xs[]", "value": [{"v": 1}, {"v": 2}]}], "message": "pr.z is \"s\", which isn't a list", "passed": false, "requirement": "r", "subject": {"id": "p", "type": "pr"}}
         ]
       }
@@ -2219,7 +2219,7 @@
         "input": {"c": null, "prs": [{"id": "p0", "xs": []}]},
         "results": [
           {"cause": "null", "check": "deeper", "inputs": [{"locations": [], "name": "count of xs whose v is in $params.d.z.w", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.d.z is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
-          {"cause": "null", "check": "input", "inputs": [{"locations": [], "name": "count of xs whose v is in $input.c.z", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$input.c is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
+          {"cause": "null", "check": "input", "inputs": [{"locations": [], "name": "count of xs whose v is in $input.c.z", "value": null}, {"locations": [], "name": "xs[]", "value": []}, {"locations": ["/c"], "name": "$input.c.z", "value": null}], "message": "$input.c is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}},
           {"cause": "null", "check": "params", "inputs": [{"locations": [], "name": "count of xs whose v is in $params.c.z", "value": null}, {"locations": [], "name": "xs[]", "value": []}], "message": "$params.c is null", "passed": false, "requirement": "r", "subject": {"id": "p0", "type": "pr"}}
         ]
       }

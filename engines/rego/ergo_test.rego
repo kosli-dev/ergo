@@ -5238,7 +5238,7 @@ test_null_params_read_by_a_key_from_the_item_say_what_params_that_are_missing_sa
 
 test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs if {
 	rows := _for_rows({"for": "every xs as x", "assert": "x is one of $params.l"}, [{"id": 1, "xs": [1]}, "s"], {"l": "text"})
-	rows == [[1, "unusable", [{"cause": "unusable", "failed_assertions": [{"assertion": "x is in $params.l", "cause": "unusable"}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], [{"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}]], ["s", "unusable", [], [{"name": "xs", "value": [], "locations": []}]]]
+	rows == [[1, "unusable", [{"cause": "unusable", "failed_assertions": [{"assertion": "x is in $params.l", "cause": "unusable"}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], [{"name": "$params.l", "value": "text", "locations": ["$params:/l"]}, {"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}]], ["s", "unusable", [], [{"name": "$params.l", "value": "text", "locations": ["$params:/l"]}, {"name": "xs", "value": [], "locations": []}]]]
 	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [{"x": 1}]}], {"l": "text"})] == ["unusable"]
 	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["unusable"]
 }
@@ -7243,6 +7243,33 @@ test_a_ref_after_a_list_phrase_shows_what_it_read_and_where if {
 		{"name": "x", "value": "z", "locations": ["/things/0/x"]},
 		{"name": "$input.ks[].n", "value": ["a", "b"], "locations": ["/ks/0/n", "/ks/1/n"]},
 	]]
+}
+
+test_every_some_count_and_for_rows_list_a_ref_after_a_list_phrase_where_is_at_least_lists_its_right_side if {
+	doc := {"things": [{"id": "t", "xs": [{"n": 1, "s": "a"}]}], "l": [2], "p": ["^a"], "z": 5}
+	every pair in [
+		["every xs.n is in $input.l", "every xs.n is at least $input.z"],
+		["every xs.n is not in $params.l", "every xs.n is at least $params.z"],
+		["some xs.s matches $input.p", "some xs.s is at least $input.z"],
+		["count of xs whose n is in $input.l is 1", "count of xs whose n is at least $input.z is 1"],
+		["count of xs whose s matches $params.p is 1", "count of xs whose n is at least $params.z is 1"],
+		[{"for": "every xs as x", "assert": "x.n is in $params.l"}, {"for": "every xs as x", "assert": "x.n is at least $params.z"}],
+		[{"for": "every xs as x", "assert": "x.s does not match $input.p"}, {"for": "every xs as x", "assert": "x.n is at least $input.z"}],
+		[{"for": "every xs as x", "assert": "every xs.n is in $input.l"}, {"for": "every xs as x", "assert": "every xs.n is at least $input.z"}],
+	] {
+		r := ergo.report(doc, _sentence_policy({"a": pair[0], "b": pair[1]}), {"l": [2], "p": ["^a"], "z": 5})
+		names := {row.check: [_twin_name(i.name) | some i in row.inputs] | some row in r.results; row.check in {"a", "b"}}
+		names.a == names.b
+	}
+}
+
+_twin_name(name) := "count" if startswith(name, "count of")
+
+_twin_name(name) := "right" if name in {"$input.l", "$input.p", "$input.z", "$params.l", "$params.p", "$params.z"}
+
+_twin_name(name) := name if {
+	not startswith(name, "count of")
+	not name in {"$input.l", "$input.p", "$input.z", "$params.l", "$params.p", "$params.z"}
 }
 
 test_a_violation_lists_a_ref_once_when_the_row_lists_it_already if {

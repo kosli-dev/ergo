@@ -7834,6 +7834,73 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("x is not in $params.l", "x is not in $params.l", &[], &[]),
+    (
+        "count of xs whose n is at least $input.z is 1",
+        "count of xs whose n is at least $input.z is 1",
+        &[],
+        &[],
+    ),
+    (
+        "count of xs whose n is in $input.l is 1",
+        "count of xs whose n is in $input.l is 1",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.n is at least $input.z",
+        "every xs.n is at least $input.z",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.n is at least $params.z",
+        "every xs.n is at least $params.z",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.n is in $input.l",
+        "every xs.n is in $input.l",
+        &[],
+        &[],
+    ),
+    (
+        "every xs.n is in $params.l",
+        "every xs.n is in $params.l",
+        &[],
+        &[],
+    ),
+    (
+        "some xs.n is at least $input.z",
+        "some xs.n is at least $input.z",
+        &[],
+        &[],
+    ),
+    (
+        "some xs.s matches $input.p",
+        "some xs.s matches $input.p",
+        &[],
+        &[],
+    ),
+    (
+        "x.n is at least $input.z",
+        "x.n is at least $input.z",
+        &[],
+        &[],
+    ),
+    (
+        "x.n is at least $params.z",
+        "x.n is at least $params.z",
+        &[],
+        &[],
+    ),
+    ("x.n is in $params.l", "x.n is in $params.l", &[], &[]),
+    (
+        "x.w contains all of $input.l",
+        "x.w contains all of $input.l",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

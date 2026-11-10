@@ -1089,6 +1089,26 @@ requirements:
 
 They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `includes_some`, `not_includes_all`, `matches_any` and `not_matches_any`, and only sentences can use those. The row has the same `passed` and `cause` as the sentence with `$params.required_tickets` holding that field's value, and the field is in the row's `inputs` after the left side. A `$params` or `$input` path after these phrases, like `$params.regions` or `$input.sbom.components.name`, is in the row's `inputs` after the left side too, with `null` when nothing was read, and stays in the check's `$refs`, so a violation lists it once. A field on the right that's missing or `null` fails the row as `absent` or `null`, whatever the left side is. One that can't be used fails it as `unusable`: not a list after `is in`, `is not in`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match`, an empty list after `contains all of`, `contains none of`, `contains some of` and `does not contain all of`, and patterns that aren't all valid regular expressions. Only when the right side can be used does the left side's own cause count.
 
+The rows of `every`, `some` and `count of` list such a path where they list the right side of `is at least`: one from `$input` is listed, and one from `$params` isn't, since those rows leave `$params` to `$refs`. A `for` line's own row lists one from either. With the release `{"id": "r1", "approvers": [{"username": "ann"}, {"username": "zed"}]}` in `releases`, `"staff": ["ann", "bob"]` in the input and `{"staff": ["ann", "bob"]}` as params, `every approvers.username is in $input.staff` has the `inputs`
+
+```json
+[
+  {"locations": ["/staff"], "name": "$input.staff", "value": ["ann", "bob"]},
+  {"locations": ["/releases/0/approvers/0/username", "/releases/0/approvers/1/username"], "name": "approvers[].username", "value": ["ann", "zed"]}
+]
+```
+
+and `for: every approvers as approver` with `approver.username is in $params.staff` has
+
+```json
+[
+  {"locations": ["$params:/staff"], "name": "$params.staff", "value": ["ann", "bob"]},
+  {"locations": ["/releases/0/approvers/0", "/releases/0/approvers/1"], "name": "approvers[]", "value": [{"username": "ann"}, {"username": "zed"}]}
+]
+```
+
+on the row, and the same `$params.staff` entry after `approver.username` in the failed assertion of item 2.
+
 A path on the right that goes through a list of objects is walked the way a path after `every` is, and the phrase compares with the list of what the path ends at in each item. With this policy and this input:
 
 ```yaml

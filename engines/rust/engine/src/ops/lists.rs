@@ -321,6 +321,48 @@ fn walked_read(walk: Walked, inputs: Vec<Input>) -> RightRead {
     }
 }
 
+fn read_list_right(check: &Check) -> Option<(&Right, bool)> {
+    match check {
+        Check::In(check) => Some((&check.values, true)),
+        Check::Contains(check) => match &check.wanted {
+            Wanted::One(right) => Some((right, false)),
+            Wanted::All(right) | Wanted::Some(right) => Some((right, true)),
+        },
+        Check::Matches(check) => Some((&check.patterns, true)),
+        _ => None,
+    }
+}
+
+fn named(path: &Path) -> bool {
+    path.steps.iter().any(|step| match step {
+        Step::Field(_) => true,
+        Step::Ref(reference) => matches!(reference.start, Start::Alias(_)),
+        _ => false,
+    })
+}
+
+pub(super) fn ref_inputs(check: &Check, ctx: &Ctx, params_too: bool) -> Vec<Input> {
+    let Some((right, walks)) = read_list_right(check) else {
+        return Vec::new();
+    };
+    right
+        .ref_paths()
+        .into_iter()
+        .filter(|path| !named(path) && (params_too || matches!(path.start, Start::Input)))
+        .flat_map(|path| read_right(&Right::Ref(path.clone()), ctx, walks).inputs)
+        .collect()
+}
+
+pub(super) fn named_refs(check: &Check) -> Vec<&Path> {
+    read_list_right(check).map_or_else(Vec::new, |(right, _)| {
+        right
+            .ref_paths()
+            .into_iter()
+            .filter(|path| named(path))
+            .collect()
+    })
+}
+
 fn read_right(right: &Right, ctx: &Ctx, walks: bool) -> RightRead {
     match right {
         Right::Written(value) => RightRead {
