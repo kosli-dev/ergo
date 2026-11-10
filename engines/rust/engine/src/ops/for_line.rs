@@ -1235,7 +1235,7 @@ impl For {
                         .iter()
                         .filter(|d| d.cause == Cause::Ambiguous)
                         .collect();
-                    if !ties.is_empty() && !second {
+                    if !ties.is_empty() && (!second || self.tied_per_item()) {
                         if leaf.is_empty() {
                             parts.push(self.tie_text(&ties, depth + 1));
                         } else {
@@ -1653,7 +1653,7 @@ impl For {
             .flat_map(|s| nested_whose(&s.check, false))
             .collect();
         let outer = outer_ctx(ctx);
-        let outer_flaw = super::message::root_flaw_ordered(&whose, &outer, &counted, &nested);
+        let outer_flaw = super::message::root_flaw_in_for(&whose, &outer, &counted, &nested);
         let forms: Vec<Check> = self
             .sentences
             .iter()
@@ -1812,8 +1812,8 @@ impl For {
             .flat_map(|item| item.whose.iter())
             .collect();
         sentence_root_flaw(&forms, outer).is_some()
-            || super::message::root_flaw(&nested, outer).is_some()
-            || super::message::root_flaw(&whose, outer).is_some()
+            || super::message::root_flaw_in_for(&nested, outer, &[], &[]).is_some()
+            || super::message::root_flaw_in_for(&whose, outer, &[], &[]).is_some()
     }
 
     fn second_roots(&self, ctx: &Ctx) -> Option<(Cause, Vec<String>, Vec<String>)> {
@@ -2387,6 +2387,17 @@ impl For {
 
     fn shared_second(&self) -> bool {
         self.items.len() == 2 && !reads_path(&self.items[1].path, &self.items[0].alias)
+    }
+
+    fn tied_per_item(&self) -> bool {
+        let [first, second] = self.items.as_slice() else {
+            return false;
+        };
+        matches!(second.how, How::Pick { .. })
+            && second
+                .whose
+                .iter()
+                .any(|check| reads_alias(check, &first.alias))
     }
 }
 
@@ -4469,5 +4480,128 @@ mod tests {
             message,
             "$params.l is missing; item 1 of xs: m is null; item 2 of xs: m is {\"k\": \"a\"}, which isn't text"
         );
+    }
+
+    const TIED: &str = "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v";
+    const TIE_LINE: &str = "every xs as p, first of xs whose k is p.k sorted by v as m";
+
+    #[test]
+    fn params_that_are_not_an_object_leave_a_tie_ambiguous_when_the_check_does_not_read_them() {
+        for params in [
+            json!(3),
+            json!([]),
+            json!("s"),
+            json!(true),
+            json!({}),
+            json!(null),
+        ] {
+            let (cause, message) = pr_row(
+                json!(null),
+                TIE_LINE,
+                json!("m.v is 1"),
+                json!({"xs": [{"k": "a", "v": 1}, {"k": "a", "v": 1}]}),
+                params,
+            );
+            assert_eq!(cause, "ambiguous");
+            assert_eq!(message, TIED);
+        }
+    }
+
+    #[test]
+    fn params_that_are_not_an_object_are_named_before_a_tie_when_the_check_reads_them() {
+        for (params, said) in [
+            (json!(3), "$params is 3, which isn't an object"),
+            (json!([]), "$params is [], which isn't an object"),
+            (json!("s"), "$params is \"s\", which isn't an object"),
+            (json!(true), "$params is true, which isn't an object"),
+            (json!({}), "$params.n is missing"),
+            (json!(null), "$params.n is missing"),
+        ] {
+            let (cause, message) = pr_row(
+                json!(null),
+                TIE_LINE,
+                json!("m.v is at least $params.n"),
+                json!({"xs": [{"k": "a", "v": 1}, {"k": "a", "v": 1}]}),
+                params,
+            );
+            assert_eq!(cause, "ambiguous");
+            assert_eq!(message, format!("{said}; {TIED}"));
+        }
+    }
+
+    #[test]
+    fn params_that_are_not_an_object_still_fail_a_check_without_a_tie_as_unusable() {
+        for params in [json!(3), json!([]), json!("s"), json!(true)] {
+            for assertion in ["m.v is at least 1", "m.v is at least $params.n"] {
+                let (cause, _) = pr_row(
+                    json!(null),
+                    "every xs as m",
+                    json!(assertion),
+                    json!({"xs": ["s", null]}),
+                    params.clone(),
+                );
+                assert_eq!(cause, "unusable");
+            }
+        }
+    }
+
+    #[test]
+    fn a_part_that_holds_a_list_fails_a_count_of_whose_under_a_for_line_as_unusable() {
+        for (part, shown) in [(json!([]), "[]"), (json!([{"z": 1}]), "[{\"z\": 1}]")] {
+            for xs in [json!([{"v": 1, "ys": [{"v": 1}]}]), json!([])] {
+                for assertion in [
+                    "count of xs whose v is in pl.z is 0",
+                    "count of m.ys whose v is in pl.z is 0",
+                    "count of xs whose v is in pl.z is at least 0",
+                ] {
+                    let (cause, message) = pr_row(
+                        json!({"pl": "c"}),
+                        "every xs as m",
+                        json!(assertion),
+                        json!({"c": part, "xs": xs}),
+                        json!({}),
+                    );
+                    assert_eq!(cause, "unusable");
+                    assert!(
+                        message
+                            .as_str()
+                            .unwrap()
+                            .starts_with(&format!("pl is {shown}, which isn't an object")),
+                        "{message}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn a_part_that_is_text_null_missing_or_an_object_with_a_list_is_read_as_before_in_a_count_of_whose()
+     {
+        let xs = json!([{"v": 1}]);
+        for (fields, cause, said) in [
+            (
+                json!({"c": "s", "xs": xs}),
+                "unusable",
+                "pl is \"s\", which isn't an object",
+            ),
+            (json!({"c": null, "xs": xs}), "null", "pl is null"),
+            (json!({"xs": xs}), "absent", "pl.z is missing"),
+            (
+                json!({"c": {"z": [1]}, "xs": xs}),
+                "value",
+                "count of xs whose v is in pl.z is 1",
+            ),
+            (json!({"c": {"z": [2]}, "xs": xs}), "satisfied", ""),
+        ] {
+            let (found, message) = pr_row(
+                json!({"pl": "c"}),
+                "every xs as m",
+                json!("count of xs whose v is in pl.z is 0"),
+                fields,
+                json!({}),
+            );
+            assert_eq!(found, cause);
+            assert_eq!(message.as_str().unwrap_or(""), said);
+        }
     }
 }

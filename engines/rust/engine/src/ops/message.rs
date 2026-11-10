@@ -1481,6 +1481,25 @@ pub fn root_flaw_ordered(
     refs_first: &[&Check],
     keys_left: &[&Check],
 ) -> Option<(Cause, String)> {
+    root_flaw_with(checks, ctx, refs_first, keys_left, false)
+}
+
+pub fn root_flaw_in_for(
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+    keys_left: &[&Check],
+) -> Option<(Cause, String)> {
+    root_flaw_with(checks, ctx, refs_first, keys_left, true)
+}
+
+fn root_flaw_with(
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+    keys_left: &[&Check],
+    parts_fail: bool,
+) -> Option<(Cause, String)> {
     let mut found: Vec<(usize, Cause, String, bool)> = Vec::new();
     let mut refs: Vec<String> = Vec::new();
     for (at, check) in checks.iter().enumerate() {
@@ -1516,7 +1535,9 @@ pub fn root_flaw_ordered(
                 }) {
                     continue;
                 }
+                let part = matches!(&root.start, Start::Part(part) if !part.steps.is_empty());
                 if lists::right_paths(check).contains(&&root)
+                    && !(part && parts_fail)
                     && lists::walked_in(check, &root, ctx).is_some()
                 {
                     continue;

@@ -7774,6 +7774,12 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
     ("m.v is in pl.z", "m.v is in pl.z", &[], &[]),
     ("m.v matches pl.z", "m.v matches pl.z", &[], &[]),
     ("m.v named by m.v is 1", "m.v named by m.v is 1", &[], &[]),
+    (
+        "count of m.ys whose v is in pl.z is 0",
+        "count of m.ys whose v is in pl.z is 0",
+        &[],
+        &[],
+    ),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[
@@ -11619,6 +11625,12 @@ pub const FOR_OK: &[(&str, &str, &[&str], &[&str])] = &[
     (
         "every xs whose v is at least pr.z as m",
         "every xs whose v is at least pr.z as m",
+        &[],
+        &[],
+    ),
+    (
+        "every xs as p, first of xs whose k is p.k sorted by v as m",
+        "every xs as p, first of xs whose k equals p.k sorted by v as m",
         &[],
         &[],
     ),
