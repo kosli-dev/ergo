@@ -3806,6 +3806,7 @@ passing_row := {"passed": true, "cause": "satisfied"}
 evaluation_with(rows, matching, scope_readable) := {
 	"well_formed": passing_row,
 	"unique_ids": [passing_row],
+	"unique_ancestor_ids": [],
 	"min_subjects": [passing_row],
 	"scope_readable": scope_readable,
 	"rows_complete": ergo._rows_complete(rows, matching, two_checks_req),
@@ -5999,6 +6000,7 @@ test_a_chain_reads_its_path_from_the_parents_one_subject_and_every_row_but_well_
 		[{"type": "pull request", "id": null}, "$well_formed", "satisfied"],
 		[{"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "$min_subjects", "satisfied"],
 		[{"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "$unique_ids", "satisfied"],
+		[{"type": "artifact", "id": null}, "$unique_ancestor_ids", "satisfied"],
 		[{"type": "pull request", "id": "pr/7", "in": {"artifact": "sha-1"}}, "c", "satisfied"],
 		[{"type": "pull request", "id": "pr/8", "in": {"artifact": "sha-1"}}, "c", "value"],
 	]
@@ -6386,6 +6388,7 @@ test_a_chain_from_several_parents_checks_the_subjects_of_each_and_every_row_but_
 		["$min_subjects", {"type": "pull request", "id": null, "in": {"artifact": "b"}}, "satisfied"],
 		["$unique_ids", {"type": "pull request", "id": null, "in": {"artifact": "a"}}, "satisfied"],
 		["$unique_ids", {"type": "pull request", "id": null, "in": {"artifact": "b"}}, "satisfied"],
+		["$unique_ancestor_ids", {"type": "artifact", "id": null}, "satisfied"],
 		["c", {"type": "pull request", "id": "pr/7", "in": {"artifact": "a"}}, "satisfied"],
 		["c", {"type": "pull request", "id": "pr/8", "in": {"artifact": "a"}}, "value"],
 		["c", {"type": "pull request", "id": "pr/7", "in": {"artifact": "b"}}, "satisfied"],
@@ -6454,6 +6457,7 @@ test_a_parent_whose_conditions_cant_be_decided_fails_min_subjects_on_its_row_and
 		["$min_subjects", {"type": "pull request", "id": null, "in": {"artifact": "a"}}, "satisfied"],
 		["$min_subjects", {"type": "pull request", "id": null, "in": {"artifact": "b"}}, "absent"],
 		["$unique_ids", {"type": "pull request", "id": null, "in": {"artifact": "a"}}, "satisfied"],
+		["$unique_ancestor_ids", {"type": "artifact", "id": null}, "satisfied"],
 		["c", {"type": "pull request", "id": "pr/7", "in": {"artifact": "a"}}, "satisfied"],
 	]
 	rep.requirements.r.status == "not_met"
@@ -8783,12 +8787,13 @@ test_a_parent_read_with_every_gives_its_child_subjects_per_parent if {
 		["$min_subjects", null, {"artifact": "b"}],
 		["$unique_ids", null, {"artifact": "a"}],
 		["$unique_ids", null, {"artifact": "b"}],
+		["$unique_ancestor_ids", null, null],
 		["c", "pr/7", {"artifact": "a"}],
 		["c", "pr/7", {"artifact": "b"}],
 	]
 	rep.requirements.r.status == "met"
 	broken := ergo.report({"flows": [{"artifacts": [{"fingerprint": "a", "pull_requests": [{"url": "pr/7"}]}]}, {}]}, {"ergo_spec": ergo._spec, "subjects": subjects, "requirements": {"r": {"subject": "pull request", "checks": {"c": "url exists"}}}}, {})
-	[[r.check, r.cause, object.get(r.subject, "in", null)] | some r in broken.results; r.check != "$well_formed"] == [["$min_subjects", "absent", null], ["$unique_ids", "satisfied", null]]
+	[[r.check, r.cause, object.get(r.subject, "in", null)] | some r in broken.results; r.check != "$well_formed"] == [["$min_subjects", "absent", null], ["$unique_ids", "satisfied", null], ["$unique_ancestor_ids", "satisfied", null]]
 }
 
 _three_doc := {"artifacts": [
@@ -8819,6 +8824,9 @@ test_a_chain_of_three_subjects_checks_each_grandchild_and_its_rows_list_every_an
 		["$unique_ids", {"type": "commit", "id": null, "in": {"artifact": "sha-1", "pull request": "pr/7"}}, "satisfied"],
 		["$unique_ids", {"type": "commit", "id": null, "in": {"artifact": "sha-1", "pull request": "pr/8"}}, "satisfied"],
 		["$unique_ids", {"type": "commit", "id": null, "in": {"artifact": "sha-4", "pull request": "pr/7"}}, "value"],
+		["$unique_ancestor_ids", {"type": "artifact", "id": null}, "satisfied"],
+		["$unique_ancestor_ids", {"type": "pull request", "id": null, "in": {"artifact": "sha-1"}}, "satisfied"],
+		["$unique_ancestor_ids", {"type": "pull request", "id": null, "in": {"artifact": "sha-4"}}, "satisfied"],
 		["c", {"type": "commit", "id": "c1", "in": {"artifact": "sha-1", "pull request": "pr/7"}}, "satisfied"],
 		["c", {"type": "commit", "id": "c2", "in": {"artifact": "sha-1", "pull request": "pr/7"}}, "value"],
 		["c", {"type": "commit", "id": "c1", "in": {"artifact": "sha-4", "pull request": "pr/7"}}, "satisfied"],
@@ -8863,6 +8871,8 @@ test_an_ancestor_of_a_chain_of_three_subjects_that_cant_be_decided_fails_min_sub
 	[[r.check, r.subject, r.cause] | some r in rep.results; r.check != "$well_formed"] == [
 		["$min_subjects", {"type": "commit", "id": null, "in": {"artifact": "sha-1"}}, "absent"],
 		["$min_subjects", {"type": "commit", "id": null, "in": {"artifact": "sha-2", "pull request": "pr/8"}}, "absent"],
+		["$unique_ancestor_ids", {"type": "artifact", "id": null}, "satisfied"],
+		["$unique_ancestor_ids", {"type": "pull request", "id": null, "in": {"artifact": "sha-2"}}, "satisfied"],
 	]
 	rep.requirements.r.status == "not_met"
 }
@@ -12424,4 +12434,20 @@ test_a_walk_whose_ref_step_cant_be_read_names_its_path_and_every_root_its_phrase
 test_both_sides_of_a_comparison_are_named_when_one_is_missing_and_the_other_null if {
 	rows := _root_rows({"c": "c.z is d.z"}, {"id": "p", "c": {}, "d": null}, {})
 	rows.c == ["absent", "c.z is missing, and d is null"]
+}
+
+_ancestor_policy := {"ergo_spec": ergo._spec, "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"r": {"subject": "pull request", "checks": {"c": "number exists"}}}}
+
+_ancestor_values(doc) := [r.inputs[0].value | some r in ergo.report(doc, _ancestor_policy, {}).results; r.check == "$unique_ancestor_ids"]
+
+test_repeated_ancestor_ids_are_sorted_whatever_order_the_parents_come_in if {
+	commits := [{"sha": 3, "pull_requests": []}, {"sha": "b", "pull_requests": []}, {"sha": 10, "pull_requests": []}, {"sha": 3, "pull_requests": []}, {"sha": 10, "pull_requests": []}, {"sha": "b", "pull_requests": []}]
+	_ancestor_values({"commits": commits}) == [["b", 10, 3]]
+	_ancestor_values({"commits": array.reverse(commits)}) == [["b", 10, 3]]
+}
+
+test_a_requirement_whose_subject_has_no_parent_works_out_no_ancestor_ids if {
+	rep := ergo.report({"commits": [{"sha": "a"}, {"sha": "a"}]}, {"ergo_spec": ergo._spec, "subjects": {"commit": {"from": "commits", "identified_by": "sha"}}, "requirements": {"r": {"subject": "commit", "checks": {"c": "sha exists"}}}}, {})
+	[r.check | some r in rep.results; startswith(r.check, "$unique")] == ["$unique_ids"]
+	not "$unique_ancestor_ids" in object.keys(rep.requirements.r.checks)
 }

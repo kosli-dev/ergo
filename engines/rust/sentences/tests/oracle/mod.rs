@@ -4,6 +4,22 @@ pub mod checks;
 
 pub const FROM_OK: &[(&str, &str)] = &[
     ("commits", "commits"),
+    (
+        "commits whose merged is true",
+        "commits whose merged is true",
+    ),
+    (
+        "artifacts whose prod is true",
+        "artifacts whose prod is true",
+    ),
+    (
+        "every \"pull request\".commits",
+        "every \"pull request\".commits",
+    ),
+    (
+        "every distinct builds.artifacts",
+        "every distinct builds.artifacts",
+    ),
     ("every artifact.signatures", "every artifact.signatures"),
     ("every commit.pull_requests", "every commit.pull_requests"),
     ("every commits.pull_requests", "every commits.pull_requests"),

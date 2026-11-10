@@ -106,6 +106,6 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
   };
   const withEvery = await measure("with a check on every test", budgetPolicy, 338, 66, 26);
   const withSentences = await measure("with three checks on each deployment", sentencePolicy, 301, 66, 19);
-  const withChain = await measure("with the tests of each prod deployment as subjects", chainPolicy, 265, 132, 43);
+  const withChain = await measure("with the tests of each prod deployment as subjects", chainPolicy, 266, 132, 43);
   process.exit(failed.length > 0 || !withEvery || !withSentences || !withChain ? 1 : 0);
 });
