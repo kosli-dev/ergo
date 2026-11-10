@@ -12851,3 +12851,90 @@ test_missing_or_empty_params_leave_items_that_arent_objects_as_not_an_object if 
 		rows.some[0] == "not_an_object"
 	}
 }
+
+_tie_policy := _item_policy({}, {
+	"plain": {"for": "every xs as p, first of xs whose k is p.k sorted by v as m", "assert": "m.v is 1"},
+	"reads": {"for": "every xs as p, first of xs whose k is p.k sorted by v as m", "assert": "m.v is at least $params.n"},
+	"in": {"for": "every xs as p, first of xs whose k is p.k sorted by v as m", "assert": "m.v is in $params.l"},
+})
+
+_tie_doc := {"prs": [{"id": "p0", "xs": [{"k": "a", "v": 1}, {"k": "a", "v": 1}]}]}
+
+_tie_text := "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v"
+
+_params_word(params) := sprintf("%v", [params]) if is_number(params)
+
+_params_word(params) := "[]" if params == []
+
+_params_word(params) := "\"s\"" if params == "s"
+
+_params_word(params) := "true" if params == true
+
+test_params_that_are_not_an_object_leave_a_tie_ambiguous_when_the_check_does_not_read_them if {
+	every params in [3, [], "s", true, {}, null] {
+		_item_rows(_tie_policy, _tie_doc, params).plain == ["ambiguous", _tie_text]
+	}
+}
+
+test_params_that_are_not_an_object_are_named_before_a_tie_when_the_check_reads_them if {
+	every params in [3, [], "s", true] {
+		rows := _item_rows(_tie_policy, _tie_doc, params)
+		prefix := concat("", ["$params is ", _params_word(params), ", which isn't an object; "])
+		rows.reads == ["ambiguous", concat("", [prefix, _tie_text])]
+		rows["in"] == ["ambiguous", concat("", [prefix, _tie_text])]
+	}
+}
+
+test_params_that_are_missing_or_null_are_named_before_a_tie_when_the_check_reads_them if {
+	every params in [{}, null] {
+		rows := _item_rows(_tie_policy, _tie_doc, params)
+		rows.reads == ["ambiguous", concat("", ["$params.n is missing; ", _tie_text])]
+		rows["in"] == ["ambiguous", concat("", ["$params.l is missing; ", _tie_text])]
+	}
+}
+
+test_params_that_are_not_an_object_still_fail_a_check_without_a_tie_as_unusable_not_as_not_an_object if {
+	policy := _item_policy({}, {
+		"plain": {"for": "every xs as m", "assert": "m.v is at least 1"},
+		"reads": {"for": "every xs as m", "assert": "m.v is at least $params.n"},
+	})
+	every params in [3, [], "s", true] {
+		rows := _item_rows(policy, {"prs": [{"id": "p0", "xs": ["s", null]}]}, params)
+		rows.plain[0] == "unusable"
+		rows.reads == ["unusable", concat("", ["$params is ", _params_word(params), ", which isn't an object"])]
+	}
+}
+
+_count_part_policy := _item_policy({"has": {"pl": "c"}}, {
+	"xs": {"for": "every xs as m", "assert": "count of xs whose v is in pl.z is 0"},
+	"ys": {"for": "every xs as m", "assert": "count of m.ys whose v is in pl.z is 0"},
+	"at_least": {"for": "every xs as m", "assert": "count of xs whose v is in pl.z is at least 0"},
+})
+
+test_a_part_that_holds_a_list_fails_a_count_of_whose_under_a_for_line_as_unusable_and_names_the_part if {
+	every part, shown in {"[]": [], "[{\"z\": 1}]": [{"z": 1}]} {
+		every xs in [[{"v": 1, "ys": [{"v": 1}]}], []] {
+			rows := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": shown, "xs": xs}]}, {})
+			every check in ["xs", "ys", "at_least"] {
+				rows[check][0] == "unusable"
+				startswith(rows[check][1], concat("", ["pl is ", part, ", which isn't an object"]))
+			}
+		}
+	}
+}
+
+test_a_part_that_holds_text_or_null_or_nothing_still_says_so_for_a_count_of_whose_under_a_for_line if {
+	xs := [{"v": 1, "ys": [{"v": 1}]}]
+	text := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": "s", "xs": xs}]}, {})
+	text.xs == ["unusable", "pl is \"s\", which isn't an object"]
+	null_part := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": null, "xs": xs}]}, {})
+	null_part.ys == ["null", "pl is null"]
+	missing := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "xs": xs}]}, {})
+	missing.at_least == ["absent", "pl.z is missing"]
+}
+
+test_a_part_that_is_an_object_with_a_list_still_works_in_a_count_of_whose_under_a_for_line if {
+	rows := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": {"z": [2]}, "xs": [{"v": 1, "ys": [{"v": 1}]}]}]}, {})
+	rows.xs == ["satisfied", null]
+	rows.at_least == ["satisfied", null]
+}

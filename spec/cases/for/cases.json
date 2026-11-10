@@ -26817,5 +26817,2922 @@
         ]
       }
     ]
+  },
+  {
+    "description": "params that are a number leave a tie on a for line ambiguous when the check doesn't read them",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of xs whose k is p.k sorted by v as m",
+              "assert": "m.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "the tied items are named and the cause is ambiguous",
+        "rules": [
+          "for.roots",
+          "for.pick"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "k": "a",
+                  "v": 1
+                },
+                {
+                  "k": "a",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "a",
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params that are a list leave a tie on a for line ambiguous when the check doesn't read them",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of xs whose k is p.k sorted by v as m",
+              "assert": "m.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": [],
+    "cases": [
+      {
+        "description": "the tied items are named and the cause is ambiguous",
+        "rules": [
+          "for.roots",
+          "for.pick"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "k": "a",
+                  "v": 1
+                },
+                {
+                  "k": "a",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "a",
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params that are text leave a tie on a for line ambiguous when the check doesn't read them",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of xs whose k is p.k sorted by v as m",
+              "assert": "m.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": "s",
+    "cases": [
+      {
+        "description": "the tied items are named and the cause is ambiguous",
+        "rules": [
+          "for.roots",
+          "for.pick"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "k": "a",
+                  "v": 1
+                },
+                {
+                  "k": "a",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "a",
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params that are true leave a tie on a for line ambiguous when the check doesn't read them",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of xs whose k is p.k sorted by v as m",
+              "assert": "m.v is 1"
+            }
+          }
+        }
+      }
+    },
+    "params": true,
+    "cases": [
+      {
+        "description": "the tied items are named and the cause is ambiguous",
+        "rules": [
+          "for.roots",
+          "for.pick"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "k": "a",
+                  "v": 1
+                },
+                {
+                  "k": "a",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "a",
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params that are a number are named before a tie on a for line that reads them",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of xs whose k is p.k sorted by v as m",
+              "assert": "m.v is at least $params.n"
+            }
+          }
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "the params are named first and the cause is ambiguous",
+        "rules": [
+          "for.roots",
+          "for.pick"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "k": "a",
+                  "v": 1
+                },
+                {
+                  "k": "a",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "a",
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "$params is 3, which isn't an object; item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params that are text are named before a tie on a for line that reads them",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as p, first of xs whose k is p.k sorted by v as m",
+              "assert": "m.v is at least $params.n"
+            }
+          }
+        }
+      }
+    },
+    "params": "s",
+    "cases": [
+      {
+        "description": "the params are named first and the cause is ambiguous",
+        "rules": [
+          "for.roots",
+          "for.pick"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "k": "a",
+                  "v": 1
+                },
+                {
+                  "k": "a",
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "ambiguous",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              },
+              {
+                "cause": "ambiguous",
+                "failed_assertions": [],
+                "failed_items": [
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 1 of xs",
+                    "locations": [
+                      "/prs/0/xs/0/v"
+                    ],
+                    "path": "item 1 of xs",
+                    "value": 1
+                  },
+                  {
+                    "cause": "ambiguous",
+                    "item": "item 2 of xs",
+                    "locations": [
+                      "/prs/0/xs/1/v"
+                    ],
+                    "path": "item 2 of xs",
+                    "value": 1
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "a",
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "k": "a",
+                    "v": 1
+                  },
+                  {
+                    "k": "a",
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "$params is \"s\", which isn't an object; item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part that holds a list isn't walked by a whose in `count of xs whose v is in pl.z is 0`",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id",
+          "has": {
+            "pl": "c"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as m",
+              "assert": "count of xs whose v is in pl.z is 0"
+            }
+          }
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "the part holds a list of objects and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": [
+                {
+                  "z": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "count of xs whose v is in pl.z",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is [{\"z\": 1}], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds a list of objects and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": [
+                {
+                  "z": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in pl.z",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "pl is [{\"z\": 1}], which isn't an object; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds an empty list and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "count of xs whose v is in pl.z",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is [], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds an empty list and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in pl.z",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "pl is [], which isn't an object; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds null and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of xs whose v is in pl.z is 0",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "count of xs whose v is in pl.z",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "xs[]",
+                        "value": [
+                          {
+                            "v": 1,
+                            "ys": [
+                              {
+                                "v": 1
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "count of xs whose v is in pl.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds null and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in pl.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "pl is null; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds text and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of xs whose v is in pl.z is 0",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "count of xs whose v is in pl.z",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "xs[]",
+                        "value": [
+                          {
+                            "v": 1,
+                            "ys": [
+                              {
+                                "v": 1
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "count of xs whose v is in pl.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is \"s\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds text and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in pl.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "pl is \"s\", which isn't an object; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds an object with a list and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": {
+                "z": [
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of xs whose v is in pl.z is 0",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "count of xs whose v is in pl.z",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "xs[]",
+                        "value": [
+                          {
+                            "v": 1,
+                            "ys": [
+                              {
+                                "v": 1
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c/z"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "count of xs whose v is in pl.z",
+                "value": 1
+              },
+              {
+                "locations": [
+                  "/prs/0/c/z"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "count of xs whose v is in pl.z is 1",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds an object with a list and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": {
+                "z": [
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [],
+                "name": "count of xs whose v is in pl.z",
+                "value": 0
+              },
+              {
+                "locations": [
+                  "/prs/0/c/z"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part is missing",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of xs whose v is in pl.z is 0",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "count of xs whose v is in pl.z",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "xs[]",
+                        "value": [
+                          {
+                            "v": 1,
+                            "ys": [
+                              {
+                                "v": 1
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "count of xs whose v is in pl.z",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl.z is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part that holds a list isn't walked by a whose in `count of m.ys whose v is in pl.z is 0`",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id",
+          "has": {
+            "pl": "c"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as m",
+              "assert": "count of m.ys whose v is in pl.z is 0"
+            }
+          }
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "the part holds a list of objects and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": [
+                {
+                  "z": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is [{\"z\": 1}], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds a list of objects and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": [
+                {
+                  "z": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "pl is [{\"z\": 1}], which isn't an object; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds an empty list and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is [], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds an empty list and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": []
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "pl is [], which isn't an object; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds null and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of m.ys whose v is in pl.z is 0",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "count of m.ys whose v is in pl.z",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "m.ys[]",
+                        "value": [
+                          {
+                            "v": 1
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds null and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": null
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "pl is null; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds text and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of m.ys whose v is in pl.z is 0",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "count of m.ys whose v is in pl.z",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "m.ys[]",
+                        "value": [
+                          {
+                            "v": 1
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl is \"s\", which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds text and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": "s"
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "pl is \"s\", which isn't an object; xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds an object with a list and the list has an item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ],
+              "c": {
+                "z": [
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of m.ys whose v is in pl.z is 0",
+                    "cause": "value",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "count of m.ys whose v is in pl.z",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "m.ys[]",
+                        "value": [
+                          {
+                            "v": 1
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c/z"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": [
+                          1
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c/z"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: count of m.ys whose v is in pl.z is 1",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part holds an object with a list and the list has no item",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [],
+              "c": {
+                "z": [
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "value",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "value",
+                "failed_assertions": [],
+                "item": "xs",
+                "locations": [
+                  "/prs/0/xs"
+                ],
+                "path": "xs",
+                "value": []
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c/z"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": [
+                  1
+                ]
+              },
+              {
+                "locations": [],
+                "name": "xs[]",
+                "value": []
+              }
+            ],
+            "message": "xs is []",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "the part is missing",
+        "rules": [
+          "for.roots"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "absent",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "count of m.ys whose v is in pl.z is 0",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "count of m.ys whose v is in pl.z",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/ys/0"
+                        ],
+                        "name": "m.ys[]",
+                        "value": [
+                          {
+                            "v": 1
+                          }
+                        ]
+                      },
+                      {
+                        "locations": [
+                          "/prs/0"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1,
+                  "ys": [
+                    {
+                      "v": 1
+                    }
+                  ]
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1,
+                    "ys": [
+                      {
+                        "v": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "message": "pl.z is missing",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

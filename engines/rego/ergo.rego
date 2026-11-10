@@ -10562,13 +10562,13 @@ _for_row(check, subj) := _for_row_of(check, subj, _for_row_raw(check, subj))
 _for_row_of(check, subj, r) := r if {
 	r.cause == "satisfied"
 } else := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [], "message": _m_fallback(check)}) if {
-	r.cause != "satisfied"
+	not r.cause in {"satisfied", "ambiguous"}
 	_m_params_unread(check)
 } else := object.union(object.remove(r, ["root_msgs", "other_roots", "natural"]), {"failed": [_m_strip(f) | some f in r.failed], "message": _for_row_text(check, subj, r)}) if {
 	r.cause != "satisfied"
 }
 
-_for_row_raw(check, subj) := object.union(r, {"cause": "unusable", "natural": r.cause}) if {
+_for_row_raw(check, subj) := object.union(r, {"cause": _for_shape_cause(r), "natural": r.cause}) if {
 	_params_shape_only_unreadable(check)
 	not _param_broken(check, set())
 	r := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
@@ -10586,9 +10586,21 @@ _for_row_raw(check, subj) := object.union(r, {"cause": "unusable", "natural": r.
 	not is_object(subj)
 } else := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
 
-_for_flawed_cause(_) := "unusable" if _params_not_an_object
+_for_flawed_cause(r) := "ambiguous" if {
+	_params_not_an_object
+	r.cause == "ambiguous"
+}
+
+_for_flawed_cause(r) := "unusable" if {
+	_params_not_an_object
+	r.cause != "ambiguous"
+}
 
 _for_flawed_cause(r) := _worst_of({"unusable", r.cause}) if not _params_not_an_object
+
+_for_shape_cause(r) := "ambiguous" if r.cause == "ambiguous"
+
+_for_shape_cause(r) := "unusable" if r.cause != "ambiguous"
 
 _params_not_an_object if {
 	some p in data.ergo_unreadable
