@@ -25,13 +25,13 @@ You'll need [OPA](https://www.openpolicyagent.org/docs/#1-download-opa) 1.22.0 a
 
 ## Pull requests
 
-The title becomes the commit on `main`, so it names the area that changed and says what the change does, in lowercase:
+The title becomes the commit on `main`, so it says what the change does, in lowercase. An area prefix is optional, for when one area clearly fits:
 
 ```
 rego: fail compare when either side is missing
 ```
 
-The areas are listed in [`AGENTS.md`](AGENTS.md#commits), and CI checks the title against them. If the change alters the report for an existing policy, say so in the description.
+The rules are in [`AGENTS.md`](AGENTS.md#commits). If the change alters the report for an existing policy, say so in the description.
 
 ## Releases
 

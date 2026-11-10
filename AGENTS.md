@@ -152,23 +152,12 @@ When talking to people:
 
 ## Commits
 
-The first line names the part of the repo that changed, then says what the change does, in the imperative and in lowercase:
+The first line says what the change does, in the imperative and in lowercase, like `fail compare when either side is missing`.
 
-- `rego:` `engines/rego/ergo.rego` and its tests
-- `rust:` the Rust engine in `engines/rust/`
-- `docs:` `README.md`, `OPA.md`, `CLI.md`, `REFERENCE.md`, `AGENTS.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `CODE_OF_CONDUCT.md` and the issue and pull request templates
-- `site:` the website in `site/`
-- `ci:` workflows and Dependabot
-- `examples:` the worked examples in `examples/`
-- `spec:` the spec in `spec/`, its cases and `engines/rego/spec_test.rego`
-- `playground:` the playground in `packages/playground`, the Markdown compiler in `packages/markdown` and the pnpm workspace around them
+An area prefix is optional. Add one when a single area clearly fits, and leave it out when the change spans several. People have used `rego:`, `rust:`, `docs:`, `site:`, `ci:`, `examples:`, `spec:` and `playground:`, and commits from before the Rust engine say `core:` for `rego:`, and commits from before the playground say `markdown:` for `playground:`. Nothing in CI checks the prefix.
 
-For example, `rego: fail compare when either side is missing`. Commits from before the Rust engine say `core:` for `rego:`, and commits from before the playground say `markdown:` for `playground:`.
+A `rego:` change that alters behaviour adds the cases Rust now fails to `engines/rust/known-failures.txt`. The change that ports it to the Rust engine deletes those lines.
 
-One area per commit. A `rego:` or `rust:` change that updates `REFERENCE.md` or `spec/` with it keeps its area. A `rego:` change that alters behaviour adds the cases Rust now fails to `engines/rust/known-failures.txt`, and keeps its area. The `rust:` change that ports it deletes those lines.
+When a change to `ergo.rego` or to the Rust engine alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
 
-When a `rego:` or `rust:` change alters the report for an existing policy, say so in the body, on a line starting with `Changes the report:`.
-
-Add a body when the reason isn't obvious from the first line. PR titles follow the same rules, because they become the commit on `main`. Issue titles do too, so an issue reads like the change that will fix it.
-
-CI checks every PR title against the areas listed above, so a new area only needs adding to that list.
+Add a body when the reason isn't obvious from the first line. A pull request is squashed into one commit, so its title is what lands on `main` and follows the same rules. Issue titles do too, so an issue reads like the change that will fix it. CI only checks that a PR title isn't empty.
