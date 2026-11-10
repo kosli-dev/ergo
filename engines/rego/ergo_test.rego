@@ -5194,9 +5194,52 @@ test_a_second_item_a_whose_cant_decide_fails_the_first_item_with_its_cause if {
 	_for_rows(check, [{"id": 1, "xs": [1], "ys": [{"s": 1}, {"t": 1}]}], {})[0] == [1, "absent", [{"path": "item 2 of ys", "item": "item 2 of ys", "cause": "absent", "value": {"t": 1}, "failed_assertions": [], "locations": ["/things/0/ys/1"]}], [{"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}, {"name": "ys[]", "value": [{"s": 1}, {"t": 1}], "locations": ["/things/0/ys/0", "/things/0/ys/1"]}]]
 }
 
+_for_root_rows(checks, z, params) := {r.check: [r.cause, r.message] |
+	thing := object.union({"id": 1, "xs": [{"k": "a", "v": 1}, {"k": "b", "v": "x"}]}, z)
+	policy := {"ergo_spec": ergo._spec, "subjects": {"pr": {"from": "things", "identified_by": "id"}}, "requirements": {"s": {"subject": "pr", "checks": checks}}}
+	some r in ergo.report({"things": [thing]}, policy, params).results
+	not startswith(r.check, "$")
+}
+
+_for_root_checks := {
+	"ab": {"for": "every xs whose v is 1 and whose k is in pr.z as m", "assert": "m.v is 1"},
+	"ba": {"for": "every xs whose k is in pr.z and whose v is 1 as m", "assert": "m.v is 1"},
+	"as1": {"for": "every xs as m", "assert": ["m.v is 1", "m.k is in z"]},
+	"as2": {"for": "every xs as m", "assert": ["m.k is in z", "m.v is 1"]},
+	"second": {"for": "every xs as m, every z as y", "assert": "y is at least m.v"},
+}
+
+test_a_root_that_cant_be_read_comes_first_and_keeps_each_items_own_problem_in_any_order if {
+	missing := _for_root_rows(_for_root_checks, {}, {})
+	missing.ab == ["unusable", `pr.z is missing; item 2 of xs: v is "x", which isn't a number`]
+	missing.as1 == ["unusable", `z is missing; item 2 of xs: m.v is "x", which isn't a number`]
+	missing.second == ["unusable", `z is missing; item 2 of xs: m.v is "x", which isn't a number`]
+	nulled := _for_root_rows(_for_root_checks, {"z": null}, {})
+	nulled.ab == ["unusable", `pr.z is null; item 2 of xs: v is "x", which isn't a number`]
+	nulled.as1 == ["unusable", `z is null; item 2 of xs: m.v is "x", which isn't a number`]
+	nulled.second == ["unusable", `z is null; item 2 of xs: m.v is "x", which isn't a number`]
+	wrong := _for_root_rows(_for_root_checks, {"z": "s"}, {})
+	wrong.ab == ["unusable", `pr.z is "s", which isn't a list; item 2 of xs: v is "x", which isn't a number`]
+	wrong.as1 == ["unusable", `z is "s", which isn't a list; item 2 of xs: m.v is "x", which isn't a number`]
+	wrong.second == ["unusable", `z is "s", which isn't a list or an object; item 2 of xs: m.v is "x", which isn't a number`]
+	every rows in [missing, nulled, wrong] {
+		rows.ab == rows.ba
+		rows.as1 == rows.as2
+	}
+}
+
+test_null_params_read_by_a_key_from_the_item_say_what_params_that_are_missing_say if {
+	checks := {"whole": {"for": "every xs as m", "assert": "$params named by m.k is 1"}, "field": {"for": "every xs as m", "assert": "$params.q named by m.k is 1"}}
+	every params in [null, {}] {
+		said := `item 1 of xs: m is {"k": "a", "v": 1}, which isn't text; item 2 of xs: m is {"k": "b", "v": "x"}, which isn't text`
+		_for_root_rows(checks, {}, params) == {"whole": ["unusable", said], "field": ["unusable", said]}
+	}
+}
+
 test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs if {
 	rows := _for_rows({"for": "every xs as x", "assert": "x is one of $params.l"}, [{"id": 1, "xs": [1]}, "s"], {"l": "text"})
-	rows == [[1, "unusable", [], [{"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}]], ["s", "unusable", [], [{"name": "xs", "value": [], "locations": []}]]]
+	rows == [[1, "unusable", [{"cause": "unusable", "failed_assertions": [{"assertion": "x is in $params.l", "cause": "unusable"}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], [{"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}]], ["s", "unusable", [], [{"name": "xs", "value": [], "locations": []}]]]
+	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [{"x": 1}]}], {"l": "text"})] == ["unusable"]
 	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["unusable"]
 }
 
@@ -6797,6 +6840,93 @@ test_a_whose_that_reads_a_parent_through_a_for_name_lists_the_part_before_the_na
 		{"name": "ks[]", "value": ["a", "b"], "locations": ["/artifacts/0/prs/0/ks/0", "/artifacts/0/prs/0/ks/1"]},
 		{"name": "rows[]", "value": [{"n": 1}, {"n": 2}], "locations": ["/artifacts/0/prs/0/rows/0", "/artifacts/0/prs/0/rows/1"]},
 	]]]
+}
+
+_for_sentence_root_rows(checks, subject) := {r.check: [r.cause, r.message] |
+	some r in ergo.report({"things": [object.union(subject, {"id": 1})]}, {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": checks}}}, {}).results
+	not startswith(r.check, "$")
+}
+
+test_a_sentence_root_that_cant_be_read_fails_once_before_any_item_on_an_empty_list if {
+	checks := {"c": {"for": "every xs, if any, as m", "assert": "m.v is at least z"}}
+	_for_sentence_root_rows(checks, {"xs": []}) == {"c": ["absent", "z is missing"]}
+	_for_sentence_root_rows(checks, {"xs": [], "z": null}) == {"c": ["null", "z is null"]}
+	_for_sentence_root_rows(checks, {"xs": [], "z": "s"}) == {"c": ["unusable", "z is \"s\", which isn't a number"]}
+	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {"v": 2}], "z": "s"}) == {"c": ["unusable", "z is \"s\", which isn't a number"]}
+}
+
+test_a_sentence_root_that_cant_be_read_comes_before_an_empty_list_without_if_any if {
+	checks := {"c": {"for": "every xs as m", "assert": "m.v is at least $params.missing"}}
+	_for_sentence_root_rows(checks, {"xs": []}) == {"c": ["absent", "$params.missing is missing; xs is []"]}
+}
+
+test_a_roots_problem_comes_first_once_and_each_item_keeps_its_own_problems if {
+	checks := {"c": {"for": "every xs as m", "assert": ["m.v is 2", "m.v is at least z"]}}
+	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {"v": 3}]}) == {"c": ["absent", "z is missing; item 1 of xs: m.v is 1; item 2 of xs: m.v is 3"]}
+	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {"v": 3}], "z": null}) == {"c": ["null", "z is null; item 1 of xs: m.v is 1; item 2 of xs: m.v is 3"]}
+	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {"v": 3}], "z": "s"}) == {"c": ["unusable", "z is \"s\", which isn't a number; item 1 of xs: m.v is 1; item 2 of xs: m.v is 3"]}
+	_for_sentence_root_rows(checks, {"xs": [{"v": 1}, {}, {"v": null}, {"v": "t"}]}) == {"c": ["unusable", "z is missing; item 1 of xs: m.v is 1; item 2 of xs: m.v is missing; and 2 more"]}
+}
+
+test_a_roots_problem_said_once_still_lists_every_failed_item if {
+	rep := ergo.report({"things": [{"id": 1, "xs": [{"v": 1}, {"v": 3}]}]}, {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as m", "assert": ["m.v is 2", "m.v is at least z"]}}}}}, {})
+	some r in rep.results
+	r.check == "c"
+	[[f.item, f.cause, [a.cause | some a in f.failed_assertions]] | some f in r.failed_items] == [["item 1 of xs", "absent", ["value", "absent"]], ["item 2 of xs", "absent", ["value", "absent"]]]
+}
+
+test_a_null_on_the_items_own_path_is_named_after_a_roots_problem if {
+	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every rs as r", "assert": "r.x.y named by $params.i does not exist"}}}}}
+	input_doc := {"things": [{"id": 1, "rs": [{"x": null}, {"x": {}}]}]}
+	msgs := {[p, r.cause, r.message] | some p in [{}, {"i": null}, {"i": [1]}]; some r in ergo.report(input_doc, policy, p).results; r.check == "c"}
+	msgs == {
+		[{}, "absent", "$params.i is missing; item 1 of rs: r.x is null"],
+		[{"i": null}, "null", "$params.i is null; item 1 of rs: r.x is null"],
+		[{"i": [1]}, "unusable", "$params.i is [1], which isn't text; item 1 of rs: r.x is null"],
+	}
+}
+
+test_a_root_on_the_for_line_comes_before_an_empty_list_unless_if_any if {
+	checks := {"c": {"for": "every xs whose v is in thing.z as m", "assert": "m.v is 1"}, "any": {"for": "every xs whose v is in thing.z, if any, as m", "assert": "m.v is 1"}}
+	_for_sentence_root_rows(checks, {"xs": []}) == {"c": ["absent", "thing.z is missing; xs is []"], "any": ["absent", "thing.z is missing"]}
+	_for_sentence_root_rows(checks, {"xs": [], "z": null}) == {"c": ["null", "thing.z is null; xs is []"], "any": ["null", "thing.z is null"]}
+	_for_sentence_root_rows(checks, {"xs": [], "z": "s"}) == {"c": ["unusable", "thing.z is \"s\", which isn't a list; xs is []"], "any": ["unusable", "thing.z is \"s\", which isn't a list"]}
+}
+
+test_a_sentence_that_doesnt_read_the_item_is_said_once_whatever_its_cause if {
+	checks := {"one": {"for": "every xs as m", "assert": "z is 1"}, "exists": {"for": "every xs as m", "assert": "z exists"}}
+	xs := [{"v": 1}, {"v": 2}]
+	_for_sentence_root_rows(checks, {"xs": xs}) == {"one": ["absent", "z is missing"], "exists": ["value", "z is missing"]}
+	_for_sentence_root_rows(checks, {"xs": xs, "z": null}) == {"one": ["null", "z is null"], "exists": ["value", "z is null"]}
+	_for_sentence_root_rows(checks, {"xs": xs, "z": ""}) == {"one": ["unusable", "z is \"\", which isn't a number"]}
+}
+
+test_a_params_sentence_that_doesnt_read_the_item_is_said_once if {
+	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"q": {"for": "every xs as m", "assert": "$params.q exists"}}}}}
+	input_doc := {"things": [{"id": 1, "xs": [{"v": 1}, {"v": 2}]}]}
+	msgs := {[p, r.cause, r.message, count(r.failed_items)] | some p in [{}, {"q": null}]; some r in ergo.report(input_doc, policy, p).results; r.check == "q"}
+	msgs == {[{}, "value", "$params.q is missing", 2], [{"q": null}, "value", "$params.q is null", 2]}
+}
+
+test_failed_items_lists_every_item_when_the_list_a_sentence_looks_in_isnt_a_list if {
+	policy := {"ergo_spec": ergo._spec, "subjects": {"thing": {"from": "things", "identified_by": "id"}}, "requirements": {"r": {"subject": "thing", "checks": {"c": {"for": "every xs as m", "assert": "m.v is in $params.q"}}}}}
+	input_doc := {"things": [{"id": 1, "xs": [{"v": 1}, {}]}]}
+	rows := {[q, r.cause, r.message, [[f.item, f.cause, [[a.assertion, a.cause] | some a in f.failed_assertions]] | some f in r.failed_items]] |
+		some q in ["s", 3, {"a": 1}]
+		some r in ergo.report(input_doc, policy, {"q": q}).results
+		r.check == "c"
+	}
+	items := [["item 1 of xs", "unusable", [["m.v is in $params.q", "unusable"]]], ["item 2 of xs", "unusable", [["m.v is in $params.q", "unusable"]]]]
+	rows == {
+		["s", "unusable", "$params.q is \"s\", which isn't a list", items],
+		[3, "unusable", "$params.q is 3, which isn't a list", items],
+		[{"a": 1}, "unusable", "$params.q is {\"a\": 1}, which isn't a list", items],
+	}
+}
+
+test_a_sentence_root_named_by_the_lines_alias_is_read_for_each_item if {
+	checks := {"c": {"for": "every ks as k", "assert": "m named by k is 1"}}
+	_for_sentence_root_rows(checks, {"ks": ["a", "b"], "m": {"a": 1}}) == {"c": ["absent", "item 2 of ks: m named by k is missing"]}
 }
 
 _old_policy := {
@@ -10685,7 +10815,7 @@ test_a_walk_keyed_by_the_subjects_field_reads_it_like_a_plain_check_and_one_keye
 	got == {
 		"plain": ["value", ["artifact.nums named by key", "key", "rows[].n"], "item 1 of rows: n is 1, and artifact.nums named by key is 2"],
 		"whose": ["satisfied", ["count of rows whose n is at least artifact.nums named by key", "rows[]", "artifact.nums"], ""],
-		"for": ["value", ["artifact.nums named by key", "key", "keys[]", "rows[].n"], "item 1 of keys: item 1 of rows: n is 1, and artifact.nums named by key is 2"],
+		"for": ["value", ["artifact.nums named by key", "key", "keys[]", "rows[].n"], "item 1 of rows: n is 1, and artifact.nums named by key is 2"],
 		"alias": ["value", ["artifact.nums named by key", "groups[]", "key"], "item 1 of groups: item 1 of g.items: n is 1, and artifact.nums named by key is 2"],
 	}
 }
@@ -11361,6 +11491,17 @@ test_message_of_an_empty_for_list_that_is_missing_names_the_list if {
 
 test_message_a_check_whose_path_is_not_a_path_has_only_its_refs_as_sides if {
 	ergo._m_found_sides({"op": "for", "path": "x"}) == []
+}
+
+test_an_every_leaf_compared_with_a_plain_value_reads_no_root if {
+	check := {"op": "every", "path": ["xs"], "check": {"op": "compare", "left": ["v"], "cmp": "eq", "right": 1}}
+	ergo._leaf_without_roots(check.check)
+	ergo._leaf_root_flaw(check, {"xs": [{"v": 1}]}) == ""
+}
+
+test_a_null_before_an_unreadable_key_is_read_from_the_sides_a_check_already_carries if {
+	check := {"$sides": [["s", {"named_by_field": "p"}]], "op": "present", "path": ["other"]}
+	ergo._m_null_key_parts({"s": null, "p": null}, check) == ["s is null", "p is null"]
 }
 
 test_message_of_an_unusable_check_with_nothing_to_blame_repeats_its_expression if {
@@ -12342,7 +12483,8 @@ _distinct_scope_reads(place) if {
 _rooted_field_rows(doc) := [[r.check, r.cause, r.message] | some r in ergo.report({"ts": [doc]}, {"ergo_spec": ergo._spec, "subjects": {"t": {"from": "ts", "identified_by": "id"}}, "requirements": {"r": {"subject": "t", "checks": {"w": "every rows.n is at least m named by k", "p": "m named by k is 1"}}}}, {}).results; r.check in {"w", "p"}]
 
 test_a_named_by_field_on_the_right_of_every_reads_the_subjects_key_and_never_an_items if {
-	_rooted_field_rows({"id": 1, "k": null, "m": null, "rows": [{"n": 3}]}) == [["p", "null", "k is null"], ["w", "null", "k is null"]]
+	_rooted_field_rows({"id": 1, "k": null, "m": null, "rows": [{"n": 3}]}) == [["p", "null", "m is null; k is null"], ["w", "null", "m is null; k is null"]]
+	_rooted_field_rows({"id": 1, "k": null, "m": {}, "rows": [{"n": 3}]}) == [["p", "null", "k is null"], ["w", "null", "k is null"]]
 	_rooted_field_rows({"id": 1, "k": "m", "m": 3, "rows": [{"n": 3, "k": "n"}, {"n": 4}]}) == [["p", "unusable", "m is 3, which isn't an object"], ["w", "unusable", "m is 3, which isn't an object"]]
 }
 
@@ -12381,7 +12523,7 @@ test_a_root_that_isnt_a_list_after_is_in_fails_before_any_item_is_read if {
 		"subject": ["unusable", "pr.z is \"s\", which isn't a list"],
 		"part": ["unusable", "pl.z is 5, which isn't a list"],
 		"params": ["unusable", "$params.q is \"s\", which isn't a list"],
-		"for": ["unusable", "pr.z is \"s\", which isn't a list"],
+		"for": ["unusable", "pr.z is \"s\", which isn't a list; xs is []"],
 	}
 }
 
@@ -12436,6 +12578,149 @@ test_both_sides_of_a_comparison_are_named_when_one_is_missing_and_the_other_null
 	rows.c == ["absent", "c.z is missing, and d is null"]
 }
 
+test_a_for_line_reads_a_bare_params_once_before_any_item_whatever_the_list_holds if {
+	least := {"c": {"for": "every xs as m", "assert": "m.v is at least $params"}}
+	_root_rows(least, {"id": "p", "xs": []}, null).c == ["absent", "$params is missing; xs is []"]
+	_root_rows(least, {"id": "p"}, null).c == ["absent", "$params is missing; xs is missing"]
+	_root_rows(least, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, null).c == ["absent", "$params is missing"]
+	_root_rows(least, {"id": "p", "xs": []}, {}).c == ["unusable", "$params is {}, which isn't a number; xs is []"]
+	_root_rows(least, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, {}).c == ["unusable", "$params is {}, which isn't a number"]
+	_root_rows(least, {"id": "p", "xs": []}, "s").c == ["unusable", "$params is \"s\", which isn't an object"]
+}
+
+test_a_for_line_compares_a_bare_params_before_any_item_and_names_the_empty_list_after_it if {
+	is_3 := {"c": {"for": "every xs as m", "assert": "$params is 3"}}
+	_root_rows(is_3, {"id": "p", "xs": []}, null).c == ["absent", "$params is missing; xs is []"]
+	_root_rows(is_3, {"id": "p", "xs": [{"v": 1}]}, null).c == ["absent", "$params is missing"]
+	_root_rows(is_3, {"id": "p", "xs": []}, {}).c == ["value", "xs is []"]
+	_root_rows(is_3, {"id": "p", "xs": []}, 3).c == ["unusable", "$params is 3, which isn't an object"]
+}
+
+test_a_for_line_reads_a_bare_input_before_any_item_and_names_the_empty_list_after_it if {
+	least := {"c": {"for": "every xs as m", "assert": "m.v is at least $input"}}
+	_root_rows(least, {"id": "p", "xs": []}, {}).c == ["unusable", "$input is {\"prs\": [{\"id\": \"p\", \"xs\": []}]}, which isn't a number; xs is []"]
+	_root_rows(least, {"id": "p", "xs": [{"v": 1}]}, {}).c == ["unusable", "$input is {\"prs\": [{\"id\": \"p\", \"xs\": [{\"v\": 1}]}]}, which isn't a number"]
+}
+
+test_a_bare_params_in_a_whose_is_read_once_with_no_item_in_front if {
+	whose := {"c": {"for": "every xs whose v is in $params as m", "assert": "m.v is 1"}}
+	_root_rows(whose, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, null).c == ["absent", "$params is missing"]
+	_root_rows(whose, {"id": "p", "xs": []}, 3).c == ["unusable", "$params is 3, which isn't an object"]
+	count_whose := {"c": "count of xs whose v is in $params is 0"}
+	_root_rows(count_whose, {"id": "p", "xs": [{"v": 1}, {"v": 2}]}, 3).c == ["unusable", "$params is 3, which isn't a list"]
+	_root_rows(count_whose, {"id": "p", "xs": []}, null).c == ["absent", "$params is missing"]
+}
+
+test_a_check_with_a_for_key_and_no_op_is_a_for_check if {
+	ergo._for_check({"for": "every xs as m", "assert": "m.v is 1"})
+	ergo._for_check({"op": "for"})
+	not ergo._for_check({"op": "all_of"})
+}
+
+test_a_path_with_a_ref_step_that_cant_be_read_is_flawed if {
+	path := ["x", {"ref": ["$$params", "k"]}]
+	ergo._ref_step_flawed(path) with data.ergo_params as {}
+	ergo._ref_step_flawed(path) with data.ergo_params as {"k": 3}
+	not ergo._ref_step_flawed(path) with data.ergo_params as {"k": "a"}
+}
+
+test_a_for_row_with_no_failed_item_says_what_the_empty_list_found if {
+	ergo._for_item_text({"items": [{"path": ["xs"]}]}, {"xs": []}, {"cause": "value", "failed": []}, []) == "xs is []"
+}
+
+test_a_null_on_the_path_stops_the_read_at_the_step_after_the_first_key if {
+	ergo._null_stop_at({"c": null}, ["c", "z"]) == 1
+}
+
+test_a_right_side_that_is_a_ref_is_the_root_it_reads if {
+	ergo._right_root({"right": {"ref": ["$$params", "q"]}}, ["$$params", "q"])
+	ergo._right_root({"right": ["$$params", "q"]}, ["$$params", "q"])
+}
+
+test_a_root_message_said_inside_another_is_not_said_again if {
+	ergo._with_roots(["x is 1"], ["y is missing"]) == ["y is missing", "x is 1"]
+	ergo._with_roots(["y is missing", "x is 1"], ["y is missing"]) == ["y is missing", "x is 1"]
+	ergo._with_roots(["item 1 of xs: y is missing"], ["y is missing"]) == ["item 1 of xs: y is missing"]
+}
+
+test_a_for_row_that_only_names_roots_has_no_item_text if {
+	ergo._for_item_text({}, {}, {"root_msgs": ["a"], "failed": []}, ["a"]) == ""
+}
+
+test_a_second_for_roots_problem_is_added_to_the_row_in_every_state_the_row_can_be_in if {
+	xs := [{"fl": "absent", "ms": ["m"]}]
+	ergo._for_second_rooted({"cause": "value", "failed": [{}]}, xs) == {"cause": "absent", "failed": [{}], "other_roots": ["m"]}
+	ergo._for_second_rooted({"cause": "value", "failed": [{"failed_assertions": [1]}]}, xs) == {"cause": "absent", "failed": [], "root_msgs": ["m"]}
+	ergo._for_second_rooted({"cause": "unusable", "failed": [{"failed_assertions": [1]}]}, xs) == {"cause": "unusable", "failed": [{"failed_assertions": [1]}], "other_roots": ["m"]}
+}
+
+test_a_for_list_that_failed_names_what_it_found_whatever_narrowed_it if {
+	ergo._m_for_empty({"items": [{"path": ["xs"]}]}, {"xs": []}, "value") == ["xs is []"]
+	ergo._m_for_empty({"items": [{"path": ["xs"], "whose": [{"op": "present", "path": ["v"]}]}]}, {"xs": []}, "value") == ["xs is []"]
+	ergo._m_for_empty({"items": [{"path": ["xs"]}]}, {"xs": [1]}, "value") == ["xs is [1]"]
+	ergo._m_for_empty({"items": [{"path": ["xs"]}], "assert": "m.v is 1"}, {"xs": "s"}, "value") == ["the check is false"]
+}
+
+test_a_ref_that_is_not_a_list_names_the_kind_of_list_the_phrase_needs if {
+	ergo._m_leaf_needs({"op": "includes", "values": {"ref": ["$$params", "q"]}}, "s") == "a list"
+	ergo._m_leaf_needs({"op": "includes", "values": {"ref": ["$$params", "q"]}}, []) == "a list with at least one value"
+	ergo._m_leaf_needs({"op": "matches", "patterns": {"ref": ["$$params", "q"]}}, "s") == "a list"
+}
+
+_params_not_object_policy := {
+	"ergo_spec": ergo._spec,
+	"subjects": {"pr": {"from": "prs", "identified_by": "id"}},
+	"requirements": {"r": {"subject": "pr", "checks": {
+		"least_z": {"for": "every xs as m", "assert": "m.v is at least z"},
+		"least_q": {"for": "every xs as m", "assert": "m.v is at least $params.q"},
+		"in_q": {"for": "every xs as m", "assert": "m.v is in $params.q"},
+		"plain": {"for": "every xs as m", "assert": "z is 1"},
+	}}},
+}
+
+_params_not_object_doc := {"prs": [{"id": "p0", "z": "s", "xs": [{"v": 1}, {"v": 2}]}]}
+
+_params_not_object_rows(doc, params) := {r.check: [r.cause, r.message, count(r.failed_items)] |
+	some r in ergo.report(doc, _params_not_object_policy, params).results
+	not startswith(r.check, "$")
+}
+
+test_a_for_check_that_reads_params_says_only_that_params_is_not_an_object if {
+	rows := _params_not_object_rows(_params_not_object_doc, 3)
+	rows.least_q == ["unusable", "$params is 3, which isn't an object", 0]
+	rows.in_q == ["unusable", "$params is 3, which isn't an object", 0]
+	rows_s := _params_not_object_rows(_params_not_object_doc, "s")
+	rows_s.least_q == ["unusable", "$params is \"s\", which isn't an object", 0]
+	rows_s.in_q == ["unusable", "$params is \"s\", which isn't an object", 0]
+	rows_l := _params_not_object_rows(_params_not_object_doc, [])
+	rows_l.least_q == ["unusable", "$params is [], which isn't an object", 0]
+	rows_l.in_q == ["unusable", "$params is [], which isn't an object", 0]
+}
+
+test_a_for_check_that_does_not_read_params_keeps_its_message_and_lists_every_item_when_params_is_not_an_object if {
+	every params in [3, "s", []] {
+		rows := _params_not_object_rows(_params_not_object_doc, params)
+		rows.least_z == ["unusable", "z is \"s\", which isn't a number", 2]
+		rows.plain == ["unusable", "z is \"s\", which isn't a number", 2]
+	}
+}
+
+test_a_for_check_that_does_not_read_params_but_passes_is_unusable_with_its_expression_when_params_is_not_an_object if {
+	doc := {"prs": [{"id": "p0", "z": 1, "xs": [{"v": 1}]}]}
+	every params in [3, "s", []] {
+		_params_not_object_rows(doc, params).plain == ["unusable", "for every xs as m: z is 1 is false", 0]
+	}
+}
+
+test_a_for_check_with_params_missing_or_null_reads_it_as_missing_and_lists_every_item if {
+	every params in [null, {}] {
+		rows := _params_not_object_rows(_params_not_object_doc, params)
+		rows.least_z == ["unusable", "z is \"s\", which isn't a number", 2]
+		rows.least_q == ["absent", "$params.q is missing", 2]
+		rows.in_q == ["absent", "$params.q is missing", 2]
+	}
+}
+
 _ancestor_policy := {"ergo_spec": ergo._spec, "subjects": {"commit": {"from": "commits", "identified_by": "sha"}, "pull request": {"from": "every commit.pull_requests", "identified_by": "number"}}, "requirements": {"r": {"subject": "pull request", "checks": {"c": "number exists"}}}}
 
 _ancestor_values(doc) := [r.inputs[0].value | some r in ergo.report(doc, _ancestor_policy, {}).results; r.check == "$unique_ancestor_ids"]
@@ -12450,4 +12735,206 @@ test_a_requirement_whose_subject_has_no_parent_works_out_no_ancestor_ids if {
 	rep := ergo.report({"commits": [{"sha": "a"}, {"sha": "a"}]}, {"ergo_spec": ergo._spec, "subjects": {"commit": {"from": "commits", "identified_by": "sha"}}, "requirements": {"r": {"subject": "commit", "checks": {"c": "sha exists"}}}}, {})
 	[r.check | some r in rep.results; startswith(r.check, "$unique")] == ["$unique_ids"]
 	not "$unique_ancestor_ids" in object.keys(rep.requirements.r.checks)
+}
+
+_item_policy(has, checks) := {
+	"ergo_spec": ergo._spec,
+	"subjects": {"pr": object.union({"from": "prs", "identified_by": "id"}, has)},
+	"requirements": {"r": {"subject": "pr", "checks": checks}},
+}
+
+_item_rows(policy, doc, params) := {r.check: [r.cause, object.get(r, "message", null)] |
+	some r in ergo.report(doc, policy, params).results
+	not startswith(r.check, "$")
+}
+
+_named_by_policy := _item_policy({}, {
+	"every": {"for": "every xs as m", "assert": "m.k named by m.k is 1"},
+	"if_any": {"for": "every xs, if any, as m", "assert": "m.k named by m.k is 1"},
+	"two": {"for": "every xs as m", "assert": ["m is $params.l", "m.v named by m.v is 1"]},
+})
+
+test_a_null_item_under_a_named_by_key_says_it_is_null_once_beside_the_item_that_isnt_text if {
+	doc := {"prs": [{"id": "p0", "xs": [null, {"k": "a"}]}]}
+	rows := _item_rows(_named_by_policy, doc, {})
+	want := "item 1 of xs: m is null; item 2 of xs: m is {\"k\": \"a\"}, which isn't text"
+	rows.every == ["unusable", want]
+	rows.if_any == ["unusable", want]
+	rows.two == ["unusable", concat("", ["$params.l is missing; ", want])]
+}
+
+test_a_null_item_under_a_named_by_key_says_it_is_null_once_when_params_are_there if {
+	rows := _item_rows(_named_by_policy, {"prs": [{"id": "p0", "xs": [null]}]}, {"l": 1})
+	every check in ["every", "if_any", "two"] {
+		rows[check] == ["null", "item 1 of xs: m is null"]
+	}
+}
+
+test_an_item_that_isnt_an_object_and_a_null_item_under_a_named_by_key_are_each_said_once if {
+	rows := _item_rows(_named_by_policy, {"prs": [{"id": "p0", "xs": ["s", null]}]}, {"l": 1})
+	every check in ["every", "if_any", "two"] {
+		rows[check] == ["not_an_object", "item 1 of xs is \"s\", which isn't an object; item 2 of xs: m is null"]
+	}
+}
+
+test_a_named_by_key_that_is_null_or_missing_or_not_text_keeps_saying_each_item_once if {
+	rows := _item_rows(_named_by_policy, {"prs": [{"id": "p0", "xs": [{"k": null}, {}, {"k": 1}]}]}, {})
+	rows.every == ["unusable", "item 1 of xs: k is null; m is {\"k\": null}, which isn't text; item 2 of xs: m is {}, which isn't text; item 3 of xs: m is {\"k\": 1}, which isn't text"]
+}
+
+_part_policy := _item_policy({"has": {"pl": "c"}}, {
+	"in": {"for": "every xs as m", "assert": "m.v is in pl.z"},
+	"matches": {"for": "every xs as m", "assert": "m.v matches pl.z"},
+	"contains": {"for": "every xs as m", "assert": "pl.z contains m.v"},
+})
+
+test_a_part_that_isnt_an_object_on_the_right_of_a_list_phrase_fails_as_unusable_and_names_the_part if {
+	rows := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": [], "xs": [{"v": 1}]}]}, {})
+	every check in ["in", "matches", "contains"] {
+		rows[check] == ["unusable", "pl is [], which isn't an object"]
+	}
+}
+
+test_a_part_that_is_a_list_of_objects_is_not_walked_on_the_right_of_a_list_phrase if {
+	rows := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": [{"z": 1}], "xs": [{"v": 1}]}]}, {})
+	rows.in == ["unusable", "pl is [{\"z\": 1}], which isn't an object"]
+	rows.contains == ["unusable", "pl is [{\"z\": 1}], which isn't an object"]
+	rows.matches == ["unusable", "pl is [{\"z\": 1}], which isn't an object; item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"]
+}
+
+test_a_part_that_is_text_or_null_on_the_right_of_a_list_phrase_says_so if {
+	text := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": "s", "xs": [{"v": 1}]}]}, {})
+	null_part := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": null, "xs": [{"v": 1}]}]}, {})
+	every check in ["in", "matches", "contains"] {
+		text[check][0] == "unusable"
+		null_part[check] == ["null", "pl is null"]
+	}
+	text["in"] == ["unusable", "pl is \"s\", which isn't an object"]
+}
+
+test_a_part_that_is_an_object_with_a_list_still_works_on_the_right_of_a_list_phrase if {
+	rows := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": {"z": [1]}, "xs": [{"v": 1}]}]}, {})
+	rows["in"][0] == "satisfied"
+	rows.contains[0] == "satisfied"
+}
+
+_params_cause_policy := _item_policy({}, {
+	"plain": {"for": "every xs as m", "assert": "m.v is at least 1"},
+	"reads": {"for": "every xs as m", "assert": "m.v is at least $params.n"},
+	"some": {"for": "some xs as m", "assert": "m.v is 1"},
+	"whose": {"for": "every xs whose k is 1 and whose v is in $params.l as m", "assert": "m.v is 1"},
+})
+
+test_params_that_arent_an_object_make_a_for_line_unusable_even_when_its_items_arent_objects if {
+	every params in [[], 3, "s", true] {
+		rows := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": ["s", {"v": "x"}]}]}, params)
+		rows.plain == ["unusable", "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number"]
+		rows.some[0] == "unusable"
+		rows.reads[0] == "unusable"
+		rows.whose[0] == "unusable"
+		nulls := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": [null]}]}, params)
+		nulls.plain == ["unusable", "item 1 of xs is null, which isn't an object"]
+		nulls.reads[0] == "unusable"
+	}
+}
+
+test_params_that_arent_an_object_name_themselves_in_a_for_line_that_reads_them_whatever_its_items_are if {
+	rows := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": [null, "s"]}]}, 3)
+	rows.reads == ["unusable", "$params is 3, which isn't an object"]
+	rows.whose == ["unusable", "$params is 3, which isn't an object"]
+}
+
+test_missing_or_empty_params_leave_items_that_arent_objects_as_not_an_object if {
+	every params in [null, {}] {
+		rows := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": ["s", {"v": "x"}]}]}, params)
+		rows.plain[0] == "not_an_object"
+		rows.some[0] == "not_an_object"
+	}
+}
+
+_tie_policy := _item_policy({}, {
+	"plain": {"for": "every xs as p, first of xs whose k is p.k sorted by v as m", "assert": "m.v is 1"},
+	"reads": {"for": "every xs as p, first of xs whose k is p.k sorted by v as m", "assert": "m.v is at least $params.n"},
+	"in": {"for": "every xs as p, first of xs whose k is p.k sorted by v as m", "assert": "m.v is in $params.l"},
+})
+
+_tie_doc := {"prs": [{"id": "p0", "xs": [{"k": "a", "v": 1}, {"k": "a", "v": 1}]}]}
+
+_tie_text := "item 1 of xs: item 1 and item 2 of xs tie on v; item 2 of xs: item 1 and item 2 of xs tie on v"
+
+_params_word(params) := sprintf("%v", [params]) if is_number(params)
+
+_params_word(params) := "[]" if params == []
+
+_params_word(params) := "\"s\"" if params == "s"
+
+_params_word(params) := "true" if params == true
+
+test_params_that_are_not_an_object_leave_a_tie_ambiguous_when_the_check_does_not_read_them if {
+	every params in [3, [], "s", true, {}, null] {
+		_item_rows(_tie_policy, _tie_doc, params).plain == ["ambiguous", _tie_text]
+	}
+}
+
+test_params_that_are_not_an_object_are_named_before_a_tie_when_the_check_reads_them if {
+	every params in [3, [], "s", true] {
+		rows := _item_rows(_tie_policy, _tie_doc, params)
+		prefix := concat("", ["$params is ", _params_word(params), ", which isn't an object; "])
+		rows.reads == ["ambiguous", concat("", [prefix, _tie_text])]
+		rows["in"] == ["ambiguous", concat("", [prefix, _tie_text])]
+	}
+}
+
+test_params_that_are_missing_or_null_are_named_before_a_tie_when_the_check_reads_them if {
+	every params in [{}, null] {
+		rows := _item_rows(_tie_policy, _tie_doc, params)
+		rows.reads == ["ambiguous", concat("", ["$params.n is missing; ", _tie_text])]
+		rows["in"] == ["ambiguous", concat("", ["$params.l is missing; ", _tie_text])]
+	}
+}
+
+test_params_that_are_not_an_object_still_fail_a_check_without_a_tie_as_unusable_not_as_not_an_object if {
+	policy := _item_policy({}, {
+		"plain": {"for": "every xs as m", "assert": "m.v is at least 1"},
+		"reads": {"for": "every xs as m", "assert": "m.v is at least $params.n"},
+	})
+	every params in [3, [], "s", true] {
+		rows := _item_rows(policy, {"prs": [{"id": "p0", "xs": ["s", null]}]}, params)
+		rows.plain[0] == "unusable"
+		rows.reads == ["unusable", concat("", ["$params is ", _params_word(params), ", which isn't an object"])]
+	}
+}
+
+_count_part_policy := _item_policy({"has": {"pl": "c"}}, {
+	"xs": {"for": "every xs as m", "assert": "count of xs whose v is in pl.z is 0"},
+	"ys": {"for": "every xs as m", "assert": "count of m.ys whose v is in pl.z is 0"},
+	"at_least": {"for": "every xs as m", "assert": "count of xs whose v is in pl.z is at least 0"},
+})
+
+test_a_part_that_holds_a_list_fails_a_count_of_whose_under_a_for_line_as_unusable_and_names_the_part if {
+	every part, shown in {"[]": [], "[{\"z\": 1}]": [{"z": 1}]} {
+		every xs in [[{"v": 1, "ys": [{"v": 1}]}], []] {
+			rows := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": shown, "xs": xs}]}, {})
+			every check in ["xs", "ys", "at_least"] {
+				rows[check][0] == "unusable"
+				startswith(rows[check][1], concat("", ["pl is ", part, ", which isn't an object"]))
+			}
+		}
+	}
+}
+
+test_a_part_that_holds_text_or_null_or_nothing_still_says_so_for_a_count_of_whose_under_a_for_line if {
+	xs := [{"v": 1, "ys": [{"v": 1}]}]
+	text := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": "s", "xs": xs}]}, {})
+	text.xs == ["unusable", "pl is \"s\", which isn't an object"]
+	null_part := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": null, "xs": xs}]}, {})
+	null_part.ys == ["null", "pl is null"]
+	missing := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "xs": xs}]}, {})
+	missing.at_least == ["absent", "pl.z is missing"]
+}
+
+test_a_part_that_is_an_object_with_a_list_still_works_in_a_count_of_whose_under_a_for_line if {
+	rows := _item_rows(_count_part_policy, {"prs": [{"id": "p0", "c": {"z": [2]}, "xs": [{"v": 1, "ys": [{"v": 1}]}]}]}, {})
+	rows.xs == ["satisfied", null]
+	rows.at_least == ["satisfied", null]
 }

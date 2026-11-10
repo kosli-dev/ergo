@@ -606,9 +606,44 @@ fn any_of_message(any: &super::any_of::AnyOf, ctx: &Ctx) -> String {
     }
 }
 
+pub fn null_key_parts(path: &Path, ctx: &Ctx) -> Vec<String> {
+    let Some(at) = path.steps.iter().position(|step| {
+        matches!(step, Step::Field(_) | Step::Ref(_)) && path::resolve(step, ctx).is_err()
+    }) else {
+        return Vec::new();
+    };
+    let first = usize::from(path.start == Start::Subject);
+    let null_at = (first..=at).find(|end| {
+        let prefix = Path {
+            start: path.start.clone(),
+            steps: path.steps[..*end].to_vec(),
+        };
+        path::read(&prefix, ctx).outcome == Outcome::Null
+    });
+    let (Some(end), Some(key)) = (null_at, key_text(&path.steps[at], ctx)) else {
+        return Vec::new();
+    };
+    let prefix = Path {
+        start: path.start.clone(),
+        steps: path.steps[..end].to_vec(),
+    };
+    vec![format!("{} is null", name::name(&prefix)), key]
+}
+
 pub fn message(check: &Check, ctx: &Ctx, verdict: &Verdict) -> String {
     if let Check::AnyOf(any) = check {
         return any_of_message(any, ctx);
+    }
+    if matches!(verdict.cause, Cause::Absent | Cause::Null | Cause::Unusable) {
+        let parts: Vec<String> = once_of(
+            side_paths(check)
+                .into_iter()
+                .flat_map(|path| null_key_parts(path, ctx))
+                .collect(),
+        );
+        if !parts.is_empty() {
+            return parts.join("; ");
+        }
     }
     let clauses: Vec<String> = match verdict.cause {
         Cause::Value => {
@@ -1402,8 +1437,71 @@ fn first_null_step(root: &Path, ctx: &Ctx) -> Option<(Cause, String)> {
     None
 }
 
+pub(super) fn root_kind_fault(check: &Check, root: &Path, ctx: &Ctx) -> Option<String> {
+    if lists::haystacks(check).contains(&root) {
+        return lists::ref_faults(check, ctx).into_iter().next();
+    }
+    if let Check::Tally(tally) = check
+        && let Some(super::tally::Side::Plain(super::compare::Side::Path(right))) = &tally.right
+        && right == root
+        && let super::tally::Test::Compare { cmp, within } = &tally.test
+    {
+        let compare = Check::Compare(super::compare::Compare {
+            left: super::compare::Side::Value(serde_json::Value::Null),
+            right: super::compare::Side::Path(right.clone()),
+            cmp: *cmp,
+            within: within.clone(),
+        });
+        return root_kind_fault(&compare, root, ctx);
+    }
+    let right = match check {
+        Check::Compare(c) => &c.right,
+        Check::CompareTime(c) => &c.right,
+        _ => return None,
+    };
+    if !matches!(right, super::compare::Side::Path(path) if path == root) {
+        return None;
+    }
+    let read = path::read(root, ctx);
+    let value = read.value.filter(|_| read.outcome == Outcome::Found)?;
+    super::walk::right_needs(check, value).map(|kind| isnt(&name::name(root), value, kind))
+}
+
 pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
+    root_flaw_ordered(checks, ctx, &[], &[])
+}
+
+pub fn root_flaw_counted(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
+    root_flaw_ordered(checks, ctx, checks, &[])
+}
+
+pub fn root_flaw_ordered(
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+    keys_left: &[&Check],
+) -> Option<(Cause, String)> {
+    root_flaw_with(checks, ctx, refs_first, keys_left, false)
+}
+
+pub fn root_flaw_in_for(
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+    keys_left: &[&Check],
+) -> Option<(Cause, String)> {
+    root_flaw_with(checks, ctx, refs_first, keys_left, true)
+}
+
+fn root_flaw_with(
+    checks: &[&Check],
+    ctx: &Ctx,
+    refs_first: &[&Check],
+    keys_left: &[&Check],
+    parts_fail: bool,
+) -> Option<(Cause, String)> {
     let mut found: Vec<(usize, Cause, String, bool)> = Vec::new();
+    let mut refs: Vec<String> = Vec::new();
     for (at, check) in checks.iter().enumerate() {
         if matches!(check, Check::Present(_)) {
             continue;
@@ -1423,12 +1521,23 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                 roots.push((path.clone(), false));
             }
             for (root, is_key) in roots {
+                if is_key && keys_left.iter().any(|left| std::ptr::eq(*left, *check)) {
+                    continue;
+                }
                 if let Start::Alias(name) = &root.start
                     && !ctx.aliases.contains_key(name)
                 {
                     continue;
                 }
+                if root.steps.iter().any(|step| {
+                    matches!(step, Step::Ref(key) | Step::Field(key)
+                        if matches!(&key.start, Start::Alias(name) if !ctx.aliases.contains_key(name)))
+                }) {
+                    continue;
+                }
+                let part = matches!(&root.start, Start::Part(part) if !part.steps.is_empty());
                 if lists::right_paths(check).contains(&&root)
+                    && !(part && parts_fail)
                     && lists::walked_in(check, &root, ctx).is_some()
                 {
                     continue;
@@ -1452,7 +1561,15 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                 }
                 let read = path::read(&root, ctx);
                 if let Some(cause) = read.outcome.cause() {
-                    found.push((at, cause, root_text(&root, ctx, cause), is_key));
+                    let text = root_text(&root, ctx, cause);
+                    if refs_first.iter().any(|first| std::ptr::eq(*first, *check))
+                        && !is_key
+                        && matches!(root.start, Start::Params | Start::Input)
+                        && matches!(cause, Cause::Absent | Cause::Null)
+                    {
+                        refs.push(text.clone());
+                    }
+                    found.push((at, cause, text, is_key));
                 } else if is_key && let Some(value) = read.value.filter(|value| !value.is_string())
                 {
                     found.push((
@@ -1461,16 +1578,8 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
                         isnt(&name::name(&root), value, "text"),
                         true,
                     ));
-                } else if !is_key
-                    && lists::haystacks(check).contains(&&root)
-                    && let Some(value) = read.value.filter(|value| !value.is_array())
-                {
-                    found.push((
-                        at,
-                        Cause::Unusable,
-                        isnt(&name::name(&root), value, "a list"),
-                        false,
-                    ));
+                } else if !is_key && let Some(text) = root_kind_fault(check, &root, ctx) {
+                    found.push((at, Cause::Unusable, text, false));
                 }
             }
         }
@@ -1481,13 +1590,28 @@ pub fn root_flaw(checks: &[&Check], ctx: &Ctx) -> Option<(Cause, String)> {
             .map(|(_, cause, _, _)| *cause)
             .collect::<Vec<_>>(),
     )?;
-    let mut texts: Vec<String> = Vec::new();
+    let mut kept: Vec<(String, bool)> = Vec::new();
     for (at, cause, text, is_key) in &found {
         let keyed = found.iter().any(|(other, other_cause, _, key)| {
             other == at && *key && (other_cause == cause || *other_cause == Cause::Unusable)
         });
-        if (*is_key || !keyed) && !texts.contains(text) {
-            texts.push(text.clone());
+        if (*is_key || !keyed) && !kept.iter().any(|(said, _)| said == text) {
+            kept.push((text.clone(), *is_key));
+        }
+    }
+    refs.retain(|text| kept.iter().any(|(said, _)| said == text));
+    refs.sort();
+    let keys = kept
+        .iter()
+        .filter(|(text, is_key)| *is_key && !refs.is_empty() && !refs.contains(text))
+        .map(|(text, _)| text.clone());
+    let mut texts: Vec<String> = Vec::new();
+    for text in keys
+        .chain(refs.clone())
+        .chain(kept.iter().map(|(text, _)| text.clone()))
+    {
+        if !texts.contains(&text) {
+            texts.push(text);
         }
     }
     Some((worst, texts.join("; ")))
