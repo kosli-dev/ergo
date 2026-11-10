@@ -10662,11 +10662,6 @@ _for_rooted_row(check, subj, r) := object.union(r, {"cause": _worst_of({flaw, r.
 	ms != []
 } else := _rooted_row(check, subj, r)
 
-_for_sentence_flaw(check, subj) := _worst_of(states) if {
-	states := {fl | some c in array.concat(_for_sentence_conds(check), _for_nested_conds(check)); fl := _root_read_flaw(subj, c); fl != ""}
-	count(states) > 0
-} else := ""
-
 _for_second_roots(check, subj) := [{"fl": fl, "ms": ms, "raw": [_m_aliased(m) | some m in _m_cond_root_texts(subj, c) with input as {"ergo/names": names}]} |
 	count(check.items) == 2
 	item := check.items[0]

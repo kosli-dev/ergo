@@ -5240,7 +5240,7 @@ test_a_for_line_whose_param_cant_be_used_fails_as_unusable_and_keeps_its_inputs 
 	rows := _for_rows({"for": "every xs as x", "assert": "x is one of $params.l"}, [{"id": 1, "xs": [1]}, "s"], {"l": "text"})
 	rows == [[1, "unusable", [{"cause": "unusable", "failed_assertions": [{"assertion": "x is in $params.l", "cause": "unusable"}], "item": "item 1 of xs", "locations": ["/things/0/xs/0"], "path": "item 1 of xs", "value": 1}], [{"name": "xs[]", "value": [1], "locations": ["/things/0/xs/0"]}]], ["s", "unusable", [], [{"name": "xs", "value": [], "locations": []}]]]
 	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [{"x": 1}]}], {"l": "text"})] == ["unusable"]
-	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["not_an_object"]
+	[row[1] | some row in _for_rows({"for": "every xs whose x is one of $params.l as x", "assert": "x is 1"}, [{"id": 1, "xs": [1]}], {"l": "text"})] == ["unusable"]
 }
 
 test_a_name_whose_path_ends_missing_or_unreadable_fails_its_item_before_its_lines if {
