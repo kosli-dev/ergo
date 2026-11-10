@@ -7642,6 +7642,60 @@ pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
         &[],
     ),
     ("o is pl.name", "o equals pl.name", &[], &[]),
+    (
+        "s does not match $params.p",
+        "s does not match $params.p",
+        &[],
+        &[],
+    ),
+    ("s matches $params.l", "s matches $params.l", &[], &[]),
+    ("s matches $params.p", "s matches $params.p", &[], &[]),
+    ("w contains $params.v", "w contains $params.v", &[], &[]),
+    (
+        "w contains all of $params.l",
+        "w contains all of $params.l",
+        &[],
+        &[],
+    ),
+    (
+        "w contains none of $params.l",
+        "w contains none of $params.l",
+        &[],
+        &[],
+    ),
+    (
+        "w contains some of $params.l",
+        "w contains some of $params.l",
+        &[],
+        &[],
+    ),
+    (
+        "w does not contain $params.v",
+        "w does not contain $params.v",
+        &[],
+        &[],
+    ),
+    (
+        "w does not contain all of $params.l",
+        "w does not contain all of $params.l",
+        &[],
+        &[],
+    ),
+    ("x is in $input.l", "x is in $input.l", &[], &[]),
+    ("x is in $params.l", "x is in $params.l", &[], &[]),
+    (
+        "x is in $params.m named by k",
+        "x is in $params.m named by k",
+        &[],
+        &[],
+    ),
+    (
+        "x is not in $input.ks.n",
+        "x is not in $input.ks.n",
+        &[],
+        &[],
+    ),
+    ("x is not in $params.l", "x is not in $params.l", &[], &[]),
 ];
 
 pub const CHECK_ERRORS: &[(&str, &[&str])] = &[

@@ -198,6 +198,13 @@
             "check": "c",
             "inputs": [
               {
+                "name": "$params.l",
+                "value": null,
+                "locations": [
+                  "$params:"
+                ]
+              },
+              {
                 "name": "x",
                 "value": 1,
                 "locations": [
@@ -216,6 +223,13 @@
             "cause": "absent",
             "check": "c",
             "inputs": [
+              {
+                "name": "$params.l",
+                "value": null,
+                "locations": [
+                  "$params:"
+                ]
+              },
               {
                 "name": "x",
                 "value": 2,
@@ -275,6 +289,13 @@
             "cause": "unusable",
             "check": "c",
             "inputs": [
+              {
+                "name": "$params.l",
+                "value": "text",
+                "locations": [
+                  "$params:/l"
+                ]
+              },
               {
                 "name": "x",
                 "value": 1,

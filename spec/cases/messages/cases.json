@@ -1869,7 +1869,7 @@
         "rules": ["path.unusable", "message.cause"],
         "input": {"things": [{"id": "t", "zz": "v"}], "y": 3},
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/zz"], "name": "zz", "value": "v"}], "message": "zz is \"v\", which isn't a list, and $input.y is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/things/0/zz"], "name": "zz", "value": "v"}, {"locations": ["/y"], "name": "$input.y.v", "value": null}], "message": "zz is \"v\", which isn't a list, and $input.y is 3, which isn't an object", "passed": false, "requirement": "s", "subject": {"id": "t", "type": "thing"}}
         ]
       }
     ]
@@ -1911,7 +1911,7 @@
         "rules": ["walk.right", "message.cause"],
         "input": [{"id": "a"}],
         "results": [
-          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}], "message": "$input[0].id is \"a\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
+          {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/0/id"], "name": "id", "value": "a"}, {"locations": ["/0/id"], "name": "$input[0].id", "value": "a"}], "message": "$input[0].id is \"a\", which isn't a list", "passed": false, "requirement": "s", "subject": {"id": "a", "type": "thing"}}
         ]
       }
     ]

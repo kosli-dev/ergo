@@ -763,7 +763,7 @@ With `{"deployment": {"change_type": "bug_fix"}, "test_runs": []}`, the deployme
     ...
 ```
 
-The `$applies` row reads `{"name": "deployment.change_type", "value": "bug_fix", "locations": ["/deployment/change_type"]}`, and the `$applies` entry in `checks` records the list it was compared with, under `$refs`: `{"name": "$params.untested_change_types", "value": ["bug_fix", "refactor"], "locations": ["$params:/untested_change_types"]}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because Ergo can't tell whether it applies.
+The `$applies` row reads `{"name": "$params.untested_change_types", "value": ["bug_fix", "refactor"], "locations": ["$params:/untested_change_types"]}` and `{"name": ".deployment.change_type", "value": "bug_fix", "locations": ["/deployment/change_type"]}`, and the `$applies` entry in `checks` records the list it was compared with too, under `$refs`: `{"name": "$params.untested_change_types", "value": ["bug_fix", "refactor"], "locations": ["$params:/untested_change_types"]}`. A new feature with no test runs fails `tested` and `passed`, and so does a change type that isn't listed, like `hotfix`, so a new or misspelt type has to be tested until someone adds it to the list. A deployment with no `change_type` fails the requirement, because Ergo can't tell whether it applies.
 
 The condition lists the types that don't need tests, rather than the ones that do. `deployment.change_type is "new_development"` would also work, but then any other type, misspelt ones included, would quietly skip the tests.
 
@@ -1087,7 +1087,7 @@ requirements:
 }
 ```
 
-They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `includes_some`, `not_includes_all`, `matches_any` and `not_matches_any`, and only sentences can use those. The row has the same `passed` and `cause` as the sentence with `$params.required_tickets` holding that field's value, and the field is in the row's `inputs` after the left side instead of in `$refs`. A field on the right that's missing or `null` fails the row as `absent` or `null`, whatever the left side is. One that can't be used fails it as `unusable`: not a list after `is in`, `is not in`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match`, an empty list after `contains all of`, `contains none of`, `contains some of` and `does not contain all of`, and patterns that aren't all valid regular expressions. Only when the right side can be used does the left side's own cause count.
+They run as `compare` with `in`, `not_in`, `includes`, `excludes`, `includes_all`, `excludes_all`, `includes_some`, `not_includes_all`, `matches_any` and `not_matches_any`, and only sentences can use those. The row has the same `passed` and `cause` as the sentence with `$params.required_tickets` holding that field's value, and the field is in the row's `inputs` after the left side. A `$params` or `$input` path after these phrases, like `$params.regions` or `$input.sbom.components.name`, is in the row's `inputs` after the left side too, with `null` when nothing was read, and stays in the check's `$refs`, so a violation lists it once. A field on the right that's missing or `null` fails the row as `absent` or `null`, whatever the left side is. One that can't be used fails it as `unusable`: not a list after `is in`, `is not in`, `contains all of`, `contains none of`, `contains some of`, `does not contain all of`, `matches` and `does not match`, an empty list after `contains all of`, `contains none of`, `contains some of` and `does not contain all of`, and patterns that aren't all valid regular expressions. Only when the right side can be used does the left side's own cause count.
 
 A path on the right that goes through a list of objects is walked the way a path after `every` is, and the phrase compares with the list of what the path ends at in each item. With this policy and this input:
 
@@ -1118,7 +1118,8 @@ requirements:
   "cause": "value",
   "check": "in_the_sbom",
   "inputs": [
-    {"locations": ["/pins/1/name"], "name": "name", "value": "attrs"}
+    {"locations": ["/pins/1/name"], "name": "name", "value": "attrs"},
+    {"locations": ["/sbom/components/0/name", "/sbom/components/1/name"], "name": "$input.sbom.components[].name", "value": ["click", "jinja2"]}
   ],
   "message": "name is \"attrs\", and $input.sbom.components[].name is [\"click\", \"jinja2\"]",
   "passed": false,
@@ -1127,7 +1128,7 @@ requirements:
 }
 ```
 
-The path is in the check's `$refs` as `$input.sbom.components[].name`, with the location of each name, and a path from the subject is in the row's `inputs` instead. It works after every phrase above but `contains` and `does not contain`, which take one value. Ergo can't tell whether the names are complete when one can't be read, so every row fails: a component with no name fails as `absent`, with the message `item 2 of $input.sbom.components: name is missing`, one with a `null` name as `null`, something that isn't an object in the list or after the name as `unusable`, and an empty list as `value`, even after `is not in`, with the message `$input.sbom.components is []`. A path that meets no list is read as before, so a list that is `null` or missing fails as `null` or `absent`, and text fails as `unusable` with `$input.sbom.components is "x", which isn't an object`. A phrase that takes one value, like `is` or `starts with`, doesn't read its right side this way.
+The path is in the check's `$refs` as `$input.sbom.components[].name`, with the location of each name, and in the row's `inputs` after the left side, as a path from the subject is. It works after every phrase above but `contains` and `does not contain`, which take one value. Ergo can't tell whether the names are complete when one can't be read, so every row fails: a component with no name fails as `absent`, with the message `item 2 of $input.sbom.components: name is missing`, one with a `null` name as `null`, something that isn't an object in the list or after the name as `unusable`, and an empty list as `value`, even after `is not in`, with the message `$input.sbom.components is []`. A path that meets no list is read as before, so a list that is `null` or missing fails as `null` or `absent`, and text fails as `unusable` with `$input.sbom.components is "x", which isn't an object`. A phrase that takes one value, like `is` or `starts with`, doesn't read its right side this way.
 
 `contains` and `does not contain` look for one value in a list, so the path after them never walks a list. A list it ends at is one value, so a list of pairs can be searched for a pair. A list it meets on the way fails the row as `unusable` and names that list. On an input that is a list, a path from `$input` whose first step is a name, like `$input.k`, fails as `not_an_object` with `$input is [...], which isn't an object`, said once without an item inside a `whose`; `$input[0].k` reads the first item, and `$input` alone is the whole input, looked for as one value. To check a list of values, use `contains all of`, `contains some of` or `contains none of`. With this policy and this input:
 
@@ -1167,7 +1168,8 @@ requirements:
   "cause": "unusable",
   "check": "one_team",
   "inputs": [
-    {"locations": ["/repos/0/teams"], "name": "teams", "value": ["web", "ops"]}
+    {"locations": ["/repos/0/teams"], "name": "teams", "value": ["web", "ops"]},
+    {"locations": ["/owners"], "name": "$input.owners.team", "value": null}
   ],
   "message": "$input.owners is [{\"team\": \"web\"}, {\"team\": \"ops\"}], which isn't an object",
   "passed": false,
@@ -1289,6 +1291,7 @@ click passes on `declared` and prometheus-client on `known`. leftpad fails both,
   "cause": "absent",
   "check": "licence_allowed",
   "inputs": [
+    {"locations": ["$params:/allowed_licenses"], "name": "$params.allowed_licenses", "value": ["BSD-3-Clause", "Apache-2.0"]},
     {"locations": ["$params:/known_package_licenses"], "name": "$params.known_package_licenses named by name", "value": null},
     {"locations": ["/components/2/licenses"], "name": "licenses", "value": [{"license": {"id": "WTFPL"}}]},
     {"locations": ["/components/2/licenses/0/license/id"], "name": "licenses[].license.id", "value": ["WTFPL"]},
@@ -1690,9 +1693,9 @@ each region is a subject, with the region as its id, and the one that isn't allo
 
 ```json
 {"check": "allowed", "subject": {"id": "eu-west-1", "type": "region"}, "passed": true, "cause": "satisfied",
- "inputs": [{"name": "region", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}], "requirement": "allowed"}
+ "inputs": [{"name": "region", "value": "eu-west-1", "locations": ["/deployment/regions/0"]}, {"name": "$params.allowed_regions", "value": ["eu-west-1"], "locations": ["$params:/allowed_regions"]}], "requirement": "allowed"}
 {"check": "allowed", "subject": {"id": "us-east-1", "type": "region"}, "passed": false, "cause": "value", "message": "region is \"us-east-1\", and $params.allowed_regions is [\"eu-west-1\"]",
- "inputs": [{"name": "region", "value": "us-east-1", "locations": ["/deployment/regions/1"]}], "requirement": "allowed"}
+ "inputs": [{"name": "region", "value": "us-east-1", "locations": ["/deployment/regions/1"]}, {"name": "$params.allowed_regions", "value": ["eu-west-1"], "locations": ["$params:/allowed_regions"]}], "requirement": "allowed"}
 ```
 
 The subject's name, as the requirement's `subject` gives it, means the subject itself, whatever it holds. `region is an object` passes for an object, and a subject that is `null` or the wrong type for the phrase fails the way the same phrase fails on a field holding that value: `region is a string` on `null` fails as `null`, on `3` as `value`, and `region is at least 2` on `"a"` as `unusable`. Two regions with the same name still fail `$unique_ids`, because ids are the values.
@@ -1966,9 +1969,9 @@ the two rows are:
 
 ```json
 {"check": "region", "subject": {"id": "d-1", "type": "deployment"}, "passed": false, "cause": "value", "message": "region is \"us-east-1\", and $params.regions is [\"eu-west-1\"]",
- "inputs": [{"name": "region", "value": "us-east-1", "locations": ["/deployments/0/region"]}]}
+ "inputs": [{"name": "region", "value": "us-east-1", "locations": ["/deployments/0/region"]}, {"name": "$params.regions", "value": ["eu-west-1"], "locations": ["$params:/regions"]}]}
 {"check": "region", "subject": {"id": "d-2", "type": "deployment"}, "passed": false, "cause": "absent", "message": "region is missing",
- "inputs": [{"name": "region", "value": null, "locations": ["/deployments/1"]}]}
+ "inputs": [{"name": "region", "value": null, "locations": ["/deployments/1"]}, {"name": "$params.regions", "value": ["eu-west-1"], "locations": ["$params:/regions"]}]}
 ```
 
 and the check's `$refs` entry is `{"name": "$params.regions", "value": ["eu-west-1"], "locations": ["$params:/regions"]}`.
@@ -2237,7 +2240,7 @@ When a check reads several fields, the row shows the first cause in this table's
 
 ## Violations
 
-The violations are the rows of the report that are real problems, each with its check's `description` and `expression` added, and its `$refs` added to the end of `inputs`. Each keeps its row's [`message`](#messages). For the deployment `{"id": "d-2", "approved_by": null}`:
+The violations are the rows of the report that are real problems, each with its check's `description` and `expression` added, and its `$refs` added to the end of `inputs`, each once: a ref the row lists already isn't added again. Each keeps its row's [`message`](#messages). For the deployment `{"id": "d-2", "approved_by": null}`:
 
 ```json
 [

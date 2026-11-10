@@ -9,8 +9,8 @@
         "rules": ["sentence.path.subject", "sentence.check", "subjects.every", "subjects.id", "path.inputs"],
         "input": {"deployment": {"id": "d-17", "regions": ["eu-west-1", "us-east-1"]}},
         "results": [
-          {"cause": "satisfied", "check": "allowed", "inputs": [{"locations": ["/deployment/regions/0"], "name": "region", "value": "eu-west-1"}], "passed": true, "requirement": "allowed", "subject": {"id": "eu-west-1", "type": "region"}},
-          {"cause": "value", "check": "allowed", "inputs": [{"locations": ["/deployment/regions/1"], "name": "region", "value": "us-east-1"}], "message": "region is \"us-east-1\", and $params.allowed_regions is [\"eu-west-1\"]", "passed": false, "requirement": "allowed", "subject": {"id": "us-east-1", "type": "region"}}
+          {"cause": "satisfied", "check": "allowed", "inputs": [{"locations": ["/deployment/regions/0"], "name": "region", "value": "eu-west-1"}, {"locations": ["$params:/allowed_regions"], "name": "$params.allowed_regions", "value": ["eu-west-1"]}], "passed": true, "requirement": "allowed", "subject": {"id": "eu-west-1", "type": "region"}},
+          {"cause": "value", "check": "allowed", "inputs": [{"locations": ["/deployment/regions/1"], "name": "region", "value": "us-east-1"}, {"locations": ["$params:/allowed_regions"], "name": "$params.allowed_regions", "value": ["eu-west-1"]}], "message": "region is \"us-east-1\", and $params.allowed_regions is [\"eu-west-1\"]", "passed": false, "requirement": "allowed", "subject": {"id": "us-east-1", "type": "region"}}
         ],
         "expressions": {"allowed": {"allowed": "region is in $params.allowed_regions"}},
         "refs": {"allowed": {"allowed": [{"locations": ["$params:/allowed_regions"], "name": "$params.allowed_regions", "value": ["eu-west-1"]}]}}
@@ -553,16 +553,16 @@
         "results": [
           {"cause": "satisfied", "check": "c", "inputs": [{"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}, {"locations": ["/xs/0"], "name": "region", "value": "eu"}], "passed": true, "requirement": "r", "subject": {"id": "eu", "type": "region"}},
           {"cause": "satisfied", "check": "d", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "eu"}, {"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}], "passed": true, "requirement": "r", "subject": {"id": "eu", "type": "region"}},
-          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "eu"}], "passed": true, "requirement": "r", "subject": {"id": "eu", "type": "region"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/xs/0"], "name": "region", "value": "eu"}, {"locations": ["$params:/allowed"], "name": "$params.allowed", "value": ["eu", "us"]}], "passed": true, "requirement": "r", "subject": {"id": "eu", "type": "region"}},
           {"cause": "value", "check": "c", "inputs": [{"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}, {"locations": ["/xs/1"], "name": "region", "value": "us"}], "message": "$params.wanted is \"eu\", and region is \"us\"", "passed": false, "requirement": "r", "subject": {"id": "us", "type": "region"}},
           {"cause": "value", "check": "d", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": "us"}, {"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}], "message": "region is \"us\", and $params.wanted is \"eu\"", "passed": false, "requirement": "r", "subject": {"id": "us", "type": "region"}},
-          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": "us"}], "passed": true, "requirement": "r", "subject": {"id": "us", "type": "region"}},
+          {"cause": "satisfied", "check": "e", "inputs": [{"locations": ["/xs/1"], "name": "region", "value": "us"}, {"locations": ["$params:/allowed"], "name": "$params.allowed", "value": ["eu", "us"]}], "passed": true, "requirement": "r", "subject": {"id": "us", "type": "region"}},
           {"cause": "null", "check": "c", "inputs": [{"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}, {"locations": ["/xs/2"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
           {"cause": "null", "check": "d", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": null}, {"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}], "message": "region is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
-          {"cause": "null", "check": "e", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": null}], "message": "region is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
+          {"cause": "null", "check": "e", "inputs": [{"locations": ["/xs/2"], "name": "region", "value": null}, {"locations": ["$params:/allowed"], "name": "$params.allowed", "value": ["eu", "us"]}], "message": "region is null", "passed": false, "requirement": "r", "subject": {"id": null, "type": "region"}},
           {"cause": "unusable", "check": "c", "inputs": [{"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}, {"locations": ["/xs/3"], "name": "region", "value": 3}], "message": "$params.wanted is \"eu\", which isn't a number", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "region"}},
           {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/xs/3"], "name": "region", "value": 3}, {"locations": ["$params:/wanted"], "name": "$params.wanted", "value": "eu"}], "message": "region is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "region"}},
-          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/xs/3"], "name": "region", "value": 3}], "message": "region is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "region"}}
+          {"cause": "unusable", "check": "e", "inputs": [{"locations": ["/xs/3"], "name": "region", "value": 3}, {"locations": ["$params:/allowed"], "name": "$params.allowed", "value": ["eu", "us"]}], "message": "region is 3, which isn't text", "passed": false, "requirement": "r", "subject": {"id": 3, "type": "region"}}
         ]
       }
     ]
@@ -977,7 +977,7 @@
           {"cause": "unusable", "check": "a", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/xs/0"], "name": "thing", "value": {"thing": [0], "x": 0}}], "message": "thing is {\"thing\": [0], \"x\": 0}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}},
           {"cause": "unusable", "check": "b", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/xs/0"], "name": "thing", "value": {"thing": [0], "x": 0}}], "message": "thing is {\"thing\": [0], \"x\": 0}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}},
           {"cause": "unusable", "check": "c", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/xs/0"], "name": "thing", "value": {"thing": [0], "x": 0}}], "message": "thing is {\"thing\": [0], \"x\": 0}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}},
-          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}], "message": "$input.o is {\"a\": 0, \"b\": [0]}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}}
+          {"cause": "unusable", "check": "d", "inputs": [{"locations": ["/xs/0/x"], "name": "x", "value": 0}, {"locations": ["/o"], "name": "$input.o", "value": {"a": 0, "b": [0]}}], "message": "$input.o is {\"a\": 0, \"b\": [0]}, which isn't a list", "passed": false, "requirement": "r", "subject": {"id": {"thing": [0], "x": 0}, "type": "thing"}}
         ]
       }
     ]

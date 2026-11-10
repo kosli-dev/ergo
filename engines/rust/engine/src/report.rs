@@ -990,7 +990,8 @@ pub fn violations(report: &Value) -> Value {
             .and_then(|def| def.get("$refs"))
             .and_then(Value::as_array)
         {
-            inputs.extend(refs.iter().cloned());
+            let listed = inputs.clone();
+            inputs.extend(refs.iter().filter(|r| !listed.contains(r)).cloned());
         }
         let mut violation = Map::new();
         violation.insert("requirement".to_string(), requirement);
@@ -2150,6 +2151,26 @@ mod tests {
         assert!(first.get("passed").is_none());
         assert!(first.get("failed_assertions").is_none());
         assert_eq!(first["subject"], json!({"type": "thing", "id": 1}));
+    }
+
+    #[test]
+    fn a_violation_lists_a_ref_once_when_its_row_lists_it_already() {
+        let report = crate::report(
+            &json!({"things": [{"id": "t", "x": "z"}]}),
+            &json!({
+                "ergo_spec": crate::SPEC,
+                "subjects": {"thing": {"from": "things", "identified_by": "id"}},
+                "requirements": {"s": {"subject": "thing", "checks": {"c": "x is in $params.k"}}}
+            }),
+            &json!({"k": ["a"]}),
+        );
+        assert_eq!(
+            violations(&report)[0]["inputs"],
+            json!([
+                {"name": "x", "value": "z", "locations": ["/things/0/x"]},
+                {"name": "$params.k", "value": ["a"], "locations": ["$params:/k"]}
+            ])
+        );
     }
 
     #[test]

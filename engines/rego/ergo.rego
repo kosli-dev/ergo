@@ -4851,11 +4851,17 @@ _check_inputs(subj, check) := _derived_eval(check, subj).inputs if {
 	_derived_once(check)
 }
 
-_check_inputs(subj, check) := [_path_input(subj, check.path)] if {
+_check_inputs(subj, check) := array.concat([_path_input(subj, check.path)], _right_ref_inputs(check)) if {
 	not check.inputs
 	not _two_sided(check)
 	is_array(check.path)
 }
+
+_right_ref_ops := {"in", "not_in", "includes", "excludes", "includes_some", "not_includes_all", "matches_any", "not_matches_any"}
+
+_right_ref_inputs(check) := _ref_inputs(object.remove(check, ["path"])) if check.op in _right_ref_ops
+
+_right_ref_inputs(check) := [] if not check.op in _right_ref_ops
 
 _leaf_paths(leaf) := [side | some side in [leaf.left, leaf.right]; is_array(side)] if _two_sided(leaf)
 
@@ -6308,7 +6314,7 @@ _violations(report, shadowing) := [object.union(
 		"check": row.check,
 		"description": _definition_field(report.requirements, row, "description"),
 		"expression": _definition_field(report.requirements, row, "expression"),
-		"inputs": array.concat(row.inputs, _recorded_refs(report.requirements, row)),
+		"inputs": array.concat(row.inputs, [r | some r in _recorded_refs(report.requirements, row); not r in row.inputs]),
 		"cause": row.cause,
 	},
 	object.union(object.union(_failed_items_of(row), _failed_assertions_of(row)), _message_of(row)),
@@ -9698,11 +9704,7 @@ _s_plain_model(a) := {"op": _s_contains_ops[a.phrase.op], "path": _s_model_path(
 	not _s_field_arg(a.phrase)
 }
 
-_s_plain_model(a) := object.union({"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))}, _s_shown_inputs(a)) if _s_field_arg(a.phrase)
-
-_s_shown_inputs(a) := {"inputs": [_s_model_path(a.path)]} if _s_named_arg(a.phrase)
-
-_s_shown_inputs(a) := {} if not _s_named_arg(a.phrase)
+_s_plain_model(a) := {"op": "compare", "left": _s_model_path(a.path), "cmp": _s_list_cmps[a.phrase.op], "right": _s_model_path(_s_list_path(a.phrase))} if _s_field_arg(a.phrase)
 
 _s_field_arg(ph) if {
 	ph.op in _s_list_ops

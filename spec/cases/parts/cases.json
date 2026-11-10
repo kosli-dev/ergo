@@ -4255,6 +4255,15 @@
                 ]
               },
               {
+                "name": "$params.allowed named by id",
+                "value": [
+                  1
+                ],
+                "locations": [
+                  "$params:/allowed/a"
+                ]
+              },
+              {
                 "name": "id",
                 "value": "a",
                 "locations": [
