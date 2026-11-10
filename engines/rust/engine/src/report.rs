@@ -571,7 +571,9 @@ pub fn status(
 
 fn parent_key(row: &Row) -> String {
     match &row.subject_in {
-        Some(parents) if !parents.is_empty() => Value::Object(parents.clone()).to_string(),
+        Some(parents) if !parents.is_empty() => {
+            crate::value::plain(&Value::Object(parents.clone())).to_string()
+        }
         _ => String::new(),
     }
 }
@@ -1960,6 +1962,31 @@ mod tests {
             json!([{"cause": "absent", "rows": 1}])
         );
         evaluation.subject_rows[2] = vec![child_row("c", "p2", Cause::Satisfied)];
+        assert_eq!(status(&requirement, &well_formed, &evaluation), "met");
+    }
+
+    #[test]
+    fn some_on_child_subjects_groups_parent_ids_1_and_1_0_together() {
+        let (read, requirement) = requirement_of(
+            json!({"subject": "thing", "require": "some", "checks": {"c": "x exists"}}),
+        );
+        let well_formed = well_formed_row(&read, "s", &requirement, None);
+        let mut one = child_row("c", "p", Cause::Satisfied);
+        one.subject_in = Some(Map::from_iter([(
+            "p".to_string(),
+            serde_json::from_str("1").unwrap(),
+        )]));
+        let mut one_point_zero = child_row("c", "p", Cause::Absent);
+        one_point_zero.subject_in = Some(Map::from_iter([(
+            "p".to_string(),
+            serde_json::from_str("1.0").unwrap(),
+        )]));
+        let evaluation = Evaluation {
+            total: 2,
+            matching: 2,
+            subject_rows: vec![vec![one], vec![one_point_zero]],
+            ..Evaluation::default()
+        };
         assert_eq!(status(&requirement, &well_formed, &evaluation), "met");
     }
 
