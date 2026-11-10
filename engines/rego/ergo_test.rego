@@ -12736,3 +12736,118 @@ test_a_requirement_whose_subject_has_no_parent_works_out_no_ancestor_ids if {
 	[r.check | some r in rep.results; startswith(r.check, "$unique")] == ["$unique_ids"]
 	not "$unique_ancestor_ids" in object.keys(rep.requirements.r.checks)
 }
+
+_item_policy(has, checks) := {
+	"ergo_spec": ergo._spec,
+	"subjects": {"pr": object.union({"from": "prs", "identified_by": "id"}, has)},
+	"requirements": {"r": {"subject": "pr", "checks": checks}},
+}
+
+_item_rows(policy, doc, params) := {r.check: [r.cause, object.get(r, "message", null)] |
+	some r in ergo.report(doc, policy, params).results
+	not startswith(r.check, "$")
+}
+
+_named_by_policy := _item_policy({}, {
+	"every": {"for": "every xs as m", "assert": "m.k named by m.k is 1"},
+	"if_any": {"for": "every xs, if any, as m", "assert": "m.k named by m.k is 1"},
+	"two": {"for": "every xs as m", "assert": ["m is $params.l", "m.v named by m.v is 1"]},
+})
+
+test_a_null_item_under_a_named_by_key_says_it_is_null_once_beside_the_item_that_isnt_text if {
+	doc := {"prs": [{"id": "p0", "xs": [null, {"k": "a"}]}]}
+	rows := _item_rows(_named_by_policy, doc, {})
+	want := "item 1 of xs: m is null; item 2 of xs: m is {\"k\": \"a\"}, which isn't text"
+	rows.every == ["unusable", want]
+	rows.if_any == ["unusable", want]
+	rows.two == ["unusable", concat("", ["$params.l is missing; ", want])]
+}
+
+test_a_null_item_under_a_named_by_key_says_it_is_null_once_when_params_are_there if {
+	rows := _item_rows(_named_by_policy, {"prs": [{"id": "p0", "xs": [null]}]}, {"l": 1})
+	every check in ["every", "if_any", "two"] {
+		rows[check] == ["null", "item 1 of xs: m is null"]
+	}
+}
+
+test_an_item_that_isnt_an_object_and_a_null_item_under_a_named_by_key_are_each_said_once if {
+	rows := _item_rows(_named_by_policy, {"prs": [{"id": "p0", "xs": ["s", null]}]}, {"l": 1})
+	every check in ["every", "if_any", "two"] {
+		rows[check] == ["not_an_object", "item 1 of xs is \"s\", which isn't an object; item 2 of xs: m is null"]
+	}
+}
+
+test_a_named_by_key_that_is_null_or_missing_or_not_text_keeps_saying_each_item_once if {
+	rows := _item_rows(_named_by_policy, {"prs": [{"id": "p0", "xs": [{"k": null}, {}, {"k": 1}]}]}, {})
+	rows.every == ["unusable", "item 1 of xs: k is null; m is {\"k\": null}, which isn't text; item 2 of xs: m is {}, which isn't text; item 3 of xs: m is {\"k\": 1}, which isn't text"]
+}
+
+_part_policy := _item_policy({"has": {"pl": "c"}}, {
+	"in": {"for": "every xs as m", "assert": "m.v is in pl.z"},
+	"matches": {"for": "every xs as m", "assert": "m.v matches pl.z"},
+	"contains": {"for": "every xs as m", "assert": "pl.z contains m.v"},
+})
+
+test_a_part_that_isnt_an_object_on_the_right_of_a_list_phrase_fails_as_unusable_and_names_the_part if {
+	rows := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": [], "xs": [{"v": 1}]}]}, {})
+	every check in ["in", "matches", "contains"] {
+		rows[check] == ["unusable", "pl is [], which isn't an object"]
+	}
+}
+
+test_a_part_that_is_a_list_of_objects_is_not_walked_on_the_right_of_a_list_phrase if {
+	rows := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": [{"z": 1}], "xs": [{"v": 1}]}]}, {})
+	rows.in == ["unusable", "pl is [{\"z\": 1}], which isn't an object"]
+	rows.contains == ["unusable", "pl is [{\"z\": 1}], which isn't an object"]
+	rows.matches == ["unusable", "pl is [{\"z\": 1}], which isn't an object; item 1 of xs: m.v is 1, which isn't text, and pl[].z is [1], which isn't a list of patterns"]
+}
+
+test_a_part_that_is_text_or_null_on_the_right_of_a_list_phrase_says_so if {
+	text := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": "s", "xs": [{"v": 1}]}]}, {})
+	null_part := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": null, "xs": [{"v": 1}]}]}, {})
+	every check in ["in", "matches", "contains"] {
+		text[check][0] == "unusable"
+		null_part[check] == ["null", "pl is null"]
+	}
+	text["in"] == ["unusable", "pl is \"s\", which isn't an object"]
+}
+
+test_a_part_that_is_an_object_with_a_list_still_works_on_the_right_of_a_list_phrase if {
+	rows := _item_rows(_part_policy, {"prs": [{"id": "p0", "c": {"z": [1]}, "xs": [{"v": 1}]}]}, {})
+	rows["in"][0] == "satisfied"
+	rows.contains[0] == "satisfied"
+}
+
+_params_cause_policy := _item_policy({}, {
+	"plain": {"for": "every xs as m", "assert": "m.v is at least 1"},
+	"reads": {"for": "every xs as m", "assert": "m.v is at least $params.n"},
+	"some": {"for": "some xs as m", "assert": "m.v is 1"},
+	"whose": {"for": "every xs whose k is 1 and whose v is in $params.l as m", "assert": "m.v is 1"},
+})
+
+test_params_that_arent_an_object_make_a_for_line_unusable_even_when_its_items_arent_objects if {
+	every params in [[], 3, "s", true] {
+		rows := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": ["s", {"v": "x"}]}]}, params)
+		rows.plain == ["unusable", "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number"]
+		rows.some[0] == "unusable"
+		rows.reads[0] == "unusable"
+		rows.whose[0] == "unusable"
+		nulls := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": [null]}]}, params)
+		nulls.plain == ["unusable", "item 1 of xs is null, which isn't an object"]
+		nulls.reads[0] == "unusable"
+	}
+}
+
+test_params_that_arent_an_object_name_themselves_in_a_for_line_that_reads_them_whatever_its_items_are if {
+	rows := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": [null, "s"]}]}, 3)
+	rows.reads == ["unusable", "$params is 3, which isn't an object"]
+	rows.whose == ["unusable", "$params is 3, which isn't an object"]
+}
+
+test_missing_or_empty_params_leave_items_that_arent_objects_as_not_an_object if {
+	every params in [null, {}] {
+		rows := _item_rows(_params_cause_policy, {"prs": [{"id": "p0", "xs": ["s", {"v": "x"}]}]}, params)
+		rows.plain[0] == "not_an_object"
+		rows.some[0] == "not_an_object"
+	}
+}

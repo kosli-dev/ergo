@@ -25544,5 +25544,1278 @@
         }
       }
     }
+  },
+  {
+    "description": "a key read from the item when the item is null or not text",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "every": {
+              "for": "every xs as m",
+              "assert": "m.k named by m.k is 1"
+            },
+            "if_any": {
+              "for": "every xs, if any, as m",
+              "assert": "m.k named by m.k is 1"
+            },
+            "two": {
+              "for": "every xs as m",
+              "assert": [
+                "m is $params.l",
+                "m.v named by m.v is 1"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "names the null item once, then the item that isn't text",
+        "rules": [
+          "for.named_by",
+          "for.failed_items"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                null,
+                {
+                  "k": "a"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "every",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.k named by m.k is 1",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "m.k named by m.k",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": null
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.k named by m.k is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/k"
+                        ],
+                        "name": "m.k named by m.k",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "a"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  null,
+                  {
+                    "k": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: m is null; item 2 of xs: m is {\"k\": \"a\"}, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "if_any",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.k named by m.k is 1",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "m.k named by m.k",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": null
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.k named by m.k is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/k"
+                        ],
+                        "name": "m.k named by m.k",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "a"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  null,
+                  {
+                    "k": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs: m is null; item 2 of xs: m is {\"k\": \"a\"}, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "two",
+            "failed_items": [
+              {
+                "cause": "absent",
+                "failed_assertions": [
+                  {
+                    "assertion": "m equals $params.l",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "m",
+                        "value": null
+                      },
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.l",
+                        "value": null
+                      }
+                    ]
+                  },
+                  {
+                    "assertion": "m.v named by m.v is 1",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "m.v named by m.v",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": null
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "m equals $params.l",
+                    "cause": "absent",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1"
+                        ],
+                        "name": "m",
+                        "value": {
+                          "k": "a"
+                        }
+                      },
+                      {
+                        "locations": [
+                          "$params:"
+                        ],
+                        "name": "$params.l",
+                        "value": null
+                      }
+                    ]
+                  },
+                  {
+                    "assertion": "m.v named by m.v is 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1"
+                        ],
+                        "name": "m.v named by m.v",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "k": "a"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.l",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  null,
+                  {
+                    "k": "a"
+                  }
+                ]
+              }
+            ],
+            "message": "$params.l is missing; item 1 of xs: m is null; item 2 of xs: m is {\"k\": \"a\"}, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "a part read as a list on the right of a phrase that isn't an object",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id",
+          "has": {
+            "pl": "c"
+          }
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "in": {
+              "for": "every xs as m",
+              "assert": "m.v is in pl.z"
+            },
+            "matches": {
+              "for": "every xs as m",
+              "assert": "m.v matches pl.z"
+            }
+          }
+        }
+      }
+    },
+    "params": {},
+    "cases": [
+      {
+        "description": "an empty list fails as unusable and names the part",
+        "rules": [
+          "for.roots",
+          "for.flaws"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "c": [],
+              "xs": [
+                {
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "in",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "pl is [], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "matches",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "pl is [], which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a list of objects is not walked",
+        "rules": [
+          "for.roots",
+          "for.flaws"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "c": [
+                {
+                  "z": "a"
+                }
+              ],
+              "xs": [
+                {
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "in",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is in pl.z",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "m.v",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c/0/z"
+                        ],
+                        "name": "pl[].z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": [
+                          "a"
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "pl is [{\"z\": \"a\"}], which isn't an object; item 1 of xs: m.v is 1, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "unusable",
+            "check": "matches",
+            "failed_items": [
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v matches pl.z",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "m.v",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c/0/z"
+                        ],
+                        "name": "pl[].z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": [
+                          "a"
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "pl is [{\"z\": \"a\"}], which isn't an object; item 1 of xs: m.v is 1, which isn't text",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      },
+      {
+        "description": "a null part fails as null",
+        "rules": [
+          "for.roots",
+          "for.flaws"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "c": null,
+              "xs": [
+                {
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "null",
+            "check": "in",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is in pl.z",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "m.v",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "pl is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          },
+          {
+            "cause": "null",
+            "check": "matches",
+            "failed_items": [
+              {
+                "cause": "null",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v matches pl.z",
+                    "cause": "null",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0/v"
+                        ],
+                        "name": "m.v",
+                        "value": 1
+                      },
+                      {
+                        "locations": [
+                          "/prs/0/c"
+                        ],
+                        "name": "pl.z",
+                        "part": {
+                          "id": null,
+                          "name": "pl"
+                        },
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": {
+                  "v": 1
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/c"
+                ],
+                "name": "pl.z",
+                "part": {
+                  "id": null,
+                  "name": "pl"
+                },
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "name": "xs[]",
+                "value": [
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "pl is null",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params that are a list fail a for line as unusable even when its items aren't objects",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as m",
+              "assert": "m.v is at least 1"
+            }
+          }
+        }
+      }
+    },
+    "params": [],
+    "cases": [
+      {
+        "description": "an item that isn't an object is named and the cause is still unusable",
+        "rules": [
+          "for.flaws"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                "s",
+                {
+                  "v": "x"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is at least 1",
+                    "cause": "not_an_object",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "m.v",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": "s"
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is at least 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "m.v",
+                        "value": "x"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  "s",
+                  {
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params that are a number fail a for line as unusable even when its items aren't objects",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as m",
+              "assert": "m.v is at least 1"
+            }
+          }
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "an item that isn't an object is named and the cause is still unusable",
+        "rules": [
+          "for.flaws"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                "s",
+                {
+                  "v": "x"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is at least 1",
+                    "cause": "not_an_object",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "m.v",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": "s"
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is at least 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "m.v",
+                        "value": "x"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  "s",
+                  {
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params that are text fail a for line as unusable even when its items aren't objects",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as m",
+              "assert": "m.v is at least 1"
+            }
+          }
+        }
+      }
+    },
+    "params": "s",
+    "cases": [
+      {
+        "description": "an item that isn't an object is named and the cause is still unusable",
+        "rules": [
+          "for.flaws"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                "s",
+                {
+                  "v": "x"
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [
+              {
+                "cause": "not_an_object",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is at least 1",
+                    "cause": "not_an_object",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/0"
+                        ],
+                        "name": "m.v",
+                        "value": null
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 1 of xs",
+                "locations": [
+                  "/prs/0/xs/0"
+                ],
+                "path": "item 1 of xs",
+                "value": "s"
+              },
+              {
+                "cause": "unusable",
+                "failed_assertions": [
+                  {
+                    "assertion": "m.v is at least 1",
+                    "cause": "unusable",
+                    "inputs": [
+                      {
+                        "locations": [
+                          "/prs/0/xs/1/v"
+                        ],
+                        "name": "m.v",
+                        "value": "x"
+                      }
+                    ]
+                  }
+                ],
+                "item": "item 2 of xs",
+                "locations": [
+                  "/prs/0/xs/1"
+                ],
+                "path": "item 2 of xs",
+                "value": {
+                  "v": "x"
+                }
+              }
+            ],
+            "inputs": [
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  "s",
+                  {
+                    "v": "x"
+                  }
+                ]
+              }
+            ],
+            "message": "item 1 of xs is \"s\", which isn't an object; item 2 of xs: v is \"x\", which isn't a number",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "params that are a number fail a for line that reads them as unusable even when its items aren't objects",
+    "policy": {
+      "ergo_spec": "{{spec}}",
+      "subjects": {
+        "pr": {
+          "from": "prs",
+          "identified_by": "id"
+        }
+      },
+      "requirements": {
+        "r": {
+          "subject": "pr",
+          "checks": {
+            "c": {
+              "for": "every xs as m",
+              "assert": "m.v is at least $params.n"
+            }
+          }
+        }
+      }
+    },
+    "params": 3,
+    "cases": [
+      {
+        "description": "a null item does not change the cause",
+        "rules": [
+          "for.flaws"
+        ],
+        "input": {
+          "prs": [
+            {
+              "id": "p0",
+              "xs": [
+                null,
+                {
+                  "v": 1
+                }
+              ]
+            }
+          ]
+        },
+        "results": [
+          {
+            "cause": "unusable",
+            "check": "c",
+            "failed_items": [],
+            "inputs": [
+              {
+                "locations": [
+                  "$params:"
+                ],
+                "name": "$params.n",
+                "value": null
+              },
+              {
+                "locations": [
+                  "/prs/0/xs/0",
+                  "/prs/0/xs/1"
+                ],
+                "name": "xs[]",
+                "value": [
+                  null,
+                  {
+                    "v": 1
+                  }
+                ]
+              }
+            ],
+            "message": "$params is 3, which isn't an object",
+            "passed": false,
+            "requirement": "r",
+            "subject": {
+              "id": "p0",
+              "type": "pr"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

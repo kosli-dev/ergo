@@ -10568,11 +10568,11 @@ _for_row_of(check, subj, r) := r if {
 	r.cause != "satisfied"
 }
 
-_for_row_raw(check, subj) := object.union(r, {"cause": _worst_of({"unusable", r.cause}), "natural": r.cause}) if {
+_for_row_raw(check, subj) := object.union(r, {"cause": "unusable", "natural": r.cause}) if {
 	_params_shape_only_unreadable(check)
 	not _param_broken(check, set())
 	r := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
-} else := object.union(r, {"cause": _worst_of({"unusable", r.cause}), "failed": _for_unreadable_failed(check, r)}) if {
+} else := object.union(r, {"cause": _for_flawed_cause(r), "failed": _for_unreadable_failed(check, r)}) if {
 	_walk_flawed(check)
 	_walk_root_flaw(check, subj) != ""
 	r := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
@@ -10585,6 +10585,16 @@ _for_row_raw(check, subj) := object.union(r, {"cause": _worst_of({"unusable", r.
 	not _for_list_item(item, subj)
 	not is_object(subj)
 } else := _for_rooted(check, subj, _for_outer(check, subj, _for_names))
+
+_for_flawed_cause(_) := "unusable" if _params_not_an_object
+
+_for_flawed_cause(r) := _worst_of({"unusable", r.cause}) if not _params_not_an_object
+
+_params_not_an_object if {
+	some p in data.ergo_unreadable
+	p.name == "$params"
+	"not an object" in p.value
+}
 
 _for_row_text(check, _, r) := _m_fallback(check) if object.get(r, "natural", null) == "satisfied"
 
@@ -11890,12 +11900,16 @@ _key_step_later(p) if {
 	is_object(step)
 }
 
-_m_null_key_pair(subj, p) := [concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i])] if {
+_m_null_key_pair(subj, p) := _m_said_once(concat("", [_input_name(array.slice(p, 0, j)), " is null"]), _m_key_text(subj, p[i])) if {
 	i := min({k | some k, step in p; _m_key_text(subj, step)})
 	i > 0
 	j := min({m | some m in numbers.range(1, i); _resolved(subj, array.slice(p, 0, m)) == null})
 	_input_name(array.slice(p, 0, j)) != "$params"
 }
+
+_m_said_once(first, second) := [second] if _m_aliased(first) == second
+
+else := [first, second]
 
 _m_key_text(subj, step) := t if {
 	t := _m_key_fault(subj, step)
