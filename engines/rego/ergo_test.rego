@@ -2555,6 +2555,27 @@ test_violations_exclude_rows_of_a_met_requirement if {
 	ergo.violations(rep) == []
 }
 
+test_some_on_a_child_subject_is_not_met_by_a_passing_child_under_another_parent if {
+	policy := {
+		"ergo_spec": ergo._spec,
+		"subjects": {
+			"commit": {"from": "commits", "identified_by": "sha"},
+			"pull request": {"from": "every commit.pull_requests", "identified_by": "number"},
+		},
+		"requirements": {"reviewed": {"subject": "pull request", "require": "some", "checks": {"approved": "approved_by is a non-empty string"}}},
+	}
+	rep := ergo.report(
+		{"commits": [
+			{"sha": "a1", "pull_requests": [{"number": 7, "approved_by": "bob"}, {"number": 8}]},
+			{"sha": "a2", "pull_requests": [{"number": 9}]},
+		]},
+		policy, {},
+	)
+	rep.requirements.reviewed.status == "not_met"
+	rep.requirements.reviewed.causes == [{"cause": "absent", "rows": 1}]
+	[v.subject | some v in ergo.violations(rep)] == [{"type": "pull request", "id": 9, "in": {"commit": "a2"}}]
+}
+
 test_is_violation_reads_only_the_requirements_so_violations_stay_linear_in_subjects if {
 	rep := report(
 		{"items": [

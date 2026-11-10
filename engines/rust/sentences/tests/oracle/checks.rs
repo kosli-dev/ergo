@@ -1,4 +1,11 @@
 pub const CHECK_OK: &[(&str, &str, &[&str], &[&str])] = &[
+    (
+        "approved_by is a non-empty string",
+        "approved_by is a non-empty string",
+        &[],
+        &[],
+    ),
+    ("valid is true", "valid is true", &[], &[]),
     ("i.qty is 1", "i.qty is 1", &[], &[]),
     ("w is not empty", "w is not empty", &[], &[]),
     (".y.k is 9", "y.k is 9", &[], &[]),

@@ -5461,11 +5461,21 @@ _required("every", groups) if {
 }
 
 _required("some", groups) if {
-	some group in groups
-	_all_passed(group)
+	pairs := _parent_passes(groups)
+	count({parent | some [parent, _] in pairs} - {parent | some [parent, true] in pairs}) == 0
 }
 
-_required("some", groups) if count(groups) == 0
+_group_parent(group) := object.get(group[0].subject, "in", {})
+
+_parent_passes(groups) := {[_group_parent(group), _group_passed(group)] | some group in groups; count(group) > 0}
+
+_group_passed(group) if _all_passed(group)
+
+else := false
+
+_shadowing_parents(req, e) := {parent | some [parent, true] in _parent_passes(e.subject_rows)} - {{}} if _require_of(req) == "some"
+
+else := set()
 
 _all_passed(rows) if {
 	every row in rows {
@@ -5485,18 +5495,36 @@ _status(req, e) := "not_applicable" if {
 
 _status(req, e) := "not_met" if not _holds(req, e)
 
-_causes(status, _) := [] if status in {"met", "not_applicable"}
+_causes(status, _, _) := [] if status in {"met", "not_applicable"}
 
-_causes("not_met", e) := [{"cause": cause, "rows": n} |
+_causes("not_met", e, req) := _counted_causes(e, _shadowing_parents(req, e))
+
+_counted_causes(e, shadowing) := _cause_counts([row.cause | some row in _failing_rows(e, shadowing)])
+
+_cause_counts(causes) := [{"cause": cause, "rows": n} |
 	some cause in array.concat(_cause_precedence, ["value"])
-	n := count([row |
-		some row in _requirement_rows(e)
-		row.passed == false
-		not _out_of_scope_row(row)
-		row.cause == cause
-	])
+	n := count([found | some found in causes; found == cause])
 	n > 0
 ]
+
+_failing_rows(e, shadowing) := [row |
+	some row in _requirement_rows(e)
+	row.passed == false
+	not _out_of_scope_row(row)
+] if count(shadowing) == 0
+
+else := [row |
+	some row in _requirement_rows(e)
+	row.passed == false
+	not _out_of_scope_row(row)
+	not _shadowed(row, shadowing)
+]
+
+_shadowed(row, shadowing) if {
+	count(shadowing) > 0
+	not startswith(row.check, "$")
+	object.get(row.subject, "in", {}) in shadowing
+}
 
 _requirement_rows(e) := array.concat(
 	array.concat(array.concat([e.well_formed], array.concat(e.min_subjects, e.unique_ids)), e.applies),
@@ -5950,7 +5978,7 @@ _report_of(doc, policy, compiled) := {
 		"require": _require_of(req),
 		"subject": _reported_subject_name(req),
 		"status": status,
-		"causes": _causes(status, evaluations[name]),
+		"causes": _causes(status, evaluations[name], req),
 		"subjects": {"total": evaluations[name].total, "matching": evaluations[name].matching},
 		"checks": _ahead_check_defs(req, object.get(compiled, name, {})),
 	} |
@@ -6213,7 +6241,34 @@ _every_no_items(req) := {"failed_items": []} if _every_from(req)
 
 else := {}
 
-violations(report) := [object.union(
+violations(report) := _violations(report, _shadowing_report_parents(report))
+
+_shadowing_report_parents(report) := _shadowing_in(report, _some_requirements(report))
+
+_shadowing_in(report, some_requirements) := set() if count(some_requirements) == 0
+
+else := {[requirement, subject.in] | some [requirement, subject] in (_child_check_subjects(report, some_requirements) - _failed_child_check_subjects(report, some_requirements))}
+
+_some_requirements(report) := {name | some name, req in report.requirements; req.require == "some"}
+
+_child_check_subjects(report, some_requirements) := {[row.requirement, row.subject] |
+	some row in report.results
+	_child_check_row(some_requirements, row)
+}
+
+_failed_child_check_subjects(report, some_requirements) := {[row.requirement, row.subject] |
+	some row in report.results
+	_child_check_row(some_requirements, row)
+	row.passed == false
+}
+
+_child_check_row(some_requirements, row) if {
+	row.requirement in some_requirements
+	not startswith(row.check, "$")
+	object.get(row.subject, "in", {}) != {}
+}
+
+_violations(report, shadowing) := [object.union(
 	{
 		"requirement": row.requirement,
 		"subject": row.subject,
@@ -6225,9 +6280,19 @@ violations(report) := [object.union(
 	},
 	object.union(object.union(_failed_items_of(row), _failed_assertions_of(row)), _message_of(row)),
 ) |
-	some row in report.results
+	some row in _unshadowed_results(report, shadowing)
 	_is_violation(report.requirements, row)
 ]
+
+_unshadowed_results(report, shadowing) := report.results if count(shadowing) == 0
+
+else := [row | some row in report.results; not _shadowed_in_report(row, shadowing)]
+
+_shadowed_in_report(row, shadowing) if {
+	count(shadowing) > 0
+	not startswith(row.check, "$")
+	[row.requirement, object.get(row.subject, "in", {})] in shadowing
+}
 
 _message_of(row) := {"message": row.message} if "message" in object.keys(row)
 
