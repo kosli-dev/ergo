@@ -94,9 +94,22 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
     },
     requirements: { approved: { subject: "test", checks: { ok: "ok is true and deployment.approved_by exists" } } },
   };
-  const measure = async (name, policy, rows, matching, budgetMB) => {
+  const forPolicy = {
+    ergo_spec: "v0.6-dev",
+    subjects: budgetPolicy.subjects,
+    requirements: {
+      approved: {
+        subject: "deployment",
+        checks: {
+          approved: { for: "every tests as t", assert: ["t.ok is true", "approved_by is a non-empty string"] },
+          expected: { for: "every tests as t", assert: "t.ok is $params.ok" },
+        },
+      },
+    },
+  };
+  const measure = async (name, policy, rows, matching, budgetMB, params = {}) => {
     const fresh = await load(ergoDir);
-    const report = fresh.evaluate({ document, policy, params: {} }, "entrypoint/report")[0].result;
+    const report = fresh.evaluate({ document, policy, params }, "entrypoint/report")[0].result;
     const usedMB = (fresh.wasmInstance.exports.opa_heap_ptr_get() - fresh.baseHeapPtr) / 1e6;
     const sound = report.results.length === rows && report.requirements.approved.subjects.matching === matching;
     console.log(`A report on 100 deployments ${name} used ${usedMB.toFixed(1)} MB of Wasm memory (budget ${budgetMB} MB)`);
@@ -107,5 +120,6 @@ Promise.all([load(runtimeDir, { initial: 16 }), load(ergoDir)]).then(async ([pol
   const withEvery = await measure("with a check on every test", budgetPolicy, 338, 66, 26);
   const withSentences = await measure("with three checks on each deployment", sentencePolicy, 301, 66, 19);
   const withChain = await measure("with the tests of each prod deployment as subjects", chainPolicy, 266, 132, 43);
-  process.exit(failed.length > 0 || !withEvery || !withSentences || !withChain ? 1 : 0);
+  const withFor = await measure("with two for checks on each deployment", forPolicy, 235, 66, 112, { ok: true });
+  process.exit(failed.length > 0 || !withEvery || !withSentences || !withChain || !withFor ? 1 : 0);
 });
