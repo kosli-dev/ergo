@@ -57,7 +57,8 @@ grep -qxF 'current interface' out/packages/interface
 grep -qxF 'export const sampleCases = { bakery: "baking" };' out/packages/playground/released-build.mjs
 grep -qxF 'released rust' out/engines/rust/source
 grep -qxF 'released rust corpus' out/spec/sentences-corpus.json
-grep -qxF 'version := "0.9.0"' out/engines/rego/ergo.rego
+grep -qxF 'version := "0.9.0"' out/dist/ergo.rego
+[ ! -e out/engines/rego ]
 if RELEASES=rego-v0.9.0 site/prepare-playground.sh "$dir/missing"; then exit 1; fi
 if ASSET_VERSION=0.9.0-dev site/prepare-playground.sh "$dir/wrong"; then exit 1; fi
 if site/prepare-playground.sh "$dir/out"; then exit 1; fi

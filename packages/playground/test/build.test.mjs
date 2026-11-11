@@ -74,12 +74,12 @@ test("the page has a tab label for every view", () => {
 });
 
 const casesDir = join(here, "..", "..", "markdown", "cases");
-const regoVersion = /^version := "(.+)"$/m.exec(readFileSync(join(casesDir, "..", "..", "..", "engines", "rego", "ergo.rego"), "utf8"))[1];
+const regoVersion = () => /^version := "(.+)"$/m.exec(readFileSync(join(casesDir, "..", "..", "..", "dist", "ergo.rego"), "utf8"))[1];
 const expected = (dir, file) => {
   const path = join(casesDir, dir, file);
   if (!existsSync(path)) return null;
   const value = JSON.parse(readFileSync(path, "utf8"));
-  if (value.engine?.version === "ergo.rego's version") value.engine.version = regoVersion;
+  if (value.engine?.version === "ergo.rego's version") value.engine.version = regoVersion();
   return value;
 };
 let ergo;
@@ -111,7 +111,7 @@ test("the Wasm inside the page reads a number a JavaScript number can't hold as 
 
 test("the Rust Wasm inside the page reads a number a JavaScript number can't hold as written", async () => {
   const policy = {
-    ergo_spec: /^_spec := "(v[0-9.]+(?:-dev)?)"/m.exec(readFileSync(join(casesDir, "..", "..", "..", "engines", "rego", "ergo.rego"), "utf8"))[1],
+    ergo_spec: /^_spec := "(v[0-9.]+(?:-dev)?)"/m.exec(readFileSync(join(casesDir, "..", "..", "..", "dist", "ergo.rego"), "utf8"))[1],
     subjects: { item: { from: "items", identified_by: "id" } },
     requirements: { r: { subject: "item", checks: { exact: "n is 9007199254740993", cap: "n is at most $params.max" } } },
   };

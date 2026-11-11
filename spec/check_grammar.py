@@ -293,7 +293,7 @@ def ergo_reads(samples):
     handle.close()
     try:
         out = subprocess.run(
-            ["opa", "eval", "--format", "json", "-d", "engines/rego/ergo.rego", "-d", probe_file.name, "--input", handle.name, "data.probe.out"],
+            ["opa", "eval", "--format", "json", "-d", "dist/ergo.rego", "-d", probe_file.name, "--input", handle.name, "data.probe.out"],
             capture_output=True, text=True,
         )
     finally:
@@ -336,6 +336,7 @@ def rust_command(argv):
 
 def main():
     command = rust_command(sys.argv[1:])
+    subprocess.run([".github/build-ergo.sh"], check=True)
     started = time.time()
     grammar = load_grammar()
     generator = Generator(grammar, SEED)

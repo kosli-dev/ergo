@@ -50,7 +50,8 @@ const buildWasm = () => {
   const dir = mkdtempSync(join(tmpdir(), "ergo-editor-"));
   try {
     mkdirSync(join(dir, "src"));
-    copyFileSync(join(root, "engines", "rego", "ergo.rego"), join(dir, "src", "ergo.rego"));
+    if (existsSync(join(root, "engines", "rego", "src"))) execFileSync(join(root, ".github", "build-ergo.sh"), { stdio: "inherit" });
+    copyFileSync(join(root, "dist", "ergo.rego"), join(dir, "src", "ergo.rego"));
     writeFileSync(
       join(dir, "src", "editor.rego"),
       "package editor\n\nimport data.ergo\n\nreport := ergo.report(input.input, input.policy, input.params)\n",

@@ -101,7 +101,8 @@ The `wasm` profile aborts on a panic. In JavaScript that is a `WebAssembly.Runti
 
 ```sh
 python3 engines/rust/bench/make_inputs.py /tmp/ergo-bench
-opa eval -d engines/rego/ergo.rego -d /tmp/ergo-bench/bench.rego -d /tmp/ergo-bench/data.json -i /tmp/ergo-bench/input-1000.json --metrics --format json 'data.bench.report' > /tmp/ergo-bench/opa.json
+.github/build-ergo.sh
+opa eval -d dist/ergo.rego -d /tmp/ergo-bench/bench.rego -d /tmp/ergo-bench/data.json -i /tmp/ergo-bench/input-1000.json --metrics --format json 'data.bench.report' > /tmp/ergo-bench/opa.json
 jq '.result[0].expressions[0].value' /tmp/ergo-bench/opa.json > /tmp/ergo-bench/rego.json
 jq '.metrics.timer_rego_query_eval_ns / 1e9' /tmp/ergo-bench/opa.json
 docker run --rm -v "$PWD":/src -v /tmp/ergo-bench:/bench -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust \

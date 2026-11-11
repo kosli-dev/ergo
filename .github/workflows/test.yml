@@ -34,13 +34,17 @@ jobs:
         run: |
           .github/spec-placeholder.sh
           .github/spec-placeholder_test.sh
-      - run: opa check --strict engines/rego spec:spec examples:examples
+      - name: Build dist/ergo.rego from its parts
+        run: |
+          .github/build-ergo_test.sh
+          .github/build-ergo.sh
+      - run: opa check --strict engines/rego dist spec:spec examples:examples --ignore src
       - name: Check Ergo compiles where input is checked against a closed schema
-        run: opa check --strict --schema .github/closed-input-schema.json engines/rego/ergo.rego
+        run: opa check --strict --schema .github/closed-input-schema.json dist/ergo.rego
       - name: Check Ergo compiles without built-ins whose answer depends on the machine
         run: |
           opa capabilities --current | jq '.builtins |= map(select(.nondeterministic != true))' > "$RUNNER_TEMP/deterministic.json"
-          opa check --strict --capabilities "$RUNNER_TEMP/deterministic.json" engines/rego/ergo.rego
+          opa check --strict --capabilities "$RUNNER_TEMP/deterministic.json" dist/ergo.rego
       - run: opa fmt --list --fail engines/rego examples engines/rust/sentences/tests/oracle
       - name: Check every folder with Rego is named in the OPA commands
         run: |
@@ -62,7 +66,7 @@ jobs:
         run: |
           comments=$(git ls-files '*.rego' | while read -r f; do
             opa parse "$f" --format json --json-include comments,locations |
-              jq -r --arg f "$f" '.package.location.row as $p | .comments[]? | .Location.row as $r | select(($f == "engines/rego/ergo.rego" and $r < $p) | not) | "\($f):\($r)"'
+              jq -r --arg f "$f" '.package.location.row as $p | .comments[]? | .Location.row as $r | select(($f == "engines/rego/src/package.rego" and $r < $p) | not) | "\($f):\($r)"'
           done)
           if [ -n "$comments" ]; then
             echo "These lines have comments:"
@@ -70,7 +74,7 @@ jobs:
             exit 1
           fi
       - name: Check the tests give the same results with --strict-builtin-errors
-        run: opa eval --strict-builtin-errors -d engines/rego -d spec:spec -d examples:examples --format raw 'count(data) > 0'
+        run: opa eval --strict-builtin-errors -d engines/rego -d dist -d spec:spec -d examples:examples --ignore src --format raw 'count(data) > 0'
 
   tests-rego:
     runs-on: ubuntu-latest
@@ -89,12 +93,13 @@ jobs:
       - name: Run this part of the tests with coverage
         shell: bash
         run: |
-          if ! opa test engines/rego spec:spec examples:examples --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
+          .github/build-ergo.sh
+          if ! opa test engines/rego dist spec:spec examples:examples --ignore src --timeout 120s --coverage -r "$(.github/tests.sh | .github/test-pattern.sh)" > "$RUNNER_TEMP/coverage.json"; then
             cat "$RUNNER_TEMP/coverage.json"
             exit 1
           fi
-          jq -e '.files["engines/rego/ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
-          jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | range(.start.row; .end.row + 1) | "\($f):\(.)"' "$RUNNER_TEMP/coverage.json" | sort -u > "$RUNNER_TEMP/not-covered-$PART.txt"
+          jq -e '.files["dist/ergo.rego"]' "$RUNNER_TEMP/coverage.json" > /dev/null
+          jq -r '.files | to_entries[] | .key as $f | .value.not_covered[]? | range(.start.row; .end.row + 1) | "\($f):\(.)"' "$RUNNER_TEMP/coverage.json" | .github/build-ergo.sh where | sort -u > "$RUNNER_TEMP/not-covered-$PART.txt"
       - uses: actions/upload-artifact@v7
         with:
           name: not-covered-${{ matrix.part }}
@@ -243,6 +248,9 @@ jobs:
         with:
           name: ergo-policy-sentences-wasm-pkg
           path: engines/rust/sentences-wasm/pkg
+      - name: Build dist/ergo.rego from its parts
+        working-directory: .
+        run: .github/build-ergo.sh
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm test

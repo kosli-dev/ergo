@@ -38,6 +38,6 @@ body:
     id: versions
     attributes:
       label: Versions
-      description: The output of `opa version`, and the commit or date of the `ergo.rego` you copied.
+      description: The output of `opa version`, and the release of the `ergo.rego` you use, which its `version :=` line says.
     validations:
       required: true

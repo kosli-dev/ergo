@@ -8,7 +8,9 @@ import {fileURLToPath} from "node:url";
 import {compile} from "../src/compile.ts";
 
 const cases = fileURLToPath(new URL("../cases/", import.meta.url));
-const ergo = fileURLToPath(new URL("../../../engines/rego/ergo.rego", import.meta.url));
+const root = fileURLToPath(new URL("../../../", import.meta.url));
+execFileSync(join(root, ".github", "build-ergo.sh"));
+const ergo = join(root, "dist", "ergo.rego");
 
 const report = (policy: unknown, params: unknown, input: string): string => {
   const dir = mkdtempSync(join(tmpdir(), "ergo-markdown-"));

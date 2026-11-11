@@ -58,10 +58,12 @@ PATH=$dir/bin:$PATH
 export PATH
 
 repo=$dir/repo
-mkdir -p "$repo/site/assets/js/tutorial" "$repo/site/assets/css" "$repo/site/layouts" "$repo/site/content" "$repo/examples/demo" "$repo/engines/rego" "$repo/spec/policy" "$repo/spec/report"
+mkdir -p "$repo/site/assets/js/tutorial" "$repo/site/assets/css" "$repo/site/layouts" "$repo/site/content" "$repo/examples/demo" "$repo/engines/rego/src/shared" "$repo/.github" "$repo/spec/policy" "$repo/spec/report"
 cd "$repo"
 git init --quiet
 cp "$root/site/prepare.sh" "$root/site/latest-release.sh" "$root/site/spec-schemas.sh" site/
+cp "$root/.github/build-ergo.sh" .github/
+printf 'package ergo\n\nimport rego.v1\n' > engines/rego/src/package.rego
 printf '%s\n' '# Readme' '"version": "0.1.0-dev"' '10.1.0-dev' '0.1.0-devX' '0.1.0-dev-rc' 'v0.1.0-dev' '0.1.0-dev 0.1.0-dev' 'Ergo is at 0.1.0-dev.' 'x.0.1.0-dev' > README.md
 echo 'expected ergo.rego 0.1.0-dev' > REFERENCE.md
 echo "package demo" > examples/demo/demo.rego
@@ -71,7 +73,7 @@ echo ".tut {}" > site/assets/css/tutorial.css
 echo ":root {}" > site/assets/css/ergo.css
 echo "<head></head><div></div>" > site/layouts/tutorial.html
 echo "---" > site/content/tutorial.md
-printf 'package ergo\n\nversion := "0.1.0-dev"\n\n_spec := "v0.1"\n' > engines/rego/ergo.rego
+printf 'package ergo\n\nimport rego.v1\n\nversion := "0.1.0-dev"\n\n_spec := "v0.1"\n' > engines/rego/src/shared/basics.rego
 for name in policy report; do
   printf '{\n  "$id": "https://ergo.kosli.com/spec/0.1/%s.schema.json"\n}\n' "$name" > "spec/$name/schema.json"
 done
@@ -79,7 +81,7 @@ git add .
 git -c user.name=test -c user.email=test@example.com -c commit.gpgSign=false commit --quiet --message release
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag rego-v0.1.0
 git -c tag.gpgSign=false -c tag.forceSignAnnotated=false tag spec-v0.1
-printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > engines/rego/ergo.rego
+printf 'package ergo\n\nimport rego.v1\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > engines/rego/src/shared/basics.rego
 
 fails() {
   if out=$(site/prepare.sh "$@" 2>&1); then
@@ -225,10 +227,10 @@ site/prepare.sh --working-tree > /dev/null
 says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "0.4.1", "spec": "0.1", "ergo_spec": "v0.2-dev", "opa": "", "cli": ""}'
 git tag --delete rust-v0.4.1 rust-v0.4.0 > /dev/null
 
-printf 'package ergo\n\nversion := "0.3.0-dev"\n\n_spec := "v0.3"\n' > engines/rego/ergo.rego
+printf 'package ergo\n\nimport rego.v1\n\nversion := "0.3.0-dev"\n\n_spec := "v0.3"\n' > engines/rego/src/shared/basics.rego
 site/prepare.sh --working-tree > /dev/null
 says site/prepared/data/release.json '{"source": "working tree", "rego": "", "rust": "", "spec": "0.1", "ergo_spec": "v0.3", "opa": "", "cli": ""}'
-printf 'package ergo\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > engines/rego/ergo.rego
+printf 'package ergo\n\nimport rego.v1\n\nversion := "0.2.0-dev"\n\n_spec := "v0.2-dev"\n' > engines/rego/src/shared/basics.rego
 
 (expected="usage: site/prepare.sh [--working-tree]"; fails --release)
 (FAKE_RELEASES="rego-v1.0.0-rc1 rego-vlatest spec-v0.1"; expected="kosli-dev/ergo has no published rego-vX.Y.Z release"; fails)

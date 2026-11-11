@@ -19,11 +19,11 @@ git init --quiet "$dir/work"
 cd "$dir/work"
 git config user.name test
 git config user.email test@example.com
-mkdir -p engines/rego engines/rust
+mkdir -p engines/rego/src/shared engines/rust
 git commit --quiet --allow-empty -m setup
 
 setup() {
-  printf '%s\n' "version := \"$1-dev\"" > engines/rego/ergo.rego
+  printf '%s\n' "version := \"$1-dev\"" > engines/rego/src/shared/basics.rego
   printf '%s\n' '# Changes' '' "## $2" '' ${3:+"$3"} 'Text.' > CHANGELOG.md
   printf '%s\n' '[workspace.package]' "version = \"$1-dev\"" > engines/rust/Cargo.toml
   printf '%s\n' '# Changes' '' "## $2 (not released yet)" '' ${3:+"$3"} 'Text.' > engines/rust/CHANGELOG.md
@@ -156,7 +156,7 @@ setup 0.1.1 'Unreleased'
 fails "must look like ## 0.3.1"
 
 setup 0.1.1 0.1.1
-printf '%s\n' 'version := "0.1.1"' > engines/rego/ergo.rego
+printf '%s\n' 'version := "0.1.1"' > engines/rego/src/shared/basics.rego
 if out=$(bash "$script" rego 2>&1); then
   echo "changelog-version.sh rego should fail without -dev, and passed" >&2
   exit 1

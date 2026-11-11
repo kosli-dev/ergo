@@ -94,7 +94,7 @@ The spec doesn't settle these yet, because the two engines give different report
 
 ## Rules without cases
 
-Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and `ergo_test.rego` tests it instead. `report.hash` waits for the question about hashing numbers above. `report.keys` is about how the report is written out, and a case compares a report as values, where the order of keys doesn't count. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
+Every rule needs a case, apart from the ones listed here. The `sentence` rules here are for forms `ergo.rego` doesn't run or check yet. `report.engine` gives different values for each engine, so a case can't pin it, and the Rego tests in `engines/rego/tests` test it instead. `report.hash` waits for the question about hashing numbers above. `report.keys` is about how the report is written out, and a case compares a report as values, where the order of keys doesn't count. `check_rules.py` fails when a rule on this list has a case or doesn't exist, so the list stays true.
 
 - `sentence.forms`
 - `sentence.subject.depth`

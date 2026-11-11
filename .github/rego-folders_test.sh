@@ -5,8 +5,8 @@ dir=$(mktemp -d)
 trap 'rm -rf "$dir"' EXIT
 cd "$dir"
 git init --quiet
-mkdir -p engines/rego spec/cases examples/baking/ergo engines/rust/sentences/tests/oracle
-for file in engines/rego/ergo.rego engines/rego/ergo_test.rego examples/baking/ergo/policy.rego engines/rust/sentences/tests/oracle/oracle_test.rego; do
+mkdir -p engines/rego/src engines/rego/tests spec/cases examples/baking/ergo engines/rust/sentences/tests/oracle
+for file in engines/rego/src/package.rego engines/rego/tests/spec_test.rego examples/baking/ergo/policy.rego engines/rust/sentences/tests/oracle/oracle_test.rego; do
   echo "package demo" > "$file"
 done
 echo "{}" > spec/cases/cases.json
@@ -35,7 +35,7 @@ for expected in "tools/helper.rego" "engines/rust/other/other_test.rego" "spec/s
   esac
 done
 case $out in
-  *"engines/rego/ergo.rego"* | *"oracle_test.rego"*)
+  *"engines/rego/src/package.rego"* | *"spec_test.rego"* | *"oracle_test.rego"*)
     echo "rego-folders.sh should not name the allowed files, and said: $out" >&2
     exit 1
     ;;

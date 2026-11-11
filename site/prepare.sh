@@ -58,10 +58,10 @@ if [ "$mode" = release ]; then
     git cat-file -e "$1:$2" 2> /dev/null
   }
   rego_version_of() {
-    git show "$1:engines/rego/ergo.rego" 2> /dev/null | sed -n 's/^version := "\(.*\)"$/\1/p'
+    { git show "$1:engines/rego/src/shared/basics.rego" 2> /dev/null || git show "$1:engines/rego/ergo.rego" 2> /dev/null; } | sed -n 's/^version := "\(.*\)"$/\1/p'
   }
   spec_of() {
-    { git show "$1:engines/rego/ergo.rego" 2> /dev/null || git show "$1:ergo.rego" 2> /dev/null; } | sed -n 's/^_spec := "\(v[0-9][0-9]*\.[0-9][0-9]*\)"$/\1/p'
+    { git show "$1:engines/rego/src/shared/basics.rego" 2> /dev/null || git show "$1:engines/rego/ergo.rego" 2> /dev/null || git show "$1:ergo.rego" 2> /dev/null; } | sed -n 's/^_spec := "\(v[0-9][0-9]*\.[0-9][0-9]*\)"$/\1/p'
   }
 
   found_spec=
@@ -156,7 +156,8 @@ if [ "$mode" = release ]; then
     tar -x -f "$dir/cli.tar" -C "$dir/tag"
   fi
 else
-  rego=engines/rego/ergo.rego
+  .github/build-ergo.sh
+  rego=dist/ergo.rego
   version=
   docs=.
   source="working tree"
