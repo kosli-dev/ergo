@@ -1,5 +1,5 @@
 ---
-ergo_spec: v0.6-dev
+ergo_spec: v0.6
 ---
 
 # Deployments and their tests

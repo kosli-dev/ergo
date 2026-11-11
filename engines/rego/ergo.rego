@@ -5989,7 +5989,7 @@ else := {concat("", ["unsupported version ", v, ", expected ", _spec])} if v != 
 
 else := set()
 
-_spec := "v0.6-dev"
+_spec := "v0.6"
 
 _is_version(v) if regex.match(`^v[0-9]+\.[0-9]+(-dev)?$`, v)
 

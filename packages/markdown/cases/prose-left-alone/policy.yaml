@@ -1,4 +1,4 @@
-ergo_spec: v0.6-dev
+ergo_spec: v0.6
 description: Every batch that leaves the bakery is safe to eat and baked right.
 subjects:
   batch:
