@@ -15,11 +15,11 @@ cargo install --locked ergo-policy-cli
 Or download it, without Rust, for Linux (x86_64) or macOS (arm64) from the [latest release of the CLI](https://github.com/kosli-dev/ergo/releases?q=rust&expanded=true), unpack it and put `ergo` on your `PATH`:
 
 ```sh
-curl -L https://github.com/kosli-dev/ergo/releases/download/rust-v0.3.0/ergo-0.3.0-macos-arm64.tar.gz | tar xz
+curl -L https://github.com/kosli-dev/ergo/releases/download/rust-v0.4.0/ergo-0.4.0-macos-arm64.tar.gz | tar xz
 ./ergo --version
 ```
 
-On Linux, the file is `ergo-0.3.0-linux-x86_64.tar.gz`.
+On Linux, the file is `ergo-0.4.0-linux-x86_64.tar.gz`.
 
 To build it from this repo with Docker instead, see [`engines/rust/README.md`](engines/rust/README.md#building-the-cli).
 
@@ -32,7 +32,7 @@ ergo report --policy policy.yaml --input deployments.json
 ergo violations --policy policy.yaml --input deployments.json
 ```
 
-The report is the one the [README](README.md#the-report) shows, apart from `engine`, which says `{"name": "ergo-rust", "version": "0.3.0"}`. The violations are the same too.
+The report is the one the [README](README.md#the-report) shows, apart from `engine`, which says `{"name": "ergo-rust", "version": "0.4.0"}`. The violations are the same too.
 
 `--params <file>` gives the policy its params. The file holds the params themselves, like `limit: 9`, without a `params:` key around them, and without `--params` they are `{}`. The output has sorted keys and two-space indents, like `opa eval --format=pretty`, and `--compact` prints one line. `ergo --version` prints the version.
 
