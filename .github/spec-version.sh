@@ -9,7 +9,7 @@ fail() {
 }
 
 swept_paths=(
-  engines/rego/ergo.rego
+  engines/rego/src
   engines/rust/engine
   REFERENCE.md
   OPA.md
@@ -48,8 +48,8 @@ files_with() {
 if [ "${1:-}" = set ]; then
   new=${2:-}
   [[ $new =~ ^v[0-9]+\.[0-9]+(-dev)?$ ]] || fail "Usage: .github/spec-version.sh set vX.Y or vX.Y-dev"
-  old=$(sed -n 's/^_spec := "\(v[0-9][0-9.]*\(-dev\)\{0,1\}\)"$/\1/p' engines/rego/ergo.rego)
-  [ -n "$old" ] || fail 'ergo.rego must say _spec := "vX.Y" or _spec := "vX.Y-dev"'
+  old=$(sed -n 's/^_spec := "\(v[0-9][0-9.]*\(-dev\)\{0,1\}\)"$/\1/p' engines/rego/src/shared/basics.rego)
+  [ -n "$old" ] || fail 'engines/rego/src/shared/basics.rego must say _spec := "vX.Y" or _spec := "vX.Y-dev"'
   [ "$new" != "$old" ] || fail "The spec already says $old"
   pattern=$(version_pattern "$old")
   for f in $(files_with "$old"); do
@@ -87,8 +87,8 @@ defining=(
   spec/cases
 )
 
-rego=$(sed -n 's/^_spec := "v\([0-9][0-9.]*\(-dev\)\{0,1\}\)"$/\1/p' engines/rego/ergo.rego)
-[ -n "$rego" ] || fail 'ergo.rego must say _spec := "vX.Y" or _spec := "vX.Y-dev"'
+rego=$(sed -n 's/^_spec := "v\([0-9][0-9.]*\(-dev\)\{0,1\}\)"$/\1/p' engines/rego/src/shared/basics.rego)
+[ -n "$rego" ] || fail 'engines/rego/src/shared/basics.rego must say _spec := "vX.Y" or _spec := "vX.Y-dev"'
 
 for name in policy report; do
   id=$(sed -n "s|^ *\"\\\$id\": *\".*/spec/\\([^/]*\\)/$name.schema.json\",\{0,1\}\$|\\1|p" "spec/$name/schema.json")

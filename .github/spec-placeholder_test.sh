@@ -5,12 +5,12 @@ dir=$(mktemp -d)
 trap 'rm -rf "$dir"' EXIT
 cd "$dir"
 git init --quiet
-mkdir -p engines/rego engines/rust/engine/src engines/rust/engine/tests spec/cases/demo engines/rust/engine/tests/regressions/demo
-echo '_spec := "v0.6-dev"' > engines/rego/ergo.rego
+mkdir -p engines/rego/src/shared engines/rego/tests engines/rust/engine/src engines/rust/engine/tests spec/cases/demo engines/rust/engine/tests/regressions/demo
+echo '_spec := "v0.6-dev"' > engines/rego/src/shared/basics.rego
 echo 'pub const SPEC: &str = "v0.6-dev";' > engines/rust/engine/src/policy.rs
 echo 'fn t() { let _ = SPEC; }' > engines/rust/engine/tests/demo.rs
-echo 'package ergo_test' > engines/rego/ergo_test.rego
-echo 'package spec_test' > engines/rego/spec_test.rego
+echo 'package ergo_test' > engines/rego/tests/ergo_test.rego
+echo 'package spec_test' > engines/rego/tests/spec_test.rego
 echo '[{"policy": {"ergo_spec": "{{spec}}"}, "other": "v0.5", "rc": "v0.6-dev-rc", "close": "v0.6-dev2", "longer": "xv0.6-dev", "wide": "v0.60-dev", "suffix": "v0.6-devx", "minor": "v0.6-dev.1", "bare": "0.6-dev"}]' > spec/cases/demo/cases.json
 echo '[{"policy": {"ergo_spec": "{{spec}}"}}]' > engines/rust/engine/tests/regressions/demo/regressions.json
 git add .
@@ -36,13 +36,13 @@ sh "$script"
 
 echo "spec-placeholder.sh fails and names each file that writes the current version"
 echo '[{"report": {"ergo": "v0.6-dev"}}]' > engines/rust/engine/tests/regressions/demo/regressions.json
-echo 'x := {"ergo_spec": "v0.6-dev"}' >> engines/rego/ergo_test.rego
+echo 'x := {"ergo_spec": "v0.6-dev"}' >> engines/rego/tests/ergo_test.rego
 echo '[{"policy": {"ergo_spec": "v0.6-dev"}}]' > spec/cases/demo/cases.json
 git add .
-fails "spec/cases/demo/cases.json" "engines/rust/engine/tests/regressions/demo/regressions.json" "engines/rego/ergo_test.rego" "Write {{spec}} instead"
+fails "spec/cases/demo/cases.json" "engines/rust/engine/tests/regressions/demo/regressions.json" "engines/rego/tests/ergo_test.rego" "Write {{spec}} instead"
 
 echo "spec-placeholder.sh fails when the version is followed or preceded by punctuation"
-echo 'package ergo_test' > engines/rego/ergo_test.rego
+echo 'package ergo_test' > engines/rego/tests/ergo_test.rego
 echo '[{"report": {"ergo": "ok"}}]' > engines/rust/engine/tests/regressions/demo/regressions.json
 for text in 'expected v0.6-dev.' 'v0.6-dev_a' 'a_v0.6-dev' 'v0.6-dev, then' '(v0.6-dev)' 'v0.6-dev'; do
   printf '[{"text": "%s"}]\n' "$text" > spec/cases/demo/cases.json
@@ -64,7 +64,7 @@ printf '[{"text": "%s"}]\n' 'v0.6-dev' > spec/cases/demo/cases.json
 fails "spec/cases/demo/cases.json"
 
 echo "spec-placeholder.sh does the same when _spec has no -dev"
-echo '_spec := "v0.6"' > engines/rego/ergo.rego
+echo '_spec := "v0.6"' > engines/rego/src/shared/basics.rego
 echo 'pub const SPEC: &str = "v0.6";' > engines/rust/engine/src/policy.rs
 for text in 'v0.6.' 'v0.6_a' 'a_v0.6' 'v0.6'; do
   printf '[{"text": "%s"}]\n' "$text" > spec/cases/demo/cases.json
@@ -74,7 +74,7 @@ for text in 'v0.6-dev' 'v0.60' 'v0.6.1' 'v0.6x' 'v0.6-rc'; do
   printf '[{"text": "%s"}]\n' "$text" > spec/cases/demo/cases.json
   sh "$script"
 done
-echo '_spec := "v0.6-dev"' > engines/rego/ergo.rego
+echo '_spec := "v0.6-dev"' > engines/rego/src/shared/basics.rego
 echo 'pub const SPEC: &str = "v0.6-dev";' > engines/rust/engine/src/policy.rs
 echo '[{"text": "{{spec}}"}]' > spec/cases/demo/cases.json
 
@@ -105,7 +105,7 @@ fails "policy.rs is missing"
 echo 'pub const SPEC: &str = "v0.6-dev";' > engines/rust/engine/src/policy.rs
 
 echo "spec-placeholder.sh fails when a path it scans is missing"
-for path in spec/cases engines/rust/engine/tests/regressions engines/rego/ergo_test.rego engines/rego/spec_test.rego; do
+for path in spec/cases engines/rust/engine/tests/regressions engines/rego/tests; do
   /bin/mv -f "$path" "$path.away"
   fails "$path is missing"
   /bin/mv -f "$path.away" "$path"

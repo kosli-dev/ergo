@@ -47,7 +47,7 @@ Here is one case, from `cases/present`. Its group's policy has a `thing` subject
 }
 ```
 
-`{{spec}}` stands for the spec version the engine reads. Write it wherever a case needs the current version, in a policy's `ergo_spec`, in a report's `ergo` and inside text like `unsupported version v0.1, expected {{spec}}`, and every reader of the cases fills it in, so moving the spec version edits no case, and no file that writes it. A case that means another version, like `v0.1` for one the spec rejects, writes it out. `.github/spec-placeholder.sh` fails when the cases, the Rust regression files, `ergo_test.rego` or `spec_test.rego` write the current version, or when `SPEC` in the Rust engine differs from `_spec`. The same script fails when a Rust file under `engines/rust` other than `policy.rs` writes the current version: Rust tests use `SPEC` from `ergo_policy_engine`.
+`{{spec}}` stands for the spec version the engine reads. Write it wherever a case needs the current version, in a policy's `ergo_spec`, in a report's `ergo` and inside text like `unsupported version v0.1, expected {{spec}}`, and every reader of the cases fills it in, so moving the spec version edits no case, and no file that writes it. A case that means another version, like `v0.1` for one the spec rejects, writes it out. `.github/spec-placeholder.sh` fails when the cases, the Rust regression files or the Rego tests in `engines/rego/tests` write the current version, or when `SPEC` in the Rust engine differs from `_spec`. The same script fails when a Rust file under `engines/rust` other than `policy.rs` writes the current version: Rust tests use `SPEC` from `ergo_policy_engine`.
 
 This is the case:
 
@@ -68,16 +68,17 @@ This is the case:
 
 `python3 spec/check_rules.py` fails when a case cites a rule that doesn't exist, or when no case cites a rule. A rule can go without cases only while it's listed under [Rules without cases](OPEN.md#rules-without-cases) in `OPEN.md`, and the script also fails when a rule on that list has a case or doesn't exist.
 
-`spec/sentences-corpus.json` holds every sentence, `for` line and `from` line of `sentences-corpus.md` as a list, so that [`ergo_test.rego`](../engines/rego/ergo_test.rego) can parse each one. `python3 spec/sentences_corpus.py` writes it from the markdown, and `python3 spec/sentences_corpus.py --check` fails when it's out of date.
+`spec/sentences-corpus.json` holds every sentence, `for` line and `from` line of `sentences-corpus.md` as a list, so that the Rego tests in [`engines/rego/tests`](../engines/rego/tests) can parse each one. `python3 spec/sentences_corpus.py` writes it from the markdown, and `python3 spec/sentences_corpus.py --check` fails when it's out of date.
 
 `spec/check_grammar.py` reads every sentence of the corpus and the cases, and a few thousand more generated from [`sentences.abnf`](sentences.abnf), with `ergo.rego` and with a parser built from the ABNF (`abnf` on PyPI). It fails when one reads a sentence and the other rejects it as a matter of syntax, apart from the ones listed under [Sentences the ABNF and ergo.rego read differently](OPEN.md#sentences-the-abnf-and-ergorego-read-differently) in `OPEN.md`.
 
 ## Running the cases
 
-[`spec_test.rego`](../engines/rego/spec_test.rego) runs every case against `ergo.rego`, with one test for each folder of cases, so no test runs long enough to hit the timeout. A new folder needs its test added there too, and a test fails until it is. Its `known_differences` lists the cases an implementation is known to fail, which is where it still differs from the spec. A folder's test fails when another case in it fails, and also when a listed case passes, so the list stays true.
+[`spec_test.rego`](../engines/rego/tests/spec_test.rego) runs every case against `ergo.rego`, with one test for each folder of cases, so no test runs long enough to hit the timeout. A new folder needs its test added there too, and a test fails until it is. Its `known_differences` lists the cases an implementation is known to fail, which is where it still differs from the spec. A folder's test fails when another case in it fails, and also when a listed case passes, so the list stays true.
 
 To list the cases `ergo.rego` fails:
 
 ```sh
-opa eval -d engines/rego -d spec:spec --format pretty 'data.spec_test.failures'
+.github/build-ergo.sh
+opa eval -d engines/rego -d dist -d spec:spec --ignore src --format pretty 'data.spec_test.failures'
 ```

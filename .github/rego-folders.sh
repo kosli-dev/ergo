@@ -9,3 +9,11 @@ if [ -n "$stray" ]; then
   echo "Add their folder to the OPA commands in .github/workflows/test.yml and AGENTS.md, and to .github/rego-folders.sh."
   exit 1
 fi
+
+hidden=$(git ls-files '*.rego' | grep -E '(^|/)src/' | grep -v -E '^engines/rego/src/' || true)
+if [ -n "$hidden" ]; then
+  echo "These Rego files are in a folder named src, which the OPA commands skip with --ignore src:"
+  printf '%s\n' "$hidden" | sed 's/^/  /'
+  echo "Only engines/rego/src may hold Rego in a folder named src. Rename the folder."
+  exit 1
+fi

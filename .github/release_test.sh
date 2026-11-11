@@ -9,7 +9,7 @@ git clone --quiet "$dir/origin.git" "$dir/work" 2> /dev/null
 cd "$dir/work"
 git config user.name test
 git config user.email test@example.com
-mkdir -p .github bin engines/rego spec/policy spec/report engines/rust/engine engines/rust/cli engines/rust/sentences-wasm
+mkdir -p .github bin engines/rego/src/shared spec/policy spec/report engines/rust/engine engines/rust/cli engines/rust/sentences-wasm
 cp "$script" .github/release.sh
 printf '%s\n' '#!/bin/sh' 'echo 1' > bin/gh
 chmod +x bin/gh
@@ -24,7 +24,7 @@ readme() {
 
 setup() {
   readme ergo-rego 0.1.0 ergo-rust 0.1.0
-  printf '%s\n' 'version := "0.1.0-dev"' '_spec := "v0.1"' > engines/rego/ergo.rego
+  printf '%s\n' 'version := "0.1.0-dev"' '_spec := "v0.1"' > engines/rego/src/shared/basics.rego
   printf '%s\n' '## 0.1.0' 'First.' > CHANGELOG.md
   printf '%s\n' '## 0.1' 'First.' > spec/CHANGELOG.md
   printf '%s\n' '{' '  "$id": "https://ergo.kosli.com/spec/0.1/policy.schema.json"' '}' > spec/policy/schema.json

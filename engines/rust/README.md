@@ -14,9 +14,9 @@ It has five crates. The first three, `ergo-policy-sentences`, `ergo-policy-engin
 
 ## The cases
 
-`engine/tests/cases.rs` builds the report for every case in `spec/cases` and compares it the way [`spec_test.rego`](../rego/spec_test.rego) does, as [`spec/README.md`](../../spec/README.md#cases) describes. It prints how many cases pass, like `1365 of 1365 cases pass`.
+`engine/tests/cases.rs` builds the report for every case in `spec/cases` and compares it the way [`spec_test.rego`](../rego/tests/spec_test.rego) does, as [`spec/README.md`](../../spec/README.md#cases) describes. It prints how many cases pass, like `1365 of 1365 cases pass`.
 
-`known-failures.txt` lists the cases the engine fails, one per line, named like in [`spec_test.rego`](../rego/spec_test.rego): the folder, the group's description and the case's description, joined by ` / `. The test fails when a case fails that isn't listed, and when a listed case passes, so the list only shrinks. When a case starts passing, the test names it, and you delete its line.
+`known-failures.txt` lists the cases the engine fails, one per line, named like in [`spec_test.rego`](../rego/tests/spec_test.rego): the folder, the group's description and the case's description, joined by ` / `. The test fails when a case fails that isn't listed, and when a listed case passes, so the list only shrinks. When a case starts passing, the test names it, and you delete its line.
 
 ## Running the checks
 
@@ -101,7 +101,8 @@ The `wasm` profile aborts on a panic. In JavaScript that is a `WebAssembly.Runti
 
 ```sh
 python3 engines/rust/bench/make_inputs.py /tmp/ergo-bench
-opa eval -d engines/rego/ergo.rego -d /tmp/ergo-bench/bench.rego -d /tmp/ergo-bench/data.json -i /tmp/ergo-bench/input-1000.json --metrics --format json 'data.bench.report' > /tmp/ergo-bench/opa.json
+.github/build-ergo.sh
+opa eval -d dist/ergo.rego -d /tmp/ergo-bench/bench.rego -d /tmp/ergo-bench/data.json -i /tmp/ergo-bench/input-1000.json --metrics --format json 'data.bench.report' > /tmp/ergo-bench/opa.json
 jq '.result[0].expressions[0].value' /tmp/ergo-bench/opa.json > /tmp/ergo-bench/rego.json
 jq '.metrics.timer_rego_query_eval_ns / 1e9' /tmp/ergo-bench/opa.json
 docker run --rm -v "$PWD":/src -v /tmp/ergo-bench:/bench -v ergo-rust-target:/target -v ergo-cargo-registry:/usr/local/cargo/registry ergo-rust \

@@ -9,7 +9,7 @@ pnpm --filter @kosli/ergo-playground build
 open playground/dist/playground.html
 ```
 
-The build needs `opa` on your PATH, because it compiles `ergo.rego` to Wasm for the Report view. It also needs the Rust engine built to Wasm in `engines/rust/wasm/pkg`, which the Report view can run instead, and the Rust sentence parser built to Wasm in `engines/rust/sentences-wasm/pkg`: see "Building for a browser" in `engines/rust/README.md` for both. It prints the OPA version it used, and warns when that isn't the one the README tests with.
+The build needs `opa` on your PATH, because it builds `dist/ergo.rego` with `.github/build-ergo.sh` and compiles it to Wasm for the Report view. It also needs the Rust engine built to Wasm in `engines/rust/wasm/pkg`, which the Report view can run instead, and the Rust sentence parser built to Wasm in `engines/rust/sentences-wasm/pkg`: see "Building for a browser" in `engines/rust/README.md` for both. It prints the OPA version it used, and warns when that isn't the one the README tests with.
 
 Local builds use the working tree's engines and samples. The website keeps the interface and Markdown compiler on `main`, but uses published engine releases and the samples from the Rego release. Its build sets `ERGO_PLAYGROUND_SAMPLE_CASES` to a JSON file holding that release's sample names and case folders, so a new sample on `main` does not require an engine release.
 

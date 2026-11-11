@@ -53,6 +53,17 @@ jobs:
           app-id: ${{ inputs.app-id }}
           private-key: ${{ secrets.app-private-key }}
 
+      - name: Check out Ergo main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: kosli-dev/ergo
+          ref: main
+          path: ergo
+          persist-credentials: false
+
+      - name: Build ergo.rego from its parts
+        run: ergo/.github/build-ergo.sh ergo
+
       - name: Open or refresh a PR when the copy is behind Ergo main
         id: pr
         env:
@@ -65,10 +76,10 @@ jobs:
           base=${BASE:-$(gh api "repos/$REPO" --jq .default_branch)}
           branch=update-ergo
 
-          ergo_sha=$(gh api repos/kosli-dev/ergo/commits/main --jq .sha)
+          ergo_sha=$(git -C ergo rev-parse HEAD)
           short=${ergo_sha:0:7}
           echo "ergo=$short" >> "$GITHUB_OUTPUT"
-          ergo_blob=$(gh api "repos/kosli-dev/ergo/contents/engines/rego/ergo.rego?ref=$ergo_sha" --jq .sha)
+          ergo_blob=$(git hash-object ergo/dist/ergo.rego)
 
           # Equal blob SHAs mean equal content, in any repo.
           base_blob=$(gh api "repos/$REPO/contents/$TARGET?ref=$base" --jq .sha)
@@ -96,7 +107,7 @@ jobs:
           fi
 
           # The contents API commits through GitHub, so an app token gets a signed commit.
-          content=$(gh api "repos/kosli-dev/ergo/contents/engines/rego/ergo.rego?ref=$ergo_sha" --jq '.content | gsub("\n"; "")')
+          content=$(base64 -w 0 ergo/dist/ergo.rego)
           gh api -X PUT "repos/$REPO/contents/$TARGET" \
             -f branch="$branch" \
             -f sha="$parent_blob" \
@@ -108,7 +119,7 @@ jobs:
           title="Update ergo.rego to ergo $short"
           body="Copies \`ergo.rego\` from kosli-dev/ergo@$ergo_sha into \`$TARGET\`.
 
-          Changes in ergo: https://github.com/kosli-dev/ergo/commits/$ergo_sha/engines/rego/ergo.rego"
+          Changes in ergo: https://github.com/kosli-dev/ergo/commits/$ergo_sha/engines/rego/src"
           if [ -n "$pr" ]; then
             gh pr edit "$pr" --title "$title" --body "$body"
             echo "change=refreshed" >> "$GITHUB_OUTPUT"
