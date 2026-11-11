@@ -24,7 +24,7 @@ export const readYaml = (text) => {
   }
   const policy = doc.toJS();
   if (!policy || typeof policy !== "object" || Array.isArray(policy)) {
-    return { policy: null, problems: [{ path: "line 1", message: "a policy is a YAML mapping, starting with ergo_spec: v0.6-dev" }] };
+    return { policy: null, problems: [{ path: "line 1", message: "a policy is a YAML mapping, starting with ergo_spec: v0.6" }] };
   }
   return { policy, problems: [] };
 };

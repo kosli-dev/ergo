@@ -150,7 +150,7 @@ Params are the third argument to `ergo.report`. Ergo doesn't look for them anywh
 `ergo.rego` compares numbers with OPA, and OPA can treat two decimals as the same when they only differ after the 15th significant digit. Whole numbers are always compared exactly. With this policy and this input:
 
 ```yaml
-ergo_spec: v0.6-dev
+ergo_spec: v0.6
 subjects:
   row:
     from: rows
@@ -201,7 +201,7 @@ or `["missing"]` when the compiled policy has no `engine`. That only tells relea
 A `make` rule keeps it fresh, since it runs again when either file changes. With this `policy.yaml`:
 
 ```yaml
-ergo_spec: v0.6-dev
+ergo_spec: v0.6
 subjects:
   deployment:
     from: deployments
@@ -270,7 +270,7 @@ The [reference](REFERENCE.md#policies-written-before-01) says what spec 0.1 stop
 
 ### Moving a policy to sentences
 
-`ergo.as_sentences(policy)` rewrites a policy written the old way into sentences, wherever a sentence reads back as exactly what was written. It always sets `ergo_spec: v0.6-dev` on what it returns. Anything it can't rewrite stays as it was, and under 0.1 that is written wrong, so you rewrite those parts by hand. With this `policy.yaml`:
+`ergo.as_sentences(policy)` rewrites a policy written the old way into sentences, wherever a sentence reads back as exactly what was written. It always sets `ergo_spec: v0.6` on what it returns. Anything it can't rewrite stays as it was, and under 0.1 that is written wrong, so you rewrite those parts by hand. With this `policy.yaml`:
 
 ```yaml
 subjects:
@@ -301,7 +301,7 @@ opa eval -d ergo.rego -d policy.yaml --format raw \
 prints:
 
 ```yaml
-ergo_spec: v0.6-dev
+ergo_spec: v0.6
 requirements:
   approved:
     checks:
