@@ -64,7 +64,7 @@ jobs:
             exit 1
           fi
           if grep -q '^_spec := "v.*-dev"$' engines/rego/src/shared/basics.rego; then
-            echo "ergo.rego says $(grep -m 1 '^_spec := ' engines/rego/src/shared/basics.rego), a spec that isn't released. Release the spec first, or with this tag."
+            echo "basics.rego says $(grep -m 1 '^_spec := ' engines/rego/src/shared/basics.rego), a spec that isn't released. Release the spec first, or with this tag."
             exit 1
           fi
       - uses: open-policy-agent/setup-opa@v2
@@ -218,7 +218,7 @@ jobs:
         shell: bash
         run: |
           if grep -q '^_spec := "v.*-dev"$' engines/rego/src/shared/basics.rego; then
-            echo "ergo.rego says $(grep -m 1 '^_spec := ' engines/rego/src/shared/basics.rego), so this spec isn't ready. Drop -dev from the spec everywhere first."
+            echo "basics.rego says $(grep -m 1 '^_spec := ' engines/rego/src/shared/basics.rego), so this spec isn't ready. Drop -dev from the spec everywhere first."
             exit 1
           fi
           for name in policy report; do
@@ -228,7 +228,7 @@ jobs:
             fi
           done
           if ! grep -qxF "_spec := \"v$VERSION\"" engines/rego/src/shared/basics.rego; then
-            echo "ergo.rego must say _spec := \"v$VERSION\""
+            echo "basics.rego must say _spec := \"v$VERSION\""
             exit 1
           fi
           if ! grep -qxF "## $VERSION" spec/CHANGELOG.md; then

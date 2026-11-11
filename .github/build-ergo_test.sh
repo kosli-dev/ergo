@@ -59,6 +59,49 @@ printf 'package ergo\n\nimport rego.v1\n\nimport data.x\n' > engines/rego/src/b/
 if sh "$script" "$dir" > /dev/null 2>&1; then
   fail "build-ergo.sh should fail on a second import, and passed"
 fi
-[ "$(cat dist/ergo.rego)" = "$(printf '# License\n\npackage ergo\n\nimport rego.v1\n\na := 1\n\nc := 3\n\nb := 2')" ] || fail "a failed build should leave the last dist/ergo.rego alone"
+[ ! -e dist/ergo.rego ] || fail "a failed build should not leave an older dist/ergo.rego in place"
+
+refuses() {
+  name=$1
+  file=$2
+  content=$3
+  echo "build-ergo.sh fails on $name and names the file"
+  sh "$script" "$dir" > /dev/null
+  [ -f dist/ergo.rego ] || fail "the build before $name should have worked"
+  printf "$content" > "$file"
+  if out=$(sh "$script" "$dir" 2>&1); then
+    fail "build-ergo.sh should fail on $name, and passed"
+  fi
+  case $out in
+    *"$file"*) ;;
+    *) fail "build-ergo.sh should name $file for $name, and said: $out" ;;
+  esac
+  [ ! -e dist/ergo.rego ] || fail "a build that failed on $name left dist/ergo.rego in place"
+  /bin/rm -f "$file"
+}
+
+/bin/rm -f engines/rego/src/b/three.rego
+refuses "an empty part" engines/rego/src/b/three.rego ''
+refuses "a part that is only the package line" engines/rego/src/b/three.rego 'package ergo\n'
+refuses "a part without the import line" engines/rego/src/b/three.rego 'package ergo\n\nd := 4\n'
+refuses "a part with an indented import" engines/rego/src/b/three.rego 'package ergo\n\nimport rego.v1\n\nd := 4\n  import data.x\n'
+refuses "a part with a second package line" engines/rego/src/b/three.rego 'package ergo\n\nimport rego.v1\n\nd := 4\npackage ergo\n'
+refuses "a part with a space in its path" "engines/rego/src/b/a b.rego" 'package ergo\n\nimport rego.v1\n\nd := 4\n'
+
+package_text=$(cat engines/rego/src/package.rego)
+for bad in 'package other\n\nimport rego.v1\n' 'package ergo\n' 'package ergo\n\nimport rego.v1\n\nimport data.x\n' 'package ergo\n\nimport rego.v1\n\n  package ergo\n' '# License\n\nimport rego.v1\n'; do
+  echo "build-ergo.sh fails on a package.rego that breaks the rules, and names it"
+  sh "$script" "$dir" > /dev/null
+  printf "$bad" > engines/rego/src/package.rego
+  if out=$(sh "$script" "$dir" 2>&1); then
+    fail "build-ergo.sh should fail on a package.rego like $bad, and passed"
+  fi
+  case $out in
+    *"engines/rego/src/package.rego"*) ;;
+    *) fail "build-ergo.sh should name package.rego, and said: $out" ;;
+  esac
+  [ ! -e dist/ergo.rego ] || fail "a build that failed on package.rego left dist/ergo.rego in place"
+  printf '%s\n' "$package_text" > engines/rego/src/package.rego
+done
 
 echo "build-ergo.sh tests passed"

@@ -40,3 +40,31 @@ case $out in
     exit 1
     ;;
 esac
+
+echo "rego-folders.sh fails on Rego under a folder named src other than engines/rego/src, which --ignore src would skip"
+git rm --quiet --cached tools/helper.rego engines/rust/other/other_test.rego spec/stray.rego
+/bin/rm -f tools/helper.rego engines/rust/other/other_test.rego spec/stray.rego
+sh "$script"
+mkdir -p engines/rego/tests/src examples/baking/src
+echo "package hidden" > engines/rego/tests/src/hidden_test.rego
+echo "package hidden" > examples/baking/src/hidden.rego
+git add .
+if out=$(sh "$script" 2>&1); then
+  echo "rego-folders.sh should fail on Rego under a src folder, and passed" >&2
+  exit 1
+fi
+for expected in "engines/rego/tests/src/hidden_test.rego" "examples/baking/src/hidden.rego"; do
+  case $out in
+    *"$expected"*) ;;
+    *)
+      echo "rego-folders.sh should say \"$expected\", and said: $out" >&2
+      exit 1
+      ;;
+  esac
+done
+case $out in
+  *"engines/rego/src/package.rego"*)
+    echo "rego-folders.sh should not name engines/rego/src/package.rego, and said: $out" >&2
+    exit 1
+    ;;
+esac
