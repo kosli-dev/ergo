@@ -78,9 +78,9 @@ The report is the one the [README](README.md#the-report) shows, and its `engine`
   "compliant": false,
   "engine": {
     "name": "ergo-rego",
-    "version": "0.5.0"
+    "version": "0.6.0"
   },
-  "ergo": "v0.5",
+  "ergo": "v0.6",
   ...
 }
 ```
