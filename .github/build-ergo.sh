@@ -16,6 +16,14 @@ if [ "${1:-}" = "where" ]; then
   exit 0
 fi
 
+release=""
+if [ "${1:-}" = "--release" ]; then
+  [ $# -ge 3 ] || { echo "Usage: build-ergo.sh --release VERSION COMMIT [DIR]" >&2; exit 1; }
+  release=$2
+  commit=$3
+  shift 3
+fi
+
 cd "${1:-$(dirname "$0")/..}"
 /bin/rm -f "$out" "$map"
 [ -f "$src/package.rego" ] || { echo "No $src/package.rego in $PWD." >&2; exit 1; }
@@ -40,9 +48,37 @@ awk -v file="$src/package.rego" '
 mkdir -p dist
 tmp_out=$(mktemp)
 tmp_map=$(mktemp)
-trap 'rm -f "$tmp_out" "$tmp_map"' EXIT
+tmp_body=$(mktemp)
+tmp_body_map=$(mktemp)
+trap 'rm -f "$tmp_out" "$tmp_map" "$tmp_body" "$tmp_body_map"' EXIT
 
-awk -v map="$tmp_map" -v head="$src/package.rego" '
+if [ -z "$release" ]; then
+  printf '%s\n' \
+    '# DO NOT EDIT. Built by .github/build-ergo.sh from engines/rego/src.' \
+    '# Change the parts there, then run the build again. This file is not committed.' \
+    '' > "$tmp_out"
+else
+  case $release in
+    *[!0-9.]* | .* | *. | *..*) echo "The release version must be a plain number like 0.6.0, not $release." >&2; exit 1 ;;
+  esac
+  spec=$(sed -n 's/^_spec := "\(v[0-9][0-9.]*\)"$/\1/p' "$src/shared/basics.rego")
+  [ -n "$spec" ] || { echo "$src/shared/basics.rego has no _spec := \"vX.Y\" line." >&2; exit 1; }
+  grep -qxF "version := \"$release-dev\"" "$src/shared/basics.rego" || { echo "$src/shared/basics.rego must say version := \"$release-dev\"." >&2; exit 1; }
+  epoch=${SOURCE_DATE_EPOCH:-$(date -u +%s)}
+  built=$(date -u -d "@$epoch" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -r "$epoch" +%Y-%m-%dT%H:%M:%SZ)
+  printf '%s\n' \
+    "# Ergo $release, the Rego engine. Implements spec $spec." \
+    "# Built from commit $commit on $built." \
+    "# Project: https://github.com/kosli-dev/ergo" \
+    "# Read about it in OPA.md in the project." \
+    "# License: Apache-2.0. The notice below holds the license text." \
+    "# This is a release file. If you edit your copy, the changes are yours." \
+    '' > "$tmp_out"
+fi
+header_lines=$(wc -l < "$tmp_out" | tr -d ' ')
+awk -v n="$header_lines" 'BEGIN { for (i = 0; i < n; i++) print "-" }' > "$tmp_map"
+
+awk -v map="$tmp_body_map" -v head="$src/package.rego" '
   function emit(line, from) { print line; print from > map }
   function fail(msg) { bad = msg; exit 1 }
   function short(name) { return name ": must start with package ergo, an empty line, import rego.v1 and an empty line" }
@@ -61,7 +97,15 @@ awk -v map="$tmp_map" -v head="$src/package.rego" '
     if (bad == "" && last != head && lines < 4) bad = short(last)
     if (bad != "") { print bad > "/dev/stderr"; exit 1 }
   }
-' "$src/package.rego" $parts > "$tmp_out"
+' "$src/package.rego" $parts > "$tmp_body"
+
+if [ -n "$release" ]; then
+  sed "s/^version := \"$release-dev\"$/version := \"$release\"/" "$tmp_body" > "$tmp_body.stamped"
+  /bin/mv -f "$tmp_body.stamped" "$tmp_body"
+  grep -qxF "version := \"$release\"" "$tmp_body" || { echo "The build did not stamp version := \"$release\"." >&2; exit 1; }
+fi
+cat "$tmp_body" >> "$tmp_out"
+cat "$tmp_body_map" >> "$tmp_map"
 
 /bin/mv -f "$tmp_out" "$out"
 /bin/mv -f "$tmp_map" "$map"

@@ -80,11 +80,14 @@ jobs:
             echo "The test workflow hasn't passed on this commit yet. Wait for it, then re-run this job."
             exit 1
           fi
-      - name: Write the release copy, built from the parts, which says the version without -dev
+      - name: Write the release copy, built from the parts, which says the version without -dev and has the release header
         shell: bash
         run: |
-          sed "s/^version := \"$VERSION-dev\"$/version := \"$VERSION\"/" dist/ergo.rego > "$RUNNER_TEMP/ergo.rego"
+          .github/build-ergo.sh --release "$VERSION" "$(git rev-parse HEAD)"
+          /bin/cp -f dist/ergo.rego "$RUNNER_TEMP/ergo.rego"
           grep -qxF "version := \"$VERSION\"" "$RUNNER_TEMP/ergo.rego"
+          grep -qxF "# Ergo $VERSION, the Rego engine. Implements spec $(sed -n 's/^_spec := "\(v[0-9.]*\)"$/\1/p' engines/rego/src/shared/basics.rego)." "$RUNNER_TEMP/ergo.rego"
+          ! grep -q 'DO NOT EDIT' "$RUNNER_TEMP/ergo.rego"
           opa check --strict "$RUNNER_TEMP/ergo.rego"
       - name: Create the release, which is the latest only when it's the highest ergo.rego version
         shell: bash
